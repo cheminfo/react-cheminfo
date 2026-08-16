@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 
 import type { CitationFormatId } from '../formats.ts';
 import { CITATION_FORMATS, formatCitation } from '../formats.ts';
+import type { Reference } from '../reference.ts';
 import { doiUrl } from '../reference.ts';
 import type { CitationStyleId } from '../segments.ts';
 import { CITATION_STYLES, citationSegments } from '../segments.ts';
@@ -118,6 +119,25 @@ test('every format of every style carries the DOI', () => {
       );
     }
   }
+});
+
+test('a journal paginating by article number is cited on one number', () => {
+  // Journal of Cheminformatics 14, 24 (2022): an article number, so writing it
+  // as `24–24` would name a range the article does not have.
+  const article: Reference = {
+    ...PAPER,
+    journalAbbreviation: 'J. Cheminform.',
+    year: 2022,
+    volume: '14',
+    firstPage: '24',
+    lastPage: '24',
+  };
+
+  expect(formatCitation(article, 'text')).toContain(
+    'J. Cheminform. 2022, 14, 24.',
+  );
+  expect(formatCitation(article, 'text', 'nature')).toContain('14, 24 (2022).');
+  expect(formatCitation(article, 'bibtex')).toContain('pages = {24},');
 });
 
 test('an unknown format or style is refused', () => {

@@ -164,7 +164,15 @@ function initialsFirst(reference: Reference, lastSeparator: string): string {
   return `${names.slice(0, -1).join(', ')}${lastSeparator}${last}`;
 }
 
-function pageRange(reference: Reference): string {
-  // En dash: what every style asks for in a page range.
-  return `${reference.firstPage}–${reference.lastPage}`;
+/**
+ * The pages of a work, as its styles write them.
+ * @param reference - The work being written.
+ * @param dash - What joins the two ends, an en dash in every style but BibTeX.
+ * @returns One number for a journal that paginates by article number, the
+ * range otherwise.
+ */
+export function pageRange(reference: Reference, dash = '–'): string {
+  const { firstPage, lastPage } = reference;
+  if (firstPage === lastPage) return firstPage;
+  return `${firstPage}${dash}${lastPage}`;
 }

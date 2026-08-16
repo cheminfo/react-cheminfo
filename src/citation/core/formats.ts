@@ -2,7 +2,7 @@ import type { Reference } from './reference.ts';
 import { doiUrl } from './reference.ts';
 import { renderHtml, renderMarkdown, renderText } from './render.ts';
 import type { CitationStyleId } from './segments.ts';
-import { citationSegments } from './segments.ts';
+import { citationSegments, pageRange } from './segments.ts';
 
 /** The formats the reference can be copied in. */
 export type CitationFormatId =
@@ -113,7 +113,6 @@ export function formatCitation(
 
 function formatBibTeX(reference: Reference): string {
   const { title, journal, year, volume, issue, publisher, doi } = reference;
-  const { firstPage, lastPage } = reference;
   const fields: Array<[string, string]> = [
     ['author', authorList(reference, ' and ')],
     ['title', title],
@@ -121,7 +120,7 @@ function formatBibTeX(reference: Reference): string {
     ['year', String(year)],
     ['volume', volume],
     ['number', issue],
-    ['pages', `${firstPage}--${lastPage}`],
+    ['pages', pageRange(reference, '--')],
     ['publisher', publisher],
     ['doi', doi],
     ['url', doiUrl(reference)],
