@@ -84,15 +84,15 @@ import { EcosystemButton } from 'react-cheminfo/ui';
 ```
 
 - `currentSiteId` is the one thing that differs per site: that tile is shown
-  with a _you are here_ label and is not a link. Passing nothing links all ten.
+  with a _you are here_ label and is not a link. Passing nothing links them all.
 - `compact` drops the text and the caret, leaving the icon alone to open the
   menu, for a header that has run out of room. The label stays what the pointer
   and a screen reader are told.
 - A tile **lights up in the colour of the site it opens**, so running the
-  pointer down the grid is what makes the ten pairs of colours read.
+  pointer down the grid is what makes the pairs of colours read.
 
 Each mark keeps the geometry of that site's own logo where it has one, redrawn
-on a plate of the site's own colour so ten marks from ten sites still read as
+on a plate of the site's own colour so every mark of the family still reads as
 one row, and carrying the site's answering colour on exactly one element —
 which is what stops it collapsing into a flat shape at 16 px.
 

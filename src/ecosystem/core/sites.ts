@@ -9,7 +9,10 @@ export type SiteId =
   | 'tex'
   | 'lcao'
   | 'regexp'
-  | 'pdb';
+  | 'pdb'
+  | 'elucidation'
+  | 'equilibrium'
+  | 'polycarp';
 
 export interface SiteName {
   /** First half of the name, set in the site's leading colour. */
@@ -151,6 +154,33 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brand: '#2563eb',
     brandAlt: '#b45309',
     mark: { plate: '#2563eb', accent: '#fbbf24' },
+  },
+  {
+    id: 'elucidation',
+    name: { lead: 'elucidation', alt: 'cheminfo', dot: true },
+    host: 'elucidation.cheminfo.org',
+    tagline: 'A structure from a 1H NMR spectrum and a formula.',
+    brand: '#7e22ce',
+    brandAlt: '#b45309',
+    mark: { plate: '#7e22ce', accent: '#f59e0b' },
+  },
+  {
+    id: 'equilibrium',
+    name: { lead: 'Equi', alt: 'Librium' },
+    host: 'equilibrium.cheminfo.org',
+    tagline: 'Chemical equilibria: pH, speciation and titration curves.',
+    brand: '#0b5754',
+    brandAlt: '#a56600',
+    mark: { plate: '#0b5754', accent: '#f2a71b' },
+  },
+  {
+    id: 'polycarp',
+    name: { lead: 'Poly', alt: 'Carp' },
+    host: 'polycarp.cheminfo.org',
+    tagline: 'Predict the microstructure of a radical copolymerisation.',
+    brand: '#0d1d37',
+    brandAlt: '#0c9ba3',
+    mark: { plate: '#0d1d37', accent: '#0c9ba3' },
   },
 ];
 

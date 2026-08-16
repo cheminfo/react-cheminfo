@@ -3,7 +3,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import type { EcosystemSite, SiteId } from '../core/sites.ts';
 
 // Every mark is drawn in the same 32×32 box, on a plate of the site's own
-// colour, so ten marks from ten sites still read as one row. Each keeps the
+// colour, so every mark of the family still reads as one row. Each keeps the
 // geometry of that site's own logo where it has one, and carries the site's
 // answering colour on exactly one element — which is what stops it collapsing
 // into a flat shape at 16 px.
@@ -202,6 +202,49 @@ const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <circle cx="9.2" cy="12.4" r="3.1" fill="#ffffff" />
       <circle cx="22" cy="15.4" r="3.1" fill="#ffffff" />
       <circle cx="15.6" cy="23" r="3.1" fill={alt} />
+    </>
+  ),
+  // The site's own favicon: a spectrum, and the one signal being assigned.
+  elucidation: (alt) => (
+    <>
+      <path
+        d="M5 24h4l2-11 2 11h4l2-15 2 15h3l1.5-7 1.5 7"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="19" cy="9" r="3" fill={alt} />
+    </>
+  ),
+  // The site's own favicon: the double harpoon, one direction per colour.
+  equilibrium: (alt) => (
+    <g
+      fill="none"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6.5 12.5h17l-4-4" stroke="#ffffff" />
+      <path d="M25.5 19.5h-17l4 4" stroke={alt} />
+    </g>
+  ),
+  // A chain of monomers, one of them the comonomer written into it.
+  polycarp: (alt) => (
+    <>
+      <path
+        d="M6.5 20 12.5 12 19.5 20 25.5 12"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="6.5" cy="20" r="3" fill="#ffffff" />
+      <circle cx="12.5" cy="12" r="3" fill="#ffffff" />
+      <circle cx="19.5" cy="20" r="3" fill={alt} />
+      <circle cx="25.5" cy="12" r="3" fill="#ffffff" />
     </>
   ),
 };
