@@ -1,0 +1,16 @@
+{
+  "extends": "@zakodium/tsconfig/jsx",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "outDir": "lib",
+    "types": ["node", "vite/client"]
+  },
+  "include": [
+    "src",
+    "stories",
+    "e2e",
+    ".storybook/**/*",
+    "playwright.config.ts",
+    "vitest.config.ts"
+  ]
+}

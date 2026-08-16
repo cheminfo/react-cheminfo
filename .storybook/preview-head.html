@@ -1,0 +1,69 @@
+<style>
+  /* The family's neutrals, geometry and type — identical on every site, so a
+   component is looked at in the surroundings it will actually sit in. */
+  :root {
+    --surface: #fff;
+    --surface-sunken: #f5f7fa;
+    --border: #dfe3e8;
+    --border-strong: #c3cad3;
+    --text: #16202c;
+    --text-muted: #5b6875;
+    --text-faint: #8a96a3;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgb(16 32 48 / 8%);
+    --shadow-md: 0 4px 14px rgb(16 32 48 / 10%);
+    --header-height: 3.5rem;
+
+    /* Overwritten by the Brand toolbar; these are the pair the canvas opens on. */
+    --brand: #2d72d2;
+    --brand-alt: #9a3412;
+    --accent: var(--brand);
+
+    color-scheme: light;
+  }
+
+  body {
+    color: var(--text);
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+      sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+  }
+
+  /* Blueprint's focus selectors out-specify a bare `*:focus`, and its ring shows
+   on a click as well as on a key. The keyboard ring is put back below. */
+  *:focus {
+    outline: none !important;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--accent) !important;
+    outline-offset: 2px;
+  }
+
+  /* The bar a header button is shown in, so it is judged against the white
+   surface and the single border line the sites give it. */
+  .sb-header {
+    display: flex;
+    height: var(--header-height);
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 0;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    gap: 0.15rem;
+  }
+</style>
