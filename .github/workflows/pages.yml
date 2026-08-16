@@ -7,9 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 # One deployment at a time, and never cancel one that is already publishing.
 concurrency:
@@ -19,9 +17,6 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -29,12 +24,12 @@ jobs:
           node-version: '24'
           cache: 'npm'
       - run: npm ci
-      - uses: actions/configure-pages@v6
-        with:
-          enablement: true
       - run: npm run build-storybook
-      - uses: actions/upload-pages-artifact@v5
+      - run: touch storybook-static/.nojekyll
+      - name: Deploy to GitHub pages
+        uses: JamesIves/github-pages-deploy-action@releases/v4
         with:
-          path: storybook-static
-      - id: deployment
-        uses: actions/deploy-pages@v5
+          token: ${{ secrets.BOT_TOKEN }}
+          branch: gh-pages
+          folder: storybook-static
+          clean: true
