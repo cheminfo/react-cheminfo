@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0](https://github.com/cheminfo/react-cheminfo/compare/v0.1.0...v0.2.0) (2026-08-16)
+
+
+### Features
+
+* add the elucidation, equilibrium and polycarp sites ([3525139](https://github.com/cheminfo/react-cheminfo/commit/3525139d574a93e533f037fd7ecbdc63bb4a55a0))
+
+
+### Bug Fixes
+
+* accept React 18 and react-science 20 as peers ([296c81e](https://github.com/cheminfo/react-cheminfo/commit/296c81ef692d94a4dc78aa874e1461e4b0c05623))
+* cite an article number as one page, not a range ([88ccb8e](https://github.com/cheminfo/react-cheminfo/commit/88ccb8ea861ea48ee88911975f02ded5af8110b0))
+
 ## 0.1.0 (2026-08-16)
 
 
