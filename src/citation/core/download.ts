@@ -1,3 +1,5 @@
+import { downloadBlob } from '../../download/core/downloadBlob.ts';
+
 import type { CitationDownload } from './formats.ts';
 import { citationFilename, formatCitation } from './formats.ts';
 import type { Reference } from './reference.ts';
@@ -14,14 +16,8 @@ export function downloadCitation(
   download: CitationDownload,
 ): void {
   const content = formatCitation(reference, download.format);
-  const url = URL.createObjectURL(
+  downloadBlob(
     new Blob([content], { type: download.mimeType }),
+    citationFilename(reference, download.extension),
   );
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = citationFilename(reference, download.extension);
-  document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
 }
