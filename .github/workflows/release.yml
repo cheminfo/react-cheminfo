@@ -11,6 +11,10 @@ jobs:
     uses: zakodium/workflows/.github/workflows/release.yml@release-v1
     with:
       npm: true
+      # The empty string puts release-please in manifest mode, so
+      # `release-please-config.json` is read: it keeps a breaking change on the
+      # 0.x line rather than declaring 1.0.0.
+      release-type: ''
     secrets:
       github-token: ${{ secrets.BOT_TOKEN }}
       npm-token: ${{ secrets.NPM_BOT_TOKEN }}
