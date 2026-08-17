@@ -34,9 +34,9 @@ test('no site ever writes the .org', () => {
 });
 
 test('the size is the font size, and the family class is always carried', () => {
-  const plain = renderToStaticMarkup(<Wordmark siteId="pt" />);
+  const plain = renderToStaticMarkup(<Wordmark siteId="periodic-table" />);
   const sized = renderToStaticMarkup(
-    <Wordmark siteId="pt" size={26} className="brand__name" />,
+    <Wordmark siteId="periodic-table" size={26} className="brand__name" />,
   );
 
   expect(plain).toContain('class="wordmark"');

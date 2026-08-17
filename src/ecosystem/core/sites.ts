@@ -14,7 +14,7 @@ export type SiteId =
   | 'equilibrium'
   | 'polycarp'
   | '3d'
-  | 'pt';
+  | 'periodic-table';
 
 export interface SiteName {
   /** First half of the name, set in the site's leading colour. */
@@ -210,10 +210,10 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#155e75', accent: '#f97316' },
   },
   {
-    id: 'pt',
+    id: 'periodic-table',
     name: { lead: 'Periodic', alt: 'Table' },
-    host: 'pt.cheminfo.org',
-    repository: 'https://github.com/cheminfo/pt.cheminfo.org',
+    host: 'periodic-table.cheminfo.org',
+    repository: 'https://github.com/cheminfo/periodic-table.cheminfo.org',
     tagline: 'The periodic table, coloured, plotted and taken apart.',
     brand: '#15803d',
     brandAlt: '#a16207',

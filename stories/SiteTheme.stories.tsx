@@ -64,7 +64,7 @@ export const Default: Story = {};
 export const SideBySide: Story = {
   render: () => (
     <div style={PANES_STYLE}>
-      {(['surge', 'pt'] as const).map((siteId) => (
+      {(['surge', 'periodic-table'] as const).map((siteId) => (
         <ThemedPage key={siteId} siteId={siteId} height={CARD_FRAME_HEIGHT}>
           <ResultCard />
         </ThemedPage>

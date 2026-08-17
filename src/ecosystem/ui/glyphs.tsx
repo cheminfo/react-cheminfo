@@ -214,7 +214,7 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // The stepped corner of the table, with the one cell a visitor has picked
   // carrying the accent — which is what every tool of that site is: the table,
   // and one element read off it.
-  pt: (alt) => (
+  'periodic-table': (alt) => (
     <>
       <g fill="#ffffff" opacity="0.55">
         <rect x="5" y="6" width="5" height="5" rx="1" />

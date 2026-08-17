@@ -21,7 +21,7 @@ test('the family is the fifteen sites, listed once each', () => {
     'equilibrium',
     'polycarp',
     '3d',
-    'pt',
+    'periodic-table',
   ] satisfies SiteId[]);
 });
 
@@ -65,7 +65,9 @@ test('every site names the repository its sources live in', () => {
 
   // The repository is named verbatim, dots and suffixes included, because that
   // is also the package its own workflow publishes.
-  expect(repositories).toContain('https://github.com/cheminfo/pt.cheminfo.org');
+  expect(repositories).toContain(
+    'https://github.com/cheminfo/periodic-table.cheminfo.org',
+  );
   expect(repositories).toContain('https://github.com/cheminfo/chemcalc.org');
   expect(repositories).toContain('https://github.com/cheminfo/nmrium');
 
