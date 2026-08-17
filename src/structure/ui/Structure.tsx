@@ -1,18 +1,24 @@
-import type {
-  CSSProperties,
-  ComponentType,
-  ReactElement,
-  ReactNode,
-} from 'react';
-import { useMemo } from 'react';
-import type { ErrorComponentProps } from 'react-ocl';
-import {
-  IdcodeSvgRenderer,
-  MolfileSvgRenderer,
-  SmilesSvgRenderer,
-} from 'react-ocl';
+/**
+ * A read-only depiction of a structure, whichever notation the caller has.
+ *
+ * Which notation is drawn, and what is shown when there is nothing to draw, is
+ * decided here; the drawing itself sits behind `React.lazy`, so a page that
+ * never renders a structure never downloads react-ocl and openchemlib for one.
+ * That is also what lets `react-cheminfo/structure` be imported at all when
+ * those optional peers are not installed.
+ */
+
+import type { ReactElement, ReactNode } from 'react';
+import { Suspense, lazy } from 'react';
 
 import { structureSource } from '../core/structureSource.ts';
+
+import { StructurePlaceholder } from './StructurePlaceholder.tsx';
+
+const StructureSvg = lazy(async () => {
+  const module = await import('./StructureSvg.tsx');
+  return { default: module.StructureSvg };
+});
 
 /** What is written on a depiction besides the atoms and the bonds. */
 export interface StructureLabels {
@@ -121,7 +127,8 @@ export interface StructureProps {
  * Nothing here throws and nothing renders a broken box: a blank value, a
  * molfile with an empty atom block and a SMILES with a typo in it all come out
  * as the same quiet placeholder, sized like the picture that would have been
- * drawn so a list of structures keeps its rhythm.
+ * drawn so a list of structures keeps its rhythm. The box the renderers load
+ * into is that same placeholder, so nothing moves once they arrive.
  * @param props - The structure, its size and what is written on it.
  * @returns The picture, or the placeholder.
  */
@@ -144,10 +151,6 @@ export function Structure(props: StructureProps): ReactElement {
   } = props;
 
   const source = structureSource({ idCode, coordinates, molfile, smiles });
-  const ErrorComponent = useMemo(
-    () => createFallbackRenderer(fallback),
-    [fallback],
-  );
 
   if (source.kind === 'empty') {
     return (
@@ -157,80 +160,24 @@ export function Structure(props: StructureProps): ReactElement {
     );
   }
 
-  const shared = {
-    width,
-    height,
-    autoCrop,
-    autoCropMargin,
-    atomHighlight,
-    atomHighlightColor,
-    bondHighlight,
-    bondHighlightColor,
-    showAtomNumber: labels.atoms ?? false,
-    showBondNumber: labels.bonds ?? false,
-    showMapping: labels.mapping ?? false,
-    label: labels.caption,
-    ErrorComponent,
-  };
-
-  if (source.kind === 'idcode') {
-    return (
-      <IdcodeSvgRenderer
-        idcode={source.value}
-        coordinates={source.coordinates}
-        {...shared}
-      />
-    );
-  }
-  if (source.kind === 'molfile') {
-    return <MolfileSvgRenderer molfile={source.value} {...shared} />;
-  }
-  return <SmilesSvgRenderer smiles={source.value} {...shared} />;
-}
-
-interface StructurePlaceholderProps {
-  width: number;
-  height: number;
-  children: ReactNode;
-}
-
-/**
- * A box the size of the picture that could not be drawn, holding whatever the
- * caller wants said instead.
- * @param props - The size of the box and what goes in it.
- * @returns The placeholder.
- */
-function StructurePlaceholder(props: StructurePlaceholderProps): ReactElement {
-  const { width, height, children } = props;
   return (
-    <span style={{ ...PLACEHOLDER_STYLE, width, height }} aria-hidden="true">
-      {children}
-    </span>
+    <Suspense fallback={<StructurePlaceholder width={width} height={height} />}>
+      <StructureSvg
+        source={source}
+        width={width}
+        height={height}
+        autoCrop={autoCrop}
+        autoCropMargin={autoCropMargin}
+        atomHighlight={atomHighlight}
+        atomHighlightColor={atomHighlightColor}
+        bondHighlight={bondHighlight}
+        bondHighlightColor={bondHighlightColor}
+        showAtomNumber={labels.atoms ?? false}
+        showBondNumber={labels.bonds ?? false}
+        showMapping={labels.mapping ?? false}
+        label={labels.caption}
+        fallback={fallback}
+      />
+    </Suspense>
   );
 }
-
-/**
- * Build the renderer react-ocl falls back to, so a structure it refuses looks
- * like one that was never supplied rather than like an error.
- * @param fallback - What the caller wants shown instead of the structure.
- * @returns The component react-ocl renders in place of the picture.
- */
-function createFallbackRenderer(
-  fallback: ReactNode,
-): ComponentType<ErrorComponentProps> {
-  return function StructureFallback(props: ErrorComponentProps): ReactElement {
-    return (
-      <StructurePlaceholder width={props.width} height={props.height}>
-        {fallback}
-      </StructurePlaceholder>
-    );
-  };
-}
-
-const PLACEHOLDER_STYLE: CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '#8a96a3',
-  fontSize: '0.75rem',
-};

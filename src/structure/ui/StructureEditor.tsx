@@ -1,13 +1,26 @@
+/**
+ * The canvas structure editor and the box it is drawn in.
+ *
+ * The canvas itself sits behind `React.lazy`: it is the half that imports
+ * react-ocl, so a page that never opens an editor never downloads openchemlib,
+ * and `react-cheminfo/structure` stays importable when those optional peers
+ * are absent.
+ */
+
 import type { CSSProperties, ReactElement } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef } from 'react';
 import type { CanvasEditorInputFormat } from 'react-ocl';
 
 import type {
   StructureEditorChange,
   StructureEditorMode,
 } from './EditorCanvas.tsx';
-import { EditorCanvas } from './EditorCanvas.tsx';
 import { useToolbarFloor } from './useToolbarFloor.ts';
+
+const EditorCanvas = lazy(async () => {
+  const module = await import('./EditorCanvas.tsx');
+  return { default: module.EditorCanvas };
+});
 
 export interface StructureEditorProps {
   /**
@@ -95,14 +108,16 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
       className={className}
       style={{ ...ROOT_STYLE, minHeight, ...style }}
     >
-      <EditorCanvas
-        key={revision}
-        onChange={handleChange}
-        fragment={fragment}
-        inputFormat={inputFormat}
-        value={value}
-        mode={mode}
-      />
+      <Suspense fallback={<div style={LOADING_STYLE}>Loading the editor…</div>}>
+        <EditorCanvas
+          key={revision}
+          onChange={handleChange}
+          fragment={fragment}
+          inputFormat={inputFormat}
+          value={value}
+          mode={mode}
+        />
+      </Suspense>
     </div>
   );
 }
@@ -167,4 +182,15 @@ const ROOT_STYLE: CSSProperties = {
   border: '1px solid #d3d8de',
   borderRadius: 6,
   background: '#fff',
+};
+
+/** The box the canvas will fill, so its arrival moves nothing. */
+const LOADING_STYLE: CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: '#8a96a3',
+  fontSize: 13,
 };

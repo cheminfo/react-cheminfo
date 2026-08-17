@@ -1,7 +1,18 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { expect, test } from 'vitest';
+import { beforeAll, expect, test, vi } from 'vitest';
 
 import { Structure } from '../Structure.tsx';
+
+// The renderers are loaded through React.lazy, and renderToStaticMarkup is
+// synchronous: without this throwaway render it would only ever see the box
+// they load into.
+beforeAll(async () => {
+  await vi.waitFor(() => {
+    if (!renderToStaticMarkup(<Structure smiles="CCCC" />).includes('<svg')) {
+      throw new Error('the renderers have not been loaded yet');
+    }
+  });
+});
 
 test('a structure is drawn as an svg', () => {
   const markup = renderToStaticMarkup(<Structure smiles="CCCC" />);
