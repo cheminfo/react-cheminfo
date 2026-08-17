@@ -13,6 +13,7 @@
   "type": "module",
   "exports": {
     "./core": "./lib/core.js",
+    "./orbital": "./lib/orbital.js",
     "./ui": "./lib/ui.js"
   },
   "files": [
@@ -52,6 +53,7 @@
     "eslint": "^9.39.5",
     "eslint-config-cheminfo-react": "^20.1.0",
     "eslint-config-cheminfo-typescript": "^22.1.0",
+    "molstar": "^5.11.0",
     "prettier": "^3.9.6",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -66,7 +68,8 @@
     "@blueprintjs/core": "^6.18.0",
     "react": "^18.3.1 || >=19",
     "react-dom": "^18.3.1 || >=19",
-    "react-science": "^20.6.2 || ^21.0.0 || ^22.0.0 || ^23.0.0"
+    "react-science": "^20.6.2 || ^21.0.0 || ^22.0.0 || ^23.0.0",
+    "molstar": "^5.11.0"
   },
   "repository": {
     "type": "git",
@@ -75,5 +78,10 @@
   "bugs": {
     "url": "https://github.com/cheminfo/react-cheminfo/issues"
   },
-  "homepage": "https://github.com/cheminfo/react-cheminfo#readme"
+  "homepage": "https://github.com/cheminfo/react-cheminfo#readme",
+  "peerDependenciesMeta": {
+    "molstar": {
+      "optional": true
+    }
+  }
 }

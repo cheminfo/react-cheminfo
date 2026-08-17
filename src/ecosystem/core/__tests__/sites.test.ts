@@ -3,7 +3,7 @@ import { expect, test } from 'vitest';
 import type { SiteId } from '../sites.ts';
 import { ECOSYSTEM_SITES, siteUrl } from '../sites.ts';
 
-test('the family is the thirteen sites, listed once each', () => {
+test('the family is the fifteen sites, listed once each', () => {
   const ids = ECOSYSTEM_SITES.map((site) => site.id);
 
   expect(ids).toStrictEqual([
@@ -20,6 +20,8 @@ test('the family is the thirteen sites, listed once each', () => {
     'elucidation',
     'equilibrium',
     'polycarp',
+    '3d',
+    'pt',
   ] satisfies SiteId[]);
 });
 
@@ -33,7 +35,7 @@ test('this site is one of them', () => {
 test('every site is a distinct https address', () => {
   const hosts = ECOSYSTEM_SITES.map((site) => site.host);
 
-  expect(new Set(hosts).size).toBe(13);
+  expect(new Set(hosts).size).toBe(15);
 
   for (const site of ECOSYSTEM_SITES) {
     expect(siteUrl(site)).toBe(`https://${site.host}/`);

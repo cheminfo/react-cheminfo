@@ -25,15 +25,22 @@ npm i react-cheminfo
 dependencies: a site already has them, and a second copy of `react-science`
 would mean two Blueprint style trees in one page.
 
-## Two entry points
+## Three entry points
 
-| Import                | Holds                                                                         |
-| --------------------- | ----------------------------------------------------------------------------- |
-| `react-cheminfo/ui`   | the React components                                                          |
-| `react-cheminfo/core` | the framework-free logic — citation formats, the site list — with no React in |
+| Import                   | Holds                                                                         | Costs          |
+| ------------------------ | ----------------------------------------------------------------------------- | -------------- |
+| `react-cheminfo/core`    | the framework-free logic — citation formats, the site list, the orbital maths | nothing        |
+| `react-cheminfo/ui`      | the React components of a site header                                         | React          |
+| `react-cheminfo/orbital` | the 3D atomic-orbital viewer                                                  | React, molstar |
 
 A backend serving an RIS endpoint, and every unit test of that logic, therefore
-load no React at all.
+load no React at all — and a worker sampling an orbital loads neither React nor
+molstar.
+
+The orbital viewer has its own door because **molstar is several megabytes**: a
+site that only wants the Tools menu must never be made to carry it. `molstar` is
+an optional peer dependency, so `npm i react-cheminfo` installs nothing extra
+until a site actually imports `react-cheminfo/orbital`.
 
 The sources are organised the other way round — one folder per component
 (`src/citation`, `src/ecosystem`), each holding a `core/` and a `ui/` half — and
@@ -90,6 +97,40 @@ import { EcosystemButton } from 'react-cheminfo/ui';
   and a screen reader are told.
 - A tile **lights up in the colour of the site it opens**, so running the
   pointer down the grid is what makes the pairs of colours read.
+
+### `AtomicOrbitalViewer`
+
+One hydrogen-like atomic orbital, screened by Slater's rules, sampled in the
+browser and drawn as a signed isosurface with molstar.
+
+```tsx
+import { AtomicOrbitalViewer } from 'react-cheminfo/orbital';
+
+<AtomicOrbitalViewer atomicNumber={26} orbitalId="3dz2" />;
+```
+
+- The **maths is exact**, not a cartoon: a hydrogen-like radial function with its
+  `n − ℓ − 1` nodes, times a real spherical harmonic with its ℓ angular ones.
+  The Slater orbital a hybridisation model uses is nodeless and would draw a 3s
+  exactly like a 1s, only fatter.
+- The canvas is behind a `React.lazy` boundary and **nothing this entry point
+  exports pulls molstar in statically**, so a page that never draws an orbital
+  never downloads it.
+- A **WebGL probe runs before molstar is touched** (`probeViewerCapability`), so
+  a locked-down school machine gets a sentence rather than a blank rectangle.
+- Every orbital is drawn at one canonical size. Molstar's camera clamps its near
+  plane, so uranium's 4f — which reaches 0.35 Å — would otherwise stay a dot in
+  the corner; the true extent is reported as ⟨r⟩ instead.
+- `sample` accepts a worker-backed sampler when a site would rather not spend
+  ~25 ms of its main thread per orbital. `runAtomicSample` from
+  `react-cheminfo/core` is the function that worker calls, and it imports
+  neither React nor molstar.
+
+The maths is exported on its own from `react-cheminfo/core` —
+`atomicOrbitalsOf`, `configurationOf`, `slaterScreening`, `radialProfile`,
+`radialNodeRadii`, `sampleAtomicOrbital` — so a site can draw its own radial
+plot, list an element's orbitals, or print a screened charge without mounting
+anything.
 
 Each mark keeps the geometry of that site's own logo where it has one, redrawn
 on a plate of the site's own colour so every mark of the family still reads as

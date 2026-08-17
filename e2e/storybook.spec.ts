@@ -25,6 +25,12 @@ const STORY_IDS = [
   'ecosystem-sitemark--default',
   'ecosystem-sitemark--every-site',
   'ecosystem-sitemark--every-size',
+  'orbital-atomicorbitalviewer--colour-blind-safe',
+  'orbital-atomicorbitalviewer--default',
+  'orbital-atomicorbitalviewer--f-orbital',
+  'orbital-atomicorbitalviewer--radial-nodes',
+  'orbital-atomicorbitalviewer--simple',
+  'orbital-atomicorbitalviewer--spinning',
 ];
 
 test('the book holds exactly the stories the specs address', async ({

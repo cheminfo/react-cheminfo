@@ -36,7 +36,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-/** Every mark of the family, so the ten of them can be read as one row. */
+/** Every mark of the family, so they can be read as one row. */
 export const EverySite: Story = {
   parameters: { layout: 'padded' },
   render: (args) => (

@@ -12,7 +12,9 @@ export type SiteId =
   | 'pdb'
   | 'elucidation'
   | 'equilibrium'
-  | 'polycarp';
+  | 'polycarp'
+  | '3d'
+  | 'pt';
 
 export interface SiteName {
   /** First half of the name, set in the site's leading colour. */
@@ -181,6 +183,24 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brand: '#0d1d37',
     brandAlt: '#0c9ba3',
     mark: { plate: '#0d1d37', accent: '#0c9ba3' },
+  },
+  {
+    id: '3d',
+    name: { lead: '3d', alt: 'cheminfo', dot: true },
+    host: '3d.cheminfo.org',
+    tagline: 'Conformers in 3D from a structure you draw.',
+    brand: '#155e75',
+    brandAlt: '#b45309',
+    mark: { plate: '#155e75', accent: '#f97316' },
+  },
+  {
+    id: 'pt',
+    name: { lead: 'pt', alt: 'cheminfo', dot: true },
+    host: 'pt.cheminfo.org',
+    tagline: 'The periodic table, coloured, plotted and taken apart.',
+    brand: '#15803d',
+    brandAlt: '#a16207',
+    mark: { plate: '#15803d', accent: '#fbbf24' },
   },
 ];
 
