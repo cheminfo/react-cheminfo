@@ -20,6 +20,7 @@ import { DefaultPluginSpec as defaultPluginSpec } from 'molstar/lib/mol-plugin/s
 import { Color } from 'molstar/lib/mol-util/color/color.js';
 
 import type { OrbitalGrid } from '../core/grid.ts';
+import type { OrbitalContour } from '../core/isovalue.ts';
 
 import { DEFAULT_CAMERA_DURATION, frameOrbital, setSpin } from './camera.ts';
 import type { VolumeStyle } from './renderVolume.ts';
@@ -89,15 +90,19 @@ export class OrbitalViewer {
   /**
    * Replace the isosurface pair with one drawn from a sampled field.
    * @param field - The sampled wavefunction, in ångström.
+   * @param contour - The isovalue and reach measured on that field.
    * @param style - See {@link VolumeStyle}.
    * @returns How far the drawn surface reaches, in scene units, for the camera
    * to frame; `undefined` once the viewer has been disposed.
    */
   showOrbital(
     field: OrbitalGrid,
+    contour: OrbitalContour,
     style?: VolumeStyle,
   ): Promise<number | undefined> {
-    return this.#run((plugin) => renderSampledVolume(plugin, field, style));
+    return this.#run((plugin) =>
+      renderSampledVolume(plugin, field, contour, style),
+    );
   }
 
   /**

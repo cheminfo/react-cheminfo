@@ -9,6 +9,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
 import { PHASE_PALETTES } from '../core/palette.ts';
 import type { AtomicSampler } from '../core/sample.ts';
@@ -30,9 +31,13 @@ export interface AtomicOrbitalCanvasProps {
   palette?: PhasePalette;
   /**
    * Samples along each edge of the cube; the cost is the cube of it.
+   *
+   * A number fixes it. A {@link ResolutionLimits} pair lets each orbital's own
+   * shape pick a resolution between the two, which is what the orbitals with
+   * inner shells packed against the nucleus need.
    * @default 56
    */
-  resolution?: number;
+  resolution?: number | ResolutionLimits;
   /**
    * Whether the scene turns on its own, which is what makes a still screenshot
    * of a 3D shape readable.
@@ -83,7 +88,7 @@ export function AtomicOrbitalCanvas(
 
   // What the canvas is being asked to show. Comparing it with what it *is*
   // showing gives the progress note without a state write on every prop change.
-  const wanted = `${atomicNumber}|${orbitalId}|${resolution}|${palette.id}`;
+  const wanted = `${atomicNumber}|${orbitalId}|${resolutionKey(resolution)}|${palette.id}`;
   const busy = drawn !== wanted;
 
   // Callbacks are read through refs so a caller passing an inline arrow does
@@ -120,7 +125,7 @@ export function AtomicOrbitalCanvas(
       .then(async (result) => {
         if (cancelled) return;
         callbacks.current.onNodeRadii?.(result.nodeRadii);
-        const reach = await viewer.showOrbital(result.grid, {
+        const reach = await viewer.showOrbital(result.grid, result.contour, {
           positiveColour: palette.positive,
           negativeColour: palette.negative,
         });
@@ -151,6 +156,17 @@ export function AtomicOrbitalCanvas(
 
 /** Samples per edge; 56 resolves the radial node of a 3s in about 25 ms. */
 const DEFAULT_RESOLUTION = 56;
+
+/**
+ * A stable identity for either shape the resolution prop can take.
+ * @param resolution - A fixed sample count, or the limits it may vary between.
+ * @returns A string that changes exactly when the sampling would.
+ */
+function resolutionKey(resolution: number | ResolutionLimits): string {
+  return typeof resolution === 'number'
+    ? String(resolution)
+    : `${resolution.floor}-${resolution.cap}`;
+}
 
 /**
  * A square, centred stage: an atomic orbital is as tall as it is wide, so a

@@ -18,6 +18,7 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { Suspense, lazy, useState } from 'react';
 
+import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
 import type { AtomicSampler } from '../core/sample.ts';
 
@@ -44,9 +45,12 @@ export interface AtomicOrbitalViewerProps {
   palette?: PhasePalette;
   /**
    * Samples along each edge of the cube; the cost is the cube of it.
+   *
+   * A number fixes it. A {@link ResolutionLimits} pair lets each orbital's own
+   * shape pick a resolution between the two.
    * @default 56
    */
-  resolution?: number;
+  resolution?: number | ResolutionLimits;
   /**
    * Whether the scene turns on its own.
    * @default false

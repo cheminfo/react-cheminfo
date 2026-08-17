@@ -16,7 +16,11 @@ import type { AtomicOrbital } from './atomicOrbitals.ts';
 import { hydrogenicParametersOf } from './atomicOrbitals.ts';
 import type { GridBox, OrbitalEvaluator, OrbitalGrid } from './grid.ts';
 import { evaluateGrid } from './grid.ts';
-import { createRadialFunction, enclosingRadius } from './hydrogenic.ts';
+import {
+  createRadialFunction,
+  enclosingRadius,
+  radialNodeRadii,
+} from './hydrogenic.ts';
 
 /** How finely, and how far out, an orbital is sampled. */
 export interface AtomicGridOptions {
@@ -105,8 +109,56 @@ export function atomicGridBox(
   };
 }
 
+/** How finely one orbital may be sampled, whatever its shape asks for. */
+export interface ResolutionLimits {
+  /** Samples per edge no orbital drops below. */
+  floor: number;
+  /** Samples per edge no orbital exceeds. */
+  cap: number;
+}
+
+/**
+ * How finely this particular orbital has to be sampled.
+ *
+ * One resolution for a whole periodic table draws the nested orbitals badly.
+ * The box is sized by the outermost lobe, but a `4p` also has to separate two
+ * inner shells packed against the nucleus, and at 56 samples per edge xenon's
+ * innermost 4p lobe spans **6.6 voxels** while the outer one spans 41 — the
+ * inner shells come out as lumps and the outer surface visibly faceted. What
+ * sets the requirement is therefore the ratio between the box and the smallest
+ * feature in it, not the orbital's size, which is why a nodeless orbital
+ * (every `1s`, `2p`, `3d`, `4f`) stays on the floor and costs nothing extra.
+ *
+ * The cap is not a budget cheat: the innermost lobe of caesium's `7s` would
+ * need 858 samples per edge, and no uniform grid the browser can afford
+ * resolves it. Those orbitals are drawn as well as the cap allows.
+ * @param orbital - The orbital to draw.
+ * @param limits - See {@link ResolutionLimits}.
+ * @returns Samples along each edge of the cube.
+ */
+export function atomicGridResolution(
+  orbital: AtomicOrbital,
+  limits: ResolutionLimits,
+): number {
+  const { floor, cap } = limits;
+  const parameters = hydrogenicParametersOf(orbital);
+  const innermost = radialNodeRadii(parameters)[0];
+  if (innermost === undefined || !(innermost > 0)) return Math.min(floor, cap);
+  const half = atomicGridBox(orbital).size.x / 2;
+  // The samples span the box edge to edge, so `resolution - 1` of them cover
+  // it: a lobe of radius r gets `r (resolution - 1) / half` across its diameter.
+  const needed = Math.ceil((INNER_LOBE_SAMPLES * half) / innermost) + 1;
+  return Math.min(cap, Math.max(floor, needed));
+}
+
 /** Samples per edge; the cost is the cube of it. */
 const DEFAULT_RESOLUTION = 56;
+
+/**
+ * Samples the innermost radial lobe is asked to span, edge to edge. Below
+ * about eight, marching cubes turns a sphere into a faceted blob.
+ */
+const INNER_LOBE_SAMPLES = 12;
 
 /** A tail past this holds too little density to change the surface. */
 const DEFAULT_ENCLOSED_FRACTION = 0.985;

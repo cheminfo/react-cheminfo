@@ -121,6 +121,20 @@ import { AtomicOrbitalViewer } from 'react-cheminfo/orbital';
 - Every orbital is drawn at one canonical size. Molstar's camera clamps its near
   plane, so uranium's 4f — which reaches 0.35 Å — would otherwise stay a dot in
   the corner; the true extent is reported as ⟨r⟩ instead.
+- The **isovalue is a weighted quantile** of the samples (`isocontourCutoff`),
+  never molstar's `computeOrbitalIsocontourValues`: that one abandons any field
+  whose mean ψ² falls under an absolute `1e-5`, which reads the orbital's _size_
+  rather than its shape, and left 2588 of 7460 orbitals blank. A quantile has no
+  scale of its own.
+- The isosurface is extracted **on the CPU** (`tryUseGpu: false`). Molstar's GPU
+  marching cubes quantises the field to 255 steps on upload, which terraces
+  xenon's 4p, and pits a diffuse outer lobe with voxel-sized dimples. The
+  surface is a thin shell whatever the box holds, so the CPU path costs 13–44 ms
+  even at 152³.
+- `resolution` takes a `{ floor, cap }` pair as well as a number, and then each
+  orbital picks its own: one resolution for a whole table leaves xenon's
+  innermost 4p lobe spanning 6.6 voxels while the outer one spans 41. A nodeless
+  orbital stays on the floor and costs nothing extra.
 - `sample` accepts a worker-backed sampler when a site would rather not spend
   ~25 ms of its main thread per orbital. `runAtomicSample` from
   `react-cheminfo/core` is the function that worker calls, and it imports
@@ -128,9 +142,9 @@ import { AtomicOrbitalViewer } from 'react-cheminfo/orbital';
 
 The maths is exported on its own from `react-cheminfo/core` —
 `atomicOrbitalsOf`, `configurationOf`, `slaterScreening`, `radialProfile`,
-`radialNodeRadii`, `sampleAtomicOrbital` — so a site can draw its own radial
-plot, list an element's orbitals, or print a screened charge without mounting
-anything.
+`radialNodeRadii`, `sampleAtomicOrbital`, `orbitalContour` — so a site can draw
+its own radial plot, list an element's orbitals, or print a screened charge
+without mounting anything.
 
 Each mark keeps the geometry of that site's own logo where it has one, redrawn
 on a plate of the site's own colour so every mark of the family still reads as

@@ -14,7 +14,6 @@
  * them wholesale.
  */
 
-import { computeOrbitalIsocontourValues } from 'molstar/lib/extensions/alpha-orbitals/orbitals.js';
 import type { Volume } from 'molstar/lib/mol-model/volume.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import { createVolumeRepresentationParams } from 'molstar/lib/mol-plugin-state/helpers/volume-representation-params.js';
@@ -22,10 +21,10 @@ import type { Representation } from 'molstar/lib/mol-repr/representation.js';
 import { Theme } from 'molstar/lib/mol-theme/theme.js';
 import { Color } from 'molstar/lib/mol-util/color/color.js';
 
-import { ENCLOSED_WEIGHT } from '../core/constants.ts';
 import type { OrbitalGrid } from '../core/grid.ts';
+import type { OrbitalContour } from '../core/isovalue.ts';
 
-import { DISPLAY_REACH, surfaceReach, toVolume } from './volumeField.ts';
+import { DISPLAY_REACH, toVolume } from './volumeField.ts';
 
 /** Colours and opacity of one signed isosurface pair. */
 export interface VolumeStyle {
@@ -40,8 +39,8 @@ export interface VolumeStyle {
    */
   negativeColour?: string;
   /**
-   * Isovalue as a multiple of the one enclosing `ENCLOSED_WEIGHT` of the
-   * orbital's weight. Larger means a tighter, smaller surface.
+   * Isovalue as a multiple of the contour's own cutoff. Larger means a
+   * tighter, smaller surface.
    * @default 1
    */
   relativeIsovalue?: number;
@@ -56,6 +55,8 @@ export interface VolumeStyle {
  * Replace the isosurface pair drawn from a sampled field.
  * @param plugin - The molstar context.
  * @param field - The field, as `sampleAtomicOrbital` produced it.
+ * @param contour - The isovalue and reach measured on that field, as
+ * `runAtomicSample` returned them.
  * @param style - See {@link VolumeStyle}.
  * @returns How far the drawn surface reaches from the centre of the box,
  * ångström — what a camera has to frame to fill the viewport with it.
@@ -64,6 +65,7 @@ export interface VolumeStyle {
 export async function renderSampledVolume(
   plugin: PluginContext,
   field: OrbitalGrid,
+  contour: OrbitalContour,
   style: VolumeStyle = {},
 ): Promise<number> {
   const canvas3d = plugin.canvas3d;
@@ -78,25 +80,30 @@ export async function renderSampledVolume(
   } = style;
   clearSampledVolume(plugin);
 
-  const isovalues = computeOrbitalIsocontourValues(field.data, ENCLOSED_WEIGHT);
+  const { cutoff, reach } = contour;
   // Molstar's camera clamps both its target distance and its near plane, so it
   // cannot get close to a small object: uranium's 4f reaches 0.35 Å and would
   // stay a dot in the corner whatever the camera is asked to frame. Every
   // orbital is therefore drawn at one canonical size, and the true extent is
   // reported as ⟨r⟩ and on the radial plot instead of by the picture's scale.
-  const reach = surfaceReach(field, isovalues);
   const volume = toVolume(field, reach > 0 ? DISPLAY_REACH / reach : 1);
   // A nodeless orbital — every 1s — has no negative lobe at all, and asking for
   // its isosurface would draw an empty mesh at value 0.
   const surfaces = await Promise.all([
-    maybeSurface(plugin, volume, isovalues.positive, relativeIsovalue, {
-      colour: positiveColour,
-      alpha,
-    }),
-    maybeSurface(plugin, volume, isovalues.negative, relativeIsovalue, {
-      colour: negativeColour,
-      alpha,
-    }),
+    maybeSurface(
+      plugin,
+      volume,
+      field.max >= cutoff ? cutoff : undefined,
+      relativeIsovalue,
+      { colour: positiveColour, alpha },
+    ),
+    maybeSurface(
+      plugin,
+      volume,
+      field.min <= -cutoff ? -cutoff : undefined,
+      relativeIsovalue,
+      { colour: negativeColour, alpha },
+    ),
   ]);
   const drawn = surfaces.filter(
     (surface): surface is Representation.Any => surface !== null,
@@ -163,7 +170,13 @@ async function createSurface(
       isoValue: { kind: 'absolute', absoluteValue: isovalue },
       alpha,
       xrayShaded: true,
-      tryUseGpu: true,
+      // Molstar's GPU marching cubes pits the outer lobe of a diffuse orbital
+      // with voxel-sized dimples — caesium's 6s and every 7s, 6d and 7p above
+      // it — and quantises the field to 255 steps on upload unless told
+      // otherwise, which terraces xenon's 4p. The surface is a thin shell
+      // whatever the box holds, so the CPU path costs 13–44 ms and returns
+      // 27 k vertices even on the 152³ grid the highest quality asks for.
+      tryUseGpu: false,
     },
     color: 'uniform',
     colorParams: { value: Color.fromHexStyle(colour) },

@@ -11,8 +11,8 @@
  * `sample` prop; one that does not gets the in-process version for free.
  */
 
-import type { AtomicGridOptions } from './atomicGrid.ts';
-import { sampleAtomicOrbital } from './atomicGrid.ts';
+import type { AtomicGridOptions, ResolutionLimits } from './atomicGrid.ts';
+import { atomicGridResolution, sampleAtomicOrbital } from './atomicGrid.ts';
 import {
   atomicOrbitalsOf,
   findAtomicOrbital,
@@ -20,6 +20,8 @@ import {
 } from './atomicOrbitals.ts';
 import type { OrbitalGrid } from './grid.ts';
 import { radialNodeRadii } from './hydrogenic.ts';
+import type { OrbitalContour } from './isovalue.ts';
+import { orbitalContour } from './isovalue.ts';
 
 /** Which orbital to sample, and how finely. */
 export interface AtomicSampleRequest {
@@ -29,15 +31,27 @@ export interface AtomicSampleRequest {
   orbitalId: string;
   /**
    * Samples along each edge of the cube. The cost is the cube of this.
+   *
+   * A number fixes the resolution. {@link ResolutionLimits} lets the orbital's
+   * own shape pick one between the two, which is what a nested orbital needs —
+   * see {@link atomicGridResolution}.
    * @default 56
    */
-  resolution?: number;
+  resolution?: number | ResolutionLimits;
 }
 
 /** What one sampling job produces. */
 export interface AtomicSampleResult {
   /** The signed field, ready for an isosurface. */
   grid: OrbitalGrid;
+  /**
+   * The isovalue both phases are drawn at, and how far the pair reaches.
+   *
+   * Measured here rather than beside the renderer: both passes are O(samples),
+   * and at the resolutions a nested orbital asks for that is over a million of
+   * them on whichever thread runs this.
+   */
+  contour: OrbitalContour;
   /** Radii of the orbital's radial nodes, ångström, ascending. */
   nodeRadii: number[];
 }
@@ -65,9 +79,15 @@ export function runAtomicSample(
     );
   }
   const options: AtomicGridOptions = {};
-  if (resolution !== undefined) options.resolution = resolution;
+  if (typeof resolution === 'number') {
+    options.resolution = resolution;
+  } else if (resolution !== undefined) {
+    options.resolution = atomicGridResolution(orbital, resolution);
+  }
+  const grid = sampleAtomicOrbital(orbital, options);
   return {
-    grid: sampleAtomicOrbital(orbital, options),
+    grid,
+    contour: orbitalContour(grid),
     nodeRadii: radialNodeRadii(hydrogenicParametersOf(orbital)),
   };
 }

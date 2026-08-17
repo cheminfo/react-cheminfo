@@ -1,6 +1,7 @@
-export type { AtomicGridOptions } from './atomicGrid.ts';
+export type { AtomicGridOptions, ResolutionLimits } from './atomicGrid.ts';
 export {
   atomicGridBox,
+  atomicGridResolution,
   createAtomicOrbitalEvaluator,
   sampleAtomicOrbital,
 } from './atomicGrid.ts';
@@ -37,6 +38,8 @@ export {
 } from './electronConfiguration.ts';
 export type { GridBox, OrbitalEvaluator, OrbitalGrid } from './grid.ts';
 export { evaluateGrid, gridIndex } from './grid.ts';
+export type { OrbitalContour } from './isovalue.ts';
+export { enclosedReach, isocontourCutoff, orbitalContour } from './isovalue.ts';
 export type { HydrogenicParameters } from './hydrogenic.ts';
 export {
   createRadialFunction,

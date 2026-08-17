@@ -2,12 +2,18 @@ import { expect, test } from 'vitest';
 
 import {
   atomicGridBox,
+  atomicGridResolution,
   createAtomicOrbitalEvaluator,
   sampleAtomicOrbital,
 } from '../atomicGrid.ts';
 import type { AtomicOrbital } from '../atomicOrbitals.ts';
-import { atomicOrbitalsOf, findAtomicOrbital } from '../atomicOrbitals.ts';
+import {
+  atomicOrbitalsOf,
+  findAtomicOrbital,
+  hydrogenicParametersOf,
+} from '../atomicOrbitals.ts';
 import { gridIndex } from '../grid.ts';
+import { radialNodeRadii } from '../hydrogenic.ts';
 
 import { atomicNumberOf } from './symbols.ts';
 
@@ -138,6 +144,39 @@ test('the box grows with the shell and shrinks with the nuclear charge', () => {
   expect(half(orbital('H', '3s'))).toBeGreaterThan(half(orbital('H', '2s')));
   // Fluorine pulls its 2p far tighter than lithium does.
   expect(half(orbital('F', '2pz'))).toBeLessThan(half(orbital('Li', '2s')));
+});
+
+test('a nodeless orbital stays on the floor and a nested one is refined', () => {
+  const limits = { floor: 56, cap: 112 };
+
+  // No radial node, so nothing hides near the nucleus: the floor is enough.
+  expect(atomicGridResolution(orbital('H', '1s'), limits)).toBe(56);
+  expect(atomicGridResolution(orbital('C', '2pz'), limits)).toBe(56);
+  expect(atomicGridResolution(orbital('U', '4fxyz'), limits)).toBe(56);
+
+  // Xenon's 4p packs two inner shells against the nucleus; at the floor its
+  // innermost lobe spans 6.6 voxels, which marching cubes draws as a lump.
+  expect(atomicGridResolution(orbital('Xe', '4py'), limits)).toBe(101);
+
+  // Caesium's 7s would need 858 and is drawn as well as the cap allows.
+  expect(atomicGridResolution(orbital('Cs', '7s'), limits)).toBe(112);
+});
+
+test('the innermost lobe gets the samples the resolution promised it', () => {
+  const target = orbital('Xe', '4py');
+  const resolution = atomicGridResolution(target, { floor: 56, cap: 112 });
+  const grid = sampleAtomicOrbital(target, { resolution });
+  const innermost = radialNodeRadii(
+    hydrogenicParametersOf(target),
+  )[0] as number;
+
+  expect((2 * innermost) / grid.spacing).toBeGreaterThanOrEqual(12);
+});
+
+test('a cap below the floor still yields a usable grid', () => {
+  expect(
+    atomicGridResolution(orbital('Cs', '7s'), { floor: 56, cap: 40 }),
+  ).toBe(40);
 });
 
 test('every sampled field carries usable statistics', () => {

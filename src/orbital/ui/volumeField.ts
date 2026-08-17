@@ -1,9 +1,11 @@
 /**
  * Turning a field the caller sampled into the `Volume` molstar's isosurface
- * renderer wants, and measuring how far the surface inside it actually reaches.
+ * renderer wants.
  *
- * Both halves are arithmetic over the samples, which is why they are here
- * rather than in `renderVolume.ts` — that module is about representations.
+ * It is arithmetic over the samples, which is why it is here rather than in
+ * `renderVolume.ts` — that module is about representations. How far the
+ * surface inside the box reaches is measured in `core/isovalue.ts`, beside the
+ * isovalue it is measured against.
  */
 
 import { Mat4, Tensor, Vec3 } from 'molstar/lib/mol-math/linear-algebra.js';
@@ -23,52 +25,6 @@ const { Space: createTensorSpace, Data1: asTensorData } = Tensor;
  * impossible to fill the frame with.
  */
 export const DISPLAY_REACH = 12;
-
-/**
- * How far from the centre of the box the drawn surface actually reaches.
- *
- * Molstar sizes a volume representation's bounding sphere from the whole
- * sampled box, which is deliberately much larger than the isosurface inside it,
- * so a camera framing that sphere leaves the orbital a quarter of the frame
- * wide. Measuring the samples that are actually enclosed gives the camera the
- * real extent, and does it here because this is where the isovalue is known.
- * @param field - The sampled field.
- * @param isovalues - The two isovalues the surfaces were drawn at.
- * @param isovalues.negative - Isovalue the negative lobe was drawn at, if any.
- * @param isovalues.positive - Isovalue the positive lobe was drawn at, if any.
- * @returns The reach in ångström, or 0 when nothing was drawn.
- */
-export function surfaceReach(
-  field: OrbitalGrid,
-  isovalues: { negative?: number | undefined; positive?: number | undefined },
-): number {
-  const cutoff = Math.min(
-    Math.abs(isovalues.positive ?? Infinity),
-    Math.abs(isovalues.negative ?? Infinity),
-  );
-  if (!Number.isFinite(cutoff) || cutoff <= 0) return 0;
-  const { data, dimensions, origin, spacing } = field;
-  const [countX, countY, countZ] = dimensions;
-  const centreX = origin.x + ((countX - 1) * spacing) / 2;
-  const centreY = origin.y + ((countY - 1) * spacing) / 2;
-  const centreZ = origin.z + ((countZ - 1) * spacing) / 2;
-  let furthest = 0;
-  let index = 0;
-  for (let indexX = 0; indexX < countX; indexX++) {
-    const dx = origin.x + indexX * spacing - centreX;
-    for (let indexY = 0; indexY < countY; indexY++) {
-      const dy = origin.y + indexY * spacing - centreY;
-      for (let indexZ = 0; indexZ < countZ; indexZ++) {
-        const value = data[index++] as number;
-        if (value < cutoff && value > -cutoff) continue;
-        const dz = origin.z + indexZ * spacing - centreZ;
-        const squared = dx * dx + dy * dy + dz * dz;
-        if (squared > furthest) furthest = squared;
-      }
-    }
-  }
-  return Math.sqrt(furthest);
-}
 
 /**
  * Wrap a sampled field in molstar's `Volume`.
