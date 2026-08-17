@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/cheminfo/react-cheminfo/compare/v0.2.0...v0.3.0) (2026-08-17)
+
+
+### Features
+
+* add the atomic orbital viewer on a third entry point ([5068a42](https://github.com/cheminfo/react-cheminfo/commit/5068a42552ef2fed4c23415098dc4910e3b7e381))
+
 ## [0.2.0](https://github.com/cheminfo/react-cheminfo/compare/v0.1.0...v0.2.0) (2026-08-16)
 
 
