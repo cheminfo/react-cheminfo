@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 
-import type { EcosystemSite } from '../core/sites.ts';
+import { siteById } from '../core/lookup.ts';
+import type { EcosystemSite, SiteId } from '../core/sites.ts';
 
 import { GLYPHS } from './glyphs.tsx';
 
@@ -12,22 +13,58 @@ import { GLYPHS } from './glyphs.tsx';
 const MARK_STYLE: CSSProperties = { display: 'block', flex: 'none' };
 
 export interface SiteMarkProps {
-  /** The site whose mark is drawn, with the two colours it owns. */
-  site: EcosystemSite;
+  /**
+   * The site whose mark is drawn, with the two colours it owns. One of `site`
+   * and `siteId` is required.
+   * @default undefined
+   */
+  site?: EcosystemSite;
+  /**
+   * The same site, named rather than passed, for a header that knows only
+   * which site it is.
+   * @default undefined
+   */
+  siteId?: SiteId;
   /**
    * Edge of the square the mark is drawn in, in pixels.
    * @default 28
    */
   size?: number;
+  /**
+   * Whether the drawing sits on the site's rounded plate. Several marks are
+   * drawn in the plate's negative space, so dropping it suits a mark already
+   * standing on a surface of the site's own colour.
+   * @default true
+   */
+  plate?: boolean;
+  /**
+   * Whether the two colours are written out or read from the page. `tokens`
+   * draws the plate in `var(--brand)` and the answering element in
+   * `var(--brand-alt)`, so a site retuning its pair retunes its mark; it is
+   * therefore for the site's own mark rather than for another site's.
+   * @default 'literal'
+   */
+  colors?: 'literal' | 'tokens';
 }
 
 /**
  * The little logo of one site of the family.
- * @param props - The site and the size of its mark.
+ * @param props - Which site, how big, and where its colours come from.
  * @returns The mark, as an inline SVG.
+ * @throws {Error} When neither `site` nor `siteId` is given.
  */
 export function SiteMark(props: SiteMarkProps): ReactElement {
-  const { site, size = 28 } = props;
+  const { site, siteId, size = 28, plate = true, colors = 'literal' } = props;
+
+  const drawn = site ?? (siteId === undefined ? undefined : siteById(siteId));
+  if (drawn === undefined) {
+    throw new Error('SiteMark needs one of its `site` and `siteId` props');
+  }
+
+  const usesTokens = colors === 'tokens';
+  const plateFill = usesTokens ? 'var(--brand)' : drawn.mark.plate;
+  const accent = usesTokens ? 'var(--brand-alt)' : drawn.mark.accent;
+  const edge = drawn.mark.edge;
 
   return (
     <svg
@@ -38,16 +75,18 @@ export function SiteMark(props: SiteMarkProps): ReactElement {
       aria-hidden="true"
       focusable="false"
     >
-      <rect
-        x={site.mark.edge ? 0.5 : 0}
-        y={site.mark.edge ? 0.5 : 0}
-        width={site.mark.edge ? 31 : 32}
-        height={site.mark.edge ? 31 : 32}
-        rx={site.mark.edge ? 6.5 : 7}
-        fill={site.mark.plate}
-        stroke={site.mark.edge}
-      />
-      {GLYPHS[site.id](site.mark.accent)}
+      {plate ? (
+        <rect
+          x={edge ? 0.5 : 0}
+          y={edge ? 0.5 : 0}
+          width={edge ? 31 : 32}
+          height={edge ? 31 : 32}
+          rx={edge ? 6.5 : 7}
+          fill={plateFill}
+          stroke={edge}
+        />
+      ) : null}
+      {GLYPHS[drawn.id](accent)}
     </svg>
   );
 }

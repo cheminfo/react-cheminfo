@@ -58,6 +58,24 @@ test('every site owns two colours for its name and two for its mark', () => {
   }
 });
 
+test('every site names the repository its sources live in', () => {
+  const repositories = ECOSYSTEM_SITES.map((site) => site.repository);
+
+  expect(new Set(repositories).size).toBe(15);
+
+  // The repository is named verbatim, dots and suffixes included, because that
+  // is also the package its own workflow publishes.
+  expect(repositories).toContain('https://github.com/cheminfo/pt.cheminfo.org');
+  expect(repositories).toContain('https://github.com/cheminfo/chemcalc.org');
+  expect(repositories).toContain('https://github.com/cheminfo/nmrium');
+
+  for (const site of ECOSYSTEM_SITES) {
+    expect(site.repository.startsWith('https://github.com/cheminfo/')).toBe(
+      true,
+    );
+  }
+});
+
 test('both halves of a name are readable on white', () => {
   for (const site of ECOSYSTEM_SITES) {
     // 3:1, which is what a name set at 15px bold asks for. Two sites keep an

@@ -1,0 +1,223 @@
+/*
+ * The chrome every *.cheminfo.org site carries: the neutrals, the geometry and
+ * the type the family shares, then the bar, the menu and the footer drawn from
+ * them. A site imports this once and adds only the two colours it owns —
+ * `--brand`, `--brand-alt`, the readable `--brand-alt-text` when the second one
+ * is too light for text, and `--accent: var(--brand)`.
+ *
+ * The page background, the box-sizing reset and the focus policy stay with the
+ * site: a rule shipped from a package cannot be relied on to lose the cascade
+ * against the page importing it.
+ */
+
+:root {
+  /* The neutrals, the geometry and the depth are identical on every site of
+     the family, so two of them opened side by side read as one house. */
+  --surface: #ffffff;
+  --surface-sunken: #f5f7fa;
+  --surface-raised: #ffffff;
+  --border: #dfe3e8;
+  --border-strong: #c3cad3;
+  --text: #16202c;
+  --text-muted: #5b6875;
+  --text-faint: #8a96a3;
+
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgb(16 32 48 / 8%);
+  --shadow-md: 0 4px 14px rgb(16 32 48 / 10%);
+  --shadow-lg: 0 12px 32px rgb(16 32 48 / 16%);
+
+  --header-height: 3.5rem;
+  --page-max: 84rem;
+}
+
+/* The size goes on `body`, never on `html`: `rem` has to stay the browser's
+   16px, or every measurement written here shrinks by 6.25% and the bar renders
+   52.5px tall on one site and 56px on its sibling. */
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A form control does not inherit the page font: it would otherwise be set in
+   the UA's Helvetica beside text in ours. */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+/* ── The bar ─────────────────────────────────────────────────────────────── */
+
+.app-header {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  flex: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.app-header__inner {
+  display: flex;
+  height: var(--header-height);
+  max-width: var(--page-max);
+  align-items: center;
+  padding: 0 1.25rem;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  color: var(--text);
+  font-weight: 700;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: block;
+  flex: none;
+}
+
+.wordmark {
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.wordmark__lead {
+  color: var(--brand);
+}
+
+/* Neutral, so the two coloured halves read as the name rather than as three
+   equal parts. */
+.wordmark__dot {
+  color: var(--text-faint);
+}
+
+/* The answering colour of several sites is an amber or a yellow sitting around
+   2:1 on white, so the name takes the darkened form wherever there is one. */
+.wordmark__alt {
+  color: var(--brand-alt-text, var(--brand-alt));
+}
+
+/* The pages start at the brand and scroll on a narrow window rather than
+   pushing the utilities off the edge. */
+.app-header-nav {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 0.15rem;
+  scrollbar-width: thin;
+}
+
+/* The utilities keep the right edge, and never scroll with the pages. */
+.app-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+/* Only needed when the pages do not grow — a bar with no page links at all. */
+.spacer {
+  flex: 1;
+}
+
+/* Carried by a link and by a button alike, so the whole row reads as one menu
+   rather than as a button dropped among addresses. */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  gap: 0.4rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  background: var(--surface-sunken);
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* The brand tint is what says "you are here", so hovering never impersonates
+   the page you are on. */
+.nav-link--active,
+.nav-link--active:hover {
+  background: color-mix(in oklab, var(--accent) 12%, white);
+  color: var(--accent);
+}
+
+.nav-link svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* The Cite and Tools buttons arrive already dressed as bar items, so only their
+   type is brought to the one the links beside them are set in. */
+.citation-button .bp6-button,
+.ecosystem-button .bp6-button {
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* The brand marks the current entry of a header menu too, not Blueprint's own
+   blue. */
+.nav-menu .bp6-menu-item.bp6-active,
+.nav-menu .bp6-menu-item.bp6-active:hover {
+  background: color-mix(in oklab, var(--accent) 12%, white);
+  color: var(--accent);
+}
+
+/* ── The footer ──────────────────────────────────────────────────────────── */
+
+/* The family, in the page rather than only behind the Tools button: this is
+   what lets a crawler — and a reader — walk from one of our tools to the next. */
+.app-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.app-footer__inner {
+  max-width: var(--page-max);
+  padding: 1.25rem;
+  margin: 0 auto;
+}
+
+/* ── Printing ────────────────────────────────────────────────────────────── */
+
+/* Students print the cheatsheet. Let them, without the chrome. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
