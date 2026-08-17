@@ -52,7 +52,7 @@ downloads none of them.
 | ----------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`              | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                             |
 | **Chrome**              | —                                                                                                        | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                         |
-| **Citation**            | `formatCitation`, `citationSegments`, `downloadCitation`, `doiUrl`                                       | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
+| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl` | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
 | **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs  | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                   |
 | **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink` | —                                                                                                                                                |
 | **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`               | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList` |
@@ -73,11 +73,11 @@ second, your own code last.** The full import table and the checklist live in
 
 ## Seeing it
 
-Storybook is the demo, and every exported component has one — 204 stories:
+Storybook is the demo, and every exported component has one — 210 stories:
 
 ```console
 npm run dev              # the book on http://localhost:10815
-npm run test-e2e         # Playwright opens all 204 and fails on any console error
+npm run test-e2e         # Playwright opens all 210 and fails on any console error
 ```
 
 The **Brand** toolbar at the top retunes `--brand` / `--brand-alt`, so any story
@@ -122,6 +122,35 @@ import { CiteButton } from 'react-cheminfo/ui';
 
 Adding a style means one function in `citation/core/segments.ts` and one entry
 in `CITATION_STYLES` — the three output formats and the preview follow.
+
+A site is often built on more than one work — the tool it wraps, and the
+platform it runs on — and a reader handed two references has to be told what is
+what. Pass `works` rather than `reference`, each one carrying the words that say
+what citing it credits:
+
+```tsx
+<CiteButton
+  works={[
+    {
+      reference: SURGE_PAPER,
+      what: 'The isomer generator',
+      note: 'Cite it for the enumeration: every structure here comes from surge.',
+    },
+    {
+      reference: PLATFORM_PAPER,
+      what: 'The browser platform',
+      note: 'Cite it for the site itself.',
+    },
+  ]}
+/>
+```
+
+The menu then opens on a line asking for all of them — `guidance` writes that
+line when the default does not fit — and lists every work with what it covers.
+Each work holds its own article and its own reference, in the default style; the
+sections below carry the whole set at once, so one copy pastes both citations and
+one saved file holds both records (`references.ris`). Nothing changes for a site
+asking for a single work.
 
 ### `EcosystemButton`
 

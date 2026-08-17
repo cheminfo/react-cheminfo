@@ -1,5 +1,5 @@
-export { copyCitation } from './clipboard.ts';
-export { downloadCitation } from './download.ts';
+export { copyCitation, copyCitations } from './clipboard.ts';
+export { downloadCitation, downloadCitations } from './download.ts';
 export type {
   CitationDownload,
   CitationFormat,
@@ -20,3 +20,9 @@ export type {
   CitationStyleId,
 } from './segments.ts';
 export { CITATION_STYLES, citationSegments } from './segments.ts';
+export type { CitedWork } from './works.ts';
+export {
+  citationsFilename,
+  citedReferences,
+  formatCitations,
+} from './works.ts';

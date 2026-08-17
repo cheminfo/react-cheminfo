@@ -2,7 +2,7 @@ import type { IconName, Intent } from '@blueprintjs/core';
 import { MenuItem, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
-import { downloadCitation } from '../core/download.ts';
+import { downloadCitations } from '../core/download.ts';
 import type { CitationDownload, CitationFormat } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
 import type { CitationStyle } from '../core/segments.ts';
@@ -27,8 +27,8 @@ export interface CopyState {
 }
 
 export interface CopyEntryProps {
-  /** The work being cited. */
-  reference: Reference;
+  /** The works being cited, in reading order. */
+  references: readonly Reference[];
   /** The format the entry copies. */
   format: CitationFormat;
   /**
@@ -38,21 +38,21 @@ export interface CopyEntryProps {
   style?: CitationStyle;
   /** Feedback of the last copy, while it is showing. */
   state: CopyState | null;
-  /** Called with what the entry copies. */
-  onCopy: (format: CitationFormat, style?: CitationStyle) => void;
+  /** Called when the entry is clicked. */
+  onCopy: () => void;
 }
 
 /**
  * One entry that copies, previewing on hover what it puts on the clipboard.
- * @param props - The reference, the format, and the feedback showing.
+ * @param props - The references, the format, and the feedback showing.
  * @returns The menu entry.
  */
 export function CopyEntry(props: CopyEntryProps): ReactElement {
-  const { reference, format, style, state, onCopy } = props;
+  const { references, format, style, state, onCopy } = props;
   const entry = style ?? format;
 
   return (
-    <PreviewTooltip reference={reference} format={format.id} style={style}>
+    <PreviewTooltip references={references} format={format.id} style={style}>
       {(targetProps) => (
         <MenuItem
           {...targetProps}
@@ -69,9 +69,7 @@ export function CopyEntry(props: CopyEntryProps): ReactElement {
             )
           }
           shouldDismissPopover={false}
-          onClick={() => {
-            onCopy(format, style);
-          }}
+          onClick={onCopy}
         />
       )}
     </PreviewTooltip>
@@ -79,8 +77,8 @@ export function CopyEntry(props: CopyEntryProps): ReactElement {
 }
 
 export interface DownloadEntryProps {
-  /** The work being saved. */
-  reference: Reference;
+  /** The works being saved, in reading order. */
+  references: readonly Reference[];
   /** The file to write, from `CITATION_DOWNLOADS`. */
   download: CitationDownload;
 }
@@ -91,9 +89,9 @@ export interface DownloadEntryProps {
  * @returns The menu entry.
  */
 export function DownloadEntry(props: DownloadEntryProps): ReactElement {
-  const { reference, download } = props;
+  const { references, download } = props;
   return (
-    <PreviewTooltip reference={reference} format={download.format}>
+    <PreviewTooltip references={references} format={download.format}>
       {(targetProps) => (
         <MenuItem
           {...targetProps}
@@ -102,7 +100,7 @@ export function DownloadEntry(props: DownloadEntryProps): ReactElement {
           text={download.label}
           labelElement={download.hint}
           onClick={() => {
-            downloadCitation(reference, download);
+            downloadCitations(references, download);
           }}
         />
       )}
@@ -113,19 +111,19 @@ export function DownloadEntry(props: DownloadEntryProps): ReactElement {
 /**
  * The hover preview of what an entry copies or saves.
  * @param props - The preview options.
- * @param props.reference - The work being written.
+ * @param props.references - The works being written.
  * @param props.format - The format the entry produces.
  * @param props.style - The journal style, for a format that has one.
  * @param props.children - The entry the preview is anchored on.
  * @returns The entry, wrapped in its preview tooltip.
  */
 function PreviewTooltip(props: {
-  reference: Reference;
+  references: readonly Reference[];
   format: CitationFormat['id'];
   style?: CitationStyle;
   children: (targetProps: Record<string, unknown>) => ReactElement;
 }): ReactElement {
-  const { reference, format, style, children } = props;
+  const { references, format, style, children } = props;
   return (
     <Tooltip
       placement="left"
@@ -133,7 +131,7 @@ function PreviewTooltip(props: {
       hoverOpenDelay={PREVIEW_OPEN_DELAY}
       content={
         <CitationPreview
-          reference={reference}
+          reference={references}
           format={format}
           style={style?.id}
         />

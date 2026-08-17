@@ -149,3 +149,79 @@ test('saving the RIS file hands over what a reference manager imports', async ({
   expect(content).toContain('AU  - Patiny, L.');
   expect(content.trimEnd().endsWith('ER  -')).toBe(true);
 });
+
+const PLATFORM_DOI_URL = 'https://doi.org/10.2533/chimia.2025.66';
+
+async function openWorksMenu(page: Page): Promise<void> {
+  await openStory(page, 'citation-citebutton--several-works');
+  await page.getByRole('button', { name: 'Cite', exact: true }).click();
+  await expect(page.getByText('Please cite both works')).toBeVisible();
+}
+
+test('a site built on two works names each, and what citing it credits', async ({
+  page,
+}) => {
+  await openWorksMenu(page);
+
+  await expect(page.getByText('The calculator')).toBeVisible();
+  await expect(
+    page.getByText('Cite it for the masses and the isotopic distributions'),
+  ).toBeVisible();
+  await expect(page.getByText('The browser platform')).toBeVisible();
+  await expect(page.getByText('Copy both references as')).toBeVisible();
+});
+
+test('a work opens its own article, and copies its own reference', async ({
+  page,
+}) => {
+  await openWorksMenu(page);
+  await page.getByRole('menuitem', { name: /The browser platform/ }).hover();
+
+  // Blueprint renders a submenu inside the row that opens it, and the set below
+  // the works offers the same formats — so the entry clicked has to be looked
+  // up inside that row rather than in the menu at large.
+  const submenu = page
+    .locator('li.bp6-submenu')
+    .filter({ hasText: 'The browser platform' });
+  const article = submenu.getByRole('menuitem', { name: /Open the article/ });
+  await expect(article).toHaveAttribute('href', PLATFORM_DOI_URL);
+
+  await submenu.getByRole('menuitem', { name: BIBTEX_COPY }).click();
+
+  const copied = await copiedText(page);
+  expect(copied.startsWith('@article{Patiny2025,')).toBe(true);
+  expect(copied).not.toContain('Vanderveen');
+});
+
+test('copying the set puts both references on the clipboard', async ({
+  page,
+}) => {
+  await openWorksMenu(page);
+  await page.getByRole('menuitem', { name: HTML_COPY }).hover();
+  await page.getByRole('menuitem', { name: 'ACS' }).click();
+
+  const copied = await copiedText(page);
+  expect(copied).toContain('Patiny, L.; Borel, A.');
+  expect(copied).toContain('Patiny, L. Unlocking the Potential');
+  expect(copied).toContain(DOI_URL);
+  expect(copied).toContain(PLATFORM_DOI_URL);
+});
+
+test('the saved file holds a record for every work', async ({ page }) => {
+  await openWorksMenu(page);
+
+  const started = page.waitForEvent('download');
+  await page.getByRole('menuitem', { name: RIS_FILE }).click();
+  const download = await started;
+
+  expect(download.suggestedFilename()).toBe('references.ris');
+
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(chunk as Buffer);
+  const content = Buffer.concat(chunks).toString('utf8');
+
+  expect(content.match(/^TY {2}- JOUR$/gm)).toHaveLength(2);
+  expect(content).toContain('AU  - Borel, A.');
+  expect(content).toContain('JO  - CHIMIA');
+});

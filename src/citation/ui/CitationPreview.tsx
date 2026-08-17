@@ -1,10 +1,10 @@
 import type { CSSProperties, ReactElement } from 'react';
 
 import type { CitationFormatId } from '../core/formats.ts';
-import { formatCitation } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
 import type { CitationStyleId } from '../core/segments.ts';
 import { citationSegments } from '../core/segments.ts';
+import { formatCitations } from '../core/works.ts';
 
 // A BibTeX entry and a one-line citation share this box, so the text wraps and
 // the box never grows past what a tooltip can hold. The height is the last
@@ -28,10 +28,13 @@ const RICH_STYLE: CSSProperties = {
   fontSize: 12,
   lineHeight: 1.45,
 };
+// Two references pasted as HTML read as two lines, and preview as two.
+const RICH_LINE_STYLE: CSSProperties = { marginTop: 6 };
 const LINK_STYLE: CSSProperties = { color: '#8abbff' };
 
 export interface CitationPreviewProps {
-  reference: Reference;
+  /** The work, or the works, whose citation is previewed. */
+  reference: Reference | readonly Reference[];
   format: CitationFormatId;
   /** Journal style, for the formats that have one. */
   style?: CitationStyleId;
@@ -39,20 +42,27 @@ export interface CitationPreviewProps {
 
 /**
  * What a copy of the reference puts on the clipboard, as it will read once
- * pasted: the emphasis of the style for HTML, the source itself otherwise.
+ * pasted: the emphasis of the style for HTML, the source itself otherwise. A
+ * site asking for several works previews every one of them, in the order it
+ * names them.
  * @param props - Reference, format and style to preview.
  * @returns The body of the preview tooltip.
  */
 export function CitationPreview(props: CitationPreviewProps): ReactElement {
   const { reference, format, style } = props;
+  const references = Array.isArray(reference) ? reference : [reference];
 
   if (format === 'html' && style !== undefined) {
     return (
       <div className="citation-preview" style={RICH_STYLE}>
-        {citationSegments(reference, style).map((segment, index) => (
-          // The segments of one citation are a fixed list, never reordered.
-          // eslint-disable-next-line react/no-array-index-key
-          <Segment key={index} segment={segment} />
+        {references.map((one, line) => (
+          <div key={one.doi} style={line === 0 ? undefined : RICH_LINE_STYLE}>
+            {citationSegments(one, style).map((segment, index) => (
+              // The segments of one citation are a fixed list, never reordered.
+              // eslint-disable-next-line react/no-array-index-key
+              <Segment key={index} segment={segment} />
+            ))}
+          </div>
         ))}
       </div>
     );
@@ -60,7 +70,7 @@ export function CitationPreview(props: CitationPreviewProps): ReactElement {
 
   return (
     <pre className="citation-preview" style={PREVIEW_STYLE}>
-      {formatCitation(reference, format, style)}
+      {formatCitations(references, format, style)}
     </pre>
   );
 }
