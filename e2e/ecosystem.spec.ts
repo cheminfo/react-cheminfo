@@ -1,9 +1,14 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { ECOSYSTEM_SITES } from '../src/ecosystem/core/sites.ts';
+
 import { openStory } from './story.ts';
 
 const HEADING = 'Our other tools, all in the browser';
+
+// Counted from the list itself, so adding a site does not leave the spec behind.
+const SITE_COUNT = ECOSYSTEM_SITES.length;
 
 // Every tile of the open menu, and nothing the page itself carries.
 function tiles(page: Page) {
@@ -16,10 +21,10 @@ async function openTools(page: Page, storyId: string): Promise<void> {
   await expect(page.getByText(HEADING)).toBeVisible();
 }
 
-test('the menu lists the ten sites of the family', async ({ page }) => {
+test('the menu lists every site of the family', async ({ page }) => {
   await openTools(page, 'ecosystem-ecosystembutton--default');
 
-  await expect(tiles(page)).toHaveCount(10);
+  await expect(tiles(page)).toHaveCount(SITE_COUNT);
 });
 
 test('the current site is shown, and is the one tile that is not a link', async ({
@@ -28,7 +33,7 @@ test('the current site is shown, and is the one tile that is not a link', async 
   await openTools(page, 'ecosystem-ecosystembutton--current-site');
 
   await expect(page.getByText('you are here')).toBeVisible();
-  await expect(tiles(page)).toHaveCount(9);
+  await expect(tiles(page)).toHaveCount(SITE_COUNT - 1);
   await expect(tiles(page).filter({ hasText: /vcl/ })).toHaveCount(0);
 });
 
@@ -49,7 +54,7 @@ test('the menu stands on its own, outside the button that opens it', async ({
   await openStory(page, 'ecosystem-ecosystemmenu--current-site');
 
   await expect(page.getByText(HEADING)).toBeVisible();
-  await expect(tiles(page)).toHaveCount(9);
+  await expect(tiles(page)).toHaveCount(SITE_COUNT - 1);
 });
 
 test('the compact button drops its text but keeps its label', async ({
