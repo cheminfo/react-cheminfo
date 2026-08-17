@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t,n;function r(){return(r=e((()=>{t=[`bottom-end`,`bottom-start`,`bottom`,`top-end`,`top-start`,`top`,`left-start`,`right-start`],n={label:{control:`text`},compact:{control:`boolean`},placement:{control:`select`,options:t}}})))()}export{t as n,r,n as t};

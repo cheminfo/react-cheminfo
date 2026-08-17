@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t,n,r,i;function a(){return(a=e((()=>{t={beginner:`success`,intermediate:`warning`,advanced:`danger`},n=[`beginner`,`intermediate`,`advanced`],r={idle:`circle`,attempted:`warning-sign`,solved:`tick-circle`},i={idle:`none`,attempted:`warning`,solved:`success`}})))()}export{a,i,n,r,t};
