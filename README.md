@@ -25,26 +25,70 @@ npm i react-cheminfo
 dependencies: a site already has them, and a second copy of `react-science`
 would mean two Blueprint style trees in one page.
 
-## Three entry points
+## Entry points
 
-| Import                   | Holds                                                                         | Costs          |
-| ------------------------ | ----------------------------------------------------------------------------- | -------------- |
-| `react-cheminfo/core`    | the framework-free logic — citation formats, the site list, the orbital maths | nothing        |
-| `react-cheminfo/ui`      | the React components of a site header                                         | React          |
-| `react-cheminfo/orbital` | the 3D atomic-orbital viewer                                                  | React, molstar |
+Subpaths are **bundle boundaries, not taxonomy**: a feature gets its own door
+only when it drags a heavy dependency behind it.
 
-A backend serving an RIS endpoint, and every unit test of that logic, therefore
-load no React at all — and a worker sampling an orbital loads neither React nor
-molstar.
+| Import                      | Holds                                        | Costs                 |
+| --------------------------- | -------------------------------------------- | --------------------- |
+| `react-cheminfo/core`       | every framework-free helper — 151 exports    | nothing               |
+| `react-cheminfo/ui`         | every React component and hook — 71 exports  | React                 |
+| `react-cheminfo/orbital`    | the 3D atomic-orbital viewer                 | React, molstar        |
+| `react-cheminfo/structure`  | the structure editor and renderer            | React, react-ocl, OCL |
+| `react-cheminfo/chrome.css` | the shared tokens and site-header stylesheet | nothing               |
 
-The orbital viewer has its own door because **molstar is several megabytes**: a
-site that only wants the Tools menu must never be made to carry it. `molstar` is
-an optional peer dependency, so `npm i react-cheminfo` installs nothing extra
-until a site actually imports `react-cheminfo/orbital`.
+A backend serving an RIS endpoint, a prerender script writing a sitemap, and
+every unit test of that logic therefore load no React at all — and a worker
+sampling an orbital loads neither React nor molstar. `openchemlib`, `react-ocl`
+and `molstar` are **optional** peers, so a site that only wants the Tools menu
+downloads none of them.
 
-The sources are organised the other way round — one folder per component
-(`src/citation`, `src/ecosystem`), each holding a `core/` and a `ui/` half — and
-`src/core.ts` and `src/ui.ts` are the barrels the two entry points point at.
+`chrome.css` is served from `src/` because `tsc` does not copy CSS into `lib`.
+
+## What is in it
+
+| Area                    | `…/core`                                                                                                 | `…/ui`                                                                                                                                           |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`              | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                             |
+| **Chrome**              | —                                                                                                        | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                         |
+| **Citation**            | `formatCitation`, `citationSegments`, `downloadCitation`, `doiUrl`                                       | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
+| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs  | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                   |
+| **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink` | —                                                                                                                                                |
+| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`               | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList` |
+| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`   | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`                                                                                                 |
+| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`             | `ColorScaleLegend`                                                                                                                               |
+| **Widgets**             | `CREDITS`, `credits`                                                                                     | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                             |
+| **Hooks & state**       | `createWorkerChannel`                                                                                    | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                           |
+| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                |
+
+Everything in that table is exported from `./core`, `./ui` or `./structure` and
+nothing else is: the sub-components a component is built from, the parsers a
+helper calls and the internals of a hook stay inside the package, reachable only
+by their own path. If it is exported, it is supported.
+
+The rule for a new site is short: **`react-cheminfo` first, `react-science`
+second, your own code last.** The full import table and the checklist live in
+`websites/CLAUDE.md`.
+
+## Seeing it
+
+Storybook is the demo, and every exported component has one — 204 stories:
+
+```console
+npm run dev              # the book on http://localhost:10815
+npm run test-e2e         # Playwright opens all 204 and fails on any console error
+```
+
+The **Brand** toolbar at the top retunes `--brand` / `--brand-alt`, so any story
+can be read as it would look on any site of the family.
+
+The sources are organised the other way round — one folder per feature
+(`src/citation`, `src/ecosystem`, `src/share`, `src/pedagogy`, …), each holding a
+`core/` and a `ui/` half — and `src/core.ts` and `src/ui.ts` are the barrels the
+two entry points point at. ESLint forbids a `core/` folder from importing
+`react`, `react-dom` or anything under a `ui/`, which is what keeps the
+framework-free entry point honest.
 `src/shared` holds what more than one of them is built on: `MenuButton`, the
 shape every button of a site header takes, which is why `CiteButton` and
 `EcosystemButton` differ only in their glyph and their menu, and why both accept
