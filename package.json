@@ -16,11 +16,12 @@
     "./orbital": "./lib/orbital.js",
     "./structure": "./lib/structure.js",
     "./ui": "./lib/ui.js",
-    "./chrome.css": "./src/chrome/chrome.css"
+    "./styles/*.css": "./styles/*.css"
   },
   "files": [
     "lib",
-    "src"
+    "src",
+    "styles"
   ],
   "scripts": {
     "build-storybook": "storybook build",

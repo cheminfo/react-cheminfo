@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
 import { NavLink } from '../src/chrome/ui/NavLink.tsx';
 import { NavMenuButton } from '../src/chrome/ui/NavMenuButton.tsx';
 
-import '../src/chrome/chrome.css';
+import '../styles/chrome.css';
 
 import { DRAW_PAGE, LEARN_PAGES, noop } from './chromeFixtures.ts';
 import { PLACEMENTS } from './headerButton.ts';

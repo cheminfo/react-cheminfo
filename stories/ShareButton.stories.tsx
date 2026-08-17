@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 
 import { ShareButton } from '../src/share/ui/ShareButton.tsx';
 
-import '../src/chrome/chrome.css';
+import '../styles/chrome.css';
 
 const COLUMN_STYLE: CSSProperties = {
   display: 'grid',

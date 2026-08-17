@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 
 import { NavLink } from '../src/chrome/ui/NavLink.tsx';
 
-import '../src/chrome/chrome.css';
+import '../styles/chrome.css';
 
 import { noop } from './chromeFixtures.ts';
 

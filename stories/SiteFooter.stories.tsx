@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react';
 import { SiteFooter } from '../src/chrome/ui/SiteFooter.tsx';
 import { ECOSYSTEM_SITES } from '../src/ecosystem/core/sites.ts';
 
-import '../src/chrome/chrome.css';
+import '../styles/chrome.css';
 
 const SITE_IDS = ECOSYSTEM_SITES.map((site) => site.id);
 

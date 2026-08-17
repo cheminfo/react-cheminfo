@@ -25,7 +25,7 @@ import {
 } from './shareFixtures.ts';
 import { SearchPage } from './sharePanels.tsx';
 
-import '../src/chrome/chrome.css';
+import '../styles/chrome.css';
 
 // The dialog is generic in the tool's own parameters, and a generic component
 // reads as its default — a vocabulary carrying nothing. Naming the fixture's

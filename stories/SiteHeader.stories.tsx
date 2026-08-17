@@ -16,7 +16,7 @@ import { ECOSYSTEM_SITES } from '../src/ecosystem/core/sites.ts';
 import { EcosystemButton } from '../src/ecosystem/ui/EcosystemButton.tsx';
 import { ShareButton } from '../src/share/ui/ShareButton.tsx';
 
-import '../src/chrome/chrome.css';
+import '../styles/chrome.css';
 
 import { CAFFEINE, SITE_BARS, SMILES_PAGES, noop } from './chromeFixtures.ts';
 import { PAPER } from './paper.ts';

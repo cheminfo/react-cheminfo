@@ -30,13 +30,13 @@ would mean two Blueprint style trees in one page.
 Subpaths are **bundle boundaries, not taxonomy**: a feature gets its own door
 only when it drags a heavy dependency behind it.
 
-| Import                      | Holds                                        | Costs                 |
-| --------------------------- | -------------------------------------------- | --------------------- |
-| `react-cheminfo/core`       | every framework-free helper — 151 exports    | nothing               |
-| `react-cheminfo/ui`         | every React component and hook — 71 exports  | React                 |
-| `react-cheminfo/orbital`    | the 3D atomic-orbital viewer                 | React, molstar        |
-| `react-cheminfo/structure`  | the structure editor and renderer            | React, react-ocl, OCL |
-| `react-cheminfo/chrome.css` | the shared tokens and site-header stylesheet | nothing               |
+| Import                             | Holds                                        | Costs                 |
+| ---------------------------------- | -------------------------------------------- | --------------------- |
+| `react-cheminfo/core`              | every framework-free helper — 151 exports    | nothing               |
+| `react-cheminfo/ui`                | every React component and hook — 71 exports  | React                 |
+| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                 | React, molstar        |
+| `react-cheminfo/structure`         | the structure editor and renderer            | React, react-ocl, OCL |
+| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet | nothing               |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -44,7 +44,8 @@ sampling an orbital loads neither React nor molstar. `openchemlib`, `react-ocl`
 and `molstar` are **optional** peers, so a site that only wants the Tools menu
 downloads none of them.
 
-`chrome.css` is served from `src/` because `tsc` does not copy CSS into `lib`.
+The stylesheet ships from `styles/`, which `tsc` leaves alone, and is reached
+through a wildcard subpath exactly as `react-science` serves its own.
 
 ## What is in it
 
