@@ -15,6 +15,22 @@ export function siteById(id: SiteId): EcosystemSite {
 }
 
 /**
+ * The site's name as prose, for a page title, a card or a citation.
+ *
+ * An address-shaped name is written as the address it is — `3d` and `cheminfo`
+ * are two halves of `3d.cheminfo.org`, and joining them would read `3dcheminfo`
+ * — while a product-shaped one is its two halves run together, as its wordmark
+ * sets them.
+ * @param site - The site being named.
+ * @returns What the site is called, in one string.
+ */
+export function siteDisplayName(site: EcosystemSite): string {
+  return site.name.dot === true
+    ? site.host
+    : `${site.name.lead}${site.name.alt}`;
+}
+
+/**
  * The site a page is being served from, so a header can mark itself as the
  * current one without being told which site it belongs to.
  *

@@ -1,5 +1,5 @@
 export { renderEcosystemLinksHtml } from './links.ts';
-export { findSiteByHost, siteById } from './lookup.ts';
+export { findSiteByHost, siteById, siteDisplayName } from './lookup.ts';
 export type {
   EcosystemSite,
   SiteId,

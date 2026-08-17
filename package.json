@@ -16,6 +16,7 @@
     "./orbital": "./lib/orbital.js",
     "./structure": "./lib/structure.js",
     "./ui": "./lib/ui.js",
+    "./vite": "./lib/vite.js",
     "./styles/*.css": "./styles/*.css"
   },
   "files": [
@@ -76,7 +77,8 @@
     "react": "^18.3.1 || >=19",
     "react-dom": "^18.3.1 || >=19",
     "react-ocl": "^8.7.1",
-    "react-science": "^20.6.2 || ^21.0.0 || ^22.0.0 || ^23.0.0"
+    "react-science": "^20.6.2 || ^21.0.0 || ^22.0.0 || ^23.0.0",
+    "vite": "^7.0.0 || ^8.0.0"
   },
   "repository": {
     "type": "git",
@@ -94,6 +96,9 @@
       "optional": true
     },
     "react-ocl": {
+      "optional": true
+    },
+    "vite": {
       "optional": true
     }
   }
