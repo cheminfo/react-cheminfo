@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{i as t,n,r,t as i}from"./iconTypes-CFm7CJsW.js";import{n as a,t as o}from"./paths-DgiNJKEw.js";import{n as s,t as c}from"./paths-CdhNFjFW.js";function l(e,n){let r=t(e);return n===i.STANDARD?a[r]:s[r]}function u(){return(u=e((()=>{r(),o(),c(),n()})))()}u();export{l as getIconPaths};
