@@ -240,6 +240,13 @@ test('the book holds exactly the stories the specs address', async ({
 });
 
 test('every story renders, with nothing thrown', async ({ page }) => {
+  // One page opens every story in turn, so the budget is per story rather than
+  // Playwright's flat 30 s: the book has grown from 26 stories to several
+  // hundred, and a cold runner is far slower than a warm laptop at each
+  // navigation. Without this the walk is killed part-way and reports the story
+  // it happened to be on as empty.
+  test.setTimeout(Math.max(60_000, STORY_IDS.length * 2_000));
+
   const problems: string[] = [];
   page.on('pageerror', (error) => problems.push(error.message));
   page.on('console', (message) => {
