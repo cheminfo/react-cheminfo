@@ -211,7 +211,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
   },
   {
     id: 'pt',
-    name: { lead: 'pt', alt: 'cheminfo', dot: true },
+    name: { lead: 'Periodic', alt: 'Table' },
     host: 'pt.cheminfo.org',
     repository: 'https://github.com/cheminfo/pt.cheminfo.org',
     tagline: 'The periodic table, coloured, plotted and taken apart.',
