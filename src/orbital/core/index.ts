@@ -1,31 +1,20 @@
-export type { AtomicGridOptions, ResolutionLimits } from './atomicGrid.ts';
-export {
-  atomicGridBox,
-  atomicGridResolution,
-  createAtomicOrbitalEvaluator,
-  sampleAtomicOrbital,
-} from './atomicGrid.ts';
+export type { ResolutionLimits } from './atomicGrid.ts';
+export { atomicGridResolution } from './atomicGrid.ts';
 export type { AtomicOrbital, AtomicOrbitalOptions } from './atomicOrbitals.ts';
 export {
   atomicOrbitalsOf,
   defaultOrbitalId,
   findAtomicOrbital,
   hydrogenicParametersOf,
-  orbitalId,
 } from './atomicOrbitals.ts';
 export type { Vec3 } from './constants.ts';
-export {
-  BOHR_IN_ANGSTROM,
-  ENCLOSED_WEIGHT,
-  RYDBERG_ELECTRONVOLTS,
-} from './constants.ts';
+export { BOHR_IN_ANGSTROM, RYDBERG_ELECTRONVOLTS } from './constants.ts';
 export type { Subshell, SubshellOccupancy } from './electronConfiguration.ts';
 export {
   ELEMENT_ANOMALIES,
   HIGHEST_ATOMIC_NUMBER,
   MADELUNG_ORDER,
   NOBLE_GASES,
-  assertAtomicNumber,
   aufbauConfigurationOf,
   configurationOf,
   coreAtomicNumber,
@@ -34,7 +23,6 @@ export {
   isAnomalous,
   subshellCapacity,
   subshellLabel,
-  superscript,
 } from './electronConfiguration.ts';
 export type { GridBox, OrbitalEvaluator, OrbitalGrid } from './grid.ts';
 export { evaluateGrid, gridIndex } from './grid.ts';
@@ -70,6 +58,6 @@ export type {
   AtomicSampleResult,
   AtomicSampler,
 } from './sample.ts';
-export { runAtomicSample, sampleInProcess } from './sample.ts';
+export { runAtomicSample } from './sample.ts';
 export type { Screening } from './screening.ts';
-export { groupRank, slaterScreening } from './screening.ts';
+export { slaterScreening } from './screening.ts';

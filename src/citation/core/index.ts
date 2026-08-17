@@ -14,7 +14,6 @@ export {
 } from './formats.ts';
 export type { Reference, ReferenceAuthor } from './reference.ts';
 export { doiUrl } from './reference.ts';
-export { renderHtml, renderMarkdown, renderText } from './render.ts';
 export type {
   CitationSegment,
   CitationStyle,
