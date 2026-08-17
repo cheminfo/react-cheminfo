@@ -1,4 +1,35 @@
 /**
+ * Where a site is mounted, read off the page rather than off the build.
+ *
+ * The build is mount-agnostic — vite is given a relative base, so the same
+ * `dist` serves `https://surge.cheminfo.org/` and
+ * `https://www.cheminfo.org/surge/`. What tells the two apart is the `<base>`
+ * the deployment stamps into the page it hands out, and `document.baseURI`
+ * resolves it against the address actually opened. So this answers correctly
+ * whether or not a slash closes the address, and on an address the SPA
+ * fallback answered.
+ * @returns The mount path, in the shape {@link normalizeBasePath} returns.
+ */
+export function readMountPath(): string {
+  const baseUri = globalThis.document?.baseURI;
+  if (!baseUri) return '';
+  return normalizeBasePath(new URL(baseUri).pathname);
+}
+
+/**
+ * The path half of a site's address, as a mount path.
+ *
+ * A deployment names where it serves the site in full — origin and path in one
+ * value — because the origin is what the canonical link and the sitemap need.
+ * This is the other half of it.
+ * @param siteUrl - The absolute address the site is served at.
+ * @returns The mount path, in the shape {@link normalizeBasePath} returns.
+ */
+export function basePathOf(siteUrl: string): string {
+  return normalizeBasePath(new URL(siteUrl).pathname);
+}
+
+/**
  * A mount path in the shape the other helpers assume: the empty string when the
  * site owns the root of its host, `/surge` when it is one tool among several on
  * a shared one.

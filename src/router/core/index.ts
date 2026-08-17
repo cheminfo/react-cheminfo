@@ -1,3 +1,10 @@
+export {
+  basePathOf,
+  joinBasePath,
+  normalizeBasePath,
+  readMountPath,
+  stripBasePath,
+} from './basePath.ts';
 export type {
   AdoptLegacyHashOptions,
   LegacyHashOptions,
