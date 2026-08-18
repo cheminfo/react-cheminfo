@@ -1,0 +1,12 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{f as t,n}from"./iframe-DOiypc2O.js";import{n as r,r as i,t as a}from"./lib-DjE0bFpA.js";function o(e){let{onChange:t,fragment:n=!1,inputFormat:a=`idcode`,value:o=``,mode:u=`molecule`}=e,[d]=(0,s.useState)(o),f=(0,s.useCallback)(e=>{t({mode:`molecule`,idCode:e.getIdcode(),molfile:e.getMolfile(),smiles:e.getSmiles()})},[t]),p=(0,s.useCallback)(e=>{t({mode:`reaction`,idCode:e.getIdcode(),molfile:e.getRxn(),smiles:e.getSmiles()})},[t]);return(0,c.jsx)(`div`,{style:l,children:u===`reaction`?(0,c.jsx)(i,{width:`100%`,height:`100%`,fragment:n,inputFormat:a,inputValue:d,onChange:p}):(0,c.jsx)(r,{width:`100%`,height:`100%`,fragment:n,inputFormat:a,inputValue:d,onChange:f})})}var s,c,l;function u(){return(u=e((()=>{s=t(),a(),c=n(),l={position:`absolute`,inset:0},o.__docgenInfo={description:`The react-ocl canvas, filling whatever box it is put in.
+
+Its value is frozen at mount, so the caller remounts it — by changing its
+\`key\` — to load a different structure into it.
+@param props - What to draw, how it is written, and where to send it.
+@returns The canvas.`,methods:[],displayName:`EditorCanvas`,props:{onChange:{required:!0,tsType:{name:`signature`,type:`function`,raw:`(change: StructureEditorChange) => void`,signature:{arguments:[{type:{name:`StructureEditorChange`},name:`change`}],return:{name:`void`}}},description:`Called on every stroke, with the editor read out synchronously.`},fragment:{required:!1,tsType:{name:`boolean`},description:`Draw a query fragment rather than a whole structure, which is what a
+substructure filter needs.
+@default false`},inputFormat:{required:!1,tsType:{name:`CanvasEditorInputFormat`},description:"How `value` is written.\n@default 'idcode'"},value:{required:!1,tsType:{name:`string`},description:`What the canvas holds when it appears. Read once, at mount: the editor is
+uncontrolled, so feeding a later value back would replace the structure
+and reset every coordinate under the pen.
+@default ''`},mode:{required:!1,tsType:{name:`union`,raw:`'molecule' | 'reaction'`,elements:[{name:`literal`,value:`'molecule'`},{name:`literal`,value:`'reaction'`}]},description:`Whether the editor draws one structure or a reaction.
+@default 'molecule'`}}}})))()}u();export{o as EditorCanvas};

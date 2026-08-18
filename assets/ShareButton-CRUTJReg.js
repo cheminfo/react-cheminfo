@@ -1,0 +1,11 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-DOiypc2O.js";import{n,t as r}from"./icon-064BWocN.js";import{n as i,r as a}from"./buttons-gDIJBG5o.js";function o(e){let{onClick:t,variant:n=`nav-link`,label:a=`Share`,compact:o=!1,title:l=c,className:u}=e,d=o?void 0:a;return n===`blueprint`?(0,s.jsx)(i,{className:u,variant:`minimal`,icon:`share`,text:d,title:l,"aria-label":a,onClick:t}):(0,s.jsxs)(`button`,{type:`button`,className:u===void 0?`nav-link`:`nav-link ${u}`,title:l,"aria-label":a,onClick:t,children:[(0,s.jsx)(r,{icon:`share`,size:14}),d]})}var s,c;function l(){return(l=e((()=>{a(),n(),s=t(),c=`Share a link to this page, or embed it in your own site`,o.__docgenInfo={description:`The Share entry of a site header: the button that offers the open page as a
+link, or as the iframe that frames it in someone else's site.
+@param props - What the button does, how it is dressed, and how it is named.
+@returns The button.`,methods:[],displayName:`ShareButton`,props:{onClick:{required:!0,tsType:{name:`signature`,type:`function`,raw:`() => void`,signature:{arguments:[],return:{name:`void`}}},description:`Called when the button is pressed; what it opens is the caller's business.`},variant:{required:!1,tsType:{name:`union`,raw:`'nav-link' | 'blueprint'`,elements:[{name:`literal`,value:`'nav-link'`},{name:`literal`,value:`'blueprint'`}]},description:`A plain entry of a site's own header bar, or a Blueprint button for a
+toolbar already made of them.
+@default 'nav-link'`},label:{required:!1,tsType:{name:`string`},description:`Text of the button, and what a screen reader is told.
+@default 'Share'`},compact:{required:!1,tsType:{name:`boolean`},description:`Whether the button is reduced to its icon, for a bar that has run out of
+room. It is still named to the pointer and to a screen reader.
+@default false`},title:{required:!1,tsType:{name:`string`},description:`What the pointer is told.
+@default 'Share a link to this page, or embed it in your own site'`},className:{required:!1,tsType:{name:`string`},description:`Class the button carries, on top of the one its variant gives it.
+@default undefined`}}}})))()}export{l as n,o as t};
