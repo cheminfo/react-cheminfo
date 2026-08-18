@@ -4,14 +4,14 @@
  * The card is the site's own mark, its two colours and its name, all read from
  * its record — so it is generated rather than hand-drawn. A mark redrawn in the
  * card is a mark that drifts from the one the site shows.
+ *
+ * React is reached for only when a card is actually drawn, and never at module
+ * load: this module sits in the same entry point as the prerender plugin, which
+ * a site must be able to import with none of the optional peers installed.
  */
-
-import { createElement } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 
 import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
-import { SiteMark } from '../../ecosystem/ui/marks.tsx';
 import { escapeText } from '../../share/core/escape.ts';
 
 /** The width every card is drawn at. */
@@ -37,13 +37,23 @@ export interface OgCardOptions {
  * Screenshot it at {@link OG_WIDTH} × {@link OG_HEIGHT} — a headless browser is
  * the only thing here that can rasterise it, and every site already has one for
  * its end-to-end tests.
+ *
+ * Drawing the mark is the one thing here that needs React, so React is loaded
+ * on the call rather than by the module. The card is drawn by a build script
+ * that already awaits a browser, so the await costs it nothing.
  * @param options - Which site, and what it says.
  * @returns A complete HTML document.
  */
-export function ogCardHtml(options: OgCardOptions): string {
+export async function ogCardHtml(options: OgCardOptions): Promise<string> {
   const site =
     typeof options.site === 'string' ? siteById(options.site) : options.site;
   const description = options.description ?? site.tagline;
+  const [{ createElement }, { renderToStaticMarkup }, { SiteMark }] =
+    await Promise.all([
+      import('react'),
+      import('react-dom/server'),
+      import('../../ecosystem/ui/marks.tsx'),
+    ]);
   const mark = renderToStaticMarkup(
     createElement(SiteMark, { site, size: 132, colors: 'literal' }),
   );

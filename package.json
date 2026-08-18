@@ -89,13 +89,25 @@
   },
   "homepage": "https://github.com/cheminfo/react-cheminfo#readme",
   "peerDependenciesMeta": {
+    "@blueprintjs/core": {
+      "optional": true
+    },
     "molstar": {
       "optional": true
     },
     "openchemlib": {
       "optional": true
     },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
     "react-ocl": {
+      "optional": true
+    },
+    "react-science": {
       "optional": true
     },
     "vite": {

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { injectPageMeta } from '../pageMeta.ts';
+import { injectPageMeta, pageDocumentMeta } from '../pageMeta.ts';
 import type { RouteMeta } from '../routes.ts';
 
 const ROUTES: RouteMeta[] = [
@@ -19,11 +19,11 @@ const ROUTES: RouteMeta[] = [
 const PAGE = [
   '<!doctype html>',
   '<html lang="en">',
-  '<head>',
-  '<title>placeholder</title>',
-  '<meta name="description" content="placeholder" />',
-  '</head>',
-  '<body><div id="root"></div></body>',
+  '  <head>',
+  '    <meta charset="utf-8" />',
+  '    <!--cheminfo:head-->',
+  '  </head>',
+  '  <body><div id="root"></div><!--cheminfo:body--></body>',
   '</html>',
 ].join('\n');
 
@@ -40,7 +40,7 @@ test('a page carries the title and description of the route it answers', () => {
   expect(html).toContain(
     '<meta name="description" content="What this tool computes, and how to cite it." />',
   );
-  expect(html).not.toContain('placeholder');
+  expect(html).not.toContain('<!--cheminfo:head-->');
 });
 
 test('the canonical is absolute and drops the query string', () => {
@@ -118,20 +118,42 @@ test('an origin carrying markup is escaped', () => {
     site: '3d',
     routes: ROUTES,
     url: '/about',
-    origin: 'https://evil"><script>alert(1)</script>',
+    origin: 'https://evil.example/"><script>alert(1)</script>',
   });
 
   expect(html).not.toContain('<script>alert(1)</script>');
   expect(html).toContain('&quot;&gt;&lt;script&gt;');
 });
 
-test('a page with no head at all still gets one written', () => {
-  const html = injectPageMeta('<html><body>hi</body></html>', {
-    site: '3d',
-    routes: ROUTES,
-    url: '/',
-  });
+test('an origin that is not an absolute address is refused', () => {
+  expect(() =>
+    injectPageMeta(PAGE, {
+      site: '3d',
+      routes: ROUTES,
+      url: '/about',
+      origin: 'learn.cheminfo.org/surge',
+    }),
+  ).toThrow(
+    'an origin is an absolute address, e.g. https://surge.cheminfo.org: "learn.cheminfo.org/surge"',
+  );
+});
 
-  expect(html).toContain('<title>');
-  expect(html).toContain('rel="canonical"');
+test('a section titles every page beneath it', () => {
+  const routes: RouteMeta[] = [
+    ...ROUTES,
+    {
+      path: '/molecules',
+      title: 'The ligands',
+      description: 'Every chemical component of the bank.',
+      prefix: true,
+    },
+  ];
+
+  expect(
+    pageDocumentMeta({ site: '3d', routes, url: '/molecules/HEM' }),
+  ).toStrictEqual({
+    title: 'The ligands — 3d.cheminfo.org',
+    description: 'Every chemical component of the bank.',
+    canonical: 'https://3d.cheminfo.org/molecules',
+  });
 });

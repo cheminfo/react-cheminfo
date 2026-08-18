@@ -4,18 +4,23 @@
  * Googlebot renders JavaScript, but Bing, a Slack unfurl, an LMS preview and
  * every academic indexer read the HTML that came off the wire — so the title,
  * the description and the canonical of a page must already be in it. A site
- * with a server rewrites them per request; a static one writes one file per
+ * with a server writes them per request; a static one writes one file per
  * address at build time. Both call this, which is pure string work: no
  * `window`, no `node:fs`.
+ *
+ * The page it is given is the template, which declares where its head goes and
+ * carries none of its own, so this only ever writes — see `./template.ts`.
  */
 
-import { siteById, siteDisplayName } from '../../ecosystem/core/lookup.ts';
+import { siteDisplayName } from '../../ecosystem/core/lookup.ts';
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
 import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
 
 import type { DocumentMeta } from './documentMeta.ts';
 import type { RouteMeta } from './routes.ts';
-import { pageMetaFor, trimTrailingSlash } from './routes.ts';
+import { pageMetaFor } from './routes.ts';
+import { mountPathOf, originOf, resolveSite } from './siteFiles.ts';
+import { PAGE_HEAD_MARKER, fill } from './template.ts';
 
 /** Which site is being served, and what it answers. */
 export interface PageMetaOptions {
@@ -23,11 +28,18 @@ export interface PageMetaOptions {
   site: EcosystemSite | SiteId;
   /** Every address it answers, each with its title and description. */
   routes: readonly RouteMeta[];
-  /** The address being written, query string included. */
+  /**
+   * The address being written, query string included: a path, or the absolute
+   * address an app reads off the page it is on.
+   */
   url: string;
   /**
-   * Origin every absolute address is built on. A server passes the one the
-   * request arrived on; a build leaves it out and the site's own host is used.
+   * Where the site is served, mount path included, e.g.
+   * `https://learn.cheminfo.org/surge`. A server passes the one the request
+   * arrived on; a build leaves it out and the site's own host is used. Every
+   * address written here is composed on it, so the mount is carried by the
+   * origin rather than applied a second time. It is an absolute address, or it
+   * is refused.
    * @default `https://<the site's host>`
    */
   origin?: string;
@@ -41,33 +53,44 @@ export interface PageMetaOptions {
 /**
  * Give a page the title, the description and the canonical address of the route
  * it answers, plus the card a link to it unfurls into.
- * @param html - The built page.
+ * @param html - The built template.
  * @param options - Which site, which address, and where it is served from.
- * @returns The page, with its head rewritten for that route.
+ * @returns The page, with its head written for that route.
+ * @throws {Error} When the page carries no `<!--cheminfo:head-->`, when the
+ * site answers no route, or when it names an origin that is not an absolute
+ * address.
  */
 export function injectPageMeta(html: string, options: PageMetaOptions): string {
-  const site = resolveSite(options.site);
-  const meta = pageMetaFor(options.routes, options.url);
-  const name = siteDisplayName(site);
-  const origin = trimTrailingSlash(options.origin ?? `https://${site.host}`);
+  return fill(html, PAGE_HEAD_MARKER, pageHeadTags(options));
+}
+
+/**
+ * The head a route is indexed and shared under, for a caller writing more into
+ * the same place — a structured-data block, a tracking snippet.
+ * @param options - Which site, which address, and where it is served from.
+ * @returns The tags, one per line.
+ * @throws {Error} When the site answers no route, or names an origin that is
+ * not an absolute address.
+ */
+export function pageHeadTags(options: PageMetaOptions): string {
+  const name = siteDisplayName(resolveSite(options.site));
+  const description = routeMetaOf(options).description;
+  const origin = originOf(options);
   const { title, canonical } = pageDocumentMeta(options);
   const image = absolute(options.image ?? '/og.png', origin);
 
-  const head = [
+  return [
+    `<title>${escapeText(title)}</title>`,
+    `<meta name="description" content="${escapeAttribute(description)}" />`,
     `<link rel="canonical" href="${escapeAttribute(canonical)}" />`,
     '<meta property="og:type" content="website" />',
     `<meta property="og:site_name" content="${escapeAttribute(name)}" />`,
     `<meta property="og:title" content="${escapeAttribute(title)}" />`,
-    `<meta property="og:description" content="${escapeAttribute(meta.description)}" />`,
+    `<meta property="og:description" content="${escapeAttribute(description)}" />`,
     `<meta property="og:url" content="${escapeAttribute(canonical)}" />`,
     `<meta property="og:image" content="${escapeAttribute(image)}" />`,
     '<meta name="twitter:card" content="summary_large_image" />',
   ].join('\n');
-
-  return insertBeforeHeadEnd(
-    replaceDescription(replaceTitle(html, title), meta.description),
-    head,
-  );
 }
 
 /**
@@ -78,50 +101,28 @@ export function injectPageMeta(html: string, options: PageMetaOptions): string {
  * click that changes the page cannot disagree with the page a crawler fetched.
  * @param options - Which site, which address, and where it is served from.
  * @returns The title, the description and the canonical of that address.
+ * @throws {Error} When the site answers no route, or names an origin that is
+ * not an absolute address.
  */
-export function pageDocumentMeta(options: PageMetaOptions): Required<DocumentMeta> {
+export function pageDocumentMeta(
+  options: PageMetaOptions,
+): Required<DocumentMeta> {
   const site = resolveSite(options.site);
-  const meta = pageMetaFor(options.routes, options.url);
-  const origin = trimTrailingSlash(options.origin ?? `https://${site.host}`);
+  const meta = routeMetaOf(options);
   return {
     title: `${meta.title} — ${siteDisplayName(site)}`,
     description: meta.description,
-    canonical: `${origin}${meta.path}`,
+    canonical: `${originOf(options)}${meta.path}`,
   };
 }
 
-/**
- * Put an addition at the end of the head, where a tracking snippet and a
- * structured-data block both belong.
- * @param html - The page.
- * @param addition - The markup to add, taken as written.
- * @returns The page, with the addition before `</head>`.
- */
-export function insertBeforeHeadEnd(html: string, addition: string): string {
-  const head = html.lastIndexOf('</head>');
-  if (head === -1) return `${html}\n${addition}\n`;
-  return `${html.slice(0, head)}${addition}\n${html.slice(head)}`;
-}
-
-function resolveSite(site: EcosystemSite | SiteId): EcosystemSite {
-  return typeof site === 'string' ? siteById(site) : site;
+// A server behind a mount is handed the address the browser asked for, and the
+// route table is written from the site's own root, so the mount the origin
+// carries is taken off it before the table is read.
+function routeMetaOf(options: PageMetaOptions): RouteMeta {
+  return pageMetaFor(options.routes, options.url, mountPathOf(options));
 }
 
 function absolute(target: string, origin: string): string {
   return target.startsWith('/') ? `${origin}${target}` : target;
-}
-
-function replaceTitle(html: string, title: string): string {
-  const replacement = `<title>${escapeText(title)}</title>`;
-  return html.includes('<title>')
-    ? html.replace(/<title>[\s\S]*?<\/title>/, replacement)
-    : insertBeforeHeadEnd(html, replacement);
-}
-
-function replaceDescription(html: string, description: string): string {
-  const replacement = `<meta name="description" content="${escapeAttribute(description)}" />`;
-  const existing = /<meta[^>]*name="description"[^>]*>/;
-  return existing.test(html)
-    ? html.replace(existing, replacement)
-    : insertBeforeHeadEnd(html, replacement);
 }

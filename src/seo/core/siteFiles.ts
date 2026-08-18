@@ -1,21 +1,26 @@
 /**
- * The files and blocks a crawler reads besides the head: the sitemap, the
- * robots policy, the structured-data block and the list of addresses a visitor
- * without JavaScript can still follow.
+ * The sitemap, and what every other file a crawler fetches on its own is
+ * derived from: which site is being written, where it is served, and the path
+ * it is mounted at.
  *
- * All four are derived from the site's own record and its route table, so a
- * page added to the table is added to every one of them at once.
+ * A deployment names where it serves the site in full — origin and mount path
+ * in one value — because the origin is what a canonical link and a sitemap
+ * entry need. The mount is read back out of it here, so the addresses these
+ * files hand out start where the site actually answers.
  */
 
-import { siteById, siteDisplayName } from '../../ecosystem/core/lookup.ts';
+import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
-import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
+import { basePathOf } from '../../router/core/basePath.ts';
+import { escapeText } from '../../share/core/escape.ts';
 
 import type { RouteMeta } from './routes.ts';
 import { trimTrailingSlash } from './routes.ts';
 
-/** The sequence that must not appear raw inside a script element. */
-const SCRIPT_SAFE_LESS_THAN = String.raw`\u003c`;
+// A crawler fetches what it is given over HTTP, so an origin is written in one
+// of the two schemes it speaks. Parsing alone does not say that: `localhost:3000`
+// parses, with `localhost:` as its scheme and `3000` as its path.
+const HTTP_ORIGIN = /^https?:\/\//i;
 
 /** What a crawler is told about the site as a whole. */
 export interface SiteFilesOptions {
@@ -24,7 +29,9 @@ export interface SiteFilesOptions {
   /** Every address it answers. */
   routes: readonly RouteMeta[];
   /**
-   * Origin every absolute address is built on.
+   * Where the site is served, mount path included, e.g.
+   * `https://learn.cheminfo.org/surge`. Every absolute address is built on it,
+   * and every path one of these files writes starts at its mount.
    * @default `https://<the site's host>`
    */
   origin?: string;
@@ -32,11 +39,20 @@ export interface SiteFilesOptions {
 
 /**
  * Every routed address, as the sitemap lists them.
+ *
+ * A sitemap names at least one address: `<url>` is required by the sitemaps.org
+ * schema, and `robots.txt` advertises the file, so an empty one is reported as
+ * an error on every fetch rather than read as a site with nothing to index.
  * @param options - The site and its routes.
  * @returns The `sitemap.xml` document.
+ * @throws {Error} When the site answers no route, or names an origin that is
+ * not an absolute address.
  */
 export function sitemapXml(options: SiteFilesOptions): string {
   const origin = originOf(options);
+  if (options.routes.length === 0) {
+    throw new Error('a sitemap lists at least one address');
+  }
   const entries = options.routes
     .map(
       (route) =>
@@ -51,100 +67,46 @@ ${entries}
 }
 
 /**
- * The crawl policy.
- *
- * Our tools are meant to be found, so only the endpoints are disallowed — an
- * API prefix and its documentation are not pages. The sitemap is named only
- * because this module also writes it: a `Sitemap:` line pointing at a 404 is
- * reported as an error on every fetch.
- * @param options - The site and its routes.
- * @param disallow - Address prefixes to keep out of the index.
- * @returns The `robots.txt` document.
+ * The site these files are being written for.
+ * @param site - The site, named or passed.
+ * @returns Its record.
  */
-export function robotsTxt(
-  options: SiteFilesOptions,
-  disallow: readonly string[] = [],
-): string {
-  const lines = ['User-agent: *', 'Allow: /'];
-  for (const path of disallow) lines.push(`Disallow: ${path}`);
-  lines.push('', `Sitemap: ${originOf(options)}/sitemap.xml`, '');
-  return lines.join('\n');
-}
-
-/** What the structured-data block says the tool is. */
-export interface StructuredDataOptions extends SiteFilesOptions {
-  /**
-   * The schema.org application category.
-   * @default 'EducationalApplication'
-   */
-  category?: string;
-  /**
-   * What the tool needs to run.
-   * @default 'Any modern browser'
-   */
-  operatingSystem?: string;
-}
-
-/**
- * One `application/ld+json` block describing the tool.
- *
- * It is the same on every page of a site — what varies per page is the head —
- * so it is written into the built page once rather than per route.
- * @param options - The site, and what kind of application it is.
- * @returns The script tag, ready to put in the head.
- */
-export function structuredDataScript(options: StructuredDataOptions): string {
-  const site = resolveSite(options.site);
-  const data = {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: siteDisplayName(site),
-    url: `${originOf(options)}/`,
-    description: site.tagline,
-    applicationCategory: options.category ?? 'EducationalApplication',
-    operatingSystem: options.operatingSystem ?? 'Any modern browser',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-    publisher: { '@type': 'Organization', name: 'cheminfo' },
-  };
-  const json = JSON.stringify(data, null, 2).replaceAll(
-    '<',
-    SCRIPT_SAFE_LESS_THAN,
-  );
-  return `<script type="application/ld+json">\n${json}\n</script>`;
-}
-
-/**
- * A readable page for a visitor, or a crawler, with no JavaScript.
- *
- * The body of our sites is an empty root element, so this is the only crawl
- * path through them that costs nothing to render — and it is honest: it says
- * the tool needs JavaScript, and links every address it answers.
- * @param options - The site and its routes.
- * @returns The `noscript` block, ready to put in the body.
- */
-export function noscriptIndex(options: SiteFilesOptions): string {
-  const site = resolveSite(options.site);
-  const items = options.routes
-    .map(
-      (route) =>
-        `    <li><a href="${escapeAttribute(route.path)}">${escapeText(route.title)}</a></li>`,
-    )
-    .join('\n');
-  return `<noscript>
-  <h1>${escapeText(siteDisplayName(site))}</h1>
-  <p>${escapeText(site.tagline)} This tool needs JavaScript; these are the pages it offers:</p>
-  <ul>
-${items}
-  </ul>
-</noscript>`;
-}
-
-function resolveSite(site: EcosystemSite | SiteId): EcosystemSite {
+export function resolveSite(site: EcosystemSite | SiteId): EcosystemSite {
   return typeof site === 'string' ? siteById(site) : site;
 }
 
-function originOf(options: SiteFilesOptions): string {
-  return trimTrailingSlash(
-    options.origin ?? `https://${resolveSite(options.site).host}`,
-  );
+/**
+ * Where the site is served, as an absolute address without a trailing slash.
+ *
+ * It is an absolute `http` or `https` address or it is refused: a canonical
+ * link, an `og:url` and a sitemap entry are addresses a crawler resolves on its
+ * own, and one written from an origin missing its scheme is resolved against
+ * whatever directory the page was fetched from — pointing every page of the
+ * site at a sibling of itself. A dev or staging origin written `localhost:3000`
+ * is refused for the same reason: it parses, but as a path under a `localhost:`
+ * scheme, so the mount read back off it would be `/3000`.
+ * @param options - The site and where it is served.
+ * @returns The origin, mount path included when the deployment named one.
+ * @throws {Error} When the deployment named something that is not an absolute
+ * `http` or `https` address.
+ */
+export function originOf(options: SiteFilesOptions): string {
+  const origin = options.origin ?? `https://${resolveSite(options.site).host}`;
+  if (!HTTP_ORIGIN.test(origin) || !URL.canParse(origin)) {
+    throw new Error(
+      `an origin is an absolute address, e.g. https://surge.cheminfo.org: ${JSON.stringify(origin)}`,
+    );
+  }
+  return trimTrailingSlash(origin);
+}
+
+/**
+ * The path the deployment is mounted at, read off the address it named.
+ * @param options - The site and where it is served.
+ * @returns `''` for a site owning its host, `/surge` for one mounted under it.
+ * @throws {Error} When the deployment named something that is not an absolute
+ * address, so there is no path to read off it.
+ */
+export function mountPathOf(options: SiteFilesOptions): string {
+  return basePathOf(originOf(options));
 }

@@ -1,12 +1,7 @@
 import { expect, test } from 'vitest';
 
 import type { RouteMeta } from '../routes.ts';
-import {
-  noscriptIndex,
-  robotsTxt,
-  sitemapXml,
-  structuredDataScript,
-} from '../siteFiles.ts';
+import { mountPathOf, originOf, sitemapXml } from '../siteFiles.ts';
 
 const ROUTES: RouteMeta[] = [
   { path: '/', title: 'Conformers in 3D', description: 'The home page.' },
@@ -26,47 +21,89 @@ test('the sitemap lists every routed address, absolute', () => {
   );
 });
 
-test('robots allows everything and names the sitemap it is written with', () => {
-  expect(robotsTxt(OPTIONS)).toBe(
-    'User-agent: *\nAllow: /\n\nSitemap: https://3d.cheminfo.org/sitemap.xml\n',
+test('a mounted deployment lists its addresses under the mount, once', () => {
+  expect(
+    sitemapXml({ ...OPTIONS, origin: 'https://learn.cheminfo.org/surge/' }),
+  ).toBe(
+    `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://learn.cheminfo.org/surge/</loc></url>
+  <url><loc>https://learn.cheminfo.org/surge/about</loc></url>
+</urlset>
+`,
   );
 });
 
-test('robots keeps the endpoints out of the index', () => {
-  const robots = robotsTxt(OPTIONS, ['/v1/', '/docs']);
-
-  expect(robots).toContain('Disallow: /v1/');
-  expect(robots).toContain('Disallow: /docs');
+test('the origin is the site host until a deployment names another', () => {
+  expect(originOf(OPTIONS)).toBe('https://3d.cheminfo.org');
+  expect(
+    originOf({ ...OPTIONS, origin: 'https://learn.cheminfo.org/surge/' }),
+  ).toBe('https://learn.cheminfo.org/surge');
 });
 
-test('the structured data names the site, its address and its publisher', () => {
-  const script = structuredDataScript(OPTIONS);
-
-  expect(script).toContain('"@type": "WebApplication"');
-  expect(script).toContain('"name": "3d.cheminfo.org"');
-  expect(script).toContain('"url": "https://3d.cheminfo.org/"');
-  expect(script).toContain(
-    '"description": "Conformers in 3D from a structure you draw."',
+test('the mount is the path half of the address the deployment named', () => {
+  expect(mountPathOf(OPTIONS)).toBe('');
+  expect(mountPathOf({ ...OPTIONS, origin: 'https://3d.cheminfo.org/' })).toBe(
+    '',
   );
-  expect(script).toContain('"applicationCategory": "EducationalApplication"');
-  expect(script).toContain('"name": "cheminfo"');
+  expect(
+    mountPathOf({ ...OPTIONS, origin: 'https://learn.cheminfo.org/surge/' }),
+  ).toBe('/surge');
 });
 
-test('the structured data cannot close its own script tag', () => {
-  const script = structuredDataScript({
-    ...OPTIONS,
-    operatingSystem: '</script><script>alert(1)</script>',
-  });
-
-  expect(script).not.toContain('<script>alert(1)');
-  expect(script).toContain(String.raw`\u003c/script>`);
+test('an address that is not one is refused, not read as the host root', () => {
+  expect(() => mountPathOf({ ...OPTIONS, origin: '' })).toThrow(
+    'an origin is an absolute address, e.g. https://surge.cheminfo.org: ""',
+  );
+  expect(() => mountPathOf({ ...OPTIONS, origin: '/surge' })).toThrow(
+    'an origin is an absolute address, e.g. https://surge.cheminfo.org: "/surge"',
+  );
+  expect(() =>
+    originOf({ ...OPTIONS, origin: 'learn.cheminfo.org/surge' }),
+  ).toThrow(
+    'an origin is an absolute address, e.g. https://surge.cheminfo.org: "learn.cheminfo.org/surge"',
+  );
 });
 
-test('the noscript block links every routed address', () => {
-  const block = noscriptIndex(OPTIONS);
+test('a doubled trailing slash composes one address, not one with a gap', () => {
+  expect(
+    originOf({ ...OPTIONS, origin: 'https://learn.cheminfo.org/surge//' }),
+  ).toBe('https://learn.cheminfo.org/surge');
+  expect(
+    sitemapXml({ ...OPTIONS, origin: 'https://learn.cheminfo.org/surge//' }),
+  ).toContain('<url><loc>https://learn.cheminfo.org/surge/about</loc></url>');
+});
 
-  expect(block).toContain('<h1>3d.cheminfo.org</h1>');
-  expect(block).toContain('<li><a href="/">Conformers in 3D</a></li>');
-  expect(block).toContain('<li><a href="/about">About</a></li>');
-  expect(block).toContain('This tool needs JavaScript');
+test('a sitemap with no address in it is refused, never written empty', () => {
+  expect(() => sitemapXml({ site: '3d', routes: [] })).toThrow(
+    'a sitemap lists at least one address',
+  );
+});
+
+test('an origin in a scheme no crawler fetches is refused, not read as a path', () => {
+  for (const origin of [
+    'localhost:3000',
+    'c:/build/dist',
+    // Assembled rather than written out: a script URL in source is an eslint
+    // error, and it is the scheme this guard most has to refuse.
+    ['java', 'script:alert(1)'].join(''),
+    'mailto:a@b.c',
+    'x:',
+  ]) {
+    expect(() => originOf({ ...OPTIONS, origin })).toThrow(
+      `an origin is an absolute address, e.g. https://surge.cheminfo.org: ${JSON.stringify(origin)}`,
+    );
+    expect(() => mountPathOf({ ...OPTIONS, origin })).toThrow(
+      `an origin is an absolute address, e.g. https://surge.cheminfo.org: ${JSON.stringify(origin)}`,
+    );
+  }
+});
+
+test('a plain http origin is served as written', () => {
+  expect(originOf({ ...OPTIONS, origin: 'http://localhost:3000/surge' })).toBe(
+    'http://localhost:3000/surge',
+  );
+  expect(
+    mountPathOf({ ...OPTIONS, origin: 'http://localhost:3000/surge' }),
+  ).toBe('/surge');
 });
