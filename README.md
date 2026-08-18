@@ -69,6 +69,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Widgets**             | `CREDITS`, `credits`                                                                                                                                                                                              | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                             |
 | **Hooks & state**       | `createWorkerChannel`                                                                                                                                                                                             | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                           |
 | **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                         | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                |
+| **Periodic table**      | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                             | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                 |
 
 Everything in that table is exported from `./core`, `./ui`, `./vite` or
 `./structure` and nothing else is: the sub-components a component is built
@@ -161,6 +162,21 @@ Each work holds its own article and its own reference, in the default style; the
 sections below carry the whole set at once, so one copy pastes both citations and
 one saved file holds both records (`references.ris`). Nothing changes for a site
 asking for a single work.
+
+The two works the whole family shares are held here rather than copied into each
+site, so none of them can name a different version of the same paper — import
+them from `react-cheminfo/core` and put the site's own work first:
+
+| Export                             | The work                                                                                                               |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `PLATFORM_PAPER` / `PLATFORM_WORK` | Chemical data processed in the browser, which is what makes these applications rather than queues of jobs. Every site. |
+| `TEACHING_PAPER` / `TEACHING_WORK` | Two decades of online teaching, which is what the tutorials and the exercises are. The sites that teach.               |
+
+```tsx
+import { PLATFORM_WORK, TEACHING_WORK } from 'react-cheminfo/core';
+
+<CiteButton works={[OWN_WORK, TEACHING_WORK, PLATFORM_WORK]} />;
+```
 
 ### `EcosystemButton`
 

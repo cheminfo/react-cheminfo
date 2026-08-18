@@ -19,8 +19,9 @@ test('nothing in the rule is escaped into something a browser cannot read', () =
   expect(html).not.toContain('&');
   expect(html).toBe(
     `<style>:root {
-  --brand: #0d1d37;
-  --brand-alt: #0c9ba3;
+  --brand: #701a75;
+  --brand-alt: #a3e635;
+  --brand-alt-text: #4d7c0f;
   --accent: var(--brand);
 }
 </style>`,

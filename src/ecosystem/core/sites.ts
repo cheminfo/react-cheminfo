@@ -206,9 +206,9 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'polycarp.cheminfo.org',
     repository: 'https://github.com/cheminfo/polycarp.cheminfo.org',
     tagline: 'Predict the microstructure of a radical copolymerisation.',
-    brand: '#0d1d37',
-    brandAlt: '#0c9ba3',
-    mark: { plate: '#0d1d37', accent: '#0c9ba3' },
+    brand: '#701a75',
+    brandAlt: '#4d7c0f',
+    mark: { plate: '#701a75', accent: '#a3e635' },
   },
   {
     id: '3d',

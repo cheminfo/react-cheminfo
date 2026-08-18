@@ -60,4 +60,4 @@ export type {
 } from './sample.ts';
 export { runAtomicSample } from './sample.ts';
 export type { Screening } from './screening.ts';
-export { slaterScreening } from './screening.ts';
+export { groupRank, slaterScreening } from './screening.ts';

@@ -1,9 +1,8 @@
 /**
  * Atomic numbers for the tests, by symbol.
  *
- * The package ships no periodic table on purpose — a consumer already has one —
- * so the handful of elements the orbital tests are written against are named
- * here rather than looked up.
+ * Written out rather than looked up through the periodic module, so a mistake
+ * there cannot quietly move every orbital test with it.
  */
 
 const ATOMIC_NUMBERS: Record<string, number> = {

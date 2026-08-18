@@ -8,6 +8,7 @@ export * from './ecosystem/core/index.ts';
 export * from './format/core/index.ts';
 export * from './orbital/core/index.ts';
 export * from './pedagogy/core/index.ts';
+export * from './periodic/core/index.ts';
 export * from './router/core/index.ts';
 export * from './seo/core/index.ts';
 export * from './share/core/index.ts';

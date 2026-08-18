@@ -54,6 +54,7 @@
     "@types/react-dom": "^19.2.4",
     "@vitest/coverage-v8": "^4.1.10",
     "@zakodium/tsconfig": "^1.0.5",
+    "chemical-elements": "^2.3.2",
     "eslint": "^9.39.5",
     "eslint-config-cheminfo-react": "^20.1.0",
     "eslint-config-cheminfo-typescript": "^22.1.0",

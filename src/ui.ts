@@ -11,6 +11,7 @@ export * from './error/ui/index.ts';
 export * from './help/ui/index.ts';
 export * from './hooks/ui/index.ts';
 export * from './pedagogy/ui/index.ts';
+export * from './periodic/ui/index.ts';
 export * from './share/ui/index.ts';
 export * from './shared/ui/index.ts';
 export * from './state/ui/index.ts';
