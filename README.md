@@ -30,43 +30,50 @@ would mean two Blueprint style trees in one page.
 Subpaths are **bundle boundaries, not taxonomy**: a feature gets its own door
 only when it drags a heavy dependency behind it.
 
-| Import                             | Holds                                        | Costs                 |
-| ---------------------------------- | -------------------------------------------- | --------------------- |
-| `react-cheminfo/core`              | every framework-free helper — 151 exports    | nothing               |
-| `react-cheminfo/ui`                | every React component and hook — 71 exports  | React                 |
-| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                 | React, molstar        |
-| `react-cheminfo/structure`         | the structure editor and renderer            | React, react-ocl, OCL |
-| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet | nothing               |
+| Import                             | Holds                                             | Costs                      |
+| ---------------------------------- | ------------------------------------------------- | -------------------------- |
+| `react-cheminfo/core`              | every framework-free helper — 140 value exports   | nothing                    |
+| `react-cheminfo/ui`                | every React component and hook — 60 value exports | React                      |
+| `react-cheminfo/vite`              | the prerender plugin and the OG card              | nothing; React on the card |
+| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                      | React, molstar             |
+| `react-cheminfo/structure`         | the structure editor and renderer                 | React, react-ocl, OCL      |
+| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet      | nothing                    |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
-sampling an orbital loads neither React nor molstar. `openchemlib`, `react-ocl`
-and `molstar` are **optional** peers, so a site that only wants the Tools menu
-downloads none of them.
+sampling an orbital loads neither React nor molstar. **Every peer is optional**,
+so a site that only wants the Tools menu downloads none of them, and a project
+that only prerenders installs neither React nor Vite.
+
+`react-cheminfo/vite` is the one door with a split bill: `cheminfoPrerender`
+needs nothing beyond Vite's own plugin type, while `ogCardHtml` renders a mark
+and therefore loads React — but on the call, not on the import, so the plugin
+stays reachable from a checkout that has neither.
 
 The stylesheet ships from `styles/`, which `tsc` leaves alone, and is reached
 through a wildcard subpath exactly as `react-science` serves its own.
 
 ## What is in it
 
-| Area                    | `…/core`                                                                                                 | `…/ui`                                                                                                                                           |
-| ----------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`              | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                             |
-| **Chrome**              | —                                                                                                        | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                         |
-| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl` | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
-| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs  | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                   |
-| **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink` | —                                                                                                                                                |
-| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`               | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList` |
-| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`   | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`                                                                                                 |
-| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`             | `ColorScaleLegend`                                                                                                                               |
-| **Widgets**             | `CREDITS`, `credits`                                                                                     | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                             |
-| **Hooks & state**       | `createWorkerChannel`                                                                                    | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                           |
-| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                |
+| Area                    | `…/core`                                                                                                                                                                                                          | `…/ui`                                                                                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`                                                                                                                       | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                             |
+| **Chrome**              | —                                                                                                                                                                                                                 | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                         |
+| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                          | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
+| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs                                                                                                           | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                   |
+| **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink`                                                                                                          | —                                                                                                                                                |
+| **Indexing**            | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute` | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                         |
+| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                        | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList` |
+| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`                                                                                                            | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`                                                                                                 |
+| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`                                                                                                                      | `ColorScaleLegend`                                                                                                                               |
+| **Widgets**             | `CREDITS`, `credits`                                                                                                                                                                                              | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                             |
+| **Hooks & state**       | `createWorkerChannel`                                                                                                                                                                                             | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                           |
+| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                         | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                |
 
-Everything in that table is exported from `./core`, `./ui` or `./structure` and
-nothing else is: the sub-components a component is built from, the parsers a
-helper calls and the internals of a hook stay inside the package, reachable only
-by their own path. If it is exported, it is supported.
+Everything in that table is exported from `./core`, `./ui`, `./vite` or
+`./structure` and nothing else is: the sub-components a component is built
+from, the parsers a helper calls and the internals of a hook stay inside the
+package, reachable only by their own path. If it is exported, it is supported.
 
 The rule for a new site is short: **`react-cheminfo` first, `react-science`
 second, your own code last.** The full import table and the checklist live in
@@ -85,11 +92,13 @@ The **Brand** toolbar at the top retunes `--brand` / `--brand-alt`, so any story
 can be read as it would look on any site of the family.
 
 The sources are organised the other way round — one folder per feature
-(`src/citation`, `src/ecosystem`, `src/share`, `src/pedagogy`, …), each holding a
-`core/` and a `ui/` half — and `src/core.ts` and `src/ui.ts` are the barrels the
-two entry points point at. ESLint forbids a `core/` folder from importing
-`react`, `react-dom` or anything under a `ui/`, which is what keeps the
-framework-free entry point honest.
+(`src/citation`, `src/ecosystem`, `src/share`, `src/seo`, `src/pedagogy`, …),
+each holding a `core/` and a `ui/` half — and `src/core.ts`, `src/ui.ts`,
+`src/vite.ts`, `src/structure.ts` and `src/orbital.ts` are the barrels the entry
+points point at. ESLint forbids a `core/` folder from importing `react`,
+`react-dom` or anything under a `ui/`, which is what keeps the framework-free
+entry points honest; `src/seo/vite` is the one half named for its consumer
+rather than for a framework, because a build plugin is neither.
 `src/shared` holds what more than one of them is built on: `MenuButton`, the
 shape every button of a site header takes, which is why `CiteButton` and
 `EcosystemButton` differ only in their glyph and their menu, and why both accept
@@ -235,6 +244,138 @@ The colours a name is set in are the site's own and are not retuned to reach the
 4.5:1 of body text: ChemCalc's teal and NMRium's orange both land just under it,
 which is why a name is set bold, where 3:1 is the threshold.
 
+## Prerendering a site
+
+A static site has no server to rewrite a head per request, so a crawler gets
+whatever came off the wire. `cheminfoPrerender` writes **one real HTML file per
+routed address** at build time, each with its own title, description and
+canonical, plus `sitemap.xml`, `robots.txt`, the JSON-LD block and the
+`noscript` crawl path. Without it every address carries the same head and a
+search engine folds the whole site into one result.
+
+### The template says where the head goes
+
+`index.html` is the **template**, and it carries no title and no description of
+its own: it declares where they go, with two comments.
+
+```html
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%BASE_URL%favicon.svg" />
+  <!--cheminfo:head-->
+</head>
+<body>
+  <div id="root"></div>
+  <!--cheminfo:body-->
+</body>
+```
+
+That is the whole contract, and it is what makes the rest of this small: the
+head is _written_, never found and operated on. Nothing is parsed and nothing is
+searched for but the marker, so a byte order mark, an implicit head, a `</head>`
+the page's own prose displays or a bundled script quotes in a string, and a
+`<title>` inside an `<svg>` all leave the result exactly as it is — and no
+duplicate title or description is possible, because the template carries none. A
+page missing `<!--cheminfo:head-->` throws rather than shipping headless.
+
+`<!--cheminfo:body-->` is where the `noscript` crawl path goes, and a site
+running with `noscript: false` needs no such marker.
+
+It is a Vite plugin, and the whole of a live caller — `3d.cheminfo.org` — is:
+
+```ts
+// vite.config.ts
+import react from '@vitejs/plugin-react';
+import { cheminfoPrerender } from 'react-cheminfo/vite';
+import { defineConfig } from 'vite';
+
+import { PAGE_ROUTES } from './src/seo/routes.ts';
+
+export default defineConfig({
+  plugins: [
+    react(),
+    cheminfoPrerender({
+      site: '3d',
+      routes: PAGE_ROUTES,
+      operatingSystem: 'Any browser with WebGL2',
+    }),
+  ],
+});
+```
+
+`routes` is one `RouteMeta[]` the site owns and three things read: this plugin,
+`injectPageMeta` on a server that has one, and `writeDocumentMeta` in the
+running app after an in-app move. A page missing from it is a page a search
+engine only ever sees as the home page.
+
+`npm run dev` fills the same two markers from the home route, so a developer
+never opens a page showing its markers and dev reads like production.
+
+### The mount lives in `origin`, and nothing else
+
+**`origin` is where the site is served, mount path included** — one value
+carrying both, because that is exactly what a canonical link, an `og:url` and a
+sitemap entry need. Everything else is read back off it: `robots.txt` writes its
+`Allow` and `Disallow` under the mount, the `noscript` index links under the
+mount, and every absolute address is built on it. There is no second option to
+keep in step.
+
+```ts
+cheminfoPrerender({ site: 'surge', routes: PAGE_ROUTES });
+// origin defaults to https://surge.cheminfo.org — the site owns its host,
+// the mount is '', and /exercises is written at dist/exercises/index.html.
+
+cheminfoPrerender({
+  site: 'surge',
+  routes: PAGE_ROUTES,
+  origin: 'https://learn.cheminfo.org/surge',
+});
+// the same build, mounted under /surge: canonicals and the sitemap read
+// https://learn.cheminfo.org/surge/exercises, and robots.txt allows /surge/.
+```
+
+The **files on disk are laid out from the build's own root either way** —
+`dist/exercises/index.html`, never `dist/surge/exercises/index.html`. It is the
+server that puts them under the mount. An origin must be an absolute `http` or
+`https` address or it is refused: one written `localhost:3000` parses with
+`localhost:` as its scheme, which would read the mount back as `/3000`.
+
+`robots: false` skips `robots.txt` for a site shipping its own,
+`category: false` skips the JSON-LD block, and `noscript: false` leaves the site
+without its only crawl path — so leave it on.
+
+### The card a link unfurls into
+
+`ogCardHtml` draws `public/og.png` from the site's own record — its mark, its
+two colours, its name — so the card never drifts from the mark the site shows.
+It returns a page for a headless browser to screenshot, and it is the one export
+of this entry point that loads React, on the call rather than on the import:
+
+```ts
+// scripts/generateOgImage.ts, run with `npm run og-image`
+import { chromium } from '@playwright/test';
+import { OG_HEIGHT, OG_WIDTH, ogCardHtml } from 'react-cheminfo/vite';
+
+const browser = await chromium.launch();
+const page = await browser.newPage({
+  viewport: { width: OG_WIDTH, height: OG_HEIGHT },
+});
+await page.setContent(await ogCardHtml({ site: '3d' }), { waitUntil: 'load' });
+const png = await page.screenshot({ type: 'png' });
+await browser.close();
+```
+
+### On a site that does have a server
+
+The same head is written per request instead:
+`injectPageMeta(index, { site, routes, origin, url })`, next to the
+tracking-script injection, on `/`, `/index.html` and the SPA fallback alike — the
+served page is the same template, with the same two markers. `robotsTxt` and
+`sitemapXml` are the same two calls, answered as routes rather than written to
+disk. A server writing more into the same place composes it itself, with
+`pageHeadTags` and `fill(page, PAGE_BODY_MARKER, noscriptIndex(…))`. All of that
+is `react-cheminfo/core`, so a backend loads no React and no Vite.
+
 ## Styling
 
 **No stylesheet, nothing for a consumer to import.** Every rule is a
@@ -312,12 +453,19 @@ Then, from a throwaway app — or from the site you are about to adopt it in:
 npm i ../react-cheminfo/react-cheminfo-0.0.0.tgz
 ```
 
-Import from both entry points, so the check covers the framework-free half too:
+Import from every entry point, so the check covers the framework-free halves
+too:
 
 ```tsx
 import { CITATION_STYLES, formatCitation } from 'react-cheminfo/core';
 import { CiteButton, EcosystemButton } from 'react-cheminfo/ui';
+import { cheminfoPrerender } from 'react-cheminfo/vite';
 ```
+
+Install the tarball on its own once — **with no other dependency** — and import
+`react-cheminfo/core` and `react-cheminfo/vite` from it. Every peer is optional,
+so npm installs none of them, and either import failing means a module that
+should be framework-free is loading one at module scope.
 
 Reinstall the tarball after every `npm pack` — npm caches it by name and
 version, and this package stays at `0.0.0` until release-please cuts the first
