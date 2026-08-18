@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{i as t,r as n}from"./lookup-BPEw8KfH.js";import{n as r,t as i}from"./EcosystemMenu-BycGy862.js";var a,o,s,c;function l(){return(l=e((()=>{t(),r(),a={title:`Ecosystem/EcosystemMenu`,component:i,argTypes:{currentSiteId:{control:`select`,options:n.map(e=>e.id)}},parameters:{layout:`padded`,docs:{description:{component:`What the Tools button opens, shown on its own: every site of the family, each behind its own little logo and the two colours it owns.`}}}},o={},s={args:{currentSiteId:`vcl`}},o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  args: {
+    currentSiteId: 'vcl'
+  }
+}`,...s.parameters?.docs?.source},description:{story:`The current site keeps its tile, marked, and is the one that is not a link.`,...s.parameters?.docs?.description}}},c=[`Default`,`CurrentSite`]})))()}l();export{s as CurrentSite,o as Default,c as __namedExportsOrder,a as default};
