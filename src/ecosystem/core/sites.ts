@@ -107,8 +107,8 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     repository: 'https://github.com/cheminfo/chemcalc.org',
     tagline: 'Molecular formula, exact mass and isotopic distribution.',
     brand: '#5b52e0',
-    brandAlt: '#0d9488',
-    mark: { plate: '#5b52e0', accent: '#09d3ac' },
+    brandAlt: '#d63384',
+    mark: { plate: '#5b52e0', accent: '#ff8ac2' },
   },
   {
     id: 'nmrium',
