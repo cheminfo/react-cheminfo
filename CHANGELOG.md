@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/cheminfo/react-cheminfo/compare/v0.6.0...v0.7.0) (2026-08-18)
+
+
+### Features
+
+* add a shared periodic table ([e1cc34f](https://github.com/cheminfo/react-cheminfo/commit/e1cc34f5a780dc017ecee36b16e55289757bf2f1))
+* **citation:** export the platform paper as a shared work ([2f5019d](https://github.com/cheminfo/react-cheminfo/commit/2f5019d535741ba335da6bb84a57b2ae7e36d120))
+
+
+### Bug Fixes
+
+* **ecosystem:** give chemcalc a rose second colour ([0fb49ec](https://github.com/cheminfo/react-cheminfo/commit/0fb49ec389466d62612561dcda3b1e3ff46847f1))
+
 ## [0.6.0](https://github.com/cheminfo/react-cheminfo/compare/v0.5.0...v0.6.0) (2026-08-18)
 
 
