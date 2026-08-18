@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/cheminfo/react-cheminfo/compare/v0.5.0...v0.6.0) (2026-08-18)
+
+
+### Features
+
+* draw a labelled cartesian frame, and turn the scene slower ([9539698](https://github.com/cheminfo/react-cheminfo/commit/95396985def8628fce680259b1b06a87a0b42b82))
+
 ## [0.5.0](https://github.com/cheminfo/react-cheminfo/compare/v0.4.1...v0.5.0) (2026-08-18)
 
 
