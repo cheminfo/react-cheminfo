@@ -27,7 +27,9 @@ const LEVEL_LABELS = {
  */
 function TutorialStepStripDemo(props: TutorialStepStripProps): ReactElement {
   const [index, setIndex] = useState(props.activeIndex);
-  const step = props.steps[Math.min(index, props.steps.length - 1)];
+  // The strip asks for a title and a level; this course also writes prose.
+  const step = props.steps[Math.min(index, props.steps.length - 1)] as
+    TutorialStep | undefined;
 
   return (
     <div style={COLUMN_STYLE}>

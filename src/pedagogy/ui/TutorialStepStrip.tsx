@@ -1,15 +1,29 @@
 import { Button, Tag, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
-import type { ExerciseLevel, TutorialStep } from '../core/types.ts';
+import type { ExerciseLevel } from '../core/types.ts';
 
 import { LEVEL_ORDER } from './exerciseMeta.ts';
 import type { TutorialLevelColours } from './tutorialLevels.ts';
 import { TUTORIAL_LEVEL_COLOURS } from './tutorialLevels.ts';
 
+/**
+ * The little a strip needs of a step: what to call it, and which coloured group
+ * it belongs to. A tool passes its own steps, whatever else they carry.
+ */
+export interface TutorialStripStep {
+  /**
+   * What keys the button, when the tool gives its steps one.
+   * @default undefined — the position in the tour keys it instead
+   */
+  id?: string;
+  title: string;
+  level: ExerciseLevel;
+}
+
 export interface TutorialStepStripProps {
   /** The whole tour, in teaching order. */
-  steps: readonly TutorialStep[];
+  steps: readonly TutorialStripStep[];
   /**
    * Which step is open, as its position in `steps`. A position outside the
    * tour is read as one of its ends, so a hand-edited link still opens.
@@ -110,7 +124,7 @@ export function TutorialStepStrip(props: TutorialStepStripProps): ReactElement {
 }
 
 interface LevelStripProps {
-  steps: readonly TutorialStep[];
+  steps: readonly TutorialStripStep[];
   positions: readonly number[];
   colours: TutorialLevelColours;
   label: string;
@@ -122,11 +136,11 @@ function LevelStrip(props: LevelStripProps): ReactElement {
   const { steps, positions, colours, label, activeIndex, onSelect } = props;
   const buttons: ReactNode[] = [];
   for (const position of positions) {
-    const step = steps[position] as TutorialStep;
+    const step = steps[position] as TutorialStripStep;
     const active = position === activeIndex;
     buttons.push(
       <Tooltip
-        key={step.id}
+        key={step.id ?? position}
         content={step.title}
         hoverOpenDelay={HOVER_OPEN_DELAY}
         placement="bottom"
@@ -155,7 +169,7 @@ function LevelStrip(props: LevelStripProps): ReactElement {
 }
 
 function positionsOfLevel(
-  steps: readonly TutorialStep[],
+  steps: readonly TutorialStripStep[],
   level: ExerciseLevel,
 ): number[] {
   const positions: number[] = [];

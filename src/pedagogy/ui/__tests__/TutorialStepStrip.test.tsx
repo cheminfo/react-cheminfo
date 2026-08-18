@@ -122,6 +122,23 @@ test('every number is the same square, so the strips line up as columns', () => 
   expect(html).not.toContain('min-width');
 });
 
+test('a tour whose steps carry no id is still numbered and clickable', () => {
+  const html = renderToStaticMarkup(
+    <TutorialStepStrip
+      steps={[
+        { title: 'Literal characters', level: 'beginner' },
+        { title: 'Lookahead', level: 'advanced' },
+      ]}
+      activeIndex={1}
+      onSelect={noop}
+    />,
+  );
+
+  expect(html).toContain('aria-label="Step 1: Literal characters"');
+  expect(html).toContain('aria-label="Step 2: Lookahead"');
+  expect(html).toContain('Step 2 of 2');
+});
+
 test('a strip is named by the tool, and the pager may carry a word', () => {
   const html = renderToStaticMarkup(
     <TutorialStepStrip
