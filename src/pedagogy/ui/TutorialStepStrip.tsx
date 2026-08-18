@@ -172,6 +172,9 @@ function clampIndex(index: number, total: number): number {
 
 /**
  * The open step takes the darker shade of its own level, plus a border.
+ *
+ * Every button is the same square whatever it holds, so the numbers of one
+ * strip stand above those of the next and the tour reads as a grid.
  * @param colours - The two shades of the level the step belongs to.
  * @param active - Whether this is the step on screen.
  * @returns The style of one numbered button.
@@ -181,19 +184,28 @@ function numberStyle(
   active: boolean,
 ): CSSProperties {
   return {
-    background: active ? colours.activeBackground : '#ffffff',
+    display: 'inline-flex',
+    width: STEP_SIZE,
+    height: STEP_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
     border: active ? '2px solid #1c2127' : '1px solid rgb(17 20 24 / 20%)',
     borderRadius: 4,
+    background: active ? colours.activeBackground : '#ffffff',
+    boxSizing: 'border-box',
     color: '#1c2127',
     cursor: 'pointer',
     font: 'inherit',
     fontSize: 12,
+    fontVariantNumeric: 'tabular-nums',
     fontWeight: active ? 700 : 500,
     lineHeight: 1,
-    minWidth: 26,
-    padding: active ? '5px 6px' : '6px 7px',
   };
 }
+
+/** Wide enough for two digits, which every tour of ours stays under a hundred of. */
+const STEP_SIZE = 28;
 
 /** Long enough that the pointer can cross the strip without opening a title. */
 const HOVER_OPEN_DELAY = 150;

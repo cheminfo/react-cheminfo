@@ -100,6 +100,28 @@ test('the pager dies at each end and can be left out entirely', () => {
   expect(none).not.toContain('Step 1 of 3');
 });
 
+test('every number is the same square, so the strips line up as columns', () => {
+  const steps: TutorialStep[] = [];
+  for (let index = 0; index < 12; index++) {
+    steps.push({
+      id: `step-${index}`,
+      title: `Step ${index + 1}`,
+      description: 'A step.',
+      level: index < 8 ? 'beginner' : 'advanced',
+    });
+  }
+
+  const html = renderToStaticMarkup(
+    <TutorialStepStrip steps={steps} activeIndex={9} onSelect={noop} />,
+  );
+
+  const widths = html.match(/width:28px/g);
+
+  expect(widths).toHaveLength(12);
+  expect(html).toContain('>12</button>');
+  expect(html).not.toContain('min-width');
+});
+
 test('a strip is named by the tool, and the pager may carry a word', () => {
   const html = renderToStaticMarkup(
     <TutorialStepStrip
