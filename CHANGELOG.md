@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.0](https://github.com/cheminfo/react-cheminfo/compare/v0.4.1...v0.5.0) (2026-08-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* index.html must carry <!--cheminfo:head-->, and <!--cheminfo:body--> unless noscript is false; a page without the head marker throws rather than shipping headless. injectPageMeta no longer rewrites an existing title or description, and insertBeforeHeadEnd is gone from ./core. ogCardHtml returns a promise. origin must be an absolute http(s) address. sitemapXml throws on an empty route table, and cheminfoPrerender validates the route table when the config is evaluated.
+
+### Features
+
+* add DerepFlow to the ecosystem ([c2644e4](https://github.com/cheminfo/react-cheminfo/commit/c2644e4517e1455b7b28e8c017753c87186d73cc))
+* follow the route with one shared startDocumentMeta ([ace0668](https://github.com/cheminfo/react-cheminfo/commit/ace06681cc53611ff0a2ae8ce430c7588741fed7))
+* write the page head from a template marker ([b747cdd](https://github.com/cheminfo/react-cheminfo/commit/b747cdde9d9fb5801155c80fd0f863b3cbf23c0b))
+
+
+### Bug Fixes
+
+* keep react, react-dom, blueprint and react-science required peers ([19a25c7](https://github.com/cheminfo/react-cheminfo/commit/19a25c7711a97f8418808c6c6e61258b56b3bcb0))
+
 ## [0.4.1](https://github.com/cheminfo/react-cheminfo/compare/v0.4.0...v0.4.1) (2026-08-17)
 
 
