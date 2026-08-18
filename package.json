@@ -1,6 +1,6 @@
 {
   "name": "react-cheminfo",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "license": "MIT",
   "description": "Assembled React components shared by the cheminfo sites: a Cite button and an ecosystem menu",
   "author": "Luc Patiny",
