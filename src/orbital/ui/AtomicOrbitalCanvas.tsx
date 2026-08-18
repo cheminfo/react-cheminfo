@@ -15,6 +15,7 @@ import { PHASE_PALETTES } from '../core/palette.ts';
 import type { AtomicSampler } from '../core/sample.ts';
 import { sampleInProcess } from '../core/sample.ts';
 
+import { DEFAULT_SPIN_SPEED } from './camera.ts';
 import type { OrbitalViewer } from './viewer.ts';
 import { createOrbitalViewer } from './viewer.ts';
 
@@ -44,6 +45,11 @@ export interface AtomicOrbitalCanvasProps {
    * @default false
    */
   spinning?: boolean;
+  /**
+   * How fast it turns, in molstar's own spin unit. Lower is slower.
+   * @default 0.3
+   */
+  spinSpeed?: number;
   /**
    * How the field is produced. Supply a worker-backed sampler to keep the main
    * thread free; the default runs in process.
@@ -77,6 +83,7 @@ export function AtomicOrbitalCanvas(
     palette = PHASE_PALETTES.textbook,
     resolution = DEFAULT_RESOLUTION,
     spinning = false,
+    spinSpeed = DEFAULT_SPIN_SPEED,
     sample = sampleInProcess,
     onNodeRadii,
     onError,
@@ -144,8 +151,8 @@ export function AtomicOrbitalCanvas(
   }, [atomicNumber, orbitalId, resolution, palette, sample, wanted]);
 
   useEffect(() => {
-    void viewerRef.current?.setSpin(spinning);
-  }, [spinning]);
+    void viewerRef.current?.setSpin(spinning, spinSpeed);
+  }, [spinning, spinSpeed]);
 
   return (
     <div ref={containerRef} style={CANVAS_STYLE}>

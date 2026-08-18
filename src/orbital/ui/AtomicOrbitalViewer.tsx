@@ -57,6 +57,11 @@ export interface AtomicOrbitalViewerProps {
    */
   spinning?: boolean;
   /**
+   * How fast it turns, in molstar's own spin unit. Lower is slower.
+   * @default 0.3
+   */
+  spinSpeed?: number;
+  /**
    * How the field is produced. Supply a worker-backed sampler to keep the main
    * thread free; the default runs in process.
    * @default sampleInProcess

@@ -11,6 +11,14 @@ import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 export const DEFAULT_CAMERA_DURATION = 250;
 
 /**
+ * Turn rate used when the caller does not pick one, in molstar's own spin unit.
+ *
+ * A lobe has to stay in one place long enough to be read; molstar's own 1 turns
+ * an orbital fast enough that the phases blur into each other.
+ */
+export const DEFAULT_SPIN_SPEED = 0.3;
+
+/**
  * Fraction of the bounding sphere kept as breathing room around the orbital.
  *
  * `camera.reset()` frames the scene with molstar's own margin, which suits a
@@ -113,7 +121,7 @@ export function frameOrbital(
 export function setSpin(
   plugin: PluginContext,
   spinning: boolean,
-  speed = 1,
+  speed = DEFAULT_SPIN_SPEED,
 ): void {
   plugin.canvas3d?.setProps({
     trackball: {

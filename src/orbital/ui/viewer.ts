@@ -22,7 +22,14 @@ import { Color } from 'molstar/lib/mol-util/color/color.js';
 import type { OrbitalGrid } from '../core/grid.ts';
 import type { OrbitalContour } from '../core/isovalue.ts';
 
-import { DEFAULT_CAMERA_DURATION, frameOrbital, setSpin } from './camera.ts';
+import {
+  DEFAULT_CAMERA_DURATION,
+  DEFAULT_SPIN_SPEED,
+  frameOrbital,
+  setSpin,
+} from './camera.ts';
+import type { AxesStyle } from './renderAxes.ts';
+import { clearOrbitalAxes, renderOrbitalAxes } from './renderAxes.ts';
 import type { VolumeStyle } from './renderVolume.ts';
 import { clearSampledVolume, renderSampledVolume } from './renderVolume.ts';
 
@@ -106,6 +113,29 @@ export class OrbitalViewer {
   }
 
   /**
+   * Draw the labelled x, y, z frame through the origin, replacing any previous
+   * one.
+   * @param reach - How far the orbital reaches, in scene units, as
+   * `showOrbital` returned it.
+   * @param style - See {@link AxesStyle}.
+   * @returns How far the frame reaches, labels included, for the camera to
+   * frame; `undefined` once the viewer has been disposed.
+   */
+  showAxes(reach: number, style?: AxesStyle): Promise<number | undefined> {
+    return this.#run((plugin) => renderOrbitalAxes(plugin, reach, style));
+  }
+
+  /**
+   * Remove the frame.
+   * @returns Nothing, once the axes are gone.
+   */
+  hideAxes(): Promise<void> {
+    return this.#run((plugin) => {
+      clearOrbitalAxes(plugin);
+    });
+  }
+
+  /**
    * Remove the isosurface pair.
    * @returns Nothing, once the surfaces are gone.
    */
@@ -138,7 +168,7 @@ export class OrbitalViewer {
    * @param speed - molstar's own spin unit.
    * @returns Nothing, once the spin has been switched.
    */
-  setSpin(spinning: boolean, speed = 1): Promise<void> {
+  setSpin(spinning: boolean, speed = DEFAULT_SPIN_SPEED): Promise<void> {
     return this.#run((plugin) => {
       setSpin(plugin, spinning, speed);
     });
