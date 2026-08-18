@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/cheminfo/react-cheminfo/compare/v0.4.0...v0.4.1) (2026-08-17)
+
+
+### Bug Fixes
+
+* write pt's wordmark as PeriodicTable, not pt.cheminfo ([0d7a34c](https://github.com/cheminfo/react-cheminfo/commit/0d7a34c9fe997aa65f94a926b7f14df883fea0dc))
+
 ## [0.4.0](https://github.com/cheminfo/react-cheminfo/compare/v0.3.0...v0.4.0) (2026-08-17)
 
 
