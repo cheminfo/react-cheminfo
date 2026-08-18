@@ -10,9 +10,9 @@
  */
 export function writeDocumentMeta(meta: DocumentMeta): void {
   if (typeof document === 'undefined') return;
-  documentTitle(meta.title);
-  if (meta.description !== undefined) metaDescription(meta.description);
-  if (meta.canonical !== undefined) canonicalLink(meta.canonical);
+  if (meta.title) documentTitle(meta.title);
+  if (meta.description) metaDescription(meta.description);
+  if (meta.canonical) canonicalLink(meta.canonical);
 }
 
 /**
@@ -58,8 +58,8 @@ export interface DocumentMeta {
   title: string;
   /**
    * One sentence describing this page, in the words someone would search for.
-   * Left out, the description the page was served with stays as it is — which
-   * is what every crawler but a rendering one has already read.
+   * Left out or empty, the description the page was served with stays as it is
+   * — which is what every crawler but a rendering one has already read.
    * @default undefined
    */
   description?: string;

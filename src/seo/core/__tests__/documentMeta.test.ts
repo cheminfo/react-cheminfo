@@ -104,6 +104,20 @@ test('what the call leaves out is left as the page was served with it', () => {
   expect(fake.find('link[rel="canonical"]')).toBeNull();
 });
 
+test('an empty description leaves the served one alone', () => {
+  const description: FakeElement = {
+    name: 'description',
+    content: 'What the server wrote.',
+  };
+  const fake = withDocument(() => {
+    writeDocumentMeta({ title: 'A step', description: '', canonical: '' });
+  }, [description]);
+
+  expect(fake.title).toBe('A step');
+  expect(description.content).toBe('What the server wrote.');
+  expect(fake.find('link[rel="canonical"]')).toBeNull();
+});
+
 // A head of the smallest shape the module reads: the package has no DOM
 // implementation and must not grow one.
 function withDocument(

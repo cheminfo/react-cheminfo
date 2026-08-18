@@ -26,6 +26,8 @@ export {
 } from './routes.ts';
 export type { SiteFilesOptions } from './siteFiles.ts';
 export { sitemapXml } from './siteFiles.ts';
+export type { StartDocumentMetaOptions } from './startDocumentMeta.ts';
+export { startDocumentMeta } from './startDocumentMeta.ts';
 export type { StructuredDataOptions } from './structuredData.ts';
 export { structuredDataScript } from './structuredData.ts';
 export { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from './template.ts';
