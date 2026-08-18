@@ -74,6 +74,25 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <path d="M23 24V18" stroke="#ffffff" />
     </g>
   ),
+  // Three peaks of a mixture over the funnel that narrows them to one compound,
+  // which is the dereplication this one does.
+  derepflow: (alt) => (
+    <>
+      <g stroke="#ffffff" strokeWidth="4" strokeLinecap="round" fill="none">
+        <path d="M7 15.6V9.4" />
+        <path d="M16 15.6V4.6" />
+        <path d="M25 15.6v-4.6" />
+      </g>
+      <path
+        d="M6.2 20.4 16 27 25.8 20.4"
+        stroke={alt}
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </>
+  ),
   // The official NMRium symbol, from `Logo.tsx` of the NMRium sources: the
   // orange half is theirs, and the half their logo sets in plum is set in white
   // here because the plate already is that plum.

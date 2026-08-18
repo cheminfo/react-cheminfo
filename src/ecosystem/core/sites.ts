@@ -5,6 +5,7 @@ export type SiteId =
   | 'smiles'
   | 'chemcalc'
   | 'nmrium'
+  | 'derepflow'
   | 'surge'
   | 'tex'
   | 'lcao'
@@ -118,6 +119,16 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brand: '#ea580c',
     brandAlt: '#2b143e',
     mark: { plate: '#2b143e', accent: '#ea580c' },
+  },
+  {
+    id: 'derepflow',
+    name: { lead: 'Derep', alt: 'Flow' },
+    host: 'derepflow.cheminfo.org',
+    repository: 'https://github.com/cheminfo/derepflow',
+    tagline: 'Identify the constituents of a mixture from its ¹³C spectrum.',
+    brand: '#be185d',
+    brandAlt: '#0f766e',
+    mark: { plate: '#be185d', accent: '#0d9488' },
   },
   {
     id: 'surge',

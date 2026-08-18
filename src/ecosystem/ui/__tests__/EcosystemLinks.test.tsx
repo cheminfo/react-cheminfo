@@ -12,7 +12,7 @@ test('every site of the family is a followable link in the markup', () => {
     expect(html).toContain(`href="${siteUrl(site)}"`);
   }
 
-  expect(html.match(/<a /g)).toHaveLength(15);
+  expect(html.match(/<a /g)).toHaveLength(16);
 });
 
 test('what each site does is text in the page, never a title attribute', () => {
@@ -46,13 +46,13 @@ test('the site it sits on is written but not linked', () => {
 
   expect(html).toContain('you are here');
   expect(html).not.toContain('href="https://tex.cheminfo.org/"');
-  expect(html.match(/<a /g)).toHaveLength(14);
+  expect(html.match(/<a /g)).toHaveLength(15);
 });
 
 test('the row layout writes the names only, and still links every site', () => {
   const html = renderToStaticMarkup(<EcosystemLinks layout="row" />);
 
-  expect(html.match(/<a /g)).toHaveLength(15);
+  expect(html.match(/<a /g)).toHaveLength(16);
   expect(html).toContain('>smiles.cheminfo.org</a>');
   expect(html).not.toContain(ECOSYSTEM_SITES[0]?.tagline ?? '');
 });
@@ -60,6 +60,6 @@ test('the row layout writes the names only, and still links every site', () => {
 test('the menu carries the same links, for the visitor who opens it', () => {
   const html = renderToStaticMarkup(<EcosystemMenu currentSiteId="tex" />);
 
-  expect(html.match(/<a /g)).toHaveLength(14);
+  expect(html.match(/<a /g)).toHaveLength(15);
   expect(html).toContain('target="_blank"');
 });

@@ -3,7 +3,7 @@ import { expect, test } from 'vitest';
 import type { SiteId } from '../sites.ts';
 import { ECOSYSTEM_SITES, siteUrl } from '../sites.ts';
 
-test('the family is the fifteen sites, listed once each', () => {
+test('the family is the sixteen sites, listed once each', () => {
   const ids = ECOSYSTEM_SITES.map((site) => site.id);
 
   expect(ids).toStrictEqual([
@@ -12,6 +12,7 @@ test('the family is the fifteen sites, listed once each', () => {
     'smiles',
     'chemcalc',
     'nmrium',
+    'derepflow',
     'surge',
     'tex',
     'lcao',
@@ -35,7 +36,7 @@ test('this site is one of them', () => {
 test('every site is a distinct https address', () => {
   const hosts = ECOSYSTEM_SITES.map((site) => site.host);
 
-  expect(new Set(hosts).size).toBe(15);
+  expect(new Set(hosts).size).toBe(16);
 
   for (const site of ECOSYSTEM_SITES) {
     expect(siteUrl(site)).toBe(`https://${site.host}/`);
@@ -61,7 +62,7 @@ test('every site owns two colours for its name and two for its mark', () => {
 test('every site names the repository its sources live in', () => {
   const repositories = ECOSYSTEM_SITES.map((site) => site.repository);
 
-  expect(new Set(repositories).size).toBe(15);
+  expect(new Set(repositories).size).toBe(16);
 
   // The repository is named verbatim, dots and suffixes included, because that
   // is also the package its own workflow publishes.

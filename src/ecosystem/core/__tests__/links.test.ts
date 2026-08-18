@@ -6,7 +6,7 @@ import { ECOSYSTEM_SITES, siteUrl } from '../sites.ts';
 test('every site of the family is one followable list item', () => {
   const html = renderEcosystemLinksHtml();
 
-  expect(html.match(/<li>/g)).toHaveLength(15);
+  expect(html.match(/<li>/g)).toHaveLength(16);
 
   for (const site of ECOSYSTEM_SITES) {
     expect(html).toContain(
@@ -26,7 +26,7 @@ test('every angle bracket of the page belongs to a tag this wrote', () => {
   const html = renderEcosystemLinksHtml();
 
   // The list, and four tags per site: the item, the link, and both closings.
-  expect(html.match(/</g)).toHaveLength(62);
-  expect(html.match(/>/g)).toHaveLength(62);
+  expect(html.match(/</g)).toHaveLength(66);
+  expect(html.match(/>/g)).toHaveLength(66);
   expect(html).not.toContain('&');
 });
