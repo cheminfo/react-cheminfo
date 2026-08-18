@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 
 import { formatCitation } from '../formats.ts';
+import { PLATFORM_PAPER } from '../platformPaper.ts';
 import type { CitedWork } from '../works.ts';
 import {
   citationsFilename,
@@ -9,7 +10,6 @@ import {
 } from '../works.ts';
 
 import { PAPER } from './paper.ts';
-import { PLATFORM_PAPER } from './platformPaper.ts';
 
 const WORKS: readonly CitedWork[] = [
   { reference: PAPER, what: 'The screening method' },

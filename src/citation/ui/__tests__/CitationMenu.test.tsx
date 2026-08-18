@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import { PAPER } from '../../core/__tests__/paper.ts';
-import { PLATFORM_PAPER } from '../../core/__tests__/platformPaper.ts';
+import { PLATFORM_PAPER } from '../../core/platformPaper.ts';
 import type { CitedWork } from '../../core/works.ts';
 import { CitationMenu } from '../CitationMenu.tsx';
 
