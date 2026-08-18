@@ -21,6 +21,7 @@ export type {
   CitationStyleId,
 } from './segments.ts';
 export { CITATION_STYLES, citationSegments } from './segments.ts';
+export { TEACHING_PAPER, TEACHING_WORK } from './teachingPaper.ts';
 export type { CitedWork } from './works.ts';
 export {
   citationsFilename,
