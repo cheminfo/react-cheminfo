@@ -129,6 +129,7 @@ const STORY_IDS = [
   'orbital-atomicorbitalviewer--simple',
   'orbital-atomicorbitalviewer--spinning',
   'orbital-atomicorbitalviewer--with-axes',
+  'orbital-atomicorbitalviewer--without-axes',
   'pedagogy-exerciseactions--default',
   'pedagogy-exerciseactions--hints-exhausted',
   'pedagogy-exerciseactions--nothing-to-check-yet',
