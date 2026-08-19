@@ -2,6 +2,8 @@ export type { BackToSlidesProps } from './BackToSlides.tsx';
 export { BackToSlides } from './BackToSlides.tsx';
 export type { DemoLinkProps, RenderSlideLink } from './DemoLink.tsx';
 export { DemoLink } from './DemoLink.tsx';
+export type { EmbedSlideProps } from './EmbedSlide.tsx';
+export { EmbedSlide } from './EmbedSlide.tsx';
 export type { SectionSlideProps } from './SectionSlide.tsx';
 export { SectionSlide } from './SectionSlide.tsx';
 export type { SlideLayoutProps, SlideViewProps } from './Slide.tsx';

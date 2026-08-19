@@ -10,6 +10,7 @@ import { demoLabel, splitDemoLinks } from '../core/index.ts';
 
 import type { RenderSlideLink } from './DemoLink.tsx';
 import { DemoLink } from './DemoLink.tsx';
+import { EmbedSlide } from './EmbedSlide.tsx';
 import { SectionSlide } from './SectionSlide.tsx';
 import { SlideBody } from './SlideBody.tsx';
 
@@ -58,6 +59,7 @@ export function SlideView(props: SlideViewProps): ReactElement {
   const Custom = layouts?.[slide.layout];
   if (Custom !== undefined) return <Custom {...layoutProps} />;
   if (slide.layout === 'section') return <SectionSlide body={slide.body} />;
+  if (slide.layout === 'embed') return <EmbedSlide slide={slide} />;
 
   return <GenericSlide {...layoutProps} />;
 }

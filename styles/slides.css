@@ -631,3 +631,23 @@
   filter: brightness(1.08);
   text-decoration: none;
 }
+
+/* ── A slide that is the tool itself ─────────────────────── */
+.slide--embed .slide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.slide-embed-frame {
+  width: 100%;
+  flex: 1 1 auto;
+  border: 1px solid var(--slide-line);
+  border-radius: var(--slide-radius);
+  background: var(--slide-surface);
+}
+
+.slide-embed-missing {
+  color: var(--slide-muted);
+  font-style: italic;
+}
