@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.0](https://github.com/cheminfo/react-cheminfo/compare/v0.7.0...v0.8.0) (2026-08-18)
+
+
+### Features
+
+* **citation:** add the teaching paper as a citable work ([9348149](https://github.com/cheminfo/react-cheminfo/commit/9348149257465a72c9972b71f78dbcfc10571b76))
+* let a strip take any step carrying a title and a level ([3fdd1ec](https://github.com/cheminfo/react-cheminfo/commit/3fdd1ecd080604304c4ce6ea05082e1e720f847b))
+
+
+### Bug Fixes
+
+* make every tutorial step button the same square so strips line up ([c0e8751](https://github.com/cheminfo/react-cheminfo/commit/c0e8751631777f0b2adc0740dfc314517ec886a8))
+
 ## [0.7.0](https://github.com/cheminfo/react-cheminfo/compare/v0.6.0...v0.7.0) (2026-08-18)
 
 
