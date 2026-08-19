@@ -14,18 +14,24 @@
   "exports": {
     "./core": "./lib/core.js",
     "./orbital": "./lib/orbital.js",
+    "./slides": "./lib/slides.js",
     "./structure": "./lib/structure.js",
     "./ui": "./lib/ui.js",
     "./vite": "./lib/vite.js",
     "./styles/*.css": "./styles/*.css"
   },
+  "bin": {
+    "cheminfo-check-tokens": "bin/check-tokens.mjs"
+  },
   "files": [
+    "bin",
     "lib",
     "src",
     "styles"
   ],
   "scripts": {
     "build-storybook": "storybook build",
+    "check-tokens": "node bin/check-tokens.mjs styles src",
     "check-types": "tsc --noEmit",
     "clean": "rimraf coverage lib storybook-static",
     "dev": "storybook dev -p 10815",
@@ -34,7 +40,7 @@
     "prepack": "npm run tsc",
     "prettier": "prettier --check .",
     "prettier-write": "prettier --write .",
-    "test": "npm run test-only && npm run check-types && npm run eslint && npm run prettier",
+    "test": "npm run test-only && npm run check-types && npm run check-tokens && npm run eslint && npm run prettier",
     "test-e2e": "playwright test",
     "test-e2e-ui": "playwright test --ui",
     "test-only": "vitest run --coverage",
@@ -42,7 +48,9 @@
     "tsc-build": "tsc --project tsconfig.build.json"
   },
   "dependencies": {
-    "cheminfo-font": "^1.28.0"
+    "cheminfo-font": "^1.28.0",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0"
   },
   "devDependencies": {
     "@blueprintjs/core": "^6.18.0",

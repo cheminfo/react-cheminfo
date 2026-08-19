@@ -107,9 +107,67 @@ export function frameOrbital(
       position: Vec3.add(Vec3.zero(), centre, offset),
       up: Vec3.clone(ORBITAL_VIEW_UP),
       radius,
+      radiusMax: sceneRadius(canvas3d),
     },
     durationMs,
   );
+}
+
+/**
+ * Keep the view the student has set, and rescale it for an orbital of a
+ * different extent.
+ *
+ * Every atomic orbital is drawn at one canonical size, so the two extents are
+ * normally equal and the camera does not move at all: clicking through a shell
+ * keeps the rotation and the zoom instead of throwing them away. When they do
+ * differ, the offset from the target and the radius are multiplied by the same
+ * factor, which keeps the zoom *relative* to the orbital.
+ * @param plugin - The molstar context.
+ * @param previousRadius - Extent the camera is currently fitted to.
+ * @param orbitalRadius - Extent to fit now.
+ * @param durationMs - Transition length. Pass 0 for an instant jump.
+ */
+export function refitOrbital(
+  plugin: PluginContext,
+  previousRadius: number,
+  orbitalRadius: number,
+  durationMs = DEFAULT_CAMERA_DURATION,
+): void {
+  const canvas3d = plugin.canvas3d;
+  if (canvas3d === undefined) return;
+  const scale = orbitalRadius / previousRadius;
+  if (!Number.isFinite(scale) || scale <= 0) {
+    frameOrbital(plugin, orbitalRadius, durationMs);
+    return;
+  }
+  // The box a sampled orbital lives in changes with the orbital, and molstar
+  // only tracks that for a camera it also reframes, which this one is not.
+  const radiusMax = sceneRadius(canvas3d);
+  if (scale === 1) {
+    canvas3d.camera.setState({ radiusMax }, 0);
+    return;
+  }
+  const { target, position, radius } = canvas3d.camera.state;
+  const offset = Vec3.sub(Vec3.zero(), position, target);
+  Vec3.scale(offset, offset, scale);
+  canvas3d.camera.setState(
+    {
+      position: Vec3.add(Vec3.zero(), target, offset),
+      radius: radius * scale,
+      radiusMax,
+    },
+    durationMs,
+  );
+}
+
+/**
+ * How far the whole scene reaches, as molstar measures it for its near and far
+ * planes.
+ * @param canvas3d - The canvas whose scene to measure.
+ * @returns The radius, in scene units.
+ */
+function sceneRadius(canvas3d: PluginContext['canvas3d'] & object): number {
+  return canvas3d.boundingSphere.radius * canvas3d.props.sceneRadiusFactor;
 }
 
 /**

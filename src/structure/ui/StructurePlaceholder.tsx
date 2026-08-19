@@ -43,6 +43,6 @@ const PLACEHOLDER_STYLE: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#8a96a3',
+  color: 'var(--text-faint, #8a96a3)',
   fontSize: '0.75rem',
 };

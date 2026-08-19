@@ -179,7 +179,7 @@ const ROOT_STYLE: CSSProperties = {
   position: 'relative',
   overflow: 'hidden',
   boxSizing: 'border-box',
-  border: '1px solid #d3d8de',
+  border: '1px solid var(--border, #d3d8de)',
   borderRadius: 6,
   background: '#fff',
 };
@@ -191,6 +191,6 @@ const LOADING_STYLE: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#8a96a3',
+  color: 'var(--text-faint, #8a96a3)',
   fontSize: 13,
 };

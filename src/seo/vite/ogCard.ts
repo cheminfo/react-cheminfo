@@ -1,3 +1,4 @@
+// tokens-ok: file — the card is an image built outside any page, so it has no tokens to read.
 /**
  * The 1200×630 card a link to a site unfurls into, as a page to screenshot.
  *

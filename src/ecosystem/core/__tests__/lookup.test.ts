@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 
 import { findSiteByHost, siteById } from '../lookup.ts';
+import type { SiteId } from '../sites.ts';
 import { ECOSYSTEM_SITES } from '../sites.ts';
 
 test('a site is found by the identifier its entry carries', () => {
@@ -13,8 +14,8 @@ test('a site is found by the identifier its entry carries', () => {
 test('an identifier belonging to nobody names itself in the error', () => {
   // A stored preference or a query parameter can carry an identifier that no
   // longer exists, and the message has to say which one.
-  expect(() => siteById('learn' as never)).toThrow(
-    'unknown ecosystem site: learn',
+  expect(() => siteById('chemcalc-legacy' as SiteId)).toThrow(
+    'unknown ecosystem site: chemcalc-legacy',
   );
 });
 

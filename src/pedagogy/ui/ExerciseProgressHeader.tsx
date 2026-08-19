@@ -129,7 +129,7 @@ const ROW_STYLE: CSSProperties = {
 const COUNT_STYLE: CSSProperties = { fontWeight: 600 };
 
 const PERCENT_STYLE: CSSProperties = {
-  color: '#5b6875',
+  color: 'var(--text-muted, #5b6875)',
   flex: '1 1 auto',
   fontSize: 12,
 };

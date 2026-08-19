@@ -1,5 +1,7 @@
+// tokens-ok: file — every site's two colours are declared here.
 /** The sites the menu links to, in the order they are listed. */
 export type SiteId =
+  | 'learn'
   | 'inchi'
   | 'vcl'
   | 'smiles'
@@ -70,6 +72,16 @@ export interface SiteMarkColors {
  * go with them live in `marks.tsx`.
  */
 export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
+  {
+    id: 'learn',
+    name: { lead: 'learn', alt: 'cheminfo', dot: true },
+    host: 'learn.cheminfo.org',
+    repository: 'https://github.com/cheminfo/learn.cheminfo.org',
+    tagline: 'Arrange the tools into a course and hand out its link.',
+    brand: '#0d9488',
+    brandAlt: '#b45309',
+    mark: { plate: '#0d9488', accent: '#f59e0b' },
+  },
   {
     id: 'inchi',
     name: { lead: 'inchi', alt: 'cheminfo', dot: true },

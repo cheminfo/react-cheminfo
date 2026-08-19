@@ -145,7 +145,7 @@ const NOTE_STYLE: CSSProperties = {
   padding: 12,
   borderRadius: 3,
   background: 'rgb(241 245 249)',
-  color: '#5f6b7c',
+  color: 'var(--text-muted, #5f6b7c)',
   fontSize: 13,
   textAlign: 'center',
 };

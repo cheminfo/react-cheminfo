@@ -1,3 +1,4 @@
+// tokens-ok: file — a mark is asserted in the colours it draws.
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 

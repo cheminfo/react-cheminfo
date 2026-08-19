@@ -1,3 +1,4 @@
+// tokens-ok: file — the token block is asserted literally.
 import { expect, test } from 'vitest';
 
 import { ECOSYSTEM_SITES } from '../sites.ts';

@@ -1,3 +1,4 @@
+// tokens-ok: file — the token block is asserted literally.
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 

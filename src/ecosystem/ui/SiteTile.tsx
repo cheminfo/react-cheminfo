@@ -11,7 +11,7 @@ const TILE_STYLE: CSSProperties = {
   padding: '7px 8px',
   border: '1px solid transparent',
   borderRadius: 10,
-  color: '#16202c',
+  color: 'var(--text, #16202c)',
   gap: 10,
   textDecoration: 'none',
   transition: 'background 120ms, border-color 120ms, transform 120ms',
@@ -37,7 +37,7 @@ const HERE_STYLE: CSSProperties = {
   textTransform: 'uppercase',
 };
 const TAGLINE_STYLE: CSSProperties = {
-  color: '#5b6875',
+  color: 'var(--text-muted, #5b6875)',
   fontSize: '0.75rem',
   lineHeight: 1.35,
 };
@@ -91,7 +91,9 @@ export function SiteTile(props: SiteTileProps): ReactElement {
         <div style={NAME_STYLE}>
           <span>
             <span style={{ color: site.brand }}>{site.name.lead}</span>
-            {site.name.dot ? <span style={{ color: '#8a96a3' }}>.</span> : null}
+            {site.name.dot ? (
+              <span style={{ color: 'var(--text-faint, #8a96a3)' }}>.</span>
+            ) : null}
             <span style={{ color: site.brandAlt }}>{site.name.alt}</span>
           </span>
           {isCurrent ? (
@@ -134,7 +136,7 @@ export function SiteTile(props: SiteTileProps): ReactElement {
 // A tile lights up in the colour of the site it opens, never in ours: the
 // pointer moving down the grid is what makes the pairs of colours read.
 function tint(site: EcosystemSite, isCurrent: boolean, lit: boolean): string {
-  if (isCurrent) return '#f5f7fa';
+  if (isCurrent) return 'var(--surface-sunken, #f5f7fa)';
   return lit ? `color-mix(in oklab, ${site.brand} 9%, white)` : 'transparent';
 }
 
@@ -143,6 +145,6 @@ function borderOf(
   isCurrent: boolean,
   lit: boolean,
 ): string {
-  if (isCurrent) return '#dfe3e8';
+  if (isCurrent) return 'var(--border, #dfe3e8)';
   return lit ? `color-mix(in oklab, ${site.brand} 32%, white)` : 'transparent';
 }

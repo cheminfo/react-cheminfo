@@ -191,7 +191,7 @@ const TAG_STYLE: CSSProperties = { color: '#abb3bf', fontSize: 11 };
 const SUMMARY_STYLE: CSSProperties = { fontSize: 12, lineHeight: 1.4 };
 
 const DETAIL_STYLE: CSSProperties = {
-  color: '#d3d8de',
+  color: 'var(--border, #d3d8de)',
   fontSize: 12,
   lineHeight: 1.45,
 };
@@ -209,7 +209,7 @@ const ROW_STYLE: CSSProperties = { display: 'flex', gap: 6, fontSize: 12 };
 const LABEL_STYLE: CSSProperties = { color: '#abb3bf', flex: '0 0 68px' };
 
 const VALUE_STYLE: CSSProperties = {
-  color: '#f6f7f9',
+  color: 'var(--surface-sunken, #f6f7f9)',
   fontFamily: MONOSPACE,
   overflowWrap: 'anywhere',
 };

@@ -19,7 +19,10 @@ const BASE_PRE_STYLE: CSSProperties = {
 
 const TONE_STYLE: Record<CodeBlockTone, CSSProperties> = {
   default: {},
-  muted: { background: '#f6f7f9', border: '1px solid #d3d8de' },
+  muted: {
+    background: 'var(--surface-sunken, #f6f7f9)',
+    border: '1px solid var(--border, #d3d8de)',
+  },
   dark: {
     background: '#1e293b',
     border: '1px solid #1e293b',

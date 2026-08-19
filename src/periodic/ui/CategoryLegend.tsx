@@ -74,7 +74,7 @@ export function CategoryLegend(props: CategoryLegendProps): ReactElement {
 }
 
 const legendStyle = {
-  color: 'rgb(95 107 124)',
+  color: 'var(--text-muted, rgb(95 107 124))',
   display: 'flex',
   flexWrap: 'wrap',
   fontSize: 11,

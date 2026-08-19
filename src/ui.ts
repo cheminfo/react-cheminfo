@@ -1,3 +1,4 @@
+export * from './about/ui/index.ts';
 export * from './capsule/ui/index.ts';
 export * from './chrome/ui/index.ts';
 export * from './citation/ui/index.ts';

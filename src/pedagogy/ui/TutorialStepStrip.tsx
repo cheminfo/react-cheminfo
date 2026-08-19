@@ -253,4 +253,7 @@ const PAGER_STYLE: CSSProperties = {
   paddingTop: 2,
 };
 
-const HINT_STYLE: CSSProperties = { color: '#5b6875', fontSize: 11 };
+const HINT_STYLE: CSSProperties = {
+  color: 'var(--text-muted, #5b6875)',
+  fontSize: 11,
+};

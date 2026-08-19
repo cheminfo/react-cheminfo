@@ -76,7 +76,7 @@ const ITEM_STYLE = {
 const NAME_STYLE = { fontWeight: 600 } as const satisfies CSSProperties;
 
 const LICENSE_STYLE = {
-  color: '#5f6b7c',
+  color: 'var(--text-muted, #5f6b7c)',
   fontSize: 11,
   margin: '0 6px',
 } as const satisfies CSSProperties;

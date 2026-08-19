@@ -14,7 +14,7 @@ const PANEL_STYLE: CSSProperties = {
   gap: 8,
 };
 const HEADING_STYLE: CSSProperties = {
-  color: '#5b6875',
+  color: 'var(--text-muted, #5b6875)',
   fontSize: '0.75rem',
   fontWeight: 600,
 };

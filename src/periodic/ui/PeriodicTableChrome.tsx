@@ -145,7 +145,7 @@ function HeaderCell(props: HeaderCellProps): ReactElement {
 
 const headerStyle = {
   alignItems: 'center',
-  color: 'rgb(95 107 124)',
+  color: 'var(--text-muted, rgb(95 107 124))',
   display: 'flex',
   fontSize: 'clamp(0.4rem, 1.9cqw, 0.62rem)',
   justifyContent: 'center',
@@ -163,7 +163,7 @@ const markerStyle = {
   alignItems: 'center',
   border: '1px dashed rgb(182 191 204)',
   borderRadius: 3,
-  color: 'rgb(95 107 124)',
+  color: 'var(--text-muted, rgb(95 107 124))',
   display: 'flex',
   fontSize: 'clamp(0.36rem, 1.7cqw, 0.55rem)',
   justifyContent: 'center',

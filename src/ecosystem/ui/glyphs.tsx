@@ -16,6 +16,46 @@ import type { SiteId } from '../core/sites.ts';
 
 /** Every mark, keyed by site, drawn on top of its plate. */
 export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
+  // Six tiles standing where the six atoms of a benzene ring stand: the
+  // arrangement of tiles is the product and the ring is the subject.
+  learn: (alt) => (
+    <g>
+      <rect x="12.85" y="4.15" width="6.3" height="6.3" rx="1.9" fill={alt} />
+      <rect
+        x="20.39"
+        y="8.5"
+        width="6.3"
+        height="6.3"
+        rx="1.9"
+        fill="#ffffff"
+      />
+      <rect
+        x="20.39"
+        y="17.2"
+        width="6.3"
+        height="6.3"
+        rx="1.9"
+        fill="#ffffff"
+      />
+      <rect
+        x="12.85"
+        y="21.55"
+        width="6.3"
+        height="6.3"
+        rx="1.9"
+        fill="#ffffff"
+      />
+      <rect
+        x="5.31"
+        y="17.2"
+        width="6.3"
+        height="6.3"
+        rx="1.9"
+        fill="#ffffff"
+      />
+      <rect x="5.31" y="8.5" width="6.3" height="6.3" rx="1.9" fill="#ffffff" />
+    </g>
+  ),
   // A hexagon with a tail: the structure, and the string it hashes into.
   inchi: (alt) => (
     <g

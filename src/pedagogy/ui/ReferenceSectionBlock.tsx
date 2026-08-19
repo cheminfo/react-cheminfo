@@ -140,7 +140,10 @@ function syntaxStyle(
     fontWeight: 600,
     color: '#1c2127',
     ...(interactive
-      ? { borderBottom: '1px dotted #5b6875', alignSelf: 'flex-start' }
+      ? {
+          borderBottom: '1px dotted var(--text-muted, #5b6875)',
+          alignSelf: 'flex-start',
+        }
       : {}),
   };
 }
@@ -153,7 +156,7 @@ const SECTION_STYLE: CSSProperties = {
 
 const INTRO_STYLE: CSSProperties = {
   margin: '0 0 4px',
-  color: '#5b6875',
+  color: 'var(--text-muted, #5b6875)',
   fontSize: 12,
 };
 

@@ -17,7 +17,7 @@ const SECTION_STYLE: CSSProperties = {
 };
 const HEADING_STYLE: CSSProperties = {
   margin: 0,
-  color: '#5b6875',
+  color: 'var(--text-muted, #5b6875)',
   fontSize: '0.75rem',
   fontWeight: 600,
 };
@@ -40,7 +40,7 @@ const LINK_STYLE: CSSProperties = {
 };
 const CURRENT_STYLE: CSSProperties = {
   ...LINK_STYLE,
-  color: '#8a96a3',
+  color: 'var(--text-faint, #8a96a3)',
   cursor: 'default',
 };
 

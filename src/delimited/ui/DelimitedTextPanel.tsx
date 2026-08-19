@@ -143,7 +143,7 @@ const CONTROLS_STYLE = {
 } as const satisfies CSSProperties;
 
 const LABEL_STYLE = {
-  color: '#5f6b7c',
+  color: 'var(--text-muted, #5f6b7c)',
   fontSize: 12,
 } as const satisfies CSSProperties;
 

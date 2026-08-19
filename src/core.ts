@@ -1,3 +1,4 @@
+export * from './about/core/index.ts';
 export * from './citation/core/index.ts';
 export * from './clipboard/core/index.ts';
 export * from './color/core/index.ts';
@@ -12,4 +13,5 @@ export * from './periodic/core/index.ts';
 export * from './router/core/index.ts';
 export * from './seo/core/index.ts';
 export * from './share/core/index.ts';
+export * from './tokens/core/index.ts';
 export * from './worker/core/index.ts';

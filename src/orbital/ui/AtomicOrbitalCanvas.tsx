@@ -136,7 +136,7 @@ export function AtomicOrbitalCanvas(
           positiveColour: palette.positive,
           negativeColour: palette.negative,
         });
-        await viewer.frame(reach);
+        await viewer.refit(reach);
         if (!cancelled) setDrawn(wanted);
       })
       .catch((error: unknown) => {
@@ -199,6 +199,6 @@ const BUSY_STYLE: CSSProperties = {
   padding: '3px 8px',
   borderRadius: 3,
   background: 'rgba(255, 255, 255, 0.85)',
-  color: '#5f6b7c',
+  color: 'var(--text-muted, #5f6b7c)',
   fontSize: 11,
 };

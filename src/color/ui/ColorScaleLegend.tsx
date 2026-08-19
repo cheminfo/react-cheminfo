@@ -127,7 +127,7 @@ const ROW_STYLE = {
 } as const satisfies CSSProperties;
 
 const LABEL_STYLE = {
-  color: 'rgb(95 107 124)',
+  color: 'var(--text-muted, rgb(95 107 124))',
   fontSize: 12,
 } as const satisfies CSSProperties;
 

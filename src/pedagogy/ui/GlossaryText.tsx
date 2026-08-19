@@ -140,7 +140,7 @@ const TITLE_STYLE: CSSProperties = { fontWeight: 600, fontSize: 13 };
 const SUMMARY_STYLE: CSSProperties = {
   fontSize: 12,
   lineHeight: 1.45,
-  color: '#d3d8de',
+  color: 'var(--border, #d3d8de)',
 };
 
 const LIST_STYLE: CSSProperties = {
@@ -159,6 +159,6 @@ const CODE_STYLE: CSSProperties = {
   color: '#8abbff',
 };
 
-const INPUT_STYLE: CSSProperties = { color: '#f6f7f9' };
+const INPUT_STYLE: CSSProperties = { color: 'var(--surface-sunken, #f6f7f9)' };
 
 const NOTE_STYLE: CSSProperties = { fontStyle: 'italic', color: '#abb3bf' };

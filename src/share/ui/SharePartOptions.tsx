@@ -8,7 +8,7 @@ const OPTION_STYLE: CSSProperties = { marginBottom: 8 };
 const DESCRIPTION_STYLE: CSSProperties = {
   display: 'block',
   marginLeft: 26,
-  color: '#5b6875',
+  color: 'var(--text-muted, #5b6875)',
   fontSize: 12,
 };
 

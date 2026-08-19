@@ -38,7 +38,7 @@ test('each tone paints the block and names itself in a class', () => {
   const dark = renderToStaticMarkup(<CodeBlock code="CCO" tone="dark" />);
 
   expect(muted).toContain('class="code-block code-block--muted"');
-  expect(muted).toContain('background:#f6f7f9');
+  expect(muted).toContain('background:var(--surface-sunken, #f6f7f9)');
   expect(dark).toContain('class="code-block code-block--dark"');
   expect(dark).toContain('color:#e2e8f0');
 });

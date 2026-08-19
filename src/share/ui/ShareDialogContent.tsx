@@ -28,7 +28,10 @@ import type { ShareDialogProps, ShareDraft } from './ShareDialog.tsx';
 import { SharePartOptions } from './SharePartOptions.tsx';
 import { withPart } from './draft.ts';
 
-const LEAD_STYLE: CSSProperties = { marginTop: 0, color: '#5b6875' };
+const LEAD_STYLE: CSSProperties = {
+  marginTop: 0,
+  color: 'var(--text-muted, #5b6875)',
+};
 const SECTION_STYLE: CSSProperties = { marginBottom: 18 };
 const ACTIONS_STYLE: CSSProperties = {
   display: 'flex',
@@ -39,7 +42,7 @@ const ACTIONS_STYLE: CSSProperties = {
 const HINT_STYLE: CSSProperties = {
   display: 'block',
   marginLeft: 26,
-  color: '#5b6875',
+  color: 'var(--text-muted, #5b6875)',
   fontSize: 12,
 };
 

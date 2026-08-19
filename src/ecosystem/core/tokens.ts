@@ -1,3 +1,4 @@
+// tokens-ok: file — the block a site renders is written here.
 import { siteById } from './lookup.ts';
 import type { EcosystemSite, SiteId } from './sites.ts';
 

@@ -51,7 +51,9 @@ test('with no label the scale still says what it is to a screen reader', () => {
   );
 
   expect(html).toContain('aria-label="Colour scale from 0 to 100"');
-  expect(html).not.toContain('</span><span style="color:rgb(95 107 124)');
+  expect(html).not.toContain(
+    '</span><span style="color:var(--text-muted, rgb(95 107 124))',
+  );
 });
 
 test('the caller may write the end values its own way', () => {

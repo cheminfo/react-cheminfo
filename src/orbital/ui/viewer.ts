@@ -26,6 +26,7 @@ import {
   DEFAULT_CAMERA_DURATION,
   DEFAULT_SPIN_SPEED,
   frameOrbital,
+  refitOrbital,
   setSpin,
 } from './camera.ts';
 import type { AxesStyle } from './renderAxes.ts';
@@ -65,6 +66,8 @@ export function createOrbitalViewer(
 export class OrbitalViewer {
   readonly #model: PluginViewModel;
   #disposed = false;
+  /** Extent the camera was last fitted to; `null` before it has been placed. */
+  #fittedRadius: number | null = null;
 
   /** Resolves once the canvas exists; every method awaits it internally. */
   readonly ready: Promise<void>;
@@ -78,7 +81,16 @@ export class OrbitalViewer {
         canvas3d: {
           ...spec.canvas3d,
           renderer: { backgroundColor: Color.fromHexStyle(background) },
-          camera: { helper: { axes: { name: 'off', params: {} } } },
+          camera: {
+            helper: { axes: { name: 'off', params: {} } },
+            // The camera is ours alone. Molstar reframes itself whenever a
+            // scene commit leaves the renderable count at zero, which is what
+            // replacing one orbital by another does — the old surfaces are
+            // removed and committed before the new ones exist — and it frames
+            // the whole sampled box rather than the isosurface inside it,
+            // which leaves the orbital a fifth of the frame wide.
+            manualReset: true,
+          },
         },
       },
     });
@@ -159,6 +171,33 @@ export class OrbitalViewer {
   ): Promise<void> {
     return this.#run((plugin) => {
       frameOrbital(plugin, orbitalRadius, durationMs);
+      this.#fittedRadius = orbitalRadius ?? null;
+    });
+  }
+
+  /**
+   * Fit a newly drawn orbital without disturbing the view.
+   *
+   * The first call frames the orbital, since there is no view to keep yet.
+   * Later ones leave the rotation and the zoom the student set and only rescale
+   * them when the drawn extent changed — clicking through a shell must not
+   * throw their view away.
+   * @param orbitalRadius - Extent of the drawn surface, as `showOrbital`
+   * returned it.
+   * @param durationMs - Transition length; 0 jumps.
+   * @returns Nothing, once the camera has been set.
+   */
+  refit(
+    orbitalRadius?: number,
+    durationMs = DEFAULT_CAMERA_DURATION,
+  ): Promise<void> {
+    const fitted = this.#fittedRadius;
+    if (fitted === null || orbitalRadius === undefined) {
+      return this.frame(orbitalRadius, durationMs);
+    }
+    return this.#run((plugin) => {
+      refitOrbital(plugin, fitted, orbitalRadius, durationMs);
+      this.#fittedRadius = orbitalRadius;
     });
   }
 
