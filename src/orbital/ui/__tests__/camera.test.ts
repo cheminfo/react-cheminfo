@@ -24,7 +24,10 @@ interface Snapshot {
  * @param state - Where the camera currently sits.
  * @returns The stub and the `setState` spy the assertions read.
  */
-function stubPlugin(state: CameraState): {
+function stubPlugin(
+  state: CameraState,
+  sceneRadius = 30,
+): {
   plugin: PluginContext;
   setState: ReturnType<typeof vi.fn<(s: Snapshot, ms: number) => void>>;
 } {
@@ -40,7 +43,7 @@ function stubPlugin(state: CameraState): {
         getTargetDistance: (radius: number) => radius * 2,
         setState,
       },
-      boundingSphere: { radius: 30 },
+      boundingSphere: { radius: sceneRadius },
       boundingSphereVisible: { radius: 20, center: Vec3.zero() },
       props: { sceneRadiusFactor: 1 },
     },
@@ -113,4 +116,19 @@ test('no previous extent falls back to framing the orbital afresh', () => {
   expect([...(snapshot?.up ?? [])]).toStrictEqual([0, 0, 1]);
   expect(snapshot?.radius).toBeCloseTo(12 * 1.08, 10);
   expect(snapshot?.radiusMax).toBe(30);
+});
+
+test('a scene sphere that is not measured yet leaves the far plane alone', () => {
+  // molstar only recomputes `boundingSphere` on a draw, so it reads 0 in the
+  // moment after a representation is added — and writing that as `radiusMax`
+  // collapses the clipping planes onto the target, which slices the orbital
+  // into a few thin arcs. The visible sphere stands in.
+  const { plugin, setState } = stubPlugin(
+    { position: [0, -24, 0], target: [0, 0, 0], radius: 12 },
+    0,
+  );
+
+  refitOrbital(plugin, 12, 12);
+
+  expect(setState).toHaveBeenCalledExactlyOnceWith({ radiusMax: 20 }, 0);
 });

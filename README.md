@@ -37,7 +37,9 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/vite`              | the prerender plugin and the OG card              | nothing; React on the card |
 | `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                      | React, molstar             |
 | `react-cheminfo/structure`         | the structure editor and renderer                 | React, react-ocl, OCL      |
+| `react-cheminfo/slides`            | the deck format and the slideshow player          | React, react-markdown      |
 | `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet      | nothing                    |
+| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours | nothing                    |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -262,6 +264,50 @@ pattern, in ChemCalc's own indigo and teal.
 The colours a name is set in are the site's own and are not retuned to reach the
 4.5:1 of body text: ChemCalc's teal and NMRium's orange both land just under it,
 which is why a name is set bold, where 3:1 is the threshold.
+
+## Carrying talks
+
+A deck is one Markdown file in the repository of the site whose subject it
+teaches — front matter, slides separated by a `---` line, and a
+`<!-- layout: … -->` comment where the default is not what is wanted. The
+format and the player are `react-cheminfo/slides`; the addresses and the
+authoring rules are in `rules/slideshows.md`.
+
+```tsx
+import { parseTalk, Slideshow } from 'react-cheminfo/slides';
+import 'react-cheminfo/styles/slides.css';
+
+const talk = parseTalk(source);
+
+<Slideshow
+  talk={talk}
+  talkId="20260824_IMSC"
+  index={slide}
+  onIndex={(next) => navigate(`/talks/${id}?slide=${next}`)}
+  layouts={{ octochemdb: OctoChemDbFlow }}
+/>;
+```
+
+The index is **controlled**: the site owns the address, so a link can open one
+slide and a demo link can come back to it. Arrow keys, space and PageUp/Down
+navigate, `Home` and `End` jump, `f` is fullscreen, `b` and `w` blank the
+screen, `n` shows the speaker's notes. A layout name the player does not know
+falls back to `content` rather than breaking a deck in front of a room, and a
+site adds its own through `layouts`.
+
+The `embed` layout puts a **live tool** on the slide — the last bare URL of the
+body is framed — which is what our `?embed` mode exists for.
+
+Publishing a site's decks to the family is one plugin:
+
+```ts
+import { cheminfoTalks } from 'react-cheminfo/vite';
+
+plugins: [cheminfoTalks({ site: 'chemcalc' })];
+```
+
+It writes `dist/talks.json` and `dist/talks/<id>.md`, which is what
+learn.cheminfo.org reads to list and play every site's talks beside its own.
 
 ## Prerendering a site
 

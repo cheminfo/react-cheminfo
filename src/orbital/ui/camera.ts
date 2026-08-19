@@ -107,7 +107,7 @@ export function frameOrbital(
       position: Vec3.add(Vec3.zero(), centre, offset),
       up: Vec3.clone(ORBITAL_VIEW_UP),
       radius,
-      radiusMax: sceneRadius(canvas3d),
+      ...radiusMaxOf(canvas3d),
     },
     durationMs,
   );
@@ -142,9 +142,9 @@ export function refitOrbital(
   }
   // The box a sampled orbital lives in changes with the orbital, and molstar
   // only tracks that for a camera it also reframes, which this one is not.
-  const radiusMax = sceneRadius(canvas3d);
+  const radiusMax = radiusMaxOf(canvas3d);
   if (scale === 1) {
-    canvas3d.camera.setState({ radiusMax }, 0);
+    canvas3d.camera.setState(radiusMax, 0);
     return;
   }
   const { target, position, radius } = canvas3d.camera.state;
@@ -154,20 +154,43 @@ export function refitOrbital(
     {
       position: Vec3.add(Vec3.zero(), target, offset),
       radius: radius * scale,
-      radiusMax,
+      ...radiusMax,
     },
     durationMs,
   );
 }
 
 /**
+ * The far plane's share of a camera state, left out when the scene cannot be
+ * measured yet.
+ * @param canvas3d - The canvas whose scene to measure.
+ * @returns `{ radiusMax }`, or an empty object to keep the camera's own value.
+ */
+function radiusMaxOf(canvas3d: PluginContext['canvas3d'] & object): {
+  radiusMax?: number;
+} {
+  const radiusMax = sceneRadius(canvas3d);
+  return radiusMax > 0 ? { radiusMax } : {};
+}
+
+/**
  * How far the whole scene reaches, as molstar measures it for its near and far
  * planes.
+ *
+ * `boundingSphere` covers the whole scene but is only recomputed on a draw, so
+ * in the moment after a representation was added it still reads 0 — and a zero
+ * `radiusMax` collapses the near and far planes onto the target, leaving the
+ * orbital sliced into a few thin arcs. The visible sphere is current there, so
+ * it stands in.
  * @param canvas3d - The canvas whose scene to measure.
- * @returns The radius, in scene units.
+ * @returns The radius, in scene units; 0 when neither sphere is ready.
  */
 function sceneRadius(canvas3d: PluginContext['canvas3d'] & object): number {
-  return canvas3d.boundingSphere.radius * canvas3d.props.sceneRadiusFactor;
+  const radius =
+    canvas3d.boundingSphere.radius > 0
+      ? canvas3d.boundingSphere.radius
+      : canvas3d.boundingSphereVisible.radius;
+  return radius * canvas3d.props.sceneRadiusFactor;
 }
 
 /**
