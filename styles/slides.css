@@ -633,8 +633,17 @@
 }
 
 /* ── A slide that is the tool itself ─────────────────────── */
+/* The frame takes the whole slide under the heading: an embedded tool that is
+   200 px tall on a beamer teaches nobody anything. */
+.slide--embed {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
 .slide--embed .slide-content {
   display: flex;
+  height: 100%;
   flex-direction: column;
   gap: 24px;
 }
