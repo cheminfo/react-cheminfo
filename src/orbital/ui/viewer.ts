@@ -202,6 +202,19 @@ export class OrbitalViewer {
   }
 
   /**
+   * Put the camera back where the orbital was first framed from.
+   *
+   * The counterpart of `refit`: since a view is now kept across a change of
+   * orbital, a student who has turned the atom into an unreadable angle needs
+   * one way back.
+   * @param durationMs - Transition length; 0 jumps.
+   * @returns Nothing, once the camera has been set.
+   */
+  resetView(durationMs = DEFAULT_CAMERA_DURATION): Promise<void> {
+    return this.frame(this.#fittedRadius ?? undefined, durationMs);
+  }
+
+  /**
    * Turn the automatic spin on or off.
    * @param spinning - Whether the scene should keep turning.
    * @param speed - molstar's own spin unit.

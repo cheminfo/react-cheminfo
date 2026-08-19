@@ -651,3 +651,8 @@
   color: var(--slide-muted);
   font-style: italic;
 }
+
+.talk-list-empty {
+  margin: 0;
+  color: var(--slide-muted);
+}

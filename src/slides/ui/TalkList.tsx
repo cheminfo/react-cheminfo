@@ -21,6 +21,12 @@ export interface TalkListProps {
    * @default the id itself
    */
   siteName?: (site: string) => string;
+  /**
+   * What an empty list says. A list that draws nothing at all reads as a
+   * broken page rather than as a site that has published no deck yet.
+   * @default 'No talk yet.'
+   */
+  emptyNote?: string;
 }
 
 /**
@@ -33,9 +39,19 @@ export interface TalkListProps {
  * @returns The listing.
  */
 export function TalkList(props: TalkListProps): ReactElement {
-  const { manifests, onOpen, renderHref, siteName } = props;
+  const {
+    manifests,
+    onOpen,
+    renderHref,
+    siteName,
+    emptyNote = 'No talk yet.',
+  } = props;
   const groups = groupBySite(manifests);
   const showSite = groups.length > 1;
+
+  if (groups.length === 0) {
+    return <p className="talk-list-empty">{emptyNote}</p>;
+  }
 
   return (
     <div className="talk-list">
@@ -104,6 +120,8 @@ function groupBySite(manifests: readonly TalkManifest[]): TalkGroup[] {
 
   const groups: TalkGroup[] = [];
   for (const [site, entries] of bySite) {
+    // A site that has published nothing is not a heading over an empty row.
+    if (entries.length === 0) continue;
     groups.push({ site, entries: entries.toSorted(byMostRecent) });
   }
   return groups;

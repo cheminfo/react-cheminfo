@@ -6,6 +6,7 @@
  * reason the two components are separate files.
  */
 
+import { Button } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -39,6 +40,13 @@ export interface AtomicOrbitalCanvasProps {
    * @default 56
    */
   resolution?: number | ResolutionLimits;
+  /**
+   * Whether a labelled x, y, z frame is drawn through the nucleus. A `3d_xz` is
+   * only `3d_xz` because of where its lobes sit against those axes, and a lone
+   * isosurface says nothing about that.
+   * @default false
+   */
+  axes?: boolean;
   /**
    * Whether the scene turns on its own, which is what makes a still screenshot
    * of a 3D shape readable.
@@ -82,6 +90,7 @@ export function AtomicOrbitalCanvas(
     orbitalId,
     palette = PHASE_PALETTES.textbook,
     resolution = DEFAULT_RESOLUTION,
+    axes = false,
     spinning = false,
     spinSpeed = DEFAULT_SPIN_SPEED,
     sample = sampleInProcess,
@@ -92,6 +101,13 @@ export function AtomicOrbitalCanvas(
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OrbitalViewer | null>(null);
   const [drawn, setDrawn] = useState<string | null>(null);
+
+  // How far the drawn surface reaches, and whether the frame is wanted around
+  // it. Both are read by the sampling effect, which finishes long after the
+  // render that started it; keeping them in refs is what lets the frame be
+  // switched on without re-sampling the orbital.
+  const reachRef = useRef<number | null>(null);
+  const axesRef = useRef(axes);
 
   // What the canvas is being asked to show. Comparing it with what it *is*
   // showing gives the progress note without a state write on every prop change.
@@ -136,7 +152,8 @@ export function AtomicOrbitalCanvas(
           positiveColour: palette.positive,
           negativeColour: palette.negative,
         });
-        await viewer.refit(reach);
+        reachRef.current = reach ?? null;
+        await viewer.refit(await fitAxes(viewer, reach, axesRef.current));
         if (!cancelled) setDrawn(wanted);
       })
       .catch((error: unknown) => {
@@ -150,6 +167,16 @@ export function AtomicOrbitalCanvas(
     };
   }, [atomicNumber, orbitalId, resolution, palette, sample, wanted]);
 
+  // Toggling the frame on an orbital already on screen: the field it was drawn
+  // from is unchanged, so nothing is re-sampled.
+  useEffect(() => {
+    axesRef.current = axes;
+    const viewer = viewerRef.current;
+    const reach = reachRef.current;
+    if (viewer === null || reach === null) return;
+    void fitAxes(viewer, reach, axes).then((framed) => viewer.refit(framed));
+  }, [axes]);
+
   useEffect(() => {
     void viewerRef.current?.setSpin(spinning, spinSpeed);
   }, [spinning, spinSpeed]);
@@ -157,8 +184,42 @@ export function AtomicOrbitalCanvas(
   return (
     <div ref={containerRef} style={CANVAS_STYLE}>
       {busy && <div style={BUSY_STYLE}>Sampling…</div>}
+      <div style={RESET_STYLE}>
+        <Button
+          variant="minimal"
+          size="small"
+          icon="zoom-to-fit"
+          title="Reset the view"
+          aria-label="Reset the view"
+          onClick={() => {
+            void viewerRef.current?.resetView();
+          }}
+        />
+      </div>
     </div>
   );
+}
+
+/**
+ * Draw the cartesian frame around the orbital, or remove it.
+ * @param viewer - The viewer holding the canvas.
+ * @param reach - How far the drawn surface reaches, as `showOrbital` returned
+ * it.
+ * @param axes - Whether the frame is wanted.
+ * @returns What the camera has to fit: the frame reaches past the surface, so
+ * turning it on has to zoom out or the labels sit off screen.
+ */
+async function fitAxes(
+  viewer: OrbitalViewer,
+  reach: number | undefined,
+  axes: boolean,
+): Promise<number | undefined> {
+  if (!axes) {
+    await viewer.hideAxes();
+    return reach;
+  }
+  if (reach === undefined) return undefined;
+  return (await viewer.showAxes(reach)) ?? reach;
 }
 
 /** Samples per edge; 56 resolves the radial node of a 3s in about 25 ms. */
@@ -189,6 +250,17 @@ const CANVAS_STYLE: CSSProperties = {
   minHeight: 260,
   borderRadius: 3,
   overflow: 'hidden',
+};
+
+/**
+ * The way back to the framing the orbital opened on, since a change of orbital
+ * now keeps whatever angle and zoom the student is on.
+ */
+const RESET_STYLE: CSSProperties = {
+  position: 'absolute',
+  top: 4,
+  right: 4,
+  zIndex: 1,
 };
 
 const BUSY_STYLE: CSSProperties = {

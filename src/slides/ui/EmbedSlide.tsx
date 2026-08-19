@@ -73,7 +73,8 @@ function splitEmbedAddress(body: string): {
 
 /**
  * A frame without a title is unreadable to a screen reader.
- * @param src
+ * @param src - The address being framed.
+ * @returns What the frame is called.
  */
 function frameTitle(src: string): string {
   try {

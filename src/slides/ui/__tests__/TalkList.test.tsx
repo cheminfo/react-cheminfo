@@ -130,10 +130,26 @@ test('a card is a real link when the site says where the talk sits', () => {
   );
 });
 
-test('nothing published is an empty list, not an error', () => {
+test('nothing published says so, rather than drawing an empty box', () => {
   const html = renderToStaticMarkup(
     <TalkList manifests={[]} onOpen={() => undefined} />,
   );
 
-  expect(html).toBe('<div class="talk-list"></div>');
+  expect(html).toBe('<p class="talk-list-empty">No talk yet.</p>');
+});
+
+test('a site that has published nothing is not a heading over a void', () => {
+  const html = renderToStaticMarkup(
+    <TalkList
+      manifests={[
+        { site: 'surge', origin: 'https://surge.cheminfo.org', talks: [] },
+      ]}
+      onOpen={() => undefined}
+      emptyNote="Nothing here yet — write the first one."
+    />,
+  );
+
+  expect(html).toBe(
+    '<p class="talk-list-empty">Nothing here yet — write the first one.</p>',
+  );
 });

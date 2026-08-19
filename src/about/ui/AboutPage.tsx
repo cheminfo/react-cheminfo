@@ -131,6 +131,8 @@ const PAGE_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   maxWidth: 980,
+  // Centred, because the About is read on its own rather than beside a tool.
+  marginInline: 'auto',
   gap: 10,
 } as const satisfies CSSProperties;
 

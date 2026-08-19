@@ -9,6 +9,7 @@ const meta = {
   argTypes: {
     atomicNumber: { control: { type: 'range', min: 1, max: 118, step: 1 } },
     resolution: { control: { type: 'range', min: 16, max: 80, step: 4 } },
+    axes: { control: 'boolean' },
     spinning: { control: 'boolean' },
   },
   args: { atomicNumber: 26, orbitalId: '3dz2' },
@@ -53,6 +54,11 @@ export const FOrbital: Story = {
 /** The blue/amber pair, for the readers the blue/red one fails. */
 export const ColourBlindSafe: Story = {
   args: { palette: PHASE_PALETTES.colourBlindSafe },
+};
+
+/** The labelled frame, which is what tells a `3d_xz` from a `3d_yz`. */
+export const WithAxes: Story = {
+  args: { atomicNumber: 34, orbitalId: '3dyz', axes: true },
 };
 
 /** Turning makes a still screenshot of a 3D shape readable. */

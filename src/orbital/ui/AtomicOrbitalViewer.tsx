@@ -52,6 +52,12 @@ export interface AtomicOrbitalViewerProps {
    */
   resolution?: number | ResolutionLimits;
   /**
+   * Whether a labelled x, y, z frame is drawn through the nucleus, which is
+   * what tells a `3d_xz` from a `3d_yz`.
+   * @default false
+   */
+  axes?: boolean;
+  /**
    * Whether the scene turns on its own.
    * @default false
    */

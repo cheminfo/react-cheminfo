@@ -5,6 +5,9 @@ import { openStory } from './story.ts';
 // Every story the book holds, so a component that gains one without a spec, or
 // loses one to a rename, is noticed rather than silently skipped.
 const STORY_IDS = [
+  'about-aboutpage--another-site',
+  'about-aboutpage--default',
+  'about-aboutpage--with-citation',
   'capsule-capsulefilter--compact-counts',
   'capsule-capsulefilter--default',
   'capsule-capsulefilter--pre-selected',
@@ -125,6 +128,7 @@ const STORY_IDS = [
   'orbital-atomicorbitalviewer--radial-nodes',
   'orbital-atomicorbitalviewer--simple',
   'orbital-atomicorbitalviewer--spinning',
+  'orbital-atomicorbitalviewer--with-axes',
   'pedagogy-exerciseactions--default',
   'pedagogy-exerciseactions--hints-exhausted',
   'pedagogy-exerciseactions--nothing-to-check-yet',
@@ -204,6 +208,14 @@ const STORY_IDS = [
   'share-sharedialog--from-the-header',
   'share-sharedialog--the-link-and-the-frame',
   'share-sharedialog--with-tool-section',
+  'slides-slideshow--content',
+  'slides-slideshow--default',
+  'slides-slideshow--live-tool',
+  'slides-slideshow--on-another-site',
+  'slides-slideshow--section-divider',
+  'slides-talklist--default',
+  'slides-talklist--empty',
+  'slides-talklist--one-site',
   'structure-structure--default',
   'structure-structure--every-size',
   'structure-structure--highlighted',
