@@ -71,6 +71,22 @@ export interface SlideshowProps {
    * @default undefined
    */
   className?: string;
+  /**
+   * Fullscreen owned by the site rather than by the player.
+   *
+   * A deck that links into the live tool wants the whole app fullscreen, not
+   * the player: the player unmounts on the way to the demo, and the browser
+   * would leave fullscreen with it. A site in that shape passes what it
+   * fullscreens and how to toggle it, and the player's key and button drive
+   * that instead of their own element.
+   * @default undefined — the player fullscreens itself
+   */
+  fullscreen?: {
+    /** Whether the site is presenting. */
+    isFullscreen: boolean;
+    /** Called when `f` or the bar's button asks to change that. */
+    onToggle: () => void;
+  };
 }
 
 /** Slides are authored on this canvas, and it is scaled to whatever it is played on. */
@@ -102,6 +118,7 @@ export function Slideshow(props: SlideshowProps): ReactElement {
     talkId = '',
     site,
     talkOrigin,
+    fullscreen,
     title,
     className,
   } = props;
@@ -130,7 +147,8 @@ export function Slideshow(props: SlideshowProps): ReactElement {
     [onIndex, total],
   );
 
-  const toggleFullscreen = useCallback(() => {
+  const ownFullscreen = fullscreen === undefined;
+  const toggleOwn = useCallback(() => {
     const element = playerRef.current;
     if (element === null) return;
     if (document.fullscreenElement === element) {
@@ -139,8 +157,10 @@ export function Slideshow(props: SlideshowProps): ReactElement {
       void element.requestFullscreen().catch(() => undefined);
     }
   }, []);
+  const toggleFullscreen = fullscreen?.onToggle ?? toggleOwn;
 
   useEffect(() => {
+    if (!ownFullscreen) return;
     function onFullscreenChange(): void {
       setIsFullscreen(document.fullscreenElement === playerRef.current);
     }
@@ -148,7 +168,7 @@ export function Slideshow(props: SlideshowProps): ReactElement {
     return () => {
       document.removeEventListener('fullscreenchange', onFullscreenChange);
     };
-  }, []);
+  }, [ownFullscreen]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent): void {
@@ -237,7 +257,7 @@ export function Slideshow(props: SlideshowProps): ReactElement {
         title={title ?? talk.meta.title}
         index={current}
         total={total}
-        isFullscreen={isFullscreen}
+        isFullscreen={fullscreen?.isFullscreen ?? isFullscreen}
         onGo={goTo}
         onToggleFullscreen={toggleFullscreen}
         onExit={onExit}

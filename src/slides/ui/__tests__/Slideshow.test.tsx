@@ -122,3 +122,18 @@ test('a talk with no slides still draws its player', () => {
     '<div class="slide-canvas" style="transform:scale(1)">',
   );
 });
+
+test('a site that fullscreens its own shell drives the bar and the key', () => {
+  const html = renderToStaticMarkup(
+    <Slideshow
+      talk={talkOf(3)}
+      index={0}
+      onIndex={() => undefined}
+      fullscreen={{ isFullscreen: true, onToggle: () => undefined }}
+    />,
+  );
+
+  // The bar reads the site's state, not the player's own element: presenting
+  // shows the way out rather than the way in.
+  expect(html).toContain('data-icon="minimize"');
+});

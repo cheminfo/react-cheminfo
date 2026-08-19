@@ -302,6 +302,11 @@ The format itself is framework-free and is also exported from
 `react-cheminfo/core`, so a backend gathering the family's manifests reads them
 without loading React.
 
+A site that fullscreens its own shell — so a slide can open the live tool and
+come back still presenting — passes `fullscreen={{ isFullscreen, onToggle }}`,
+and the `f` key and the bar's button drive that instead of the player's own
+element.
+
 Publishing a site's decks to the family is one plugin:
 
 ```ts
