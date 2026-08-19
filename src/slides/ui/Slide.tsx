@@ -22,6 +22,17 @@ export interface SlideLayoutProps {
   talkId: string;
   /** Which slide of the talk this is, zero-based. */
   slideIndex: number;
+  /**
+   * Which site published the deck, written into the way back.
+   * @default undefined — the site playing it
+   */
+  site?: string;
+  /**
+   * Where the publishing site lives, which a relative address in the deck is
+   * resolved against.
+   * @default undefined — the addresses are this site's own
+   */
+  talkOrigin?: string;
   /** What the talk's front-matter said, for a layout that draws from it. */
   meta: TalkMeta;
   /**
@@ -68,10 +79,14 @@ export function SlideView(props: SlideViewProps): ReactElement {
 const GENERIC_LAYOUTS = new Set(['content', 'title', 'quote', 'thanks']);
 
 function GenericSlide(props: SlideLayoutProps): ReactElement {
-  const { slide, talkId, slideIndex, meta, renderLink } = props;
+  const { slide, talkId, slideIndex, meta, renderLink, site, talkOrigin } =
+    props;
   const layout = GENERIC_LAYOUTS.has(slide.layout) ? slide.layout : 'content';
   const { body, demos } = splitDemoLinks(slide.body);
-  const origin: TalkOrigin = { talkId, slide: slideIndex };
+  const origin: TalkOrigin =
+    site === undefined
+      ? { talkId, slide: slideIndex }
+      : { talkId, slide: slideIndex, site };
   const logos = layout === 'title' ? (meta.logos ?? []) : [];
 
   return (
@@ -96,7 +111,7 @@ function GenericSlide(props: SlideLayoutProps): ReactElement {
                   </span>
                 )}
                 <DemoLink
-                  href={demo.href}
+                  href={resolveDemoHref(demo.href, talkOrigin)}
                   origin={origin}
                   renderLink={renderLink}
                 >
@@ -109,4 +124,20 @@ function GenericSlide(props: SlideLayoutProps): ReactElement {
       </div>
     </div>
   );
+}
+
+/**
+ * Where a demo link actually points.
+ *
+ * A deck writes `/mf-finder?mass=300`, meaning its own site. Played there it is
+ * exactly that; played on another site of the family it has to be resolved
+ * against the site that wrote it, or the link lands on a page that does not
+ * exist.
+ * @param href - The address the slide wrote.
+ * @param talkOrigin - Where the publishing site lives, when it is not this one.
+ * @returns The address to open.
+ */
+function resolveDemoHref(href: string, talkOrigin?: string): string {
+  if (talkOrigin === undefined || !href.startsWith('/')) return href;
+  return `${talkOrigin.replace(/\/$/, '')}${href}`;
 }

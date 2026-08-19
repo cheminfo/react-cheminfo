@@ -22,6 +22,8 @@ interface Snapshot {
 /**
  * A plugin whose camera is a plain object, which is all the camera moves read.
  * @param state - Where the camera currently sits.
+ * @param sceneRadius - What the whole scene's sphere measures; 0 stands for a
+ * sphere molstar has not recomputed yet.
  * @returns The stub and the `setState` spy the assertions read.
  */
 function stubPlugin(

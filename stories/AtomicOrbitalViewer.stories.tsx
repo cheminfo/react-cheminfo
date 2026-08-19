@@ -58,7 +58,12 @@ export const ColourBlindSafe: Story = {
 
 /** The labelled frame, which is what tells a `3d_xz` from a `3d_yz`. */
 export const WithAxes: Story = {
-  args: { atomicNumber: 34, orbitalId: '3dyz', axes: true },
+  args: { atomicNumber: 34, orbitalId: '3dyz' },
+};
+
+/** Opening without the frame; the button in the corner brings it back. */
+export const WithoutAxes: Story = {
+  args: { axes: false },
 };
 
 /** Turning makes a still screenshot of a 3D shape readable. */

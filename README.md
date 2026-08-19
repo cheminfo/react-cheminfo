@@ -298,6 +298,10 @@ site adds its own through `layouts`.
 The `embed` layout puts a **live tool** on the slide — the last bare URL of the
 body is framed — which is what our `?embed` mode exists for.
 
+The format itself is framework-free and is also exported from
+`react-cheminfo/core`, so a backend gathering the family's manifests reads them
+without loading React.
+
 Publishing a site's decks to the family is one plugin:
 
 ```ts

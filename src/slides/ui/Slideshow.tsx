@@ -47,6 +47,21 @@ export interface SlideshowProps {
    */
   talkId?: string;
   /**
+   * Which site published the deck. A deck played somewhere else — as
+   * learn.cheminfo.org plays the family's — says so in the way back, so the
+   * link returns to the player it came from rather than to this one.
+   * @default undefined — the deck belongs to the site playing it
+   */
+  site?: string;
+  /**
+   * Where the publishing site lives, e.g. `https://www.chemcalc.org`. A deck
+   * written for one site holds addresses relative to it, so playing it
+   * elsewhere has to resolve them against their own origin rather than against
+   * the page.
+   * @default undefined — the addresses are this site's own
+   */
+  talkOrigin?: string;
+  /**
    * What the bar reads.
    * @default the talk's own title
    */
@@ -85,6 +100,8 @@ export function Slideshow(props: SlideshowProps): ReactElement {
     layouts,
     renderLink,
     talkId = '',
+    site,
+    talkOrigin,
     title,
     className,
   } = props;
@@ -192,6 +209,8 @@ export function Slideshow(props: SlideshowProps): ReactElement {
               key={current}
               slide={slide}
               talkId={talkId}
+              site={site}
+              talkOrigin={talkOrigin}
               slideIndex={current}
               meta={talk.meta}
               layouts={layouts}

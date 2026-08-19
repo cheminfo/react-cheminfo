@@ -33,6 +33,7 @@ import type { AxesStyle } from './renderAxes.ts';
 import { clearOrbitalAxes, renderOrbitalAxes } from './renderAxes.ts';
 import type { VolumeStyle } from './renderVolume.ts';
 import { clearSampledVolume, renderSampledVolume } from './renderVolume.ts';
+import { createSerialRunner } from './serial.ts';
 
 /** Settings fixed for the life of a viewer. */
 export interface OrbitalViewerOptions {
@@ -65,6 +66,9 @@ export function createOrbitalViewer(
  */
 export class OrbitalViewer {
   readonly #model: PluginViewModel;
+  // One canvas, so one operation at a time — see `serial.ts` for what
+  // interleaving two of them does to the scene.
+  readonly #serial = createSerialRunner();
   #disposed = false;
   /** Extent the camera was last fitted to; `null` before it has been placed. */
   #fittedRadius: number | null = null;
@@ -251,23 +255,26 @@ export class OrbitalViewer {
   }
 
   /**
-   * Wait for initialisation, then run `action` on the plugin. Resolves to
-   * `undefined` when the viewer was disposed, before the call or while `action`
-   * was still running; an initialisation failure still reaches the caller.
+   * Wait for the operations queued before this one and for initialisation,
+   * then run `action` on the plugin. Resolves to `undefined` when the viewer
+   * was disposed, before the call or while `action` was still running; an
+   * initialisation failure still reaches the caller.
    * @param action - What to run once the canvas is ready.
    * @returns What `action` returned, or `undefined` when disposed.
    */
-  async #run<Result>(
+  #run<Result>(
     action: (plugin: PluginContext) => Result | Promise<Result>,
   ): Promise<Result | undefined> {
-    if (this.#disposed) return undefined;
-    await this.ready;
-    if (this.#disposed) return undefined;
-    try {
-      return await action(this.#model.plugin);
-    } catch (error) {
+    return this.#serial.run(async () => {
       if (this.#disposed) return undefined;
-      throw error;
-    }
+      await this.ready;
+      if (this.#disposed) return undefined;
+      try {
+        return await action(this.#model.plugin);
+      } catch (error) {
+        if (this.#disposed) return undefined;
+        throw error;
+      }
+    });
   }
 }

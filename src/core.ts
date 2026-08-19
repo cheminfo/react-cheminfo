@@ -13,5 +13,8 @@ export * from './periodic/core/index.ts';
 export * from './router/core/index.ts';
 export * from './seo/core/index.ts';
 export * from './share/core/index.ts';
+// The deck format and its navigation are framework-free, so a backend can read
+// a manifest without loading React: `react-cheminfo/slides` is the player.
+export * from './slides/core/index.ts';
 export * from './tokens/core/index.ts';
 export * from './worker/core/index.ts';

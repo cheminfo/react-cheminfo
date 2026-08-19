@@ -10,6 +10,8 @@ import { Button } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import type { HelpContent } from '../../help/ui/HelpBody.tsx';
+import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
 import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
 import { PHASE_PALETTES } from '../core/palette.ts';
@@ -41,12 +43,23 @@ export interface AtomicOrbitalCanvasProps {
    */
   resolution?: number | ResolutionLimits;
   /**
-   * Whether a labelled x, y, z frame is drawn through the nucleus. A `3d_xz` is
-   * only `3d_xz` because of where its lobes sit against those axes, and a lone
-   * isosurface says nothing about that.
-   * @default false
+   * Whether the labelled x, y, z frame is drawn through the nucleus when the
+   * canvas opens. A `3d_xz` is only `3d_xz` because of where its lobes sit
+   * against those axes, and a lone isosurface says nothing about that, so the
+   * frame is on unless a site says otherwise.
+   *
+   * The canvas owns the state from then on: the button in its corner flips it,
+   * and {@link AtomicOrbitalCanvasProps.onAxesChange} reports the new value to
+   * a site that wants to remember it for the next mount.
+   * @default true
    */
   axes?: boolean;
+  /**
+   * Called when the student flips the frame, with its new state — so a site can
+   * persist the choice and pass it back as `axes`.
+   * @default undefined
+   */
+  onAxesChange?: (axes: boolean) => void;
   /**
    * Whether the scene turns on its own, which is what makes a still screenshot
    * of a 3D shape readable.
@@ -90,10 +103,11 @@ export function AtomicOrbitalCanvas(
     orbitalId,
     palette = PHASE_PALETTES.textbook,
     resolution = DEFAULT_RESOLUTION,
-    axes = false,
+    axes: initialAxes = true,
     spinning = false,
     spinSpeed = DEFAULT_SPIN_SPEED,
     sample = sampleInProcess,
+    onAxesChange,
     onNodeRadii,
     onError,
   } = props;
@@ -107,7 +121,9 @@ export function AtomicOrbitalCanvas(
   // render that started it; keeping them in refs is what lets the frame be
   // switched on without re-sampling the orbital.
   const reachRef = useRef<number | null>(null);
-  const axesRef = useRef(axes);
+  const axesRef = useRef(initialAxes);
+
+  const [axes, setAxes] = useState(initialAxes);
 
   // What the canvas is being asked to show. Comparing it with what it *is*
   // showing gives the progress note without a state write on every prop change.
@@ -116,9 +132,9 @@ export function AtomicOrbitalCanvas(
 
   // Callbacks are read through refs so a caller passing an inline arrow does
   // not re-sample the orbital on every render of its parent.
-  const callbacks = useRef({ onNodeRadii, onError });
+  const callbacks = useRef({ onAxesChange, onNodeRadii, onError });
   useEffect(() => {
-    callbacks.current = { onNodeRadii, onError };
+    callbacks.current = { onAxesChange, onNodeRadii, onError };
   });
 
   // Created and disposed once per mount. React 19 runs this twice in
@@ -184,17 +200,32 @@ export function AtomicOrbitalCanvas(
   return (
     <div ref={containerRef} style={CANVAS_STYLE}>
       {busy && <div style={BUSY_STYLE}>Sampling…</div>}
-      <div style={RESET_STYLE}>
-        <Button
-          variant="minimal"
-          size="small"
-          icon="zoom-to-fit"
-          title="Reset the view"
-          aria-label="Reset the view"
-          onClick={() => {
-            void viewerRef.current?.resetView();
-          }}
-        />
+      <div style={CONTROLS_STYLE}>
+        <HelpTooltip content={AXES_HELP} placement="bottom">
+          <Button
+            variant="minimal"
+            size="small"
+            icon="grid"
+            active={axes}
+            aria-label="Show the x, y, z axes"
+            aria-pressed={axes}
+            onClick={() => {
+              setAxes(!axes);
+              callbacks.current.onAxesChange?.(!axes);
+            }}
+          />
+        </HelpTooltip>
+        <HelpTooltip content={RESET_HELP} placement="bottom">
+          <Button
+            variant="minimal"
+            size="small"
+            icon="zoom-to-fit"
+            aria-label="Reset the view"
+            onClick={() => {
+              void viewerRef.current?.resetView();
+            }}
+          />
+        </HelpTooltip>
       </div>
     </div>
   );
@@ -221,6 +252,22 @@ async function fitAxes(
   if (reach === undefined) return undefined;
   return (await viewer.showAxes(reach)) ?? reach;
 }
+
+/** What the frame button says it is for. */
+const AXES_HELP: HelpContent = {
+  title: 'Cartesian axes',
+  body: 'Draw x, y and z through the nucleus. The label names an orbital by where its lobes sit against them.',
+  example: {
+    code: '3d_yz',
+    note: 'four lobes between the y and z axes, none on either.',
+  },
+};
+
+/** What the reset button says it is for. */
+const RESET_HELP: HelpContent = {
+  title: 'Reset the view',
+  body: 'Back to the angle and zoom the orbital opened on. A change of orbital keeps whatever view you have turned it to.',
+};
 
 /** Samples per edge; 56 resolves the radial node of a 3s in about 25 ms. */
 const DEFAULT_RESOLUTION = 56;
@@ -253,14 +300,17 @@ const CANVAS_STYLE: CSSProperties = {
 };
 
 /**
- * The way back to the framing the orbital opened on, since a change of orbital
- * now keeps whatever angle and zoom the student is on.
+ * The two controls the canvas owns: the frame, and the way back to the framing
+ * the orbital opened on — a change of orbital now keeps whatever angle and zoom
+ * the student is on.
  */
-const RESET_STYLE: CSSProperties = {
+const CONTROLS_STYLE: CSSProperties = {
   position: 'absolute',
   top: 4,
   right: 4,
   zIndex: 1,
+  display: 'flex',
+  gap: 2,
 };
 
 const BUSY_STYLE: CSSProperties = {

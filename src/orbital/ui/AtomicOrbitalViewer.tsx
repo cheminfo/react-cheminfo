@@ -52,11 +52,18 @@ export interface AtomicOrbitalViewerProps {
    */
   resolution?: number | ResolutionLimits;
   /**
-   * Whether a labelled x, y, z frame is drawn through the nucleus, which is
-   * what tells a `3d_xz` from a `3d_yz`.
-   * @default false
+   * Whether the labelled x, y, z frame is drawn through the nucleus when the
+   * canvas opens — it is what tells a `3d_xz` from a `3d_yz`. The button in the
+   * canvas's corner flips it from there.
+   * @default true
    */
   axes?: boolean;
+  /**
+   * Called when the student flips the frame, with its new state — so a site can
+   * persist the choice and pass it back as `axes`.
+   * @default undefined
+   */
+  onAxesChange?: (axes: boolean) => void;
   /**
    * Whether the scene turns on its own.
    * @default false

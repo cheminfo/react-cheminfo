@@ -117,3 +117,17 @@ test('the site draws the in-app links when it says how', () => {
     '<a class="slide-demo router-link" href="/mf?from=talk:demo:4">',
   );
 });
+
+test('a deck played away from home keeps its links pointing at the site that wrote it', () => {
+  const html = render(
+    {
+      layout: 'content',
+      body: 'Try it.\n\n[Demo: the formula tool](/?mf=C6H12O6)',
+    },
+    { site: 'chemcalc', talkOrigin: 'https://www.chemcalc.org' },
+  );
+
+  expect(html).toContain(
+    'href="https://www.chemcalc.org/?mf=C6H12O6&amp;from=talk:chemcalc:demo:4"',
+  );
+});
