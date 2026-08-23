@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.9.0](https://github.com/cheminfo/react-cheminfo/compare/v0.8.0...v0.9.0) (2026-08-23)
+
+
+### Features
+
+* add the shared slideshow, the About page and a token guard ([a20d5c3](https://github.com/cheminfo/react-cheminfo/commit/a20d5c36c640f39d0135c00fbcb920fa891a5ab8))
+* **credits:** register Lexical, KaTeX, dnd kit, Signals, Fastify and SQLite ([63c951e](https://github.com/cheminfo/react-cheminfo/commit/63c951e9ba6662705927526b657b43b147d4d1c9))
+* **orbital:** export createAtomicOrbitalEvaluator, and clear every surface ([4c88758](https://github.com/cheminfo/react-cheminfo/commit/4c88758913e95ddb607335831f28e9914b7aa6e8))
+* **slides:** add the embed layout, so a live tool is a slide ([5110880](https://github.com/cheminfo/react-cheminfo/commit/5110880f08c1eb14ed1210de1750d4d632f56fd0))
+* **slides:** let the site own fullscreen, and export isModifiedClick ([b9993f7](https://github.com/cheminfo/react-cheminfo/commit/b9993f73e13359d44856d4f5bc5b4af25852ae2b))
+* **slides:** play a deck away from home, and read one without React ([e0bccca](https://github.com/cheminfo/react-cheminfo/commit/e0bccca4a8a64d1095af3933c89d7b1687eb20ee))
+* **slides:** show a note when nothing is published, and demo the new components ([633010e](https://github.com/cheminfo/react-cheminfo/commit/633010e09ea26508cfcc75f91cc5327e815b8f00))
+
+
+### Bug Fixes
+
+* **slides:** the embedded tool fills the slide ([54f5ff9](https://github.com/cheminfo/react-cheminfo/commit/54f5ff9190abbd7976e39d659cd81ef1e84fd977))
+
 ## [0.8.0](https://github.com/cheminfo/react-cheminfo/compare/v0.7.0...v0.8.0) (2026-08-18)
 
 
