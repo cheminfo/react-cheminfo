@@ -32,8 +32,11 @@ export interface RealHarmonic {
    * @param y - Offset from the nucleus along y, ångström.
    * @param z - Offset from the nucleus along z, ångström.
    * @param radius - Length of `(x, y, z)`, passed in because the caller has
-   * already computed it for the radial part.
-   * @returns The dimensionless amplitude; 0 at the nucleus for ℓ > 0.
+   * already computed it for the radial part. Never 0: a harmonic names a
+   * direction and the nucleus has none, so every ℓ > 0 divides by it. Build
+   * `ψ` with `createAtomicOrbitalEvaluator`, which answers that one point
+   * itself rather than paying for a branch on every sample.
+   * @returns The dimensionless amplitude.
    */
   evaluate: (x: number, y: number, z: number, radius: number) => number;
 }

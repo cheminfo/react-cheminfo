@@ -1,5 +1,8 @@
 export type { ResolutionLimits } from './atomicGrid.ts';
-export { atomicGridResolution } from './atomicGrid.ts';
+export {
+  atomicGridResolution,
+  createAtomicOrbitalEvaluator,
+} from './atomicGrid.ts';
 export type { AtomicOrbital, AtomicOrbitalOptions } from './atomicOrbitals.ts';
 export {
   atomicOrbitalsOf,

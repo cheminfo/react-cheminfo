@@ -108,7 +108,14 @@ export async function renderSampledVolume(
   const drawn = surfaces.filter(
     (surface): surface is Representation.Any => surface !== null,
   );
-  representations.set(plugin, drawn);
+  // Added to whatever is already recorded rather than replacing it, so the
+  // record is every surface on the canvas and the next clear can take them all
+  // away. Overwriting it would strand any pair that reached the canvas without
+  // being the last one recorded, and a stranded pair is on screen for good.
+  representations.set(plugin, [
+    ...(representations.get(plugin) ?? []),
+    ...drawn,
+  ]);
   for (const representation of drawn) canvas3d.add(representation);
   // add() only queues; nothing appears until the queue is committed.
   canvas3d.commit();
