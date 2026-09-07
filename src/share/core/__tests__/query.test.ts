@@ -30,13 +30,23 @@ test('a plus inside a value stays a plus, never a space', () => {
   );
 });
 
-test('a plus and a comma are written literally, everything else is escaped', () => {
+test('a comma is written literally, and a plus is escaped', () => {
+  // A comma has one reading, so it stays legible. A bare `+` does not: every
+  // form-urlencoded reader takes it for a space, so it is written `%2B` and
+  // the molecule survives being read by something other than `parseQuery`.
   expect(
     serializeQuery([
       ['smiles', 'CC[N+](C)(C)C'],
       ['hide', 'hints,answers'],
     ]),
-  ).toBe('smiles=CC%5BN+%5D(C)(C)C&hide=hints,answers');
+  ).toBe('smiles=CC%5BN%2B%5D(C)(C)C&hide=hints,answers');
+});
+
+test('what is written is read back the same by every reader', () => {
+  const written = serializeQuery([['ionizations', 'H+']]);
+
+  expect(parseQuery(written)).toStrictEqual([['ionizations', 'H+']]);
+  expect(new URLSearchParams(written).get('ionizations')).toBe('H+');
 });
 
 test('a space is written as %20, so it can never be read back as a plus', () => {

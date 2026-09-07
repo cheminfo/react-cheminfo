@@ -26,10 +26,16 @@ export function parseQuery(search: string): QueryEntry[] {
 }
 
 /**
- * Write pairs back into a query string, keeping the two characters a reader
- * of these links cares about legible: a comma stays a comma rather than
- * `%2C`, and a plus stays a plus rather than `%2B`. Both parse back
- * identically through {@link parseQuery}.
+ * Write pairs back into a query string, keeping the comma legible — `hide=a,b`
+ * rather than `hide=a%2Cb` — because a teacher has to read these links, and a
+ * comma has only one reading.
+ *
+ * A plus is written `%2B`, even though {@link parseQuery} would read a literal
+ * one back. We are liberal in what we accept and strict in what we write: a
+ * bare `+` in a query string is read as a space by `URLSearchParams`,
+ * `query-string` and every server-side parser, so `ionizations=H+` comes back
+ * as `H ` and `smiles=CC[N+](C)(C)C` as a different molecule — silently,
+ * anywhere the link is read by something other than {@link parseQuery}.
  * @param entries - The pairs to write, in the order they should appear.
  * @returns The query string, without its leading `?`.
  */
@@ -66,7 +72,5 @@ function decodeComponent(value: string): string {
 }
 
 function encodeComponent(value: string): string {
-  return encodeURIComponent(value)
-    .replaceAll('%2C', ',')
-    .replaceAll('%2B', '+');
+  return encodeURIComponent(value).replaceAll('%2C', ',');
 }

@@ -154,8 +154,10 @@ test('a shared structure survives being written and read back', () => {
     VOCABULARY,
   );
 
-  expect(written).toBe('smiles=CC%5BN+%5D(C)(C)C&embed=1&hide=hints');
+  expect(written).toBe('smiles=CC%5BN%2B%5D(C)(C)C&embed=1&hide=hints');
   expect(parseQuery(written)[0]).toStrictEqual(['smiles', 'CC[N+](C)(C)C']);
+  // And by a reader that is not ours, which is the point of writing `%2B`.
+  expect(new URLSearchParams(written).get('smiles')).toBe('CC[N+](C)(C)C');
 });
 
 test('a link is configured when it embeds, when it hides, or when it carries a value', () => {

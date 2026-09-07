@@ -55,7 +55,7 @@ test('a shared structure keeps its charge', () => {
   });
 
   expect(url).toBe(
-    'https://chemcalc.org/mf-finder?smiles=CC%5BN+%5D(C)(C)C&embed=1',
+    'https://chemcalc.org/mf-finder?smiles=CC%5BN%2B%5D(C)(C)C&embed=1',
   );
 });
 
