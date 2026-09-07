@@ -57,24 +57,24 @@ through a wildcard subpath exactly as `react-science` serves its own.
 
 ## What is in it
 
-| Area                    | `…/core`                                                                                                                                                                                                          | `…/ui`                                                                                                                                           |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`                                                                                                                       | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                             |
-| **Chrome**              | —                                                                                                                                                                                                                 | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                         |
-| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                          | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
-| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs                                                                                                           | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                   |
-| **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink`                                                                                                          | —                                                                                                                                                |
-| **Indexing**            | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute` | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                         |
-| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                        | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList` |
-| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`                                                                                                            | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`                                                                                                 |
-| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`                                                                                                                      | `ColorScaleLegend`                                                                                                                               |
-| **Widgets**             | `CREDITS`, `credits`                                                                                                                                                                                              | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                             |
-| **Hooks & state**       | `createWorkerChannel`                                                                                                                                                                                             | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                           |
-| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                         | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                |
-| **About**               | `resolveAbout`, `aboutProblems`                                                                                                                                                                                   | `AboutPage`                                                                                                                                      |
-| **Slideshows**          | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                        | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                  |
-| **Token guard**         | `findTokenViolations`                                                                                                                                                                                             | `cheminfo-check-tokens` (the bin)                                                                                                                |
-| **Periodic table**      | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                             | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                 |
+| Area                    | `…/core`                                                                                                                                                                                                                      | `…/ui`                                                                                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`                                                                                                                                   | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                             |
+| **Chrome**              | —                                                                                                                                                                                                                             | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                         |
+| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                      | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
+| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs                                                                                                                       | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                   |
+| **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink`                                                                                                                      | —                                                                                                                                                |
+| **Indexing**            | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute`             | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                         |
+| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                                    | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList` |
+| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`                                                                                                                        | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`                                                                                                 |
+| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv` | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                      |
+| **Widgets**             | `CREDITS`, `credits`                                                                                                                                                                                                          | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                             |
+| **Hooks & state**       | `createWorkerChannel`                                                                                                                                                                                                         | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                           |
+| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                                     | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                |
+| **About**               | `resolveAbout`, `aboutProblems`                                                                                                                                                                                               | `AboutPage`                                                                                                                                      |
+| **Slideshows**          | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                    | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                  |
+| **Token guard**         | `findTokenViolations`                                                                                                                                                                                                         | `cheminfo-check-tokens` (the bin)                                                                                                                |
+| **Periodic table**      | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                                         | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                 |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -264,6 +264,41 @@ pattern, in ChemCalc's own indigo and teal.
 The colours a name is set in are the site's own and are not retuned to reach the
 4.5:1 of body text: ChemCalc's teal and NMRium's orange both land just under it,
 which is why a name is set bold, where 3:1 is the threshold.
+
+### `ColorScaleSelect`
+
+The colours a quantity is read with, chosen by looking at them rather than by
+reading their names — and, behind the last entry, built from anchors of the
+reader's own.
+
+```tsx
+import { COLOR_SCALES, resolveColorScale, swatchAt } from 'react-cheminfo/core';
+import { ColorScaleSelect } from 'react-cheminfo/ui';
+
+<ColorScaleSelect label="Colour scale" value={scale} onChange={setScale} />;
+
+const { scale } = resolveColorScale(text); // 'plasma', or 'hsv-long,0-0000ff,1-ff0000'
+swatchAt(scale, 0.5); // { background, foreground }
+```
+
+- **The choice is one string**, which is what goes in the state and in the
+  address: the id of one of `COLOR_SCALES`, or a scale spelled out. Nothing else
+  has to be carried, and `resolveColorScale` never throws — a scale renamed
+  since a course page was written falls back to viridis rather than blanking the
+  figure.
+- **Ten scales are offered**: viridis, plasma, magma, inferno, cividis and
+  turbo; greys for a photocopier; cool-warm and blue-red for a quantity read
+  away from a middle; and the rainbow, which orders nothing but is what a course
+  usually draws.
+- **A custom scale is anchors plus a path.** `rgb` mixes the three channels,
+  which is what a browser gradient does; `hsv` turns along the colour wheel the
+  short way, keeping the saturation instead of fading through the grey in the
+  middle; `hsv-long` turns the other way, which is how two anchors of one hue
+  draw a whole rainbow. `ColorScaleEditor` is that editor on its own, for a site
+  that wants it inline.
+- **A scale that turns is sampled, never handed to CSS as its two ends** — a
+  browser only interpolates the straight line between two colours.
+  `colorScaleGradient` and `ColorScaleBar` do the sampling.
 
 ## Carrying talks
 

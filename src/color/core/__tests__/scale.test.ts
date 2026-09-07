@@ -44,9 +44,9 @@ test('a genuine zero on a logarithmic scale lands at the bottom, not off it', ()
 
 test('the scale runs from its first stop to its last', () => {
   expect(colorFromScale(VIRIDIS_SCALE, 0)).toBe('#440154');
-  expect(colorFromScale(VIRIDIS_SCALE, 1)).toBe('#b4de2c');
+  expect(colorFromScale(VIRIDIS_SCALE, 1)).toBe('#fde725');
   expect(colorFromScale(VIRIDIS_SCALE, -5)).toBe('#440154');
-  expect(colorFromScale(VIRIDIS_SCALE, 5)).toBe('#b4de2c');
+  expect(colorFromScale(VIRIDIS_SCALE, 5)).toBe('#fde725');
   expect(colorFromScale(VIRIDIS_SCALE, Number.NaN)).toBe('#440154');
 });
 
@@ -83,7 +83,7 @@ test('a swatch carries the colour and the ink that reads on it', () => {
     foreground: '#ffffff',
   });
   expect(swatchFromScale(VIRIDIS_SCALE, 1)).toStrictEqual({
-    background: '#b4de2c',
+    background: '#fde725',
     foreground: '#182026',
   });
 });

@@ -1,32 +1,18 @@
 import type { ReadableInkOptions } from './contrast.ts';
-import { readableInk } from './contrast.ts';
-import { parseHexColor, toHexColor } from './hex.ts';
+import type { Swatch } from './interpolate.ts';
+import { colorAt, evenScale, swatchAt } from './interpolate.ts';
+import { VIRIDIS_COLORS } from './scaleData.ts';
+
+export type { Swatch } from './interpolate.ts';
 
 /**
  * Viridis, sampled at nine stops.
  *
  * It stays readable under the common colour deficiencies and is monotone in
  * lightness, so a greyscale print of the same figure still orders the values.
+ * It is the default of `COLOR_SCALES`, which is where the others are.
  */
-export const VIRIDIS_SCALE: readonly string[] = [
-  '#440154',
-  '#482878',
-  '#3e4a89',
-  '#31688e',
-  '#26828e',
-  '#1f9e89',
-  '#35b779',
-  '#6dcd59',
-  '#b4de2c',
-];
-
-/** A colour, and the ink that stays readable on it. */
-export interface Swatch {
-  /** The colour behind the value. */
-  background: string;
-  /** The ink to write the value in. */
-  foreground: string;
-}
+export const VIRIDIS_SCALE: readonly string[] = VIRIDIS_COLORS;
 
 /** How {@link positionInRange} places a value. */
 export interface PositionInRangeOptions {
@@ -73,51 +59,33 @@ export function positionInRange(
 }
 
 /**
- * The colour a scale takes at a position, interpolated between its stops.
- * @param stops - The scale's colours, from its low end to its high end, as `#rgb` or `#rrggbb`.
- * @param position - Where on the scale to read, from 0 to 1; anything outside is clamped.
+ * The colour a list of evenly spread colours takes at a position.
+ * @param stops - The colours, from the low end to the high end, as `#rgb` or `#rrggbb`.
+ * @param position - Where to read, from 0 to 1; anything outside is clamped.
  * @returns The colour at that position, as `#rrggbb`.
- * @throws {Error} When the scale has no stops, or a stop is not a hex colour.
+ * @throws {Error} When the list is empty, or a colour is not a hex colour.
  */
 export function colorFromScale(
   stops: readonly string[],
   position: number,
 ): string {
-  if (stops.length === 0) {
-    throw new Error('a colour scale needs at least one stop');
-  }
-  const scaled = clampUnit(position) * (stops.length - 1);
-  const lowerIndex = Math.floor(scaled);
-  const start = stops[lowerIndex];
-  const end = stops[Math.min(lowerIndex + 1, stops.length - 1)];
-  if (start === undefined || end === undefined) {
-    throw new Error(`no colour at position ${String(position)}`);
-  }
-  const from = parseHexColor(start);
-  const to = parseHexColor(end);
-  const ratio = scaled - lowerIndex;
-  return toHexColor({
-    red: from.red + (to.red - from.red) * ratio,
-    green: from.green + (to.green - from.green) * ratio,
-    blue: from.blue + (to.blue - from.blue) * ratio,
-  });
+  return colorAt(evenScale(stops), position);
 }
 
 /**
- * The colour a scale takes at a position, together with the ink to write on it.
- * @param stops - The scale's colours, from its low end to its high end.
- * @param position - Where on the scale to read, from 0 to 1; anything outside is clamped.
+ * The colour a list of evenly spread colours takes, with the ink to write on it.
+ * @param stops - The colours, from the low end to the high end.
+ * @param position - Where to read, from 0 to 1; anything outside is clamped.
  * @param options - See {@link ReadableInkOptions}.
  * @returns The background and the readable ink.
- * @throws {Error} When the scale has no stops, or a stop is not a hex colour.
+ * @throws {Error} When the list is empty, or a colour is not a hex colour.
  */
 export function swatchFromScale(
   stops: readonly string[],
   position: number,
   options: ReadableInkOptions = {},
 ): Swatch {
-  const background = colorFromScale(stops, position);
-  return { background, foreground: readableInk(background, options) };
+  return swatchAt(evenScale(stops), position, options);
 }
 
 function clampUnit(value: number): number {
