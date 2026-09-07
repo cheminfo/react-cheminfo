@@ -209,6 +209,26 @@ export const CREDITS = [
     license: 'Public domain',
   },
   {
+    id: 'sqlite-wasm',
+    name: 'SQLite Wasm',
+    href: 'https://sqlite.org/wasm/',
+    description: 'runs the same engine in the page, compiled to WebAssembly.',
+    license: 'Public domain',
+  },
+  {
+    id: 'pouchdb',
+    name: 'PouchDB',
+    href: 'https://pouchdb.com/',
+    description: 'answers Mango selectors the way CouchDB answers them.',
+    license: 'Apache-2.0',
+  },
+  {
+    id: 'chemexper',
+    name: 'ChemExper',
+    href: 'https://www.chemexper.com/',
+    description: 'the catalogue the compounds and their spectra come from.',
+  },
+  {
     id: 'react',
     name: 'React',
     href: 'https://react.dev/',

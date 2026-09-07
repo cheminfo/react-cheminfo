@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 
+import type { CreditEntry } from '../credits.ts';
 import { CREDITS, creditOf, credits } from '../credits.ts';
 
 test('the works come back in the order they were asked for', () => {
@@ -74,11 +75,14 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(23);
+  expect(CREDITS).toHaveLength(26);
 });
 
 test('every entry names a work, an address and what it does', () => {
-  for (const entry of CREDITS) {
+  // Read through the interface: a work with no licence of its own — a data
+  // source rather than a package — is allowed, and `CreditsList` already omits
+  // the line for it.
+  for (const entry of CREDITS as readonly CreditEntry[]) {
     expect(entry.name).not.toBe('');
     expect(entry.href.startsWith('https://')).toBe(true);
     expect(entry.description.endsWith('.')).toBe(true);
