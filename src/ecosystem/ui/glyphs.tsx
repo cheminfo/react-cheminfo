@@ -302,4 +302,20 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <circle cx="16" cy="16" r="2.9" fill="#ffffff" />
     </>
   ),
+  // A stack of platters, the top one carrying the answering colour: the disk
+  // stack every database has been drawn as, and the two shapes this site asks
+  // the same question in.
+  database: (alt) => (
+    <>
+      <path
+        d="M5.8 9.4v5.3a10.2 3.9 0 0 0 20.4 0V9.4a10.2 3.9 0 0 1-20.4 0Z"
+        fill="#ffffff"
+      />
+      <path
+        d="M5.8 17.4v5.3a10.2 3.9 0 0 0 20.4 0v-5.3a10.2 3.9 0 0 1-20.4 0Z"
+        fill="#ffffff"
+      />
+      <ellipse cx="16" cy="9.4" rx="10.2" ry="3.9" fill={alt} />
+    </>
+  ),
 };

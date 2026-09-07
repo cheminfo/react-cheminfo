@@ -3,7 +3,7 @@ import { expect, test } from 'vitest';
 import type { SiteId } from '../sites.ts';
 import { ECOSYSTEM_SITES, siteUrl } from '../sites.ts';
 
-test('the family is the seventeen sites, listed once each', () => {
+test('the family is the eighteen sites, listed once each', () => {
   const ids = ECOSYSTEM_SITES.map((site) => site.id);
 
   expect(ids).toStrictEqual([
@@ -24,6 +24,7 @@ test('the family is the seventeen sites, listed once each', () => {
     'polycarp',
     '3d',
     'periodic-table',
+    'database',
   ] satisfies SiteId[]);
 });
 

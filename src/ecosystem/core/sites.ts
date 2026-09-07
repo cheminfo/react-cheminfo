@@ -17,7 +17,8 @@ export type SiteId =
   | 'equilibrium'
   | 'polycarp'
   | '3d'
-  | 'periodic-table';
+  | 'periodic-table'
+  | 'database';
 
 export interface SiteName {
   /** First half of the name, set in the site's leading colour. */
@@ -241,6 +242,16 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brand: '#15803d',
     brandAlt: '#a16207',
     mark: { plate: '#15803d', accent: '#fbbf24' },
+  },
+  {
+    id: 'database',
+    name: { lead: 'database', alt: 'cheminfo', dot: true },
+    host: 'database.cheminfo.org',
+    repository: 'https://github.com/cheminfo/database.cheminfo.org',
+    tagline: 'Query a real chemical dataset in SQL and in Mango.',
+    brand: '#7c2d12',
+    brandAlt: '#0b6e85',
+    mark: { plate: '#7c2d12', accent: '#06b6d4' },
   },
 ];
 
