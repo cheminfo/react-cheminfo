@@ -108,7 +108,7 @@ test('a property map colours the cells itself and writes the value in them', asy
   // Fluorine is the most electronegative element, so it takes the light end of
   // viridis; the family colours are gone entirely.
   await expect(cell(page, 'F')).toContainText('3.98');
-  await expect(cell(page, 'F')).toHaveCSS('background-color', rgb('#b4de2c'));
+  await expect(cell(page, 'F')).toHaveCSS('background-color', rgb('#fde725'));
   await expect(cell(page, 'Cl')).not.toHaveCSS(
     'background-color',
     rgb(categorySwatch('halogen').background),

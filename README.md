@@ -57,24 +57,27 @@ through a wildcard subpath exactly as `react-science` serves its own.
 
 ## What is in it
 
-| Area                    | `…/core`                                                                                                                                                                                                                      | `…/ui`                                                                                                                                           |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`                                                                                                                                   | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                             |
-| **Chrome**              | —                                                                                                                                                                                                                             | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                         |
-| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                      | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                  |
-| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs                                                                                                                       | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                   |
-| **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink`                                                                                                                      | —                                                                                                                                                |
-| **Indexing**            | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute`             | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                         |
-| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                                    | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList` |
-| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`                                                                                                                        | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`                                                                                                 |
-| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv` | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                      |
-| **Widgets**             | `CREDITS`, `credits`                                                                                                                                                                                                          | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                             |
-| **Hooks & state**       | `createWorkerChannel`                                                                                                                                                                                                         | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                           |
-| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                                     | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                |
-| **About**               | `resolveAbout`, `aboutProblems`                                                                                                                                                                                               | `AboutPage`                                                                                                                                      |
-| **Slideshows**          | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                    | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                  |
-| **Token guard**         | `findTokenViolations`                                                                                                                                                                                                         | `cheminfo-check-tokens` (the bin)                                                                                                                |
-| **Periodic table**      | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                                         | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                 |
+| Area                    | `…/core`                                                                                                                                                                                                                      | `…/ui`                                                                                                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`, `siteThemeColor`, `renderEcosystemLinksHtml`                                                                                                                                   | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                    |
+| **Chrome**              | —                                                                                                                                                                                                                             | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                                                                |
+| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                      | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                         |
+| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, the param codecs                                                                                                                       | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                                                          |
+| **Routing & head**      | `createTabRouter`, `createPageAddresses`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `canonicalLink`                                                                                                                      | —                                                                                                                                                                                       |
+| **Indexing**            | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute`             | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                                                                |
+| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                                    | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList`                                        |
+| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`, `downloadFigure`, `figureSvg`, `figurePng`, `figureSize`                                                              | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`, `FigureDownload`                                                                                                                      |
+| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv` | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                                                             |
+| **Widgets**             | `CREDITS`, `credits`                                                                                                                                                                                                          | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                    |
+| **Hooks & state**       | `createWorkerChannel`                                                                                                                                                                                                         | `persistBucket`, `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                  |
+| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                                     | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                       |
+| **Spectra**             | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS`                           | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect`                                                                                                                |
+| **About**               | `resolveAbout`, `aboutProblems`                                                                                                                                                                                               | `AboutPage`                                                                                                                                                                             |
+| **Slideshows**          | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                    | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                                                         |
+| **Token guard**         | `findTokenViolations`                                                                                                                                                                                                         | `cheminfo-check-tokens` (the bin)                                                                                                                                                       |
+| **Figures**             | `chartScale`, `chartAxisScale`, `chartAxisTitle`, `chartShare`, `chartColumnExtent`, `chartBinCounts`, `chartSeriesColor`, `rowMatrix`, `stackedMatrix`, `emptiestCorner`, `placeOverlayCard`, `overlayMetrics`               | `ChartFrame`, `ChartAxis`, `TrackedLineChart`, `OverlayBar`, `OverlaySelect`, `OverlaySegmented`, `OverlayToggle`, `OverlayNumber`, `OverlayLegend`, `OverlayCaption`, `OverlayReadout` |
+| **Projections**         | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `PROJECTION_COPY`                                | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                         |
+| **Periodic table**      | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                                         | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                        |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -87,11 +90,11 @@ second, your own code last.** The full import table and the checklist live in
 
 ## Seeing it
 
-Storybook is the demo, and every exported component has one — 210 stories:
+Storybook is the demo, and every exported component has one — 287 stories:
 
 ```console
 npm run dev              # the book on http://localhost:10815
-npm run test-e2e         # Playwright opens all 210 and fails on any console error
+npm run test-e2e         # Playwright opens all 287 and fails on any console error
 ```
 
 The **Brand** toolbar at the top retunes `--brand` / `--brand-alt`, so any story
@@ -299,6 +302,199 @@ swatchAt(scale, 0.5); // { background, foreground }
 - **A scale that turns is sampled, never handed to CSS as its two ends** — a
   browser only interpolates the straight line between two colours.
   `colorScaleGradient` and `ColorScaleBar` do the sampling.
+
+### `SpectraSettingsEditor`
+
+Everything [`spectra-processor`](https://github.com/cheminfo/spectra-processor)
+can be told, laid out in the order it happens — and the principal components a
+score plot is then drawn against.
+
+```tsx
+import { EMPTY_SETTINGS, settingsProblems } from 'react-cheminfo/core';
+import { SpectraSettingsEditor } from 'react-cheminfo/ui';
+
+<SpectraSettingsEditor
+  value={settings}
+  onChange={setSettings}
+  spectrumIds={processor.getIDs()}
+  principalComponents={{
+    selection,
+    onSelectionChange: setSelection, // { x: 0, y: 1 } — columns of the score matrix
+    count: scores.columns,
+    explainedVariance: pca.getExplainedVariance(),
+    settings: pcaOptions,
+    onSettingsChange: setPcaOptions,
+  }}
+/>;
+
+processor.setNormalization(settings.processor.normalization);
+processor.getPostProcessedData(settings.postProcessing);
+```
+
+- **The types come from the packages that own them**, not from a copy.
+  `src/spectra/core/settings.ts` is the only file naming `spectra-processor` or
+  `ml-signal-processing`, and it reads the shapes off their public surface —
+  `ConstructorParameters<typeof SpectraProcessor>[0]`, `FilterXYType`. Both are
+  optional peers and every import is `import type`, so a site that does not use
+  this component downloads neither.
+- **All 23 chain steps are offered**, grouped as a chain is built — baseline,
+  smoothing and derivatives, scaling, the two axes, housekeeping — with every
+  option each one takes, down to the nested peak picking of `calibrateX`. The
+  catalog is a `Record` keyed by the step name, so the day `ml-signal-processing`
+  adds a filter this package stops compiling instead of quietly not offering it.
+- **The order is the meaning, so it is editable and it is checked.** A step moves
+  with two arrow buttons — no drag dependency, and it works from the keyboard.
+  Scaling placed before the baseline it depends on, a second resampling, a crop
+  that leaves the spectra on grids that no longer line up: each is named where it
+  sits.
+- **Nothing blocks.** A reader mid-thought may hold settings the processor would
+  throw on. `settingsProblems` says which value it would throw on — separating
+  what fails from what merely looks unintended — and the editor still takes the
+  edit.
+- **A cleared box means "whatever upstream does"**, never `undefined` written
+  into the settings, which is the only way back to a default once it has been
+  typed over. A half-typed `1e-` is kept as typed rather than parsed away.
+- **The components are named `PC1` and handed back as `0`.** The label is what a
+  chemist writes; the number is the column of the score matrix, because that is
+  what indexes it. `clampPrincipalComponents` keeps a selection saved on other
+  data inside the components that exist, and keeps the two axes apart so a plot
+  never collapses onto its diagonal. `FilterChainEditor` and
+  `PrincipalComponentSelect` are each usable on their own.
+
+### `PcaViewer`
+
+A finished principal component analysis, read by somebody who has never met one.
+
+```tsx
+import { PCA } from 'ml-pca';
+import { PcaViewer } from 'react-cheminfo/ui';
+
+const pca = new PCA(rows, { scale: true });
+
+<PcaViewer
+  pca={pca}
+  rows={rows}
+  scaled
+  projected={newBatch} // placed into the finished model, drawn hollow
+  variables={{
+    kind: 'named',
+    names: ['Sepal length', 'Sepal width', 'Petal length', 'Petal width'],
+    unit: 'cm',
+  }}
+  samples={{
+    ids,
+    groups: species,
+    groupLabel: 'Species',
+    fields: (index) => [
+      { label: 'Sepal length', value: `${rows[index][0]} cm` },
+    ],
+  }}
+  onSelectionChange={(ids) => setPicked(ids)}
+  onTrackVariable={(track) => setHovered(track?.readout ?? null)}
+/>;
+```
+
+- **Four tabs, and only the ones the data can fill.** `projectionTabs` reads the
+  result rather than a prop: a principal component analysis publishes a share of
+  the variance and a set of weights, so it gets the map, every pair, what differs
+  and how much each explains. A UMAP embedding publishes neither, so it gets the
+  map alone — one tab and no tab strip, instead of three empty ones.
+- **It never imports `ml-pca`.** `PcaLike` is a structural type — `predict`,
+  `getExplainedVariance`, `getEigenvalues`, `getLoadings` — which `ml-pca`'s
+  `PCA` satisfies as it stands, with no adapter and no cast. The package has no
+  runtime dependency on it, and `embeddingResult` is the same door for
+  coordinates from anywhere else.
+- **An outline says what share of a group it holds, not how many standard
+  deviations it is.** In two dimensions those are not the numbers anybody
+  remembers: an ellipse at one standard deviation holds about 39% of the points,
+  not 68%. The picker therefore offers `50% of samples` … `99% of samples`, and
+  the legend writes the same words, so the figure cannot promise a coverage it
+  does not have.
+- **The outline is projected, not rotated.** The two axes almost never carry the
+  same units per pixel, so an ellipse turned by an angle in the data is not
+  turned by that angle on the screen. Handing an SVG `<ellipse>` the data-space
+  angle draws every tilted group slightly wrong and never says so.
+- **A sample the model was built from is filled; one placed into it afterwards is
+  hollow.** `pcaResult(pca, { rows, projected })` appends the second kind and
+  records where they start, because the two are not equally trustworthy: a fitted
+  sample helped choose where the axes point and is bound to land somewhere
+  reasonable, while a projected one can land anywhere — and landing far out is
+  the finding, not a fault.
+- **Colour means one thing per tab and the legend says which.** Groups on the map
+  and the pair grid, components on the other two, drawn from two orders of the
+  Okabe–Ito palette that are disjoint over their first four, so blue-is-setosa on
+  one tab is never blue-is-PC1 on the next. `OverlayLegend` has no default title:
+  a legend that does not name its encoding is how a reader carries the wrong
+  meaning from one tab to the next.
+- **The direction of a component is arbitrary, so it is never a colour.** Sign is
+  carried by geometry — above or below the zero line — and each component is
+  flipped so its strongest measurement comes out positive, because otherwise
+  refitting on one more sample mirrors the whole map and reads as a fault.
+- **Selecting is a drag.** Plain drag replaces the selection, shift adds, alt
+  removes, and the caption says which while the pointer is still down.
+  `onSelectionChange` hands back sample **ids**, so a caller never keeps a second
+  index. Pointer capture, cancellation and lost capture all funnel into one path,
+  which is what stops a lasso being left half-drawn.
+
+### `ProjectionViewer` and the floating options
+
+`PcaViewer` is a thin adapter over `ProjectionViewer`, which draws any
+dimension-reduction result — a k-means run with its centroids, a UMAP embedding,
+coordinates read from a file — from one `ProjectionResult`. The pieces below it
+are meant to be built on:
+
+| Domain           | Holds                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/chart`      | `MatrixLike` read where it stands, linear scales, round ticks, the SVG frame, the tracked line chart |
+| `src/overlay`    | The card of controls that floats over a figure, and the caption, legend and readout that explain one |
+| `src/scatter`    | Lasso selection, hover, confidence ellipses, the plot and the pair grid                              |
+| `src/projection` | The result model, the two adapters, and the viewer                                                   |
+
+The overlay domain is the part most likely to turn up elsewhere. A card rests at
+three quarters strength and wakes when the pointer reaches the figure or the
+keyboard reaches one of its controls; **only its ground fades, never its text**,
+because a label at three quarters over a busy scatter is unreadable exactly when
+it is wanted. One or two controls stay in the strip and everything an expert
+changes lives behind a cog — concealment is the default, and a control is visible
+only because somebody put it there deliberately. Below about 420 pixels the whole
+bar folds into that cog, and the tab order is the same folded or open.
+
+```tsx
+<OverlayLayer width={width} density="compact">
+  <OverlayBar placement={emptiestCorner(points)} more={<Expert />}>
+    <OverlaySelect caption="Across" value={x} options={axes} onChange={setX} />
+  </OverlayBar>
+</OverlayLayer>
+```
+
+### Saving a figure
+
+Every projection viewer carries a save glyph in its bar: a reader picks PNG or
+SVG, picks a resolution, and gets the figure as a file. The panel writes out the
+pixels each resolution would produce, and `fileName` names what arrives — the
+view is appended, so `fileName="ecstasy"` saves `ecstasy-map.png`.
+
+The control behind it is `FigureDownload`, and it is not tied to the viewer: it
+takes the **`id` of the box a figure sits in**, so it can stand in a bar, a
+toolbar or a menu without the component that drew the figure handing anything
+over.
+
+```tsx
+<FigureDownload targetId="pca-figure" fileName="ecstasy-map" />
+<div id="pca-figure">
+  <PcaViewer pca={pca} rows={rows} samples={samples} />
+</div>
+```
+
+Three things it does that a screenshot does not. Everything inside the box is
+saved, so a view that is really sixteen charts arrives as one picture with each
+placed back where the reader saw it. The tokens the figure is drawn from are
+resolved first — a `var(--border)` that left the site would draw a chart with no
+axes. And the chrome floating over the picture is left behind: an `OverlayLayer`
+marks itself, so the cog in the corner never lands in the middle of the scatter.
+
+`downloadFigure(target, options)`, `figureSvg` and `figurePng` are the same thing
+without the button, for a site saving a figure from its own menu.
 
 ## Carrying talks
 
