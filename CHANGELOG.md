@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.10.0](https://github.com/cheminfo/react-cheminfo/compare/v0.9.0...v0.10.0) (2026-09-09)
+
+
+### Features
+
+* **color:** choose the colours a quantity is read with ([0309867](https://github.com/cheminfo/react-cheminfo/commit/030986710033d279b7a5352f9122011497eb7c5a))
+* **credits:** register SQLite Wasm, PouchDB and ChemExper ([933b4f0](https://github.com/cheminfo/react-cheminfo/commit/933b4f0a755a5b7d9a5f821ef42035b4bc92b408))
+* draw a dimension reduction, and the charts it is read in ([692f01a](https://github.com/cheminfo/react-cheminfo/commit/692f01a22cb5a55d11da056d240d8768ea6e30be))
+* **ecosystem:** add database.cheminfo.org ([9276922](https://github.com/cheminfo/react-cheminfo/commit/92769225216a809c32592ebd1c8834acbaf5853d))
+
+
+### Bug Fixes
+
+* **e2e:** follow the bar to where it now folds, and list the two new stories ([63875d5](https://github.com/cheminfo/react-cheminfo/commit/63875d5e2c416d805cdf3b45f019d59d2542ea9f))
+* **share:** write a plus as %2B, so every reader reads it back ([0a29a7d](https://github.com/cheminfo/react-cheminfo/commit/0a29a7de9a04c8c210f7f2d30eaf8ad0966ec0f4))
+
 ## [0.9.0](https://github.com/cheminfo/react-cheminfo/compare/v0.8.0...v0.9.0) (2026-08-23)
 
 
