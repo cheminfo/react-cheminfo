@@ -236,7 +236,7 @@ test('the bar writes less of itself as the figure narrows, and never less than t
 
   // The key word is the first thing to go: a setting's name is read once and
   // its value every time.
-  await page.setViewportSize({ width: 700, height: 900 });
+  await page.setViewportSize({ width: 740, height: 900 });
   await expect(page.getByText('Outlines', { exact: true })).toHaveCount(0);
   await expect(tabs).toHaveText(TABS.map((tab) => tab.name));
   await expect(colour).toHaveCount(1);
@@ -249,7 +249,7 @@ test('the bar writes less of itself as the figure narrows, and never less than t
 
   // Then the boxes around the settings, which gather into one chip that still
   // reads the configuration. The question mark is still on the row.
-  await page.setViewportSize({ width: 460, height: 900 });
+  await page.setViewportSize({ width: 540, height: 900 });
   await expect(chip).toHaveCount(1);
   await expect(outlines).toHaveCount(0);
   await expect(help).toHaveCount(1);

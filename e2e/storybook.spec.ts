@@ -239,6 +239,8 @@ const STORY_IDS = [
   'projection-pcaviewer--projected-samples',
   'projection-pcaviewer--what-differs',
   'projection-projectionviewer--clusters',
+  'projection-projectionviewer--named-samples',
+  'projection-projectionviewer--seized-pills',
   'projection-projectionviewer--umap',
   'scatter-scattermatrix--four-components',
   'scatter-scattermatrix--narrow',
