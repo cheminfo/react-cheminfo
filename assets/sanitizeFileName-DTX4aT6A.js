@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e,t=`download`){let c=e.replaceAll(i,``).replaceAll(r,`-`).replaceAll(n,``).replaceAll(a,` `).replace(o,``).replace(s,``);return c===``?t:c}var n,r,i,a,o,s;function c(){return(c=e((()=>{n=/["*:<>?|]/gu,r=/[/\\]/gu,i=/[^\P{Cc}\s]/gu,a=/\s+/gu,o=/^[\s.-]+/u,s=/[\s.]+$/u})))()}export{t as n,c as t};

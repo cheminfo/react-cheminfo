@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-D72pBctd.js";function n(e){let{width:t,height:n,children:a}=e;return(0,r.jsx)(`span`,{style:{...i,width:t,height:n},"aria-hidden":`true`,children:a})}var r,i;function a(){return(a=e((()=>{r=t(),i={display:`inline-flex`,alignItems:`center`,justifyContent:`center`,color:`var(--text-faint, #8a96a3)`,fontSize:`0.75rem`},n.__docgenInfo={description:`A box the size of the picture that is not there, holding whatever the caller
+wants said instead.
+@param props - See {@link StructurePlaceholderProps}.
+@returns The placeholder.`,methods:[],displayName:`StructurePlaceholder`,props:{width:{required:!0,tsType:{name:`number`},description:`Width of the box, in pixels: the width the picture would have had.`},height:{required:!0,tsType:{name:`number`},description:`Height of the box, in pixels.`},children:{required:!1,tsType:{name:`ReactNode`},description:`What is written in the middle of the box.
+@default undefined`}}}})))()}export{a as n,n as t};
