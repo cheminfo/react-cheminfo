@@ -1,0 +1,6 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-CsLeyY0n.js";import{c as n,i as r,o as i}from"./ChartFrame-DEpkeZ0N.js";import{E as a,I as o,L as s,N as c,O as l,V as u,_ as d,b as f,d as p,h as m,i as h,j as g,k as _,l as v,n as y,o as b,p as x,s as S,w as C,y as w,z as T}from"./OverlayToggle-BM9hXRtz.js";function E(){let{metrics:e}=n();return(0,D.jsx)(`span`,{role:`separator`,"aria-orientation":`vertical`,style:s(e)})}var D;function O(){return(O=e((()=>{o(),i(),D=t(),E.__docgenInfo={description:`A hairline between two clusters of controls.
+
+It is a real separator rather than a decorative line, so a reader moving
+through the card with a screen reader is told where one group of controls
+ends — which is the whole reason the line is there for everyone else.
+@returns The rule.`,methods:[],displayName:`OverlayDivider`}})))()}function k(){return(k=e((()=>{T(),c(),g(),l(),O(),a(),C(),r(),w(),f(),d(),m(),x(),p(),u(),v(),h(),_(),y(),S(),b(),i()})))()}export{E as n,O as r,k as t};
