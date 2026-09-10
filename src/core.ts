@@ -15,6 +15,7 @@ export * from './periodic/core/index.ts';
 export * from './projection/core/index.ts';
 export * from './router/core/index.ts';
 export * from './scatter/core/index.ts';
+export * from './scatter3d/core/index.ts';
 export * from './seo/core/index.ts';
 export * from './share/core/index.ts';
 // The deck format and its navigation are framework-free, so a backend can read

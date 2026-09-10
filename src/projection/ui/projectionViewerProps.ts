@@ -16,6 +16,25 @@ import type { ProjectionTab } from '../core/projectionTabs.ts';
 import type { ProjectionVariableTrack } from './ProjectionVariablesTab.tsx';
 import type { ProjectionSelection } from './projectionSelection.ts';
 
+/** A sample the reader opened, and where they opened it. */
+export interface ProjectionSampleOpen {
+  /** Its name, from `samples.ids` — the currency every other callback uses. */
+  id: string;
+  /** Its row in the score matrix, for a caller that would rather index. */
+  index: number;
+  /** Where the reader clicked, in pixels from the figure's left edge. */
+  x: number;
+  /** Where they clicked, in pixels from its top edge. */
+  y: number;
+  /**
+   * Where they clicked in the window, which is what an editor floating over
+   * the page is anchored to.
+   */
+  clientX: number;
+  /** Where they clicked in the window. */
+  clientY: number;
+}
+
 /** What {@link ProjectionViewer} needs. */
 export interface ProjectionViewerProps {
   /** What the run produced, whatever produced it. */
@@ -88,6 +107,22 @@ export interface ProjectionViewerProps {
    * @default undefined
    */
   onHoverSample?: (id: string | null) => void;
+  /**
+   * Called when the reader double-clicks a sample, on the map or in the cloud.
+   *
+   * The viewer says what a sample *is*; this is the door to what the page
+   * around it can do with one — open its record, edit the class it was given,
+   * show the spectrum behind the dot. The viewer does nothing itself, so a
+   * page that does not pass it has a double click that only ever resets the
+   * frame.
+   *
+   * The sample is selected first, because a double click is also two clicks.
+   * Holding every single click for the double-click interval to avoid that
+   * would make the commonest gesture in the figure feel slow, which is a worse
+   * trade than a redundant selection on the rarest one.
+   * @default undefined
+   */
+  onSampleDoubleClick?: (sample: ProjectionSampleOpen) => void;
   /**
    * What the figure is showing. Present, the caller owns every option, which
    * is how a site persists them or writes them into a share link.

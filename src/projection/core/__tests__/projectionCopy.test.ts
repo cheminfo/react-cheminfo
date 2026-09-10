@@ -55,6 +55,7 @@ test('no sentence in the copy is empty', () => {
 test('the tabs are named for what they answer', () => {
   expect(PROJECTION_COPY.tab).toStrictEqual({
     map: 'Map',
+    space: 'Map in 3D',
     pairs: 'Every pair',
     variables: 'What differs',
     shares: 'How much each explains',

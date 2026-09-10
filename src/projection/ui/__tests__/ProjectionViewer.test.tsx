@@ -41,34 +41,35 @@ test('a two-dimensional embedding is one map with no strip of views over it', ()
   expect(occurrences(html, QUESTION)).toBe(1);
 });
 
-test('a principal component run offers all four tabs, as connected pills', () => {
+test('a principal component run offers every tab, as connected pills', () => {
   const html = renderToStaticMarkup(
     <ProjectionViewer result={IRIS} samples={SAMPLES} />,
   );
 
   expect(html).toContain('role="tablist"');
-  expect(occurrences(html, 'role="tab"')).toBe(4);
+  expect(occurrences(html, 'role="tab"')).toBe(5);
   expect(occurrences(html, 'role="tabpanel"')).toBe(1);
   // The names are the short forms: an unmeasured figure is drawn at the width
   // a single column of a page gives it, and the map's bar spends two controls
   // of that on the switches that write the names onto the picture. The strip
   // shortens rather than clipping, which is the whole point of the ladder.
   expect(html).toContain('>Map</button>');
+  expect(html).toContain('>3D</button>');
   expect(html).toContain('>Pairs</button>');
   expect(html).toContain('>Differs</button>');
   expect(html).toContain('>Explains</button>');
 
-  // Exactly one pill is in the tab order, so a strip of four views costs a
-  // reader walking the page one stop rather than four. The pills are read off
+  // Exactly one pill is in the tab order, so a strip of five views costs a
+  // reader walking the page one stop rather than five. The pills are read off
   // their own tags rather than out of a slice of the markup, because the bar's
   // own controls stand between the strip and the panel and are in the tab
   // order in their own right.
   const pills = [...html.matchAll(/role="tab"[^>]*/g)].map((match) => match[0]);
 
-  expect(pills).toHaveLength(4);
+  expect(pills).toHaveLength(5);
   expect(pills.filter((pill) => pill.includes('tabindex="0"'))).toHaveLength(1);
   expect(pills.filter((pill) => pill.includes('tabindex="-1"'))).toHaveLength(
-    3,
+    4,
   );
 });
 

@@ -25,6 +25,13 @@ export interface ProjectionReadoutProps {
   xAxis: number;
   /** Which axis is drawn vertically. */
   yAxis: number;
+  /**
+   * Which axis runs away from the reader, on the cloud. It is the one place a
+   * cloud's third number is written at all: the box carries no tick labels, so
+   * a reader who wants a value points at the sample.
+   * @default undefined — the card names two axes, as the map's does
+   */
+  zAxis?: number;
   /** Where the pointer is, in pixels from the figure's left. */
   x: number;
   /** Where the pointer is, in pixels from the figure's top. */
@@ -80,6 +87,7 @@ export function ProjectionReadout(props: ProjectionReadoutProps): ReactElement {
     groups,
     xAxis,
     yAxis,
+    zAxis,
     x,
     y,
     boxWidth,
@@ -91,10 +99,13 @@ export function ProjectionReadout(props: ProjectionReadoutProps): ReactElement {
     testId,
   } = props;
 
+  const drawn = useMemo(
+    () => (zAxis === undefined ? [xAxis, yAxis] : [xAxis, yAxis, zAxis]),
+    [xAxis, yAxis, zAxis],
+  );
   const rows = useMemo(
-    () =>
-      readoutRows(index, result, samples, groups, xAxis, yAxis, formatValue),
-    [formatValue, groups, index, result, samples, xAxis, yAxis],
+    () => readoutRows(index, result, samples, groups, drawn, formatValue),
+    [drawn, formatValue, groups, index, result, samples],
   );
 
   return (
@@ -118,15 +129,14 @@ function readoutRows(
   result: ProjectionResult,
   samples: ProjectionSamples,
   groups: ResolvedProjectionGroups,
-  xAxis: number,
-  yAxis: number,
+  drawn: readonly number[],
   formatValue: (value: number) => string,
 ): OverlayReadoutRow[] {
   const rows: OverlayReadoutRow[] = [];
   const { axes, scores } = result;
   const known = index >= 0 && index < scores.rows;
 
-  for (const axis of [xAxis, yAxis]) {
+  for (const axis of drawn) {
     const name = axes[axis]?.name;
     if (name === undefined) continue;
     rows.push({

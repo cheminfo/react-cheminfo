@@ -1,6 +1,7 @@
 import type { PointerEvent, ReactElement } from 'react';
 import { useRef, useState } from 'react';
 
+import type { ScatterPointOpen } from '../../scatter/ui/scatterPlotProps.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 import type { ProjectionSamples } from '../core/projectionSamples.ts';
@@ -9,10 +10,12 @@ import { ProjectionMapTab } from './ProjectionMapTab.tsx';
 import { ProjectionPairsTab } from './ProjectionPairsTab.tsx';
 import { ProjectionReadout } from './ProjectionReadout.tsx';
 import { ProjectionSharesTab } from './ProjectionSharesTab.tsx';
+import { ProjectionSpaceTab } from './ProjectionSpaceTab.tsx';
 import type { ProjectionVariableTrack } from './ProjectionVariablesTab.tsx';
 import { ProjectionVariablesTab } from './ProjectionVariablesTab.tsx';
 import type { ProjectionMapView } from './projectionMapView.ts';
 import type { ProjectionModels } from './projectionTabModels.ts';
+import type { ProjectionSampleOpen } from './projectionViewerProps.ts';
 import type { ProjectionStateApi } from './useProjectionState.ts';
 
 /** What {@link ProjectionPanel} needs. */
@@ -46,6 +49,11 @@ export interface ProjectionPanelProps {
    * @default undefined
    */
   onHoverSample?: (id: string | null) => void;
+  /**
+   * Called when the reader double-clicks a sample, on either figure.
+   * @default undefined
+   */
+  onSampleDoubleClick?: (sample: ProjectionSampleOpen) => void;
   /**
    * Called as the pointer crosses the "what differs" panels.
    * @default undefined
@@ -83,6 +91,7 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
   const { state, result, samples, copy, models, map } = props;
   const { width, height, formatValue, baseId, panelId, strip } = props;
   const { onHoverSample, onTrackVariable, touchLasso, wheelZoom } = props;
+  const { onSampleDoubleClick } = props;
 
   const box = useRef<HTMLDivElement>(null);
   const pointer = useRef(NOWHERE);
@@ -101,6 +110,19 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
     setAnchor({ index, ...pointer.current });
     onHoverSample?.(index < 0 ? null : (samples.ids[index] ?? null));
   }
+
+  // The figures speak in row numbers, because that is what a hit test hands
+  // back; every callback out of the viewer speaks in names, so a caller never
+  // has to keep a second copy of the row order. The translation is one line
+  // and it belongs here, once, rather than in each of the two tabs.
+  const openSample =
+    onSampleDoubleClick === undefined
+      ? undefined
+      : (point: ScatterPointOpen) => {
+          const id = samples.ids[point.index];
+          if (id === undefined) return;
+          onSampleDoubleClick({ ...point, id });
+        };
 
   return (
     <div
@@ -143,6 +165,46 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
           height={height}
         />
       ) : null}
+      {state.tab === 'space' ? (
+        <ProjectionSpaceTab
+          result={result}
+          groups={state.groups}
+          options={state.options}
+          copy={copy}
+          chrome={map.spaceChrome}
+          ids={samples.ids}
+          width={width}
+          height={height}
+          selected={state.selected}
+          camera={map.camera}
+          onCameraChange={map.setCamera}
+          zoom={map.zoom}
+          onZoomChange={map.setZoom}
+          wheelZoom={wheelZoom}
+          report={map.report}
+          onSelectionChange={map.settle}
+          onHoverChange={noteHover}
+          onPointDoubleClick={openSample}
+          hoverCard={
+            anchor.index < 0 ? null : (
+              <ProjectionReadout
+                index={anchor.index}
+                result={result}
+                samples={samples}
+                groups={state.groups}
+                xAxis={state.options.xAxis}
+                yAxis={state.options.yAxis}
+                zAxis={state.options.zAxis}
+                x={anchor.x}
+                y={anchor.y}
+                boxWidth={width}
+                boxHeight={height}
+                formatValue={formatValue}
+              />
+            )
+          }
+        />
+      ) : null}
       {state.tab === 'map' ? (
         <ProjectionMapTab
           result={result}
@@ -160,6 +222,7 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
           selected={state.selected}
           onSelectionChange={map.settle}
           onHoverChange={noteHover}
+          onPointDoubleClick={openSample}
           touchLasso={touchLasso}
           hoverCard={
             anchor.index < 0 ? null : (

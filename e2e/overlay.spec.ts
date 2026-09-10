@@ -121,8 +121,8 @@ test('a narrow figure gathers its settings into a chip that still reads them', a
   await openStory(page, EMBEDDED);
 
   // A reader who cannot leave the view they are on is stuck rather than merely
-  // short of options, so the strip stays whatever the width.
-  await expect(page.getByRole('tab')).toHaveCount(4);
+  // short of options, so the strip keeps every view whatever the width.
+  await expect(page.getByRole('tab')).toHaveCount(5);
 
   // What a narrow figure takes from the settings is their boxes, never their
   // answers: the chip is on the row, and it says how the picture is drawn

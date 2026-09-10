@@ -13,6 +13,7 @@
 
 export type { PcaViewerProps } from './PcaViewer.tsx';
 export { PcaViewer } from './PcaViewer.tsx';
+export type { ProjectionSampleOpen } from './projectionViewerProps.ts';
 export type { ProjectionSelection } from './projectionSelection.ts';
 export type { ProjectionVariableTrack } from './projectionVariablesModel.ts';
 export type { ProjectionViewerProps } from './projectionViewerProps.ts';

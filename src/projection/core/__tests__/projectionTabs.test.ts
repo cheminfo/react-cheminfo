@@ -26,9 +26,10 @@ const PCA: ProjectionResult = {
   loadings: { weights: EMPTY_MATRIX, variables: IRIS_AXIS },
 };
 
-test('a principal-component run fills all four tabs', () => {
+test('a principal-component run fills every tab', () => {
   expect(projectionTabs(PCA)).toStrictEqual([
     'map',
+    'space',
     'pairs',
     'variables',
     'shares',
@@ -56,14 +57,14 @@ test('a UMAP embedding is a map and nothing else', () => {
   expect(projectionTabs(umap)).toStrictEqual(['map']);
 });
 
-test('three axes without shares earn the pair grid but not the bars', () => {
+test('three axes earn the cloud and the pair grid, but not the bars', () => {
   const embedding: ProjectionResult = {
     method: 'UMAP',
     axes: [{ name: 'UMAP 1' }, { name: 'UMAP 2' }, { name: 'UMAP 3' }],
     scores: EMPTY_MATRIX,
   };
 
-  expect(projectionTabs(embedding)).toStrictEqual(['map', 'pairs']);
+  expect(projectionTabs(embedding)).toStrictEqual(['map', 'space', 'pairs']);
 });
 
 test('one axis without a share removes the shares tab from all of them', () => {
@@ -72,7 +73,12 @@ test('one axis without a share removes the shares tab from all of them', () => {
     axes: axes([0.7296, 0.2285, undefined, 0.0052]),
   };
 
-  expect(projectionTabs(holed)).toStrictEqual(['map', 'pairs', 'variables']);
+  expect(projectionTabs(holed)).toStrictEqual([
+    'map',
+    'space',
+    'pairs',
+    'variables',
+  ]);
 });
 
 test('a two-axis model with loadings still explains what differs', () => {

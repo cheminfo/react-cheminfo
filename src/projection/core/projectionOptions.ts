@@ -1,5 +1,6 @@
 import type { EllipseSize } from '../../scatter/core/confidenceEllipse.ts';
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
+import type { CloudGesture } from '../../scatter3d/core/cloudGesture.ts';
 
 import type { ProjectionResult } from './projectionResult.ts';
 import { drawableVariablesView } from './variablesView.ts';
@@ -33,6 +34,17 @@ export interface ProjectionOptions {
    * @default 1
    */
   yAxis: number;
+  /**
+   * Which axis runs away from the reader, on the cloud alone. The map and the
+   * pair grid never read it, so moving it leaves them where they were.
+   * @default 2
+   */
+  zAxis: number;
+  /**
+   * What a drag over the cloud does: turn the box, or draw a lasso.
+   * @default 'turn'
+   */
+  cloudGesture: CloudGesture;
   /**
    * What decides a dot's colour.
    * @default 'group'
@@ -123,6 +135,8 @@ export type ProjectionOptionId = keyof ProjectionOptions;
 export const DEFAULT_PROJECTION_OPTIONS: ProjectionOptions = {
   xAxis: 0,
   yAxis: 1,
+  zAxis: 2,
+  cloudGesture: 'turn',
   colorBy: 'group',
   ellipse: { kind: 'coverage', probability: 0.95 },
   pointRadius: 3.5,
@@ -163,14 +177,21 @@ export function resolveProjectionOptions(
   const axisCount = result.axes.length;
   const lastAxis = Math.max(0, axisCount - 1);
   const xAxis = clampIndex(pick(overrides, 'xAxis'), lastAxis);
+  const yAxis = apart(
+    clampIndex(pick(overrides, 'yAxis'), lastAxis),
+    xAxis,
+    lastAxis,
+  );
 
   return {
     xAxis,
-    yAxis: apart(
-      clampIndex(pick(overrides, 'yAxis'), lastAxis),
-      xAxis,
+    yAxis,
+    zAxis: apartFrom(
+      clampIndex(pick(overrides, 'zAxis'), lastAxis),
+      [xAxis, yAxis],
       lastAxis,
     ),
+    cloudGesture: pick(overrides, 'cloudGesture'),
     colorBy: pick(overrides, 'colorBy'),
     ellipse: pick(overrides, 'ellipse'),
     pointRadius: atLeast(pick(overrides, 'pointRadius'), 3.5, 0),
@@ -221,6 +242,30 @@ function apart(yAxis: number, xAxis: number, lastAxis: number): number {
   if (yAxis !== xAxis) return yAxis;
   // One axis against itself is a diagonal line, which says nothing at all.
   return xAxis > 0 ? xAxis - 1 : Math.min(1, lastAxis);
+}
+
+/**
+ * An axis that is none of the ones already drawn.
+ *
+ * The cloud's third direction has two axes to avoid rather than one, and an
+ * axis drawn against itself in a box is a flat map stood on its edge — worse
+ * than the diagonal line it is on a map, because the reader cannot see from
+ * the picture that it happened.
+ * @param wanted - The axis asked for, already inside the result.
+ * @param taken - The axes already drawn.
+ * @param lastAxis - The highest axis there is.
+ * @returns The axis to draw; the lowest one still free when the wanted one is taken, and the wanted one back when every axis is.
+ */
+function apartFrom(
+  wanted: number,
+  taken: readonly number[],
+  lastAxis: number,
+): number {
+  if (!taken.includes(wanted)) return wanted;
+  for (let axis = 0; axis <= lastAxis; axis++) {
+    if (!taken.includes(axis)) return axis;
+  }
+  return wanted;
 }
 
 function clampCount(

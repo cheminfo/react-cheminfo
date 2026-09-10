@@ -58,6 +58,14 @@ export const PROJECTION_HELP: Record<ProjectionOptionId, ProjectionHelp> = {
     title: 'Up',
     body: 'Which pattern of difference runs bottom to top.',
   },
+  zAxis: {
+    title: 'Into',
+    body: 'Which pattern of difference runs away from you, into the box. Only the cloud draws it; the map and the pair grid never read it.',
+  },
+  cloudGesture: {
+    title: 'Drag does',
+    body: 'Turning the box and drawing a lasso both want a plain drag, so you say which one it is. Inside a lasso, Shift still adds and Alt still takes away.',
+  },
   colorBy: {
     title: 'Colour by',
     body: 'What a dot’s colour stands for. Colouring by nothing is useful when the groups are what you are trying to find rather than what you already know.',
@@ -137,6 +145,7 @@ export const PROJECTION_HELP: Record<ProjectionOptionId, ProjectionHelp> = {
  */
 export const PROJECTION_SHORT_TAB: Record<ProjectionTab, string> = {
   map: 'Map',
+  space: '3D',
   pairs: 'Pairs',
   variables: 'Differs',
   shares: 'Explains',
@@ -155,6 +164,8 @@ export interface ProjectionBarWords {
     colorBy: string;
     /** In front of how much of a group its outline covers. */
     ellipse: string;
+    /** In front of what a drag over the cloud does. */
+    cloudGesture: string;
     /** In front of how many components the pair grid lays out. */
     pairCount: string;
     /** In front of what the "what differs" panels are drawing. */
@@ -197,6 +208,7 @@ export const PROJECTION_BAR_WORDS: ProjectionBarWords = {
   key: {
     colorBy: 'Colour',
     ellipse: 'Outlines',
+    cloudGesture: 'Drag',
     pairCount: 'Components',
     variablesView: 'Show',
     shareTarget: 'Target',
@@ -228,6 +240,8 @@ export const PROJECTION_BAR_WORDS: ProjectionBarWords = {
 export const PROJECTION_PANEL_NAME: Record<ProjectionOptionId, string> = {
   xAxis: 'Across',
   yAxis: 'Up',
+  zAxis: 'Into',
+  cloudGesture: 'Drag does',
   colorBy: 'Colour by',
   ellipse: 'Outlines',
   pointRadius: 'Dot size',
@@ -260,6 +274,8 @@ export const PROJECTION_PANEL_SECTION = {
   drawing: 'Drawing',
   /** What a drag over the figure does to the selection. */
   selecting: 'Selecting',
+  /** What a drag over the cloud does at all, before the selection hears of it. */
+  handling: 'Handling',
   /** What the panels of the "what differs" tab are measured against. */
   scale: 'Scale',
 } as const;

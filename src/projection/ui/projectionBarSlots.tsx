@@ -13,6 +13,8 @@ import { ProjectionPairsControls } from './ProjectionPairsControls.tsx';
 import { ProjectionPairsMore } from './ProjectionPairsMore.tsx';
 import { ProjectionSharesControls } from './ProjectionSharesControls.tsx';
 import { ProjectionSharesMore } from './ProjectionSharesMore.tsx';
+import { ProjectionSpaceControls } from './ProjectionSpaceControls.tsx';
+import { ProjectionSpaceMore } from './ProjectionSpaceMore.tsx';
 import { ProjectionVariablesControls } from './ProjectionVariablesControls.tsx';
 import { ProjectionVariablesMore } from './ProjectionVariablesMore.tsx';
 import type { ProjectionReading } from './projectionBarReadings.ts';
@@ -94,6 +96,23 @@ export function projectionBarSlots(
       end: <ProjectionPairsControls {...pairs} tier={tier} />,
       more: <ProjectionPairsMore {...pairs} />,
       info: projectionPairsInfo(copy, groups.label, colored),
+    };
+  }
+  if (tab === 'space') {
+    const space = {
+      ...shared,
+      result,
+      hasGroups,
+      selectedCount: selected.length,
+      onResetView: map.resetSpaceView,
+      onClearSelection: map.clearSelection,
+    };
+    return {
+      end: (
+        <ProjectionSpaceControls {...space} readings={readings} tier={tier} />
+      ),
+      more: <ProjectionSpaceMore {...space} />,
+      info: map.spaceChrome.caption,
     };
   }
   if (tab === 'variables') {

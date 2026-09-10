@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 
 import type { ChartViewport } from '../../chart/core/chartViewport.ts';
 import { ScatterPlot } from '../../scatter/ui/ScatterPlot.tsx';
+import type { ScatterPointOpen } from '../../scatter/ui/scatterPlotProps.ts';
 import type { SelectionChange } from '../../scatter/ui/useScatterSelection.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
@@ -83,6 +84,11 @@ export interface ProjectionMapTabProps {
    */
   onHoverChange?: (index: number) => void;
   /**
+   * Called when the reader double-clicks a sample.
+   * @default undefined
+   */
+  onPointDoubleClick?: (point: ScatterPointOpen) => void;
+  /**
    * The card that follows the pointer. The viewer builds it, because it has to
    * say the same thing on every tab.
    * @default undefined — no card is drawn
@@ -121,6 +127,7 @@ export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
   const { result, groups, options, copy, chrome, width, height } = props;
   const { ids, selected, viewport = null, report = null } = props;
   const { onSelectionChange, onHoverChange, hoverCard } = props;
+  const { onPointDoubleClick } = props;
   const { onViewportChange, wheelZoom, touchLasso, testId } = props;
   const { scores, fittedCount, markers } = result;
   const { xAxis, yAxis, colorBy, showGroupMeans, pointRadius } = options;
@@ -173,6 +180,7 @@ export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
       onSelectionChange={onSelectionChange}
       selectMode={selectMode}
       onHoverChange={onHoverChange}
+      onPointDoubleClick={onPointDoubleClick}
       onLassoChange={setDrawing}
       touchLasso={touchLasso}
       testId={testId}

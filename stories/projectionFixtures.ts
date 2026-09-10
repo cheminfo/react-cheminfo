@@ -95,6 +95,9 @@ export const IRIS_PC1: Float64Array = irisColumn(0);
 /** Where it lands along the second. */
 export const IRIS_PC2: Float64Array = irisColumn(1);
 
+/** Where it lands along the third, which is the cloud's depth axis. */
+export const IRIS_PC3: Float64Array = irisColumn(2);
+
 /**
  * The flowers the projected-samples story fits its model on: the first 120,
  * which is every setosa, every versicolor and twenty virginica.

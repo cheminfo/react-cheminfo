@@ -31,6 +31,18 @@ export const PROJECTION_TAB_DEFAULTS: Record<
     showIds: DEFAULT_PROJECTION_OPTIONS.showIds,
     selectMode: DEFAULT_PROJECTION_OPTIONS.selectMode,
   },
+  space: {
+    xAxis: DEFAULT_PROJECTION_OPTIONS.xAxis,
+    yAxis: DEFAULT_PROJECTION_OPTIONS.yAxis,
+    zAxis: DEFAULT_PROJECTION_OPTIONS.zAxis,
+    cloudGesture: DEFAULT_PROJECTION_OPTIONS.cloudGesture,
+    colorBy: DEFAULT_PROJECTION_OPTIONS.colorBy,
+    ellipse: DEFAULT_PROJECTION_OPTIONS.ellipse,
+    pointRadius: DEFAULT_PROJECTION_OPTIONS.pointRadius,
+    showGroupLabels: DEFAULT_PROJECTION_OPTIONS.showGroupLabels,
+    showIds: DEFAULT_PROJECTION_OPTIONS.showIds,
+    selectMode: DEFAULT_PROJECTION_OPTIONS.selectMode,
+  },
   pairs: {
     pairCount: DEFAULT_PROJECTION_OPTIONS.pairCount,
     colorBy: DEFAULT_PROJECTION_OPTIONS.colorBy,

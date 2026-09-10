@@ -13,29 +13,47 @@ const UMAP = 'projection-projectionviewer--umap';
 /** The glyph in the bar that hands the figure's own explanation back. */
 const QUESTION = 'What am I looking at?';
 
-// What each tab is called, how many charts it draws, and the sentence it
-// hands back when the reader presses the question mark in the bar.
+// What each tab is called at both lengths, how many charts it draws, and the
+// sentence it hands back when the reader presses the question mark.
+//
+// Both lengths, because which one the bar writes depends on the width it has
+// been measured at, and a figure is drawn once at an assumed width before its
+// container has reported. Pinning one of them would make this test a race that
+// passes on a fast machine.
 const TABS = [
   {
     name: 'Map',
+    short: 'Map',
     frames: 1,
     caption:
       'Each dot is one sample. Dots that sit together are alike; dots far apart are the ones that differ most. The two axes are the strongest patterns of difference, called components.',
   },
   {
+    name: 'Map in 3D',
+    short: '3D',
+    // The cloud is its own SVG rather than a framed chart: three axes seen
+    // from an angle have no room for the ticks a frame exists to carry.
+    frames: 0,
+    caption:
+      'The same map with a third component, in a box you can turn. Two groups that sit on top of each other on the flat map often come apart as soon as the box moves. The frame says which axis is which; the numbers are in the card you get by pointing at a dot. Colour = species. Each shell holds about 95% of that group, assuming the group is roughly bell-shaped. A shell has to hold a sample in three directions at once, so it is wider than the outline the same share draws on the flat map.',
+  },
+  {
     name: 'Every pair',
+    short: 'Pairs',
     frames: 16,
     caption:
       'The same map drawn for every pair of components. A grouping the first two miss often shows up in another pair.',
   },
   {
     name: 'What differs',
+    short: 'Differs',
     frames: 3,
     caption:
       'Each panel is one pattern of difference, drawn as your average sample pushed to each end of it: what a sample at each end of the map actually looks like.',
   },
   {
     name: 'How much each explains',
+    short: 'Explains',
     frames: 1,
     caption:
       'Every component accounts for a share of the differences between your samples, largest first. The first few usually account for most of them.',
@@ -65,18 +83,19 @@ const LEFT_ISLAND: readonly Vertex[] = [
   [0.02, 0.75],
 ];
 
-test('the four tabs each show their own figure and say what it is', async ({
-  page,
-}) => {
+test('every tab shows its own figure and says what it is', async ({ page }) => {
   await openStory(page, IRIS);
   const tabs = page.getByRole('tab');
-  await expect(tabs).toHaveText(TABS.map((tab) => tab.name));
+  await expect(tabs).toHaveText(TABS.map((tab) => eitherLength(tab)));
 
   /* eslint-disable no-await-in-loop -- one reader walks the tabs in turn */
-  for (const tab of TABS) {
-    const button = page.getByRole('tab', { name: tab.name, exact: true });
+  for (const [at, tab] of TABS.entries()) {
+    // Picked by its place in the strip rather than by its name, which is the
+    // one thing about it that changes with the width of the figure.
+    const button = tabs.nth(at);
     await button.click();
     await expect(button).toHaveAttribute('aria-selected', 'true');
+    await expect(button).toHaveText(eitherLength(tab));
     await expect(page.locator('.chart-frame')).toHaveCount(tab.frames);
 
     // Nothing stands under the figure any more: the words that used to are
@@ -88,6 +107,20 @@ test('the four tabs each show their own figure and say what it is', async ({
   }
   /* eslint-enable no-await-in-loop */
 });
+
+/**
+ * A tab's name at whichever length the bar happens to be writing.
+ * @param tab - The tab, with both of its names.
+ * @param tab.name
+ * @param tab.short
+ * @returns A pattern matching either one exactly.
+ */
+function eitherLength(tab: { name: string; short: string }): RegExp {
+  const forms = [tab.name, tab.short].map((form) =>
+    form.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`),
+  );
+  return new RegExp(`^(?:${forms.join('|')})$`);
+}
 
 test('a lasso on the map reports how many samples it caught', async ({
   page,
@@ -236,30 +269,30 @@ test('the bar writes less of itself as the figure narrows, and never less than t
 
   // The key word is the first thing to go: a setting's name is read once and
   // its value every time.
-  await page.setViewportSize({ width: 740, height: 900 });
+  await page.setViewportSize({ width: 800, height: 900 });
   await expect(page.getByText('Outlines', { exact: true })).toHaveCount(0);
   await expect(tabs).toHaveText(TABS.map((tab) => tab.name));
   await expect(colour).toHaveCount(1);
   await expect(outlines).toHaveCount(1);
 
   // Then the long form of the view names, written out rather than truncated.
-  await page.setViewportSize({ width: 560, height: 900 });
-  await expect(tabs).toHaveText(['Map', 'Pairs', 'Differs', 'Explains']);
+  await page.setViewportSize({ width: 700, height: 900 });
+  await expect(tabs).toHaveText(TABS.map((tab) => tab.short));
   await expect(outlines).toHaveCount(1);
 
   // Then the boxes around the settings, which gather into one chip that still
   // reads the configuration. The question mark is still on the row.
-  await page.setViewportSize({ width: 540, height: 900 });
+  await page.setViewportSize({ width: 575, height: 900 });
   await expect(chip).toHaveCount(1);
   await expect(outlines).toHaveCount(0);
   await expect(help).toHaveCount(1);
 
   // On the narrowest figure the question mark folds into the cog, and nothing
-  // else does: four views, and a chip still saying Species and 95%.
-  await page.setViewportSize({ width: 380, height: 900 });
+  // else does: all five views, and a chip still saying Species and 95%.
+  await page.setViewportSize({ width: 520, height: 900 });
   await expect(chip).toHaveCount(1);
   await expect(help).toHaveCount(0);
-  await expect(tabs).toHaveCount(4);
+  await expect(tabs).toHaveCount(TABS.length);
   await expect(tabs.first()).toBeInViewport();
 });
 

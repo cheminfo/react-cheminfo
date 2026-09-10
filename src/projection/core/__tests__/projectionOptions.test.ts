@@ -46,6 +46,8 @@ test('the figure opens on the first two axes, outlined and coloured by group', (
   expect(DEFAULT_PROJECTION_OPTIONS).toStrictEqual({
     xAxis: 0,
     yAxis: 1,
+    zAxis: 2,
+    cloudGesture: 'turn',
     colorBy: 'group',
     ellipse: { kind: 'coverage', probability: 0.95 },
     pointRadius: 3.5,

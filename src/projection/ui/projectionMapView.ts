@@ -14,6 +14,8 @@ import { useCallback, useMemo, useState } from 'react';
 import type { ChartViewport } from '../../chart/core/chartViewport.ts';
 import { chartClampViewport } from '../../chart/core/chartViewport.ts';
 import type { SelectionChange } from '../../scatter/ui/useScatterSelection.ts';
+import type { OrbitCamera } from '../../scatter3d/core/orbitCamera.ts';
+import { DEFAULT_ORBIT_CAMERA } from '../../scatter3d/core/orbitCamera.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import type {
@@ -33,6 +35,7 @@ import {
   projectionMapDomain,
   projectionMapViewport,
 } from './projectionMapModel.ts';
+import { MINIMUM_SHELL_POINTS } from './projectionSpaceModel.ts';
 
 /** What {@link useProjectionMapView} needs. */
 export interface ProjectionMapViewInput {
@@ -54,6 +57,18 @@ export interface ProjectionMapViewInput {
 export interface ProjectionMapView {
   /** The key's title, the key's entries, and the paragraph behind the `?`. */
   chrome: ProjectionMapChrome;
+  /** The same three for the cloud, which promises a different share. */
+  spaceChrome: ProjectionMapChrome;
+  /** Where the reader is standing in the cloud. */
+  camera: OrbitCamera;
+  /** Turn the box. */
+  setCamera: (camera: OrbitCamera) => void;
+  /** How far in the cloud is zoomed. */
+  zoom: number;
+  /** Zoom the box. */
+  setZoom: (zoom: number) => void;
+  /** Put the box back where it was first seen, at the size it was first drawn. */
+  resetSpaceView: () => void;
   /** The frame the map is drawn in, or `null` when it is drawn around every sample. */
   viewport: ChartViewport | null;
   /** Draw the map in another frame, which is what the wheel does. */
@@ -84,6 +99,8 @@ export function useProjectionMapView(
 
   const [zoom, setZoom] = useState<AxisFrame | null>(null);
   const [report, setReport] = useState<SelectionReport | null>(null);
+  const [camera, setCamera] = useState<OrbitCamera>(DEFAULT_ORBIT_CAMERA);
+  const [cloudZoom, setCloudZoom] = useState(1);
 
   // A frame belongs to the pair of axes it was drawn on. Carrying it onto
   // another pair would show the reader a corner of a picture they never
@@ -117,6 +134,11 @@ export function useProjectionMapView(
     setViewport(null);
   }, [setViewport]);
 
+  const resetSpaceView = useCallback(() => {
+    setCamera(DEFAULT_ORBIT_CAMERA);
+    setCloudZoom(1);
+  }, []);
+
   const colored = colorBy === 'group' && groups.entries.length > 0;
   const chrome = useMemo(
     () =>
@@ -143,6 +165,23 @@ export function useProjectionMapView(
     ],
   );
 
+  const spaceChrome = useMemo(
+    () =>
+      projectionMapChrome({
+        copy,
+        groups,
+        colored,
+        ellipse: colored ? ellipse : null,
+        minimumPoints: MINIMUM_SHELL_POINTS,
+        showGroupMeans: false,
+        markers: NO_MARKERS,
+        fittedCount: fittedCount ?? scores.rows,
+        total: scores.rows,
+        figure: 'space',
+      }),
+    [copy, groups, colored, ellipse, fittedCount, scores],
+  );
+
   const settle = useCallback(
     (change: SelectionChange) => {
       setReport((previous) => ({
@@ -164,8 +203,14 @@ export function useProjectionMapView(
 
   return {
     chrome,
+    spaceChrome,
     viewport,
     setViewport,
+    camera,
+    setCamera,
+    zoom: cloudZoom,
+    setZoom: setCloudZoom,
+    resetSpaceView,
     report,
     settle,
     zoomToSelection,

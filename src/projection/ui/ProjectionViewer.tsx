@@ -15,6 +15,7 @@ import { useProjectionState } from './useProjectionState.ts';
 
 export type { ProjectionVariableTrack } from './ProjectionVariablesTab.tsx';
 export type { ProjectionSelection } from './projectionSelection.ts';
+export type { ProjectionSampleOpen } from './projectionViewerProps.ts';
 export type { ProjectionViewerProps } from './projectionViewerProps.ts';
 
 /**
@@ -45,6 +46,7 @@ export type { ProjectionViewerProps } from './projectionViewerProps.ts';
 export function ProjectionViewer(props: ProjectionViewerProps): ReactElement {
   const { result, samples, className, testId, onTrackVariable } = props;
   const { onHoverSample, touchLasso, height = PROJECTION_TAB_HEIGHT } = props;
+  const { onSampleDoubleClick } = props;
   const { wheelZoom = true } = props;
   const { formatValue = formatProjectionValue, fileName = 'projection' } =
     props;
@@ -110,6 +112,7 @@ export function ProjectionViewer(props: ProjectionViewerProps): ReactElement {
         panelId={panelId}
         strip={strip}
         onHoverSample={onHoverSample}
+        onSampleDoubleClick={onSampleDoubleClick}
         onTrackVariable={onTrackVariable}
         touchLasso={touchLasso}
         wheelZoom={wheelZoom}

@@ -15,6 +15,7 @@ import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 import type { ProjectionTab } from '../core/projectionTabs.ts';
 
 import { ellipseCoverageText } from './projectionEllipse.ts';
+import { ellipsoidCoverageText } from './projectionEllipsoid.ts';
 import { WHOLE_SHARE } from './projectionTabStyles.ts';
 
 /** One setting on the bar, as the reader sees it right now. */
@@ -78,6 +79,23 @@ export function projectionBarReadings(
         key: bar.key.variablesView,
         label: help.variablesView.title,
         value: bar.view[options.variablesView],
+      },
+    ];
+  }
+  if (tab === 'space') {
+    return [
+      {
+        key: bar.key.cloudGesture,
+        label: help.cloudGesture.title,
+        value: options.cloudGesture === 'turn' ? 'Turn' : 'Select',
+      },
+      {
+        key: bar.key.ellipse,
+        label: help.ellipse.title,
+        value:
+          options.colorBy === 'group' && groups.entries.length > 0
+            ? ellipsoidCoverageText(options.ellipse)
+            : bar.noOutlines,
       },
     ];
   }

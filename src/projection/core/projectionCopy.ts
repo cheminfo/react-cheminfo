@@ -29,6 +29,8 @@ export interface ProjectionCopy {
   intro: {
     /** The map. */
     map: string;
+    /** The cloud. */
+    space: string;
     /** The pair grid. */
     pairs: string;
     /**
@@ -49,6 +51,8 @@ export interface ProjectionCopy {
   legend: {
     /** The map. Carries `{groups}` and `{coverage}`. */
     map: string;
+    /** The cloud. Carries `{groups}` and `{coverage}`. */
+    space: string;
     /** The map with no outlines. Carries `{groups}`. */
     mapNoEllipse: string;
     /** The pair grid. Carries `{groups}`. */
@@ -126,6 +130,7 @@ export interface ProjectionCopy {
 export const PROJECTION_COPY: ProjectionCopy = {
   tab: {
     map: 'Map',
+    space: 'Map in 3D',
     pairs: 'Every pair',
     variables: 'What differs',
     shares: 'How much each explains',
@@ -134,6 +139,8 @@ export const PROJECTION_COPY: ProjectionCopy = {
   bar: PROJECTION_BAR_WORDS,
   intro: {
     map: 'Each dot is one sample. Dots that sit together are alike; dots far apart are the ones that differ most. The two axes are the strongest patterns of difference, called components.',
+    space:
+      'The same map with a third component, in a box you can turn. Two groups that sit on top of each other on the flat map often come apart as soon as the box moves. The frame says which axis is which; the numbers are in the card you get by pointing at a dot.',
     pairs:
       'The same map drawn for every pair of components. A grouping the first two miss often shows up in another pair.',
     variablesContinuous:
@@ -149,6 +156,8 @@ export const PROJECTION_COPY: ProjectionCopy = {
   },
   legend: {
     map: 'Colour = {groups}. Each outline covers about {coverage} of that group, assuming the group is roughly bell-shaped.',
+    space:
+      'Colour = {groups}. Each shell holds about {coverage} of that group, assuming the group is roughly bell-shaped. A shell has to hold a sample in three directions at once, so it is wider than the outline the same share draws on the flat map.',
     mapNoEllipse: 'Colour = {groups}.',
     pairs:
       'Colour = {groups}. The strip along the diagonal shows how the samples spread out along that component on its own.',

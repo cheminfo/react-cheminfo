@@ -1,9 +1,17 @@
 import type { ProjectionAxis, ProjectionResult } from './projectionResult.ts';
 
 /** Which tab of a projection viewer is showing. The ids are stable, so a site may put one in its own URL. */
-export type ProjectionTab = 'map' | 'pairs' | 'variables' | 'shares';
+export type ProjectionTab = 'map' | 'space' | 'pairs' | 'variables' | 'shares';
 
 const PAIRS_MINIMUM_AXES = 3;
+
+/**
+ * How many axes a cloud needs, which is one per direction of the box.
+ *
+ * A run that produced two is not shown a third empty axis: the cloud would be
+ * a flat map stood on its edge, which says less than the map it came from.
+ */
+const SPACE_MINIMUM_AXES = 3;
 
 /**
  * The tabs a result can actually fill.
@@ -32,6 +40,7 @@ export function projectionTabs(
   const tabs: ProjectionTab[] = ['map'];
   const enoughAxes = result.axes.length >= PAIRS_MINIMUM_AXES;
 
+  if (result.axes.length >= SPACE_MINIMUM_AXES) tabs.push('space');
   if (enoughAxes) tabs.push('pairs');
   if (result.loadings !== undefined) tabs.push('variables');
   if (enoughAxes && everyAxisPublishesAShare(result.axes)) tabs.push('shares');

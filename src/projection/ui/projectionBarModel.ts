@@ -71,7 +71,8 @@ export interface ProjectionBarRoom {
  */
 export function projectionBarGlyphs(tab: ProjectionTab): number {
   if (tab === 'shares') return SAVE_GLYPHS + 1;
-  return SAVE_GLYPHS + (tab === 'map' ? MAP_BAR_GLYPHS : BAR_GLYPHS);
+  const named = tab === 'map' || tab === 'space';
+  return SAVE_GLYPHS + (named ? MAP_BAR_GLYPHS : BAR_GLYPHS);
 }
 
 /** The one that takes the figure off the page, on every tab. */
@@ -80,7 +81,7 @@ const SAVE_GLYPHS = 1;
 /** The question mark and the cog, which almost every tab carries. */
 const BAR_GLYPHS = 2;
 
-/** Those two, and the map's own pair of switches. */
+/** Those two, and the pair of name switches the map and the cloud both carry. */
 const MAP_BAR_GLYPHS = 4;
 
 /**

@@ -16,6 +16,7 @@ import type { ProjectionMarker } from '../core/projectionResult.ts';
 import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 
 import { ellipseCoverageText } from './projectionEllipse.ts';
+import { ellipsoidCoverageText } from './projectionEllipsoid.ts';
 import { UNGROUPED_INK } from './projectionMapModel.ts';
 
 /** What the map's chrome is built from. */
@@ -38,6 +39,14 @@ export interface ProjectionMapChromeInput {
   fittedCount: number;
   /** How many rows there are in all. */
   total: number;
+  /**
+   * Which figure the chrome is for. The cloud says the same things about
+   * itself, in its own words and about its own geometry: a share is a wider
+   * shape in three dimensions than in two, so the sentence promising one has
+   * to be built from the dimension it will be read in.
+   * @default 'map'
+   */
+  figure?: 'map' | 'space';
 }
 
 /** The legend and the standing caption of one map. */
@@ -73,7 +82,7 @@ export function projectionMapChrome(
   input: ProjectionMapChromeInput,
 ): ProjectionMapChrome {
   const { copy, groups, colored, ellipse, showGroupMeans, markers } = input;
-  const { minimumPoints, fittedCount, total } = input;
+  const { minimumPoints, fittedCount, total, figure = 'map' } = input;
   const entries: OverlayLegendEntry[] = [];
   const skipped: string[] = [];
 
@@ -114,7 +123,15 @@ export function projectionMapChrome(
   return {
     title: legendTitle(copy, groups, colored),
     entries,
-    caption: captionFor(copy, groups, colored, ellipse, skipped, hollow),
+    caption: captionFor(
+      copy,
+      groups,
+      colored,
+      ellipse,
+      skipped,
+      hollow,
+      figure,
+    ),
   };
 }
 
@@ -169,15 +186,19 @@ function captionFor(
   ellipse: EllipseSize | null,
   skipped: readonly string[],
   hollow: boolean,
+  figure: 'map' | 'space',
 ): string {
-  let sentence = copy.intro.map;
+  const solid = figure === 'space';
+  let sentence = solid ? copy.intro.space : copy.intro.map;
   // What an outline actually holds is the one claim the figure makes that the
   // reader cannot check by looking, so it is said in full here rather than
   // squeezed onto the key floating over the dots.
   if (colored && ellipse !== null) {
-    sentence += ` ${fillCopy(copy.legend.map, {
+    sentence += ` ${fillCopy(solid ? copy.legend.space : copy.legend.map, {
       groups: groups.label.toLowerCase(),
-      coverage: ellipseCoverageText(ellipse),
+      coverage: solid
+        ? ellipsoidCoverageText(ellipse)
+        : ellipseCoverageText(ellipse),
     })}`;
   }
   if (skipped.length > 0) {

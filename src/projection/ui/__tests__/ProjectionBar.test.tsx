@@ -76,7 +76,7 @@ test('a figure short of room drops the key words and never the settings', () => 
   // values on the row.
   const html = draw('map');
 
-  expect(occurrences(html, 'role="tab"')).toBe(4);
+  expect(occurrences(html, 'role="tab"')).toBe(5);
   expect(html).toContain('aria-label="Options"');
   expect(html).toContain('aria-label="Colour by — Species"');
   expect(html).toContain('aria-label="Group outlines — 95%"');
