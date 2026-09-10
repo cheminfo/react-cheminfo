@@ -148,6 +148,32 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </g>
   ),
+  // Two groups of samples with the outline that holds each: the picture the
+  // tool exists to draw. One is drawn and one is filled rather than both
+  // outlined, because two rings crossing close up into a blob at 16 px —
+  // checked at 16, 20, 24, 32 and 64 before this was settled on.
+  metabo: (accent) => (
+    <>
+      <ellipse
+        cx="12"
+        cy="12.5"
+        rx="5.8"
+        ry="9"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="3"
+        transform="rotate(-32 12 12.5)"
+      />
+      <ellipse
+        cx="20.5"
+        cy="20"
+        rx="5.4"
+        ry="8.6"
+        fill={accent}
+        transform="rotate(32 20.5 20)"
+      />
+    </>
+  ),
   // One formula branching into every structure it can be.
   surge: (alt) => (
     <>

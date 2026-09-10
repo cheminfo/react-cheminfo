@@ -30,24 +30,26 @@ export interface NavLinkProps {
  */
 export function NavLink(props: NavLinkProps): ReactElement {
   const { item, active = false, className } = props;
-  const { href, external = false, onSelect, title } = item;
+  const { href, external = false, onSelect, title, disabled = false } = item;
 
   const classes = [
     'nav-link',
     active ? 'nav-link--active' : null,
+    disabled ? 'nav-link--disabled' : null,
     className ?? null,
   ]
     .filter((part) => part !== null)
     .join(' ');
 
-  if (href === undefined) {
+  if (href === undefined || disabled) {
     return (
       <button
         type="button"
         className={classes}
         title={title}
         aria-label={title}
-        onClick={onSelect}
+        disabled={disabled}
+        onClick={disabled ? undefined : onSelect}
       >
         <NavLinkBody item={item} />
       </button>

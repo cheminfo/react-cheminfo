@@ -46,3 +46,16 @@ test('an embedded page is given no footer at all', () => {
 
   expect(html).toBe('');
 });
+
+test('the footer is capped at the page width unless a site asks otherwise', () => {
+  const capped = renderToStaticMarkup(<SiteFooter siteId="regexp" />);
+  const full = renderToStaticMarkup(
+    <SiteFooter siteId="regexp" width="full" />,
+  );
+
+  expect(capped).toContain('<div class="app-footer__inner">');
+  expect(capped).not.toContain('app-footer__inner--full');
+  expect(full).toContain(
+    '<div class="app-footer__inner app-footer__inner--full">',
+  );
+});

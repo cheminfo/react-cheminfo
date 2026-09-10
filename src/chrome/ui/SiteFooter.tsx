@@ -29,6 +29,14 @@ export interface SiteFooterProps {
    * @default undefined
    */
   children?: ReactNode;
+  /**
+   * How wide the footer's contents run, read exactly as `SiteHeader`'s: `page`
+   * caps them at `--page-max`, `full` runs them to both edges. A site sets the
+   * two alike, or its chrome is capped at one end of the page and not at the
+   * other.
+   * @default 'page'
+   */
+  width?: 'page' | 'full';
 }
 
 /**
@@ -46,13 +54,14 @@ export function SiteFooter(props: SiteFooterProps): ReactElement | null {
     heading,
     embedded = false,
     children,
+    width = 'page',
   } = props;
 
   if (embedded) return null;
 
   return (
     <footer className="app-footer no-print">
-      <div className="app-footer__inner">
+      <div className={INNER_CLASS[width]}>
         <EcosystemLinks
           currentSiteId={siteId}
           layout={layout}
@@ -63,3 +72,9 @@ export function SiteFooter(props: SiteFooterProps): ReactElement | null {
     </footer>
   );
 }
+
+/** The two widths the footer's contents run at, as the classes that set them. */
+const INNER_CLASS = {
+  page: 'app-footer__inner',
+  full: 'app-footer__inner app-footer__inner--full',
+} as const;

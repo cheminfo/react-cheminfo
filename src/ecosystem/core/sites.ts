@@ -7,6 +7,7 @@ export type SiteId =
   | 'smiles'
   | 'chemcalc'
   | 'nmrium'
+  | 'metabo'
   | 'derepflow'
   | 'surge'
   | 'tex'
@@ -132,6 +133,19 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brand: '#ea580c',
     brandAlt: '#2b143e',
     mark: { plate: '#2b143e', accent: '#ea580c' },
+  },
+  {
+    id: 'metabo',
+    // Not `.cheminfo`: the second half of a one-word name is the domain the
+    // site actually lives at, and this one is a sibling of NMRium rather than
+    // of the cheminfo tools.
+    name: { lead: 'metabo', alt: 'nmrium', dot: true },
+    host: 'metabo.nmrium.com',
+    repository: 'https://github.com/cheminfo/metabo',
+    tagline: 'Turn a batch of NMR spectra into a map of your samples.',
+    brand: '#4d7c0f',
+    brandAlt: '#b91c1c',
+    mark: { plate: '#4d7c0f', accent: '#b91c1c' },
   },
   {
     id: 'derepflow',

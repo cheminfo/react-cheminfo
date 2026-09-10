@@ -107,3 +107,18 @@ test('the mark takes the size the site asks for', () => {
 
   expect(html).toContain('width="24" height="24"');
 });
+
+test('the bar is capped at the page width unless a site asks otherwise', () => {
+  const capped = renderToStaticMarkup(
+    <SiteHeader siteId="learn" nav={PAGES} />,
+  );
+  const full = renderToStaticMarkup(
+    <SiteHeader siteId="learn" nav={PAGES} width="full" />,
+  );
+
+  expect(capped).toContain('<div class="app-header__inner">');
+  expect(capped).not.toContain('app-header__inner--full');
+  expect(full).toContain(
+    '<div class="app-header__inner app-header__inner--full">',
+  );
+});

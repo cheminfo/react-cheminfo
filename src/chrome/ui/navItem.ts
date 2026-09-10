@@ -47,6 +47,18 @@ export interface NavItem {
    * @default undefined
    */
   after?: ReactNode;
+  /**
+   * Whether the page cannot be opened yet — a view that needs data the site
+   * has not been given.
+   *
+   * It is greyed rather than left out, because a bar that grows entries as a
+   * reader works is a bar they have to keep re-reading, and a page they cannot
+   * see is a page they conclude the site does not have. `title` is where the
+   * reason goes; without one the entry is dead and says nothing, which is the
+   * one thing worse than leaving it out.
+   * @default false
+   */
+  disabled?: boolean;
 }
 
 /**

@@ -55,6 +55,17 @@ export interface SiteHeaderProps {
    * @default 28
    */
   markSize?: number;
+  /**
+   * How wide the bar's contents run.
+   *
+   * `page` caps them at `--page-max` and centres them, so the brand sits over
+   * the first word of a page that is capped the same way — which is what a
+   * site of reading matter wants. `full` runs them to both edges, for a tool
+   * that fills the window: there the cap leaves the brand floating inwards
+   * with the tool running past it on both sides, and reads as a fault.
+   * @default 'page'
+   */
+  width?: 'page' | 'full';
 }
 
 /**
@@ -76,6 +87,7 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
     homeHref = '/',
     onHome,
     markSize = 28,
+    width = 'page',
   } = props;
 
   if (embedded) return null;
@@ -84,7 +96,7 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
 
   return (
     <header className="app-header no-print">
-      <div className="app-header__inner">
+      <div className={INNER_CLASS[width]}>
         <a
           className="brand"
           href={homeHref}
@@ -117,3 +129,9 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
     </header>
   );
 }
+
+/** The two widths the bar's contents run at, as the classes that set them. */
+const INNER_CLASS = {
+  page: 'app-header__inner',
+  full: 'app-header__inner app-header__inner--full',
+} as const;
