@@ -45,6 +45,25 @@ export interface ScatterMarker {
   shape?: OverlayMarkShape;
 }
 
+/** A point the reader opened, and where they opened it. */
+export interface ScatterPointOpen {
+  /** Its row, as an index into the arrays the caller passed. */
+  index: number;
+  /** Where the reader clicked, in pixels from the figure's left edge. */
+  x: number;
+  /** Where they clicked, in pixels from its top edge. */
+  y: number;
+  /**
+   * Where they clicked in the window, which is what an editor floating over
+   * the page — a menu, a popover, a dialog anchored on the point — is placed
+   * from. The pair above is the figure's own space, for a caller drawing
+   * inside it.
+   */
+  clientX: number;
+  /** Where they clicked in the window. */
+  clientY: number;
+}
+
 /** What {@link ScatterPlot} needs. */
 export interface ScatterPlotProps {
   /** Horizontal coordinate of every point, in data units. */
@@ -174,6 +193,22 @@ export interface ScatterPlotProps {
    * @default undefined
    */
   onPinChange?: (index: number) => void;
+  /**
+   * Called when the reader double-clicks a point: the gesture for "tell me
+   * more about this one", or "let me change it".
+   *
+   * A double click is also two clicks, so the point is selected first and its
+   * card pinned. That is deliberate: the alternative is to hold every single
+   * click for the length of the double-click interval before acting on it, and
+   * clicking a dot is the commonest gesture in the figure — making it feel
+   * slow to save a redundant selection on the rarest one is the wrong trade.
+   *
+   * A double click on empty ground is not this. It puts the frame back around
+   * every point, which is the only way out of a zoom, and it keeps doing that
+   * whether or not this is given.
+   * @default undefined — a double click only ever resets the frame
+   */
+  onPointDoubleClick?: (point: ScatterPointOpen) => void;
   /**
    * Called when a lasso starts being drawn and again when it ends, and never
    * in between.

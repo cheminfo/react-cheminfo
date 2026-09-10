@@ -163,6 +163,16 @@ export function modifierMode(
   return resting;
 }
 
+/** The little of an event that says where on the surface it happened. */
+export interface SurfaceEvent {
+  /** The element the handler is on, which is the rectangle being measured. */
+  currentTarget: Element;
+  /** Where the event happened, in the window. */
+  clientX: number;
+  /** Where the event happened, in the window. */
+  clientY: number;
+}
+
 /**
  * Where the pointer is, in the space the points were measured in.
  *
@@ -170,13 +180,16 @@ export function modifierMode(
  * the plot's own corner, so the answer can be compared with a point coordinate
  * without the caller mapping anything. An element that cannot be measured —
  * a server render — reports the corner itself rather than throwing.
- * @param event - The pointer event.
+ *
+ * It takes the three fields it actually reads rather than a pointer event,
+ * because a double click arrives as a mouse event and asks the same question.
+ * @param event - The event, or anything carrying those three fields.
  * @param originX - The rectangle's left edge in the points' space.
  * @param originY - Its top edge.
  * @returns The position, in pixels.
  */
 export function surfacePosition(
-  event: ReactPointerEvent<Element>,
+  event: SurfaceEvent,
   originX: number,
   originY: number,
 ): { x: number; y: number } {

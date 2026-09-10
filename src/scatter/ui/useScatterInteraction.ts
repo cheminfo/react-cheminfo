@@ -97,6 +97,15 @@ export interface ScatterInteractionApi {
   keyboard: ScatterKeyboardApi;
   /** The outline being drawn, for the plot to stroke. */
   lasso: LassoGesture;
+  /**
+   * Which point is near a position, or `-1`.
+   *
+   * The same search a click runs, offered on its own so that a gesture the
+   * hook does not own — a double click, which the plot answers because only
+   * the plot knows what a double click on empty ground means — asks it in the
+   * same words and with the same radius.
+   */
+  pointAt: (x: number, y: number) => number;
 }
 
 /**
@@ -233,5 +242,17 @@ export function useScatterInteraction(
 
   const keyboard = useScatterKeyboard({ count, onCommit, onCancel });
 
-  return { surface: lasso.surface, selection, hover, keyboard, lasso };
+  const pointAt = useCallback(
+    (x: number, y: number) => nearestPointIndex(points, x, y, radius, included),
+    [included, points, radius],
+  );
+
+  return {
+    surface: lasso.surface,
+    selection,
+    hover,
+    keyboard,
+    lasso,
+    pointAt,
+  };
 }

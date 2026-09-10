@@ -15,7 +15,10 @@ import { PROJECTION_COPY, fillCopy } from '../src/projection/core/index.ts';
 import { ellipseCoverageText } from '../src/projection/ui/projectionEllipse.ts';
 import { projectionSelectionSentence } from '../src/projection/ui/projectionMapChrome.ts';
 import type { EllipseSize } from '../src/scatter/core/index.ts';
-import type { ScatterPlotProps } from '../src/scatter/ui/ScatterPlot.tsx';
+import type {
+  ScatterPlotProps,
+  ScatterPointOpen,
+} from '../src/scatter/ui/ScatterPlot.tsx';
 import { ScatterPlot } from '../src/scatter/ui/ScatterPlot.tsx';
 
 import {
@@ -116,6 +119,19 @@ export const HoverCard: Story = {
   render: (args) => <HoverDemo {...args} />,
 };
 
+/**
+ * Double-clicking a flower opens it: the gesture for "tell me more about this
+ * one", or "let me change it". The page decides what opening means — here it
+ * writes the flower out underneath.
+ *
+ * Double-clicking empty ground is the other half, and it is the plot's own:
+ * the frame goes back around every flower, which is the only way out of a
+ * zoom. That happens whether or not a page wants the first half.
+ */
+export const OpenOnDoubleClick: Story = {
+  render: (args) => <OpenDemo {...args} />,
+};
+
 function LassoDemo(props: ScatterPlotProps): ReactElement {
   const [picked, setPicked] = useState<readonly number[]>([]);
 
@@ -183,6 +199,31 @@ function HoverDemo(props: ScatterPlotProps): ReactElement {
           )
         }
       />
+    </div>
+  );
+}
+
+function OpenDemo(props: ScatterPlotProps): ReactElement {
+  const [opened, setOpened] = useState<ScatterPointOpen | null>(null);
+
+  return (
+    <div style={STACK_STYLE}>
+      <ScatterPlot
+        {...props}
+        onPointDoubleClick={setOpened}
+        overlay={
+          <OverlayLegend
+            placement="top-left"
+            title={LEGEND_TITLE}
+            entries={LEGEND_ENTRIES}
+          />
+        }
+      />
+      <p style={READOUT_STYLE} data-testid="opened">
+        {opened === null
+          ? 'Nothing opened — double-click a flower.'
+          : `Opened ${IRIS_SAMPLES.ids[opened.index] ?? ''} (row ${opened.index}).`}
+      </p>
     </div>
   );
 }

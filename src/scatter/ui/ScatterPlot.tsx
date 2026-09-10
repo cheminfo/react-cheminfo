@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { MouseEvent as ReactMouseEvent, ReactElement } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { ChartFrame } from '../../chart/ui/ChartFrame.tsx';
@@ -7,6 +7,7 @@ import { ScatterEllipseLayer } from './ScatterEllipseLayer.tsx';
 import { ScatterLabelLayer } from './ScatterLabelLayer.tsx';
 import { ScatterMarkLayer } from './ScatterMarkLayer.tsx';
 import { ScatterPointLayer } from './ScatterPointLayer.tsx';
+import { surfacePosition } from './lassoGesture.ts';
 import {
   SCATTER_GROUP_LABEL_SIZE,
   SCATTER_LABEL_SIZE,
@@ -28,6 +29,7 @@ export type {
   ScatterGroup,
   ScatterMarker,
   ScatterPlotProps,
+  ScatterPointOpen,
 } from './scatterPlotProps.ts';
 
 /**
@@ -68,6 +70,7 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
     selectMode,
     onHoverChange,
     onPinChange,
+    onPointDoubleClick,
     onLassoChange,
     touchLasso,
     viewport,
@@ -151,6 +154,22 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
     onPinChange,
   });
 
+  function handleDoubleClick(event: ReactMouseEvent<SVGRectElement>): void {
+    const at = surfacePosition(event, rect.x, rect.y);
+    const index = interaction.pointAt(at.x, at.y);
+    if (index === -1 || onPointDoubleClick === undefined) {
+      reset();
+      return;
+    }
+    onPointDoubleClick({
+      index,
+      x: at.x,
+      y: at.y,
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
+  }
+
   // Held in a ref so an inline arrow, which is how every caller writes it, does
   // not put the callback in the effect's dependencies and report a drag that
   // never changed on every render.
@@ -224,7 +243,7 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
             fill="transparent"
             tabIndex={0}
             onKeyDown={interaction.keyboard.onKeyDown}
-            onDoubleClick={reset}
+            onDoubleClick={handleDoubleClick}
             {...interaction.surface}
           />
         </>
