@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.11.0](https://github.com/cheminfo/react-cheminfo/compare/v0.10.0...v0.11.0) (2026-09-10)
+
+
+### Features
+
+* **ecosystem:** add metabo, and let a nav item be greyed ([06aa274](https://github.com/cheminfo/react-cheminfo/commit/06aa2745b75314b896cbc997970e4402275f0f4e))
+* **scatter3d:** a cloud you can turn, with a glass shell per group ([0a93484](https://github.com/cheminfo/react-cheminfo/commit/0a93484825487779a5049a721f58f69c1a43eb32))
+* **scatter:** open a point on a double click ([7be2da8](https://github.com/cheminfo/react-cheminfo/commit/7be2da8954ac927c3c99535d05500011294c8a66))
+
+
+### Bug Fixes
+
+* **download:** paint the key into the saved figure ([acf09c5](https://github.com/cheminfo/react-cheminfo/commit/acf09c55ef1a04a949365943180a3c5a24c48fe9))
+
 ## [0.10.0](https://github.com/cheminfo/react-cheminfo/compare/v0.9.0...v0.10.0) (2026-09-09)
 
 
