@@ -21,11 +21,19 @@ export type {
   FigureSvgDocumentOptions,
 } from './figureSvgDocument.ts';
 export { figureSvgDocument } from './figureSvgDocument.ts';
+export type {
+  FigureLegendCard,
+  FigureLegendMark,
+  FigureLegendPrint,
+  FigureLegendText,
+} from './figureLegend.ts';
+export { figureLegendMarkup } from './figureLegend.ts';
 export type { FigureBounds } from './figureTarget.ts';
 export {
   figureBounds,
   figureDrawings,
   figureElement,
+  figureLegends,
   figureSize,
 } from './figureTarget.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';

@@ -13,6 +13,9 @@ import type { FigurePixels } from './figureScale.ts';
 /** Chrome floating over a figure, which is not part of the picture. */
 const CHROME = '[data-figure="chrome"]';
 
+/** A key floating over a figure, which is. */
+const LEGEND = '[data-figure="legend"]';
+
 /** A figure's box on the page, in the coordinates a bounding box reports. */
 export interface FigureBounds {
   /** Its left edge. */
@@ -68,6 +71,24 @@ export function figureDrawings(element: Element): readonly SVGSVGElement[] {
     drawings.push(drawing);
   }
   return drawings;
+}
+
+/**
+ * The keys inside it.
+ *
+ * A key is chrome — it is a filter the reader presses — and is therefore not
+ * among the drawings, but it is still part of the picture: a saved figure
+ * whose colours stand for nothing is not a figure. So it is collected
+ * separately, to be redrawn over the drawings rather than copied with them.
+ * @param element - The box the figure is mounted in.
+ * @returns The keys, in the order they are painted.
+ */
+export function figureLegends(element: Element): readonly Element[] {
+  const legends: Element[] = [];
+  for (const legend of element.querySelectorAll(LEGEND)) {
+    legends.push(legend);
+  }
+  return legends;
 }
 
 /**

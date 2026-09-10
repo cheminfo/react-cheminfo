@@ -144,6 +144,26 @@ test('the SVG that leaves the page carries colours rather than token names', asy
   expect(file).toContain('#dfe3e8');
 });
 
+test('the saved figure carries the key, which the chrome around it does not', async ({
+  page,
+}) => {
+  await openStory(page, IRIS);
+  await expect(page.locator('.chart-frame')).toHaveCount(1);
+
+  await openSavePanel(page, SAVE_PNG);
+  await page.getByRole('radio', { name: 'SVG' }).click();
+  const file = await savedText(page);
+
+  // What the colour means, and every name it stands for. A figure saved
+  // without them is three colours nobody can read.
+  expect(file).toContain('Colour = species');
+  expect(file).toContain('setosa (50)');
+  expect(file).toContain('versicolor (50)');
+  expect(file).toContain('virginica (50)');
+  // The cog and the rest of the bar are chrome, and stay behind.
+  expect(file).not.toContain('Save this figure');
+});
+
 test('a grid of sixteen charts is saved as one figure, not as its first cell', async ({
   page,
 }) => {
@@ -157,7 +177,7 @@ test('a grid of sixteen charts is saved as one figure, not as its first cell', a
   expect(download.suggestedFilename()).toBe('projection-pairs.svg');
 
   const file = readFileSync(await download.path(), 'utf8');
-  expect(file.match(/<g transform="translate\(/gu)).toHaveLength(16);
+  expect(file.match(/<g data-figure="drawing"/gu)).toHaveLength(16);
 });
 
 test('the glyphs of the controls floating over a figure are left behind', async ({
@@ -171,6 +191,7 @@ test('the glyphs of the controls floating over a figure are left behind', async 
 
   const file = await savedText(page);
   // One drawing, which is the chart; a cog or a caret saved into the middle of
-  // the scatter would be a second.
-  expect(file.match(/<g transform="translate\(/gu)).toHaveLength(1);
+  // the scatter would be a second. The key is painted over it and says so.
+  expect(file.match(/<g data-figure="drawing"/gu)).toHaveLength(1);
+  expect(file.match(/<g data-figure="legend"/gu)).toHaveLength(1);
 });

@@ -103,7 +103,13 @@ export function OverlayLegend(props: OverlayLegendProps): ReactElement {
   const written = folded === 0 ? entries : entries.slice(0, room - 1);
 
   return (
-    <div style={overlayCardStyle(placement, metrics)} data-testid={testId}>
+    <div
+      style={overlayCardStyle(placement, metrics)}
+      // The key is chrome, since its entries are pressed, but it is part of
+      // the picture all the same: the export redraws it into the saved file.
+      data-figure="legend"
+      data-testid={testId}
+    >
       <div style={overlayGroundStyle(awake ? 1 : RESTING_OPACITY, busy)} />
       <div
         role="group"

@@ -13,7 +13,7 @@ test('one drawing is written into a document of its own size', () => {
   expect(document).toBe(
     '<?xml version="1.0" encoding="UTF-8"?>' +
       '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">' +
-      `<g transform="translate(0 0)">${CHART}</g></svg>`,
+      `<g data-figure="drawing" transform="translate(0 0)">${CHART}</g></svg>`,
   );
 });
 
@@ -27,9 +27,13 @@ test('every drawing of a grid is placed back where the reader saw it', () => {
     { width: 410, height: 210 },
   );
 
-  expect(document).toContain('<g transform="translate(210.5 0)">');
-  expect(document).toContain('<g transform="translate(0 110)">');
-  expect(document.match(/<g transform=/gu)).toHaveLength(3);
+  expect(document).toContain(
+    '<g data-figure="drawing" transform="translate(210.5 0)">',
+  );
+  expect(document).toContain(
+    '<g data-figure="drawing" transform="translate(0 110)">',
+  );
+  expect(document.match(/<g data-figure="drawing"/gu)).toHaveLength(3);
 });
 
 test('the ground is painted before anything is drawn on it', () => {
@@ -40,7 +44,7 @@ test('the ground is painted before anything is drawn on it', () => {
   });
 
   expect(document).toContain(
-    '<rect width="100%" height="100%" fill="#ffffff"/><g transform=',
+    '<rect width="100%" height="100%" fill="#ffffff"/><g data-figure=',
   );
 });
 
@@ -75,4 +79,19 @@ test('offsets are written to two decimals rather than to sixteen', () => {
 
   expect(document).toContain('translate(10.12 0)');
   expect(document).toContain('width="200.5" height="100.13"');
+});
+
+test('a key painted over the drawings says that is what it is', () => {
+  const document = figureSvgDocument(
+    [
+      { markup: CHART, x: 0, y: 0 },
+      { markup: '<rect/>', x: 12, y: 30, kind: 'legend' },
+    ],
+    { width: 200, height: 100 },
+  );
+
+  expect(document).toContain(
+    '<g data-figure="legend" transform="translate(12 30)"><rect/></g>',
+  );
+  expect(document.match(/<g data-figure="drawing"/gu)).toHaveLength(1);
 });

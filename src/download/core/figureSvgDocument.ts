@@ -12,14 +12,21 @@
  * that decides what the file *is* can be read without a DOM to run it in.
  */
 
-/** One drawing on the page, and where it sits inside the saved figure. */
+/** One piece of the page, and where it sits inside the saved figure. */
 export interface FigurePiece {
-  /** The `<svg>` element as it was serialized, tokens already resolved. */
+  /** The markup, tokens already resolved. */
   markup: string;
   /** Its left edge, in pixels from the left of the saved figure. */
   x: number;
   /** Its top edge, in pixels from the top of the saved figure. */
   y: number;
+  /**
+   * What it is. Written into the file, so a reader — a test, or somebody
+   * editing the figure afterwards — can tell the drawings from the key that
+   * was painted over them.
+   * @default 'drawing'
+   */
+  kind?: 'drawing' | 'legend';
 }
 
 /** How the file around the drawings is written. */
@@ -71,7 +78,10 @@ export function figureSvgDocument(
       ? ''
       : `<rect width="100%" height="100%" fill="${escapeAttribute(background)}"/>`;
   for (const piece of pieces) {
-    inside += `<g transform="translate(${round(piece.x)} ${round(piece.y)})">${piece.markup}</g>`;
+    const kind = piece.kind ?? 'drawing';
+    inside +=
+      `<g data-figure="${kind}" transform="translate(${round(piece.x)} ${round(piece.y)})">` +
+      `${piece.markup}</g>`;
   }
 
   return (

@@ -8,9 +8,16 @@
  */
 
 import { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
+import type { FigureLegendMark, FigureLegendText } from './figureLegend.ts';
+import { figureLegendMarkup } from './figureLegend.ts';
 import type { FigurePiece } from './figureSvgDocument.ts';
 import { figureSvgDocument } from './figureSvgDocument.ts';
-import { figureBounds, figureDrawings, figureElement } from './figureTarget.ts';
+import {
+  figureBounds,
+  figureDrawings,
+  figureElement,
+  figureLegends,
+} from './figureTarget.ts';
 
 /** How the figure is copied. */
 export interface FigureSvgOptions {
@@ -69,6 +76,17 @@ export function figureSvg(
     });
   }
 
+  for (const legend of figureLegends(element)) {
+    const box = legend.getBoundingClientRect();
+    if (box.width <= 0 || box.height <= 0) continue;
+    pieces.push({
+      markup: legendMarkup(legend, box),
+      x: box.left - bounds.left,
+      y: box.top - bounds.top,
+      kind: 'legend',
+    });
+  }
+
   const styles = window.getComputedStyle(element);
   const markup = figureSvgDocument(pieces, {
     width: bounds.width,
@@ -83,6 +101,68 @@ export function figureSvg(
     width: Math.round(bounds.width),
     height: Math.round(bounds.height),
   };
+}
+
+/**
+ * One key, measured off the page and painted as SVG.
+ *
+ * Everything is read from where the browser put it — the card's own ground and
+ * corner, each mark's box, each run of words and the type it is set in — so
+ * the copy in the file is the card the reader was looking at, folding and all.
+ * The ground is painted at full strength however faint the card had gone on
+ * screen: a key that fades when the pointer leaves the figure is a property of
+ * pointing at it, not of the figure.
+ * @param legend - The card, as it sits on the page.
+ * @param box - Its box, so the pieces inside it can be placed against it.
+ * @returns Its markup, in the card's own coordinates.
+ */
+function legendMarkup(legend: Element, box: DOMRect): string {
+  const ground = legend.firstElementChild;
+  const styles = ground === null ? undefined : window.getComputedStyle(ground);
+
+  const marks: FigureLegendMark[] = [];
+  for (const mark of legend.querySelectorAll('svg')) {
+    const at = mark.getBoundingClientRect();
+    marks.push({
+      markup: drawingMarkup(mark),
+      x: at.left - box.left,
+      y: at.top - box.top,
+    });
+  }
+
+  const texts: FigureLegendText[] = [];
+  for (const run of legend.querySelectorAll('*')) {
+    if (run.firstElementChild !== null) continue;
+    const words = run.textContent?.trim() ?? '';
+    if (words === '') continue;
+    const at = run.getBoundingClientRect();
+    const type = window.getComputedStyle(run);
+    texts.push({
+      text: words,
+      x: at.left - box.left,
+      y: at.top - box.top + at.height / 2,
+      color: type.color,
+      fontSize: Number.parseFloat(type.fontSize),
+      fontWeight: type.fontWeight,
+    });
+  }
+
+  return figureLegendMarkup({
+    card: {
+      width: box.width,
+      height: box.height,
+      radius:
+        styles === undefined
+          ? 0
+          : Number.parseFloat(styles.borderTopLeftRadius),
+      background: styles?.backgroundColor,
+      border: styles?.borderTopColor,
+      borderWidth:
+        styles === undefined ? 1 : Number.parseFloat(styles.borderTopWidth),
+    },
+    marks,
+    texts,
+  });
 }
 
 /**
