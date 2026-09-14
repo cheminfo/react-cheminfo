@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{a as t,r as n,t as r}from"./numbers-BxzU8aH2.js";function i(e,t={}){let{share:r,digits:i=o}=t;return r===void 0||!Number.isFinite(r)?e:`${e} — ${n(r,i)}`}function a(e,t=o){return Number.isFinite(e)?r(e*100,Number.isFinite(t)?t:1):``}var o;function s(){return(s=e((()=>{t(),o=1})))()}export{a as n,s as r,i as t};

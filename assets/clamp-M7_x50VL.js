@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e,t,n,r=t){return Number.isFinite(e)?e<t?t:e>n?n:e:r}function n(){return(n=e((()=>{})))()}export{n,t};

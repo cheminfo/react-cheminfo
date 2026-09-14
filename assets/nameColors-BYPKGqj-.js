@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t,r as n,t as r}from"./familyTokens-DsQXXJV4.js";function i(e,n={}){let i=n.colors===`literal`,a=i?r[`--text`]:t.text,{ink:o}=e.name;return{lead:o===`lead`?a:e.brand,alt:o===`alt`?a:o===`lead`?e.brand:e.brandAlt,dot:i?r[`--text-faint`]:t.textFaint}}function a(){return(a=e((()=>{n()})))()}export{i as n,a as t};

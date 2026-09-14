@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{t}from"./clamp-M7_x50VL.js";function n(e,n){return Math.floor(t(e,0,n))}function r(e,t,r){let i=Math.max(0,r-1),a=n(e,i),o=n(t,i);return o===a?{x:a,y:a>0?a-1:Math.min(1,i)}:{x:a,y:o}}function i(){return(i=e((()=>{})))()}export{r as n,i as r,n as t};
