@@ -3,6 +3,8 @@ import { Collapse, Icon } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+
 /** What a titled section that folds away needs. */
 export interface CollapsibleSectionProps {
   /** The heading, which is also what opens and closes the section. */
@@ -84,11 +86,7 @@ export function CollapsibleSection(
   return (
     <section
       id={id}
-      className={
-        className === undefined
-          ? 'collapsible-section'
-          : `collapsible-section ${className}`
-      }
+      className={joinClassNames('collapsible-section', className)}
     >
       <div style={HEADER_STYLE}>
         <button

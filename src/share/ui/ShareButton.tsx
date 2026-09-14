@@ -72,13 +72,19 @@ export function ShareButton(props: ShareButtonProps): ReactElement {
   return (
     <button
       type="button"
-      className={className === undefined ? 'nav-link' : `nav-link ${className}`}
+      className={
+        className === undefined
+          ? 'nav-link nav-link--icon'
+          : `nav-link nav-link--icon ${className}`
+      }
       title={title}
       aria-label={label}
       onClick={onClick}
     >
       <Icon icon="share" size={14} />
-      {text}
+      {text === undefined ? null : (
+        <span className="nav-link__label">{text}</span>
+      )}
     </button>
   );
 }

@@ -27,15 +27,12 @@ export type {
   LoadingProfilesOptions,
 } from './loadingProfiles.ts';
 export { loadingProfiles } from './loadingProfiles.ts';
-export type { PcaLike } from './pcaLike.ts';
+export { fillCopy } from './fillCopy.ts';
+export type { PcaLike, PcaModelRecord } from './pcaLike.ts';
 export type { PcaResultOptions } from './pcaResult.ts';
 export { pcaResult } from './pcaResult.ts';
 export type { ProjectionCopy } from './projectionCopy.ts';
-export {
-  PROJECTION_COPY,
-  fillCopy,
-  mergeProjectionCopy,
-} from './projectionCopy.ts';
+export { PROJECTION_COPY } from './projectionCopy.ts';
 export type { ProjectionCopyPatch } from './projectionCopyPatch.ts';
 export type {
   ProjectionColorBy,
@@ -43,10 +40,14 @@ export type {
   ProjectionOptions,
   ProjectionVariablesView,
 } from './projectionOptions.ts';
-export {
-  DEFAULT_PROJECTION_OPTIONS,
-  resolveProjectionOptions,
-} from './projectionOptions.ts';
+export { mergeProjectionCopy } from './mergeProjectionCopy.ts';
+export { DEFAULT_PROJECTION_OPTIONS } from './projectionOptions.ts';
+export type {
+  ProjectionChoiceWords,
+  ProjectionOutlineWords,
+  ProjectionPanelWords,
+  ProjectionReasonWords,
+} from './projectionPanelWords.ts';
 export type {
   ProjectionAxis,
   ProjectionLoadings,
@@ -67,6 +68,7 @@ export type {
 export { PROJECTION_HELP } from './projectionStrings.ts';
 export type { ProjectionTab } from './projectionTabs.ts';
 export { projectionTabs } from './projectionTabs.ts';
+export { resolveProjectionOptions } from './resolveProjectionOptions.ts';
 export type {
   ContinuousVariableAxis,
   NamedVariableAxis,

@@ -111,8 +111,8 @@ test('every tab shows its own figure and says what it is', async ({ page }) => {
 /**
  * A tab's name at whichever length the bar happens to be writing.
  * @param tab - The tab, with both of its names.
- * @param tab.name
- * @param tab.short
+ * @param tab.name - Its full name.
+ * @param tab.short - The name it takes on a bar short of room.
  * @returns A pattern matching either one exactly.
  */
 function eitherLength(tab: { name: string; short: string }): RegExp {

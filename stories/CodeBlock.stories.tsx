@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { CodeBlock } from '../src/clipboard/ui/CodeBlock.tsx';
 
-const INSTALL_COMMAND = 'npm install react-cheminfo @blueprintjs/core';
+import { CAFFEINE } from './structureFixtures.ts';
 
-const CAFFEINE_SMILES = 'CN1C=NC2=C1C(=O)N(C)C(=O)N2C';
+const INSTALL_COMMAND = 'npm install react-cheminfo @blueprintjs/core';
 
 // What a share dialog hands a teacher to paste into a course page.
 const EMBED_SNIPPET = `<iframe
@@ -100,7 +100,7 @@ export const Default: Story = {};
 
 /** The grey panel, which is how a block reads inside a white card. */
 export const Muted: Story = {
-  args: { code: CAFFEINE_SMILES, tone: 'muted' },
+  args: { code: CAFFEINE, tone: 'muted' },
 };
 
 /** The dark plate, for a block sitting in a tooltip or on a dark surface. */
@@ -125,7 +125,7 @@ export const Scrolling: Story = {
 
 /** `children` colours the ring closures; `code` is still what gets copied. */
 export const Highlighted: Story = {
-  args: { code: CAFFEINE_SMILES, tone: 'dark', copyable: true },
+  args: { code: CAFFEINE, tone: 'dark', copyable: true },
   render: (args) => (
     <div style={{ width: 'min(44rem, 92vw)' }}>
       <CodeBlock {...args}>

@@ -37,13 +37,12 @@ export function filterEntry(name: SpectrumFilterName): FilterCatalogEntry {
 /**
  * What the editor knows about a step whose name it may not recognise.
  *
- * The settings the processor accepts are typed `{ name: string }`, and
- * `filterXY` really does dispatch four more names than the union declares, so a
- * chain reaching the editor can name a step the catalog has never heard of.
+ * The settings the processor accepts are typed `{ name: string }`, so a chain
+ * reaching the editor can name a step the catalog has never heard of.
  * Answering nothing lets the panel say so; throwing would take the whole page
  * down over one row.
  * @param name - The step's name, from settings that may come from anywhere.
- * @returns Its catalog entry, or undefined when the name is not one of the 23.
+ * @returns Its catalog entry, or undefined when the name is not one of the 27.
  */
 export function findFilterEntry(name: string): FilterCatalogEntry | undefined {
   return Object.hasOwn(FILTER_CATALOG, name)
@@ -79,7 +78,7 @@ export function filterNamesInGroup(
 /**
  * The whole menu, group by group, skipping a group that holds nothing.
  *
- * The 23 steps are unreadable as one list, and grouping them by what they touch
+ * The 27 steps are unreadable as one list, and grouping them by what they touch
  * is the same order a chain is usually built in: level the baseline, smooth,
  * scale, then move the axis.
  * @returns Each group with its steps.

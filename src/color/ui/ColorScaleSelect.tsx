@@ -8,13 +8,13 @@ import {
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
-import type { ColorScale } from '../core/interpolate.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { formatColorScale, resolveColorScale } from '../core/scaleText.ts';
-import type { ColorScaleKind } from '../core/scales.ts';
-import { COLOR_SCALES, COLOR_SCALE_KIND_LABELS } from '../core/scales.ts';
+import { COLOR_SCALES } from '../core/scales.ts';
 
 import { ColorScaleBar } from './ColorScaleBar.tsx';
 import { ColorScaleEditor } from './ColorScaleEditor.tsx';
+import { ColorScaleEntry } from './ColorScaleEntry.tsx';
 
 const BUTTON_BAR_WIDTH = 72;
 
@@ -42,6 +42,11 @@ export interface ColorScaleSelectProps {
    * @default undefined
    */
   testId?: string;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -55,7 +60,14 @@ export interface ColorScaleSelectProps {
  * @returns The button, and the menu it opens.
  */
 export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
-  const { value, onChange, label = '', allowCustom = true, testId } = props;
+  const {
+    className,
+    value,
+    onChange,
+    label = '',
+    allowCustom = true,
+    testId,
+  } = props;
   const [isOpen, setOpen] = useState(false);
   const [isEditing, setEditing] = useState(false);
   const resolved = resolveColorScale(value);
@@ -91,7 +103,7 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
   ) : (
     <Menu style={MENU_STYLE}>
       {COLOR_SCALES.map((entry, index) => (
-        <ScaleEntry
+        <ColorScaleEntry
           key={entry.id}
           id={entry.id}
           label={entry.label}
@@ -120,7 +132,7 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
   );
 
   return (
-    <label style={FIELD_STYLE}>
+    <label className={className} style={FIELD_STYLE}>
       {label === '' ? null : <span style={CAPTION_STYLE}>{label}</span>}
       <PopoverNext
         // A fade, like the pickers a site puts beside this one: the default
@@ -157,57 +169,6 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
   );
 }
 
-/**
- * One line of the menu, under the heading of its kind when the kind changes.
- * @param props - The scale the line offers, and what precedes it.
- * @param props.id - Id of the scale, which is what a link carries.
- * @param props.label - What the line is called.
- * @param props.kind - What the scale is for, which is the heading it sits under.
- * @param props.description - One line on when to reach for it, read on hover.
- * @param props.previous - Kind of the line above, so a heading is written once.
- * @param props.selected - Whether it is the scale in force.
- * @param props.onChange - Called with the id when the line is chosen.
- * @returns The line, with its heading when it opens a kind.
- */
-function ScaleEntry(props: {
-  id: string;
-  label: string;
-  kind: ColorScaleKind;
-  description: string;
-  previous: ColorScaleKind | undefined;
-  selected: boolean;
-  onChange: (value: string) => void;
-}): ReactElement {
-  const { id, label, kind, description, previous, selected, onChange } = props;
-  const entry = (
-    <MenuItem
-      roleStructure="listoption"
-      selected={selected}
-      htmlTitle={description}
-      text={
-        <span style={ITEM_STYLE}>
-          <span>{label}</span>
-          <ColorScaleBar scale={scaleOf(id)} />
-        </span>
-      }
-      onClick={() => {
-        onChange(id);
-      }}
-    />
-  );
-  if (previous === kind) return entry;
-  return (
-    <>
-      <MenuDivider title={COLOR_SCALE_KIND_LABELS[kind]} />
-      {entry}
-    </>
-  );
-}
-
-function scaleOf(id: string): ColorScale {
-  return resolveColorScale(id).scale;
-}
-
 const FIELD_STYLE = {
   display: 'flex',
   flex: '1 1 auto',
@@ -218,7 +179,7 @@ const FIELD_STYLE = {
 } as const satisfies CSSProperties;
 
 const CAPTION_STYLE = {
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: 12,
   fontWeight: 600,
 } as const satisfies CSSProperties;
@@ -228,14 +189,6 @@ const BUTTON_TEXT_STYLE = {
   alignItems: 'center',
   gap: 10,
   width: '100%',
-} as const satisfies CSSProperties;
-
-const ITEM_STYLE = {
-  display: 'grid',
-  gridTemplateColumns: '7rem 1fr',
-  alignItems: 'center',
-  gap: 10,
-  minWidth: 220,
 } as const satisfies CSSProperties;
 
 const MENU_STYLE = {

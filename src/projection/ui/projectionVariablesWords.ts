@@ -9,9 +9,9 @@
  */
 
 import type { OverlayLegendEntry } from '../../overlay/ui/OverlayLegend.tsx';
+import { fillCopy } from '../core/fillCopy.ts';
 import type { LoadingProfiles } from '../core/loadingProfiles.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import { fillCopy } from '../core/projectionCopy.ts';
 import type { VariableAxis } from '../core/variableAxis.ts';
 
 /**

@@ -17,7 +17,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'What the Tools button opens, shown on its own: every site of the family, each behind its own little logo and the two colours it owns.',
+          'What the Tools button opens, shown on its own: every site of the family gathered under its topic, each behind its own little logo and the two colours it owns. The panel lays the topics out in CSS columns, so the same markup gives three columns on a laptop and one on a phone — resize the browser to see it fold.',
       },
     },
   },

@@ -1,10 +1,14 @@
-import { Button, Callout, SegmentedControl } from '@blueprintjs/core';
+import { Button, Callout, Classes, SegmentedControl } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 
 import { CopyButton } from '../../clipboard/ui/CopyButton.tsx';
 import { downloadText } from '../../download/core/downloadText.ts';
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import { formatInteger } from '../../format/core/numbers.ts';
+import { pluralize } from '../../format/core/words.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { DelimiterId } from '../core/delimiters.ts';
 import { DELIMITER_CHOICES, delimiterChoice } from '../core/delimiters.ts';
 import { toDelimited } from '../core/toDelimited.ts';
@@ -50,6 +54,11 @@ export interface DelimitedTextPanelProps {
    * @default 320
    */
   height?: number;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -66,6 +75,7 @@ export function DelimitedTextPanel(
   props: DelimitedTextPanelProps,
 ): ReactElement {
   const {
+    className,
     rows,
     header,
     description,
@@ -84,7 +94,7 @@ export function DelimitedTextPanel(
   );
 
   return (
-    <div className="delimited-text">
+    <div className={joinClassNames('delimited-text', className)}>
       <Callout intent="primary" compact icon="info-sign">
         {description ?? defaultDescription(rows.length)}
       </Callout>
@@ -121,7 +131,7 @@ export function DelimitedTextPanel(
         value={text}
         spellCheck={false}
         aria-label={label}
-        className="bp6-input"
+        className={Classes.INPUT}
         style={{ ...TEXT_STYLE, height }}
         onFocus={(event) => event.currentTarget.select()}
       />
@@ -130,7 +140,7 @@ export function DelimitedTextPanel(
 }
 
 function defaultDescription(rowCount: number): string {
-  const rows = rowCount === 1 ? '1 row' : `${rowCount.toLocaleString()} rows`;
+  const rows = `${formatInteger(rowCount)} ${pluralize(rowCount, 'row')}`;
   return `${rows}, one per line. Copy them, then paste into a spreadsheet.`;
 }
 
@@ -143,7 +153,7 @@ const CONTROLS_STYLE = {
 } as const satisfies CSSProperties;
 
 const LABEL_STYLE = {
-  color: 'var(--text-muted, #5f6b7c)',
+  color: TOKEN.textMuted,
   fontSize: 12,
 } as const satisfies CSSProperties;
 

@@ -8,18 +8,24 @@
  * hook cannot be called from inside the frame's render callback.
  */
 
-import { chartAxisScale } from '../../chart/core/chartAxisScale.ts';
 import type { ChartScale } from '../../chart/core/chartScale.ts';
-import { chartScale } from '../../chart/core/chartScale.ts';
-import type { ChartAxisSpec } from '../../chart/ui/ChartFrame.tsx';
-import { chartOuterRoom, chartPlotArea } from '../../chart/ui/chartStyles.ts';
+import type { ChartViewport } from '../../chart/core/chartViewport.ts';
+import { chartZoomViewport } from '../../chart/core/chartViewport.ts';
+import type {
+  ChartAxisSpec,
+  ChartFrameRender,
+} from '../../chart/ui/ChartFrame.tsx';
+import { chartFrameGeometry } from '../../chart/ui/chartFrameGeometry.ts';
 import type { ScreenPoints } from '../core/screenPoints.ts';
 
+import type { ScatterGroup } from './scatterFigureProps.ts';
 import type { ScatterPixelMark } from './scatterMarkGlyph.tsx';
-import type { ScatterGroup, ScatterMarker } from './scatterPlotProps.ts';
+import type { ScatterMarker } from './scatterPlotProps.ts';
 
 /** Where a scatter's data lands, and the rectangle it lands in. */
 export interface ScatterPlotView {
+  /** The frame's own geometry, handed to `ChartFrame` so it is not worked out twice. */
+  geometry: ChartFrameRender;
   /** The rectangle gestures are taken on, ready to spread onto a `<rect>`. */
   rect: { x: number; y: number; width: number; height: number };
   /** Data to pixels, horizontally. */
@@ -41,11 +47,10 @@ export interface ScatterGroupInk {
 /**
  * The plot rectangle, the two mappings, and every point in pixels.
  *
- * It repeats what `ChartFrame` works out for itself, from the same inputs and
- * through the same two functions, because the interaction needs the positions
- * before the frame has drawn anything and a hook cannot be called from inside
- * the frame's render callback. Both answers come out of `chartPlotArea`, so
- * they cannot drift apart without the frame's own tests saying so.
+ * The interaction needs the positions before the frame has drawn anything, and
+ * a hook cannot be called from inside the frame's render callback, so the
+ * geometry is worked out here with `chartFrameGeometry` and handed to the
+ * frame: the dots, the hit tests and the axes all read that one answer.
  * @param x - Horizontal coordinate of every point, in data units.
  * @param y - Vertical coordinate, in the same order.
  * @param width - Total width of the figure, in pixels.
@@ -62,30 +67,8 @@ export function scatterPlotGeometry(
   xAxis: ChartAxisSpec,
   yAxis: ChartAxisSpec,
 ): ScatterPlotView {
-  const across = chartAxisScale(xAxis.domain[0], xAxis.domain[1], {
-    count: xAxis.tickCount,
-    nice: xAxis.nice,
-  });
-  const up = chartAxisScale(yAxis.domain[0], yAxis.domain[1], {
-    count: yAxis.tickCount,
-    nice: yAxis.nice,
-  });
-  const plot = chartPlotArea(
-    width,
-    height,
-    {},
-    {
-      bottom: chartOuterRoom('bottom', xAxis, across),
-      left: chartOuterRoom('left', yAxis, up),
-    },
-  );
-  const toX = chartScale(
-    across.domain[0],
-    across.domain[1],
-    plot.left,
-    plot.right,
-  );
-  const toY = chartScale(up.domain[0], up.domain[1], plot.bottom, plot.top);
+  const geometry = chartFrameGeometry(width, height, xAxis, yAxis);
+  const { plot, x: toX, y: toY } = geometry;
   const total = Math.min(x.length, y.length);
   const pixelX = new Float64Array(total);
   const pixelY = new Float64Array(total);
@@ -94,6 +77,7 @@ export function scatterPlotGeometry(
     pixelY[index] = toY.offset + (y[index] ?? Number.NaN) * toY.factor;
   }
   return {
+    geometry,
     rect: { x: plot.left, y: plot.top, width: plot.width, height: plot.height },
     toX,
     toY,
@@ -156,7 +140,7 @@ export function scatterPixelMarks(
  * A figure with no label at all is hidden from a reader entirely, which for a
  * plot carrying the whole result is worse than a sentence nobody wrote by
  * hand. The axes are named the way the plot names them, so a reader hearing
- * `PC 2 against PC 1` hears the same words a sighted reader sees.
+ * `PC2 against PC1` hears the same words a sighted reader sees.
  * @param xAxis - The horizontal axis.
  * @param yAxis - The vertical axis.
  * @param count - How many points are drawn.
@@ -170,6 +154,36 @@ export function scatterPlotLabel(
   const across = xAxis.label ?? 'the horizontal axis';
   const up = yAxis.label ?? 'the vertical axis';
   return `A scatter plot of ${count} points, ${up} against ${across}.`;
+}
+
+/**
+ * The frame a wheel turned over a scatter asks for.
+ *
+ * The pointer arrives as a share of the plot rectangle measured from its top
+ * left corner. The vertical axis grows upward while that share grows downward,
+ * so the vertical share is read from the top of the frame.
+ * @param full - What the axes cover unzoomed.
+ * @param shown - The frame showing, or `null` when all of it is.
+ * @param alongX - How far across the plot the pointer is, from 0 to 1.
+ * @param alongY - How far down it is, from 0 to 1.
+ * @param factor - How much wider the frame becomes; below one it narrows.
+ * @returns The new frame, or `null` once it covers everything again.
+ */
+export function scatterWheelViewport(
+  full: ChartViewport,
+  shown: ChartViewport | null,
+  alongX: number,
+  alongY: number,
+  factor: number,
+): ChartViewport | null {
+  const frame = shown ?? full;
+  return chartZoomViewport(
+    full,
+    shown,
+    along(frame.x, alongX),
+    along(frame.y, 1 - alongY),
+    factor,
+  );
 }
 
 /**
@@ -198,3 +212,13 @@ export const SCATTER_HOVER_SLACK = 8;
  * of the group is still there — a reader mutes a group to see past it.
  */
 const MUTED_OPACITY = 0.2;
+
+/**
+ * The value a share of the way along a range stands for.
+ * @param domain - The range.
+ * @param share - How far along, from 0 to 1.
+ * @returns The value.
+ */
+function along(domain: readonly [number, number], share: number): number {
+  return domain[0] + share * (domain[1] - domain[0]);
+}

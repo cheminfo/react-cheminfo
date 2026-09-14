@@ -14,7 +14,7 @@ import {
 } from '../../scatter/ui/scatterMatrixLayout.ts';
 
 /** How few and how many components the grid may be asked to lay out. */
-export interface ProjectionPairsCeiling {
+interface ProjectionPairsCeiling {
   /** The fewest, which is the smallest grid worth drawing. */
   min: number;
   /** The most, once the run and the width have both had their say. */

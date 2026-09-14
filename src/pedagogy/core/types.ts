@@ -28,6 +28,7 @@ export interface BaseExercise {
   id: string;
   /** How the exercise is listed. */
   title: string;
+  /** How hard it is, which is also how it is coloured in the list. */
   level: ExerciseLevel;
   /** What to do, in a few sentences; may carry `[[term]]` markers. */
   description: string;
@@ -49,6 +50,7 @@ export interface BaseExercise {
 export interface ExerciseSet<TExercise = BaseExercise> {
   /** Stable and URL-safe. */
   id: string;
+  /** How the set is named where it is picked. */
   title: string;
   /** One line on what the set drills. */
   description: string;
@@ -58,6 +60,7 @@ export interface ExerciseSet<TExercise = BaseExercise> {
    * @default undefined
    */
   level?: ExerciseLevel;
+  /** The questions, in the order the set hands them out. */
   exercises: TExercise[];
 }
 
@@ -70,6 +73,7 @@ export interface ExerciseSet<TExercise = BaseExercise> {
 export type TutorialStep<TPayload = unknown> = {
   /** Stable and URL-safe: it is what a link to the step carries. */
   id: string;
+  /** The heading of the step, and its name in the step strip. */
   title: string;
   /** One short paragraph; may carry `[[term]]` markers. */
   description: string;

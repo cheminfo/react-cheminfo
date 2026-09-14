@@ -38,12 +38,12 @@ export interface AxesStyle {
    * Colour of the three rods, as `#rrggbb`.
    * @default '#64748b'
    */
-  colour?: string;
+  color?: string;
   /**
    * Colour of the three labels, as `#rrggbb`.
    * @default '#334155'
    */
-  labelColour?: string;
+  labelColor?: string;
   /**
    * What the axes are called, in x, y, z order.
    * @default ['x', 'y', 'z']
@@ -71,8 +71,8 @@ export async function renderOrbitalAxes(
     throw new Error('renderOrbitalAxes: the molstar canvas is not ready.');
   }
   const {
-    colour = '#64748b',
-    labelColour = '#334155',
+    color = '#64748b',
+    labelColor = '#334155',
     labels = ['x', 'y', 'z'],
   } = style;
   clearOrbitalAxes(plugin);
@@ -81,11 +81,11 @@ export async function renderOrbitalAxes(
   const labelSize = reach * LABEL_SIZE;
   const labelAt = reach * ROD_LENGTH + labelSize;
   const drawn = await Promise.all([
-    createRods(plugin, buildAxisRods(reach), colour),
+    createRods(plugin, buildAxisRods(reach), color),
     createLabels(
       plugin,
       buildAxisLabels(labelAt, labels),
-      labelColour,
+      labelColor,
       labelSize,
     ),
   ]);
@@ -114,17 +114,17 @@ export function clearOrbitalAxes(plugin: PluginContext): void {
  * The rods, as a representation the canvas can hold.
  * @param plugin - The molstar context.
  * @param mesh - The rod mesh.
- * @param colour - Rod colour, as `#rrggbb`.
+ * @param color - Rod colour, as `#rrggbb`.
  * @returns The representation.
  */
 async function createRods(
   plugin: PluginContext,
   mesh: Mesh,
-  colour: string,
+  color: string,
 ): Promise<Representation.Any> {
-  const value = Color.fromHexStyle(colour);
+  const value = Color.fromHexStyle(color);
   const representation = shapeRepresentation(
-    (_ctx, data: Mesh) =>
+    (_context, data: Mesh) =>
       Shape.create(
         'orbital axes',
         {},
@@ -148,19 +148,19 @@ async function createRods(
  * The labels, as a representation the canvas can hold.
  * @param plugin - The molstar context.
  * @param text - The label geometry.
- * @param colour - Label colour, as `#rrggbb`.
+ * @param color - Label colour, as `#rrggbb`.
  * @param size - Label height, in scene units.
  * @returns The representation.
  */
 async function createLabels(
   plugin: PluginContext,
   text: Text,
-  colour: string,
+  color: string,
   size: number,
 ): Promise<Representation.Any> {
-  const value = Color.fromHexStyle(colour);
+  const value = Color.fromHexStyle(color);
   const representation = shapeRepresentation(
-    (_ctx, data: Text) =>
+    (_context, data: Text) =>
       Shape.create(
         'orbital axis labels',
         {},

@@ -5,6 +5,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ElementRange } from '../core/layout.ts';
 import {
   COLUMN_COUNT,
@@ -13,7 +14,7 @@ import {
 } from '../core/layout.ts';
 
 /** What {@link HeaderStrips} needs. */
-export interface HeaderStripsProps {
+interface HeaderStripsProps {
   /**
    * Called with the run whose header was clicked. Without it the strips are
    * labels rather than buttons.
@@ -86,7 +87,7 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
 }
 
 /** What {@link InnerTransitionMarkers} needs. */
-export interface InnerTransitionMarkersProps {
+interface InnerTransitionMarkersProps {
   /** 1 when the table draws its header strips, 0 otherwise. */
   offset: number;
 }
@@ -145,7 +146,7 @@ function HeaderCell(props: HeaderCellProps): ReactElement {
 
 const headerStyle = {
   alignItems: 'center',
-  color: 'var(--text-muted, rgb(95 107 124))',
+  color: TOKEN.textMuted,
   display: 'flex',
   fontSize: 'clamp(0.4rem, 1.9cqw, 0.62rem)',
   justifyContent: 'center',
@@ -161,9 +162,9 @@ const headerButtonStyle = {
 
 const markerStyle = {
   alignItems: 'center',
-  border: '1px dashed rgb(182 191 204)',
+  border: `1px dashed ${TOKEN.borderStrong}`,
   borderRadius: 3,
-  color: 'var(--text-muted, rgb(95 107 124))',
+  color: TOKEN.textMuted,
   display: 'flex',
   fontSize: 'clamp(0.36rem, 1.7cqw, 0.55rem)',
   justifyContent: 'center',

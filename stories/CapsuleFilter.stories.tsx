@@ -5,8 +5,8 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
 import type {
-  CapsuleFilterProps,
   CapsuleOption,
+  SingleCapsuleFilterProps,
 } from '../src/capsule/ui/CapsuleFilter.tsx';
 import { CapsuleFilter } from '../src/capsule/ui/CapsuleFilter.tsx';
 
@@ -91,6 +91,8 @@ const UNCOUNTED_OPTIONS: readonly CapsuleOption[] = [
   { value: 'failed', label: 'Failed', intent: 'danger' },
 ];
 
+const OUTCOME_OPTIONS = OPTIONS.filter((option) => option.value !== 'all');
+
 const COMPACT = new Intl.NumberFormat('en', { notation: 'compact' });
 
 const OUTCOME_INTENT: Record<CheckedStructure['outcome'], Intent> = {
@@ -99,7 +101,7 @@ const OUTCOME_INTENT: Record<CheckedStructure['outcome'], Intent> = {
   failed: 'danger',
 };
 
-function CapsuleFilterDemo(props: CapsuleFilterProps): ReactElement {
+function CapsuleFilterDemo(props: SingleCapsuleFilterProps): ReactElement {
   const [value, setValue] = useState(props.value);
   const rows =
     value === 'all' ? SAMPLE : SAMPLE.filter((row) => row.outcome === value);
@@ -114,18 +116,48 @@ function CapsuleFilterDemo(props: CapsuleFilterProps): ReactElement {
           props.onChange(next);
         }}
       />
-      <div style={TABLE_STYLE}>
-        {rows.map((row) => (
-          <div key={row.name} style={ROW_STYLE}>
-            <Tag minimal intent={OUTCOME_INTENT[row.outcome]}>
-              {row.outcome}
-            </Tag>
-            <span style={NAME_STYLE}>{row.name}</span>
-            <code style={FORMULA_STYLE}>{row.formula}</code>
-            <span style={NOTE_STYLE}>{row.note}</span>
-          </div>
-        ))}
-      </div>
+      <SampleRows rows={rows} />
+    </div>
+  );
+}
+
+function MultipleCapsuleFilterDemo(): ReactElement {
+  const [values, setValues] = useState<string[]>(['warning', 'failed']);
+  const rows =
+    values.length === 0
+      ? SAMPLE
+      : SAMPLE.filter((row) => values.includes(row.outcome));
+
+  return (
+    <div style={STACK_STYLE}>
+      <CapsuleFilter
+        multiple
+        options={OUTCOME_OPTIONS}
+        values={values}
+        allOption={{ label: 'All', count: 12_480 }}
+        label="Outcome"
+        onChange={setValues}
+      />
+      <SampleRows rows={rows} />
+    </div>
+  );
+}
+
+function SampleRows(props: {
+  rows: readonly CheckedStructure[];
+}): ReactElement {
+  return (
+    <div style={TABLE_STYLE}>
+      {props.rows.map((row) => (
+        <div key={row.name} style={ROW_STYLE}>
+          <Tag minimal intent={OUTCOME_INTENT[row.outcome]}>
+            {row.outcome}
+          </Tag>
+          <span style={NAME_STYLE}>{row.name}</span>
+          <code style={FORMULA_STYLE}>{row.formula}</code>
+          <span style={NOTE_STYLE}>{row.note}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -158,7 +190,7 @@ const meta = {
   // The demo owns the selection, so the capsules actually move; the `value`
   // control names the one the story opens on.
   render: (args) => <CapsuleFilterDemo key={args.value} {...args} />,
-} satisfies Meta<typeof CapsuleFilter>;
+} satisfies Meta<SingleCapsuleFilterProps>;
 
 export default meta;
 
@@ -179,6 +211,14 @@ export const WithoutCounts: Story = {
 /** A count written compactly, for a row that has to survive a narrow panel. */
 export const CompactCounts: Story = {
   args: { formatCount: (count) => COMPACT.format(count) },
+};
+
+/**
+ * Several outcomes kept at once, with the capsule that clears them: filled
+ * while nothing is picked, because an empty selection keeps every row.
+ */
+export const SeveralOutcomes: Story = {
+  render: () => <MultipleCapsuleFilterDemo />,
 };
 
 const STACK_STYLE = {

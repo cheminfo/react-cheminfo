@@ -14,7 +14,7 @@ export interface SelectionReport {
 }
 
 /** What {@link ProjectionMapCaption} needs. */
-export interface ProjectionMapCaptionProps {
+interface ProjectionMapCaptionProps {
   /** What the last gesture picked out, or `null` before there was one. */
   report: SelectionReport | null;
   /** The words the map writes, already merged over the defaults. */

@@ -26,7 +26,13 @@ export interface DelimitedTextDialogProps extends DelimitedTextPanelProps {
 export function DelimitedTextDialog(
   props: DelimitedTextDialogProps,
 ): ReactElement {
-  const { isOpen, onClose, title = 'Copy the table', ...panel } = props;
+  const {
+    isOpen,
+    onClose,
+    title = 'Copy the table',
+    className,
+    ...panel
+  } = props;
 
   return (
     <Dialog
@@ -34,6 +40,7 @@ export function DelimitedTextDialog(
       onClose={onClose}
       title={title}
       icon="th"
+      className={className}
       style={DIALOG_STYLE}
     >
       <DialogBody>

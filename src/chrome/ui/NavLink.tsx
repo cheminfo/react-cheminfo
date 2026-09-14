@@ -30,10 +30,18 @@ export interface NavLinkProps {
  */
 export function NavLink(props: NavLinkProps): ReactElement {
   const { item, active = false, className } = props;
-  const { href, external = false, onSelect, title, disabled = false } = item;
+  const {
+    href,
+    external = false,
+    onSelect,
+    title,
+    disabled = false,
+    icon,
+  } = item;
 
   const classes = [
     'nav-link',
+    icon === undefined ? null : 'nav-link--icon',
     active ? 'nav-link--active' : null,
     disabled ? 'nav-link--disabled' : null,
     className ?? null,
@@ -80,10 +88,18 @@ export function NavLink(props: NavLinkProps): ReactElement {
 function NavLinkBody(props: { item: NavItem }): ReactNode {
   const { icon, label, after } = props.item;
 
+  // Only an entry with a glyph can give up its label in a narrow bar, so only
+  // then is the label wrapped where the stylesheet can reach it.
   return (
     <>
-      {icon === undefined ? null : <Icon icon={icon} size={14} />}
-      {label}
+      {icon === undefined ? (
+        label
+      ) : (
+        <>
+          <Icon icon={icon} size={14} />
+          <span className="nav-link__label">{label}</span>
+        </>
+      )}
       {after}
     </>
   );

@@ -2,7 +2,7 @@
 import { expect, test } from 'vitest';
 
 import { ECOSYSTEM_SITES } from '../sites.ts';
-import { siteThemeColor, siteTokensCss } from '../tokens.ts';
+import { siteTokensCss } from '../tokens.ts';
 
 test('a site whose answering colour is too light for text carries both forms', () => {
   expect(siteTokensCss('inchi')).toBe(
@@ -49,14 +49,5 @@ test('every site declares its palette and binds the accent to the lead', () => {
     expect(css.startsWith(':root {\n')).toBe(true);
     expect(css.endsWith('}\n')).toBe(true);
     expect(css).not.toContain('undefined');
-  }
-});
-
-test('the browser chrome takes the leading colour', () => {
-  expect(siteThemeColor('vcl')).toBe('#2d72d2');
-  expect(siteThemeColor('regexp')).toBe('#1e3a8a');
-
-  for (const site of ECOSYSTEM_SITES) {
-    expect(siteThemeColor(site.id)).toBe(site.brand);
   }
 });

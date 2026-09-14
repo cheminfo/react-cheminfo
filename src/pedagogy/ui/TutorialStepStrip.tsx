@@ -1,9 +1,12 @@
 import { Button, Tag, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { clamp } from '../../format/core/clamp.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ExerciseLevel } from '../core/types.ts';
 
 import { LEVEL_ORDER } from './exerciseMeta.ts';
+import { HOVER_OPEN_DELAY } from './pedagogyStyle.ts';
 import type { TutorialLevelColours } from './tutorialLevels.ts';
 import { TUTORIAL_LEVEL_COLOURS } from './tutorialLevels.ts';
 
@@ -17,10 +20,13 @@ export interface TutorialStripStep {
    * @default undefined — the position in the tour keys it instead
    */
   id?: string;
+  /** What the step is called. */
   title: string;
+  /** Which coloured strip the step sits in. */
   level: ExerciseLevel;
 }
 
+/** What {@link TutorialStepStrip} needs. */
 export interface TutorialStepStripProps {
   /** The whole tour, in teaching order. */
   steps: readonly TutorialStripStep[];
@@ -180,8 +186,7 @@ function positionsOfLevel(
 }
 
 function clampIndex(index: number, total: number): number {
-  if (!Number.isFinite(index) || index <= 0) return 0;
-  return Math.min(Math.floor(index), Math.max(total - 1, 0));
+  return Math.floor(clamp(index, 0, Math.max(total - 1, 0)));
 }
 
 /**
@@ -204,11 +209,13 @@ function numberStyle(
     alignItems: 'center',
     justifyContent: 'center',
     padding: 0,
-    border: active ? '2px solid #1c2127' : '1px solid rgb(17 20 24 / 20%)',
+    border: active
+      ? `2px solid ${TOKEN.text}`
+      : '1px solid rgb(17 20 24 / 20%)',
     borderRadius: 4,
-    background: active ? colours.activeBackground : '#ffffff',
+    background: active ? colours.activeBackground : TOKEN.surface,
     boxSizing: 'border-box',
-    color: '#1c2127',
+    color: TOKEN.text,
     cursor: 'pointer',
     font: 'inherit',
     fontSize: 12,
@@ -220,9 +227,6 @@ function numberStyle(
 
 /** Wide enough for two digits, which every tour of ours stays under a hundred of. */
 const STEP_SIZE = 28;
-
-/** Long enough that the pointer can cross the strip without opening a title. */
-const HOVER_OPEN_DELAY = 150;
 
 const ROOT_STYLE: CSSProperties = {
   display: 'flex',
@@ -243,7 +247,7 @@ const LABEL_STYLE: CSSProperties = {
   flex: '0 0 220px',
   fontSize: 12,
   fontWeight: 600,
-  color: '#1c2127',
+  color: TOKEN.text,
 };
 
 const PAGER_STYLE: CSSProperties = {
@@ -254,6 +258,6 @@ const PAGER_STYLE: CSSProperties = {
 };
 
 const HINT_STYLE: CSSProperties = {
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: 11,
 };

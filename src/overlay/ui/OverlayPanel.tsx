@@ -1,9 +1,12 @@
 import type { ReactElement, ReactNode } from 'react';
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo } from 'react';
 
 import type { HelpContent } from '../../help/ui/HelpBody.tsx';
 import { HelpIcon } from '../../help/ui/HelpIcon.tsx';
 
+import type { OverlayAction } from './OverlayAction.tsx';
+import type { OverlayGroup } from './OverlayGroup.tsx';
+import type { OverlayRow } from './OverlayRow.tsx';
 import type { OverlayPanelShape } from './overlayPanelContext.ts';
 import { OverlayPanelContext } from './overlayPanelContext.ts';
 import {
@@ -17,6 +20,7 @@ import {
 } from './overlayPanelStyles.ts';
 import { overlayNameColumnWidth } from './overlayRowStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
+import { useOverlayInteraction } from './useOverlayInteraction.ts';
 
 /** What {@link OverlayPanel} holds. */
 export interface OverlayPanelProps {
@@ -101,7 +105,7 @@ export function OverlayPanel(props: OverlayPanelProps): ReactElement {
   const { actions, hint = DEFAULT_HINT, nameWidth, testId } = props;
   const { metrics } = useOverlaySurface();
   const titleId = useId();
-  const [resetHovered, setResetHovered] = useState(false);
+  const reset = useOverlayInteraction();
 
   const width = nameWidth ?? overlayNameColumnWidth(metrics);
   const shape = useMemo<OverlayPanelShape>(
@@ -126,12 +130,9 @@ export function OverlayPanel(props: OverlayPanelProps): ReactElement {
         {onReset === undefined ? null : (
           <button
             type="button"
-            style={overlayPanelResetStyle(metrics, resetHovered)}
+            style={overlayPanelResetStyle(metrics, reset)}
             onClick={onReset}
-            onPointerEnter={() => setResetHovered(true)}
-            onPointerLeave={() => setResetHovered(false)}
-            onFocus={() => setResetHovered(true)}
-            onBlur={() => setResetHovered(false)}
+            {...reset.handlers}
           >
             {resetLabel}
           </button>

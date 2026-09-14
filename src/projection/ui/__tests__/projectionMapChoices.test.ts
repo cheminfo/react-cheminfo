@@ -6,7 +6,10 @@
 
 import { expect, test } from 'vitest';
 
-import { DEFAULT_PROJECTION_OPTIONS } from '../../core/index.ts';
+import {
+  DEFAULT_PROJECTION_OPTIONS,
+  PROJECTION_COPY,
+} from '../../core/index.ts';
 import {
   projectionColourChoices,
   projectionOutlineChoices,
@@ -20,7 +23,10 @@ test('the colour stands for the groups or for nothing, in that order', () => {
 });
 
 test('the outline sizes are bare shares, with the sentence on the pointer', () => {
-  const choices = projectionOutlineChoices(DEFAULT_PROJECTION_OPTIONS, 'None');
+  const choices = projectionOutlineChoices(
+    DEFAULT_PROJECTION_OPTIONS,
+    PROJECTION_COPY,
+  );
 
   expect(choices).toStrictEqual([
     { value: 'none', label: 'None', title: 'No outlines' },
@@ -36,7 +42,7 @@ test('a size asked for in spreads keeps its place, written as what it covers', (
     ...DEFAULT_PROJECTION_OPTIONS,
     ellipse: { kind: 'standardDeviations', standardDeviations: 2 },
   } as const;
-  const choices = projectionOutlineChoices(options, 'None');
+  const choices = projectionOutlineChoices(options, PROJECTION_COPY);
 
   // Two standard deviations is widely assumed to mean 95%; on a map it covers
   // 86%, so the bar writes 86% and the pointer says where that came from.

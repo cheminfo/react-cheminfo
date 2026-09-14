@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import type { SiteId } from '../core/sites.ts';
 import { siteTokensCss } from '../core/tokens.ts';
 
+/** What the site palette needs. */
 export interface SiteThemeProps {
   /** The site whose palette the page takes. */
   siteId: SiteId;

@@ -44,3 +44,22 @@ test('the size is the font size, and the family class is always carried', () => 
   expect(sized).toContain('class="wordmark brand__name"');
   expect(sized).toContain('font-size:26px');
 });
+
+test('the half a logo leaves uncoloured is written in the family ink', () => {
+  const html = renderToStaticMarkup(<Wordmark siteId="derepflow" />);
+
+  expect(html).toContain(
+    '<span class="wordmark__lead" style="color:var(--text, #16202c)">',
+  );
+  expect(html).toContain('>Derep</span>');
+  expect(html).toContain('<span class="wordmark__alt" style="color:#127ba3">');
+  expect(html).toContain('>Flow</span>');
+});
+
+test('a name with no ink half keeps the two colours the site owns', () => {
+  const html = renderToStaticMarkup(<Wordmark siteId="chemcalc" />);
+
+  expect(html).toContain('<span class="wordmark__lead" style="color:#5b52e0">');
+  expect(html).toContain('<span class="wordmark__alt" style="color:#d63384">');
+  expect(html).not.toContain('var(--text,');
+});

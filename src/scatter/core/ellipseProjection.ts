@@ -10,7 +10,7 @@
 import type { ChartScale } from '../../chart/core/chartScale.ts';
 
 import type { ConfidenceEllipse, EllipsePoint } from './confidenceEllipse.ts';
-import { ellipseAxes } from './confidenceEllipse.ts';
+import { ellipseAxes } from './ellipseAxes.ts';
 
 const HALF_TURN_DEGREES = 180;
 const DEFAULT_STEPS = 64;

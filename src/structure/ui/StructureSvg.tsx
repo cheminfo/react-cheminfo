@@ -3,26 +3,24 @@
  * picked.
  *
  * `Structure` holds it behind `React.lazy`, and the barrel deliberately does
- * not export it: this is the file that value-imports react-ocl, so
- * anything able to reach it statically drags openchemlib into every bundle,
- * including the ones that only ever wanted the Tools menu.
+ * not export it: this is the file that value-imports react-ocl and
+ * openchemlib, so anything able to reach it statically drags openchemlib into
+ * every bundle, including the ones that only ever wanted the Tools menu.
  */
 
-import type { ComponentType, ReactElement, ReactNode } from 'react';
+import { Molecule } from 'openchemlib';
+import type { ReactElement, ReactNode } from 'react';
 import { useMemo } from 'react';
-import type { ErrorComponentProps } from 'react-ocl';
-import {
-  IdcodeSvgRenderer,
-  MolfileSvgRenderer,
-  SmilesSvgRenderer,
-} from 'react-ocl';
+import { SvgRenderer } from 'react-ocl';
 
+import type { AtomLabelPlacement } from '../core/atomLabels.ts';
+import { applyAtomLabels } from '../core/atomLabels.ts';
 import type { StructureSource } from '../core/structureSource.ts';
 
 import { StructurePlaceholder } from './StructurePlaceholder.tsx';
 
 /** Props of {@link StructureSvg}. */
-export interface StructureSvgProps {
+interface StructureSvgProps {
   /** The notation to draw, as `structureSource` picked it. */
   source: StructureSource;
   /** Width of the picture, in pixels. */
@@ -53,58 +51,136 @@ export interface StructureSvgProps {
   showBondNumber: boolean;
   /** Write the reaction mapping number of every mapped atom. */
   showMapping: boolean;
+  /** Write the CIP descriptor, R or S, next to every stereocentre. */
+  showCIPParity: boolean;
   /**
    * A caption drawn inside the picture, under the structure.
    * @default undefined
    */
   label?: string;
-  /** What is shown in place of a structure react-ocl refuses to read. */
+  /**
+   * Text written on atoms, keyed by atom index from 0.
+   * @default undefined
+   */
+  atomLabels?: ReadonlyMap<number, string>;
+  /** Where the atom labels are written. */
+  atomLabelPlacement: AtomLabelPlacement;
+  /**
+   * Called with the index of the atom that was clicked.
+   * @default undefined
+   */
+  onAtomClick?: (atom: number) => void;
+  /**
+   * Called with the index of the bond that was clicked.
+   * @default undefined
+   */
+  onBondClick?: (bond: number) => void;
+  /** What is shown in place of a structure openchemlib refuses to read. */
   fallback: ReactNode;
 }
 
 /**
- * Draw the picture with the renderer the notation calls for.
+ * Read the notation and draw the picture.
  * @param props - See {@link StructureSvgProps}.
  * @returns The svg, or the placeholder when the notation cannot be read.
  */
 export function StructureSvg(props: StructureSvgProps): ReactElement {
-  const { source, fallback, ...rest } = props;
+  const {
+    source,
+    fallback,
+    atomLabels,
+    atomLabelPlacement,
+    onAtomClick,
+    onBondClick,
+    showCIPParity,
+    ...rest
+  } = props;
+  const { kind, value, coordinates } = source;
+  // A map a caller builds during render is a new object every time; its
+  // content is what decides whether the molecule has to be read again.
+  const labelsKey =
+    atomLabels === undefined ? '' : JSON.stringify([...atomLabels]);
 
-  const ErrorComponent = useMemo(
-    () => createFallbackRenderer(fallback),
-    [fallback],
+  const drawing = useMemo(
+    () => readDrawing(kind, value, coordinates, labelsKey, atomLabelPlacement),
+    [kind, value, coordinates, labelsKey, atomLabelPlacement],
   );
-  const shared = { ...rest, ErrorComponent };
 
-  if (source.kind === 'idcode') {
+  if (drawing === null) {
     return (
-      <IdcodeSvgRenderer
-        idcode={source.value}
-        coordinates={source.coordinates}
-        {...shared}
-      />
-    );
-  }
-  if (source.kind === 'molfile') {
-    return <MolfileSvgRenderer molfile={source.value} {...shared} />;
-  }
-  return <SmilesSvgRenderer smiles={source.value} {...shared} />;
-}
-
-/**
- * Build the renderer react-ocl falls back to, so a structure it refuses looks
- * like one that was never supplied rather than like an error.
- * @param fallback - What the caller wants shown instead of the structure.
- * @returns The component react-ocl renders in place of the picture.
- */
-function createFallbackRenderer(
-  fallback: ReactNode,
-): ComponentType<ErrorComponentProps> {
-  return function StructureFallback(props: ErrorComponentProps): ReactElement {
-    return (
-      <StructurePlaceholder width={props.width} height={props.height}>
+      <StructurePlaceholder width={rest.width} height={rest.height}>
         {fallback}
       </StructurePlaceholder>
     );
-  };
+  }
+
+  return (
+    <SvgRenderer
+      {...rest}
+      molecule={drawing.molecule}
+      noCarbonLabelWithCustomLabel={drawing.labelled}
+      suppressCIPParity={!showCIPParity}
+      onAtomClick={
+        onAtomClick === undefined
+          ? undefined
+          : (atom) => {
+              onAtomClick(atom);
+            }
+      }
+      onBondClick={
+        onBondClick === undefined
+          ? undefined
+          : (bond) => {
+              onBondClick(bond);
+            }
+      }
+    />
+  );
+}
+
+/** A molecule ready to draw, and whether any label was written on it. */
+interface Drawing {
+  molecule: Molecule;
+  labelled: boolean;
+}
+
+/**
+ * Parse the notation and write the labels on the result.
+ * @param kind - Which notation `value` is written in.
+ * @param value - The notation.
+ * @param coordinates - The idCode's encoded coordinates, when it has them.
+ * @param labelsKey - The atom labels, as `JSON.stringify` wrote their entries;
+ * empty for none.
+ * @param placement - Where the labels go.
+ * @returns The molecule, or `null` when it cannot be read or holds no atom.
+ */
+function readDrawing(
+  kind: StructureSource['kind'],
+  value: string,
+  coordinates: string | undefined,
+  labelsKey: string,
+  placement: AtomLabelPlacement,
+): Drawing | null {
+  let molecule: Molecule;
+  try {
+    molecule = parseMolecule(kind, value, coordinates);
+  } catch {
+    return null;
+  }
+  if (molecule.getAllAtoms() === 0) return null;
+  if (labelsKey === '') return { molecule, labelled: false };
+
+  const labels = new Map(JSON.parse(labelsKey) as Array<[number, string]>);
+  const written = applyAtomLabels(molecule, labels, placement);
+  return { molecule, labelled: written > 0 };
+}
+
+function parseMolecule(
+  kind: StructureSource['kind'],
+  value: string,
+  coordinates: string | undefined,
+): Molecule {
+  if (kind === 'idcode') return Molecule.fromIDCode(value, coordinates);
+  if (kind === 'molfile') return Molecule.fromMolfile(value);
+  return Molecule.fromSmiles(value);
 }

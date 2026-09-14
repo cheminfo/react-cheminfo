@@ -1,3 +1,5 @@
+import { clamp } from '../../format/core/clamp.ts';
+
 import type { RgbColor } from './hex.ts';
 
 const TURN = 360;
@@ -48,8 +50,8 @@ export function rgbToHsv(color: RgbColor): HsvColor {
  */
 export function hsvToRgb(color: HsvColor): RgbColor {
   const hue = wrapHue(color.hue) / SECTOR;
-  const saturation = unit(color.saturation);
-  const value = unit(color.value);
+  const saturation = clamp(color.saturation, 0, 1);
+  const value = clamp(color.value, 0, 1);
   const sector = Math.floor(hue) % 6;
   const offset = hue - Math.floor(hue);
   const low = value * (1 - saturation);
@@ -102,11 +104,5 @@ function scale(red: number, green: number, blue: number): RgbColor {
 }
 
 function channel(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(1, Math.max(0, value / MAXIMUM_CHANNEL));
-}
-
-function unit(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(1, Math.max(0, value));
+  return clamp(value / MAXIMUM_CHANNEL, 0, 1);
 }

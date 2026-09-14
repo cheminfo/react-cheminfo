@@ -1,17 +1,25 @@
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
 import type { ScatterSurfaceProps } from '../../scatter/ui/lassoGesture.ts';
 import {
-  capturePointer,
-  dropFrame,
   modifierMode,
-  scheduleFrame,
   surfacePosition,
 } from '../../scatter/ui/lassoGesture.ts';
+import { useCapturedPointer } from '../../scatter/ui/useCapturedPointer.ts';
 import type { OrbitCamera } from '../core/orbitCamera.ts';
 import { orbitByDrag } from '../core/orbitCamera.ts';
+
+import type { OrbitDragTrack } from './orbitDragTrack.ts';
+import {
+  createOrbitDragTrack,
+  followOrbitDrag,
+  hoverOrbitDrag,
+  isOrbitTap,
+  pressOrbitDrag,
+  takePendingTurn,
+} from './orbitDragTrack.ts';
 
 /** What {@link useOrbitDrag} needs. */
 export interface OrbitDragOptions {
@@ -58,15 +66,15 @@ export interface OrbitDrag {
 /**
  * Turning the box with the pointer.
  *
- * It is the lasso's twin and is built the same way — the pointer is captured
- * on the way down so a drag that wanders off the figure keeps turning it, all
- * three ways a capture can end lead to one function, and moves are coalesced
- * to one a frame because a pointer emits many per frame and each one that
- * reaches the caller repaints every dot and every face.
+ * It is the lasso's twin and stands on the same `useCapturedPointer`, so a
+ * drag that wanders off the figure keeps turning it and every way a capture
+ * can end leads to one place. A finger is always claimed: a box whose one
+ * gesture is turning cannot be turned on a phone that scrolls instead.
  *
  * A press that goes nowhere is a tap rather than a turn of no degrees, because
  * nobody presses a mouse button without moving it a pixel or two and a reader
  * who meant to pick a sample must not have to hold their hand still to do it.
+ * The arithmetic of that decision is in `orbitDragTrack`.
  * @param options - See {@link OrbitDragOptions}.
  * @returns The drag. See {@link OrbitDrag}.
  */
@@ -80,141 +88,71 @@ export function useOrbitDrag(options: OrbitDragOptions): OrbitDrag {
     mode: restingMode = 'replace',
   } = options;
 
-  const pointerRef = useRef<number | null>(null);
-  const lastRef = useRef({ x: 0, y: 0 });
-  const travelRef = useRef(0);
-  const frameRef = useRef<number | null>(null);
-  const pendingRef = useRef<PendingTurn | null>(null);
+  const trackRef = useRef<OrbitDragTrack>(createOrbitDragTrack());
   const [turning, setTurning] = useState(false);
 
-  const flush = useCallback(() => {
-    frameRef.current = null;
-    const next = pendingRef.current;
-    pendingRef.current = null;
-    if (next === null) return;
-    if (pointerRef.current === null) {
-      onMove?.(next.x, next.y);
-      return;
-    }
-    onOrbit((camera) => orbitByDrag(camera, next.dx, next.dy));
-  }, [onMove, onOrbit]);
+  const press = useCallback((event: ReactPointerEvent<Element>) => {
+    pressOrbitDrag(trackRef.current, event.clientX, event.clientY);
+    setTurning(true);
+    return true;
+  }, []);
 
-  const end = useCallback(
-    (event: ReactPointerEvent<Element>, commit: boolean) => {
-      if (event.pointerId !== pointerRef.current) return;
-      pointerRef.current = null;
-      pendingRef.current = null;
-      dropFrame(frameRef);
+  const follow = useCallback(
+    (event: ReactPointerEvent<Element>, claimed: boolean) => {
+      if (!claimed) {
+        const at = surfacePosition(event, 0, 0);
+        hoverOrbitDrag(trackRef.current, at.x, at.y);
+        return true;
+      }
+      return followOrbitDrag(
+        trackRef.current,
+        event.clientX,
+        event.clientY,
+        enabled,
+      );
+    },
+    [enabled],
+  );
+
+  const flush = useCallback(
+    (claimed: boolean) => {
+      const next = takePendingTurn(trackRef.current);
+      if (next === null) return;
+      if (!claimed) {
+        onMove?.(next.x, next.y);
+        return;
+      }
+      onOrbit((camera) => orbitByDrag(camera, next.dx, next.dy));
+    },
+    [onMove, onOrbit],
+  );
+
+  const finish = useCallback(
+    (event: ReactPointerEvent<Element> | null, commit: boolean) => {
+      const track = trackRef.current;
+      takePendingTurn(track);
       setTurning(false);
-      if (!commit || travelRef.current > TAP_SLACK) return;
+      if (event === null || !commit || !isOrbitTap(track)) return;
       const at = surfacePosition(event, 0, 0);
       onTap?.(at.x, at.y, modifierMode(event, restingMode));
     },
     [onTap, restingMode],
   );
 
-  const handleDown = useCallback((event: ReactPointerEvent<Element>) => {
-    if (pointerRef.current !== null || event.button > 0) return;
-    pointerRef.current = event.pointerId;
-    lastRef.current = { x: event.clientX, y: event.clientY };
-    travelRef.current = 0;
-    setTurning(true);
-    capturePointer(event);
-  }, []);
-
-  const handleMove = useCallback(
-    (event: ReactPointerEvent<Element>) => {
-      const active = pointerRef.current;
-      if (active === null) {
-        const at = surfacePosition(event, 0, 0);
-        pendingRef.current = { x: at.x, y: at.y, dx: 0, dy: 0 };
-        scheduleFrame(frameRef, flush);
-        return;
-      }
-      if (event.pointerId !== active) return;
-      const last = lastRef.current;
-      const dx = event.clientX - last.x;
-      const dy = event.clientY - last.y;
-      lastRef.current = { x: event.clientX, y: event.clientY };
-      travelRef.current += Math.abs(dx) + Math.abs(dy);
-      if (!enabled) return;
-      const waiting = pendingRef.current;
-      pendingRef.current = {
-        x: 0,
-        y: 0,
-        dx: (waiting?.dx ?? 0) + dx,
-        dy: (waiting?.dy ?? 0) + dy,
-      };
-      scheduleFrame(frameRef, flush);
-    },
-    [enabled, flush],
-  );
-
-  const handleUp = useCallback(
-    (event: ReactPointerEvent<Element>) => {
-      end(event, true);
-    },
-    [end],
-  );
-
-  const handleAbandon = useCallback(
-    (event: ReactPointerEvent<Element>) => {
-      end(event, false);
-    },
-    [end],
-  );
-
-  const handleLeave = useCallback(() => {
-    if (pointerRef.current !== null) return;
-    pendingRef.current = null;
+  const forget = useCallback(() => {
+    takePendingTurn(trackRef.current);
     onLeave?.();
   }, [onLeave]);
 
-  const surface = useMemo<ScatterSurfaceProps>(
-    () => ({
-      onPointerDown: handleDown,
-      onPointerMove: handleMove,
-      onPointerUp: handleUp,
-      onPointerCancel: handleAbandon,
-      onLostPointerCapture: handleAbandon,
-      onPointerLeave: handleLeave,
-      style: {
-        cursor: enabled ? (turning ? 'grabbing' : 'grab') : 'default',
-        touchAction: 'none',
-      },
-    }),
-    [
-      enabled,
-      handleAbandon,
-      handleDown,
-      handleLeave,
-      handleMove,
-      handleUp,
-      turning,
-    ],
-  );
+  const { surface } = useCapturedPointer({
+    touch: true,
+    cursor: enabled ? (turning ? 'grabbing' : 'grab') : 'default',
+    onPress: press,
+    onMove: follow,
+    onFrame: flush,
+    onRelease: finish,
+    onLeave: forget,
+  });
 
   return { turning, surface };
-}
-
-/**
- * How far a press may travel and still be a tap, in pixels of total travel.
- *
- * Generous on purpose: a mouse moves a pixel or two under the click of its own
- * button, and a finger moves rather more, so a stricter number turns "pick
- * this sample" into "turn the box by nothing at all" for anybody whose hand is
- * not steady.
- */
-const TAP_SLACK = 5;
-
-/** What the pointer has done since the last frame, waiting for the next. */
-interface PendingTurn {
-  /** Where it is, for a move that is not turning anything. */
-  x: number;
-  /** Where it is. */
-  y: number;
-  /** How far it has moved across since the last frame. */
-  dx: number;
-  /** How far it has moved down. */
-  dy: number;
 }

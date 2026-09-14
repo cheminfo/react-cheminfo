@@ -219,8 +219,8 @@ function deadEnds(html: string): string[] {
   for (const button of html.split('<button').slice(1)) {
     const tag = button.slice(0, button.indexOf('>'));
     if (!tag.includes('disabled')) continue;
-    const name = /aria-label="([^"]*)"/.exec(tag);
-    if (name?.[1] !== undefined) dead.push(name[1]);
+    const name = /aria-label="(?<name>[^"]*)"/.exec(tag)?.groups?.name;
+    if (name !== undefined) dead.push(name);
   }
   return dead;
 }

@@ -1,4 +1,4 @@
-import type { IconName } from '@blueprintjs/core';
+import type { IconName, Intent } from '@blueprintjs/core';
 import { Button } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
@@ -7,6 +7,7 @@ import {
   useCopyToClipboard,
 } from './useCopyToClipboard.ts';
 
+/** What {@link CopyButton} copies, and how it reads. */
 export interface CopyButtonProps {
   /**
    * What to copy. A function is called when the button is pressed, which is
@@ -26,6 +27,11 @@ export interface CopyButtonProps {
    * @default 'Copied'
    */
   copiedLabel?: string;
+  /**
+   * Text shown while a refused copy is being reported, when there is a label.
+   * @default 'Copy failed'
+   */
+  failedLabel?: string;
   /**
    * Whether the button drops its background, for a toolbar or a code block.
    * @default false
@@ -64,7 +70,8 @@ export interface CopyButtonProps {
 }
 
 /**
- * A button that puts a piece of text on the clipboard and says so.
+ * A button that puts a piece of text on the clipboard and says so — with a
+ * tick when it worked, and a cross when the browser refused it.
  * @param props - What to copy, what the button reads, and how it looks.
  * @returns The copy button.
  */
@@ -73,6 +80,7 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
     content,
     label,
     copiedLabel = 'Copied',
+    failedLabel = 'Copy failed',
     minimal = false,
     small = false,
     icon = 'duplicate',
@@ -81,16 +89,24 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
     title = 'Copy to clipboard',
     className,
   } = props;
-  const { copied, copy } = useCopyToClipboard(resetAfter);
+  const { copied, failed, copy } = useCopyToClipboard(resetAfter);
+  const look = buttonLook({
+    copied,
+    failed,
+    icon,
+    label,
+    copiedLabel,
+    failedLabel,
+  });
 
   return (
     <Button
       className={className}
       variant={minimal ? 'minimal' : 'solid'}
       size={small ? 'small' : 'medium'}
-      icon={copied ? 'tick' : icon}
-      intent={copied ? 'success' : 'none'}
-      text={buttonText(label, copiedLabel, copied)}
+      icon={look.icon}
+      intent={look.intent}
+      text={look.text}
       disabled={disabled}
       title={title}
       aria-label={label ?? title}
@@ -101,11 +117,35 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
   );
 }
 
-function buttonText(
-  label: string | undefined,
-  copiedLabel: string,
-  copied: boolean,
-): string | undefined {
-  if (label === undefined) return undefined;
-  return copied ? copiedLabel : label;
+interface ButtonLookInput {
+  copied: boolean;
+  failed: boolean;
+  icon: IconName;
+  label: string | undefined;
+  copiedLabel: string;
+  failedLabel: string;
+}
+
+function buttonLook(input: ButtonLookInput): {
+  icon: IconName;
+  intent: Intent;
+  text: string | undefined;
+} {
+  const { copied, failed, icon, label, copiedLabel, failedLabel } = input;
+  const hasLabel = label !== undefined;
+  if (copied) {
+    return {
+      icon: 'tick',
+      intent: 'success',
+      text: hasLabel ? copiedLabel : undefined,
+    };
+  }
+  if (failed) {
+    return {
+      icon: 'cross',
+      intent: 'danger',
+      text: hasLabel ? failedLabel : undefined,
+    };
+  }
+  return { icon, intent: 'none', text: label };
 }

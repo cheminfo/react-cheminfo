@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, RefObject } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 
 import type { OverlayTier } from '../../overlay/core/overlayTiers.ts';
@@ -12,7 +12,7 @@ import {
 } from './projectionBarStyles.ts';
 
 /** What {@link ProjectionTabStrip} needs. */
-export interface ProjectionTabStripProps {
+interface ProjectionTabStripProps {
   /** The tabs the result can fill, in reading order. */
   tabs: readonly ProjectionTab[];
   /** The one showing. */
@@ -97,11 +97,6 @@ export function ProjectionTabStrip(
     [tabs, written],
   );
 
-  useEffect(() => {
-    if (!scrolls) return;
-    showSelected(track.current);
-  }, [scrolls, tab, options, maxWidth]);
-
   return (
     <div ref={track} style={projectionTabTrackStyle(scrolls, maxWidth)}>
       <OverlayPills<ProjectionTab>
@@ -113,8 +108,46 @@ export function ProjectionTabStrip(
         panelId={panelId}
         onChange={onTabChange}
       />
+      {scrolls ? (
+        <SelectedViewInSight
+          track={track}
+          tab={tab}
+          options={options}
+          maxWidth={maxWidth}
+        />
+      ) : null}
     </div>
   );
+}
+
+/** What {@link SelectedViewInSight} watches. */
+interface SelectedViewInSightProps {
+  /** The scrolling strip. */
+  track: RefObject<HTMLDivElement | null>;
+  /** The view in force. */
+  tab: ProjectionTab;
+  /** The pills, whose names decide where the view in force sits. */
+  options: ReadonlyArray<OverlayPillOption<ProjectionTab>>;
+  /** The most room the strip may take, which decides how much of it shows. */
+  maxWidth: number;
+}
+
+/**
+ * Keeps the view in force in sight while the strip scrolls.
+ *
+ * Mounted only while the strip scrolls: a strip that holds every name has
+ * nothing to bring into sight.
+ * @param props - See {@link SelectedViewInSightProps}.
+ * @returns Nothing; it only moves the strip.
+ */
+function SelectedViewInSight(props: SelectedViewInSightProps): null {
+  const { track, tab, options, maxWidth } = props;
+
+  useEffect(() => {
+    showSelected(track.current);
+  }, [track, tab, options, maxWidth]);
+
+  return null;
 }
 
 /**

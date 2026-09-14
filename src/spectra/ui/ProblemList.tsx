@@ -4,7 +4,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import type { SettingsProblem } from '../core/problems.ts';
 
 /** What {@link ProblemList} reports. */
-export interface ProblemListProps {
+interface ProblemListProps {
   /** The problems of one part of the settings, errors and advice together. */
   problems: readonly SettingsProblem[];
   /**
@@ -12,6 +12,11 @@ export interface ProblemListProps {
    * @default 'The processor would fail on this' — what an error always means
    */
   title?: string;
+  /**
+   * Whether each line names the place before saying what is wrong.
+   * @default true — a list under a whole part has to say which entry a line is about
+   */
+  showWhere?: boolean;
 }
 
 /**
@@ -25,7 +30,11 @@ export interface ProblemListProps {
  * @returns The two callouts, or nothing at all when there is nothing to say.
  */
 export function ProblemList(props: ProblemListProps): ReactElement | null {
-  const { problems, title = 'The processor would fail on this' } = props;
+  const {
+    problems,
+    title = 'The processor would fail on this',
+    showWhere = true,
+  } = props;
   const errors = problems.filter((entry) => entry.severity === 'error');
   const warnings = problems.filter((entry) => entry.severity !== 'error');
   if (errors.length === 0 && warnings.length === 0) return null;
@@ -34,12 +43,12 @@ export function ProblemList(props: ProblemListProps): ReactElement | null {
     <div style={LIST_STYLE}>
       {errors.length === 0 ? null : (
         <Callout intent="danger" compact title={title}>
-          <Lines problems={errors} />
+          <Lines problems={errors} showWhere={showWhere} />
         </Callout>
       )}
       {warnings.length === 0 ? null : (
         <Callout intent="warning" compact title="Worth a look">
-          <Lines problems={warnings} />
+          <Lines problems={warnings} showWhere={showWhere} />
         </Callout>
       )}
     </div>
@@ -47,17 +56,22 @@ export function ProblemList(props: ProblemListProps): ReactElement | null {
 }
 
 /**
- * One line per problem, naming the part before saying what is wrong.
+ * One line per problem, naming the place, when asked, before what is wrong.
  * @param props - What the lines are made of.
  * @param props.problems - The problems to list.
+ * @param props.showWhere - Whether each line starts with the place.
  * @returns The list.
  */
-function Lines(props: { problems: readonly SettingsProblem[] }): ReactElement {
+function Lines(props: {
+  problems: readonly SettingsProblem[];
+  showWhere: boolean;
+}): ReactElement {
+  const { problems, showWhere } = props;
   return (
     <ul style={LINES_STYLE}>
-      {props.problems.map((entry) => (
+      {problems.map((entry) => (
         <li key={`${entry.severity} ${entry.where} ${entry.message}`}>
-          {`${entry.where} — ${entry.message}`}
+          {showWhere ? `${entry.where} — ${entry.message}` : entry.message}
         </li>
       ))}
     </ul>

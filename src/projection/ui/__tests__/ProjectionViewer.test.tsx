@@ -1,13 +1,11 @@
-import { getClasses, getNumbers } from 'ml-dataset-iris';
-import { PCA } from 'ml-pca';
+import { getClasses } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import type { ProjectionResult, ProjectionSamples } from '../../core/index.ts';
 import { embeddingResult, pcaResult } from '../../core/index.ts';
 import { ProjectionViewer } from '../ProjectionViewer.tsx';
-
-const rows = getNumbers();
 
 const SAMPLES: ProjectionSamples = {
   ids: rows.map((_, index) => `flower-${index + 1}`),
@@ -15,7 +13,7 @@ const SAMPLES: ProjectionSamples = {
   groupLabel: 'Species',
 };
 
-const IRIS: ProjectionResult = pcaResult(new PCA(rows, { scale: true }), {
+const IRIS: ProjectionResult = pcaResult(IRIS_PCA, {
   rows,
   scaled: true,
 });

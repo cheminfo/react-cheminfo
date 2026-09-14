@@ -1,4 +1,25 @@
-import type { SpectrumFilter, SpectrumFilterName } from './settings.ts';
+import type {
+  MatrixFilter,
+  SpectrumFilter,
+  SpectrumFilterName,
+} from './settings.ts';
+
+/**
+ * A step of either stage, as far as its options go: a chain step and a matrix
+ * step both have this shape, so one reader and one writer serve both.
+ */
+export interface FilterStep {
+  /**
+   * The step's name.
+   * @default undefined — a matrix step may carry none, and is then skipped
+   */
+  name?: string;
+  /**
+   * The step's options, whatever shape they turn out to be.
+   * @default undefined — upstream's defaults apply
+   */
+  options?: unknown;
+}
 
 /** What a step's options are, before any one filter's shape is assumed. */
 type OptionsRecord = Record<string, unknown>;
@@ -28,7 +49,10 @@ export function defaultFilter(name: SpectrumFilterName): SpectrumFilter {
   if (name === 'calibrateX') {
     return { name, options: { gsd: { ...CALIBRATE_PEAK_PICKING } } };
   }
-  return { name };
+  // TypeScript matches an object literal against a discriminated union of at
+  // most 25 members, and the chain has more. Every step's options are optional
+  // upstream, so a bare name is a whole step of whichever filter it names.
+  return { name } as SpectrumFilter;
 }
 
 /**
@@ -54,7 +78,8 @@ export function removeFilter(
   chain: readonly SpectrumFilter[],
   index: number,
 ): SpectrumFilter[] {
-  return chain.filter((_, position) => position !== index);
+  if (index < 0 || index >= chain.length) return [...chain];
+  return chain.toSpliced(index, 1);
 }
 
 /**
@@ -69,11 +94,7 @@ export function duplicateFilter(
 ): SpectrumFilter[] {
   const step = chain[index];
   if (step === undefined) return [...chain];
-  return [
-    ...chain.slice(0, index + 1),
-    structuredClone(step),
-    ...chain.slice(index + 1),
-  ];
+  return chain.toSpliced(index + 1, 0, structuredClone(step));
 }
 
 /**
@@ -93,24 +114,37 @@ export function moveFilter(
   offset: number,
 ): SpectrumFilter[] {
   const target = index + offset;
-  const step = chain[index];
-  if (step === undefined || target < 0 || target >= chain.length) {
-    return [...chain];
-  }
-  const moved = [...chain];
-  moved.splice(index, 1);
-  moved.splice(target, 0, step);
+  if (index < 0 || index >= chain.length) return [...chain];
+  if (target < 0 || target >= chain.length) return [...chain];
+  return reorder(chain, index, target);
+}
+
+/**
+ * A list with one entry moved to another position.
+ * @param list - What to reorder.
+ * @param index - Which entry to move.
+ * @param target - Where it lands.
+ * @returns A new list, the same entries when there is nothing at `index`.
+ */
+export function reorder<T>(
+  list: readonly T[],
+  index: number,
+  target: number,
+): T[] {
+  const moved = [...list];
+  const [entry] = moved.splice(index, 1);
+  if (entry !== undefined) moved.splice(target, 0, entry);
   return moved;
 }
 
 /**
  * What one option of a step is set to.
- * @param filter - The step.
+ * @param filter - The step, of the chain or of the matrix stage.
  * @param key - Where the value sits, dotted for a nested one.
  * @returns The value, or undefined when the step leaves it to upstream.
  */
-export function readFilterOption(filter: SpectrumFilter, key: string): unknown {
-  let current: unknown = 'options' in filter ? filter.options : undefined;
+export function readFilterOption(filter: FilterStep, key: string): unknown {
+  let current: unknown = filter.options;
   for (const segment of key.split('.')) {
     if (typeof current !== 'object' || current === null) return undefined;
     current = (current as OptionsRecord)[segment];
@@ -123,7 +157,9 @@ export function readFilterOption(filter: SpectrumFilter, key: string): unknown {
  *
  * Dropping rather than writing `undefined` is what lets a cleared field mean
  * "whatever upstream does", which is the only way a reader can get back to the
- * default once they have typed over it.
+ * default once they have typed over it. Options that are not an object are
+ * thrown away rather than read, so a written step is always one the processor
+ * can take.
  * @param filter - The step.
  * @param key - Where the value sits, dotted for a nested one.
  * @param value - What to set it to, or undefined to clear it.
@@ -133,19 +169,48 @@ export function setFilterOption(
   filter: SpectrumFilter,
   key: string,
   value: unknown,
-): SpectrumFilter {
+): SpectrumFilter;
+export function setFilterOption(
+  filter: MatrixFilter,
+  key: string,
+  value: unknown,
+): MatrixFilter;
+export function setFilterOption(
+  filter: FilterStep,
+  key: string,
+  value: unknown,
+): FilterStep {
   const written = writePath(filterOptions(filter), key.split('.'), value);
   if (Object.keys(written).length === 0) return { name: filter.name };
   return { name: filter.name, options: written };
 }
 
 /**
+ * One option of a step as a number box can show it.
+ *
+ * Anything that is not a number — a bound pasted in as text, a `null` — reads
+ * as nothing, so the box shows its placeholder rather than junk.
+ * @param filter - The step, of the chain or of the matrix stage.
+ * @param key - Where the value sits, dotted for a nested one.
+ * @returns The number, or undefined when the step holds none there.
+ */
+export function readNumberOption(
+  filter: FilterStep,
+  key: string,
+): number | undefined {
+  const value = readFilterOption(filter, key);
+  return typeof value === 'number' ? value : undefined;
+}
+
+/**
  * The step's options as a plain record, for a form that walks the catalog.
- * @param filter - The step.
+ * @param filter - The step, of the chain or of the matrix stage.
  * @returns Its options, empty when it carries none.
  */
-export function filterOptions(filter: SpectrumFilter): Readonly<OptionsRecord> {
-  const options = 'options' in filter ? filter.options : undefined;
+export function filterOptions(
+  filter: FilterStep,
+): Readonly<Record<string, unknown>> {
+  const { options } = filter;
   if (typeof options !== 'object' || options === null) return {};
   // An interface carries no index signature, so a form that walks the catalog
   // has to read it as the record the catalog's keys describe.

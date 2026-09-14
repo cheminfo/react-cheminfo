@@ -41,8 +41,23 @@ test('a glyph is drawn before the label, and the caret after it', () => {
     <NavMenuButton label="Pages" items={MORE} icon="menu" />,
   );
 
-  expect(html).toContain('data-icon="menu"></span>Pages<');
+  expect(html).toContain(
+    'data-icon="menu"></span><span class="nav-link__label">Pages</span>',
+  );
+  expect(html).toContain('class="nav-link nav-link--icon"');
   expect(html.indexOf('bp6-icon-menu')).toBeLessThan(
     html.indexOf('bp6-icon-caret-down'),
   );
+});
+
+test('a compact trigger keeps its glyph and its name, and drops the rest', () => {
+  const html = renderToStaticMarkup(
+    <NavMenuButton label="Pages" items={MORE} icon="menu" compact />,
+  );
+
+  expect(html).toContain('bp6-icon-menu');
+  expect(html).toContain('aria-label="Pages"');
+  expect(html).toContain('title="Pages"');
+  expect(html).not.toContain('nav-link__label');
+  expect(html).not.toContain('bp6-icon-caret-down');
 });

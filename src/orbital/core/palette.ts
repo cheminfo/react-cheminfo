@@ -8,10 +8,11 @@
  */
 
 /** Which pair of phase colours the viewer uses. */
-export type PhasePaletteId = 'textbook' | 'colourBlindSafe';
+export type PhasePaletteId = 'textbook' | 'colorBlindSafe';
 
 /** The colours one phase palette provides. */
 export interface PhasePalette {
+  /** Key of the palette in {@link PHASE_PALETTES}. */
   id: PhasePaletteId;
   /** Name shown in the palette picker. */
   label: string;
@@ -19,9 +20,12 @@ export interface PhasePalette {
   positive: string;
   /** Lobe where the wavefunction is negative. */
   negative: string;
-  /** Lobe drawn with the `phase` display flag off. */
+  /**
+   * Lobe drawn when the phases are not told apart, for a caller that offers
+   * a sign-blind view.
+   */
   neutral: string;
-  /** Translucent disc marking a nodal plane. */
+  /** Translucent disc marking a nodal plane, for a caller that draws one. */
   node: string;
 }
 
@@ -29,7 +33,7 @@ export interface PhasePalette {
  * The two phase palettes.
  *
  * `textbook` is the blue/red of printed MO diagrams and of Jmol's signed
- * isosurfaces; `colourBlindSafe` swaps the negative lobe for the amber of the
+ * isosurfaces; `colorBlindSafe` swaps the negative lobe for the amber of the
  * Okabe-Ito qualitative palette, which stays separable under protanopia,
  * deuteranopia and tritanopia.
  */
@@ -42,8 +46,8 @@ export const PHASE_PALETTES: Record<PhasePaletteId, PhasePalette> = {
     neutral: '#9ca3af',
     node: '#64748b',
   },
-  colourBlindSafe: {
-    id: 'colourBlindSafe',
+  colorBlindSafe: {
+    id: 'colorBlindSafe',
     label: 'Blue / yellow (colour-blind safe)',
     positive: '#0072b2',
     negative: '#e69f00',

@@ -50,6 +50,25 @@ test('the matrix menu offers the three names the processor matches and no fourth
   expect(menu).toContain('value="rescale"');
 });
 
+test('the matrix menu prompts first, then names the three steps the way their rows do', () => {
+  const menu = addMenu(
+    renderToStaticMarkup(
+      <PostProcessingEditor
+        value={SETTINGS}
+        problems={[]}
+        onChange={() => null}
+      />,
+    ),
+  );
+
+  expect(menu.match(/<option[^>]*>[^<]*<\/option>/g)).toStrictEqual([
+    '<option value="" label="Add a matrix step…" selected="">Add a matrix step…</option>',
+    '<option value="pqn" label="Probabilistic quotient normalization">Probabilistic quotient normalization</option>',
+    '<option value="centerMean" label="Centre on the mean">Centre on the mean</option>',
+    '<option value="rescale" label="Rescale">Rescale</option>',
+  ]);
+});
+
 test('a matrix step carries its own options, and centerMean says it has none', () => {
   const html = renderToStaticMarkup(
     <PostProcessingEditor
@@ -141,7 +160,7 @@ test('a calculation is a name and a formula, and the formula is not prose', () =
   expect(html).toContain('value="ratio"');
   expect(html).toContain('value="aromatic / 2"');
   expect(html).toContain('aria-label="Formula of calculation 1"');
-  expect(html).toContain('font-family:ui-monospace');
+  expect(html).toContain('font-family:var(--font-mono, ui-monospace');
 });
 
 test('the ids are typed as a list when the processor holds nothing to pick from', () => {
@@ -210,23 +229,34 @@ test('each part shows only its own problems, matched on what settingsProblems wr
   const problems: readonly SettingsProblem[] = [
     {
       severity: 'error',
+      part: 'matrix',
+      index: 0,
       where: 'Matrix step 1',
       message: 'The matrix stage only knows pqn, centerMean, rescale.',
     },
     {
       severity: 'warning',
+      part: 'scaling',
       where: 'Scaling',
       message: 'The difference is taken against the first spectrum.',
     },
-    { severity: 'error', where: 'Range 1', message: 'From is not below to.' },
     {
       severity: 'error',
+      part: 'range',
+      index: 0,
+      where: 'Range 1',
+      message: 'From is not below to.',
+    },
+    {
+      severity: 'error',
+      part: 'calculation',
       where: 'Calculations',
       message:
         'A calculation reads the range integrals, and no range is named.',
     },
     {
       severity: 'error',
+      part: 'resampling',
       where: 'Resampling',
       message: 'From is not below to.',
     },

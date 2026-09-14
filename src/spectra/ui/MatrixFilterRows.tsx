@@ -1,20 +1,24 @@
 import { Button, HTMLSelect } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
-import { useState } from 'react';
 
+import {
+  readNumberOption,
+  reorder,
+  setFilterOption,
+} from '../core/filterChain.ts';
+import {
+  MATRIX_FILTER_NAMES,
+  MATRIX_STEPS,
+  findMatrixStep,
+} from '../core/matrixCatalog.ts';
 import type { MatrixFilter } from '../core/settings.ts';
 
 import { NumberField } from './NumberField.tsx';
-import {
-  MATRIX_ADD_OPTIONS,
-  matrixStep,
-  readMatrixOption,
-  writeMatrixOption,
-} from './matrixSteps.ts';
-import { fitKeys, nextKey, reorder } from './rowKeys.ts';
+import { EMPTY_STYLE, HELP_STYLE, ROW_STYLE } from './fieldStyles.ts';
+import { useRowKeys } from './rowKeys.ts';
 
 /** What {@link MatrixFilterRows} edits. */
-export interface MatrixFilterRowsProps {
+interface MatrixFilterRowsProps {
   /** The steps, in the order the matrix goes through them. */
   value: readonly MatrixFilter[];
   /** Called with the new list on every edit. */
@@ -34,19 +38,13 @@ export interface MatrixFilterRowsProps {
  */
 export function MatrixFilterRows(props: MatrixFilterRowsProps): ReactElement {
   const { value, onChange } = props;
-  const [rowKeys, setRowKeys] = useState<readonly number[]>(() =>
-    value.map((_, index) => index),
-  );
-
-  if (rowKeys.length !== value.length) {
-    setRowKeys(fitKeys(rowKeys, value.length));
-  }
+  const rows = useRowKeys(value.length);
 
   function move(index: number, offset: number): void {
     const target = index + offset;
     if (target < 0 || target >= value.length) return;
+    rows.move(index, target);
     onChange(reorder(value, index, target));
-    setRowKeys(reorder(rowKeys, index, target));
   }
 
   return (
@@ -57,9 +55,9 @@ export function MatrixFilterRows(props: MatrixFilterRowsProps): ReactElement {
         </span>
       ) : null}
       {value.map((step, index) => {
-        const known = matrixStep(step.name);
+        const known = findMatrixStep(step.name);
         return (
-          <div key={rowKeys[index] ?? index} style={ROW_STYLE}>
+          <div key={rows.keys[index] ?? index} style={STEP_STYLE}>
             <div style={HEADER_STYLE}>
               <span style={NAME_STYLE}>
                 {known?.label ?? String(step.name)}
@@ -90,28 +88,27 @@ export function MatrixFilterRows(props: MatrixFilterRowsProps): ReactElement {
                 size="small"
                 aria-label={`Remove matrix step ${String(index + 1)}`}
                 onClick={() => {
-                  setRowKeys(rowKeys.filter((_, at) => at !== index));
-                  onChange(value.filter((_, at) => at !== index));
+                  rows.removeAt(index);
+                  onChange(value.toSpliced(index, 1));
                 }}
               />
             </div>
             {known === undefined ? null : (
-              <span style={SUMMARY_STYLE}>{known.summary}</span>
+              <span style={HELP_STYLE}>{known.summary}</span>
             )}
             {known === undefined || known.fields.length === 0 ? null : (
-              <div style={FIELDS_STYLE}>
+              <div style={ROW_STYLE}>
                 {known.fields.map((field) => (
                   <NumberField
                     key={field.key}
                     label={field.label}
-                    value={readMatrixOption(step, field.key)}
+                    value={readNumberOption(step, field.key)}
                     placeholder={field.placeholder}
                     onChange={(option) => {
                       onChange(
-                        value.map((held, at) =>
-                          at === index
-                            ? writeMatrixOption(held, field.key, option)
-                            : held,
+                        value.with(
+                          index,
+                          setFilterOption(step, field.key, option),
                         ),
                       );
                     }}
@@ -125,17 +122,26 @@ export function MatrixFilterRows(props: MatrixFilterRowsProps): ReactElement {
       <HTMLSelect
         aria-label="Add a matrix step"
         value=""
-        options={MATRIX_ADD_OPTIONS}
+        options={ADD_OPTIONS}
         onChange={(event) => {
           const name = event.currentTarget.value;
           if (name === '') return;
-          setRowKeys([...rowKeys, nextKey(rowKeys)]);
+          rows.append();
           onChange([...value, { name }]);
         }}
       />
     </div>
   );
 }
+
+/** The add menu: the empty prompt, then the only three names that run. */
+const ADD_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
+  { value: '', label: 'Add a matrix step…' },
+  ...MATRIX_FILTER_NAMES.map((name) => ({
+    value: name,
+    label: MATRIX_STEPS[name].label,
+  })),
+];
 
 const LIST_STYLE = {
   display: 'flex',
@@ -144,14 +150,14 @@ const LIST_STYLE = {
   alignItems: 'flex-start',
 } as const satisfies CSSProperties;
 
-const ROW_STYLE = {
+const STEP_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
   alignSelf: 'stretch',
   padding: 8,
-  borderRadius: 'var(--radius, 6px)',
-  background: 'var(--surface-sunken, #f4f6f8)',
+  borderRadius: 'var(--radius)',
+  background: 'var(--surface-sunken)',
 } as const satisfies CSSProperties;
 
 const HEADER_STYLE = {
@@ -164,21 +170,5 @@ const NAME_STYLE = {
   flex: 1,
   fontSize: 12,
   fontWeight: 600,
-  color: 'var(--text, #1c2127)',
-} as const satisfies CSSProperties;
-
-const SUMMARY_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;
-
-const FIELDS_STYLE = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 8,
-} as const satisfies CSSProperties;
-
-const EMPTY_STYLE = {
-  fontSize: 12,
-  color: 'var(--text-faint, #8a96a3)',
+  color: 'var(--text)',
 } as const satisfies CSSProperties;

@@ -1,14 +1,46 @@
+import { writeClipboardItem } from './clipboardItem.ts';
+
+/** Text for the clipboard, with a rich rendering of it beside. */
+export interface ClipboardText {
+  /** The plain text, which every place it is pasted into can read. */
+  text: string;
+  /**
+   * The same content as HTML, which a word processor pastes with its
+   * emphasis and links; a plain text editor still receives `text`.
+   * @default undefined — only the text is written
+   */
+  html?: string;
+}
+
+/** What {@link writeToClipboard} puts on the clipboard: text, or text with its HTML. */
+export type ClipboardContent = string | ClipboardText;
+
 /**
  * Put a piece of text on the clipboard, without ever throwing at the caller.
  *
- * The async Clipboard API is tried first and a hidden textarea is the fallback,
- * which is what a page served over plain HTTP, an older Safari, or a browser
- * that refused the permission is left with. A refusal is an outcome the caller
- * shows rather than an error it has to catch, so both paths resolve.
- * @param text - What to put on the clipboard.
- * @returns Whether the clipboard now holds the text.
+ * With `html`, both renderings go on as one item, so a paste into Word or
+ * Google Docs keeps the formatting. Where that is refused, or for plain text,
+ * the async Clipboard API is tried and a hidden textarea is the fallback, which
+ * is what a page served over plain HTTP, an older Safari, or a browser that
+ * refused the permission is left with. A refusal is an outcome the caller
+ * shows rather than an error it has to catch, so every path resolves.
+ * @param content - The text, or the text and its HTML.
+ * @returns Whether the clipboard now holds the content — at least as text.
  */
-export async function writeToClipboard(text: string): Promise<boolean> {
+export async function writeToClipboard(
+  content: ClipboardContent,
+): Promise<boolean> {
+  const text = typeof content === 'string' ? content : content.text;
+  const html = typeof content === 'string' ? undefined : content.html;
+
+  if (html !== undefined && typeof Blob !== 'undefined') {
+    const written = await writeClipboardItem({
+      'text/html': new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([text], { type: 'text/plain' }),
+    });
+    if (written) return true;
+  }
+
   const clipboard = globalThis.navigator?.clipboard;
   if (clipboard) {
     try {

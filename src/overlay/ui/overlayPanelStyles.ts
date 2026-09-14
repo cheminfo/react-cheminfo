@@ -20,6 +20,7 @@ import type { CSSProperties } from 'react';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 
 import { OVERLAY_HELP_NAME_STYLE } from './overlayRowStyles.ts';
+import { overlayFocusRing } from './overlayValueStyles.ts';
 
 /**
  * The panel itself: a header, a body, and whatever the figure can be told to
@@ -86,15 +87,19 @@ export function overlayPanelTitleStyle(metrics: OverlayMetrics): CSSProperties {
  * not the title, and drawing an outline around it would make it compete with
  * the settings it undoes. It is faint until pointed at, then the accent, so a
  * reader who is not looking for it never sees it and one who is finds it where
- * every other panel keeps it.
+ * every other panel keeps it. The keyboard is shown the ring every button of
+ * the family draws.
  * @param metrics - The measurements the card is drawn from.
- * @param hovered - Whether the pointer is over it or the keyboard is on it.
+ * @param look - Whether it is pointed at, and whether it holds focus.
+ * @param look.hovered - Whether the pointer is over it.
+ * @param look.focused - Whether the keyboard is on it.
  * @returns The button's rules.
  */
 export function overlayPanelResetStyle(
   metrics: OverlayMetrics,
-  hovered: boolean,
+  look: { hovered: boolean; focused: boolean },
 ): CSSProperties {
+  const { hovered, focused } = look;
   return {
     flex: 'none',
     padding: 0,
@@ -106,6 +111,7 @@ export function overlayPanelResetStyle(
     lineHeight: 1,
     textDecoration: hovered ? 'underline' : 'none',
     cursor: 'pointer',
+    ...overlayFocusRing(focused),
   };
 }
 
@@ -178,7 +184,7 @@ export function overlaySectionStyle(metrics: OverlayMetrics): CSSProperties {
 }
 
 /** How a section heading stands. */
-export interface OverlaySectionLook {
+interface OverlaySectionLook {
   /**
    * Whether a hairline is drawn above it. The first heading of a panel takes
    * none: a rule immediately under the header's own rule reads as a doubled

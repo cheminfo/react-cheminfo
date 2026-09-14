@@ -13,7 +13,7 @@ import { drawableVariablesView } from './variablesView.ts';
 export interface LoadingProfile {
   /** Which component, from 0. */
   index: number;
-  /** What the panel is titled, e.g. `PC 2`. */
+  /** What the panel is titled, e.g. `PC2`. */
   label: string;
   /** The colour this component carries on every tab. */
   color: string;
@@ -81,6 +81,12 @@ export interface LoadingProfilesOptions {
    * @default ''
    */
   sampleLabel?: string;
+  /**
+   * What the vertical axis measures while the panels draw weights, which are a
+   * share of a direction rather than a quantity anybody measured.
+   * @default 'Weight'
+   */
+  weightLabel?: string;
 }
 
 /**
@@ -105,6 +111,7 @@ export function loadingProfiles(
     order,
     view: wanted,
     sampleScores,
+    weightLabel = 'Weight',
   } = options;
   const {
     weights,
@@ -165,7 +172,7 @@ export function loadingProfiles(
     const axis = axes[index];
     profiles.push({
       index,
-      label: axis?.name ?? `Component ${index + 1}`,
+      label: axis?.name ?? '',
       color: chartSeriesColor(index, 'component'),
       share: axis?.share,
       values,
@@ -190,8 +197,7 @@ export function loadingProfiles(
     order: slots,
     mean: reference,
     profiles,
-    // Weights are a share of a direction, not a quantity anybody measured.
-    valueLabel: view === 'weights' ? 'Weight' : valueLabel,
+    valueLabel: view === 'weights' ? weightLabel : valueLabel,
     sharedScale,
     // Bars are read from the zero line, so the line has to be on the panel; a
     // spectrum sitting on a baseline would be squashed into its top third by

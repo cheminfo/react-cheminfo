@@ -3,12 +3,12 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import { rowMatrix } from '../../../chart/core/index.ts';
+import { ScatterMatrix } from '../ScatterMatrix.tsx';
+import type { ScatterGroup } from '../scatterFigureProps.ts';
 import type {
   ScatterMatrixAxis,
   ScatterMatrixProps,
-} from '../ScatterMatrix.tsx';
-import { ScatterMatrix } from '../ScatterMatrix.tsx';
-import type { ScatterGroup } from '../ScatterPlot.tsx';
+} from '../scatterMatrixProps.ts';
 
 const AXES: ScatterMatrixAxis[] = [
   { name: 'PC 1', share: 0.7296 },

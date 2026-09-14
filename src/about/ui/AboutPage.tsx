@@ -7,6 +7,7 @@ import type { AboutContent } from '../core/about.ts';
 import { resolveAbout } from '../core/about.ts';
 
 import { AboutCitations } from './AboutCitations.tsx';
+import { AboutProvidedBy } from './AboutProvidedBy.tsx';
 import { AboutSection } from './AboutSection.tsx';
 
 export interface AboutPageProps {
@@ -24,12 +25,20 @@ export interface AboutPageProps {
    * @default undefined
    */
   children?: ReactNode;
+  /**
+   * The site's own drawn lockup, for a site that has one. It stands in the
+   * hero in place of the mark and the written name, above the tagline, and
+   * must therefore carry the name itself. Anything else about the hero stays
+   * where a reader of our other About pages expects it.
+   * @default undefined
+   */
+  logo?: ReactNode;
 }
 
 /**
- * The About page of a site of the family: what the tool is, what a visitor can
- * do with it, what it is built on, how to cite it, and where to report a
- * problem — always in that order.
+ * The About page of a site of the family: what the tool is, who provides it,
+ * what a visitor can do with it, what it is built on, how to cite it, and where
+ * to report a problem — always in that order.
  *
  * The order is the point. A reader who has read one of our About pages knows
  * where the credits are on the other thirteen, and a site that writes its own
@@ -39,7 +48,7 @@ export interface AboutPageProps {
  * @throws {Error} When the record names a site or a credit that does not exist.
  */
 export function AboutPage(props: AboutPageProps): ReactElement {
-  const { content, className, children } = props;
+  const { content, className, children, logo } = props;
   const about = resolveAbout(content);
   const site = about.site;
 
@@ -50,16 +59,25 @@ export function AboutPage(props: AboutPageProps): ReactElement {
       }
       style={PAGE_STYLE}
     >
-      <header className="about-hero" style={HERO_STYLE}>
-        <SiteMark siteId={site.id} size={56} />
+      <header
+        className="about-hero"
+        style={logo === undefined ? HERO_STYLE : LOGO_HERO_STYLE}
+      >
+        {logo === undefined ? <SiteMark siteId={site.id} size={56} /> : null}
         <div>
-          <h1 style={NAME_STYLE}>
-            <Wordmark siteId={site.id} size={26} />
+          <h1 style={logo === undefined ? NAME_STYLE : LOGO_NAME_STYLE}>
+            {logo ?? <Wordmark siteId={site.id} size={26} />}
           </h1>
           <p style={TAGLINE_STYLE}>{site.tagline}</p>
           <p style={WHAT_STYLE}>{about.what}</p>
         </div>
       </header>
+
+      {about.people.length === 0 && about.providedBy.length === 0 ? null : (
+        <AboutSection title="Provided by" className="about-provided-by">
+          <AboutProvidedBy people={about.people} providers={about.providedBy} />
+        </AboutSection>
+      )}
 
       <AboutSection title="What you can do here" className="about-can">
         <ul style={CAN_LIST_STYLE}>
@@ -151,6 +169,17 @@ const NAME_STYLE = {
   margin: 0,
   fontSize: 26,
   fontWeight: 700,
+} as const satisfies CSSProperties;
+
+// A drawn lockup already carries the mark and the name at its own proportions,
+// so the hero gives it the full width rather than a column beside a mark.
+const LOGO_HERO_STYLE = {
+  ...HERO_STYLE,
+  display: 'block',
+} as const satisfies CSSProperties;
+
+const LOGO_NAME_STYLE = {
+  margin: '0 0 4px',
 } as const satisfies CSSProperties;
 
 const TAGLINE_STYLE = {

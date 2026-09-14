@@ -2,6 +2,7 @@ import type { IconName } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 import { Button } from 'react-science/ui';
 
+import type { OverlayPanel } from './OverlayPanel.tsx';
 import type { OverlayControlProps } from './OverlayRow.tsx';
 import { OverlayRow } from './OverlayRow.tsx';
 import { overlaySwatchStyle } from './overlayControlStyles.ts';

@@ -1,7 +1,9 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { HELP_STYLE } from './fieldStyles.ts';
+
 /** What {@link SettingsPart} frames. */
-export interface SettingsPartProps {
+interface SettingsPartProps {
   /** What the part is called, drawn above everything in it. */
   title: string;
   /**
@@ -29,9 +31,7 @@ export function SettingsPart(props: SettingsPartProps): ReactElement {
   return (
     <section style={PART_STYLE}>
       <h4 style={TITLE_STYLE}>{title}</h4>
-      {summary === undefined ? null : (
-        <span style={SUMMARY_STYLE}>{summary}</span>
-      )}
+      {summary === undefined ? null : <span style={HELP_STYLE}>{summary}</span>}
       {children}
     </section>
   );
@@ -42,19 +42,14 @@ const PART_STYLE = {
   flexDirection: 'column',
   gap: 8,
   padding: 12,
-  borderRadius: 'var(--radius, 6px)',
-  border: '1px solid var(--border, #d8dee6)',
-  background: 'var(--surface, #ffffff)',
+  borderRadius: 'var(--radius)',
+  border: '1px solid var(--border)',
+  background: 'var(--surface)',
 } as const satisfies CSSProperties;
 
 const TITLE_STYLE = {
   margin: 0,
   fontSize: 13,
   fontWeight: 600,
-  color: 'var(--text, #1c2127)',
-} as const satisfies CSSProperties;
-
-const SUMMARY_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
+  color: 'var(--text)',
 } as const satisfies CSSProperties;

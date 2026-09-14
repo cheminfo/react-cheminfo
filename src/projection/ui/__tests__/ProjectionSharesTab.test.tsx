@@ -1,13 +1,11 @@
-import { getNumbers } from 'ml-dataset-iris';
-import { PCA } from 'ml-pca';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import { explainedShares, pcaResult } from '../../core/index.ts';
 import { ProjectionSharesTab } from '../ProjectionSharesTab.tsx';
 
-const rows = getNumbers();
-const result = pcaResult(new PCA(rows, { scale: true }), {
+const result = pcaResult(IRIS_PCA, {
   rows,
   scaled: true,
 });

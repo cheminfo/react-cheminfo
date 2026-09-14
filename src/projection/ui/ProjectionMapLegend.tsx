@@ -11,7 +11,7 @@ import {
 } from './projectionTabStyles.ts';
 
 /** What {@link ProjectionMapLegend} needs. */
-export interface ProjectionMapLegendProps {
+interface ProjectionMapLegendProps {
   /** The one short sentence naming what the colour means here. */
   title: string;
   /** What each mark on the map means, in the order they are written. */

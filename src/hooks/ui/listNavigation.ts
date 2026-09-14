@@ -1,5 +1,7 @@
+import { isTextEntryTarget } from './keyTargets.ts';
+
 /** The default number of entries `PageUp` and `PageDown` move by. */
-export const DEFAULT_PAGE_STEP = 10;
+const DEFAULT_PAGE_STEP = 10;
 
 /** How a list stands when a key reaches it. */
 export interface ListNavigationOptions {
@@ -92,25 +94,17 @@ export function nextSelectedIndex(
  * move, so the page never scrolls out from under the last entry.
  * @param event - The keyboard event, synthetic or native.
  * @param options - See {@link ListNavigationHandlerOptions}.
+ * @returns Whether the selection moved, i.e. whether `onSelect` was called.
  */
 export function handleListNavigationKey(
   event: ListNavigationKeyEvent,
   options: ListNavigationHandlerOptions,
-): void {
-  if (isTextEntryTarget(event.target)) return;
+): boolean {
+  if (isTextEntryTarget(event.target)) return false;
   const next = nextSelectedIndex(event.key, options);
-  if (next === null) return;
+  if (next === null) return false;
   event.preventDefault();
-  if (next !== options.selectedIndex) options.onSelect(next);
-}
-
-const TEXT_ENTRY_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
-
-function isTextEntryTarget(target: EventTarget | null | undefined): boolean {
-  if (target === null || target === undefined) return false;
-  const element = target as { tagName?: unknown; isContentEditable?: unknown };
-  if (element.isContentEditable === true) return true;
-  return (
-    typeof element.tagName === 'string' && TEXT_ENTRY_TAGS.has(element.tagName)
-  );
+  if (next === options.selectedIndex) return false;
+  options.onSelect(next);
+  return true;
 }

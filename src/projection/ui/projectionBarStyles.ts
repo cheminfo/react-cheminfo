@@ -133,8 +133,8 @@ export function projectionBarEndStyle(metrics: OverlayMetrics): CSSProperties {
  *
  * On the narrowest figures the question mark is the glyph that goes, because
  * the reader still has to be able to reach the settings and the second tier —
- * so the paragraph it used to open is written at the head of the panel the cog
- * opens instead. Not one word of it is dropped in the move.
+ * so the paragraph it opens on a wider figure is written, whole, at the head
+ * of the panel the cog opens instead.
  *
  * It brings its own room and its own hairline, because the panel under it
  * brings both of those and the popover holding the two brings neither: a

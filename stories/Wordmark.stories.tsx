@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ECOSYSTEM_SITES } from '../src/ecosystem/core/sites.ts';
 import { Wordmark } from '../src/ecosystem/ui/Wordmark.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 // The sizes a name is actually set at: a footer under a mark, a header bar, a
 // page heading, and the hero of a landing page.
@@ -81,7 +82,7 @@ const ROW_STYLE = {
 } as const;
 
 const HOST_STYLE = {
-  color: 'var(--text-faint, #8a96a3)',
+  color: TOKEN.textFaint,
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontSize: '0.75rem',
 } as const;

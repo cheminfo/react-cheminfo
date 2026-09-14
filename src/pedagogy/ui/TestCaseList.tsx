@@ -1,8 +1,10 @@
-import { Icon } from '@blueprintjs/core';
+import { Colors, Icon } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { TestCaseResult } from '../core/validation.ts';
 
+/** What {@link TestCaseList} needs. */
 export interface TestCaseListProps<
   TCase extends TestCaseResult = TestCaseResult,
 > {
@@ -95,7 +97,7 @@ function itemStyle(passed: boolean, pending: boolean): CSSProperties {
     gap: 8,
     padding: '4px 8px',
     borderRadius: 3,
-    borderLeft: `3px solid ${passed ? '#1c6e42' : failed ? '#cd4246' : '#c5cbd3'}`,
+    borderLeft: `3px solid ${passed ? Colors.GREEN2 : failed ? Colors.RED3 : Colors.GRAY5}`,
     background: passed
       ? 'rgb(236 253 245)'
       : failed
@@ -117,6 +119,6 @@ const LABEL_STYLE: CSSProperties = { marginRight: 6 };
 
 const REASON_STYLE: CSSProperties = {
   display: 'block',
-  color: 'rgb(65 75 90)',
+  color: TOKEN.textMuted,
   lineHeight: 1.4,
 };

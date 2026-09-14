@@ -8,6 +8,7 @@ import {
   numberField,
 } from './filterFields.ts';
 
+/** Everything that moves, crops or resamples the x axis, and the two housekeeping steps. */
 export const AXIS_ENTRIES = {
   xFunction: {
     label: 'Apply a formula to x',
@@ -23,6 +24,22 @@ export const AXIS_ENTRIES = {
     ],
     caution:
       'Every range below is then read in the new units — including the resampling range, which runs last unless you resample first.',
+  },
+  setMinX: {
+    label: 'Shift x to start at a value',
+    group: 'x-axis',
+    summary:
+      'Adds one constant to every x so the smallest lands on the value given.',
+    fields: [numberField('min', 'Smallest x', '0')],
+    caution: 'Left empty, the smallest x is moved to 0, not left where it is.',
+  },
+  setMaxX: {
+    label: 'Shift x to end at a value',
+    group: 'x-axis',
+    summary:
+      'Adds one constant to every x so the largest lands on the value given.',
+    fields: [numberField('max', 'Largest x', '1')],
+    caution: 'Left empty, the largest x is moved to 1, not left where it is.',
   },
   fromTo: {
     label: 'Crop',

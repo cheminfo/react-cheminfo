@@ -1,3 +1,5 @@
+import { formatTrimmed } from '../../format/core/numbers.ts';
+
 /**
  * A number as a hover card writes it.
  *
@@ -11,7 +13,7 @@
  */
 export function formatProjectionValue(value: number): string {
   if (!Number.isFinite(value)) return UNKNOWN_VALUE;
-  return String(Number(value.toFixed(DECIMALS)));
+  return formatTrimmed(value, DECIMALS);
 }
 
 const DECIMALS = 3;

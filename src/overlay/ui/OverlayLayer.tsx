@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { OverlayDensity } from '../core/overlayMetrics.ts';
 import { overlayMetrics } from '../core/overlayMetrics.ts';
 
@@ -102,9 +103,7 @@ export function OverlayLayer(props: OverlayLayerProps): ReactElement {
   return (
     <div
       ref={layer}
-      className={
-        className === undefined ? 'overlay-layer' : `overlay-layer ${className}`
-      }
+      className={joinClassNames('overlay-layer', className)}
       style={OVERLAY_LAYER_STYLE}
       data-figure="chrome"
       onFocus={() => setFocusInside(true)}

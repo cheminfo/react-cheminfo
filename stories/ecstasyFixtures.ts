@@ -37,7 +37,7 @@ export const ECSTASY_SOURCE = data.source;
 export const ECSTASY_PROCESSING = data.processing;
 
 /** What is known about each pill, in the score matrix's row order. */
-export const ECSTASY_PILLS: ReadonlyArray<{
+const ECSTASY_PILLS: ReadonlyArray<{
   /** The spectrum's own name, which is its file's name in `original.zip`. */
   id: string;
   /** The seizure it belongs to. */
@@ -49,13 +49,13 @@ export const ECSTASY_PILLS: ReadonlyArray<{
 }> = data.samples;
 
 /** The seizures, in the order the legend lists them. */
-export const ECSTASY_SEIZURES: readonly string[] = data.categories;
+const ECSTASY_SEIZURES: readonly string[] = data.categories;
 
 /**
  * The wavenumbers the spectra were resampled onto, read the way an infrared
  * spectrum is: high on the left.
  */
-export const ECSTASY_WAVENUMBERS: ContinuousVariableAxis = {
+const ECSTASY_WAVENUMBERS: ContinuousVariableAxis = {
   kind: 'continuous',
   values: data.variables.values,
   label: data.variables.label,

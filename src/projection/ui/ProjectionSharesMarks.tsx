@@ -1,31 +1,27 @@
 import type { ReactElement } from 'react';
 
 import type { ChartBand } from '../../chart/core/chartBand.ts';
-import { chartBand, chartBandCenter } from '../../chart/core/chartBand.ts';
+import { chartBandCenter } from '../../chart/core/chartBand.ts';
+import { chartShare } from '../../chart/core/chartLabels.ts';
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { ChartFrameRender } from '../../chart/ui/ChartFrame.tsx';
+import { roundTo } from '../../format/core/roundTo.ts';
 import type { ExplainedShares } from '../core/explainedShares.ts';
+import { fillCopy } from '../core/fillCopy.ts';
+import type { ProjectionCopy } from '../core/projectionCopy.ts';
 
-import {
-  AXIS_CAPTION_STYLE,
-  AXIS_LAYER_STYLE,
-  AXIS_NAME_STYLE,
-  SHARES_BOTTOM_ROOM,
-  SHARES_CAPTION_OFFSET,
-  SHARES_LEFT_ROOM,
-  SHARES_NAME_OFFSET,
-  SHARES_RIGHT_ROOM,
-  TOTAL_LABEL_STYLE,
-  WHOLE_SHARE,
-} from './projectionTabStyles.ts';
+import { TOTAL_LABEL_STYLE, WHOLE_SHARE } from './projectionTabStyles.ts';
 
 /** What {@link SharesMarks} draws. */
-export interface SharesMarksProps {
+interface SharesMarksProps {
   /** The bars, their running total and the target they are measured against. */
   shares: ExplainedShares;
   /** The frame they are drawn in. */
   frame: ChartFrameRender;
   /** The slots the bars stand on. */
   band: ChartBand;
+  /** The words the chart writes: the running total's name and the hover card. */
+  copy: ProjectionCopy;
 }
 
 /**
@@ -42,7 +38,7 @@ export interface SharesMarksProps {
  * @returns The marks.
  */
 export function SharesMarks(props: SharesMarksProps): ReactElement {
-  const { shares, frame, band } = props;
+  const { shares, frame, band, copy } = props;
   const { components, target, reachesTargetAt } = shares;
   const { plot, y } = frame;
   const zero = y.offset;
@@ -67,12 +63,12 @@ export function SharesMarks(props: SharesMarksProps): ReactElement {
         height={Math.abs(zero - top)}
         fill={component.color}
       >
-        <title>{hoverCard(shares, index)}</title>
+        <title>{hoverCard(shares, index, copy.sentence.shareCard)}</title>
       </rect>,
     );
     lastX = middle;
     lastY = y.offset + component.cumulative * WHOLE_SHARE * y.factor;
-    path += `${index === 0 ? 'M' : 'L'}${round(middle)} ${round(lastY)}`;
+    path += `${index === 0 ? 'M' : 'L'}${chartRoundPixel(middle)} ${chartRoundPixel(lastY)}`;
     dots.push(<circle key={component.number} cx={middle} cy={lastY} r={2.5} />);
   }
 
@@ -97,61 +93,11 @@ export function SharesMarks(props: SharesMarksProps): ReactElement {
         textAnchor="end"
         style={TOTAL_LABEL_STYLE}
       >
-        {`Running total ${(total * WHOLE_SHARE).toFixed(1)}%`}
+        {fillCopy(copy.sentence.runningTotal, {
+          percent: chartShare(total),
+        })}
       </text>
     </>
-  );
-}
-
-/** What {@link SharesAxis} writes. */
-export interface SharesAxisProps {
-  /** The bars, for their names. */
-  shares: ExplainedShares;
-  /** Total width of the figure, in pixels, which the slots are laid out in. */
-  width: number;
-  /** Total height, which fixes the baseline the names sit on. */
-  height: number;
-  /** What the axis measures, written under the names. */
-  caption: string;
-}
-
-/**
- * The component names under the bars, and what the axis measures under them.
- *
- * They are written in a layer of their own because a frame clips its children
- * to the plot and these sit below it — the same reason the tracked line chart
- * writes its slot names this way rather than as frame children.
- * @param props - See {@link SharesAxisProps}.
- * @returns The names.
- */
-export function SharesAxis(props: SharesAxisProps): ReactElement {
-  const { shares, width, height, caption } = props;
-  const right = Math.max(SHARES_LEFT_ROOM, width - SHARES_RIGHT_ROOM);
-  const band = chartBand(shares.components.length, SHARES_LEFT_ROOM, right);
-  const baseline = height - SHARES_BOTTOM_ROOM;
-
-  return (
-    <svg width="100%" height="100%" style={AXIS_LAYER_STYLE}>
-      {shares.components.map((component, index) => (
-        <text
-          key={component.number}
-          x={chartBandCenter(band, index)}
-          y={baseline + SHARES_NAME_OFFSET}
-          textAnchor="middle"
-          style={AXIS_NAME_STYLE}
-        >
-          {component.label}
-        </text>
-      ))}
-      <text
-        x={(SHARES_LEFT_ROOM + right) / 2}
-        y={baseline + SHARES_CAPTION_OFFSET}
-        textAnchor="middle"
-        style={AXIS_CAPTION_STYLE}
-      >
-        {caption}
-      </text>
-    </svg>
   );
 }
 
@@ -207,18 +153,26 @@ function targetMark(
  * fifty who wants it.
  * @param shares - The bars.
  * @param index - Which one, from 0.
+ * @param template - The card's sentence, from the copy.
  * @returns The card's text.
  */
-function hoverCard(shares: ExplainedShares, index: number): string {
+function hoverCard(
+  shares: ExplainedShares,
+  index: number,
+  template: string,
+): string {
   const component = shares.components[index];
   if (component === undefined) return '';
-  const own = (component.share * WHOLE_SHARE).toFixed(2);
-  const together = (component.cumulative * WHOLE_SHARE).toFixed(2);
-  const line = `${component.label} — ${own}% of the differences. The first ${component.number} together: ${together}%.`;
+  const line = fillCopy(template, {
+    component: component.label,
+    share: chartShare(component.share, CARD_SHARE_DIGITS),
+    count: String(component.number),
+    total: chartShare(component.cumulative, CARD_SHARE_DIGITS),
+  });
   const { eigenvalue } = component;
   return eigenvalue === undefined
     ? line
-    : `${line}\nλ = ${Math.round(eigenvalue * ROUNDING) / ROUNDING}`;
+    : `${line}\nλ = ${roundTo(eigenvalue, EIGENVALUE_DECIMALS)}`;
 }
 
 /** The light wash over the components that reach the target. */
@@ -235,7 +189,11 @@ const TARGET_BAND = 'color-mix(in srgb, var(--border-strong) 22%, transparent)';
 const DOT_GAP = 6;
 const LABEL_ROOM = 12;
 
-/** Decimals the fine print rounds an eigenvalue to. */
-const ROUNDING = 1000;
+/**
+ * Decimals the hover card writes a share with: one more than the axis titles,
+ * because the card is the fine print a reader opens to read the number itself.
+ */
+const CARD_SHARE_DIGITS = 2;
 
-const round = (value: number): number => Math.round(value * 100) / 100;
+/** Decimals the fine print rounds an eigenvalue to. */
+const EIGENVALUE_DECIMALS = 3;

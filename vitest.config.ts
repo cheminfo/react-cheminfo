@@ -11,5 +11,10 @@ export default defineConfig({
     snapshotFormat: {
       maxOutputLength: Number.MAX_SAFE_INTEGER,
     },
+    // The numeric integrations over the harmonics and the wasm-backed structure
+    // suites run several seconds each, and v8 coverage profiles every call, so
+    // the 5s default trips on them while they are doing nothing wrong.
+    testTimeout: 30000,
+    hookTimeout: 30000,
   },
 });

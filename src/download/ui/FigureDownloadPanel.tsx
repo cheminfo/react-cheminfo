@@ -36,6 +36,12 @@ export interface FigureDownloadPanelProps {
   onScaleChange: (scale: number) => void;
   /** Called when they press save. */
   onSave: () => void;
+  /**
+   * Whether the SVG holds a rendered picture rather than vector drawings, as
+   * for a WebGL scene: its resolution then applies, and the hint says so.
+   * @default false
+   */
+  rasterSvg?: boolean;
 }
 
 /**
@@ -59,14 +65,14 @@ export function FigureDownloadPanel(
   props: FigureDownloadPanelProps,
 ): ReactElement {
   const { title, format, scale, scales, size, failure, saving } = props;
-  const { onFormatChange, onScaleChange, onSave } = props;
+  const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
 
-  const vector = format === 'svg';
+  const vector = format === 'svg' && !rasterSvg;
 
   return (
     <OverlayPanel
       title={title}
-      hint={hintOf(format, size, scale, failure)}
+      hint={hintOf(format, size, scale, failure, rasterSvg)}
       actions={
         <OverlayAction
           text="Save"
@@ -148,6 +154,7 @@ function scaleChoices(
  * @param size - How big the figure is on the page.
  * @param scale - The multiple it is painted at.
  * @param failure - What went wrong last time, if anything.
+ * @param rasterSvg - Whether the SVG embeds a rendered picture.
  * @returns The sentence.
  */
 function hintOf(
@@ -155,9 +162,13 @@ function hintOf(
   size: FigurePixels | null,
   scale: number,
   failure: string | null,
+  rasterSvg: boolean,
 ): string {
   if (failure !== null) return failure;
   if (size === null) return 'There is no figure on the page to save yet.';
+  if (format === 'svg' && rasterSvg) {
+    return `An SVG holding a picture of ${formatFigurePixels(figurePixels(size, scale))}: a 3D scene has no vector form.`;
+  }
   if (format === 'svg') {
     return `An SVG stays sharp at any size, so the resolution does not apply. Drawn ${formatFigurePixels(size)}.`;
   }

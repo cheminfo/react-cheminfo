@@ -1,10 +1,14 @@
 import { expect, test } from 'vitest';
 
+import type { ProblemPlace } from '../problems.ts';
 import type { SpectrumFilter, SpectrumFilterName } from '../settings.ts';
 import { stepProblems } from '../stepProblems.ts';
 
 /** How the panel labels the one step every test below asks about. */
 const WHERE = 'Step 1';
+
+/** Where that step sits: the first of the chain. */
+const PLACE: ProblemPlace = { part: 'chain', index: 0, where: WHERE };
 
 /** The complaint every bad Savitzky–Golay window earns, wherever the window sits. */
 const WINDOW_MESSAGE = 'The window must be an odd whole number of 5 or more.';
@@ -14,17 +18,18 @@ const KEEP_MESSAGE =
   'Zone to keep 1 needs both bounds, with from below to; the processor fails on a half-filled one.';
 
 function messages(step: SpectrumFilter): string[] {
-  return stepProblems(step, WHERE).map((found) => found.message);
+  return stepProblems(step, PLACE).map((found) => found.message);
 }
 
 // `FromTo` demands both bounds, so a half-filled zone — the very settings these
 // rules exist to catch — cannot be written as a zone literal. Reading the
-// options as a plain record is how settings from the wild reach the editor.
+// options as a plain record is how settings from the wild reach the editor, and
+// that record is exactly what no filter's own options type admits.
 function looseStep(
   name: SpectrumFilterName,
   options: Record<string, unknown>,
 ): SpectrumFilter {
-  return { name, options };
+  return { name, options } as SpectrumFilter;
 }
 
 test('a Savitzky–Golay window of 3 is an error, because the fit needs five points before it means anything', () => {
@@ -41,10 +46,12 @@ test('a fractional Savitzky–Golay window is the same error, because a window i
 
 test('a negative derivative is an error, because there is no derivative below the zeroth', () => {
   expect(
-    stepProblems({ name: 'savitzkyGolay', options: { derivative: -1 } }, WHERE),
+    stepProblems({ name: 'savitzkyGolay', options: { derivative: -1 } }, PLACE),
   ).toStrictEqual([
     {
       severity: 'error',
+      part: 'chain',
+      index: 0,
       where: WHERE,
       message: 'The derivative must be a whole number of zero or more.',
     },
@@ -68,8 +75,16 @@ test('looking for no peak at all is an error, because calibrateX has nothing to 
 
 test('a zone to keep with neither bound is an error, because filterX reads the bounds of a zone it never checks', () => {
   expect(
-    stepProblems(looseStep('filterX', { zones: [{}] }), WHERE),
-  ).toStrictEqual([{ severity: 'error', where: WHERE, message: KEEP_MESSAGE }]);
+    stepProblems(looseStep('filterX', { zones: [{}] }), PLACE),
+  ).toStrictEqual([
+    {
+      severity: 'error',
+      part: 'chain',
+      index: 0,
+      where: WHERE,
+      message: KEEP_MESSAGE,
+    },
+  ]);
 });
 
 test('a zone to keep naming one bound only is the same error, because the other is read as undefined', () => {
@@ -86,10 +101,12 @@ test('a zone to keep running backwards is the same error, because it keeps no po
 
 test('a zone to drop with neither bound is only a warning, because upstream normalizes it away harmlessly', () => {
   expect(
-    stepProblems(looseStep('filterX', { exclusions: [{}] }), WHERE),
+    stepProblems(looseStep('filterX', { exclusions: [{}] }), PLACE),
   ).toStrictEqual([
     {
       severity: 'warning',
+      part: 'chain',
+      index: 0,
       where: WHERE,
       message:
         'Zone to drop 1 needs both bounds, with from below to; as it stands it is ignored.',

@@ -76,7 +76,12 @@ function Player(props: SlideshowProps): ReactElement {
 const meta = {
   title: 'Slides/Slideshow',
   component: Slideshow,
-  args: { talk: TALK, index: 0, onIndex: () => undefined, talkId: 'week-3' },
+  args: {
+    talk: TALK,
+    index: 0,
+    onIndex: () => undefined,
+    talkId: 'week-3',
+  },
   parameters: {
     layout: 'fullscreen',
     docs: {

@@ -110,3 +110,9 @@ test('the legend is drawn only when asked, and names every family', () => {
   expect(withLegend).toContain('Lanthanoid');
   expect(withLegend).toContain('Actinoid');
 });
+
+test('a class given to the table lands on its outermost element', () => {
+  const html = renderToStaticMarkup(<PeriodicTable className="picker" />);
+
+  expect(html.startsWith('<div class="picker"')).toBe(true);
+});

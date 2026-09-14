@@ -8,7 +8,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
-import type { Swatch } from '../../color/core/scale.ts';
+import type { Swatch } from '../../color/core/interpolate.ts';
 
 /** What {@link ElementCell} needs to draw one element. */
 export interface ElementCellProps {
@@ -24,6 +24,7 @@ export interface ElementCellProps {
   column: number;
   /** Row of the grid, one-based. */
   row: number;
+  /** Called with the symbol when the cell is chosen. */
   onSelect: (symbol: string) => void;
   /**
    * Third line, under the symbol: the value the tool is showing.
@@ -46,6 +47,11 @@ export interface ElementCellProps {
    * @default undefined
    */
   onHover?: (symbol: string | null) => void;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -55,6 +61,7 @@ export interface ElementCellProps {
  */
 export function ElementCell(props: ElementCellProps): ReactElement {
   const {
+    className,
     atomicNumber,
     symbol,
     name,
@@ -71,6 +78,7 @@ export function ElementCell(props: ElementCellProps): ReactElement {
   return (
     <button
       type="button"
+      className={className}
       data-testid={`element-${symbol}`}
       data-symbol={symbol}
       aria-label={`${name} (${symbol}, Z = ${String(atomicNumber)})`}

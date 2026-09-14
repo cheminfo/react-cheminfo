@@ -11,9 +11,11 @@
  * a site must be able to import with none of the optional peers installed.
  */
 
-import { siteById } from '../../ecosystem/core/lookup.ts';
+import { siteNameColors } from '../../ecosystem/core/nameColors.ts';
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
 import { escapeText } from '../../share/core/escape.ts';
+import { FAMILY_TOKEN_VALUES } from '../../tokens/core/familyTokens.ts';
+import { resolveSite } from '../core/siteFiles.ts';
 
 /** The width every card is drawn at. */
 export const OG_WIDTH = 1200;
@@ -46,8 +48,8 @@ export interface OgCardOptions {
  * @returns A complete HTML document.
  */
 export async function ogCardHtml(options: OgCardOptions): Promise<string> {
-  const site =
-    typeof options.site === 'string' ? siteById(options.site) : options.site;
+  const site = resolveSite(options.site);
+  const colors = siteNameColors(site, { colors: 'literal' });
   const description = options.description ?? site.tagline;
   const [{ createElement }, { renderToStaticMarkup }, { SiteMark }] =
     await Promise.all([
@@ -73,17 +75,17 @@ export async function ogCardHtml(options: OgCardOptions): Promise<string> {
         flex-direction: column;
         justify-content: center;
         padding: 88px;
-        background: #ffffff;
-        color: #16202c;
+        background: ${FAMILY_TOKEN_VALUES['--surface']};
+        color: ${FAMILY_TOKEN_VALUES['--text']};
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
           Helvetica, Arial, sans-serif;
         gap: 28px;
       }
       h1 { font-size: 76px; font-weight: 700; letter-spacing: -0.02em; }
-      .lead { color: ${site.brand}; }
-      .alt { color: ${site.brandAlt}; }
-      .dot { color: #8a96a3; }
-      p { max-width: 900px; color: #5b6875; font-size: 34px; line-height: 1.35; }
+      .lead { color: ${colors.lead}; }
+      .alt { color: ${colors.alt}; }
+      .dot { color: ${colors.dot}; }
+      p { max-width: 900px; color: ${FAMILY_TOKEN_VALUES['--text-muted']}; font-size: 34px; line-height: 1.35; }
       .rule {
         width: 180px;
         height: 10px;

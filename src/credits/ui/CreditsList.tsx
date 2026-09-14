@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { CreditEntry } from '../core/credits.ts';
 
 /** What a credits list draws. */
@@ -33,9 +35,7 @@ export function CreditsList(props: CreditsListProps): ReactElement {
 
   return (
     <ul
-      className={
-        className === undefined ? 'credits-list' : `credits-list ${className}`
-      }
+      className={joinClassNames('credits-list', className)}
       style={LIST_STYLE}
     >
       {entries.map((entry) => (
@@ -76,7 +76,7 @@ const ITEM_STYLE = {
 const NAME_STYLE = { fontWeight: 600 } as const satisfies CSSProperties;
 
 const LICENSE_STYLE = {
-  color: 'var(--text-muted, #5f6b7c)',
+  color: TOKEN.textMuted,
   fontSize: 11,
   margin: '0 6px',
 } as const satisfies CSSProperties;

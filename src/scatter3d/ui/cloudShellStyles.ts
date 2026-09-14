@@ -16,7 +16,7 @@ export const SHELL_FILL_OPACITY = 0.1;
  * The path through a shell grows as the secant of the angle it is seen at, so
  * at the silhouette it is unbounded and the rim would go opaque. Held to a few
  * walls it reads as the swell of a ball; unheld it reads as a ring drawn round
- * a disc, which is the wireframe this fill replaced.
+ * a disc.
  */
 const RIM_WALLS = 6;
 
@@ -35,23 +35,22 @@ export interface ShellGlassStop {
  * is two walls of it. Straight through the middle they are met square on and
  * the glass is at its thinnest; towards the rim the same two walls are met at
  * a closing angle and the path through them lengthens as the secant of it, so
- * the shell swells towards its edge and reads as round. That is the whole of
- * the modelling the tessellated version did, minus the seams between the faces
- * it needed to do it.
+ * the shell swells towards its edge and reads as round.
  *
  * The walls are composited rather than added, so two of them at a tenth are
- * not a fifth but a nineteenth-something — the same arithmetic the browser was
- * doing when they were stacked polygons.
+ * not a fifth but a nineteenth-something — the arithmetic a browser applies
+ * when it lays one translucent layer over another.
  * @param strength - How solid one wall is, after the group's own opacity.
  * @returns The stops, from the middle outwards.
  */
 export function shellGlassStops(strength: number): ShellGlassStop[] {
   const wall = Math.min(1, Math.max(0, strength));
   const clear = 1 - wall;
-  return GLASS_OFFSETS.map((offset) => ({
-    offset,
-    opacity: round(1 - clear ** wallsAt(offset)),
-  }));
+  const stops: ShellGlassStop[] = [];
+  for (const offset of GLASS_OFFSETS) {
+    stops.push({ offset, opacity: round(1 - clear ** wallsAt(offset)) });
+  }
+  return stops;
 }
 
 /**

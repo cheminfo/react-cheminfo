@@ -1,13 +1,14 @@
-import { getClasses, getNumbers } from 'ml-dataset-iris';
+import { getClasses } from 'ml-dataset-iris';
 import { PCA } from 'ml-pca';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import {
+  IRIS_PCA as model,
+  IRIS_ROWS as rows,
+} from '../../core/__tests__/iris.ts';
 import type { ProjectionSamples } from '../../core/index.ts';
 import { PcaViewer } from '../PcaViewer.tsx';
-
-const rows = getNumbers();
-const model = new PCA(rows, { scale: true });
 
 const SAMPLES: ProjectionSamples = {
   ids: rows.map((_, index) => `flower-${index + 1}`),

@@ -1,6 +1,17 @@
 /** How much a problem matters. */
 export type ProblemSeverity = 'error' | 'warning';
 
+/** Which part of the settings a problem is about, which is how a panel finds its own. */
+export type ProblemPart =
+  | 'calculation'
+  | 'chain'
+  | 'exclusion'
+  | 'matrix'
+  | 'memory'
+  | 'range'
+  | 'resampling'
+  | 'scaling';
+
 /** Something the settings get wrong, or probably get wrong. */
 export interface SettingsProblem {
   /**
@@ -8,25 +19,42 @@ export interface SettingsProblem {
    * `warning` when it runs and the reader most likely did not mean it.
    */
   severity: ProblemSeverity;
-  /** Which part of the settings it is about, as the panel labels that part. */
+  /**
+   * Which part of the settings it is about. A panel picks its problems by this,
+   * never by `where`, so rewording a label cannot lose a problem.
+   */
+  part: ProblemPart;
+  /**
+   * Which entry of the part, counting from zero: a step of the chain, a zone,
+   * a matrix step, a range, a calculation.
+   * @default undefined — the problem is about the part as a whole
+   */
+  index?: number;
+  /** How the panel labels the place, written before the message. */
   where: string;
   /** What is wrong, in one sentence a reader can act on. */
   message: string;
 }
 
+/** Where a problem sits: everything about it except how bad it is and what it says. */
+export type ProblemPlace = Pick<SettingsProblem, 'index' | 'part' | 'where'>;
+
 /**
  * A problem, spelled out.
  * @param severity - How much it matters.
- * @param where - Which part of the settings it is about.
+ * @param place - Which part, which entry of it, and how the panel labels it.
  * @param message - What is wrong.
- * @returns The problem.
+ * @returns The problem, with no `index` key at all when the place names none.
  */
 export function problem(
   severity: ProblemSeverity,
-  where: string,
+  place: ProblemPlace,
   message: string,
 ): SettingsProblem {
-  return { severity, where, message };
+  const { part, index, where } = place;
+  return index === undefined
+    ? { severity, part, where, message }
+    : { severity, part, index, where, message };
 }
 
 /**
@@ -80,8 +108,17 @@ export function formulaProblem(
   if (!new RegExp(String.raw`\b${variable}\b`).test(trimmed)) {
     return `The expression never reads ${variable}, so every point would get the same value.`;
   }
+  return bracketProblem(trimmed);
+}
+
+/**
+ * What is wrong with the brackets of an expression.
+ * @param expression - What the reader typed, already trimmed.
+ * @returns The complaint, or undefined when every bracket is closed in order.
+ */
+export function bracketProblem(expression: string): string | undefined {
   let depth = 0;
-  for (const character of trimmed) {
+  for (const character of expression) {
     if (character === '(') depth++;
     if (character === ')') depth--;
     if (depth < 0) return 'A closing bracket has nothing to close.';

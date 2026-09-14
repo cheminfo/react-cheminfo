@@ -2,6 +2,7 @@ import { Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
 import { isModifiedClick } from '../../chrome/ui/navItem.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { TalkOrigin } from '../core/index.ts';
 
 /** Where the visitor came from, and how to send them back. */
@@ -16,6 +17,11 @@ export interface BackToSlidesProps {
    * @default undefined — the browser follows the address
    */
   onReturn?: () => void;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -28,12 +34,12 @@ export interface BackToSlidesProps {
  * @returns The pill, or nothing.
  */
 export function BackToSlides(props: BackToSlidesProps): ReactElement | null {
-  const { origin, href, onReturn } = props;
+  const { className, origin, href, onReturn } = props;
   if (origin === null) return null;
 
   return (
     <a
-      className="back-to-slides no-print"
+      className={joinClassNames('back-to-slides no-print', className)}
       href={href}
       title={`Back to slide ${origin.slide + 1}`}
       onClick={(event) => {

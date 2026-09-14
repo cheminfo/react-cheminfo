@@ -2,12 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 
 import { SyntaxTooltip } from '../src/pedagogy/ui/SyntaxTooltip.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import { AROMATIC_SYNTAX, RING_CLOSURE_SYNTAX } from './pedagogyFixtures.ts';
 
 // What a cheatsheet row or an option chip looks like before it is hovered.
 const CHIP_STYLE: CSSProperties = {
-  borderBottom: '1px dotted #5b6875',
+  borderBottom: `1px dotted ${TOKEN.textMuted}`,
   cursor: 'help',
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   fontSize: 14,

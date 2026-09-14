@@ -1,6 +1,8 @@
 import type { ReactElement } from 'react';
 import { memo } from 'react';
 
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
+
 import {
   SCATTER_GROUP_LABEL_SIZE,
   SCATTER_LABEL_SIZE,
@@ -63,10 +65,10 @@ export const ScatterLabelLayer = memo(function ScatterLabelLayer(
       lines.push(
         <line
           key={index}
-          x1={round(label.x + across * start)}
-          y1={round(label.y + down * start)}
-          x2={round(leader.x)}
-          y2={round(leader.y)}
+          x1={chartRoundPixel(label.x + across * start)}
+          y1={chartRoundPixel(label.y + down * start)}
+          x2={chartRoundPixel(leader.x)}
+          y2={chartRoundPixel(leader.y)}
           stroke={label.color}
           {...LEADER_STYLE}
         />,
@@ -75,8 +77,8 @@ export const ScatterLabelLayer = memo(function ScatterLabelLayer(
     written.push(
       <text
         key={index}
-        x={round(label.textX)}
-        y={round(label.textY)}
+        x={chartRoundPixel(label.textX)}
+        y={chartRoundPixel(label.textY)}
         fill={label.color}
         textAnchor={label.anchor}
         dominantBaseline="middle"
@@ -127,9 +129,3 @@ const STRONG_LABEL_STYLE = {
   strokeLinejoin: 'round',
   userSelect: 'none',
 } as const;
-
-/*
- * Two decimals, which is under a tenth of a device pixel at any zoom a browser
- * offers and keeps the markup short enough to read in a failing test.
- */
-const round = (value: number): number => Math.round(value * 100) / 100;

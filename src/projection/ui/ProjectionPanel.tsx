@@ -1,7 +1,7 @@
 import type { PointerEvent, ReactElement } from 'react';
 import { useRef, useState } from 'react';
 
-import type { ScatterPointOpen } from '../../scatter/ui/scatterPlotProps.ts';
+import type { ScatterPointOpen } from '../../scatter/ui/scatterFigureProps.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 import type { ProjectionSamples } from '../core/projectionSamples.ts';
@@ -11,15 +11,15 @@ import { ProjectionPairsTab } from './ProjectionPairsTab.tsx';
 import { ProjectionReadout } from './ProjectionReadout.tsx';
 import { ProjectionSharesTab } from './ProjectionSharesTab.tsx';
 import { ProjectionSpaceTab } from './ProjectionSpaceTab.tsx';
-import type { ProjectionVariableTrack } from './ProjectionVariablesTab.tsx';
 import { ProjectionVariablesTab } from './ProjectionVariablesTab.tsx';
 import type { ProjectionMapView } from './projectionMapView.ts';
 import type { ProjectionModels } from './projectionTabModels.ts';
+import type { ProjectionVariableTrack } from './projectionVariablesModel.ts';
 import type { ProjectionSampleOpen } from './projectionViewerProps.ts';
 import type { ProjectionStateApi } from './useProjectionState.ts';
 
 /** What {@link ProjectionPanel} needs. */
-export interface ProjectionPanelProps {
+interface ProjectionPanelProps {
   /** The tab, the options and the selection every tab shares. */
   state: ProjectionStateApi;
   /** What the run produced, whatever produced it. */

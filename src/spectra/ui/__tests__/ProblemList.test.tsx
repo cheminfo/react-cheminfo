@@ -6,6 +6,7 @@ import { ProblemList } from '../ProblemList.tsx';
 
 const ADVICE: SettingsProblem = {
   severity: 'warning',
+  part: 'scaling',
   where: 'Scaling',
   message: 'The difference is taken against the first spectrum.',
 };
@@ -13,12 +14,30 @@ const ADVICE: SettingsProblem = {
 const PROBLEMS: readonly SettingsProblem[] = [
   {
     severity: 'error',
+    part: 'memory',
     where: 'Memory',
     message: 'The budget must be a number above zero.',
   },
   ADVICE,
-  { severity: 'error', where: 'Range 1', message: 'From is not below to.' },
+  {
+    severity: 'error',
+    part: 'range',
+    index: 0,
+    where: 'Range 1',
+    message: 'From is not below to.',
+  },
 ];
+
+test('a list drawn where the place is already named leaves the place out of every line', () => {
+  const html = renderToStaticMarkup(
+    <ProblemList problems={PROBLEMS} showWhere={false} />,
+  );
+
+  expect(html).toContain('<li>The budget must be a number above zero.</li>');
+  expect(html).toContain('<li>From is not below to.</li>');
+  expect(html).not.toContain('Memory —');
+  expect(html.match(/<li>/g)).toHaveLength(3);
+});
 
 test('nothing at all is drawn when the settings have nothing wrong with them', () => {
   const html = renderToStaticMarkup(<ProblemList problems={[]} />);

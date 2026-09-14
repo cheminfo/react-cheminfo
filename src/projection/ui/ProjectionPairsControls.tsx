@@ -8,7 +8,7 @@ import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import { projectionPairsCeiling } from './projectionPairsCeiling.ts';
 
 /** What the pair grid's own stepper is drawn from. */
-export interface ProjectionPairsControlsProps {
+interface ProjectionPairsControlsProps {
   /** What the grid is showing, already resolved against the result. */
   options: ProjectionOptions;
   /** Called with only the options that changed, for the viewer to merge. */

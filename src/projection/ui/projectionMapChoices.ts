@@ -8,6 +8,7 @@
  */
 
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
+import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type {
   ProjectionColorBy,
   ProjectionOptions,
@@ -44,19 +45,20 @@ export function projectionColourChoices(
  * the one case where the share alone hides which size a site actually asked
  * for.
  * @param options - What the map is showing.
- * @param noOutlines - What "no outlines at all" reads.
+ * @param copy - The words the viewer writes: the bar's short "no outlines",
+ * and how a size is written in full.
  * @returns The choices, in the order they are offered.
  */
 export function projectionOutlineChoices(
   options: ProjectionOptions,
-  noOutlines: string,
+  copy: ProjectionCopy,
 ): readonly OverlayOption[] {
   const choices: OverlayOption[] = [];
-  for (const choice of ellipseChoices(options.ellipse)) {
+  for (const choice of ellipseChoices(options.ellipse, copy.outline)) {
     const share = ellipseCoverageText(ellipseSize(choice.value));
     choices.push({
       value: choice.value,
-      label: share === '' ? noOutlines : share,
+      label: share === '' ? copy.bar.noOutlines : share,
       title: choice.label,
     });
   }

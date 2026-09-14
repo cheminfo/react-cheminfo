@@ -15,9 +15,11 @@
  * ```
  */
 
+import { Callout } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { Suspense, lazy, useState } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
 import type { AtomicSampler } from '../core/sample.ts';
@@ -98,6 +100,12 @@ export interface AtomicOrbitalViewerProps {
    * @default undefined
    */
   renderUnsupported?: (capability: ViewerCapability) => ReactNode;
+  /**
+   * Class of the outermost element, so a site can size or place the viewer
+   * from its stylesheet.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -111,6 +119,7 @@ export function AtomicOrbitalViewer(
   const {
     fallback = 'Loading the 3D viewer…',
     renderUnsupported,
+    className,
     ...canvas
   } = props;
   const [capability] = useState(probeViewerCapability);
@@ -118,26 +127,25 @@ export function AtomicOrbitalViewer(
 
   if (!capability.supported) {
     return (
-      <div style={NOTE_STYLE}>
+      <Callout intent="warning" compact className={className}>
         {renderUnsupported?.(capability) ?? capability.message}
-      </div>
+      </Callout>
     );
   }
 
   return (
-    <div style={ROOT_STYLE}>
+    <div className={className} style={ROOT_STYLE}>
       <Suspense fallback={<div style={NOTE_STYLE}>{fallback}</div>}>
-        <AtomicOrbitalCanvas
-          {...canvas}
-          onError={(message) => {
-            setFailure(message);
-          }}
-        />
+        <AtomicOrbitalCanvas {...canvas} onFailureChange={setFailure} />
       </Suspense>
       {failure !== null && (
-        <div style={FAILURE_STYLE}>
-          This orbital could not be drawn: {failure}
-        </div>
+        <Callout
+          intent="danger"
+          compact
+          title="This orbital could not be drawn"
+        >
+          {failure}
+        </Callout>
       )}
     </div>
   );
@@ -157,16 +165,8 @@ const NOTE_STYLE: CSSProperties = {
   minHeight: 260,
   padding: 12,
   borderRadius: 3,
-  background: 'rgb(241 245 249)',
-  color: 'var(--text-muted, #5f6b7c)',
+  background: TOKEN.surfaceSunken,
+  color: TOKEN.textMuted,
   fontSize: 13,
   textAlign: 'center',
-};
-
-const FAILURE_STYLE: CSSProperties = {
-  padding: '6px 9px',
-  borderRadius: 3,
-  background: '#fdeaea',
-  color: '#8c2b2b',
-  fontSize: 12,
 };

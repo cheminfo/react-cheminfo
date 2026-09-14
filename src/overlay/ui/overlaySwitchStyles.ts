@@ -13,7 +13,7 @@ import type { CSSProperties } from 'react';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 
 /** Every measurement a switch is drawn from. */
-export interface OverlaySwitchTrack {
+interface OverlaySwitchTrack {
   /** Width of the track, in pixels. */
   width: number;
   /** Height of the track, in pixels. */

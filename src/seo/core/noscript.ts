@@ -189,7 +189,9 @@ ${items.join('\n')}
   </ul>`;
 }
 
-function familySites(sites: readonly SiteId[] | undefined): EcosystemSite[] {
-  if (sites === undefined) return [...ECOSYSTEM_SITES];
+function familySites(
+  sites: readonly SiteId[] | undefined,
+): readonly EcosystemSite[] {
+  if (sites === undefined) return ECOSYSTEM_SITES;
   return sites.map((id) => siteById(id));
 }

@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 
 import type { ChartViewport } from '../../chart/core/chartViewport.ts';
 import { ScatterPlot } from '../../scatter/ui/ScatterPlot.tsx';
-import type { ScatterPointOpen } from '../../scatter/ui/scatterPlotProps.ts';
+import type { ScatterPointOpen } from '../../scatter/ui/scatterFigureProps.ts';
 import type { SelectionChange } from '../../scatter/ui/useScatterSelection.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
@@ -28,7 +28,7 @@ import {
 } from './projectionMapModel.ts';
 
 /** What {@link ProjectionMapTab} needs. */
-export interface ProjectionMapTabProps {
+interface ProjectionMapTabProps {
   /** What the run produced, whatever produced it. */
   result: ProjectionResult;
   /** The groups, resolved once by the viewer so every tab colours alike. */

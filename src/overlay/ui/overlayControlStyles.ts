@@ -12,6 +12,8 @@ import type { CSSProperties } from 'react';
 
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 
+import { overlayFocusRing } from './overlayValueStyles.ts';
+
 /**
  * The hairline between two clusters of controls.
  * @param metrics - The measurements the card is drawn from.
@@ -95,12 +97,18 @@ export function overlayGroupTitleStyle(metrics: OverlayMetrics): CSSProperties {
 }
 
 /** How an icon button stands. */
-export interface OverlayIconLook {
+interface OverlayIconLook {
   /**
-   * Whether the pointer is over it or the keyboard is on it.
+   * Whether the pointer is over it.
    * @default false
    */
   hovered?: boolean;
+  /**
+   * Whether the keyboard is on it, which is drawn as a ring rather than as the
+   * hover ground.
+   * @default false
+   */
+  focused?: boolean;
   /**
    * Whether the choices behind it are showing, or the thing it turns on is on.
    * @default false
@@ -130,7 +138,8 @@ export function overlayIconButtonStyle(
   metrics: OverlayMetrics,
   look: OverlayIconLook,
 ): CSSProperties {
-  const { hovered = false, active = false, disabled = false } = look;
+  const { hovered = false, focused = false } = look;
+  const { active = false, disabled = false } = look;
   const lit = !disabled && (hovered || active);
   return {
     boxSizing: 'border-box',
@@ -151,6 +160,7 @@ export function overlayIconButtonStyle(
     whiteSpace: 'nowrap',
     cursor: disabled ? 'default' : 'pointer',
     opacity: disabled ? 0.6 : 1,
+    ...overlayFocusRing(focused && !disabled),
   };
 }
 

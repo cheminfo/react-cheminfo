@@ -12,7 +12,7 @@ export interface SlideshowBarProps {
   /** Whether the player is presenting on the whole screen. */
   isFullscreen: boolean;
   /** Called with the slide to show. */
-  onGo: (index: number) => void;
+  onIndexChange: (index: number) => void;
   /** Called to enter or leave fullscreen. */
   onToggleFullscreen: () => void;
   /**
@@ -38,7 +38,7 @@ export function SlideshowBar(props: SlideshowBarProps): ReactElement {
     index,
     total,
     isFullscreen,
-    onGo,
+    onIndexChange,
     onToggleFullscreen,
     onExit,
   } = props;
@@ -56,7 +56,7 @@ export function SlideshowBar(props: SlideshowBarProps): ReactElement {
           aria-label="Previous slide"
           disabled={index === 0}
           onClick={() => {
-            onGo(index - 1);
+            onIndexChange(index - 1);
           }}
         />
         <span className="slideshow-counter">
@@ -68,7 +68,7 @@ export function SlideshowBar(props: SlideshowBarProps): ReactElement {
           aria-label="Next slide"
           disabled={index >= total - 1}
           onClick={() => {
-            onGo(index + 1);
+            onIndexChange(index + 1);
           }}
         />
         <Button

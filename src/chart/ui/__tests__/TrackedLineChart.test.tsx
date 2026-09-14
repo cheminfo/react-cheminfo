@@ -172,9 +172,9 @@ function widths(html: string, id: string): Array<{ x: number; width: number }> {
   const group = html.slice(from, from + html.slice(from).indexOf('</g>'));
   const out: Array<{ x: number; width: number }> = [];
   for (const hit of group.matchAll(
-    /<rect x="([\d.-]+)"[^>]*width="([\d.-]+)"/g,
+    /<rect x="(?<x>[\d.-]+)"[^>]*width="(?<width>[\d.-]+)"/g,
   )) {
-    out.push({ x: Number(hit[1]), width: Number(hit[2]) });
+    out.push({ x: Number(hit.groups?.x), width: Number(hit.groups?.width) });
   }
   return out;
 }

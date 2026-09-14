@@ -54,8 +54,17 @@ button {
   font-family: inherit;
 }
 
+/* Blueprint lets a button shrink in a flex row, below the width of its own
+   content, and the icon then spills out of its left edge. Blueprint's fill
+   rules are more specific and still stretch a button that asks to. */
+.bp6-button {
+  flex-shrink: 0;
+}
+
 /* ── The bar ─────────────────────────────────────────────────────────────── */
 
+/* A container, so the bar folds on its own width — a tool beside a panel folds
+   exactly as a phone does, and no site has to measure anything. */
 .app-header {
   position: sticky;
   z-index: 20;
@@ -63,6 +72,7 @@ button {
   flex: none;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
+  container: app-header / inline-size;
 }
 
 .app-header__inner {
@@ -85,6 +95,7 @@ button {
 
 .brand {
   display: flex;
+  min-width: 0;
   align-items: center;
   color: var(--text);
   font-weight: 700;
@@ -106,6 +117,14 @@ button {
   font-size: 1.0625rem;
   letter-spacing: -0.01em;
   white-space: nowrap;
+}
+
+/* The last thing to give way in a crowded bar, and then by an ellipsis rather
+   than by pushing the utilities off the edge. */
+.brand .wordmark {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .wordmark__lead {
@@ -216,6 +235,69 @@ button {
 .nav-menu .bp6-menu-item.bp6-active:hover {
   background: color-mix(in oklab, var(--accent) 12%, white);
   color: var(--accent);
+}
+
+/* The share dialog's preset tabs sit on a rule, and wrap onto a second row
+   rather than overflow a phone-width dialog. */
+.share-presets > .bp6-tab-list {
+  flex-wrap: wrap;
+  row-gap: 4px;
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+.share-presets > .bp6-tab-panel {
+  margin-top: 12px;
+}
+
+/* ── A narrow bar ────────────────────────────────────────────────────────── */
+
+/* The menu the pages fold into, drawn only once they no longer fit. */
+.app-header-nav-menu {
+  display: none;
+  flex: none;
+}
+
+/* The utilities give up their labels and keep their icons. An entry with no
+   icon keeps its label, or it would be left an empty button. */
+@container app-header (max-width: 48rem) {
+  .app-header__inner {
+    padding: 0 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .app-header-actions .nav-link--icon .nav-link__label,
+  .app-header-actions
+    .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down))
+    > .bp6-button-text,
+  .app-header-actions
+    .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down))
+    > .bp6-icon-caret-down {
+    display: none;
+  }
+
+  .app-header-actions .nav-link--icon,
+  .citation-button .bp6-button,
+  .ecosystem-button .bp6-button {
+    padding: 0.3rem 0.5rem;
+  }
+}
+
+/* A phone: the pages fold into one menu beside the brand. */
+@container app-header (max-width: 36rem) {
+  .app-header__inner:has(> .app-header-nav-menu) > .app-header-nav {
+    display: none;
+  }
+
+  .app-header-nav-menu {
+    display: flex;
+  }
+}
+
+/* The narrowest phones keep the mark, which alone still names the site. */
+@container app-header (max-width: 22rem) {
+  .brand .wordmark {
+    display: none;
+  }
 }
 
 /* ── The footer ──────────────────────────────────────────────────────────── */

@@ -5,6 +5,7 @@ export * from './chrome/ui/index.ts';
 export * from './citation/ui/index.ts';
 export * from './clipboard/ui/index.ts';
 export * from './color/ui/index.ts';
+export * from './confirm/ui/index.ts';
 export * from './credits/ui/index.ts';
 export * from './delimited/ui/index.ts';
 export * from './disclosure/ui/index.ts';
@@ -17,9 +18,14 @@ export * from './overlay/ui/index.ts';
 export * from './pedagogy/ui/index.ts';
 export * from './periodic/ui/index.ts';
 export * from './projection/ui/index.ts';
+export * from './router/ui/index.ts';
 export * from './scatter/ui/index.ts';
 export * from './scatter3d/ui/index.ts';
 export * from './share/ui/index.ts';
 export * from './shared/ui/index.ts';
-export * from './spectra/ui/index.ts';
-export * from './state/ui/index.ts';
+export type {
+  BucketRead,
+  PersistBucketOptions,
+  PersistedBucket,
+} from './state/core/index.ts';
+export { persistBucket } from './state/core/index.ts';

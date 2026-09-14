@@ -12,7 +12,7 @@ import type { ProjectionVariablesAvailability } from './projectionViewChoices.ts
 import { projectionViewChoices } from './projectionViewChoices.ts';
 
 /** What the "what differs" picker on the bar is drawn from. */
-export interface ProjectionVariablesControlsProps extends ProjectionVariablesAvailability {
+interface ProjectionVariablesControlsProps extends ProjectionVariablesAvailability {
   /** Every option the panels are drawn from. */
   options: ProjectionOptions;
   /** The words the bar writes, already merged over the defaults. */

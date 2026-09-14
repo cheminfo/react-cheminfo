@@ -6,13 +6,13 @@
  * long enough to need them, and no glyph anywhere in the rows.
  */
 
-import { getNumbers } from 'ml-dataset-iris';
-import { PCA } from 'ml-pca';
 import type { ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import { OverlayLayer } from '../../../overlay/ui/OverlayLayer.tsx';
+import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
+import { mergeProjectionCopy } from '../../core/mergeProjectionCopy.ts';
 import { pcaResult } from '../../core/pcaResult.ts';
 import { PROJECTION_COPY } from '../../core/projectionCopy.ts';
 import { DEFAULT_PROJECTION_OPTIONS } from '../../core/projectionOptions.ts';
@@ -21,8 +21,7 @@ import { ProjectionPairsMore } from '../ProjectionPairsMore.tsx';
 import { ProjectionSharesMore } from '../ProjectionSharesMore.tsx';
 import { ProjectionVariablesMore } from '../ProjectionVariablesMore.tsx';
 
-const rows = getNumbers();
-const IRIS = pcaResult(new PCA(rows, { scale: true }), { rows, scaled: true });
+const IRIS = pcaResult(IRIS_PCA, { rows, scaled: true });
 
 const SHARED = {
   options: DEFAULT_PROJECTION_OPTIONS,
@@ -154,6 +153,30 @@ test('a name too long for the column is written short, never wrapped', () => {
   expect(html).not.toContain('>One scale for all</span>');
   // The value it chooses between is not shortened with it.
   expect(html).toContain('Strongest first');
+});
+
+test('a site overriding the panel words sees them in the panel', () => {
+  const copy = mergeProjectionCopy({
+    panel: { section: { axes: 'Directions' }, name: { xAxis: 'Horizontal' } },
+    choice: { selectMode: { add: 'Plus' } },
+  });
+  const html = draw(
+    <ProjectionMapMore
+      {...SHARED}
+      copy={copy}
+      result={IRIS}
+      groupLabel="Species"
+      hasGroups
+      onZoomToSelection={doNothing}
+      onResetView={doNothing}
+      onClearSelection={doNothing}
+    />,
+  );
+
+  expect(html).toContain('>Directions</span>');
+  expect(html).toContain('>Horizontal</span>');
+  expect(html).toContain('>Plus<');
+  expect(html).not.toContain('>Axes</span>');
 });
 
 /** The hairline over a section heading, which the first heading goes without. */

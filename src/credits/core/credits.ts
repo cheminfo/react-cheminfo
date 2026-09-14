@@ -21,9 +21,8 @@ export type CreditId = (typeof CREDITS)[number]['id'];
 /**
  * The borrowed works a site names, in the order it names them.
  *
- * An About dialog lists what the page stands on, and every site had been
- * writing that list itself — which is how two of them came to credit the same
- * project to two different organisations. One registry, one answer.
+ * An About dialog lists what the page stands on. The registry is the one place
+ * a work is named, so every site credits it to the same organisation.
  * @param ids - Which works to list, in display order.
  * @returns The entries, in that order.
  * @throws {Error} When an id is not in the registry: a credits list that
@@ -55,6 +54,14 @@ export function creditOf(id: string): CreditEntry | undefined {
  * it — checked against the package each site installs, not against habit.
  */
 export const CREDITS = [
+  {
+    id: 'openbabel',
+    name: 'Open Babel',
+    href: 'https://openbabel.org/',
+    description:
+      'reads and writes the chemical file formats, and does the conversion itself.',
+    license: 'GPL-2.0',
+  },
   {
     id: 'openchemlib',
     name: 'OpenChemLib',

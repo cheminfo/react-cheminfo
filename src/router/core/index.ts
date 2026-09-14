@@ -1,3 +1,4 @@
+export { trimTrailingSlash } from './address.ts';
 export {
   basePathOf,
   joinBasePath,
@@ -5,17 +6,28 @@ export {
   readMountPath,
   stripBasePath,
 } from './basePath.ts';
+export type { WriteRouteOptions } from './history.ts';
+export {
+  ROUTE_CHANGE_EVENT,
+  readRoute,
+  subscribeToRoute,
+  writeRoute,
+} from './history.ts';
 export type {
   AdoptLegacyHashOptions,
   LegacyHashOptions,
 } from './legacyHash.ts';
 export { adoptLegacyHashAddress, pathFromLegacyHash } from './legacyHash.ts';
-export type {
-  PageAddresses,
-  PageAddressesOptions,
-  PageWithPath,
-} from './pageAddresses.ts';
-export { createPageAddresses } from './pageAddresses.ts';
+export type { QueryEntry, QueryStringOptions } from './query.ts';
+export {
+  firstQueryValues,
+  formatQueryEntries,
+  formatQueryString,
+  parseQueryEntries,
+  parseQueryString,
+} from './query.ts';
+export type { SiteAddresses, SiteAddressesOptions } from './siteAddresses.ts';
+export { createSiteAddresses } from './siteAddresses.ts';
 export type {
   TabDefinition,
   TabRoute,

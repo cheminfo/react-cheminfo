@@ -7,9 +7,11 @@ import type { SettingsProblem } from '../core/problems.ts';
 import type { SpectrumFilter } from '../core/settings.ts';
 
 import { FilterFieldControl } from './FilterFieldControl.tsx';
+import { ProblemList } from './ProblemList.tsx';
+import { HELP_STYLE } from './fieldStyles.ts';
 
 /** What {@link FilterRow} draws and edits. */
-export interface FilterRowProps {
+interface FilterRowProps {
   /** The step, as the settings hold it. */
   filter: SpectrumFilter;
   /** Where it sits in the chain, counted from zero. */
@@ -95,7 +97,7 @@ export function FilterRow(props: FilterRowProps): ReactElement {
       </div>
       <span style={SUMMARY_STYLE}>{entry.summary}</span>
       {entry.fixed === undefined ? null : (
-        <span style={FIXED_STYLE}>{`Fixed upstream: ${entry.fixed}`}</span>
+        <span style={HELP_STYLE}>{`Fixed upstream: ${entry.fixed}`}</span>
       )}
       {entry.caution === undefined ? null : (
         <Callout intent="warning" compact>
@@ -114,15 +116,7 @@ export function FilterRow(props: FilterRowProps): ReactElement {
           ))}
         </div>
       )}
-      {problems.map((issue) => (
-        <Callout
-          key={issue.message}
-          intent={issue.severity === 'error' ? 'danger' : 'warning'}
-          compact
-        >
-          {issue.message}
-        </Callout>
-      ))}
+      <ProblemList problems={problems} showWhere={false} />
     </div>
   );
 }
@@ -151,9 +145,9 @@ const ROW_STYLE = {
   flexDirection: 'column',
   gap: 6,
   padding: 10,
-  border: '1px solid var(--border, #d7dde4)',
-  borderRadius: 'var(--radius, 6px)',
-  background: 'var(--surface-raised, #ffffff)',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius)',
+  background: 'var(--surface-raised)',
 } as const satisfies CSSProperties;
 
 const HEADER_STYLE = {
@@ -165,7 +159,7 @@ const HEADER_STYLE = {
 const TITLE_STYLE = {
   fontSize: 13,
   fontWeight: 600,
-  color: 'var(--text, #1c2127)',
+  color: 'var(--text)',
 } as const satisfies CSSProperties;
 
 const SPACER_STYLE = {
@@ -174,12 +168,7 @@ const SPACER_STYLE = {
 
 const SUMMARY_STYLE = {
   fontSize: 12,
-  color: 'var(--text-muted, #5b6875)',
-} as const satisfies CSSProperties;
-
-const FIXED_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
+  color: 'var(--text-muted)',
 } as const satisfies CSSProperties;
 
 const FIELDS_STYLE = {

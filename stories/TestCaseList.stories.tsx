@@ -2,6 +2,7 @@ import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 
 import { TestCaseList } from '../src/pedagogy/ui/TestCaseList.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import { QUERY_TEST_CASES, SOLVED_TEST_CASES } from './pedagogyFixtures.ts';
 
@@ -68,7 +69,7 @@ export const NotGradedYet: Story = {
 };
 
 const SMILES_STYLE: CSSProperties = {
-  color: '#5b6875',
+  color: TOKEN.textMuted,
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   fontWeight: 400,
   marginLeft: 8,

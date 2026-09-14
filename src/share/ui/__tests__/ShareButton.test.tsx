@@ -9,9 +9,9 @@ test('the button of a site bar is a nav link: the glyph, then the label', () => 
   const html = renderToStaticMarkup(<ShareButton onClick={() => undefined} />);
 
   expect(html).toBe(
-    `<button type="button" class="nav-link" title="${TITLE}" aria-label="Share">` +
+    `<button type="button" class="nav-link nav-link--icon" title="${TITLE}" aria-label="Share">` +
       '<span aria-hidden="true" class="bp6-icon bp6-icon-share" data-icon="share"></span>' +
-      'Share</button>',
+      '<span class="nav-link__label">Share</span></button>',
   );
 });
 
@@ -62,6 +62,6 @@ test('the class a site gives reaches both variants', () => {
     />,
   );
 
-  expect(navLink).toContain('class="nav-link share-entry"');
+  expect(navLink).toContain('class="nav-link nav-link--icon share-entry"');
   expect(blueprint).toContain('share-entry');
 });

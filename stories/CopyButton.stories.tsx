@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CopyButton } from '../src/clipboard/ui/CopyButton.tsx';
 
 import { MOLECULE_TABLE_HEADER, MOLECULE_TABLE_ROWS } from './moleculeTable.ts';
+import { CAFFEINE } from './structureFixtures.ts';
 
-const CAFFEINE_SMILES = 'CN1C=NC2=C1C(=O)N(C)C(=O)N2C';
 const CAFFEINE_INCHI =
   'InChI=1S/C8H10N4O2/c1-10-4-9-6-5(10)7(13)12(3)8(14)11(2)6/h4H,1-3H3';
 
@@ -25,7 +25,7 @@ function hitList(): string {
 const meta = {
   title: 'Clipboard/CopyButton',
   component: CopyButton,
-  args: { content: CAFFEINE_SMILES, label: 'Copy SMILES' },
+  args: { content: CAFFEINE, label: 'Copy SMILES' },
   argTypes: {
     content: { control: 'text' },
     label: { control: 'text' },

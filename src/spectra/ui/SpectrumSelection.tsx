@@ -1,9 +1,16 @@
 import { Checkbox, InputGroup } from '@blueprintjs/core';
-import type { CSSProperties, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 
+import {
+  FIELD_STYLE,
+  HELP_STYLE,
+  LABEL_STYLE,
+  SWITCH_STYLE,
+} from './fieldStyles.ts';
+
 /** What {@link SpectrumSelection} edits. */
-export interface SpectrumSelectionProps {
+interface SpectrumSelectionProps {
   /**
    * The ids the stage is asked for.
    * @default undefined — every spectrum the processor holds is used
@@ -73,7 +80,7 @@ export function SpectrumSelection(props: SpectrumSelectionProps): ReactElement {
       {boxes.map((id) => (
         <Checkbox
           key={id}
-          style={BOX_STYLE}
+          style={SWITCH_STYLE}
           label={
             held.has(id) ? id : `${id} — not a spectrum the processor holds`
           }
@@ -169,25 +176,3 @@ function toggle(
   }
   return undefined;
 }
-
-const FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-} as const satisfies CSSProperties;
-
-const LABEL_STYLE = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: 'var(--text-muted, #5b6875)',
-} as const satisfies CSSProperties;
-
-const BOX_STYLE = {
-  margin: 0,
-  fontSize: 12,
-} as const satisfies CSSProperties;
-
-const HELP_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;

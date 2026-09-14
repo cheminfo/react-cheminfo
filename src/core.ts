@@ -7,6 +7,7 @@ export * from './credits/core/index.ts';
 export * from './delimited/core/index.ts';
 export * from './download/core/index.ts';
 export * from './ecosystem/core/index.ts';
+export * from './error/core/index.ts';
 export * from './format/core/index.ts';
 export * from './orbital/core/index.ts';
 export * from './overlay/core/index.ts';
@@ -21,6 +22,9 @@ export * from './share/core/index.ts';
 // The deck format and its navigation are framework-free, so a backend can read
 // a manifest without loading React: `react-cheminfo/slides` is the player.
 export * from './slides/core/index.ts';
-export * from './spectra/core/index.ts';
+export * from './state/core/index.ts';
+// Framework-free molfile and editor-value helpers, so a worker can read a
+// molfile without loading the editor that `react-cheminfo/structure` exports.
+export * from './structure/core/index.ts';
 export * from './tokens/core/index.ts';
 export * from './worker/core/index.ts';

@@ -233,8 +233,6 @@ test('double-clicking a flower opens it, and empty ground does not', async ({
  * @param corner - The surface's own top-left, in the SVG's units.
  * @param corner.x - Its left edge.
  * @param corner.y - Its top edge.
- * @param corner.x
- * @param corner.y
  * @returns The position, relative to the surface.
  */
 async function emptyGround(

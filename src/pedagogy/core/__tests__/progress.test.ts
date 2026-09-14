@@ -4,7 +4,6 @@ import type { ExerciseProgress } from '../progress.ts';
 import {
   emptyProgress,
   mergeExerciseProgress,
-  mergeProgressRecord,
   progressSummary,
 } from '../progress.ts';
 
@@ -17,83 +16,22 @@ test('an untouched exercise starts idle, blank and hintless', () => {
   });
 });
 
-test('a record written as it stands is read back unchanged', () => {
+test('a stored exercise is read over a blank record, wrong shapes dropped and extra fields kept', () => {
   expect(
-    mergeProgressRecord(
-      {
-        status: 'solved',
-        answer: 'x^2',
-        hintsRevealed: 2,
-        showSolution: true,
-      },
-      emptyProgress(),
-    ),
+    mergeExerciseProgress({
+      status: 'solved',
+      answer: 42,
+      showSolution: true,
+      seed: 7,
+    }),
   ).toStrictEqual({
     status: 'solved',
-    answer: 'x^2',
-    hintsRevealed: 2,
-    showSolution: true,
-  });
-});
-
-test('a field written by an older version lands on its default', () => {
-  expect(mergeProgressRecord({ answer: 'x' }, emptyProgress())).toStrictEqual({
-    status: 'idle',
-    answer: 'x',
-    hintsRevealed: 0,
-    showSolution: false,
-  });
-});
-
-test('a field of the wrong shape falls back on its own', () => {
-  expect(
-    mergeProgressRecord(
-      { answer: 42, hintsRevealed: '2', showSolution: 'yes' },
-      emptyProgress(),
-    ),
-  ).toStrictEqual({
-    status: 'idle',
     answer: '',
     hintsRevealed: 0,
-    showSolution: false,
+    showSolution: true,
+    seed: 7,
   });
-});
-
-test('a field the record never declared is not carried over', () => {
-  expect(
-    mergeProgressRecord({ answer: 'x', drawings: {} }, emptyProgress()),
-  ).toStrictEqual({ ...emptyProgress(), answer: 'x' });
-});
-
-test('an array default only accepts an array', () => {
-  const defaults = { found: [] as string[], gaveUp: false };
-
-  expect(mergeProgressRecord({ found: ['CCO'] }, defaults)).toStrictEqual({
-    found: ['CCO'],
-    gaveUp: false,
-  });
-  expect(mergeProgressRecord({ found: 'CCO' }, defaults)).toStrictEqual({
-    found: [],
-    gaveUp: false,
-  });
-});
-
-test('a null default accepts whatever was stored', () => {
-  expect(
-    mergeProgressRecord({ verdict: 'wrong' }, { verdict: null }),
-  ).toStrictEqual({ verdict: 'wrong' });
-});
-
-test('an unreadable record gives the defaults untouched', () => {
-  expect(mergeProgressRecord(null, emptyProgress())).toStrictEqual(
-    emptyProgress(),
-  );
-  expect(mergeProgressRecord('[]', emptyProgress())).toStrictEqual(
-    emptyProgress(),
-  );
-  expect(mergeProgressRecord([1, 2], emptyProgress())).toStrictEqual(
-    emptyProgress(),
-  );
+  expect(mergeExerciseProgress('not a record')).toStrictEqual(emptyProgress());
 });
 
 test('a status outside the three the page knows reads as idle', () => {
@@ -105,8 +43,9 @@ test('a status outside the three the page knows reads as idle', () => {
   );
 });
 
-test('a negative or fractional hint count reads as none revealed', () => {
+test('a negative or fractional hint count reads as the whole hints it names', () => {
   expect(mergeExerciseProgress({ hintsRevealed: -3 }).hintsRevealed).toBe(0);
+  expect(mergeExerciseProgress({ hintsRevealed: 0.5 }).hintsRevealed).toBe(0);
   expect(mergeExerciseProgress({ hintsRevealed: 2.7 }).hintsRevealed).toBe(2);
 });
 

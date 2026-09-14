@@ -32,12 +32,12 @@ export interface VolumeStyle {
    * Lobe where the wavefunction is positive, as `#rrggbb`.
    * @default '#2563eb'
    */
-  positiveColour?: string;
+  positiveColor?: string;
   /**
    * Lobe where the wavefunction is negative, as `#rrggbb`.
    * @default '#dc2626'
    */
-  negativeColour?: string;
+  negativeColor?: string;
   /**
    * Isovalue as a multiple of the contour's own cutoff. Larger means a
    * tighter, smaller surface.
@@ -73,8 +73,8 @@ export async function renderSampledVolume(
     throw new Error('renderSampledVolume: the molstar canvas is not ready.');
   }
   const {
-    positiveColour = '#2563eb',
-    negativeColour = '#dc2626',
+    positiveColor = '#2563eb',
+    negativeColor = '#dc2626',
     relativeIsovalue = 1,
     alpha = 0.72,
   } = style;
@@ -95,14 +95,14 @@ export async function renderSampledVolume(
       volume,
       field.max >= cutoff ? cutoff : undefined,
       relativeIsovalue,
-      { colour: positiveColour, alpha },
+      { color: positiveColor, alpha },
     ),
     maybeSurface(
       plugin,
       volume,
       field.min <= -cutoff ? -cutoff : undefined,
       relativeIsovalue,
-      { colour: negativeColour, alpha },
+      { color: negativeColor, alpha },
     ),
   ]);
   const drawn = surfaces.filter(
@@ -143,7 +143,7 @@ export function clearSampledVolume(plugin: PluginContext): void {
  * @param isovalue - Absolute isovalue of the surface.
  * @param relativeIsovalue - Multiplier applied to it.
  * @param style - Colour and opacity of the surface.
- * @param style.colour - Surface colour, as `#rrggbb`.
+ * @param style.color - Surface colour, as `#rrggbb`.
  * @param style.alpha - Surface opacity.
  * @returns The surface representation.
  */
@@ -152,14 +152,14 @@ async function maybeSurface(
   volume: Volume,
   isovalue: number | undefined,
   relativeIsovalue: number,
-  style: { colour: string; alpha: number },
+  style: { color: string; alpha: number },
 ): Promise<Representation.Any | null> {
   if (isovalue === undefined || isovalue === 0) return null;
   return createSurface(
     plugin,
     volume,
     isovalue * relativeIsovalue,
-    style.colour,
+    style.color,
     style.alpha,
   );
 }
@@ -168,7 +168,7 @@ async function createSurface(
   plugin: PluginContext,
   volume: Volume,
   isovalue: number,
-  colour: string,
+  color: string,
   alpha: number,
 ): Promise<Representation.Any> {
   const params = createVolumeRepresentationParams(plugin, volume, {
@@ -186,7 +186,7 @@ async function createSurface(
       tryUseGpu: false,
     },
     color: 'uniform',
-    colorParams: { value: Color.fromHexStyle(colour) },
+    colorParams: { value: Color.fromHexStyle(color) },
   });
   const provider = plugin.representation.volume.registry.get(params.type.name);
   const representation = provider.factory(
@@ -204,7 +204,7 @@ async function createSurface(
 }
 
 /**
- * One pair of surfaces per plugin. They are outside the state tree, like the
- * cartoon lobes, because every change of orbital replaces them entirely.
+ * One pair of surfaces per plugin. They are outside the state tree because
+ * every change of orbital replaces them entirely.
  */
 const representations = new WeakMap<PluginContext, Representation.Any[]>();

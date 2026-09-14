@@ -1,12 +1,11 @@
 /**
  * The rules a control that writes its own value is drawn with.
  *
- * A bar over a figure used to name its settings and hide their answers: a
- * caption reading `Colour by` beside a box the reader had to open to learn it
- * said `Species`. The name of a setting is read once, on the first visit; its
- * value is read every time the figure is looked at. So these controls write
- * the value and leave the name to the pointer, the screen reader and the menu
- * they open.
+ * A caption reading `Colour by` beside a box the reader has to open hides the
+ * answer, `Species`, behind the question. The name of a setting is read once,
+ * on the first visit; its value is read every time the figure is looked at. So
+ * these controls write the value and leave the name to the pointer, the screen
+ * reader and the menu they open.
  *
  * None of them carries an outline or a fill at rest. The bar already has one
  * container edge in the sunken track the tabs sit in, and a second and third
@@ -21,7 +20,7 @@ import type { CSSProperties } from 'react';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 
 /** How a value-bearing control stands. */
-export interface OverlayValueLook {
+interface OverlayValueLook {
   /**
    * Whether the pointer is over it.
    * @default false
@@ -61,29 +60,11 @@ export function overlayValueButtonStyle(
   metrics: OverlayMetrics,
   look: OverlayValueLook,
 ): CSSProperties {
-  const { hovered = false, focused = false, active = false } = look;
-  const { disabled = false } = look;
-  const lit = !disabled && (hovered || active);
-  return {
-    boxSizing: 'border-box',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: OVERLAY_VALUE_GAP,
-    minWidth: metrics.buttonSize,
-    height: metrics.controlHeight,
+  return valueControlStyle(metrics, look, {
     padding: `0 ${metrics.paddingX}px`,
-    border: 'none',
     borderRadius: metrics.controlRadius + 1,
-    background: lit ? 'var(--surface-sunken)' : 'transparent',
-    color: 'var(--text)',
-    font: 'inherit',
-    fontSize: metrics.fontSize,
-    lineHeight: 1,
-    whiteSpace: 'nowrap',
-    cursor: disabled ? 'default' : 'pointer',
-    opacity: disabled ? 0.6 : 1,
-    ...focusRing(focused && !disabled),
-  };
+    background: isLit(look) ? 'var(--surface-sunken)' : 'transparent',
+  });
 }
 
 /**
@@ -101,30 +82,14 @@ export function overlayChipStyle(
   metrics: OverlayMetrics,
   look: OverlayValueLook,
 ): CSSProperties {
-  const { hovered = false, focused = false, active = false } = look;
-  const { disabled = false } = look;
-  const lit = !disabled && (hovered || active);
-  return {
-    boxSizing: 'border-box',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: OVERLAY_VALUE_GAP,
-    minWidth: metrics.buttonSize,
-    height: metrics.controlHeight,
+  return valueControlStyle(metrics, look, {
     padding: `0 ${metrics.paddingX + 2}px`,
-    border: 'none',
     borderRadius: metrics.controlHeight / 2,
     background: 'var(--surface-sunken)',
-    color: 'var(--text)',
-    boxShadow: lit ? 'inset 0 0 0 1px var(--border)' : undefined,
-    font: 'inherit',
-    fontSize: metrics.fontSize,
-    lineHeight: 1,
-    whiteSpace: 'nowrap',
-    cursor: disabled ? 'default' : 'pointer',
-    opacity: disabled ? 0.6 : 1,
-    ...focusRing(focused && !disabled),
-  };
+    hairline: {
+      boxShadow: isLit(look) ? 'inset 0 0 0 1px var(--border)' : undefined,
+    },
+  });
 }
 
 /**
@@ -187,9 +152,6 @@ export function overlayCaretStyle(): CSSProperties {
   };
 }
 
-/** What is left between the swatches, the words and the caret. */
-const OVERLAY_VALUE_GAP = 4;
-
 /**
  * The ring around the control the keyboard is on.
  *
@@ -197,14 +159,66 @@ const OVERLAY_VALUE_GAP = 4;
  * the outline these controls spend the rest of their life not having. It falls
  * back to the text colour on a page that never declared an accent, since a
  * focus ring nobody can see is the one accessibility fault a keyboard reader
- * cannot work around.
+ * cannot work around. Every button of a floating bar draws the same one.
  * @param focused - Whether the keyboard is on it.
  * @returns The outline rules, or nothing.
  */
-function focusRing(focused: boolean): CSSProperties {
+export function overlayFocusRing(focused: boolean): CSSProperties {
   if (!focused) return {};
   return {
     outline: '2px solid var(--accent, var(--text))',
     outlineOffset: 1,
   };
+}
+
+/** What is left between the swatches, the words and the caret. */
+const OVERLAY_VALUE_GAP = 4;
+
+/** What sets a value button and a chip apart, all else being shared. */
+interface ValueControlShape {
+  /** Room each side of the words. */
+  padding: string;
+  /** How rounded the ends are. */
+  borderRadius: number;
+  /** The ground under the words. */
+  background: string;
+  /**
+   * The hairline a chip deepens with under the pointer.
+   * @default undefined — no shadow rule at all
+   */
+  hairline?: CSSProperties;
+}
+
+function valueControlStyle(
+  metrics: OverlayMetrics,
+  look: OverlayValueLook,
+  shape: ValueControlShape,
+): CSSProperties {
+  const { focused = false, disabled = false } = look;
+  return {
+    boxSizing: 'border-box',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: OVERLAY_VALUE_GAP,
+    minWidth: metrics.buttonSize,
+    height: metrics.controlHeight,
+    padding: shape.padding,
+    border: 'none',
+    borderRadius: shape.borderRadius,
+    background: shape.background,
+    color: 'var(--text)',
+    ...shape.hairline,
+    font: 'inherit',
+    fontSize: metrics.fontSize,
+    lineHeight: 1,
+    whiteSpace: 'nowrap',
+    cursor: disabled ? 'default' : 'pointer',
+    opacity: disabled ? 0.6 : 1,
+    ...overlayFocusRing(focused && !disabled),
+  };
+}
+
+function isLit(look: OverlayValueLook): boolean {
+  const { hovered = false, active = false, disabled = false } = look;
+  return !disabled && (hovered || active);
 }

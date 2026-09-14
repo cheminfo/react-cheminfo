@@ -2,8 +2,10 @@ import { Alert, Button, ProgressBar } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ProgressSummary } from '../core/progress.ts';
 
+/** What {@link ExerciseProgressHeader} needs. */
 export interface ExerciseProgressHeaderProps {
   /** Where the student stands, as `progressSummary` counted it. */
   summary: ProgressSummary;
@@ -129,7 +131,7 @@ const ROW_STYLE: CSSProperties = {
 const COUNT_STYLE: CSSProperties = { fontWeight: 600 };
 
 const PERCENT_STYLE: CSSProperties = {
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   flex: '1 1 auto',
   fontSize: 12,
 };

@@ -1,25 +1,32 @@
 import type { Placement } from '@blueprintjs/core';
 import { Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
-import { Fragment } from 'react';
 
-import type { Glossary, GlossaryEntry } from '../core/glossary.ts';
-import { lookupGlossaryTerm, parseGlossaryMarkers } from '../core/glossary.ts';
+import type { Glossary, GlossaryExample } from '../core/glossary.ts';
+import { lookupGlossaryTerm } from '../core/glossary.ts';
+import { parseInlineMarks } from '../core/inlineMarks.ts';
 
+import { GlossaryDefinition } from './GlossaryDefinition.tsx';
+import type { GlossaryContextValue } from './glossaryContext.ts';
 import { useGlossary } from './glossaryContext.ts';
+import { plainCode, renderInlineSegments } from './inlineSegments.tsx';
+import { HOVER_OPEN_DELAY } from './pedagogyStyle.ts';
 
-export interface GlossaryTextProps {
+/** Props of {@link GlossaryText}. */
+export interface GlossaryTextProps<TExample = GlossaryExample> {
   /**
    * Authored prose. Every `[[term]]` — or `[[term|displayed text]]` — the
-   * glossary knows becomes a hoverable chip.
+   * glossary knows becomes a hoverable chip, and `` `code` ``, `**strong**`
+   * and `*emphasis*` are drawn as such.
    */
   text: string;
   /**
    * Terms to resolve against, instead of the ones the surrounding provider
-   * holds. A page showing two vocabularies side by side passes its own here.
+   * holds. A page showing two vocabularies side by side passes its own here,
+   * with a `renderExample` when its examples have a shape of their own.
    * @default undefined — the glossary of the surrounding `GlossaryProvider`
    */
-  glossary?: Glossary;
+  glossary?: Glossary<TExample>;
   /**
    * Side the definition opens on.
    * @default 'bottom'
@@ -30,10 +37,21 @@ export interface GlossaryTextProps {
    * @default 'glossary-term'
    */
   className?: string;
+  /**
+   * Draws the illustration of an example inside a definition.
+   * @default the surrounding provider's, and otherwise the code and the input
+   */
+  renderExample?: (example: TExample) => ReactNode;
+  /**
+   * Draws a code span of the prose.
+   * @default the surrounding provider's, and otherwise a plain `<code>`
+   */
+  renderCode?: (code: string) => ReactNode;
 }
 
 /**
- * Render authored prose, turning its markers into hoverable definitions.
+ * Render authored prose, turning its markers into hoverable definitions and
+ * its inline marks into code, strong and emphasised runs.
  *
  * A term the glossary has no entry for renders as its plain text, never as the
  * brackets: prose is allowed to link a word months before anybody writes its
@@ -41,124 +59,55 @@ export interface GlossaryTextProps {
  * @param props - The prose, and where its terms are defined.
  * @returns The prose, with the known terms made hoverable.
  */
-export function GlossaryText(props: GlossaryTextProps): ReactElement {
+export function GlossaryText<TExample = GlossaryExample>(
+  props: GlossaryTextProps<TExample>,
+): ReactElement {
   const {
     text,
     glossary,
     placement = 'bottom',
     className = 'glossary-term',
+    renderExample,
+    renderCode,
   } = props;
-  const fromProvider = useGlossary();
-  const terms = glossary ?? fromProvider;
-
-  const pieces: ReactNode[] = [];
-  for (const segment of parseGlossaryMarkers(text)) {
-    const entry =
-      segment.kind === 'term'
-        ? lookupGlossaryTerm(terms, segment.term)
-        : undefined;
-    if (entry === undefined) {
-      pieces.push(<Fragment key={segment.start}>{segment.text}</Fragment>);
-      continue;
-    }
-    pieces.push(
-      <Tooltip
-        key={segment.start}
-        content={<GlossaryTooltipBody entry={entry} />}
-        hoverOpenDelay={HOVER_OPEN_DELAY}
-        placement={placement}
-      >
-        <span className={className} style={TERM_STYLE}>
-          {segment.text}
-        </span>
-      </Tooltip>,
-    );
-  }
-
-  return <>{pieces}</>;
-}
-
-export interface GlossaryTooltipBodyProps {
-  /** The term to explain, already resolved from a marker. */
-  entry: GlossaryEntry;
-}
-
-/**
- * The definition itself: the term, one paragraph, then the worked examples.
- *
- * Exported on its own so a glossary page can list every term with the body it
- * shows on hover, rather than describing the same entry twice.
- * @param props - The entry to show.
- * @returns The body of the tooltip.
- */
-export function GlossaryTooltipBody(
-  props: GlossaryTooltipBodyProps,
-): ReactElement {
-  const { entry } = props;
+  const context = useGlossary();
+  const terms: Glossary<unknown> = glossary ?? context.glossary;
+  const segments = parseInlineMarks(text, { glossaryMarkers: true });
 
   return (
-    <div style={BODY_STYLE}>
-      <div style={TITLE_STYLE}>{entry.title}</div>
-      <div style={SUMMARY_STYLE}>{entry.summary}</div>
-      {entry.examples.length > 0 && (
-        <ul style={LIST_STYLE}>
-          {entry.examples.map((example) => (
-            <li key={`${example.code}::${example.input ?? ''}`}>
-              <code style={CODE_STYLE}>{example.code}</code>
-              {example.input !== undefined && (
-                <span style={INPUT_STYLE}>{` on ${example.input}`}</span>
-              )}
-              {example.note !== undefined && (
-                <div style={NOTE_STYLE}>{example.note}</div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <>
+      {renderInlineSegments(segments, {
+        code: renderCode ?? context.renderCode ?? plainCode,
+        term: (term, shown) => {
+          const entry = lookupGlossaryTerm(terms, term);
+          if (entry === undefined) return shown;
+          return (
+            <Tooltip
+              content={
+                <GlossaryDefinition
+                  entry={entry}
+                  renderExample={
+                    renderExample as GlossaryContextValue['renderExample']
+                  }
+                  renderCode={renderCode}
+                />
+              }
+              hoverOpenDelay={HOVER_OPEN_DELAY}
+              placement={placement}
+            >
+              <span className={className} style={TERM_STYLE}>
+                {shown}
+              </span>
+            </Tooltip>
+          );
+        },
+      })}
+    </>
   );
 }
-
-/** Long enough that the pointer can cross a chip without opening it. */
-const HOVER_OPEN_DELAY = 150;
 
 const TERM_STYLE: CSSProperties = {
   borderBottom: '1px dotted currentColor',
   color: 'var(--accent, inherit)',
   cursor: 'help',
 };
-
-const BODY_STYLE: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 6,
-  maxWidth: 340,
-};
-
-const TITLE_STYLE: CSSProperties = { fontWeight: 600, fontSize: 13 };
-
-const SUMMARY_STYLE: CSSProperties = {
-  fontSize: 12,
-  lineHeight: 1.45,
-  color: 'var(--border, #d3d8de)',
-};
-
-const LIST_STYLE: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 4,
-  margin: 0,
-  paddingLeft: 16,
-  fontSize: 12,
-  lineHeight: 1.4,
-};
-
-const CODE_STYLE: CSSProperties = {
-  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-  fontWeight: 600,
-  color: '#8abbff',
-};
-
-const INPUT_STYLE: CSSProperties = { color: 'var(--surface-sunken, #f6f7f9)' };
-
-const NOTE_STYLE: CSSProperties = { fontStyle: 'italic', color: '#abb3bf' };

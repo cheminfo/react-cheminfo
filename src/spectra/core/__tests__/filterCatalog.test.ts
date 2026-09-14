@@ -10,7 +10,7 @@ import {
 import { FILTER_GROUPS } from '../filterFields.ts';
 
 test('every step filterXY dispatches is described, and no other', () => {
-  expect(FILTER_NAMES).toHaveLength(23);
+  expect(FILTER_NAMES).toHaveLength(27);
   expect(FILTER_NAMES).toStrictEqual([
     'airPLSBaseline',
     'iterativePolynomialBaseline',
@@ -28,7 +28,11 @@ test('every step filterXY dispatches is described, and no other', () => {
     'normed',
     'rescale',
     'yFunction',
+    'setMinY',
+    'setMaxY',
     'xFunction',
+    'setMinX',
+    'setMaxX',
     'fromTo',
     'filterX',
     'equallySpaced',
@@ -85,6 +89,31 @@ test('a step whose order is a trap says so', () => {
   expect(FILTER_CATALOG.reverseIfNeeded.caution).toContain('changes nothing');
   expect(FILTER_CATALOG.equallySpaced.caution).toContain('resamples twice');
   expect(FILTER_CATALOG.fromTo.caution).toContain('point numbers');
+});
+
+test('each of the four shifts asks for the one value it moves an end to, and warns that empty is not "leave it"', () => {
+  expect(filterNamesInGroup('x-axis').slice(0, 3)).toStrictEqual([
+    'xFunction',
+    'setMinX',
+    'setMaxX',
+  ]);
+  expect(filterNamesInGroup('y-axis')).toStrictEqual([
+    'yFunction',
+    'setMinY',
+    'setMaxY',
+  ]);
+  expect(filterEntry('setMinX').fields.map((field) => field.key)).toStrictEqual(
+    ['min'],
+  );
+  expect(filterEntry('setMaxY').fields.map((field) => field.key)).toStrictEqual(
+    ['max'],
+  );
+  expect(filterEntry('setMaxX').caution).toBe(
+    'Left empty, the largest x is moved to 1, not left where it is.',
+  );
+  expect(filterEntry('setMinY').caution).toBe(
+    'Left empty, the smallest y is moved to 0, not left where it is.',
+  );
 });
 
 test('the one enum field spells its three choices out', () => {

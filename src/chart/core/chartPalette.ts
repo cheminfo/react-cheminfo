@@ -3,14 +3,17 @@
  * read from.
  *
  * - `group` — a species, a batch, a cluster: something a sample belongs to.
- * - `component` — an axis of the embedding: PC 1, PC 2.
+ * - `component` — an axis of the embedding: PC1, PC2.
  *
  * The two roles read the palette in different orders, so that the first four
  * groups and the first four components never share a hue. That is what stops a
- * reader who learnt "blue is setosa" on one tab from reading "blue is PC 1"
+ * reader who learnt "blue is setosa" on one tab from reading "blue is PC1"
  * on the next as though it meant the same thing.
  */
 export type ChartColorRole = 'group' | 'component';
+
+/** The blue a first group takes, and the answer when the palette is read past its end. */
+const FIRST_SERIES_COLOR = '#0072b2';
 
 /**
  * Eight hues that stay apart under deuteranopia, protanopia and tritanopia,
@@ -21,7 +24,7 @@ export type ChartColorRole = 'group' | 'component';
  * the eighth is a neutral dark, for the series past the ones anybody reads.
  */
 export const CHART_SERIES_COLORS: readonly string[] = [
-  '#0072b2', // blue
+  FIRST_SERIES_COLOR, // blue
   '#d55e00', // vermillion
   '#009e73', // bluish green
   '#cc79a7', // reddish purple
@@ -47,7 +50,7 @@ export function chartSeriesColor(
   const order = role === 'component' ? COMPONENT_ORDER : GROUP_ORDER;
   const step = Number.isFinite(index) && index > 0 ? Math.floor(index) : 0;
   const position = order[step % order.length] ?? 0;
-  return CHART_SERIES_COLORS[position] ?? DEFAULT_SERIES_COLOR;
+  return CHART_SERIES_COLORS[position] ?? FIRST_SERIES_COLOR;
 }
 
 /**
@@ -66,6 +69,3 @@ const GROUP_ORDER: readonly number[] = [0, 1, 2, 3, 6, 7, 4, 5];
  * entered from the two the groups leave alone longest, orange and sky blue.
  */
 const COMPONENT_ORDER: readonly number[] = [4, 5, 7, 6, 0, 1, 2, 3];
-
-/** The blue a first group takes, and the answer when the palette is read past its end. */
-const DEFAULT_SERIES_COLOR = '#0072b2';

@@ -5,7 +5,9 @@ import type { ExerciseLevel, ExerciseStatus } from '../core/types.ts';
 
 import { LEVEL_INTENT, STATUS_ICON, STATUS_INTENT } from './exerciseMeta.ts';
 
+/** What {@link ExerciseLevelTag} needs. */
 export interface ExerciseLevelTagProps {
+  /** The difficulty the tag shows, which also picks its colour. */
   level: ExerciseLevel;
   /**
    * What the tag reads.
@@ -25,6 +27,11 @@ export interface ExerciseLevelTagProps {
    * @default undefined — the tag only reports the level
    */
   onClick?: () => void;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -33,10 +40,11 @@ export interface ExerciseLevelTagProps {
  * @returns The tag.
  */
 export function ExerciseLevelTag(props: ExerciseLevelTagProps): ReactElement {
-  const { level, label = level, active = false, onClick } = props;
+  const { className, level, label = level, active = false, onClick } = props;
 
   return (
     <Tag
+      className={className}
       round
       minimal={!active}
       active={active}
@@ -49,7 +57,9 @@ export function ExerciseLevelTag(props: ExerciseLevelTagProps): ReactElement {
   );
 }
 
+/** What {@link ExerciseStatusIcon} needs. */
 export interface ExerciseStatusIconProps {
+  /** Where the student stands on the exercise, which picks the glyph. */
   status: ExerciseStatus;
   /**
    * What the pointer and a screen reader are told.
@@ -61,6 +71,11 @@ export interface ExerciseStatusIconProps {
    * @default undefined — Blueprint's standard 16
    */
   size?: number;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -71,10 +86,11 @@ export interface ExerciseStatusIconProps {
 export function ExerciseStatusIcon(
   props: ExerciseStatusIconProps,
 ): ReactElement {
-  const { status, title = status, size } = props;
+  const { className, status, title = status, size } = props;
 
   return (
     <Icon
+      className={className}
       icon={STATUS_ICON[status]}
       intent={STATUS_INTENT[status]}
       size={size}

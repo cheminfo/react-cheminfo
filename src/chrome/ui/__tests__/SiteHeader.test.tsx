@@ -86,9 +86,32 @@ test('the site renders its own pages when it gives a renderer', () => {
     />,
   );
 
-  expect(html).toContain('<span data-active="true">convert</span>');
-  expect(html).toContain('<span data-active="false">tutorial</span>');
-  expect(html).not.toContain('nav-link');
+  const bar = html.slice(html.indexOf('<nav'), html.indexOf('</nav>'));
+
+  expect(bar).toContain('<span data-active="true">convert</span>');
+  expect(bar).toContain('<span data-active="false">tutorial</span>');
+  expect(bar).not.toContain('nav-link');
+});
+
+test('several pages also get the menu they fold into on a phone', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader siteId="inchi" nav={PAGES} activeId="tutorial" />,
+  );
+
+  const menu = html.indexOf('<div class="app-header-nav-menu">');
+
+  expect(menu).toBeGreaterThan(html.indexOf('</nav>'));
+  expect(menu).toBeLessThan(html.indexOf('<span class="spacer">'));
+  expect(html).toContain('aria-label="Pages" title="Pages"');
+  expect(html).toContain('class="nav-link nav-link--icon nav-link--active"');
+});
+
+test('a single page has nothing to fold', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader siteId="inchi" nav={PAGES.slice(0, 1)} />,
+  );
+
+  expect(html).not.toContain('app-header-nav-menu');
 });
 
 test('the brand leads where the site says, and names the site', () => {

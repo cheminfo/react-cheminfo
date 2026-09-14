@@ -6,24 +6,26 @@
  * reason the two components are separate files.
  */
 
-import { Button } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import type { HelpContent } from '../../help/ui/HelpBody.tsx';
-import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
+import { errorMessage } from '../../error/core/index.ts';
+import { useResizeObserver } from '../../hooks/ui/useResizeObserver.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
 import { PHASE_PALETTES } from '../core/palette.ts';
 import type { AtomicSampler } from '../core/sample.ts';
 import { sampleInProcess } from '../core/sample.ts';
 
+import { AtomicOrbitalControls } from './AtomicOrbitalControls.tsx';
 import { DEFAULT_SPIN_SPEED } from './camera.ts';
+import { fitAxes, resolutionKey } from './orbitalCanvasHelpers.ts';
 import type { OrbitalViewer } from './viewer.ts';
 import { createOrbitalViewer } from './viewer.ts';
 
 /** Props of {@link AtomicOrbitalCanvas}. */
-export interface AtomicOrbitalCanvasProps {
+interface AtomicOrbitalCanvasProps {
   /** Proton count of the element on screen. */
   atomicNumber: number;
   /** Which orbital of it, e.g. `3dz2`. */
@@ -84,10 +86,11 @@ export interface AtomicOrbitalCanvasProps {
    */
   onNodeRadii?: (radii: number[]) => void;
   /**
-   * Called when an orbital cannot be drawn, with the reason.
+   * Called with the reason when an orbital cannot be drawn, and with `null`
+   * once one has been drawn again.
    * @default undefined
    */
-  onError?: (message: string) => void;
+  onFailureChange?: (message: string | null) => void;
 }
 
 /**
@@ -109,7 +112,7 @@ export function AtomicOrbitalCanvas(
     sample = sampleInProcess,
     onAxesChange,
     onNodeRadii,
-    onError,
+    onFailureChange,
   } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -132,9 +135,9 @@ export function AtomicOrbitalCanvas(
 
   // Callbacks are read through refs so a caller passing an inline arrow does
   // not re-sample the orbital on every render of its parent.
-  const callbacks = useRef({ onAxesChange, onNodeRadii, onError });
+  const callbacks = useRef({ onAxesChange, onNodeRadii, onFailureChange });
   useEffect(() => {
-    callbacks.current = { onAxesChange, onNodeRadii, onError };
+    callbacks.current = { onAxesChange, onNodeRadii, onFailureChange };
   });
 
   // Created and disposed once per mount. React 19 runs this twice in
@@ -145,16 +148,15 @@ export function AtomicOrbitalCanvas(
     if (container === null) return;
     const viewer = createOrbitalViewer(container);
     viewerRef.current = viewer;
-    const observer = new ResizeObserver(() => {
-      viewer.handleResize();
-    });
-    observer.observe(container);
     return () => {
-      observer.disconnect();
       viewerRef.current = null;
       viewer.dispose();
     };
   }, []);
+
+  useResizeObserver(containerRef, () => {
+    viewerRef.current?.handleResize();
+  });
 
   useEffect(() => {
     const viewer = viewerRef.current;
@@ -165,18 +167,18 @@ export function AtomicOrbitalCanvas(
         if (cancelled) return;
         callbacks.current.onNodeRadii?.(result.nodeRadii);
         const reach = await viewer.showOrbital(result.grid, result.contour, {
-          positiveColour: palette.positive,
-          negativeColour: palette.negative,
+          positiveColor: palette.positive,
+          negativeColor: palette.negative,
         });
         reachRef.current = reach ?? null;
         await viewer.refit(await fitAxes(viewer, reach, axesRef.current));
-        if (!cancelled) setDrawn(wanted);
+        if (cancelled) return;
+        setDrawn(wanted);
+        callbacks.current.onFailureChange?.(null);
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        callbacks.current.onError?.(
-          error instanceof Error ? error.message : String(error),
-        );
+        callbacks.current.onFailureChange?.(errorMessage(error));
       });
     return () => {
       cancelled = true;
@@ -200,88 +202,22 @@ export function AtomicOrbitalCanvas(
   return (
     <div ref={containerRef} style={CANVAS_STYLE}>
       {busy && <div style={BUSY_STYLE}>Sampling…</div>}
-      <div style={CONTROLS_STYLE}>
-        <HelpTooltip content={AXES_HELP} placement="bottom">
-          <Button
-            variant="minimal"
-            size="small"
-            icon="grid"
-            active={axes}
-            aria-label="Show the x, y, z axes"
-            aria-pressed={axes}
-            onClick={() => {
-              setAxes(!axes);
-              callbacks.current.onAxesChange?.(!axes);
-            }}
-          />
-        </HelpTooltip>
-        <HelpTooltip content={RESET_HELP} placement="bottom">
-          <Button
-            variant="minimal"
-            size="small"
-            icon="zoom-to-fit"
-            aria-label="Reset the view"
-            onClick={() => {
-              void viewerRef.current?.resetView();
-            }}
-          />
-        </HelpTooltip>
-      </div>
+      <AtomicOrbitalControls
+        axes={axes}
+        onToggleAxes={() => {
+          setAxes(!axes);
+          callbacks.current.onAxesChange?.(!axes);
+        }}
+        onResetView={() => {
+          void viewerRef.current?.resetView();
+        }}
+      />
     </div>
   );
 }
 
-/**
- * Draw the cartesian frame around the orbital, or remove it.
- * @param viewer - The viewer holding the canvas.
- * @param reach - How far the drawn surface reaches, as `showOrbital` returned
- * it.
- * @param axes - Whether the frame is wanted.
- * @returns What the camera has to fit: the frame reaches past the surface, so
- * turning it on has to zoom out or the labels sit off screen.
- */
-async function fitAxes(
-  viewer: OrbitalViewer,
-  reach: number | undefined,
-  axes: boolean,
-): Promise<number | undefined> {
-  if (!axes) {
-    await viewer.hideAxes();
-    return reach;
-  }
-  if (reach === undefined) return undefined;
-  return (await viewer.showAxes(reach)) ?? reach;
-}
-
-/** What the frame button says it is for. */
-const AXES_HELP: HelpContent = {
-  title: 'Cartesian axes',
-  body: 'Draw x, y and z through the nucleus. The label names an orbital by where its lobes sit against them.',
-  example: {
-    code: '3d_yz',
-    note: 'four lobes between the y and z axes, none on either.',
-  },
-};
-
-/** What the reset button says it is for. */
-const RESET_HELP: HelpContent = {
-  title: 'Reset the view',
-  body: 'Back to the angle and zoom the orbital opened on. A change of orbital keeps whatever view you have turned it to.',
-};
-
 /** Samples per edge; 56 resolves the radial node of a 3s in about 25 ms. */
 const DEFAULT_RESOLUTION = 56;
-
-/**
- * A stable identity for either shape the resolution prop can take.
- * @param resolution - A fixed sample count, or the limits it may vary between.
- * @returns A string that changes exactly when the sampling would.
- */
-function resolutionKey(resolution: number | ResolutionLimits): string {
-  return typeof resolution === 'number'
-    ? String(resolution)
-    : `${resolution.floor}-${resolution.cap}`;
-}
 
 /**
  * A square, centred stage: an atomic orbital is as tall as it is wide, so a
@@ -299,20 +235,6 @@ const CANVAS_STYLE: CSSProperties = {
   overflow: 'hidden',
 };
 
-/**
- * The two controls the canvas owns: the frame, and the way back to the framing
- * the orbital opened on — a change of orbital now keeps whatever angle and zoom
- * the student is on.
- */
-const CONTROLS_STYLE: CSSProperties = {
-  position: 'absolute',
-  top: 4,
-  right: 4,
-  zIndex: 1,
-  display: 'flex',
-  gap: 2,
-};
-
 const BUSY_STYLE: CSSProperties = {
   position: 'absolute',
   top: 8,
@@ -320,7 +242,8 @@ const BUSY_STYLE: CSSProperties = {
   zIndex: 1,
   padding: '3px 8px',
   borderRadius: 3,
-  background: 'rgba(255, 255, 255, 0.85)',
-  color: 'var(--text-muted, #5f6b7c)',
+  background: TOKEN.surface,
+  opacity: 0.85,
+  color: TOKEN.textMuted,
   fontSize: 11,
 };

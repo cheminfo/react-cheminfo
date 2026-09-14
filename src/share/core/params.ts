@@ -97,6 +97,60 @@ export function integerParam<Fallback extends number | null>(
   };
 }
 
+/** What {@link numberParam} is configured with. */
+export interface NumberParamOptions {
+  /** The smallest value a link may ask for. */
+  min: number;
+  /** The largest value a link may ask for. */
+  max: number;
+  /**
+   * The value an absent or malformed parameter falls back to, and the one
+   * deleted rather than written.
+   */
+  default: number;
+  /**
+   * The decimal places kept, so a slider does not write `0.30000000000000004`
+   * into the address. Omitted, the value is kept as it is.
+   * @default undefined
+   */
+  decimals?: number;
+}
+
+/**
+ * A real number a link carries — a size factor, an opacity — clamped to the
+ * range the tool can serve and, when asked, rounded to a number of decimal
+ * places. As with {@link integerParam}, a value outside the range is brought
+ * back inside it rather than rejected.
+ * @param options - The range, the default and the precision.
+ * @returns The codec.
+ */
+export function numberParam(
+  options: NumberParamOptions,
+): ShareParamCodec<number> {
+  const { min, max, default: fallback, decimals } = options;
+  function normalize(value: number): number {
+    const bounded = Math.min(max, Math.max(min, value));
+    if (decimals === undefined) return bounded;
+    const factor = 10 ** decimals;
+    return Math.round(bounded * factor) / factor;
+  }
+  return {
+    parse(raw) {
+      if (raw === null) return fallback;
+      const text = raw.trim();
+      if (text === '') return fallback;
+      const parsed = Number(text);
+      if (Number.isNaN(parsed)) return fallback;
+      return normalize(parsed);
+    },
+    serialize(value) {
+      if (typeof value !== 'number' || Number.isNaN(value)) return null;
+      const normalized = normalize(value);
+      return normalized === fallback ? null : String(normalized);
+    },
+  };
+}
+
 /** What {@link stringParam} is configured with. */
 export interface StringParamOptions {
   /**

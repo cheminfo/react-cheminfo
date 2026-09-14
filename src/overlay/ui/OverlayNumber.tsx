@@ -1,5 +1,9 @@
 import type { KeyboardEvent, ReactElement } from 'react';
 
+import { clamp } from '../../format/core/clamp.ts';
+import { formatDecimal } from '../../format/core/numbers.ts';
+import { roundTo } from '../../format/core/roundTo.ts';
+
 import type { OverlayControlProps } from './OverlayRow.tsx';
 import { OverlayRow } from './OverlayRow.tsx';
 import {
@@ -67,7 +71,7 @@ export function OverlayNumber(props: OverlayNumberProps): ReactElement {
   const { metrics } = useOverlaySurface();
 
   function move(steps: number): void {
-    const next = clamp(value + steps * step, min, max);
+    const next = landOnRange(value + steps * step, min, max);
     if (next !== value) onChange(next);
   }
 
@@ -100,7 +104,7 @@ export function OverlayNumber(props: OverlayNumberProps): ReactElement {
           style={overlayNumberValueStyle(metrics, widestValue(props))}
           aria-live="polite"
         >
-          {`${value.toFixed(digits)}${unit}`}
+          {`${formatDecimal(value, digits)}${unit}`}
         </span>
         <button
           type="button"
@@ -128,7 +132,10 @@ export function OverlayNumber(props: OverlayNumberProps): ReactElement {
  */
 function widestValue(props: OverlayNumberProps): number {
   const { min, max, digits = 0, unit = '' } = props;
-  const ends = Math.max(min.toFixed(digits).length, max.toFixed(digits).length);
+  const ends = Math.max(
+    formatDecimal(min, digits).length,
+    formatDecimal(max, digits).length,
+  );
   return ends + unit.length;
 }
 
@@ -143,14 +150,11 @@ function widestValue(props: OverlayNumberProps): number {
  * @param max - The largest it may be.
  * @returns The value the caller is handed.
  */
-function clamp(value: number, min: number, max: number): number {
-  const rounded = Math.round(value * FLOAT_GRID) / FLOAT_GRID;
-  if (rounded < min) return min;
-  if (rounded > max) return max;
-  return rounded;
+function landOnRange(value: number, min: number, max: number): number {
+  return clamp(roundTo(value, FLOAT_GRID_DECIMALS), min, max);
 }
 
-const FLOAT_GRID = 1e10;
+const FLOAT_GRID_DECIMALS = 10;
 
 const STEPS_BY_KEY = new Map([
   ['ArrowUp', 1],

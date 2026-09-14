@@ -5,12 +5,16 @@ import type {
   ShareConfig,
   ShareParamCodecs,
   ShareParamValues,
+  SharePreset,
   ShareVocabulary,
 } from '../core/index.ts';
 
 import { ShareDialogContent } from './ShareDialogContent.tsx';
 
-const DIALOG_STYLE: CSSProperties = { width: 'min(680px, 94vw)' };
+const DIALOG_STYLE: CSSProperties = {
+  width: 'min(820px, 94vw)',
+  height: 'min(760px, 90dvh)',
+};
 
 /**
  * The configuration the dialog is holding, handed to a tool-specific section so
@@ -41,6 +45,20 @@ export interface ShareDialogProps<
   onClose: () => void;
   /** What this site's links can say: the hideable parts, and the tool's own parameters. */
   vocabulary: ShareVocabulary<Codecs>;
+  /**
+   * Ready-made links, offered as tabs above a last Custom tab that holds the
+   * boxes. Picking one rewrites the draft; the dialog opens on the preset the
+   * draft already is, or on Custom.
+   * @default [] — no tabs, the boxes alone
+   */
+  presets?: ReadonlyArray<SharePreset<Codecs>>;
+  /**
+   * Key of the preset the dialog opens on when the page is not already running
+   * a configuration of its own — the link a page like this is usually handed
+   * out as. A key no preset has is ignored.
+   * @default undefined — the dialog opens on the suggested configuration
+   */
+  defaultPreset?: string;
   /** How the open page is named in the dialog, and in the frame. */
   title: string;
   /**

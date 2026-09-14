@@ -1,11 +1,9 @@
 import { expect, test } from 'vitest';
 
 import type { MatrixLike } from '../../../chart/core/matrix.ts';
-import {
-  DEFAULT_PROJECTION_OPTIONS,
-  resolveProjectionOptions,
-} from '../projectionOptions.ts';
+import { DEFAULT_PROJECTION_OPTIONS } from '../projectionOptions.ts';
 import type { ProjectionResult } from '../projectionResult.ts';
+import { resolveProjectionOptions } from '../resolveProjectionOptions.ts';
 
 const EMPTY_MATRIX: MatrixLike = { rows: 0, columns: 0, get: () => 0 };
 

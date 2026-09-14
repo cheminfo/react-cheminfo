@@ -6,19 +6,13 @@
  * axes rarely carry the same number of pixels per unit.
  */
 
-import { standardDeviationsForCoverage } from './ellipseCoverage.ts';
+import type { MatrixLike } from '../../chart/core/matrix.ts';
 
-/**
- * A smaller eigenvalue below this share of the larger one is read as zero.
- *
- * A group whose spread across the major axis is under a millionth of its
- * spread along it is collinear for any purpose a plot has, and the rounding of
- * the covariance alone reaches that far: the nine points on a straight line
- * used in the tests leave a residue of about 5e-17 where the exact answer is
- * 0. Without the floor those points would draw a hairline ellipse on one
- * machine and a segment on the next.
- */
-const COLLINEAR_FLOOR = 1e-12;
+import type { EllipseCovariance } from './ellipseAxes.ts';
+import { ellipseAxes } from './ellipseAxes.ts';
+import { standardDeviationsForCoverage } from './ellipseCoverage.ts';
+import type { ScatterGroupMoments } from './scatterGroupMoments.ts';
+import { scatterGroupMoments } from './scatterGroupMoments.ts';
 
 /** A point of a cloud, or of an outline drawn around one, in data units. */
 export interface EllipsePoint {
@@ -54,15 +48,11 @@ export interface EllipseStandardDeviationSize {
  */
 export type EllipseSize = EllipseCoverageSize | EllipseStandardDeviationSize;
 
-/** How a cloud is spread, as the three distinct entries of its covariance. */
-export interface EllipseCovariance {
-  /** The spread along the horizontal axis. */
-  xx: number;
-  /** How the two axes move together; zero when they are unrelated. */
-  xy: number;
-  /** The spread along the vertical axis. */
-  yy: number;
-}
+/** What a group is outlined at when the caller says nothing: the share holding 95 % of it. */
+export const DEFAULT_ELLIPSE_SIZE: EllipseSize = {
+  kind: 'coverage',
+  probability: 0.95,
+};
 
 /** A group outline, in data units. */
 export interface ConfidenceEllipse {
@@ -114,101 +104,65 @@ export function confidenceEllipse(
   points: readonly EllipsePoint[],
   options: ConfidenceEllipseOptions = {},
 ): ConfidenceEllipse | null {
-  const { size = { kind: 'coverage', probability: 0.95 }, minimumPoints = 3 } =
-    options;
+  const { size = DEFAULT_ELLIPSE_SIZE, minimumPoints = 3 } = options;
+  const moments = scatterGroupMoments(pointMatrix(points), null, 1, 2);
+  return momentsEllipse(moments, {
+    group: 0,
+    xAxis: 0,
+    yAxis: 1,
+    standardDeviations: ellipseStandardDeviations(size),
+    minimumPoints,
+  });
+}
 
-  let count = 0;
-  let sumX = 0;
-  let sumY = 0;
-  for (const point of points) {
-    if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) continue;
-    count++;
-    sumX += point.x;
-    sumY += point.y;
-  }
-  if (count < Math.max(2, minimumPoints)) return null;
-
-  const cx = sumX / count;
-  const cy = sumY / count;
-  let spreadX = 0;
-  let together = 0;
-  let spreadY = 0;
-  for (const point of points) {
-    if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) continue;
-    const dx = point.x - cx;
-    const dy = point.y - cy;
-    spreadX += dx * dx;
-    together += dx * dy;
-    spreadY += dy * dy;
-  }
-
-  const divisor = count - 1;
-  const covariance: EllipseCovariance = {
-    xx: spreadX / divisor,
-    xy: together / divisor,
-    yy: spreadY / divisor,
-  };
-  if (
-    !Number.isFinite(cx) ||
-    !Number.isFinite(cy) ||
-    !Number.isFinite(covariance.xx) ||
-    !Number.isFinite(covariance.xy) ||
-    !Number.isFinite(covariance.yy)
-  ) {
-    return null;
-  }
-
-  const { rx, ry, angle } = ellipseAxes(
-    covariance,
-    ellipseStandardDeviations(size),
-  );
-  if (!Number.isFinite(rx) || !Number.isFinite(ry)) return null;
-  return { cx, cy, rx, ry, angle, count, covariance };
+/** Which outline {@link momentsEllipse} cuts out of a block of moments. */
+interface MomentsEllipseOptions {
+  /** Which group. */
+  group: number;
+  /** The axis the outline's `x` is read along. */
+  xAxis: number;
+  /** The axis its `y` is read along. */
+  yAxis: number;
+  /** How far out to draw, in standard deviations. */
+  standardDeviations: number;
+  /** How many rows the group needs before it has a shape; below two is read as two. */
+  minimumPoints: number;
 }
 
 /**
- * The semi-axes and the rotation that a covariance describes.
+ * One group's outline for one pair of axes, cut out of measured moments.
  *
- * The shape of an outline is the eigen-decomposition of a symmetric two by two
- * matrix, which has a closed form and so never needs an iterative solver. It
- * is public because the same three numbers are what turns any covariance into
- * something drawable — one measured elsewhere, or one already mapped into
- * pixels.
- * @param covariance - How the cloud is spread.
- * @param standardDeviations - How far out to measure. Defaults to `1`.
- * @returns The two semi-axis lengths and the rotation of the major one, in radians, in `(-π/2, π/2]`. A collinear cloud gives `ry` of exactly `0`, and one with no spread at all gives an angle of `0` because it has no direction to report.
+ * The two-by-two block of a covariance is a covariance in its own right, so a
+ * pair grid measuring every axis at once and a map measuring one pair give
+ * the same outline for the same samples.
+ * @param moments - The block, from `scatterGroupMoments`.
+ * @param options - See {@link MomentsEllipseOptions}.
+ * @returns The outline, or `null` when the group is too small to have a shape, when either axis or the group is outside the block, or when the size or the coordinates are not finite.
  */
-export function ellipseAxes(
-  covariance: EllipseCovariance,
-  standardDeviations = 1,
-): Pick<ConfidenceEllipse, 'rx' | 'ry' | 'angle'> {
-  const { xx, xy, yy } = covariance;
-  const middle = (xx + yy) / 2;
-  const half = (xx - yy) / 2;
-  const radius = Math.hypot(half, xy);
-  const major = middle + radius;
-  let minor = middle - radius;
-  if (!(minor > major * COLLINEAR_FLOOR)) minor = 0;
-  return {
-    rx: standardDeviations * Math.sqrt(major),
-    ry: standardDeviations * Math.sqrt(minor),
-    angle: majorAxisAngle(xx, xy, yy, major),
-  };
-}
+export function momentsEllipse(
+  moments: ScatterGroupMoments,
+  options: MomentsEllipseOptions,
+): ConfidenceEllipse | null {
+  const { axes, groups, counts, means, covariances } = moments;
+  const { group, xAxis, yAxis, standardDeviations, minimumPoints } = options;
+  if (group < 0 || group >= groups) return null;
+  if (xAxis < 0 || yAxis < 0 || xAxis >= axes || yAxis >= axes) return null;
+  const count = counts[group] ?? 0;
+  if (count < Math.max(2, minimumPoints)) return null;
 
-function majorAxisAngle(
-  xx: number,
-  xy: number,
-  yy: number,
-  major: number,
-): number {
-  // With no cross term the axes already are the eigenvectors, and asking
-  // `atan2` would only turn the exact answer into a rounded one.
-  if (xy === 0) return xx >= yy ? 0 : Math.PI / 2;
-  // `major - xx` is never negative, so this lands in [0, π] and a negative
-  // cross term arrives half a turn away from the direction actually wanted.
-  const angle = Math.atan2(major - xx, xy);
-  return angle > Math.PI / 2 ? angle - Math.PI : angle;
+  const base = group * axes;
+  const block = group * axes * axes;
+  const covariance: EllipseCovariance = {
+    xx: covariances[block + xAxis * axes + xAxis] ?? 0,
+    xy: covariances[block + xAxis * axes + yAxis] ?? 0,
+    yy: covariances[block + yAxis * axes + yAxis] ?? 0,
+  };
+  const { rx, ry, angle } = ellipseAxes(covariance, standardDeviations);
+  const cx = means[base + xAxis] ?? 0;
+  const cy = means[base + yAxis] ?? 0;
+  if (!Number.isFinite(rx) || !Number.isFinite(ry)) return null;
+  if (!Number.isFinite(cx) || !Number.isFinite(cy)) return null;
+  return { cx, cy, rx, ry, angle, count, covariance };
 }
 
 /**
@@ -227,4 +181,21 @@ export function ellipseStandardDeviations(size: EllipseSize): number {
     return Math.max(size.standardDeviations, 0);
   }
   return standardDeviationsForCoverage(size.probability);
+}
+
+/*
+ * A run of points read as a two-column matrix, so a group handed as objects
+ * is measured by the same scan as one handed as a score matrix.
+ */
+function pointMatrix(points: readonly EllipsePoint[]): MatrixLike {
+  return {
+    rows: points.length,
+    columns: 2,
+    get(rowIndex: number, columnIndex: number): number {
+      const point = points[rowIndex];
+      if (point === undefined) return Number.NaN;
+      if (columnIndex === 0) return point.x;
+      return columnIndex === 1 ? point.y : Number.NaN;
+    },
+  };
 }

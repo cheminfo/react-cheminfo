@@ -12,6 +12,7 @@ export {
   citationFilename,
   formatCitation,
 } from './formats.ts';
+export { OPENCHEMLIB_PAPER, OPENCHEMLIB_WORK } from './openchemlibPaper.ts';
 export { PLATFORM_PAPER, PLATFORM_WORK } from './platformPaper.ts';
 export type { Reference, ReferenceAuthor } from './reference.ts';
 export { doiUrl } from './reference.ts';

@@ -1,3 +1,5 @@
+import { chartGroupIndex } from '../../chart/core/chartGroups.ts';
+
 /**
  * Where every point sits on screen, as two parallel arrays.
  *
@@ -68,7 +70,9 @@ export function nearestPointIndex(
     const deltaX = pointX - x;
     const deltaY = pointY - y;
     const distance = deltaX * deltaX + deltaY * deltaY;
-    if (distance > limit) continue;
+    // Written so a point that is not a number is out of reach, rather than
+    // taken as the first match and then never beaten by a real one.
+    if (!(distance <= limit)) continue;
     if (nearest === -1 || distance < nearestDistance) {
       nearest = index;
       nearestDistance = distance;
@@ -107,4 +111,37 @@ export function pointsWithinBounds(
     mask[index] = 1;
   }
   return mask;
+}
+
+/**
+ * Each group's running total over the pixels, as `x`, `y` and how many points
+ * landed in it, at `group * 3`, `group * 3 + 1` and `group * 3 + 2`.
+ *
+ * Averaging pixels is the same answer as averaging data values on a linear
+ * axis and one pass fewer. A group's name and the cross at its average are
+ * both placed from here, so turning both on marks one spot rather than two.
+ * @param points - Where every point sits on screen.
+ * @param groupOf - Which group each point belongs to.
+ * @param groups - How many groups there are.
+ * @returns The sums; divide by the count for the mean, and skip a group whose count is zero.
+ */
+export function scatterGroupPixelSums(
+  points: ScreenPoints,
+  groupOf: ArrayLike<number>,
+  groups: number,
+): Float64Array {
+  const sums = new Float64Array(Math.max(0, groups) * 3);
+  const count = Math.min(points.x.length, points.y.length, groupOf.length);
+  for (let index = 0; index < count; index++) {
+    const group = chartGroupIndex(groupOf, index, groups);
+    if (group === -1) continue;
+    const x = points.x[index] ?? Number.NaN;
+    const y = points.y[index] ?? Number.NaN;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    const slot = group * 3;
+    sums[slot] = (sums[slot] ?? 0) + x;
+    sums[slot + 1] = (sums[slot + 1] ?? 0) + y;
+    sums[slot + 2] = (sums[slot + 2] ?? 0) + 1;
+  }
+  return sums;
 }

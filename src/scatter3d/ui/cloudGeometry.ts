@@ -1,13 +1,12 @@
 /**
  * Where the cube, the cloud and the shells land on screen for one camera.
  *
- * Everything a cloud draws is cut once, in cube units, and re-projected on
- * every turn — so an orbit costs one multiply-add per vertex and nothing else.
- * That is what keeps a drag smooth on a figure holding a dozen shells of a
- * hundred and sixty faces each, and it is why the cutting and the projecting
- * are two steps rather than one.
+ * Everything a cloud draws is fitted once, in cube units, and re-projected on
+ * every turn — so an orbit costs one rotation per sample and one silhouette
+ * per shell, and nothing is fitted again while the box is turning.
  */
 
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { ScreenPoints } from '../../scatter/core/screenPoints.ts';
 import type { ConfidenceEllipsoid } from '../core/confidenceEllipsoid.ts';
 import { ellipsoidSilhouette } from '../core/ellipsoidSilhouette.ts';
@@ -16,7 +15,7 @@ import type {
   OrbitViewport,
   Vector3,
 } from '../core/orbitCamera.ts';
-import { projectPoint } from '../core/orbitCamera.ts';
+import { depthFraction, projectPoint } from '../core/orbitCamera.ts';
 
 /** Room kept between the figure's edge and the cube, in pixels. */
 export const CLOUD_MARGIN = 16;
@@ -111,6 +110,36 @@ export function projectCloud(
   return { points: { x, y }, depths, order };
 }
 
+/**
+ * How large each dot is drawn, from how near the front of the box it sits.
+ *
+ * A fifth larger at the front than at the back: enough that the eye reads it
+ * as depth when it is looking for depth, and little enough that nobody takes
+ * it for a value — a dot size that carried a measurement would be a fourth
+ * dimension nothing labelled. It is read from the projection rather than from
+ * the data, so a turn changes it and a filter does not.
+ * @param depths - How far towards the reader each sample is, in cube units.
+ * @param radius - Radius of a dot at the middle of the box, in pixels.
+ * @returns One radius per sample, in pixels.
+ */
+export function cloudPointRadii(
+  depths: Float64Array,
+  radius: number,
+): Float64Array {
+  const radii = new Float64Array(depths.length);
+  for (let index = 0; index < depths.length; index++) {
+    const fraction = depthFraction(depths[index] as number);
+    radii[index] = radius * (NEAREST_SHRINK + DEPTH_RANGE * fraction);
+  }
+  return radii;
+}
+
+/** How much smaller than `radius` the dot at the very back is drawn. */
+const NEAREST_SHRINK = 0.9;
+
+/** How much the radius grows from the back of the box to its front. */
+const DEPTH_RANGE = 0.4;
+
 /** One shell's outline, ready to be filled. */
 export interface CloudOutline {
   /** Where its middle landed, in pixels from the left. */
@@ -142,11 +171,11 @@ export function projectShellOutline(
   const at = projectPoint(ellipsoid.center, camera, viewport);
   const { rx, ry, angle } = ellipsoidSilhouette(ellipsoid, camera);
   const outline = {
-    cx: round(at.x),
-    cy: round(at.y),
-    rx: round(rx * viewport.scale),
-    ry: round(ry * viewport.scale),
-    angle: round((angle * 180) / Math.PI),
+    cx: chartRoundPixel(at.x),
+    cy: chartRoundPixel(at.y),
+    rx: chartRoundPixel(rx * viewport.scale),
+    ry: chartRoundPixel(ry * viewport.scale),
+    angle: chartRoundPixel((angle * 180) / Math.PI),
     depth: at.depth,
   };
   for (const value of [outline.cx, outline.cy, outline.rx, outline.ry]) {
@@ -184,17 +213,11 @@ export function projectSegments(
     const start = projectPoint(from, camera, viewport);
     const end = projectPoint(to, camera, viewport);
     lines.push({
-      x1: round(start.x),
-      y1: round(start.y),
-      x2: round(end.x),
-      y2: round(end.y),
+      x1: chartRoundPixel(start.x),
+      y1: chartRoundPixel(start.y),
+      x2: chartRoundPixel(end.x),
+      y2: chartRoundPixel(end.y),
     });
   }
   return lines;
 }
-
-/*
- * Two decimals, which is under a tenth of a device pixel at any zoom a browser
- * offers and keeps the markup short enough to read in a failing test.
- */
-const round = (value: number): number => Math.round(value * 100) / 100;

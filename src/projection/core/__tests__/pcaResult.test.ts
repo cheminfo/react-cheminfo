@@ -5,15 +5,9 @@ import { expect, test } from 'vitest';
 import { rowMatrix } from '../../../chart/core/matrix.ts';
 import type { PcaLike } from '../pcaLike.ts';
 import { pcaResult } from '../pcaResult.ts';
-import type { VariableAxis } from '../variableAxis.ts';
 
-const IRIS_AXIS: VariableAxis = {
-  kind: 'named',
-  names: ['Sepal length', 'Sepal width', 'Petal length', 'Petal width'],
-};
+import { IRIS_AXIS, IRIS_PCA as pca, IRIS_ROWS as rows } from './iris.ts';
 
-const rows = getNumbers();
-const pca = new PCA(rows, { scale: true });
 const result = pcaResult(pca, { rows, scaled: true, variables: IRIS_AXIS });
 
 test('every component keeps its share, and they add up to one', () => {
@@ -94,7 +88,7 @@ test('the average, the scaling and the spread of the scores are read off the row
 });
 
 test('a model that did not scale offers no scaling', () => {
-  const unscaled = pcaResult(pca, { rows, variables: IRIS_AXIS });
+  const unscaled = pcaResult(new PCA(rows), { rows, variables: IRIS_AXIS });
 
   expect(unscaled.loadings?.scales).toBeUndefined();
   expect(unscaled.loadings?.valueLabel).toBe('');
@@ -157,6 +151,41 @@ test('a model that dropped a column is refused before it mislabels a panel', () 
   };
 
   expect(() => pcaResult(narrow, { rows })).toThrow('ignoreZeroVariance');
+});
+
+test('a model that reports its own scaling is believed over a missing flag', () => {
+  const told = pcaResult(pca, { rows, variables: IRIS_AXIS });
+
+  expect(told.loadings?.scales).toHaveLength(4);
+  expect(told.loadings?.scales?.[0]).toBeCloseTo(0.8280661279778629, 12);
+});
+
+test('a model that reports the columns it dropped keeps every measurement in place', () => {
+  const kept = rows.map((row) => [row[0] ?? 0, row[1] ?? 0, row[2] ?? 0]);
+  const padded = kept.map((row) => [
+    row[0] ?? 0,
+    7,
+    row[1] ?? 0,
+    7,
+    row[2] ?? 0,
+  ]);
+  const wide = pcaResult(
+    new PCA(padded, { scale: true, ignoreZeroVariance: true }),
+    { rows: padded },
+  );
+  const narrow = pcaResult(new PCA(kept, { scale: true }), { rows: kept });
+
+  expect(wide.loadings?.weights.columns).toBe(5);
+  expect(wide.loadings?.weights.get(0, 1)).toBeCloseTo(0, 15);
+  expect(wide.loadings?.weights.get(1, 3)).toBeCloseTo(0, 15);
+  expect(wide.loadings?.weights.get(0, 2)).toBe(
+    narrow.loadings?.weights.get(0, 1),
+  );
+  expect(wide.loadings?.weights.get(2, 4)).toBe(
+    narrow.loadings?.weights.get(2, 2),
+  );
+  expect(wide.loadings?.mean?.[3]).toBe(7);
+  expect(wide.scores.get(0, 0)).toBe(narrow.scores.get(0, 0));
 });
 
 test('samples placed into a finished model are appended and counted apart', () => {

@@ -4,7 +4,11 @@ import { parseShareConfig } from '../config.ts';
 import { escapeAttribute, escapeText } from '../escape.ts';
 import { buildEmbedCode, buildShareUrl } from '../url.ts';
 
-import { BARE_VOCABULARY, VOCABULARY } from './vocabulary.ts';
+import {
+  BARE_VOCABULARY,
+  HEADER_VOCABULARY,
+  VOCABULARY,
+} from './vocabulary.ts';
 
 const BASE = 'https://chemcalc.org/mf-finder';
 
@@ -44,6 +48,17 @@ test('the current address can be handed over as it is', () => {
   });
 
   expect(url).toBe('https://example.org/course/?mf=CH4&hide=about');
+});
+
+test('an embedded link leaves out the header parts it no longer has', () => {
+  const url = buildShareUrl({
+    base: BASE,
+    search: 'mf=CH4',
+    config: parseShareConfig('embed=1&hide=tabs,hints', HEADER_VOCABULARY),
+    vocabulary: HEADER_VOCABULARY,
+  });
+
+  expect(url).toBe('https://chemcalc.org/mf-finder?mf=CH4&embed=1&hide=hints');
 });
 
 test('a shared structure keeps its charge', () => {

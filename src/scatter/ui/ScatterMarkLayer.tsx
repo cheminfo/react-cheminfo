@@ -1,11 +1,11 @@
 import type { ReactElement } from 'react';
 
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { ScreenPoints } from '../core/screenPoints.ts';
+import { scatterGroupPixelSums } from '../core/screenPoints.ts';
 
 import type { ScatterPixelMark } from './scatterMarkGlyph.tsx';
 import { markGlyph } from './scatterMarkGlyph.tsx';
-
-export type { ScatterPixelMark } from './scatterMarkGlyph.tsx';
 
 /** What {@link ScatterMarkLayer} draws. */
 export interface ScatterMarkLayerProps {
@@ -140,8 +140,8 @@ function selectionRings(
       <circle
         key={index}
         data-ring="select"
-        cx={round(x)}
-        cy={round(y)}
+        cx={chartRoundPixel(x)}
+        cy={chartRoundPixel(y)}
         r={radius + GAPS.selection}
         strokeWidth={SELECTION_WIDTH}
         {...RING_STYLE}
@@ -177,8 +177,8 @@ function ring(
   return (
     <circle
       data-ring={kind}
-      cx={round(x)}
-      cy={round(y)}
+      cx={chartRoundPixel(x)}
+      cy={chartRoundPixel(y)}
       r={radius}
       strokeWidth={width}
       strokeDasharray={dashes}
@@ -203,7 +203,7 @@ function groupMeanGlyphs(
 ): ReactElement[] {
   const glyphs: ReactElement[] = [];
   if (groupOf === undefined || colors === undefined) return glyphs;
-  const sums = groupMeans(points, groupOf, colors.length);
+  const sums = scatterGroupPixelSums(points, groupOf, colors.length);
   for (let group = 0; group < colors.length; group++) {
     const seen = sums[group * 3 + 2] ?? 0;
     const color = colors[group];
@@ -215,31 +215,3 @@ function groupMeanGlyphs(
   }
   return glyphs;
 }
-
-/*
- * Each group's running total, as `x`, `y` and how many landed in it. Averaging
- * pixels is the same answer as averaging data values on a linear axis and one
- * pass fewer; one flat array costs nothing for a group nobody belongs to.
- */
-function groupMeans(
-  points: ScreenPoints,
-  groupOf: ArrayLike<number>,
-  groups: number,
-): Float64Array {
-  const sums = new Float64Array(groups * 3);
-  const total = Math.min(points.x.length, points.y.length, groupOf.length);
-  for (let index = 0; index < total; index++) {
-    const group = groupOf[index];
-    if (group === undefined || group < 0 || group >= groups) continue;
-    const x = points.x[index];
-    const y = points.y[index];
-    if (x === undefined || !Number.isFinite(x)) continue;
-    if (y === undefined || !Number.isFinite(y)) continue;
-    sums[group * 3] = (sums[group * 3] ?? 0) + x;
-    sums[group * 3 + 1] = (sums[group * 3 + 1] ?? 0) + y;
-    sums[group * 3 + 2] = (sums[group * 3 + 2] ?? 0) + 1;
-  }
-  return sums;
-}
-
-const round = (value: number): number => Math.round(value * 100) / 100;

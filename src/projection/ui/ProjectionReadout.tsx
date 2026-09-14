@@ -12,7 +12,7 @@ import type {
 import { formatProjectionValue } from './projectionFormat.ts';
 
 /** What {@link ProjectionReadout} says, and where. */
-export interface ProjectionReadoutProps {
+interface ProjectionReadoutProps {
   /** The row the card is about, as an index into the score matrix. */
   index: number;
   /** What the run produced, for the axis names and the sample's own scores. */

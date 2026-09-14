@@ -1,21 +1,19 @@
-import type { SettingsProblem } from '../core/problems.ts';
+import type { ProblemPart, SettingsProblem } from '../core/problems.ts';
 
 /**
- * The problems whose `where` is, or starts with, one of the given words.
+ * The problems about one part of the settings.
  *
- * The `where` strings are what `settingsProblems` writes, so a part of the
- * panel asks for its own by naming the same words it is headed with — which
- * keeps a problem next to the field that causes it rather than in one list at
- * the top, far from anything the reader can act on.
+ * A part of the panel asks for its own by the `part` every problem carries and
+ * never by the `where` it is labelled with, so rewording a label cannot move a
+ * problem away from the field that causes it — which is what keeps a problem
+ * next to that field rather than in one list at the top.
  * @param problems - Every problem the settings have.
- * @param prefixes - The `where` strings the part answers for.
+ * @param part - The part the panel answers for.
  * @returns Only those problems, in the order they were found.
  */
 export function problemsAbout(
   problems: readonly SettingsProblem[],
-  ...prefixes: readonly string[]
+  part: ProblemPart,
 ): SettingsProblem[] {
-  return problems.filter((entry) =>
-    prefixes.some((prefix) => entry.where.startsWith(prefix)),
-  );
+  return problems.filter((entry) => entry.part === part);
 }

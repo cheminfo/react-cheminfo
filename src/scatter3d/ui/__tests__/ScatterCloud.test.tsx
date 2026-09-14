@@ -2,8 +2,8 @@ import { getClassesAsNumber, getNumbers } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
-import type { ScatterCloudProps } from '../ScatterCloud.tsx';
 import { ScatterCloud } from '../ScatterCloud.tsx';
+import type { ScatterCloudProps } from '../scatterCloudProps.ts';
 
 const rows = getNumbers();
 const irisX = rows.map((row) => row[0] as number);
@@ -134,9 +134,9 @@ test('a dot at the front of the box is drawn larger than one at the back', () =>
       camera={{ yaw: 0, pitch: 0 }}
     />,
   );
-  const radii = [...layer(html, 'points').matchAll(/ r="([\d.]+)"/g)].map(
-    (found) => Number(found[1]),
-  );
+  const radii = [
+    ...layer(html, 'points').matchAll(/ r="(?<radius>[\d.]+)"/g),
+  ].map((found) => Number(found.groups?.radius));
 
   expect(radii).toHaveLength(2);
   expect(radii[1] as number).toBeGreaterThan(radii[0] as number);
@@ -196,6 +196,15 @@ test('a caller may say what a screen reader is told instead', () => {
   );
 
   expect(html).toContain('aria-label="The iris cloud"');
+});
+
+test('the cloud takes focus once, on the surface its keys are read from, and carries a site class', () => {
+  const html = renderToStaticMarkup(
+    <ScatterCloud {...IRIS} className="pca-space" />,
+  );
+
+  expect(occurrences(html, 'tabindex="0"')).toBe(1);
+  expect(html).toContain('<div class="pca-space"');
 });
 
 /**

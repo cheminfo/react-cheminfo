@@ -22,8 +22,8 @@ export const PLATFORM_PAPER: Reference = {
 };
 
 /**
- * The platform paper as the second work a site asks to be cited, after the work
- * the tool itself implements.
+ * The platform paper as the first work every site asks to be cited, before the
+ * works the tool itself implements.
  */
 export const PLATFORM_WORK: CitedWork = {
   reference: PLATFORM_PAPER,

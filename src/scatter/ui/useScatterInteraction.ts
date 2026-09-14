@@ -1,112 +1,20 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 import type { LassoPath } from '../core/lassoPath.ts';
 import { pointsInPolygon } from '../core/polygon.ts';
 import type { ScatterSelectionMode } from '../core/scatterSelection.ts';
-import type { ScreenPoints } from '../core/screenPoints.ts';
 import { nearestPointIndex } from '../core/screenPoints.ts';
 
-import type { LassoGesture, ScatterSurfaceProps } from './lassoGesture.ts';
-import { useLassoGesture } from './useLassoGesture.ts';
-import type { PointHoverApi } from './usePointHover.ts';
-import { DEFAULT_HOVER_RADIUS, usePointHover } from './usePointHover.ts';
-import type { ScatterKeyboardApi } from './useScatterKeyboard.ts';
-import { useScatterKeyboard } from './useScatterKeyboard.ts';
+import type { SurfaceEvent } from './lassoGesture.ts';
+import { surfacePosition } from './lassoGesture.ts';
 import type {
-  ScatterSelectionApi,
-  SelectionChange,
-} from './useScatterSelection.ts';
+  ScatterInteractionApi,
+  ScatterInteractionOptions,
+} from './scatterInteractionTypes.ts';
+import { useLassoGesture } from './useLassoGesture.ts';
+import { DEFAULT_HOVER_RADIUS, usePointHover } from './usePointHover.ts';
+import { useScatterKeyboard } from './useScatterKeyboard.ts';
 import { useScatterSelection } from './useScatterSelection.ts';
-
-/** What {@link useScatterInteraction} needs. */
-export interface ScatterInteractionOptions {
-  /** Where every point sits on screen; how many there are is read from it. */
-  points: ScreenPoints;
-  /**
-   * Where the plot's left edge is, so a gesture lands in the same space the
-   * points were measured in.
-   * @default 0
-   */
-  originX?: number;
-  /**
-   * Where its top edge is.
-   * @default 0
-   */
-  originY?: number;
-  /**
-   * The selected rows when the caller owns them.
-   * @default undefined — the hook keeps them
-   */
-  selected?: readonly number[];
-  /**
-   * The rows selected before the reader touches anything.
-   * @default undefined
-   */
-  defaultSelected?: readonly number[];
-  /**
-   * Called once per settled gesture, never during a drag.
-   * @default undefined
-   */
-  onSelectionChange?: (change: SelectionChange) => void;
-  /**
-   * What a gesture with no modifier held does to the selection.
-   * @default 'replace'
-   */
-  selectMode?: ScatterSelectionMode;
-  /**
-   * Whether a drag draws a lasso at all. The hover card works either way.
-   * @default true
-   */
-  enabled?: boolean;
-  /**
-   * Whether a finger draws one rather than scrolling the page.
-   * @default false
-   */
-  touchLasso?: boolean;
-  /**
-   * How near the pointer a point must be to be hovered or clicked, in pixels.
-   * @default 12
-   */
-  hoverRadius?: number;
-  /**
-   * One entry per point, a zero meaning it cannot be hovered or clicked.
-   * @default undefined — every point can be
-   */
-  included?: Uint8Array;
-  /**
-   * Called with the row under the pointer, or `-1`.
-   * @default undefined
-   */
-  onHoverChange?: (index: number) => void;
-  /**
-   * Called with the row whose card is pinned, or `-1`.
-   * @default undefined
-   */
-  onPinChange?: (index: number) => void;
-}
-
-/** Everything a scatter needs to be touched, in five pieces. */
-export interface ScatterInteractionApi {
-  /** Spread onto the transparent rectangle over the plot. */
-  surface: ScatterSurfaceProps;
-  /** What is picked, including what a half-drawn lasso would pick. */
-  selection: ScatterSelectionApi;
-  /** The point a card is about, and where to put it. */
-  hover: PointHoverApi;
-  /** The roving cursor, whose `onKeyDown` goes on the focusable wrapper. */
-  keyboard: ScatterKeyboardApi;
-  /** The outline being drawn, for the plot to stroke. */
-  lasso: LassoGesture;
-  /**
-   * Which point is near a position, or `-1`.
-   *
-   * The same search a click runs, offered on its own so that a gesture the
-   * hook does not own — a double click, which the plot answers because only
-   * the plot knows what a double click on empty ground means — asks it in the
-   * same words and with the same radius.
-   */
-  pointAt: (x: number, y: number) => number;
-}
 
 /**
  * Every way a reader touches a scatter, wired together.
@@ -141,6 +49,7 @@ export function useScatterInteraction(
     included,
     onHoverChange,
     onPinChange,
+    onLassoChange,
   } = options;
 
   const radius = hoverRadius ?? DEFAULT_HOVER_RADIUS;
@@ -193,7 +102,7 @@ export function useScatterInteraction(
     [caught, selectMask],
   );
 
-  const onClick = useCallback(
+  const clickAt = useCallback(
     (x: number, y: number, mode: ScatterSelectionMode) => {
       const index = nearestPointIndex(points, x, y, radius, included);
       if (index === -1) {
@@ -222,7 +131,7 @@ export function useScatterInteraction(
     mode: selectMode,
     onDraw,
     onComplete,
-    onClick,
+    onClick: clickAt,
     onMove,
     onLeave: leave,
   });
@@ -247,6 +156,29 @@ export function useScatterInteraction(
     [included, points, radius],
   );
 
+  const openAt = useCallback(
+    (event: SurfaceEvent) => {
+      const at = surfacePosition(event, originX, originY);
+      const index = pointAt(at.x, at.y);
+      if (index === -1) return null;
+      const { clientX, clientY } = event;
+      return { index, x: at.x, y: at.y, clientX, clientY };
+    },
+    [originX, originY, pointAt],
+  );
+
+  // Held in a ref so an inline arrow, which is how every caller writes it, does
+  // not put the callback in the effect's dependencies and report a drag that
+  // never changed on every render.
+  const reportLasso = useRef(onLassoChange);
+  useLayoutEffect(() => {
+    reportLasso.current = onLassoChange;
+  });
+  const drawing = lasso.drawing;
+  useEffect(() => {
+    reportLasso.current?.(drawing);
+  }, [drawing]);
+
   return {
     surface: lasso.surface,
     selection,
@@ -254,5 +186,7 @@ export function useScatterInteraction(
     keyboard,
     lasso,
     pointAt,
+    clickAt,
+    openAt,
   };
 }

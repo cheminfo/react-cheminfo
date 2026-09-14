@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+import { siteNameColors } from '../core/nameColors.ts';
 import type { EcosystemSite, SiteId } from '../core/sites.ts';
 import { siteUrl } from '../core/sites.ts';
 
@@ -7,17 +9,20 @@ import { SiteMark } from './marks.tsx';
 
 const TILE_STYLE: CSSProperties = {
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   padding: '7px 8px',
   border: '1px solid transparent',
   borderRadius: 10,
-  color: 'var(--text, #16202c)',
+  color: TOKEN.text,
   gap: 10,
   textDecoration: 'none',
   transition: 'background 120ms, border-color 120ms, transform 120ms',
 };
 const MARK_HOLDER_STYLE: CSSProperties = {
   display: 'flex',
+  // The name sits on the first line, so the mark answers that line rather than
+  // the middle of a tagline that may run to three.
+  marginTop: 1,
   transition: 'transform 160ms',
 };
 const TEXT_STYLE: CSSProperties = { minWidth: 0 };
@@ -37,11 +42,12 @@ const HERE_STYLE: CSSProperties = {
   textTransform: 'uppercase',
 };
 const TAGLINE_STYLE: CSSProperties = {
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: '0.75rem',
   lineHeight: 1.35,
 };
 
+/** What one tile of the family needs. */
 export interface SiteTileProps {
   /** The site the tile opens. */
   site: EcosystemSite;
@@ -63,6 +69,11 @@ export interface SiteTileProps {
    * @default false
    */
   newTab?: boolean;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -74,8 +85,16 @@ export interface SiteTileProps {
  * @returns The tile.
  */
 export function SiteTile(props: SiteTileProps): ReactElement {
-  const { site, isCurrent, isHovered = false, onHover, newTab = false } = props;
+  const {
+    className,
+    site,
+    isCurrent,
+    isHovered = false,
+    onHover,
+    newTab = false,
+  } = props;
   const lit = isHovered && !isCurrent;
+  const colors = siteNameColors(site);
 
   const body = (
     <>
@@ -90,11 +109,11 @@ export function SiteTile(props: SiteTileProps): ReactElement {
       <div style={TEXT_STYLE}>
         <div style={NAME_STYLE}>
           <span>
-            <span style={{ color: site.brand }}>{site.name.lead}</span>
+            <span style={{ color: colors.lead }}>{site.name.lead}</span>
             {site.name.dot ? (
-              <span style={{ color: 'var(--text-faint, #8a96a3)' }}>.</span>
+              <span style={{ color: colors.dot }}>.</span>
             ) : null}
-            <span style={{ color: site.brandAlt }}>{site.name.alt}</span>
+            <span style={{ color: colors.alt }}>{site.name.alt}</span>
           </span>
           {isCurrent ? (
             <span style={{ ...HERE_STYLE, color: site.brandAlt }}>
@@ -119,6 +138,7 @@ export function SiteTile(props: SiteTileProps): ReactElement {
 
   return (
     <a
+      className={className}
       style={style}
       href={siteUrl(site)}
       target={newTab ? '_blank' : undefined}
@@ -136,7 +156,7 @@ export function SiteTile(props: SiteTileProps): ReactElement {
 // A tile lights up in the colour of the site it opens, never in ours: the
 // pointer moving down the grid is what makes the pairs of colours read.
 function tint(site: EcosystemSite, isCurrent: boolean, lit: boolean): string {
-  if (isCurrent) return 'var(--surface-sunken, #f5f7fa)';
+  if (isCurrent) return TOKEN.surfaceSunken;
   return lit ? `color-mix(in oklab, ${site.brand} 9%, white)` : 'transparent';
 }
 
@@ -145,6 +165,6 @@ function borderOf(
   isCurrent: boolean,
   lit: boolean,
 ): string {
-  if (isCurrent) return 'var(--border, #dfe3e8)';
+  if (isCurrent) return TOKEN.border;
   return lit ? `color-mix(in oklab, ${site.brand} 32%, white)` : 'transparent';
 }

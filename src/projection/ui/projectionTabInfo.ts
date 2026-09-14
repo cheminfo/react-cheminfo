@@ -2,19 +2,18 @@
  * What each tab answers when the reader presses the question mark.
  *
  * The viewer is meant to be embedded in somebody else's page, so the paragraph
- * that used to stand under every figure now waits behind one glyph in the bar:
- * a reader who wants it opens it, and everybody else pays no vertical space
- * for it. Not one word of it was dropped in the move — the sentences are the
- * reason a reader who has never met a component can read the figure at all —
- * so they are built here, where what a tab claims about its own numbers can be
- * checked without rendering a chart.
+ * that explains each figure waits behind one glyph in the bar: a reader who
+ * wants it opens it, and everybody else pays no vertical space for it. It is
+ * written in full — the sentences are the reason a reader who has never met a
+ * component can read the figure at all — and built here, where what a tab
+ * claims about its own numbers can be checked without rendering a chart.
  */
 
 import { chartShare } from '../../chart/core/chartLabels.ts';
 import type { ExplainedShares } from '../core/explainedShares.ts';
+import { fillCopy } from '../core/fillCopy.ts';
 import type { LoadingProfiles } from '../core/loadingProfiles.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import { fillCopy } from '../core/projectionCopy.ts';
 
 import { legendTitle, variablesCaption } from './projectionVariablesWords.ts';
 
@@ -88,7 +87,7 @@ export function projectionSharesInfo(
  * @param copy - The words the viewer writes.
  * @returns The sentence.
  */
-export function projectionSharesSentence(
+function projectionSharesSentence(
   shares: ExplainedShares,
   copy: ProjectionCopy,
 ): string {

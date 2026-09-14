@@ -1,10 +1,18 @@
 import { HTMLSelect, InputGroup, Switch } from '@blueprintjs/core';
-import type { CSSProperties, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import type { FilterField } from '../core/filterFields.ts';
 
+import {
+  HELP_STYLE,
+  LABEL_STYLE,
+  MONOSPACE_STYLE,
+  SWITCH_STYLE,
+  sizedFieldStyle,
+} from './fieldStyles.ts';
+
 /** What {@link FilterChoiceControl} edits. */
-export interface FilterChoiceControlProps {
+interface FilterChoiceControlProps {
   /** Which option of the step is edited, and how. */
   field: FilterField;
   /** What the step holds for it, whatever shape that turns out to be. */
@@ -116,38 +124,6 @@ export function FilterChoiceControl(
   );
 }
 
-const FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-  minWidth: 120,
-  flex: '1 1 120px',
-} as const satisfies CSSProperties;
+const FIELD_STYLE = sizedFieldStyle(120);
 
-const FORMULA_FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-  minWidth: 220,
-  flex: '1 1 220px',
-} as const satisfies CSSProperties;
-
-const LABEL_STYLE = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: 'var(--text-muted, #5b6875)',
-} as const satisfies CSSProperties;
-
-const HELP_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;
-
-const SWITCH_STYLE = {
-  margin: 0,
-  fontSize: 12,
-} as const satisfies CSSProperties;
-
-const MONOSPACE_STYLE = {
-  fontFamily: 'monospace',
-} as const satisfies CSSProperties;
+const FORMULA_FIELD_STYLE = sizedFieldStyle(220);

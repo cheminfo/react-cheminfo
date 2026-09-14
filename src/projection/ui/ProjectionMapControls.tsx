@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react';
 
 import type { OverlayTier } from '../../overlay/core/overlayTiers.ts';
-import type { OverlayChipSetting } from '../../overlay/ui/OverlayChip.tsx';
 import { OverlayChip } from '../../overlay/ui/OverlayChip.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
@@ -14,6 +13,7 @@ import type {
 } from '../core/projectionOptions.ts';
 
 import type { ProjectionReading } from './projectionBarReadings.ts';
+import { projectionChipSettings } from './projectionBarReadings.ts';
 import {
   ellipseChoices,
   ellipseKey,
@@ -90,7 +90,7 @@ export function ProjectionMapControls(
 ): ReactElement {
   const { options, onChange, copy, groupLabel, hasGroups = false } = props;
   const { readings = NO_READINGS, tier = 'full' } = props;
-  const { bar, help } = copy;
+  const { bar, help, reason } = copy;
 
   const uncoloured = !hasGroups || options.colorBy === 'none';
   const settings = (
@@ -130,7 +130,7 @@ export function ProjectionMapControls(
       <>
         <OverlayChip
           label={bar.settings}
-          settings={chipSettings(readings)}
+          settings={projectionChipSettings(readings)}
           disabled={!hasGroups}
         >
           {settings}
@@ -149,7 +149,7 @@ export function ProjectionMapControls(
         value={options.colorBy}
         swatches={swatchesOf(readings)}
         disabled={!hasGroups}
-        disabledReason={NO_GROUPS_REASON}
+        disabledReason={reason.noGroups}
         options={projectionColourChoices(groupLabel, bar.uncoloured)}
         onChange={(colorBy) => onChange({ colorBy })}
       />
@@ -159,32 +159,13 @@ export function ProjectionMapControls(
         showKey={tier === 'full'}
         value={ellipseKey(options.ellipse)}
         disabled={uncoloured}
-        disabledReason={UNCOLOURED_REASON}
-        options={projectionOutlineChoices(options, bar.noOutlines)}
+        disabledReason={reason.uncolouredOutlines}
+        options={projectionOutlineChoices(options, copy)}
         onChange={(value) => onChange({ ellipse: ellipseSize(value) })}
       />
       {names}
     </>
   );
-}
-
-/**
- * What the chip reads out, which is every setting spelled in full.
- * @param readings - What the settings currently read.
- * @returns The chip's own settings.
- */
-function chipSettings(
-  readings: readonly ProjectionReading[],
-): readonly OverlayChipSetting[] {
-  const settings: OverlayChipSetting[] = [];
-  for (const reading of readings) {
-    settings.push({
-      label: reading.label,
-      value: reading.value,
-      swatches: reading.swatches,
-    });
-  }
-  return settings;
 }
 
 /**
@@ -227,7 +208,7 @@ interface MapSettingsProps {
  */
 function MapSettings(props: MapSettingsProps): ReactElement {
   const { options, onChange, copy, groupLabel, hasGroups } = props;
-  const { bar, help } = copy;
+  const { bar, help, outline } = copy;
 
   return (
     <>
@@ -244,14 +225,13 @@ function MapSettings(props: MapSettingsProps): ReactElement {
         help={help.ellipse}
         value={ellipseKey(options.ellipse)}
         disabled={!hasGroups || options.colorBy === 'none'}
-        options={ellipseChoices(options.ellipse)}
+        options={ellipseChoices(options.ellipse, outline)}
         onChange={(value) => onChange({ ellipse: ellipseSize(value) })}
       />
     </>
   );
 }
 
-/** Why the two settings are dead, written as the thing the data is missing. */
 /**
  * The two glyphs the switches ride as.
  *
@@ -262,10 +242,6 @@ function MapSettings(props: MapSettingsProps): ReactElement {
  */
 const GROUP_LABELS_GLYPH = 'tag';
 const IDS_GLYPH = 'id-number';
-
-const NO_GROUPS_REASON = 'These samples carry no groups to colour by.';
-const UNCOLOURED_REASON =
-  'Outlines follow the groups, so colour the map by them first.';
 
 /** No readings at all, which is what the panel behind the cog is handed. */
 const NO_READINGS: readonly ProjectionReading[] = [];

@@ -75,7 +75,10 @@ export function applyShareConfig<
     if (!owned.has(entry[0])) entries.push(entry);
   }
   if (config.embed) entries.push([EMBED_PARAM, '1']);
-  const hidden = orderHidden(new Set(config.hidden), vocabulary.parts);
+  const hidden = orderHidden(
+    new Set(config.hidden),
+    visibleShareParts(vocabulary.parts, config.embed),
+  );
   if (hidden.length > 0) entries.push([HIDE_PARAM, hidden.join(',')]);
   const values = config.params as Readonly<Record<string, unknown>>;
   for (const [key, codec] of Object.entries(codecs)) {
@@ -83,6 +86,26 @@ export function applyShareConfig<
     if (raw !== null) entries.push([key, raw]);
   }
   return serializeQuery(entries);
+}
+
+/**
+ * The parts a link can meaningfully switch off in a given layout: all of them
+ * on the full site, and only those outside the site header once the page is
+ * embedded, because the header and everything in it are already gone.
+ * @param parts - The hideable parts, in the vocabulary order.
+ * @param embed - Whether the link drops the site chrome.
+ * @returns The parts that still mean something, in the same order.
+ */
+export function visibleShareParts(
+  parts: readonly HideablePart[],
+  embed: boolean,
+): readonly HideablePart[] {
+  if (!embed) return parts;
+  const visible: HideablePart[] = [];
+  for (const part of parts) {
+    if (part.inHeader !== true) visible.push(part);
+  }
+  return visible;
 }
 
 /**

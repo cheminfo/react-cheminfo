@@ -1,6 +1,20 @@
 import { expect, test } from 'vitest';
 
-import { parseHexColor, toHexColor } from '../hex.ts';
+import { normalizeHexColor, parseHexColor, toHexColor } from '../hex.ts';
+
+test('a hex colour in any accepted spelling normalizes to lower-case six digits', () => {
+  expect(normalizeHexColor('#FFF')).toBe('#ffffff');
+  expect(normalizeHexColor(' #08f ')).toBe('#0088ff');
+  expect(normalizeHexColor('#440154')).toBe('#440154');
+});
+
+test('anything that is not a hex colour normalizes to null rather than throwing', () => {
+  expect(normalizeHexColor('440154')).toBeNull();
+  expect(normalizeHexColor('#4401')).toBeNull();
+  expect(normalizeHexColor('rebeccapurple')).toBeNull();
+  expect(normalizeHexColor(undefined)).toBeNull();
+  expect(normalizeHexColor(0x44_01_54)).toBeNull();
+});
 
 test('a six-digit colour reads as its three channels', () => {
   expect(parseHexColor('#440154')).toStrictEqual({

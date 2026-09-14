@@ -1,9 +1,11 @@
 import { InputGroup } from '@blueprintjs/core';
-import type { CSSProperties, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 
+import { HELP_STYLE, LABEL_STYLE, sizedFieldStyle } from './fieldStyles.ts';
+
 /** What {@link NumberField} edits. */
-export interface NumberFieldProps {
+interface NumberFieldProps {
   /** What the field is called, shown above the box. */
   label: string;
   /**
@@ -106,21 +108,4 @@ function read(text: string, integer: boolean): number | undefined {
   return parsed;
 }
 
-const FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-  minWidth: 120,
-  flex: '1 1 120px',
-} as const satisfies CSSProperties;
-
-const LABEL_STYLE = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: 'var(--text-muted, #5b6875)',
-} as const satisfies CSSProperties;
-
-const HELP_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;
+const FIELD_STYLE = sizedFieldStyle(120);

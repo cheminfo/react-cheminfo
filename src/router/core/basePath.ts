@@ -1,3 +1,5 @@
+import { trimTrailingSlash } from './address.ts';
+
 /**
  * Where a site is mounted, read off the page rather than off the build.
  *
@@ -38,9 +40,9 @@ export function basePathOf(siteUrl: string): string {
  */
 export function normalizeBasePath(basePath: string): string {
   const trimmed = basePath.trim();
-  if (trimmed === '' || trimmed === '/') return '';
   const opened = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-  return opened.replace(/\/+$/, '');
+  const closed = trimTrailingSlash(opened);
+  return closed === '/' ? '' : closed;
 }
 
 /**

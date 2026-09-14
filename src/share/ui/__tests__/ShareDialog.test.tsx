@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
-import type { ShareVocabulary } from '../../core/index.ts';
+import type { SharePreset, ShareVocabulary } from '../../core/index.ts';
 import { integerParam } from '../../core/index.ts';
 import { ShareDialog } from '../ShareDialog.tsx';
 
@@ -9,6 +9,12 @@ const PARAMS = { count: integerParam({ min: 1, max: 100, default: null }) };
 
 const VOCABULARY: ShareVocabulary<typeof PARAMS> = {
   parts: [
+    {
+      key: 'tabs',
+      label: 'The tab bar',
+      description: 'The tabs in the site header.',
+      inHeader: true,
+    },
     {
       key: 'menu',
       label: 'The other sets',
@@ -88,6 +94,38 @@ test('every part is offered, worded positively, with what hiding it does', () =>
   expect(html).toContain('Give up and see the answer');
 });
 
+test('an embedded draft does not offer the parts of the header it drops', () => {
+  const html = render();
+  const boxes = html.match(/type="checkbox"/g) ?? [];
+
+  expect(boxes).toHaveLength(4);
+  expect(html).not.toContain('The tab bar');
+  expect(html).not.toContain('The tabs in the site header.');
+});
+
+test('the full site offers the parts of its header', () => {
+  const html = render({ search: 'hide=tabs,menu' });
+  const boxes = html.match(/type="checkbox"/g) ?? [];
+
+  expect(boxes).toHaveLength(5);
+  expect(html).toContain('The tab bar');
+  expect(html).toContain(`${BASE}?hide=tabs,menu`);
+});
+
+test('embedding keeps what the draft says about a header part, without writing it', () => {
+  const html = render({
+    search: 'embed=1&hide=tabs,menu',
+    children: (draft) => (
+      <span>{`hidden:${draft.config.hidden.join(',')}`}</span>
+    ),
+  });
+
+  expect(html).toContain('<span>hidden:tabs,menu</span>');
+  expect(html).toContain(`${BASE}?embed=1&amp;hide=menu`);
+  expect(html).not.toContain('hide=tabs');
+  expect(html).not.toContain('The tab bar');
+});
+
 test('a vocabulary with no part to switch off offers no list', () => {
   const html = render({ vocabulary: { parts: [], params: PARAMS } });
 
@@ -140,4 +178,90 @@ test('a closed dialog holds no draft, so nothing survives into the next opening'
   expect(html).not.toContain('Share or embed');
   expect(html).not.toContain('type="checkbox"');
   expect(html).not.toContain(BASE);
+});
+
+const PRESETS: ReadonlyArray<SharePreset<typeof PARAMS>> = [
+  {
+    key: 'practice',
+    label: 'Practice set',
+    description: 'Ten exercises, with the answers left out.',
+    hidden: ['menu', 'answers'],
+    params: { count: 10 },
+  },
+  {
+    key: 'site',
+    label: 'Whole site',
+    description: 'Every part, header included.',
+    embed: false,
+  },
+];
+
+function tabTitles(html: string): string[] {
+  const titles: string[] = [];
+  for (const match of html.matchAll(
+    /<div[^>]*role="tab"[^>]*>(?<title>[^<]*)<\/div>/g,
+  )) {
+    const selected = match[0].includes('aria-selected="true"');
+    titles.push(`${match.groups?.title ?? ''}${selected ? ' *' : ''}`);
+  }
+  return titles;
+}
+
+test('without presets the dialog has no tabs', () => {
+  expect(tabTitles(render())).toStrictEqual([]);
+});
+
+test('presets are tabs, followed by a Custom tab holding the boxes', () => {
+  const html = render({ presets: PRESETS });
+  const boxes = html.match(/type="checkbox"/g) ?? [];
+
+  expect(tabTitles(html)).toStrictEqual([
+    'Practice set',
+    'Whole site',
+    'Custom *',
+  ]);
+  expect(boxes).toHaveLength(4);
+  expect(html).toContain(`${BASE}?embed=1&amp;hide=hints`);
+});
+
+test('a page already configured as a preset opens on that preset', () => {
+  const html = render({
+    presets: PRESETS,
+    search: 'embed=1&hide=answers,menu&count=10',
+  });
+
+  expect(tabTitles(html)).toStrictEqual([
+    'Practice set *',
+    'Whole site',
+    'Custom',
+  ]);
+  expect(html).toContain('Ten exercises, with the answers left out.');
+  expect(html).not.toContain('type="checkbox"');
+  expect(html).toContain(`${BASE}?embed=1&amp;hide=menu,answers&amp;count=10`);
+});
+
+test('a page not yet configured opens on the default preset', () => {
+  const html = render({ presets: PRESETS, defaultPreset: 'practice' });
+
+  expect(tabTitles(html)).toStrictEqual([
+    'Practice set *',
+    'Whole site',
+    'Custom',
+  ]);
+  expect(html).toContain(`${BASE}?embed=1&amp;hide=menu,answers&amp;count=10`);
+});
+
+test('a configured page keeps its own configuration over the default preset', () => {
+  const html = render({
+    presets: PRESETS,
+    defaultPreset: 'practice',
+    search: 'hide=hints',
+  });
+
+  expect(tabTitles(html)).toStrictEqual([
+    'Practice set',
+    'Whole site',
+    'Custom *',
+  ]);
+  expect(html).toContain(`${BASE}?hide=hints`);
 });

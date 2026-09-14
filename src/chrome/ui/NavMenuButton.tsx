@@ -27,6 +27,12 @@ export interface NavMenuButtonProps {
    */
   placement?: PopoverNextProps['placement'];
   /**
+   * Whether the trigger is reduced to its glyph, for a bar that has run out of
+   * room. The label is still what the pointer and a screen reader are told.
+   * @default false
+   */
+  compact?: boolean;
+  /**
    * What the menu adds under the pages — a divider and an action, typically.
    * @default undefined
    */
@@ -48,10 +54,18 @@ export function NavMenuButton(props: NavMenuButtonProps): ReactElement {
     activeId,
     icon,
     placement = 'bottom-start',
+    compact = false,
     children,
   } = props;
 
   const holdsActive = items.some((item) => item.id === activeId);
+  const classes = [
+    'nav-link',
+    icon === undefined ? null : 'nav-link--icon',
+    holdsActive ? 'nav-link--active' : null,
+  ]
+    .filter((part) => part !== null)
+    .join(' ');
 
   return (
     <PopoverNext
@@ -83,12 +97,19 @@ export function NavMenuButton(props: NavMenuButtonProps): ReactElement {
     >
       <button
         type="button"
-        className={holdsActive ? 'nav-link nav-link--active' : 'nav-link'}
+        className={classes}
         aria-label={label}
+        title={compact ? label : undefined}
       >
-        {icon === undefined ? null : <Icon icon={icon} size={14} />}
-        {label}
-        <Icon icon="caret-down" size={14} />
+        {icon === undefined ? (
+          label
+        ) : (
+          <>
+            <Icon icon={icon} size={14} />
+            {compact ? null : <span className="nav-link__label">{label}</span>}
+          </>
+        )}
+        {compact ? null : <Icon icon="caret-down" size={14} />}
       </button>
     </PopoverNext>
   );

@@ -4,8 +4,37 @@ import {
   booleanParam,
   enumParam,
   integerParam,
+  numberParam,
   stringParam,
 } from '../params.ts';
+
+test('a real number is clamped and keeps its fraction', () => {
+  const opacity = numberParam({ min: 0, max: 1, default: 0.8 });
+
+  expect(opacity.parse('0.35')).toBe(0.35);
+  expect(opacity.parse('3')).toBe(1);
+  expect(opacity.parse('-1e999')).toBe(0);
+  expect(opacity.serialize(0.35)).toBe('0.35');
+  expect(opacity.serialize(7)).toBe('1');
+});
+
+test('a malformed real number falls back to its default', () => {
+  const size = numberParam({ min: 0.1, max: 5, default: 1 });
+
+  expect(size.parse(null)).toBe(1);
+  expect(size.parse(' ')).toBe(1);
+  expect(size.parse('big')).toBe(1);
+  expect(size.serialize(Number.NaN)).toBeNull();
+});
+
+test('a real number is rounded to its decimal places, and its default deleted', () => {
+  const size = numberParam({ min: 0.1, max: 5, default: 1, decimals: 2 });
+
+  expect(size.parse('1.23456')).toBe(1.23);
+  expect(size.serialize(0.1 + 0.2)).toBe('0.3');
+  expect(size.serialize(1.001)).toBeNull();
+  expect(size.serialize(1)).toBeNull();
+});
 
 test('a flag is on as soon as the link names it', () => {
   const flag = booleanParam();

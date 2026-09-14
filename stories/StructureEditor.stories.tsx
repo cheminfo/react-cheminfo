@@ -5,6 +5,7 @@ import { useState } from 'react';
 import type { StructureEditorChange } from '../src/structure/ui/EditorCanvas.tsx';
 import type { StructureEditorProps } from '../src/structure/ui/StructureEditor.tsx';
 import { StructureEditor } from '../src/structure/ui/StructureEditor.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import { BENZENE, CAFFEINE } from './structureFixtures.ts';
 
@@ -137,7 +138,7 @@ const DEMO_STYLE: CSSProperties = {
 
 const HINT_STYLE: CSSProperties = {
   margin: 0,
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: '0.8125rem',
 };
 
@@ -147,7 +148,7 @@ const READOUT_STYLE: CSSProperties = {
 };
 
 const LABEL_STYLE: CSSProperties = {
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: '0.6875rem',
   fontWeight: 700,
   letterSpacing: '0.04em',
@@ -158,10 +159,10 @@ const VALUE_STYLE: CSSProperties = {
   overflow: 'auto',
   maxHeight: '11rem',
   padding: '6px 8px',
-  border: '1px solid var(--border, #dfe3e8)',
+  border: `1px solid ${TOKEN.border}`,
   borderRadius: 6,
   margin: '2px 0 0',
-  background: 'var(--surface-sunken, #f5f7fa)',
+  background: TOKEN.surfaceSunken,
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontSize: '0.75rem',
   whiteSpace: 'pre',

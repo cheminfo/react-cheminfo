@@ -53,3 +53,37 @@ test('a caption is written on the picture', () => {
 
   expect(markup).toContain('butane');
 });
+
+test('the R and S of every stereocentre are written only when asked', () => {
+  const plain = renderToStaticMarkup(<Structure smiles="C[C@@H](Cl)CC" />);
+  const labelled = renderToStaticMarkup(
+    <Structure smiles="C[C@@H](Cl)CC" labels={{ stereo: true }} />,
+  );
+
+  expect(plain).not.toMatch(/>R<\/text>/);
+  expect(labelled).toMatch(/>R<\/text>/);
+  expect(labelled).not.toMatch(/>S<\/text>/);
+});
+
+test('the caller’s own atom labels are written on the picture', () => {
+  const plain = renderToStaticMarkup(<Structure smiles="CCO" />);
+  const labelled = renderToStaticMarkup(
+    <Structure smiles="CCO" atomLabels={new Map([[2, 'Q7']])} />,
+  );
+
+  expect(plain).not.toContain('Q7');
+  expect(labelled).toContain('<svg');
+  expect(labelled).toContain('Q7');
+});
+
+test('a label written instead of the symbol replaces it', () => {
+  const markup = renderToStaticMarkup(
+    <Structure
+      smiles="CCO"
+      atomLabels={new Map([[2, 'Zq']])}
+      atomLabelPlacement="instead"
+    />,
+  );
+
+  expect(markup).toContain('Zq');
+});

@@ -4,7 +4,16 @@ export type {
   GlossaryExample,
   GlossarySegment,
 } from './glossary.ts';
-export { parseGlossaryMarkers } from './glossary.ts';
+export { lookupGlossaryTerm, parseGlossaryMarkers } from './glossary.ts';
+export type { GlossaryListing } from './glossarySearch.ts';
+export { listGlossary } from './glossarySearch.ts';
+export type { InlineSegment, ParseInlineMarksOptions } from './inlineMarks.ts';
+export { parseInlineMarks } from './inlineMarks.ts';
+export type {
+  BucketProgressStoreOptions,
+  ProgressBucket,
+} from './bucketProgressStore.ts';
+export { bucketProgressStore } from './bucketProgressStore.ts';
 export type {
   ExerciseProgress,
   LocalStorageProgressStoreOptions,
@@ -12,7 +21,12 @@ export type {
   ProgressStore,
   ProgressSummary,
 } from './progress.ts';
-export { localStorageProgressStore, progressSummary } from './progress.ts';
+export {
+  emptyProgress,
+  localStorageProgressStore,
+  mergeExerciseProgress,
+  progressSummary,
+} from './progress.ts';
 export type {
   BaseExercise,
   ExerciseLevel,

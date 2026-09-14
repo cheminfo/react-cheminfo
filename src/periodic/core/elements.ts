@@ -42,7 +42,9 @@ export interface PeriodicElement {
   period: number;
   /** IUPAC column 1 to 18; `null` for the lanthanoids and the actinoids. */
   group: number | null;
+  /** Block its outermost electrons fill, which is where the table puts it. */
   block: ElementBlock;
+  /** Family the table colours it by. */
   category: ElementCategory;
 }
 

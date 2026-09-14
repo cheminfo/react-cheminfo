@@ -1,3 +1,5 @@
+import { roundTo } from '../../format/core/roundTo.ts';
+
 /**
  * A data-to-pixel mapping, held as the two numbers a multiply-add needs.
  *
@@ -69,4 +71,19 @@ export function chartValue(scale: ChartScale, pixel: number): number {
   if (scale.factor === 0) return scale.offset;
   const value = (pixel - scale.offset) / scale.factor;
   return value === 0 ? 0 : value;
+}
+
+/**
+ * A pixel coordinate rounded for the markup.
+ *
+ * Two decimals is under a tenth of a device pixel at any zoom a browser offers
+ * and keeps the markup short enough to read in a failing test. One decimal is
+ * for a mark written thousands of times into one `d` — a lasso, a stick chart,
+ * the dots of a pair grid — where the string length is the cost.
+ * @param value - The coordinate, in pixels.
+ * @param decimals - How many decimals to keep: `2` for a mark, `1` for a dense path.
+ * @returns The rounded coordinate.
+ */
+export function chartRoundPixel(value: number, decimals: 1 | 2 = 2): number {
+  return roundTo(value, decimals);
 }

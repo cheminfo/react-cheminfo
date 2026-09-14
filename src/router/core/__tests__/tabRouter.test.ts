@@ -176,3 +176,41 @@ test('keepEmptyValues writes the flag a teacher typed back into the link', () =>
     embed: '',
   });
 });
+
+test('a legacy hash link is replaced by the address the router writes', () => {
+  const adopting = createTabRouter<Tab>({
+    tabs: ['convert', { id: 'tutorial', takesId: true }],
+    home: 'convert',
+    adoptLegacyHash: true,
+  });
+
+  expect(adopting.mode).toBe('path');
+  expect(adopting.legacyAddress('/?embed#/tutorial/3')).toBe(
+    '/tutorial/3?embed',
+  );
+  expect(adopting.legacyAddress('/#/convert')).toBe('/');
+  expect(adopting.legacyAddress('/tutorial#results')).toBeNull();
+  expect(adopting.legacyAddress('/tutorial/3')).toBeNull();
+  expect(router().legacyAddress('/#/tutorial/3')).toBeNull();
+});
+
+test('a mounted router adopts a legacy link under its mount', () => {
+  const mounted = createTabRouter<Tab>({
+    tabs: ['convert', { id: 'tutorial', takesId: true }],
+    home: 'convert',
+    basePath: '/surge',
+    adoptLegacyHash: true,
+  });
+  const hash = createTabRouter<Tab>({
+    tabs: ['convert', 'tutorial'],
+    home: 'convert',
+    mode: 'hash',
+    adoptLegacyHash: true,
+  });
+
+  expect(mounted.legacyAddress('/surge/#/tutorial/3')).toBe(
+    '/surge/tutorial/3',
+  );
+  expect(hash.mode).toBe('hash');
+  expect(hash.legacyAddress('/#/tutorial')).toBeNull();
+});

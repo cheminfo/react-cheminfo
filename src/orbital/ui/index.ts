@@ -13,5 +13,7 @@ export type { AtomicOrbitalViewerProps } from './AtomicOrbitalViewer.tsx';
 export { AtomicOrbitalViewer } from './AtomicOrbitalViewer.tsx';
 export type { ViewerCapability } from './capability.ts';
 export { probeViewerCapability } from './capability.ts';
+export type { RadialPlotProps, RadialPlotUnit } from './RadialPlot.tsx';
+export { RadialPlot } from './RadialPlot.tsx';
 export type { VolumeStyle } from './renderVolume.ts';
-export type { OrbitalViewerOptions } from './viewer.ts';
+export type { OrbitalViewerOptions } from './orbitalPluginSpec.ts';

@@ -129,11 +129,14 @@ test('a problem is drawn under the part it is about, not in one list at the top'
   const problems: readonly SettingsProblem[] = [
     {
       severity: 'error',
+      part: 'memory',
       where: 'Memory',
       message: 'The budget must be a number above zero.',
     },
     {
       severity: 'error',
+      part: 'exclusion',
+      index: 0,
       where: 'Excluded zone 1',
       message: 'From is not below to.',
     },

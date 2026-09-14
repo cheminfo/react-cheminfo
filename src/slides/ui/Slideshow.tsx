@@ -6,7 +6,9 @@ import type {
 } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { isTextEntryTarget } from '../../hooks/ui/keyTargets.ts';
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { Talk } from '../core/index.ts';
 import { clampSlideIndex, slideActionForKey } from '../core/index.ts';
 
@@ -14,6 +16,8 @@ import type { RenderSlideLink } from './DemoLink.tsx';
 import type { SlideLayoutProps } from './Slide.tsx';
 import { SlideView } from './Slide.tsx';
 import { SlideshowBar } from './SlideshowBar.tsx';
+import type { SlideshowFullscreen } from './useSlideshowFullscreen.ts';
+import { useSlideshowFullscreen } from './useSlideshowFullscreen.ts';
 
 /** The talk being presented, and everything the site keeps a hand on. */
 export interface SlideshowProps {
@@ -81,12 +85,7 @@ export interface SlideshowProps {
    * that instead of their own element.
    * @default undefined — the player fullscreens itself
    */
-  fullscreen?: {
-    /** Whether the site is presenting. */
-    isFullscreen: boolean;
-    /** Called when `f` or the bar's button asks to change that. */
-    onToggle: () => void;
-  };
+  fullscreen?: SlideshowFullscreen;
 }
 
 /** Slides are authored on this canvas, and it is scaled to whatever it is played on. */
@@ -137,7 +136,10 @@ export function Slideshow(props: SlideshowProps): ReactElement {
 
   const [blank, setBlank] = useState<'black' | 'white' | null>(null);
   const [showNotes, setShowNotes] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { isFullscreen, toggle: toggleFullscreen } = useSlideshowFullscreen(
+    playerRef,
+    fullscreen,
+  );
 
   const goTo = useCallback(
     (next: number) => {
@@ -147,35 +149,12 @@ export function Slideshow(props: SlideshowProps): ReactElement {
     [onIndex, total],
   );
 
-  const ownFullscreen = fullscreen === undefined;
-  const toggleOwn = useCallback(() => {
-    const element = playerRef.current;
-    if (element === null) return;
-    if (document.fullscreenElement === element) {
-      void document.exitFullscreen().catch(() => undefined);
-    } else {
-      void element.requestFullscreen().catch(() => undefined);
-    }
-  }, []);
-  const toggleFullscreen = fullscreen?.onToggle ?? toggleOwn;
-
-  useEffect(() => {
-    if (!ownFullscreen) return;
-    function onFullscreenChange(): void {
-      setIsFullscreen(document.fullscreenElement === playerRef.current);
-    }
-    document.addEventListener('fullscreenchange', onFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', onFullscreenChange);
-    };
-  }, [ownFullscreen]);
-
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent): void {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       // A player embedded in a page shares the document with its fields, and
       // space is both "next slide" and a character.
-      if (isTextEntry(event.target)) return;
+      if (isTextEntryTarget(event.target)) return;
       const action = slideActionForKey(event.key, current, total);
       if (action === null) return;
       event.preventDefault();
@@ -212,12 +191,7 @@ export function Slideshow(props: SlideshowProps): ReactElement {
   const progress = total > 1 ? (current / (total - 1)) * 100 : 100;
 
   return (
-    <div
-      ref={playerRef}
-      className={
-        className === undefined ? 'slideshow' : `slideshow ${className}`
-      }
-    >
+    <div ref={playerRef} className={joinClassNames('slideshow', className)}>
       {/* Clicking the stage steps on, the way a projector remote does; the
           keyboard equivalent is the arrow keys the player already listens for. */}
       <div className="slideshow-stage" ref={stageRef} onClick={onStageClick}>
@@ -257,8 +231,8 @@ export function Slideshow(props: SlideshowProps): ReactElement {
         title={title ?? talk.meta.title}
         index={current}
         total={total}
-        isFullscreen={fullscreen?.isFullscreen ?? isFullscreen}
-        onGo={goTo}
+        isFullscreen={isFullscreen}
+        onIndexChange={goTo}
         onToggleFullscreen={toggleFullscreen}
         onExit={onExit}
       />
@@ -267,16 +241,5 @@ export function Slideshow(props: SlideshowProps): ReactElement {
         style={{ '--progress': `${progress}%` } as CSSProperties}
       />
     </div>
-  );
-}
-
-const TEXT_ENTRY_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
-
-function isTextEntry(target: EventTarget | null): boolean {
-  if (target === null) return false;
-  const element = target as { tagName?: unknown; isContentEditable?: unknown };
-  if (element.isContentEditable === true) return true;
-  return (
-    typeof element.tagName === 'string' && TEXT_ENTRY_TAGS.has(element.tagName)
   );
 }

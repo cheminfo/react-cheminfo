@@ -3,7 +3,7 @@ import { expect, test } from 'vitest';
 import { relativeLuminance } from '../contrast.ts';
 import { parseHexColor } from '../hex.ts';
 import { colorAt } from '../interpolate.ts';
-import { VIRIDIS_SCALE } from '../scale.ts';
+import { VIRIDIS_COLORS } from '../scaleData.ts';
 import {
   COLOR_SCALES,
   COLOR_SCALE_KIND_LABELS,
@@ -68,7 +68,7 @@ test('the default is viridis, and it is the one the shared list holds', () => {
 
   expect(DEFAULT_COLOR_SCALE_ID).toBe('viridis');
   expect(viridis.scale.stops.map((stop) => stop.color)).toStrictEqual([
-    ...VIRIDIS_SCALE,
+    ...VIRIDIS_COLORS,
   ]);
 });
 

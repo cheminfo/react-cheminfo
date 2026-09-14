@@ -1,13 +1,13 @@
 import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
-import { useState } from 'react';
 
 import { overlayIconButtonStyle } from './overlayControlStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
+import { useOverlayInteraction } from './useOverlayInteraction.ts';
 
 /** What {@link OverlayIconButton} needs. */
-export interface OverlayIconButtonProps {
+interface OverlayIconButtonProps {
   /**
    * The glyph: a Blueprint icon name, or an element of the caller's own — an
    * inline `<svg>` drawing the very mark the figure draws, which is the one
@@ -82,7 +82,7 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
   const { icon, label, value, active = false, disabled = false } = props;
   const { disabledReason, opensMenu = false, onClick, testId } = props;
   const { metrics } = useOverlaySurface();
-  const [lit, setLit] = useState(false);
+  const { hovered, focused, handlers } = useOverlayInteraction();
 
   const name = value === undefined ? label : `${label} — ${value}`;
   const told = disabled && disabledReason !== undefined ? disabledReason : name;
@@ -98,15 +98,13 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
       disabled={disabled}
       data-testid={testId}
       style={overlayIconButtonStyle(metrics, {
-        hovered: lit,
+        hovered,
+        focused,
         active,
         disabled,
       })}
       onClick={onClick}
-      onPointerEnter={() => setLit(true)}
-      onPointerLeave={() => setLit(false)}
-      onFocus={() => setLit(true)}
-      onBlur={() => setLit(false)}
+      {...handlers}
     >
       {typeof icon === 'string' ? (
         <Icon icon={icon} size={glyphSize(metrics.buttonSize)} />

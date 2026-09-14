@@ -5,7 +5,7 @@ import { ECOSYSTEM_SITES } from '../src/ecosystem/core/sites.ts';
 
 import { openStory } from './story.ts';
 
-const HEADING = 'Our other tools, all in the browser';
+const HEADING = 'Our tools, all in the browser';
 
 // Counted from the list itself, so adding a site does not leave the spec behind.
 const SITE_COUNT = ECOSYSTEM_SITES.length;

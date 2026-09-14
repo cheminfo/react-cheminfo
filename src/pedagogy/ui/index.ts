@@ -7,14 +7,26 @@ export type {
   ExerciseStatusIconProps,
 } from './ExerciseTags.tsx';
 export { ExerciseLevelTag, ExerciseStatusIcon } from './ExerciseTags.tsx';
-export { LEVEL_INTENT, LEVEL_ORDER, STATUS_ICON } from './exerciseMeta.ts';
+export {
+  LEVEL_INTENT,
+  LEVEL_ORDER,
+  STATUS_ICON,
+  STATUS_INTENT,
+} from './exerciseMeta.ts';
+export type { GlossaryDefinitionProps } from './GlossaryDefinition.tsx';
+export { GlossaryDefinition } from './GlossaryDefinition.tsx';
+export type { GlossaryIndexProps } from './GlossaryIndex.tsx';
+export { GlossaryIndex } from './GlossaryIndex.tsx';
 export type { GlossaryProviderProps } from './GlossaryProvider.tsx';
 export { GlossaryProvider } from './GlossaryProvider.tsx';
 export type { GlossaryTextProps } from './GlossaryText.tsx';
 export { GlossaryText } from './GlossaryText.tsx';
+export type { GlossaryContextValue } from './glossaryContext.ts';
 export { useGlossary } from './glossaryContext.ts';
 export type { HintLadderProps } from './HintLadder.tsx';
 export { HintLadder } from './HintLadder.tsx';
+export type { InlineTextProps } from './InlineText.tsx';
+export { InlineText } from './InlineText.tsx';
 export type { ReferenceGridProps } from './ReferenceGrid.tsx';
 export { ReferenceGrid } from './ReferenceGrid.tsx';
 export type {
@@ -29,6 +41,7 @@ export type {
   SyntaxTooltipProps,
 } from './SyntaxTooltip.tsx';
 export { SyntaxTooltip } from './SyntaxTooltip.tsx';
+export type { ProseTone } from './pedagogyStyle.ts';
 export type { TestCaseListProps } from './TestCaseList.tsx';
 export { TestCaseList } from './TestCaseList.tsx';
 export type {

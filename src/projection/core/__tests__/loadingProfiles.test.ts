@@ -1,4 +1,3 @@
-import { getNumbers } from 'ml-dataset-iris';
 import { PCA } from 'ml-pca';
 import { expect, test } from 'vitest';
 
@@ -6,15 +5,9 @@ import type { LoadingProfilesOptions } from '../loadingProfiles.ts';
 import { loadingProfiles } from '../loadingProfiles.ts';
 import { pcaResult } from '../pcaResult.ts';
 import type { ProjectionLoadings } from '../projectionResult.ts';
-import type { VariableAxis } from '../variableAxis.ts';
 
-const IRIS_AXIS: VariableAxis = {
-  kind: 'named',
-  names: ['Sepal length', 'Sepal width', 'Petal length', 'Petal width'],
-};
+import { IRIS_AXIS, IRIS_PCA as pca, IRIS_ROWS as rows } from './iris.ts';
 
-const rows = getNumbers();
-const pca = new PCA(rows, { scale: true });
 const result = pcaResult(pca, { rows, scaled: true, variables: IRIS_AXIS });
 const loadings = result.loadings as ProjectionLoadings;
 

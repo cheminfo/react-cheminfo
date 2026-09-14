@@ -8,10 +8,8 @@
  */
 
 import type { SubshellOccupancy } from './electronConfiguration.ts';
+import { MAXIMUM_PRINCIPAL_NUMBER } from './electronConfiguration.ts';
 import { groupRank } from './screening.ts';
-
-/** No known element occupies a shell above n = 7. */
-const HIGHEST_SHELL = 7;
 
 /**
  * Slater's rules can hand a badly-screened orbital a charge at or below zero —
@@ -49,7 +47,7 @@ export function hundDistribution(
  * @returns One shell past it, never below 4 and never above 7.
  */
 export function defaultMaximumShell(valenceShell: number): number {
-  return Math.min(HIGHEST_SHELL, Math.max(4, valenceShell + 1));
+  return Math.min(MAXIMUM_PRINCIPAL_NUMBER, Math.max(4, valenceShell + 1));
 }
 
 /**

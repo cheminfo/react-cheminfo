@@ -1,3 +1,6 @@
+import { clamp } from '../../format/core/clamp.ts';
+import { formatTrimmed } from '../../format/core/numbers.ts';
+
 import type {
   ColorInterpolation,
   ColorScale,
@@ -117,7 +120,7 @@ function parseStop(piece: string): ColorStop | null {
   if (!Number.isFinite(position)) return null;
   const color = text.slice(separator + 1).replace('#', '');
   if (!HEX_DIGITS.test(color)) return null;
-  return { position: Math.min(1, Math.max(0, position)), color: `#${color}` };
+  return { position: clamp(position, 0, 1), color: `#${color}` };
 }
 
 function isInterpolation(value: string): value is ColorInterpolation {
@@ -128,7 +131,5 @@ function isInterpolation(value: string): value is ColorInterpolation {
 }
 
 function formatPosition(position: number): string {
-  const inside = Math.min(1, Math.max(0, position));
-  if (!Number.isFinite(inside)) return '0';
-  return String(Number(inside.toFixed(POSITION_DECIMALS)));
+  return formatTrimmed(clamp(position, 0, 1), POSITION_DECIMALS);
 }

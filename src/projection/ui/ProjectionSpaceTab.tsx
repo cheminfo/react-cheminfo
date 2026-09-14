@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 import { useMemo } from 'react';
 
-import type { ScatterPointOpen } from '../../scatter/ui/scatterPlotProps.ts';
+import type { ScatterPointOpen } from '../../scatter/ui/scatterFigureProps.ts';
 import type { SelectionChange } from '../../scatter/ui/useScatterSelection.ts';
 import type { OrbitCamera } from '../../scatter3d/core/orbitCamera.ts';
 import { ScatterCloud } from '../../scatter3d/ui/ScatterCloud.tsx';
@@ -23,7 +23,7 @@ import {
 import { MINIMUM_SHELL_POINTS } from './projectionSpaceModel.ts';
 
 /** What {@link ProjectionSpaceTab} needs. */
-export interface ProjectionSpaceTabProps {
+interface ProjectionSpaceTabProps {
   /** What the run produced, whatever produced it. */
   result: ProjectionResult;
   /** The groups, resolved once by the viewer so every tab colours alike. */

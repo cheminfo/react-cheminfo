@@ -1,5 +1,7 @@
-import type { RefObject } from 'react';
 import { useEffect, useRef } from 'react';
+
+import type { ElementTarget } from './elementTarget.ts';
+import { resolveElementTarget } from './elementTarget.ts';
 
 /** The content-box size of an element, in CSS pixels. */
 export interface ElementSize {
@@ -16,11 +18,13 @@ export interface ElementSize {
  * passed on every render without tearing the observer down and setting it up
  * again. Nothing is observed where `ResizeObserver` is missing — a server
  * render, or a test rendering to a string — so the hook is safe to call there.
- * @param ref - Ref holding the element to watch.
+ * @param target - Ref holding the element to watch, or the element itself.
+ * Pass the element when it mounts later than the component, so the observer
+ * follows it.
  * @param callback - Receives the new content-box size.
  */
 export function useResizeObserver(
-  ref: RefObject<Element | null>,
+  target: ElementTarget,
   callback: (size: ElementSize) => void,
 ): void {
   const callbackRef = useRef(callback);
@@ -30,7 +34,7 @@ export function useResizeObserver(
   });
 
   useEffect(() => {
-    const element = ref.current;
+    const element = resolveElementTarget(target);
     const Observer = globalThis.ResizeObserver as
       typeof ResizeObserver | undefined;
     if (element === null || Observer === undefined) return;
@@ -46,5 +50,5 @@ export function useResizeObserver(
     return () => {
       observer.disconnect();
     };
-  }, [ref]);
+  }, [target]);
 }

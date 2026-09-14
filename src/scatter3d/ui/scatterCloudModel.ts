@@ -3,13 +3,14 @@
  * group, and the sentence a screen reader is given instead of the picture.
  *
  * It is kept out of the component for the same reason the flat scatter's model
- * is — a shell has to be cut before there is anything to project, and cutting
- * it inside the render callback would cut it again on every turn.
+ * is: a shell is fitted once per change of data, and fitting it inside the
+ * render callback would fit it again on every frame of a turn.
  */
 
+import { chartGroupIndex } from '../../chart/core/chartGroups.ts';
 import type { EllipseSize } from '../../scatter/core/confidenceEllipse.ts';
+import type { ScatterGroup } from '../../scatter/ui/scatterFigureProps.ts';
 import type { ScatterGroupInk } from '../../scatter/ui/scatterPlotModel.ts';
-import type { ScatterGroup } from '../../scatter/ui/scatterPlotProps.ts';
 import { confidenceEllipsoid } from '../core/confidenceEllipsoid.ts';
 import type { Vector3 } from '../core/orbitCamera.ts';
 
@@ -54,8 +55,8 @@ export function cloudShells(input: CloudShellsInput): CloudShell[] {
   const held: Vector3[][] = groups.map(() => []);
   const count = Math.min(cube.length, groupOf.length);
   for (let index = 0; index < count; index++) {
-    const group = groupOf[index];
-    if (group === undefined || group < 0 || group >= groups.length) continue;
+    const group = chartGroupIndex(groupOf, index, groups.length);
+    if (group === -1) continue;
     (held[group] as Vector3[]).push(cube[index] as Vector3);
   }
 

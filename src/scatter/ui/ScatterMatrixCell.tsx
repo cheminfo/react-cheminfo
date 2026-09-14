@@ -124,7 +124,7 @@ function frameProps(
 }
 
 // A diagonal cell has no pair of its own, so it offers itself against the
-// neighbour it is nearest: whoever clicked `PC 3` wants to see PC 3, and the
+// neighbour it is nearest: whoever clicked `PC3` wants to see PC3, and the
 // map has to plot it against something.
 function opener(
   grid: ScatterMatrixGrid,

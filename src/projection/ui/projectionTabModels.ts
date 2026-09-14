@@ -16,16 +16,19 @@ import type { ExplainedShares } from '../core/explainedShares.ts';
 import { explainedShares } from '../core/explainedShares.ts';
 import type { LoadingProfiles } from '../core/loadingProfiles.ts';
 import { loadingProfiles } from '../core/loadingProfiles.ts';
+import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 import type { ProjectionSamples } from '../core/projectionSamples.ts';
 
 /** What {@link useProjectionModels} needs. */
-export interface ProjectionModelsInput {
+interface ProjectionModelsInput {
   /** What the run produced, whatever produced it. */
   result: ProjectionResult;
   /** Who the rows are, for naming the sample a panel rebuilds. */
   samples: ProjectionSamples;
+  /** The words the viewer writes, whose weight label the weights panels read. */
+  copy: ProjectionCopy;
   /** Every option, already made safe against the result. */
   options: ProjectionOptions;
   /** The selected rows, as indices into the score matrix. */
@@ -57,7 +60,8 @@ export interface ProjectionModels {
 export function useProjectionModels(
   input: ProjectionModelsInput,
 ): ProjectionModels {
-  const { result, samples, options, selected } = input;
+  const { result, samples, copy, options, selected } = input;
+  const weightLabel = copy.words.weight;
   const { loadings, axes, scores } = result;
 
   const one = selected.length === 1 ? (selected[0] ?? -1) : -1;
@@ -72,10 +76,11 @@ export function useProjectionModels(
       spread: options.spread,
       sharedScale: options.sharedScale,
       order: options.variableOrder,
+      weightLabel,
       sampleScores:
         one < 0 ? undefined : rowScores(scores, one, options.variablesCount),
     });
-  }, [loadings, axes, scores, options, one]);
+  }, [loadings, axes, scores, options, one, weightLabel]);
 
   const shares = useMemo(
     () => explainedShares(axes, { target: options.shareTarget }),

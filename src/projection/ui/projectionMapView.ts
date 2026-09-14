@@ -38,7 +38,7 @@ import {
 import { MINIMUM_SHELL_POINTS } from './projectionSpaceModel.ts';
 
 /** What {@link useProjectionMapView} needs. */
-export interface ProjectionMapViewInput {
+interface ProjectionMapViewInput {
   /** What the run produced, whatever produced it. */
   result: ProjectionResult;
   /** The words the viewer writes, already merged over the defaults. */

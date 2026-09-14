@@ -16,3 +16,4 @@ export type { SlideshowBarProps } from './SlideshowBar.tsx';
 export { SlideshowBar } from './SlideshowBar.tsx';
 export type { TalkListProps } from './TalkList.tsx';
 export { TalkList } from './TalkList.tsx';
+export type { SlideshowFullscreen } from './useSlideshowFullscreen.ts';

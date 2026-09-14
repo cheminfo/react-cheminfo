@@ -6,12 +6,12 @@ import { chartBinCounts } from '../../chart/core/chartBins.ts';
 import type { ChartExtent } from '../../chart/core/chartExtent.ts';
 import { chartColumnExtent } from '../../chart/core/chartExtent.ts';
 import { OverlayLayer } from '../../overlay/ui/OverlayLayer.tsx';
-import type { EllipseSize } from '../core/confidenceEllipse.ts';
+import { DEFAULT_ELLIPSE_SIZE } from '../core/confidenceEllipse.ts';
+import { scatterGroupSpread } from '../core/scatterGroupSpread.ts';
 import { scatterSelectionMask } from '../core/scatterSelection.ts';
 
 import { ScatterMatrixCell } from './ScatterMatrixCell.tsx';
 import type { ScatterMatrixGrid } from './ScatterMatrixDiagonal.tsx';
-import { scatterGroupSpread } from './scatterGroupSpread.ts';
 import {
   SCATTER_MATRIX_GAP as GAP,
   SCATTER_MATRIX_MARGINS as MARGINS,
@@ -23,11 +23,6 @@ import {
   scatterMatrixPlotSide,
 } from './scatterMatrixLayout.ts';
 import type { ScatterMatrixProps } from './scatterMatrixProps.ts';
-
-export type {
-  ScatterMatrixAxis,
-  ScatterMatrixProps,
-} from './scatterMatrixProps.ts';
 
 /**
  * The same map drawn for every pair of axes, sharing one scale per axis.
@@ -44,10 +39,10 @@ export type {
  * @returns The grid.
  */
 export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
-  const { scores, axes, width, groupOf, groups, selected } = props;
+  const { className, scores, axes, width, groupOf, groups, selected } = props;
   const { overlay, testId, onSelectPair, onHoverChange } = props;
   const { bins = DEFAULT_BINS, pointRadius = DEFAULT_RADIUS } = props;
-  const { ellipse = DEFAULT_ELLIPSE, ellipseMinimumPoints = 3 } = props;
+  const { ellipse = DEFAULT_ELLIPSE_SIZE, ellipseMinimumPoints = 3 } = props;
   const { count = Math.min(SCATTER_MATRIX_MOST_AXES, axes.length) } = props;
 
   const wanted = Math.min(count, axes.length, scores.columns);
@@ -141,7 +136,11 @@ export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
   const inner = `${side + MARGINS.right + MARGINS.left}px `;
   const above = `${side + MARGINS.top + MARGINS.bottom}px `;
   return (
-    <div style={{ position: 'relative', width }} data-testid={testId}>
+    <div
+      className={className}
+      style={{ position: 'relative', width }}
+      data-testid={testId}
+    >
       <div
         style={{
           ...GRID_STYLE,
@@ -162,13 +161,6 @@ export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
 const DEFAULT_BINS = 24;
 const DEFAULT_RADIUS = 2;
 const EXTENT_PADDING = 0.06;
-
-/**
- * What a group is outlined at when the caller says nothing, held as one
- * constant so that a grid redrawn on a hover does not measure its groups again
- * for a size that never changed.
- */
-const DEFAULT_ELLIPSE: EllipseSize = { kind: 'coverage', probability: 0.95 };
 
 const GRID_STYLE = {
   display: 'grid',

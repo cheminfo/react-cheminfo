@@ -1,27 +1,25 @@
 import type { ReactElement } from 'react';
 
-import { chartAxisTitle } from '../../chart/core/chartLabels.ts';
 import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
 import { OverlayGroup } from '../../overlay/ui/OverlayGroup.tsx';
 import { OverlayNumber } from '../../overlay/ui/OverlayNumber.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
-import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
 import type { CloudGesture } from '../../scatter3d/core/cloudGesture.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
-import {
-  PROJECTION_PANEL_NAME,
-  PROJECTION_PANEL_SECTION,
-} from '../core/projectionStrings.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
 import type { ProjectionSpaceControlsProps } from './ProjectionSpaceControls.tsx';
-import { CLOUD_GESTURE_CHOICES } from './projectionCloudChoices.ts';
+import { projectionAxisChoices } from './projectionAxisChoices.ts';
+import {
+  projectionCloudGestureChoices,
+  projectionSelectModeChoices,
+} from './projectionWordChoices.ts';
 
 /** What {@link ProjectionSpaceMore} needs beyond the cloud's own controls. */
-export interface ProjectionSpaceMoreProps extends ProjectionSpaceControlsProps {
+interface ProjectionSpaceMoreProps extends ProjectionSpaceControlsProps {
   /** The reduced space the controls apply to; its axes fill the three pickers. */
   result: ProjectionResult;
   /**
@@ -53,7 +51,7 @@ export function ProjectionSpaceMore(
 ): ReactElement {
   const { result, options, onChange, copy } = props;
   const { selectedCount = 0, onResetView, onClearSelection } = props;
-  const { action, help, tab } = copy;
+  const { action, help, panel, reason, tab } = copy;
 
   const nothingPicked = selectedCount === 0;
 
@@ -77,32 +75,44 @@ export function ProjectionSpaceMore(
         </>
       }
     >
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.axes} divider={false}>
+      <OverlayGroup label={panel.section.axes} divider={false}>
         <OverlaySelect
-          label={PROJECTION_PANEL_NAME.xAxis}
+          label={panel.name.xAxis}
           help={help.xAxis}
           value={String(options.xAxis)}
-          options={axisChoices(result, [options.yAxis, options.zAxis])}
+          options={projectionAxisChoices(
+            result,
+            [options.yAxis, options.zAxis],
+            reason.axisTakenInSpace,
+          )}
           onChange={(value) => onChange({ xAxis: Number(value) })}
         />
         <OverlaySelect
-          label={PROJECTION_PANEL_NAME.yAxis}
+          label={panel.name.yAxis}
           help={help.yAxis}
           value={String(options.yAxis)}
-          options={axisChoices(result, [options.xAxis, options.zAxis])}
+          options={projectionAxisChoices(
+            result,
+            [options.xAxis, options.zAxis],
+            reason.axisTakenInSpace,
+          )}
           onChange={(value) => onChange({ yAxis: Number(value) })}
         />
         <OverlaySelect
-          label={PROJECTION_PANEL_NAME.zAxis}
+          label={panel.name.zAxis}
           help={help.zAxis}
           value={String(options.zAxis)}
-          options={axisChoices(result, [options.xAxis, options.yAxis])}
+          options={projectionAxisChoices(
+            result,
+            [options.xAxis, options.yAxis],
+            reason.axisTakenInSpace,
+          )}
           onChange={(value) => onChange({ zAxis: Number(value) })}
         />
       </OverlayGroup>
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.drawing}>
+      <OverlayGroup label={panel.section.drawing}>
         <OverlayNumber
-          label={PROJECTION_PANEL_NAME.pointRadius}
+          label={panel.name.pointRadius}
           help={help.pointRadius}
           value={options.pointRadius}
           min={1}
@@ -113,57 +123,24 @@ export function ProjectionSpaceMore(
           onChange={(pointRadius) => onChange({ pointRadius })}
         />
       </OverlayGroup>
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.handling}>
+      <OverlayGroup label={panel.section.handling}>
         <OverlaySegmented<CloudGesture>
-          label={PROJECTION_PANEL_NAME.cloudGesture}
+          label={panel.name.cloudGesture}
           help={help.cloudGesture}
           value={options.cloudGesture}
-          options={CLOUD_GESTURE_CHOICES}
+          options={projectionCloudGestureChoices(copy)}
           onChange={(cloudGesture) => onChange({ cloudGesture })}
         />
       </OverlayGroup>
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.selecting}>
+      <OverlayGroup label={panel.section.selecting}>
         <OverlaySegmented<ScatterSelectionMode>
-          label={PROJECTION_PANEL_NAME.selectMode}
+          label={panel.name.selectMode}
           help={help.selectMode}
           value={options.selectMode}
-          options={SELECT_MODE_CHOICES}
+          options={projectionSelectModeChoices(copy)}
           onChange={(selectMode) => onChange({ selectMode })}
         />
       </OverlayGroup>
     </OverlayPanel>
   );
-}
-
-const AXIS_TAKEN_NOTE = 'Already drawn on another axis.';
-
-/** The same three words the map's panel offers, for the same reason. */
-const SELECT_MODE_CHOICES: ReadonlyArray<OverlayOption<ScatterSelectionMode>> =
-  [
-    { value: 'replace', label: 'Replace' },
-    { value: 'add', label: 'Add' },
-    { value: 'remove', label: 'Remove' },
-  ];
-
-/**
- * The axes one picker offers, with the ones already drawn kept but unreachable.
- * @param result - The reduced space being drawn.
- * @param taken - The axes the other two pickers are showing.
- * @returns The choices, in the order the run produced them.
- */
-function axisChoices(
-  result: ProjectionResult,
-  taken: readonly number[],
-): OverlayOption[] {
-  const choices: OverlayOption[] = [];
-  for (const [index, axis] of result.axes.entries()) {
-    const drawn = taken.includes(index);
-    choices.push({
-      value: String(index),
-      label: chartAxisTitle(axis.name, { share: axis.share }),
-      disabled: drawn,
-      title: drawn ? AXIS_TAKEN_NOTE : undefined,
-    });
-  }
-  return choices;
 }

@@ -1,13 +1,17 @@
-import { Button, InputGroup } from '@blueprintjs/core';
-import type { CSSProperties, ReactElement } from 'react';
-import { useState } from 'react';
+import { InputGroup } from '@blueprintjs/core';
+import type { ReactElement } from 'react';
 
 import type { SpectraCalculation } from '../core/settings.ts';
 
-import { fitKeys, nextKey } from './rowKeys.ts';
+import { EditableRows } from './EditableRows.tsx';
+import {
+  LABEL_STYLE,
+  MONOSPACE_STYLE,
+  sizedFieldStyle,
+} from './fieldStyles.ts';
 
 /** What {@link CalculationRows} edits. */
-export interface CalculationRowsProps {
+interface CalculationRowsProps {
   /** The named formulas reported per spectrum. */
   value: readonly SpectraCalculation[];
   /** Called with the new list on every edit. */
@@ -26,27 +30,18 @@ export interface CalculationRowsProps {
  */
 export function CalculationRows(props: CalculationRowsProps): ReactElement {
   const { value, onChange } = props;
-  const [rowKeys, setRowKeys] = useState<readonly number[]>(() =>
-    value.map((_, index) => index),
-  );
-
-  if (rowKeys.length !== value.length) {
-    setRowKeys(fitKeys(rowKeys, value.length));
-  }
-
-  function write(index: number, patch: Partial<SpectraCalculation>): void {
-    onChange(
-      value.map((held, at) => (at === index ? { ...held, ...patch } : held)),
-    );
-  }
 
   return (
-    <div style={LIST_STYLE}>
-      {value.length === 0 ? (
-        <span style={EMPTY_STYLE}>None — only the ranges are reported.</span>
-      ) : null}
-      {value.map((calculation, index) => (
-        <div key={rowKeys[index] ?? index} style={ROW_STYLE}>
+    <EditableRows
+      value={value}
+      onChange={onChange}
+      emptyText="None — only the ranges are reported."
+      addText="Add a calculation"
+      newEntry={newCalculation}
+      removeLabel={removeLabel}
+      help={HELP}
+      renderRow={(calculation, index, replace) => (
+        <>
           <label style={NAME_FIELD_STYLE}>
             <span style={LABEL_STYLE}>Name</span>
             <InputGroup
@@ -58,7 +53,7 @@ export function CalculationRows(props: CalculationRowsProps): ReactElement {
               autoComplete="off"
               value={calculation.label}
               onValueChange={(label) => {
-                write(index, { label });
+                replace({ ...calculation, label });
               }}
             />
           </label>
@@ -69,93 +64,44 @@ export function CalculationRows(props: CalculationRowsProps): ReactElement {
               fill
               aria-label={`Formula of calculation ${String(index + 1)}`}
               placeholder="aromatic / aliphatic"
-              style={FORMULA_STYLE}
+              style={MONOSPACE_STYLE}
               spellCheck={false}
               autoCapitalize="off"
               autoCorrect="off"
               autoComplete="off"
               value={calculation.formula}
               onValueChange={(formula) => {
-                write(index, { formula });
+                replace({ ...calculation, formula });
               }}
             />
           </label>
-          <Button
-            icon="cross"
-            variant="minimal"
-            size="small"
-            aria-label={`Remove calculation ${String(index + 1)}`}
-            onClick={() => {
-              setRowKeys(rowKeys.filter((_, at) => at !== index));
-              onChange(value.filter((_, at) => at !== index));
-            }}
-          />
-        </div>
-      ))}
-      <div>
-        <Button
-          icon="plus"
-          size="small"
-          text="Add a calculation"
-          onClick={() => {
-            setRowKeys([...rowKeys, nextKey(rowKeys)]);
-            onChange([...value, { label: '', formula: '' }]);
-          }}
-        />
-      </div>
-      <span style={HELP_STYLE}>
-        A formula reads the range names as variables, and each one holds that
-        range&apos;s integral.
-      </span>
-    </div>
+        </>
+      )}
+    />
   );
 }
 
-const LIST_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 6,
-} as const satisfies CSSProperties;
+/**
+ * The row a new calculation opens with: nothing named, nothing written.
+ * @returns The calculation.
+ */
+function newCalculation(): SpectraCalculation {
+  return { label: '', formula: '' };
+}
 
-const ROW_STYLE = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  alignItems: 'flex-end',
-  gap: 8,
-} as const satisfies CSSProperties;
+/**
+ * What a screen reader calls one row's remove button.
+ * @param index - The row, counting from zero.
+ * @returns The label.
+ */
+function removeLabel(index: number): string {
+  return `Remove calculation ${String(index + 1)}`;
+}
 
-const NAME_FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-  minWidth: 140,
-  flex: '1 1 140px',
-} as const satisfies CSSProperties;
+const HELP: readonly string[] = [
+  "A formula reads the range names as variables, and each one holds that range's integral.",
+];
 
-const FORMULA_FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-  minWidth: 200,
-  flex: '2 1 200px',
-} as const satisfies CSSProperties;
+const NAME_FIELD_STYLE = sizedFieldStyle(140);
 
-const LABEL_STYLE = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: 'var(--text-muted, #5b6875)',
-} as const satisfies CSSProperties;
-
-const FORMULA_STYLE = {
-  fontFamily: 'ui-monospace, SFMono-Regular, monospace',
-} as const satisfies CSSProperties;
-
-const EMPTY_STYLE = {
-  fontSize: 12,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;
-
-const HELP_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;
+const FORMULA_FIELD_STYLE = sizedFieldStyle(200, 2);

@@ -16,6 +16,8 @@ import type {
 } from '../core/overlayMetrics.ts';
 import { overlayMetrics } from '../core/overlayMetrics.ts';
 
+import type { OverlayLayer } from './OverlayLayer.tsx';
+
 /** What every control inside an {@link OverlayLayer} reads from it. */
 export interface OverlaySurface {
   /** The measurements every card and control is drawn from. */

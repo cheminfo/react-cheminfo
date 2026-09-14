@@ -12,7 +12,9 @@
  * anything.
  */
 
+import { chartGroupIndex } from '../../chart/core/chartGroups.ts';
 import type { ScreenPoints } from '../core/screenPoints.ts';
+import { scatterGroupPixelSums } from '../core/screenPoints.ts';
 
 /** One word written on the plot, already placed. */
 export interface ScatterPixelLabel {
@@ -81,7 +83,7 @@ export function scatterPointLabels(
     const y = points.y[index];
     if (x === undefined || !Number.isFinite(x)) continue;
     if (y === undefined || !Number.isFinite(y)) continue;
-    const group = groupOf?.[index] ?? -1;
+    const group = chartGroupIndex(groupOf, index, colors?.length ?? 0);
     placed.push({ x, y, text, color: colors?.[group] ?? fallbackColor });
   }
   return placed;
@@ -110,20 +112,7 @@ export function scatterGroupLabels(
   const placed: ScatterPixelLabel[] = [];
   if (groupOf === undefined) return placed;
 
-  const sums = new Float64Array(names.length * 3);
-  const count = Math.min(points.x.length, points.y.length, groupOf.length);
-  for (let index = 0; index < count; index++) {
-    const group = groupOf[index];
-    if (group === undefined || group < 0 || group >= names.length) continue;
-    const x = points.x[index];
-    const y = points.y[index];
-    if (x === undefined || !Number.isFinite(x)) continue;
-    if (y === undefined || !Number.isFinite(y)) continue;
-    sums[group * 3] = (sums[group * 3] ?? 0) + x;
-    sums[group * 3 + 1] = (sums[group * 3 + 1] ?? 0) + y;
-    sums[group * 3 + 2] = (sums[group * 3 + 2] ?? 0) + 1;
-  }
-
+  const sums = scatterGroupPixelSums(points, groupOf, names.length);
   for (let group = 0; group < names.length; group++) {
     const seen = sums[group * 3 + 2] ?? 0;
     const text = names[group];

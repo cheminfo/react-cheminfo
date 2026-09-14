@@ -1,8 +1,11 @@
 import { Button, Callout } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { clamp } from '../../format/core/clamp.ts';
+
 import { GlossaryText } from './GlossaryText.tsx';
 
+/** What {@link HintLadder} needs. */
 export interface HintLadderProps {
   /** Every hint of the exercise, ordered from a nudge to almost the answer. */
   hints: readonly string[];
@@ -28,6 +31,11 @@ export interface HintLadderProps {
    * @default 'Hints'
    */
   title?: string;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -41,6 +49,7 @@ export interface HintLadderProps {
  */
 export function HintLadder(props: HintLadderProps): ReactElement | null {
   const {
+    className,
     hints,
     revealed,
     onReveal,
@@ -52,7 +61,7 @@ export function HintLadder(props: HintLadderProps): ReactElement | null {
   if (open === 0 && (onReveal === undefined || hints.length === 0)) return null;
 
   return (
-    <div style={ROOT_STYLE}>
+    <div className={className} style={ROOT_STYLE}>
       {onReveal !== undefined && hints.length > 0 && (
         <div>
           <Button
@@ -80,8 +89,7 @@ export function HintLadder(props: HintLadderProps): ReactElement | null {
 }
 
 function clampRevealed(revealed: number, total: number): number {
-  if (!Number.isFinite(revealed) || revealed <= 0) return 0;
-  return Math.min(Math.floor(revealed), total);
+  return Math.floor(clamp(revealed, 0, total));
 }
 
 const ROOT_STYLE: CSSProperties = {

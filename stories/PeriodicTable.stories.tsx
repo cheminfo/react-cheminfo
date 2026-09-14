@@ -2,15 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
-import {
-  VIRIDIS_SCALE,
-  positionInRange,
-  swatchFromScale,
-} from '../src/color/core/scale.ts';
+import { swatchAt } from '../src/color/core/interpolate.ts';
+import { positionInRange } from '../src/color/core/scale.ts';
+import { resolveColorScale } from '../src/color/core/scaleText.ts';
 import { UNKNOWN_SWATCH } from '../src/periodic/core/categories.ts';
 import type { PeriodicElement } from '../src/periodic/core/elements.ts';
 import type { PeriodicTableProps } from '../src/periodic/ui/PeriodicTable.tsx';
 import { PeriodicTable } from '../src/periodic/ui/PeriodicTable.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 // A property to colour the table by, so the "knows nothing about what it shows"
 // claim can be seen rather than read: the table is handed a swatch and a string
@@ -145,13 +144,15 @@ function PropertyMapDemo(props: PeriodicTableProps): ReactElement {
   );
 }
 
-const CAPTION_STYLE = { color: '#5b6875', fontSize: 13 };
+const CAPTION_STYLE = { color: TOKEN.textMuted, fontSize: 13 };
 
 function swatchFor(element: PeriodicElement) {
   const value = ELECTRONEGATIVITY[element.symbol];
   if (value === undefined) return UNKNOWN_SWATCH;
-  return swatchFromScale(VIRIDIS_SCALE, positionInRange(value, MIN, MAX));
+  return swatchAt(VIRIDIS, positionInRange(value, MIN, MAX));
 }
+
+const VIRIDIS = resolveColorScale('viridis').scale;
 
 function detailFor(element: PeriodicElement): string {
   const value = ELECTRONEGATIVITY[element.symbol];

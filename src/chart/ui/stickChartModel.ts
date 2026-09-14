@@ -14,12 +14,13 @@ import {
   chartValuesExtent,
 } from '../core/chartExtent.ts';
 import type { ChartScale } from '../core/chartScale.ts';
+import { chartRoundPixel } from '../core/chartScale.ts';
 
 /** One set of sticks. */
 export interface ChartStickSeries {
   /** A stable id, used as the React key and named in the tracking callback. */
   id: string;
-  /** What the legend calls it, e.g. `PC 1`. */
+  /** What the legend calls it, e.g. `PC1`. */
   label: string;
   /** Where each stick ends, one value per measurement. */
   values: ArrayLike<number>;
@@ -45,7 +46,7 @@ export interface ChartStickSeries {
   muted?: boolean;
 }
 /** What the geometry needs of a drawn frame: the two scales and the rectangle. */
-export interface StickFrame {
+interface StickFrame {
   /** The rectangle to draw in. */
   plot: { top: number; bottom: number; left: number; right: number };
   /** Data to pixels, horizontally. */
@@ -75,8 +76,8 @@ export function stickPath(
     if (at === undefined || value === undefined || !Number.isFinite(value)) {
       continue;
     }
-    const pixelX = round(x.offset + at * x.factor);
-    const top = round(y.offset + value * y.factor);
+    const pixelX = chartRoundPixel(x.offset + at * x.factor, 1);
+    const top = chartRoundPixel(y.offset + value * y.factor, 1);
     const start = item.from === undefined ? foot : startOf(item, index, y);
     if (start === null || !Number.isFinite(top)) continue;
     path += `M${pixelX} ${start}V${top}`;
@@ -98,23 +99,7 @@ function startOf(
 ): number | null {
   const value = item.from?.[index];
   if (value === undefined || !Number.isFinite(value)) return null;
-  return round(y.offset + value * y.factor);
-}
-
-/**
- * Where zero sits, which is what a stick stands on.
- *
- * The frame rules the plot at zero itself whenever the domain crosses it, so
- * this only says where a stick's foot goes and never draws anything.
- * @param frame - The rectangle and the two scales.
- * @returns The pixel, clamped into the plot so a domain above zero still has a
- * foot to stand on.
- */
-export function zeroAt(frame: StickFrame): number {
-  const { plot, y } = frame;
-  const at = y.offset;
-  if (!Number.isFinite(at)) return plot.bottom;
-  return round(Math.min(plot.bottom, Math.max(plot.top, at)));
+  return chartRoundPixel(y.offset + value * y.factor, 1);
 }
 
 /**
@@ -196,6 +181,18 @@ export function valueAt(scale: ChartScale, pixel: number): number {
     : (pixel - scale.offset) / scale.factor;
 }
 
-function round(pixel: number): number {
-  return Math.round(pixel * 10) / 10;
+/**
+ * Where zero sits, which is what a stick stands on.
+ *
+ * The frame rules the plot at zero itself whenever the domain crosses it, so
+ * this only says where a stick's foot goes and never draws anything.
+ * @param frame - The rectangle and the two scales.
+ * @returns The pixel, clamped into the plot so a domain above zero still has a
+ * foot to stand on.
+ */
+function zeroAt(frame: StickFrame): number {
+  const { plot, y } = frame;
+  const at = y.offset;
+  if (!Number.isFinite(at)) return plot.bottom;
+  return chartRoundPixel(Math.min(plot.bottom, Math.max(plot.top, at)), 1);
 }

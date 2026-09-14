@@ -59,6 +59,11 @@ export interface SpectraSettingsEditorProps {
    * @default undefined — no component picker is drawn
    */
   principalComponents?: PrincipalComponentPanel;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -79,7 +84,8 @@ export interface SpectraSettingsEditorProps {
 export function SpectraSettingsEditor(
   props: SpectraSettingsEditorProps,
 ): ReactElement {
-  const { value, onChange, spectrumIds, principalComponents } = props;
+  const { className, value, onChange, spectrumIds, principalComponents } =
+    props;
   const problems = settingsProblems(value);
 
   function writeProcessor(processor: SpectraProcessorSettings): void {
@@ -91,7 +97,7 @@ export function SpectraSettingsEditor(
   }
 
   return (
-    <div style={PANEL_STYLE}>
+    <div className={className} style={PANEL_STYLE}>
       <SettingsPart
         title="Every spectrum onto one grid"
         summary="What the processor is built with. Until this is settled no two spectra can be compared, and changing it recomputes every one of them."

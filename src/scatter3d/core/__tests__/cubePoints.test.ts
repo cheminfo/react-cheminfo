@@ -1,6 +1,43 @@
 import { expect, test } from 'vitest';
 
+import {
+  chartPadExtent,
+  chartValuesExtent,
+} from '../../../chart/core/chartExtent.ts';
 import { cubePoints } from '../cubePoints.ts';
+
+test('every coordinate is the padded closed form 2(v − min)/span − 1 to within rounding', () => {
+  const runs = [
+    { base: -3, span: 6 },
+    { base: 1600, span: 200 },
+    { base: 0, span: 0.02 },
+  ].map(({ base, span }) => {
+    const values = new Float64Array(5000);
+    for (let index = 0; index < values.length; index++) {
+      values[index] = base + ((index * 0.618_033_988_75) % 1) * span;
+    }
+    return values;
+  });
+  const [across, up, away] = runs as [Float64Array, Float64Array, Float64Array];
+  const points = cubePoints(across, up, away);
+
+  const mismatches: string[] = [];
+  for (let axis = 0; axis < 3; axis++) {
+    const values = runs[axis] as Float64Array;
+    const { min, max } = chartPadExtent(chartValuesExtent(values), 0.05);
+    for (let index = 0; index < values.length; index++) {
+      const expected =
+        (2 * ((values[index] as number) - min)) / (max - min) - 1;
+      const actual = points[index]?.[axis] as number;
+      if (!(Math.abs(actual - expected) <= 1e-14)) {
+        mismatches.push(`axis ${axis} row ${index}: ${actual} vs ${expected}`);
+      }
+    }
+  }
+
+  expect(points).toHaveLength(5000);
+  expect(mismatches).toStrictEqual([]);
+});
 
 const ACROSS = [-10, 0, 10];
 const UP = [0, 1, 2];

@@ -15,9 +15,6 @@
 
 import { PluginViewModel } from 'molstar/lib/extensions/plugin/view-model.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
-// Lowercased on import: it is a factory, not a constructor.
-import { DefaultPluginSpec as defaultPluginSpec } from 'molstar/lib/mol-plugin/spec.js';
-import { Color } from 'molstar/lib/mol-util/color/color.js';
 
 import type { OrbitalGrid } from '../core/grid.ts';
 import type { OrbitalContour } from '../core/isovalue.ts';
@@ -29,20 +26,13 @@ import {
   refitOrbital,
   setSpin,
 } from './camera.ts';
+import type { OrbitalViewerOptions } from './orbitalPluginSpec.ts';
+import { orbitalPluginSpec } from './orbitalPluginSpec.ts';
 import type { AxesStyle } from './renderAxes.ts';
 import { clearOrbitalAxes, renderOrbitalAxes } from './renderAxes.ts';
 import type { VolumeStyle } from './renderVolume.ts';
 import { clearSampledVolume, renderSampledVolume } from './renderVolume.ts';
 import { createSerialRunner } from './serial.ts';
-
-/** Settings fixed for the life of a viewer. */
-export interface OrbitalViewerOptions {
-  /**
-   * Scene background, as `#rrggbb`.
-   * @default '#ffffff'
-   */
-  background?: string;
-}
 
 /**
  * Create a viewer inside `container` and start initialising it.
@@ -77,27 +67,7 @@ export class OrbitalViewer {
   readonly ready: Promise<void>;
 
   constructor(container: HTMLElement, options: OrbitalViewerOptions = {}) {
-    const { background = '#ffffff' } = options;
-    const spec = defaultPluginSpec();
-    this.#model = new PluginViewModel({
-      spec: {
-        ...spec,
-        canvas3d: {
-          ...spec.canvas3d,
-          renderer: { backgroundColor: Color.fromHexStyle(background) },
-          camera: {
-            helper: { axes: { name: 'off', params: {} } },
-            // The camera is ours alone. Molstar reframes itself whenever a
-            // scene commit leaves the renderable count at zero, which is what
-            // replacing one orbital by another does — the old surfaces are
-            // removed and committed before the new ones exist — and it frames
-            // the whole sampled box rather than the isosurface inside it,
-            // which leaves the orbital a fifth of the frame wide.
-            manualReset: true,
-          },
-        },
-      },
-    });
+    this.#model = new PluginViewModel({ spec: orbitalPluginSpec(options) });
     this.#model.mount(container);
     this.ready = this.#model.initialized;
   }
@@ -208,9 +178,9 @@ export class OrbitalViewer {
   /**
    * Put the camera back where the orbital was first framed from.
    *
-   * The counterpart of `refit`: since a view is now kept across a change of
-   * orbital, a student who has turned the atom into an unreadable angle needs
-   * one way back.
+   * The counterpart of `refit`: the view is kept across a change of orbital,
+   * so a student who has turned the atom into an unreadable angle needs one
+   * way back.
    * @param durationMs - Transition length; 0 jumps.
    * @returns Nothing, once the camera has been set.
    */

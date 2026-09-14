@@ -5,9 +5,9 @@ import { useMemo, useState } from 'react';
 import type { OverlayLegendEntry } from '../src/overlay/ui/index.ts';
 import { OverlayLegend } from '../src/overlay/ui/index.ts';
 import { PROJECTION_COPY, fillCopy } from '../src/projection/core/index.ts';
-import type { ScatterMatrixProps } from '../src/scatter/ui/ScatterMatrix.tsx';
 import { ScatterMatrix } from '../src/scatter/ui/ScatterMatrix.tsx';
 import { ScatterPlot } from '../src/scatter/ui/ScatterPlot.tsx';
+import type { ScatterMatrixProps } from '../src/scatter/ui/scatterMatrixProps.ts';
 
 import {
   IRIS_GROUPS,

@@ -47,12 +47,11 @@ export interface CloudShellLayerProps {
  * a ring of facets, it stays a curve at any zoom, and there are no seams
  * between neighbouring faces to read as a wireframe.
  *
- * What the faces were for is kept in the fill. A ray through a shell crosses
- * it twice — the near wall and the far one — so the glass is darkest where the
- * reader looks through both walls at a glancing angle, which is the rim, and
- * lightest through the middle where the far wall is turned away. That is one
- * gradient, and it says the shell is a solid the same way a hundred and sixty
- * stacked polygons did.
+ * The depth is carried by the fill. A ray through a shell crosses it twice —
+ * the near wall and the far one — so the glass is darkest where the reader
+ * looks through both walls at a glancing angle, which is the rim, and lightest
+ * through the middle where the far wall is turned away. One radial gradient
+ * says the shell is a solid.
  * @param props - See {@link CloudShellLayerProps}.
  * @returns The shells.
  */

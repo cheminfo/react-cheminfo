@@ -1,8 +1,7 @@
 import {
   AnchorButton,
   Button,
-  Checkbox,
-  DialogBody,
+  Classes,
   DialogFooter,
   H6,
 } from '@blueprintjs/core';
@@ -14,18 +13,23 @@ import type {
   ShareConfig,
   ShareParamCodecs,
   ShareParamValues,
+  SharePreset,
   ShareVocabulary,
 } from '../core/index.ts';
 import {
+  applySharePreset,
   buildEmbedCode,
   buildShareUrl,
+  findSharePreset,
   isShareConfigured,
   parseShareConfig,
   suggestedShareConfig,
+  visibleShareParts,
 } from '../core/index.ts';
 
+import { ShareConfigOptions } from './ShareConfigOptions.tsx';
 import type { ShareDialogProps, ShareDraft } from './ShareDialog.tsx';
-import { SharePartOptions } from './SharePartOptions.tsx';
+import { SharePresetTabs } from './SharePresetTabs.tsx';
 import { withPart } from './draft.ts';
 
 const LEAD_STYLE: CSSProperties = {
@@ -39,12 +43,13 @@ const ACTIONS_STYLE: CSSProperties = {
   gap: 8,
   marginTop: 8,
 };
-const HINT_STYLE: CSSProperties = {
-  display: 'block',
-  marginLeft: 26,
-  color: 'var(--text-muted, #5b6875)',
-  fontSize: 12,
-};
+
+const NO_PRESETS: readonly never[] = [];
+
+// The dialog has a fixed height so switching preset does not resize it: the
+// body takes what the header and footer leave, and scrolls.
+const BODY_CLASS = `${Classes.DIALOG_BODY} ${Classes.DIALOG_BODY_SCROLL_CONTAINER}`;
+const BODY_STYLE: CSSProperties = { maxHeight: 'none', minHeight: 0 };
 
 /** Everything the dialog holds, minus what only its shell is concerned with. */
 export type ShareDialogContentProps<
@@ -63,6 +68,8 @@ export function ShareDialogContent<
   const {
     onClose,
     vocabulary,
+    presets = NO_PRESETS,
+    defaultPreset,
     title,
     baseUrl,
     search,
@@ -75,7 +82,10 @@ export function ShareDialogContent<
   const base = baseUrl ?? address?.href ?? '';
   const query = search ?? address?.search ?? '';
   const [config, setConfig] = useState<ShareConfig<Codecs>>(() =>
-    initialDraft(query, vocabulary),
+    initialDraft(query, vocabulary, findPreset(presets, defaultPreset ?? null)),
+  );
+  const [presetKey, setPresetKey] = useState<string | null>(
+    () => findSharePreset(config, presets, vocabulary)?.key ?? null,
   );
 
   function setEmbed(embed: boolean): void {
@@ -99,6 +109,13 @@ export function ShareDialogContent<
     }));
   }
 
+  function selectPreset(key: string | null): void {
+    setPresetKey(key);
+    const preset = findPreset(presets, key);
+    if (preset === undefined) return;
+    setConfig((previous) => applySharePreset(previous, preset, vocabulary));
+  }
+
   const draft: ShareDraft<Codecs> = {
     config,
     setEmbed,
@@ -111,39 +128,33 @@ export function ShareDialogContent<
     title: frameTitle ?? title,
     height: frameHeight,
   });
+  const options = (
+    <ShareConfigOptions
+      embed={config.embed}
+      parts={visibleShareParts(vocabulary.parts, config.embed)}
+      hidden={config.hidden}
+      onEmbedChange={setEmbed}
+      onPartChange={setPartHidden}
+    />
+  );
 
   return (
     <>
-      <DialogBody>
+      <div className={BODY_CLASS} style={BODY_STYLE}>
         <p style={LEAD_STYLE}>
           A link to <b>{title}</b> as you have it set up now.
         </p>
 
-        <section className="share-section" style={SECTION_STYLE}>
-          <H6>Layout</H6>
-          <Checkbox
-            checked={config.embed}
-            label="Embed in another page"
-            onChange={(event) => {
-              setEmbed(event.currentTarget.checked);
-            }}
+        {presets.length === 0 ? (
+          options
+        ) : (
+          <SharePresetTabs
+            presets={presets}
+            selected={presetKey}
+            onSelect={selectPreset}
+            custom={options}
           />
-          <span style={HINT_STYLE}>
-            Drops the site header and its navigation, so the page sits inside a
-            page of your own.
-          </span>
-        </section>
-
-        {vocabulary.parts.length > 0 ? (
-          <section className="share-section" style={SECTION_STYLE}>
-            <H6>Show on the page</H6>
-            <SharePartOptions
-              parts={vocabulary.parts}
-              hidden={config.hidden}
-              onChange={setPartHidden}
-            />
-          </section>
-        ) : null}
+        )}
 
         {children === undefined ? null : (
           <section className="share-section" style={SECTION_STYLE}>
@@ -173,7 +184,7 @@ export function ShareDialogContent<
             <CopyButton content={frame} label="Copy the iframe" />
           </div>
         </section>
-      </DialogBody>
+      </div>
       <DialogFooter
         actions={<Button intent="primary" text="Done" onClick={onClose} />}
       />
@@ -184,9 +195,23 @@ export function ShareDialogContent<
 function initialDraft<Codecs extends ShareParamCodecs>(
   search: string,
   vocabulary: ShareVocabulary<Codecs>,
+  preset: SharePreset<Codecs> | undefined,
 ): ShareConfig<Codecs> {
   const current = parseShareConfig(search, vocabulary);
-  return isShareConfigured(current, vocabulary)
-    ? current
-    : suggestedShareConfig(vocabulary);
+  if (isShareConfigured(current, vocabulary)) return current;
+  const suggested = suggestedShareConfig(vocabulary);
+  return preset === undefined
+    ? suggested
+    : applySharePreset(suggested, preset, vocabulary);
+}
+
+function findPreset<Codecs extends ShareParamCodecs>(
+  presets: ReadonlyArray<SharePreset<Codecs>>,
+  key: string | null,
+): SharePreset<Codecs> | undefined {
+  if (key === null) return undefined;
+  for (const preset of presets) {
+    if (preset.key === key) return preset;
+  }
+  return undefined;
 }

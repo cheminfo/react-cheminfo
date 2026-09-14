@@ -1,8 +1,11 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+
 import type { ReferenceSection } from './ReferenceSectionBlock.tsx';
 import { ReferenceSectionBlock } from './ReferenceSectionBlock.tsx';
 
+/** What {@link ReferenceGrid} needs. */
 export interface ReferenceGridProps {
   /** The blocks of the cheatsheet, in reading order. */
   sections: readonly ReferenceSection[];
@@ -41,11 +44,7 @@ export function ReferenceGrid(props: ReferenceGridProps): ReactElement {
 
   return (
     <div
-      className={
-        className === undefined
-          ? 'reference-grid'
-          : `reference-grid ${className}`
-      }
+      className={joinClassNames('reference-grid', className)}
       style={gridStyle(minColumnWidth)}
     >
       {sections.map((section) => (

@@ -23,6 +23,29 @@ export const ADDUCT_HELP: HelpContent = {
   },
 };
 
+/** Several worked cases, read in order, when one would not show the rule. */
+export const NOMINAL_MASS_HELP: HelpContent = {
+  title: 'Nominal mass',
+  body: 'The mass counted in whole units, from the integer mass of the most abundant isotope of every element.',
+  example: [
+    {
+      code: 'C8H10N4O2',
+      input: 'caffeine',
+      note: '194, where the monoisotopic mass is 194.0804 Da.',
+    },
+    {
+      code: 'C2H6O',
+      input: 'ethanol',
+      note: '46, the same nominal mass as formic acid, CH2O2.',
+    },
+  ],
+};
+
+/** Free-form help with no title, for a site whose help is a plain sentence. */
+export const MINIMUM_RMSD_HELP: HelpContent = {
+  body: 'Conformers closer than this root-mean-square deviation are merged into one.',
+};
+
 /** The smallest a piece of help can be: a title and one sentence. */
 export const SMILES_HELP: HelpContent = {
   title: 'SMILES',

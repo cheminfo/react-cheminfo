@@ -34,6 +34,7 @@ import { slaterScreening } from './screening.ts';
 export interface AtomicOrbital {
   /** Url-safe and unique within the element, e.g. `3dx2-y2`. */
   id: string;
+  /** Principal quantum number, 1 to 7. */
   n: number;
   /** Angular momentum quantum number: 0 = s, 1 = p, 2 = d, 3 = f. */
   l: number;
@@ -179,11 +180,7 @@ export function hydrogenicParametersOf(
  * @param harmonic - Which real harmonic of the subshell.
  * @returns The id, e.g. `4fxyz`.
  */
-export function orbitalId(
-  n: number,
-  l: number,
-  harmonic: RealHarmonic,
-): string {
+function orbitalId(n: number, l: number, harmonic: RealHarmonic): string {
   return `${n}${subshellLetter(l)}${harmonic.key}`;
 }
 

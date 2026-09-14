@@ -2,15 +2,22 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useId } from 'react';
 
 import { formatTrimmed } from '../../format/core/numbers.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+import type { ColorScale } from '../core/interpolate.ts';
+import { evenScale, sampleScale } from '../core/interpolate.ts';
 
-const FALLBACK_STOPS: readonly string[] = ['#e4e8ee'];
 const BAR_HEIGHT = 12;
 const BAR_WIDTH = 100;
+const WHEEL_SAMPLES = 24;
 
 /** What {@link ColorScaleLegend} needs to draw a scale. */
 export interface ColorScaleLegendProps {
-  /** The scale's colours, from its low end to its high end. */
-  stops: readonly string[];
+  /**
+   * The scale: a `ColorScale` as the registry, the picker and the editor hand
+   * it over, or a plain list of colours spread evenly from the low end to the
+   * high end.
+   */
+  scale: ColorScale | readonly string[];
   /** The value the low end stands for. */
   min: number;
   /** The value the high end stands for. */
@@ -30,6 +37,11 @@ export interface ColorScaleLegendProps {
    * @default a rounding to three decimals with the trailing zeros dropped
    */
   formatValue?: (value: number) => string;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -39,13 +51,15 @@ export interface ColorScaleLegendProps {
  * The ramp is a real gradient rather than a row of buckets, and both ends
  * carry their value, so a figure lifted out of the page still says what it is
  * measuring. It is drawn as an SVG, which keeps it crisp in a print and in an
- * exported image.
+ * exported image. A scale that turns around the colour wheel is sampled, since
+ * an SVG gradient only mixes the straight line between two colours.
  * @param props - See {@link ColorScaleLegendProps}.
  * @returns The labelled gradient strip.
  */
 export function ColorScaleLegend(props: ColorScaleLegendProps): ReactElement {
   const {
-    stops,
+    className,
+    scale,
     min,
     max,
     unit = '',
@@ -54,12 +68,12 @@ export function ColorScaleLegend(props: ColorScaleLegendProps): ReactElement {
   } = props;
   const gradientId = useId();
 
-  const scale = stops.length === 0 ? FALLBACK_STOPS : stops;
+  const stops = gradientStops('stops' in scale ? scale : evenScale(scale));
   const low = withUnit(formatValue(min), unit);
   const high = withUnit(formatValue(max), unit);
 
   return (
-    <div style={ROW_STYLE}>
+    <div className={className} style={ROW_STYLE}>
       {label === '' ? null : <span style={LABEL_STYLE}>{label}</span>}
       <span style={VALUE_STYLE}>{low}</span>
       <svg
@@ -69,24 +83,27 @@ export function ColorScaleLegend(props: ColorScaleLegendProps): ReactElement {
         role="img"
         aria-label={`${label === '' ? 'Colour scale' : label} from ${low} to ${high}`}
       >
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
-            {gradientStops(scale).map((stop) => (
-              <stop
-                key={stop.offset}
-                offset={stop.offset}
-                stopColor={stop.color}
-              />
-            ))}
-          </linearGradient>
-        </defs>
+        {stops.length === 0 ? null : (
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
+              {stops.map((stop) => (
+                <stop
+                  key={stop.key}
+                  offset={stop.offset}
+                  stopColor={stop.color}
+                />
+              ))}
+            </linearGradient>
+          </defs>
+        )}
         <rect
           x="0"
           y="0"
           width={BAR_WIDTH}
           height={BAR_HEIGHT}
           rx="2"
-          fill={`url(#${gradientId})`}
+          fill={stops.length === 0 ? undefined : `url(#${gradientId})`}
+          style={stops.length === 0 ? EMPTY_BAR_STYLE : undefined}
         />
       </svg>
       <span style={VALUE_STYLE}>{high}</span>
@@ -94,21 +111,55 @@ export function ColorScaleLegend(props: ColorScaleLegendProps): ReactElement {
   );
 }
 
-function gradientStops(
-  stops: readonly string[],
-): Array<{ offset: number; color: string }> {
-  const last = stops.length - 1;
-  const rendered: Array<{ offset: number; color: string }> = [];
-  for (let index = 0; index < stops.length; index++) {
-    const color = stops[index];
-    if (color === undefined) continue;
-    rendered.push({ offset: last === 0 ? index : index / last, color });
+interface GradientStop {
+  /** Two anchors may share a position and a colour, so the rank is part of it. */
+  key: string;
+  offset: number;
+  color: string;
+}
+
+function gradientStops(scale: ColorScale): GradientStop[] {
+  if (scale.stops.length === 0) return [];
+  if (scale.interpolation !== 'rgb') {
+    const sampled = sampledStops(scale);
+    if (sampled !== null) return sampled;
+  }
+  const rendered: GradientStop[] = [];
+  let rank = 0;
+  for (const stop of scale.stops) {
+    rendered.push(gradientStop(rank, stop.position, stop.color));
+    rank += 1;
   }
   if (rendered.length === 1) {
-    const only = rendered[0];
-    if (only !== undefined) rendered.push({ offset: 1, color: only.color });
+    const color = rendered[0]?.color ?? '';
+    return [gradientStop(0, 0, color), gradientStop(1, 1, color)];
   }
   return rendered;
+}
+
+function gradientStop(
+  rank: number,
+  offset: number,
+  color: string,
+): GradientStop {
+  return { key: `${rank}:${offset}:${color}`, offset, color };
+}
+
+function sampledStops(scale: ColorScale): GradientStop[] | null {
+  let colors: string[];
+  try {
+    colors = sampleScale(scale, WHEEL_SAMPLES);
+  } catch {
+    // A colour that is not hex cannot be turned around the wheel; its anchors
+    // are still drawn as written.
+    return null;
+  }
+  const last = colors.length - 1;
+  const stops: GradientStop[] = [];
+  for (let index = 0; index < colors.length; index++) {
+    stops.push(gradientStop(index, index / last, colors[index] ?? ''));
+  }
+  return stops;
 }
 
 function defaultFormatValue(value: number): string {
@@ -127,7 +178,7 @@ const ROW_STYLE = {
 } as const satisfies CSSProperties;
 
 const LABEL_STYLE = {
-  color: 'var(--text-muted, rgb(95 107 124))',
+  color: TOKEN.textMuted,
   fontSize: 12,
 } as const satisfies CSSProperties;
 
@@ -141,4 +192,8 @@ const BAR_STYLE = {
   flex: '1 1 160px',
   maxWidth: 320,
   height: BAR_HEIGHT,
+} as const satisfies CSSProperties;
+
+const EMPTY_BAR_STYLE = {
+  fill: TOKEN.border,
 } as const satisfies CSSProperties;

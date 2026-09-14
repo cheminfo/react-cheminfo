@@ -106,6 +106,21 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // Two arrows crossing in opposite directions: one notation turned into
+  // another and back, which is the whole of what this one does.
+  openbabel: (alt) => (
+    <g
+      fill="none"
+      strokeWidth="2.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6.5 12.5h19" stroke="#ffffff" />
+      <path d="M21 8l4.5 4.5L21 17" stroke="#ffffff" />
+      <path d="M25.5 21.5h-19" stroke={alt} />
+      <path d="M11 17l-4.5 4.5L11 26" stroke={alt} />
+    </g>
+  ),
   // An isotopic pattern: the answer this one is asked for most.
   chemcalc: (alt) => (
     <g strokeLinecap="round" strokeWidth="3.4" fill="none">
@@ -114,19 +129,23 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <path d="M23 24V18" stroke="#ffffff" />
     </g>
   ),
-  // Three peaks of a mixture over the funnel that narrows them to one compound,
-  // which is the dereplication this one does.
+  // The ring and the substituent dots of the DerepFlow logo do not survive
+  // 16 px, so the mark keeps the two elements that carry its meaning: the
+  // compound, and the tick that says it has been identified.
   derepflow: (alt) => (
     <>
-      <g stroke="#ffffff" strokeWidth="4" strokeLinecap="round" fill="none">
-        <path d="M7 15.6V9.4" />
-        <path d="M16 15.6V4.6" />
-        <path d="M25 15.6v-4.6" />
-      </g>
+      <polygon
+        points="12.5,3.9 20.0,8.2 20.0,16.8 12.5,21.1 5.0,16.8 5.0,8.2"
+        stroke="#ffffff"
+        strokeWidth="2.6"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <circle cx="23.5" cy="23.5" r="7.6" fill={alt} />
       <path
-        d="M6.2 20.4 16 27 25.8 20.4"
-        stroke={alt}
-        strokeWidth="4"
+        d="M20.2 23.6 22.7 26.4 26.9 21"
+        stroke="#ffffff"
+        strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"

@@ -5,41 +5,68 @@
  * All of it in one module because the same size has to be written twice — in
  * the control that sets it and in the legend sentence that explains it — and a
  * pair like that drifts apart the moment each file spells it for itself.
+ *
+ * The map's flat outlines and the cloud's solid shells share it. They differ in
+ * one place only, and it is the one that matters: the same number of standard
+ * deviations holds a smaller share in three dimensions than in two, so every
+ * function that writes a share is told which figure it is written for.
  */
 
+import { chartShare } from '../../chart/core/chartLabels.ts';
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import type { EllipseSize } from '../../scatter/core/confidenceEllipse.ts';
 import { coverageForStandardDeviations } from '../../scatter/core/ellipseCoverage.ts';
+import { coverageForStandardDeviations3 } from '../../scatter3d/core/ellipsoidCoverage.ts';
+import { fillCopy } from '../core/fillCopy.ts';
+import type { ProjectionOutlineWords } from '../core/projectionPanelWords.ts';
 
 /**
  * How much of a group its outline holds, written the way a sentence wants it.
  *
  * A share rather than a multiple of the spread, because on a map a number of
  * standard deviations does not hold the fraction everyone has been taught it
- * does — two of them cover about 86 % of a group and not 95 % — and a legend
- * quoting the multiple is how a figure comes to promise more than it draws.
+ * does — two of them cover about 86 % of a flat group, 74 % of a solid one, and
+ * not 95 % of either — and a legend quoting the multiple is how a figure comes
+ * to promise more than it draws.
  * @param size - How large the outlines are, or `null` for none.
+ * @param figure - Whether the outline is the map's ellipse or the cloud's shell.
  * @returns The share, e.g. `95%`; the empty string when nothing is outlined.
  */
-export function ellipseCoverageText(size: EllipseSize | null): string {
+export function ellipseCoverageText(
+  size: EllipseSize | null,
+  figure: 'map' | 'space' = 'map',
+): string {
   if (size === null) return '';
   const share =
     size.kind === 'coverage'
       ? size.probability
-      : coverageForStandardDeviations(size.standardDeviations);
-  return `${Math.round(share * 100)}%`;
+      : figure === 'space'
+        ? coverageForStandardDeviations3(size.standardDeviations)
+        : coverageForStandardDeviations(size.standardDeviations);
+  return `${chartShare(share, 0)}%`;
 }
 
 /**
  * What one choice of the outline picker reads.
  * @param size - The size that choice stands for, or `null` for no outlines.
+ * @param words - How an outline size is written.
+ * @param figure - Whether the outline is the map's ellipse or the cloud's shell.
  * @returns The label, e.g. `95% of samples`, or `2 SD (about 86%)`.
  */
-export function ellipseSizeLabel(size: EllipseSize | null): string {
-  if (size === null) return NO_OUTLINES_LABEL;
-  const share = ellipseCoverageText(size);
-  if (size.kind === 'coverage') return `${share} of samples`;
-  return `${size.standardDeviations} SD (about ${share})`;
+export function ellipseSizeLabel(
+  size: EllipseSize | null,
+  words: ProjectionOutlineWords,
+  figure: 'map' | 'space' = 'map',
+): string {
+  if (size === null) {
+    return figure === 'space' ? words.noShells : words.noOutlines;
+  }
+  const share = ellipseCoverageText(size, figure);
+  if (size.kind === 'coverage') return fillCopy(words.coverage, { share });
+  return fillCopy(words.standardDeviations, {
+    count: String(size.standardDeviations),
+    share,
+  });
 }
 
 /**
@@ -47,24 +74,38 @@ export function ellipseSizeLabel(size: EllipseSize | null): string {
  *
  * A site that asked for a size of its own — a multiple of the spread, or a
  * share the four do not cover — keeps its place at the head of the list, so
- * opening the picker never silently changes the figure.
- * @param current - The size the map is drawn at, or `null` for no outlines.
+ * opening the picker never silently changes the figure. The map and the cloud
+ * offer the same shares, because a share means the same thing in both
+ * pictures.
+ * @param current - The size the figure is drawn at, or `null` for no outlines.
+ * @param words - How an outline size is written.
+ * @param figure - Whether the outline is the map's ellipse or the cloud's shell.
  * @returns The choices, in the order they are offered.
  */
-export function ellipseChoices(current: EllipseSize | null): OverlayOption[] {
+export function ellipseChoices(
+  current: EllipseSize | null,
+  words: ProjectionOutlineWords,
+  figure: 'map' | 'space' = 'map',
+): OverlayOption[] {
   const choices: OverlayOption[] = [
-    { value: NO_ELLIPSE, label: ellipseSizeLabel(null) },
+    { value: NO_ELLIPSE, label: ellipseSizeLabel(null, words, figure) },
   ];
   for (const probability of ELLIPSE_SHARES) {
     const size: EllipseSize = { kind: 'coverage', probability };
-    choices.push({ value: ellipseKey(size), label: ellipseSizeLabel(size) });
+    choices.push({
+      value: ellipseKey(size),
+      label: ellipseSizeLabel(size, words, figure),
+    });
   }
 
   const key = ellipseKey(current);
   for (const choice of choices) {
     if (choice.value === key) return choices;
   }
-  choices.splice(1, 0, { value: key, label: ellipseSizeLabel(current) });
+  choices.splice(1, 0, {
+    value: key,
+    label: ellipseSizeLabel(current, words, figure),
+  });
   return choices;
 }
 
@@ -101,4 +142,3 @@ export function ellipseSize(key: string): EllipseSize | null {
 const ELLIPSE_SHARES: readonly number[] = [0.5, 0.9, 0.95, 0.99];
 
 const NO_ELLIPSE = 'none';
-const NO_OUTLINES_LABEL = 'No outlines';

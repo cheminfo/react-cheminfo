@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 
-import { persistBucket } from '../src/state/ui/persistBucket.ts';
+import { persistBucket } from '../src/state/core/persistBucket.ts';
 
 /** The preferences of a mass panel, which is what the bucket keeps. */
 interface MassPreferences {

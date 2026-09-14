@@ -16,10 +16,8 @@ import type { ChartViewport } from '../../chart/core/chartViewport.ts';
 import type { MatrixLike } from '../../chart/core/matrix.ts';
 import { emptiestCorner } from '../../overlay/core/emptiestCorner.ts';
 import type { OverlayCorner } from '../../overlay/core/overlayPlacement.ts';
-import type {
-  ScatterGroup,
-  ScatterMarker,
-} from '../../scatter/ui/ScatterPlot.tsx';
+import type { ScatterGroup } from '../../scatter/ui/scatterFigureProps.ts';
+import type { ScatterMarker } from '../../scatter/ui/scatterPlotProps.ts';
 import type {
   ProjectionMarker,
   ProjectionResult,

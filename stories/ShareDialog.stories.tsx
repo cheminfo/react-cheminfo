@@ -10,6 +10,7 @@ import {
   parseShareConfig,
   suggestedShareConfig,
 } from '../src/share/core/index.ts';
+import { PagePart } from '../src/share/ui/PagePart.tsx';
 import { ShareButton } from '../src/share/ui/ShareButton.tsx';
 import type { ShareDialogProps } from '../src/share/ui/ShareDialog.tsx';
 import { ShareDialog } from '../src/share/ui/ShareDialog.tsx';
@@ -20,6 +21,7 @@ import {
   SHARE_BASE,
   SHARE_FRAME_TITLE,
   SHARE_PAGE_TITLE,
+  SHARE_PRESETS,
   SHARE_SEARCH,
   SHARE_VOCABULARY,
 } from './shareFixtures.ts';
@@ -114,6 +116,9 @@ function PageFrame(props: PageFrameProps): ReactElement {
       <div style={BEHIND_STYLE}>
         <div className="sb-header" style={HEADER_STYLE}>
           <span style={BRAND_STYLE}>smiles.cheminfo.org</span>
+          <PagePart part="tabs">
+            <span>Search · Exercises · Cheatsheet</span>
+          </PagePart>
           {action}
         </div>
         <SearchPage />
@@ -232,6 +237,14 @@ export const WithToolSection: Story = {
       </>
     ),
   },
+};
+
+/**
+ * The links a site knows people hand out, one tab each; Custom holds the boxes
+ * and starts from the preset picked before it.
+ */
+export const WithPresets: Story = {
+  args: { presets: SHARE_PRESETS },
 };
 
 /**

@@ -9,8 +9,10 @@
 
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+
 /** Props of {@link StructurePlaceholder}. */
-export interface StructurePlaceholderProps {
+interface StructurePlaceholderProps {
   /** Width of the box, in pixels: the width the picture would have had. */
   width: number;
   /** Height of the box, in pixels. */
@@ -43,6 +45,6 @@ const PLACEHOLDER_STYLE: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: 'var(--text-faint, #8a96a3)',
+  color: TOKEN.textFaint,
   fontSize: '0.75rem',
 };

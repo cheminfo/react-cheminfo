@@ -3,10 +3,11 @@
  *
  * An orthographic camera sends the unit sphere to a filled ellipse, so a shell
  * — a sphere carried by three semi-axes — has an exact elliptical silhouette
- * whatever it is turned to. Taking it as such is what keeps the glass smooth:
- * a tessellated shell is only as round as the number of faces it was cut into,
- * and every seam between two of those faces is a line the reader can see.
+ * whatever it is turned to. Drawing it as that one ellipse is what keeps the
+ * glass smooth at any zoom and free of seams.
  */
+
+import { ellipseAxes } from '../../scatter/core/ellipseAxes.ts';
 
 import type { ConfidenceEllipsoid } from './confidenceEllipsoid.ts';
 import type { OrbitCamera } from './orbitCamera.ts';
@@ -32,8 +33,8 @@ export interface EllipsoidSilhouette {
  * The three semi-axes are turned with the camera and their depth dropped,
  * which leaves a `2 x 3` map from the unit sphere to the screen. The image of
  * that sphere is the ellipse whose shape matrix is the map times its own
- * transpose, so the two radii are the square roots of that matrix's
- * eigenvalues and the tilt is half the angle of its off-diagonal term.
+ * transpose — a covariance in all but name — so it is decomposed by the same
+ * `ellipseAxes` a map outline is, collinear floor included.
  *
  * A group flat in one direction gives a matrix with a zero eigenvalue and
  * comes back as a segment, which is the honest picture of a group that has no
@@ -63,14 +64,7 @@ export function ellipsoidSilhouette(
   const yy = downX * downX + downY * downY + downZ * downZ;
   const xy = acrossX * downX + acrossY * downY + acrossZ * downZ;
 
-  const middle = (xx + yy) / 2;
-  const spread = Math.hypot((xx - yy) / 2, xy);
-  const major = Math.max(0, middle + spread);
-  const minor = Math.max(0, middle - spread);
-
-  return {
-    rx: Math.sqrt(major),
-    ry: Math.sqrt(minor),
-    angle: 0.5 * Math.atan2(2 * xy, xx - yy),
-  };
+  // The shape matrix is already in the screen's own frame, so the angle the
+  // decomposition reports is measured down from the right with no conversion.
+  return ellipseAxes({ xx, xy, yy });
 }

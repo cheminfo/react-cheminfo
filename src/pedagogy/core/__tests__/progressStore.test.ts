@@ -1,5 +1,6 @@
 import { afterEach, expect, test } from 'vitest';
 
+import type { ProgressRecords } from '../progress.ts';
 import { emptyProgress, localStorageProgressStore } from '../progress.ts';
 
 afterEach(() => {
@@ -95,6 +96,55 @@ test('a full quota loses the work rather than the page', () => {
   const store = localStorageProgressStore({ key: 'tex:exercises' });
 
   expect(() => store.save({ w1: emptyProgress() })).not.toThrow();
+});
+
+test('a full quota is reported, so the page can say the work is not kept', () => {
+  installStorage(() => {
+    const error = new Error('write refused');
+    error.name = 'QuotaExceededError';
+    throw error;
+  });
+  const seen: string[] = [];
+  const store = localStorageProgressStore({
+    key: 'tex:exercises',
+    onQuotaExceeded: (error) => {
+      seen.push((error as Error).name);
+    },
+  });
+
+  void store.save({ w1: emptyProgress() });
+
+  expect(seen).toStrictEqual(['QuotaExceededError']);
+});
+
+test('a stored record keeps the fields its defaults do not name, and a nested one field by field', () => {
+  const entries = installStorage();
+  entries.set(
+    'surge:exercises:v1',
+    JSON.stringify({
+      C5H12: { found: ['CCCCC'], drawings: { a: 'x' }, retired: true },
+      C4H10: { found: 'CCCC', gaveUp: 'yes' },
+    }),
+  );
+  const defaults = { found: [] as string[], drawings: {}, gaveUp: false };
+  const records = localStorageProgressStore({
+    key: 'surge:exercises',
+    defaults,
+  }).load() as ProgressRecords<typeof defaults>;
+
+  expect(records).toStrictEqual({
+    C5H12: {
+      found: ['CCCCC'],
+      drawings: { a: 'x' },
+      gaveUp: false,
+      retired: true,
+    },
+    C4H10: { found: [], drawings: {}, gaveUp: false },
+  });
+
+  records.C4H10?.found.push('CCCC');
+
+  expect(defaults.found).toStrictEqual([]);
 });
 
 test('the binding may be named after the course holding the work', () => {

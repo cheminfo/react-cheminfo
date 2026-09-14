@@ -1,73 +1,12 @@
 // tokens-ok: file — every site's two colours are declared here.
-/** The sites the menu links to, in the order they are listed. */
-export type SiteId =
-  | 'learn'
-  | 'inchi'
-  | 'vcl'
-  | 'smiles'
-  | 'chemcalc'
-  | 'nmrium'
-  | 'metabo'
-  | 'derepflow'
-  | 'surge'
-  | 'tex'
-  | 'lcao'
-  | 'regexp'
-  | 'pdb'
-  | 'elucidation'
-  | 'equilibrium'
-  | 'polycarp'
-  | '3d'
-  | 'periodic-table'
-  | 'database';
+import type { EcosystemSite } from './types.ts';
 
-export interface SiteName {
-  /** First half of the name, set in the site's leading colour. */
-  lead: string;
-  /** Second half, set in the site's answering colour. */
-  alt: string;
-  /**
-   * Whether a faint dot separates the two halves, as an address-shaped name
-   * takes and a product-shaped one does not.
-   * @default false
-   */
-  dot?: boolean;
-}
-
-export interface EcosystemSite {
-  id: SiteId;
-  /** The name, split the way the site's own wordmark splits it. */
-  name: SiteName;
-  /** Where the site lives, written the way it is typed. */
-  host: string;
-  /** Where the sources live, and what a Source link opens. */
-  repository: string;
-  /** One line on what the site does. */
-  tagline: string;
-  /** The colour the first half of the name is set in. */
-  brand: string;
-  /**
-   * The colour the second half is set in. It is the site's answering colour
-   * darkened until it is readable on white, because several of those are
-   * yellows and ambers that sit around 2:1 there.
-   */
-  brandAlt: string;
-  /** The plate of the site's mark, and the colour one element of it carries. */
-  mark: SiteMarkColors;
-}
-
-export interface SiteMarkColors {
-  /** The rounded square the mark is drawn on. */
-  plate: string;
-  /** The colour exactly one element of the mark takes. */
-  accent: string;
-  /**
-   * The hairline a plate as light as the tile behind it needs, so it still
-   * reads as a plate rather than as a drawing floating on the row.
-   * @default undefined
-   */
-  edge?: string;
-}
+export type {
+  EcosystemSite,
+  SiteId,
+  SiteMarkColors,
+  SiteName,
+} from './types.ts';
 
 /**
  * Every site of the family, each with the two colours it owns. The marks that
@@ -80,6 +19,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'learn.cheminfo.org',
     repository: 'https://github.com/cheminfo/learn.cheminfo.org',
     tagline: 'Arrange the tools into a course and hand out its link.',
+    group: 'computing',
     brand: '#0d9488',
     brandAlt: '#b45309',
     mark: { plate: '#0d9488', accent: '#f59e0b' },
@@ -90,6 +30,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'inchi.cheminfo.org',
     repository: 'https://github.com/cheminfo/inchi.cheminfo.org',
     tagline: 'InChI and InChIKey from a structure, in the browser.',
+    group: 'structures',
     brand: '#5b21b6',
     brandAlt: '#a16207',
     mark: { plate: '#5b21b6', accent: '#fcd34d' },
@@ -100,6 +41,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'vcl.cheminfo.org',
     repository: 'https://github.com/cheminfo/vcl.cheminfo.org',
     tagline: 'Combine a core and fragments into a screened library.',
+    group: 'research',
     brand: '#2d72d2',
     brandAlt: '#9a3412',
     mark: { plate: '#2d72d2', accent: '#eb6847' },
@@ -110,9 +52,21 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'smiles.cheminfo.org',
     repository: 'https://github.com/cheminfo/smiles.cheminfo.org',
     tagline: 'Draw a structure, read its SMILES, learn the notation.',
+    group: 'structures',
     brand: '#1c6e42',
     brandAlt: '#9a3412',
     mark: { plate: '#1c6e42', accent: '#ea580c' },
+  },
+  {
+    id: 'openbabel',
+    name: { lead: 'openbabel', alt: 'cheminfo', dot: true },
+    host: 'openbabel.cheminfo.org',
+    repository: 'https://github.com/cheminfo/openbabel.cheminfo.org',
+    tagline: 'Convert a structure between any pair of chemical file formats.',
+    group: 'structures',
+    brand: '#0f766e',
+    brandAlt: '#c2410c',
+    mark: { plate: '#0f766e', accent: '#fb923c' },
   },
   {
     id: 'chemcalc',
@@ -120,6 +74,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'www.chemcalc.org',
     repository: 'https://github.com/cheminfo/chemcalc.org',
     tagline: 'Molecular formula, exact mass and isotopic distribution.',
+    group: 'basics',
     brand: '#5b52e0',
     brandAlt: '#d63384',
     mark: { plate: '#5b52e0', accent: '#ff8ac2' },
@@ -130,6 +85,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'www.nmrium.org',
     repository: 'https://github.com/cheminfo/nmrium',
     tagline: 'Process and assign NMR spectra in the browser.',
+    group: 'spectra',
     brand: '#ea580c',
     brandAlt: '#2b143e',
     mark: { plate: '#2b143e', accent: '#ea580c' },
@@ -143,19 +99,21 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'metabo.nmrium.com',
     repository: 'https://github.com/cheminfo/metabo',
     tagline: 'Turn a batch of NMR spectra into a map of your samples.',
+    group: 'spectra',
     brand: '#4d7c0f',
     brandAlt: '#b91c1c',
     mark: { plate: '#4d7c0f', accent: '#b91c1c' },
   },
   {
     id: 'derepflow',
-    name: { lead: 'Derep', alt: 'Flow' },
+    name: { lead: 'Derep', alt: 'Flow', ink: 'lead' },
     host: 'derepflow.cheminfo.org',
     repository: 'https://github.com/cheminfo/derepflow',
     tagline: 'Identify the constituents of a mixture from its ¹³C spectrum.',
-    brand: '#be185d',
-    brandAlt: '#0f766e',
-    mark: { plate: '#be185d', accent: '#0d9488' },
+    group: 'spectra',
+    brand: '#127ba3',
+    brandAlt: '#1e293b',
+    mark: { plate: '#1e293b', accent: '#127ba3' },
   },
   {
     id: 'surge',
@@ -163,6 +121,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'surge.cheminfo.org',
     repository: 'https://github.com/cheminfo/surge.cheminfo.org',
     tagline: 'Every constitutional isomer of a molecular formula.',
+    group: 'structures',
     brand: '#4338ca',
     brandAlt: '#be123c',
     mark: { plate: '#4338ca', accent: '#e11d48' },
@@ -173,6 +132,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'tex.cheminfo.org',
     repository: 'https://github.com/cheminfo/tex.cheminfo.org',
     tagline: 'LaTeX formulas rendered to SVG or PNG from a URL.',
+    group: 'computing',
     brand: '#a21caf',
     brandAlt: '#a16207',
     mark: { plate: '#a21caf', accent: '#facc15' },
@@ -183,6 +143,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'lcao.cheminfo.org',
     repository: 'https://github.com/cheminfo/lcao.cheminfo.org',
     tagline: 'Combine atomic orbitals into molecular ones.',
+    group: 'basics',
     brand: '#1565c0',
     brandAlt: '#c62828',
     mark: { plate: '#ffffff', accent: '#c62828', edge: '#dfe3e8' },
@@ -193,6 +154,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'regexp.cheminfo.org',
     repository: 'https://github.com/cheminfo/regexp.cheminfo.org',
     tagline: 'Learn regular expressions in a live playground.',
+    group: 'computing',
     brand: '#1e3a8a',
     brandAlt: '#a16207',
     mark: { plate: '#1e3a8a', accent: '#fde047' },
@@ -203,6 +165,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'pdb.cheminfo.org',
     repository: 'https://github.com/cheminfo/pdb.cheminfo.org',
     tagline: 'A fast look at any Protein Data Bank entry.',
+    group: 'research',
     brand: '#2563eb',
     brandAlt: '#b45309',
     mark: { plate: '#2563eb', accent: '#fbbf24' },
@@ -213,6 +176,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'elucidation.cheminfo.org',
     repository: 'https://github.com/cheminfo/elucidation.cheminfo.org',
     tagline: 'A structure from a 1H NMR spectrum and a formula.',
+    group: 'spectra',
     brand: '#7e22ce',
     brandAlt: '#b45309',
     mark: { plate: '#7e22ce', accent: '#f59e0b' },
@@ -223,6 +187,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'equilibrium.cheminfo.org',
     repository: 'https://github.com/cheminfo/equilibrium.cheminfo.org',
     tagline: 'Chemical equilibria: pH, speciation and titration curves.',
+    group: 'basics',
     brand: '#0b5754',
     brandAlt: '#a56600',
     mark: { plate: '#0b5754', accent: '#f2a71b' },
@@ -233,6 +198,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'polycarp.cheminfo.org',
     repository: 'https://github.com/cheminfo/polycarp.cheminfo.org',
     tagline: 'Predict the microstructure of a radical copolymerisation.',
+    group: 'research',
     brand: '#701a75',
     brandAlt: '#4d7c0f',
     mark: { plate: '#701a75', accent: '#a3e635' },
@@ -243,6 +209,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: '3d.cheminfo.org',
     repository: 'https://github.com/cheminfo/3d.cheminfo.org',
     tagline: 'Conformers in 3D from a structure you draw.',
+    group: 'structures',
     brand: '#155e75',
     brandAlt: '#b45309',
     mark: { plate: '#155e75', accent: '#f97316' },
@@ -253,6 +220,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'periodic-table.cheminfo.org',
     repository: 'https://github.com/cheminfo/periodic-table.cheminfo.org',
     tagline: 'The periodic table, coloured, plotted and taken apart.',
+    group: 'basics',
     brand: '#15803d',
     brandAlt: '#a16207',
     mark: { plate: '#15803d', accent: '#fbbf24' },
@@ -263,6 +231,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     host: 'database.cheminfo.org',
     repository: 'https://github.com/cheminfo/database.cheminfo.org',
     tagline: 'Query a real chemical dataset in SQL and in Mango.',
+    group: 'research',
     brand: '#7c2d12',
     brandAlt: '#0b6e85',
     mark: { plate: '#7c2d12', accent: '#06b6d4' },

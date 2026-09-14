@@ -6,51 +6,36 @@ import {
   useWheelZoom,
 } from '../../chart/ui/useWheelZoom.ts';
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
-import { nearestPointIndex } from '../../scatter/core/screenPoints.ts';
-import { ScatterLabelLayer } from '../../scatter/ui/ScatterLabelLayer.tsx';
 import { ScatterMarkLayer } from '../../scatter/ui/ScatterMarkLayer.tsx';
-import { surfacePosition } from '../../scatter/ui/lassoGesture.ts';
-import {
-  SCATTER_GROUP_LABEL_SIZE,
-  SCATTER_LABEL_SIZE,
-} from '../../scatter/ui/scatterLabelBoxes.ts';
-import { placeScatterLabels } from '../../scatter/ui/scatterLabelPlacement.ts';
-import {
-  scatterGroupLabels,
-  scatterPointLabels,
-} from '../../scatter/ui/scatterLabels.ts';
-import {
-  LASSO_STYLE,
-  scatterGroupInk,
-} from '../../scatter/ui/scatterPlotModel.ts';
+import { ScatterOverlayLayers } from '../../scatter/ui/ScatterOverlayLayers.tsx';
+import { ScatterPointLayer } from '../../scatter/ui/ScatterPointLayer.tsx';
+import { scatterGroupInk } from '../../scatter/ui/scatterPlotModel.ts';
 import { useScatterInteraction } from '../../scatter/ui/useScatterInteraction.ts';
+import { useScatterLabels } from '../../scatter/ui/useScatterLabels.ts';
 import { cubePoints } from '../core/cubePoints.ts';
 import type { OrbitCamera } from '../core/orbitCamera.ts';
 import { DEFAULT_ORBIT_CAMERA } from '../core/orbitCamera.ts';
 
 import { CloudFrameLayer } from './CloudFrameLayer.tsx';
-import { CloudPointLayer } from './CloudPointLayer.tsx';
 import type { CloudShell } from './CloudShellLayer.tsx';
 import { CloudShellLayer } from './CloudShellLayer.tsx';
-import { cloudView, projectCloud } from './cloudGeometry.ts';
+import { cloudPointRadii, cloudView, projectCloud } from './cloudGeometry.ts';
 import { clampCloudZoom } from './cloudZoom.ts';
 import { cloudLabel, cloudShells } from './scatterCloudModel.ts';
 import type { ScatterCloudProps } from './scatterCloudProps.ts';
 import { useOrbitDrag } from './useOrbitDrag.ts';
-
-export type { CloudGesture, ScatterCloudProps } from './scatterCloudProps.ts';
 
 /**
  * A cloud of samples in a box the reader can turn, with a glass shell around
  * each group.
  *
  * It is the flat scatter's twin and shares with it everything it can — the
- * selection, the lasso, the hover card, the labels and the group colours are
- * the same hooks and the same helpers — because a reader who has learned the
- * map must not have to learn this separately. What it cannot share is the
- * frame: three axes seen from an angle have no room for three sets of tick
- * labels, so the axes are all stretched to one cube, the frame names them, and
- * the numbers stay in the card the pointer raises.
+ * selection, the lasso, the keyboard cursor, the hover card, the labels and
+ * the group colours are the same hooks and the same layers — because a reader
+ * who has learned the map must not have to learn this separately. What it
+ * cannot share is the frame: three axes seen from an angle have no room for
+ * three sets of tick labels, so the axes are all stretched to one cube, the
+ * frame names them, and the numbers stay in the card the pointer raises.
  *
  * It draws in SVG rather than in WebGL, and that is a decision about saving
  * rather than about drawing. Every other figure in this package is saved from
@@ -65,9 +50,10 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
   const { ellipsoidMinimumPoints, ellipsoidFillOpacity } = props;
   const { showGroupLabels = false, pointLabels, pointRadius = 3.5 } = props;
   const { outlinedFrom, selected, defaultSelected, onSelectionChange } = props;
-  const { selectMode = 'replace', onHoverChange, overlay } = props;
-  const { onPointDoubleClick } = props;
-  const { gesture = 'turn', wheelZoom = true, label, testId } = props;
+  const { selectMode = 'replace', onHoverChange, onPinChange } = props;
+  const { onLassoChange, onPointDoubleClick, overlay } = props;
+  const { gesture = 'turn', wheelZoom = true, wheelZoomDelay } = props;
+  const { label, className, testId } = props;
 
   const [ownCamera, setOwnCamera] = useState<OrbitCamera>(DEFAULT_ORBIT_CAMERA);
   const [ownZoom, setOwnZoom] = useState(1);
@@ -83,6 +69,10 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
   const cloud = useMemo(
     () => projectCloud(cube, camera, view.viewport),
     [camera, cube, view.viewport],
+  );
+  const radii = useMemo(
+    () => cloudPointRadii(cloud.depths, pointRadius),
+    [cloud.depths, pointRadius],
   );
   const ink = useMemo(
     () => scatterGroupInk(groups, mutedGroups),
@@ -113,19 +103,27 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
     touchLasso: selecting,
     hoverRadius: pointRadius + HOVER_SLACK,
     onHoverChange,
+    onPinChange,
+    onLassoChange,
+  });
+  const labels = useScatterLabels(cloud.points, {
+    pointLabels,
+    showGroupLabels,
+    groups,
+    groupOf,
+    colors: ink.colors,
+    radius: pointRadius,
+    bounds: view.rect,
   });
 
   // Everything a gesture callback reads is taken from here rather than from
   // the closure, so a caller that owns the camera and answers with an inline
   // arrow — which is how every caller writes it — does not rebuild the drag
   // sixty times during its own turn.
-  const live = useRef({ camera, zoom, points: cloud.points, props });
+  const live = useRef({ camera, zoom, interaction, props });
   useLayoutEffect(() => {
-    live.current = { camera, zoom, points: cloud.points, props };
+    live.current = { camera, zoom, interaction, props };
   });
-
-  const { select, mask } = interaction.selection;
-  const { moveTo, leave, pin, unpin, hovered } = interaction.hover;
 
   const onOrbit = useCallback((turn: (was: OrbitCamera) => OrbitCamera) => {
     const next = turn(live.current.camera);
@@ -138,17 +136,9 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
 
   const onTap = useCallback(
     (tapX: number, tapY: number, mode: ScatterSelectionMode) => {
-      const radius = (live.current.props.pointRadius ?? 3.5) + HOVER_SLACK;
-      const index = nearestPointIndex(live.current.points, tapX, tapY, radius);
-      if (index === -1) {
-        unpin();
-        if (mode === 'replace') interaction.selection.clear();
-        return;
-      }
-      select([index], mode, 'point');
-      pin(index);
+      live.current.interaction.clickAt(tapX, tapY, mode);
     },
-    [interaction.selection, pin, select, unpin],
+    [],
   );
 
   const onWheel = useCallback((_x: number, _y: number, factor: number) => {
@@ -161,81 +151,27 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
 
   function handleDoubleClick(event: ReactMouseEvent<SVGRectElement>): void {
     if (onPointDoubleClick === undefined) return;
-    const at = surfacePosition(event, 0, 0);
-    const radius = (live.current.props.pointRadius ?? 3.5) + HOVER_SLACK;
-    const index = nearestPointIndex(live.current.points, at.x, at.y, radius);
-    if (index === -1) return;
-    onPointDoubleClick({
-      index,
-      x: at.x,
-      y: at.y,
-      clientX: event.clientX,
-      clientY: event.clientY,
-    });
+    const opened = interaction.openAt(event);
+    if (opened !== null) onPointDoubleClick(opened);
   }
 
   const orbit = useOrbitDrag({
     enabled: !selecting,
     onOrbit,
     onTap,
-    onMove: moveTo,
-    onLeave: leave,
+    onMove: interaction.hover.moveTo,
+    onLeave: interaction.hover.leave,
     mode: selectMode,
   });
   const { ref: wheelSurface } = useWheelZoom<SVGRectElement>({
     enabled: wheelZoom,
-    delay: CHART_WHEEL_DWELL,
+    delay: wheelZoomDelay ?? CHART_WHEEL_DWELL,
     onZoom: onWheel,
   });
 
-  const named = useMemo(
-    () =>
-      pointLabels === undefined
-        ? undefined
-        : placeScatterLabels(
-            scatterPointLabels(cloud.points, pointLabels, {
-              groupOf,
-              colors: ink.colors,
-            }),
-            {
-              fontSize: SCATTER_LABEL_SIZE,
-              radius: pointRadius,
-              bounds: view.rect,
-            },
-          ),
-    [cloud.points, groupOf, ink.colors, pointLabels, pointRadius, view.rect],
-  );
-  const crowds = useMemo(
-    () =>
-      showGroupLabels && groups !== undefined
-        ? placeScatterLabels(
-            scatterGroupLabels(
-              cloud.points,
-              groups.map((group) => group.label),
-              { groupOf, colors: ink.colors },
-            ),
-            {
-              fontSize: SCATTER_GROUP_LABEL_SIZE,
-              bold: true,
-              centered: true,
-              radius: pointRadius,
-              bounds: view.rect,
-            },
-          )
-        : undefined,
-    [
-      cloud.points,
-      groupOf,
-      groups,
-      ink.colors,
-      pointRadius,
-      showGroupLabels,
-      view.rect,
-    ],
-  );
-
   return (
     <div
+      className={className}
       data-testid={testId}
       style={{ position: 'relative', width, height }}
       role="img"
@@ -255,10 +191,10 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
           viewport={view.viewport}
           fillOpacity={ellipsoidFillOpacity}
         />
-        <CloudPointLayer
+        <ScatterPointLayer
           points={cloud.points}
-          depths={cloud.depths}
           order={cloud.order}
+          radii={radii}
           groupOf={groupOf}
           colors={ink.colors}
           opacities={ink.opacities}
@@ -267,19 +203,16 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
         />
         <ScatterMarkLayer
           points={cloud.points}
-          selected={mask}
-          hovered={hovered}
+          selected={interaction.selection.mask}
+          hovered={interaction.hover.hovered}
+          focused={interaction.keyboard.cursor}
           radius={pointRadius}
         />
-        {named === undefined ? null : (
-          <ScatterLabelLayer labels={named} radius={pointRadius} />
-        )}
-        {crowds === undefined ? null : (
-          <ScatterLabelLayer labels={crowds} radius={pointRadius} strong />
-        )}
-        {interaction.lasso.pathData === '' ? null : (
-          <path d={interaction.lasso.pathData} {...LASSO_STYLE} />
-        )}
+        <ScatterOverlayLayers
+          labels={labels}
+          radius={pointRadius}
+          lassoPath={interaction.lasso.pathData}
+        />
         <rect
           x={0}
           y={0}
@@ -287,6 +220,8 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
           height={Math.max(0, height)}
           ref={wheelSurface}
           fill="transparent"
+          tabIndex={0}
+          onKeyDown={interaction.keyboard.onKeyDown}
           onDoubleClick={handleDoubleClick}
           {...(selecting ? interaction.surface : orbit.surface)}
         />

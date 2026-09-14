@@ -1,9 +1,14 @@
 import type { ReactElement } from 'react';
-import { memo, useEffect, useRef } from 'react';
+import { memo } from 'react';
 
 import type { ChartScale } from '../../chart/core/chartScale.ts';
-import type { EllipsePoint, EllipseSize } from '../core/confidenceEllipse.ts';
-import { confidenceEllipse } from '../core/confidenceEllipse.ts';
+import { columnMatrix } from '../../chart/core/matrix.ts';
+import type { EllipseSize } from '../core/confidenceEllipse.ts';
+import { DEFAULT_ELLIPSE_SIZE } from '../core/confidenceEllipse.ts';
+import {
+  scatterGroupSpread,
+  scatterPairEllipse,
+} from '../core/scatterGroupSpread.ts';
 
 import { scatterOutlineShape } from './scatterOutlineShape.tsx';
 
@@ -31,7 +36,9 @@ export interface ScatterEllipseLayerProps {
   size?: EllipseSize;
   /**
    * How many points a group needs before it is outlined at all. Below it the
-   * shape says more about the sample than about the group.
+   * shape says more about the sample than about the group. A caption that has
+   * to account for the groups left out reads them from `scatterSkippedGroups`,
+   * over a `scatterGroupSpread` of the same points, size and minimum.
    * @default 3
    */
   minimumPoints?: number;
@@ -47,14 +54,6 @@ export interface ScatterEllipseLayerProps {
    * @default SCATTER_OUTLINE_FILL_OPACITY
    */
   fillOpacity?: number;
-  /**
-   * Called with the groups too small to outline, as indices into `colors`,
-   * whenever that set changes. An outline that quietly fails to appear reads
-   * as a bug in the plot, so the caller is handed what its caption has to
-   * account for.
-   * @default undefined
-   */
-  onSkippedGroups?: (groups: readonly number[]) => void;
 }
 
 /**
@@ -82,72 +81,29 @@ export const ScatterEllipseLayer = memo(function ScatterEllipseLayer(
     colors,
     scaleX,
     scaleY,
-    size = DEFAULT_SIZE,
+    size = DEFAULT_ELLIPSE_SIZE,
     minimumPoints = 3,
     opacities,
     fillOpacity,
-    onSkippedGroups,
   } = props;
 
-  const clouds = groupClouds(x, y, groupOf, colors.length);
+  const spread = scatterGroupSpread({
+    scores: columnMatrix([x, y]),
+    groupOf,
+    groups: colors.length,
+    axes: 2,
+    size,
+    minimumPoints,
+  });
   const outlines: ReactElement[] = [];
-  const skipped: number[] = [];
-  for (let group = 0; group < clouds.length; group++) {
+  for (let group = 0; group < colors.length; group++) {
     const color = colors[group];
-    const cloud = clouds[group];
-    if (color === undefined || cloud === undefined) continue;
-    const measured = confidenceEllipse(cloud, { size, minimumPoints });
-    if (measured === null) {
-      skipped.push(group);
-      continue;
-    }
+    if (color === undefined) continue;
+    const measured = scatterPairEllipse(spread, group, 0, 1);
+    if (measured === null) continue;
     const ink = { color, opacity: opacities?.[group], fillOpacity };
     outlines.push(scatterOutlineShape(group, measured, scaleX, scaleY, ink));
   }
 
-  useSkippedReport(skipped, onSkippedGroups);
   return <g data-layer="ellipses">{outlines}</g>;
 });
-
-/** What a group is outlined at when the caller says nothing. */
-const DEFAULT_SIZE: EllipseSize = { kind: 'coverage', probability: 0.95 };
-
-/* Each group's points, gathered once so every group is measured in one pass. */
-function groupClouds(
-  x: ArrayLike<number>,
-  y: ArrayLike<number>,
-  groupOf: ArrayLike<number>,
-  groups: number,
-): EllipsePoint[][] {
-  const clouds: EllipsePoint[][] = new Array(groups);
-  for (let group = 0; group < groups; group++) clouds[group] = [];
-  const total = Math.min(x.length, y.length, groupOf.length);
-  for (let index = 0; index < total; index++) {
-    const group = groupOf[index];
-    if (group === undefined || group < 0 || group >= groups) continue;
-    const px = x[index];
-    const py = y[index];
-    if (px === undefined || py === undefined) continue;
-    clouds[group]?.push({ x: px, y: py });
-  }
-  return clouds;
-}
-
-/*
- * Report the skipped groups once each time the set changes. A fresh array is
- * built every render, so it is the joined indices that are compared and not
- * the array, which is what keeps a caller storing the answer from re-rendering
- * for ever.
- */
-function useSkippedReport(
-  skipped: readonly number[],
-  report: ((groups: readonly number[]) => void) | undefined,
-): void {
-  const last = useRef('');
-  const key = skipped.join(' ');
-  useEffect(() => {
-    if (last.current === key) return;
-    last.current = key;
-    report?.(skipped);
-  });
-}

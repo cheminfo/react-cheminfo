@@ -11,6 +11,8 @@ import type { CSSProperties, ReactElement } from 'react';
 import { Suspense, lazy, useCallback, useEffect, useRef } from 'react';
 import type { CanvasEditorInputFormat } from 'react-ocl';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+
 import type {
   StructureEditorChange,
   StructureEditorMode,
@@ -22,6 +24,7 @@ const EditorCanvas = lazy(async () => {
   return { default: module.EditorCanvas };
 });
 
+/** What {@link StructureEditor} needs. */
 export interface StructureEditorProps {
   /**
    * Called after every edit, once the drawing has been still for `debounce`
@@ -73,9 +76,15 @@ export interface StructureEditorProps {
    * @default 'molecule'
    */
   mode?: StructureEditorMode;
-  /** Class the container carries, so a site can reach it from its stylesheet. */
+  /**
+   * Class the container carries, so a site can reach it from its stylesheet.
+   * @default undefined
+   */
   className?: string;
-  /** Extra style for the container, merged over the packaged one. */
+  /**
+   * Extra style for the container, merged over the packaged one.
+   * @default undefined
+   */
   style?: CSSProperties;
 }
 
@@ -179,7 +188,7 @@ const ROOT_STYLE: CSSProperties = {
   position: 'relative',
   overflow: 'hidden',
   boxSizing: 'border-box',
-  border: '1px solid var(--border, #d3d8de)',
+  border: `1px solid ${TOKEN.border}`,
   borderRadius: 6,
   background: '#fff',
 };
@@ -191,6 +200,6 @@ const LOADING_STYLE: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: 'var(--text-faint, #8a96a3)',
+  color: TOKEN.textFaint,
   fontSize: 13,
 };

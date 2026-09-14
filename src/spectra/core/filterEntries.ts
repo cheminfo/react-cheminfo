@@ -30,7 +30,8 @@ export interface FilterCatalogEntry {
   caution?: string;
 }
 
-const SG_FIELDS: readonly FilterField[] = [
+/** The window and degree every Savitzky–Golay step asks for. */
+const SAVITZKY_GOLAY_FIELDS: readonly FilterField[] = [
   integerField(
     'windowSize',
     'Window size',
@@ -112,7 +113,7 @@ export const SIGNAL_ENTRIES = {
     summary:
       'Fits a polynomial over a sliding window; with a derivative above zero it is the general form of the three below.',
     fields: [
-      ...SG_FIELDS,
+      ...SAVITZKY_GOLAY_FIELDS,
       integerField(
         'derivative',
         'Derivative',
@@ -126,20 +127,20 @@ export const SIGNAL_ENTRIES = {
     group: 'smoothing',
     summary:
       'dy/dx by Savitzky–Golay. Removes an additive baseline and turns every peak into a zero crossing.',
-    fields: SG_FIELDS,
+    fields: SAVITZKY_GOLAY_FIELDS,
   },
   secondDerivative: {
     label: 'Second derivative',
     group: 'smoothing',
     summary:
       'd²y/dx² by Savitzky–Golay — the classic way to pull apart overlapping infrared bands.',
-    fields: SG_FIELDS,
+    fields: SAVITZKY_GOLAY_FIELDS,
   },
   thirdDerivative: {
     label: 'Third derivative',
     group: 'smoothing',
     summary: 'd³y/dx³ by Savitzky–Golay. Rarely worth it: noise dominates.',
-    fields: SG_FIELDS,
+    fields: SAVITZKY_GOLAY_FIELDS,
   },
   centerMean: {
     label: 'Centre on the mean',
@@ -209,6 +210,20 @@ export const SIGNAL_ENTRIES = {
       ),
     ],
   },
+  setMinY: {
+    label: 'Shift y to start at a value',
+    group: 'y-axis',
+    summary:
+      'Adds one constant to every y so the smallest lands on the value given — a shift, not a rescale.',
+    fields: [numberField('min', 'Smallest y', '0')],
+    caution: 'Left empty, the smallest y is moved to 0, not left where it is.',
+  },
+  setMaxY: {
+    label: 'Shift y to end at a value',
+    group: 'y-axis',
+    summary:
+      'Adds one constant to every y so the largest lands on the value given — a shift, not a rescale.',
+    fields: [numberField('max', 'Largest y', '1')],
+    caution: 'Left empty, the largest y is moved to 1, not left where it is.',
+  },
 } as const satisfies Record<string, FilterCatalogEntry>;
-
-/** Everything that moves, crops or resamples the x axis, and the two housekeeping steps. */

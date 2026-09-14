@@ -1,9 +1,9 @@
-import { getClasses, getNumbers } from 'ml-dataset-iris';
-import { PCA } from 'ml-pca';
+import { getClasses } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import { rowMatrix } from '../../../chart/core/index.ts';
+import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import type { ProjectionResult, ProjectionSamples } from '../../core/index.ts';
 import {
   DEFAULT_PROJECTION_OPTIONS,
@@ -12,8 +12,7 @@ import {
 } from '../../core/index.ts';
 import { ProjectionPairsTab } from '../ProjectionPairsTab.tsx';
 
-const rows = getNumbers();
-const result = pcaResult(new PCA(rows, { scale: true }), {
+const result = pcaResult(IRIS_PCA, {
   rows,
   scaled: true,
 });

@@ -33,7 +33,7 @@ const FRAMING_MARGIN = 0.08;
  * @param plugin - The molstar context.
  * @param durationMs - Transition length. Pass 0 for an instant jump.
  */
-export function resetCamera(
+function resetCamera(
   plugin: PluginContext,
   durationMs = DEFAULT_CAMERA_DURATION,
 ): void {

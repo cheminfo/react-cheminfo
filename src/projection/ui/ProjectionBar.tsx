@@ -31,7 +31,7 @@ import type { ProjectionModels } from './projectionTabModels.ts';
 import type { ProjectionStateApi } from './useProjectionState.ts';
 
 /** What {@link ProjectionBar} needs. */
-export interface ProjectionBarProps {
+interface ProjectionBarProps {
   /** The tab, the options and the selection every tab shares. */
   state: ProjectionStateApi;
   /** What the run produced, whatever produced it. */
@@ -193,12 +193,12 @@ function tabNames(
  * row, because the settings and the second tier both have to stay reachable —
  * so its paragraph is written here instead. A reader short of room is exactly
  * the reader who has not been told what they are looking at, which is why it
- * is moved rather than dropped.
+ * is written here rather than left out.
  *
  * It is a band above the panel rather than a row inside it: the panel's rows
  * are settings the reader changes, and a paragraph filed among them is one
  * more thing to scan past on the way to the switch they came for.
- * @param caption - The paragraph the question mark used to open.
+ * @param caption - The paragraph the question mark opens on a wider figure.
  * @param more - The panel the cog already held.
  * @param metrics - The measurements the chrome is drawn from.
  * @returns The panel's contents.

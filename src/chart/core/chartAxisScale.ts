@@ -1,4 +1,6 @@
+import { clamp } from '../../format/core/clamp.ts';
 import { formatDecimal } from '../../format/core/numbers.ts';
+import { formatSuperscript } from '../../format/core/superscript.ts';
 
 const DEFAULT_COUNT = 5;
 const MAXIMUM_COUNT = 100;
@@ -7,7 +9,6 @@ const NICE_PASSES = 8;
 const ZERO_WIDTH_SHARE = 0.05;
 const ZERO_WIDTH_FALLBACK = 1;
 const COMFORTABLE_LABEL = 6;
-const SUPERSCRIPT_DIGITS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
 const STEP_10 = Math.sqrt(50);
 const STEP_5 = Math.sqrt(10);
 const STEP_2 = Math.SQRT2;
@@ -157,11 +158,7 @@ export function chartExponentSuffix(exponent: number): string {
   if (!Number.isFinite(exponent)) return '';
   const whole = Math.trunc(exponent);
   if (whole === 0) return '';
-  const sign = whole < 0 ? '⁻' : '';
-  const digits = Math.abs(whole)
-    .toString()
-    .replaceAll(/\d/gu, (digit) => SUPERSCRIPT_DIGITS.charAt(Number(digit)));
-  return ` (×10${sign}${digits})`;
+  return ` (×10${formatSuperscript(whole)})`;
 }
 
 type TickSpec = [first: number, last: number, increment: number];
@@ -231,8 +228,7 @@ function decimalExponent(value: number): number {
 }
 
 function tickCount(count: number): number {
-  if (!Number.isFinite(count)) return DEFAULT_COUNT;
-  return Math.min(MAXIMUM_COUNT, Math.max(1, Math.floor(count)));
+  return Math.floor(clamp(count, 1, MAXIMUM_COUNT, DEFAULT_COUNT));
 }
 
 function openDomain(min: number, max: number): [number, number] {

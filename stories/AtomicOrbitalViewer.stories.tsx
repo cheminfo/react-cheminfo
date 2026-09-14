@@ -53,7 +53,7 @@ export const FOrbital: Story = {
 
 /** The blue/amber pair, for the readers the blue/red one fails. */
 export const ColourBlindSafe: Story = {
-  args: { palette: PHASE_PALETTES.colourBlindSafe },
+  args: { palette: PHASE_PALETTES.colorBlindSafe },
 };
 
 /** The labelled frame, which is what tells a `3d_xz` from a `3d_yz`. */

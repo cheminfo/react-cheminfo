@@ -1,6 +1,46 @@
 import { expect, test } from 'vitest';
 
-import { formulaProblem, isUsableLabel } from '../problems.ts';
+import {
+  bracketProblem,
+  formulaProblem,
+  isUsableLabel,
+  problem,
+} from '../problems.ts';
+
+test('brackets closed in order raise nothing, and each way of getting them wrong is named', () => {
+  expect(bracketProblem('(a + (b))')).toBeUndefined();
+  expect(bracketProblem('a + b')).toBeUndefined();
+  expect(bracketProblem('(a')).toBe('A bracket is left open.');
+  expect(bracketProblem(')a(')).toBe('A closing bracket has nothing to close.');
+});
+
+test('a problem about a whole part carries no index key at all, and one about an entry carries its index', () => {
+  const whole = problem(
+    'error',
+    { part: 'memory', where: 'Memory' },
+    'The budget must be a number above zero.',
+  );
+  const entry = problem(
+    'warning',
+    { part: 'range', index: 0, where: 'Range 1' },
+    'From is not below to.',
+  );
+
+  expect(whole).toStrictEqual({
+    severity: 'error',
+    part: 'memory',
+    where: 'Memory',
+    message: 'The budget must be a number above zero.',
+  });
+  expect(Object.hasOwn(whole, 'index')).toBe(false);
+  expect(entry).toStrictEqual({
+    severity: 'warning',
+    part: 'range',
+    index: 0,
+    where: 'Range 1',
+    message: 'From is not below to.',
+  });
+});
 
 test('a label that can be a variable is accepted', () => {
   expect(isUsableLabel('amide')).toBe(true);

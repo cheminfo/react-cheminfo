@@ -9,6 +9,7 @@ import {
   ExerciseLevelTag,
   ExerciseStatusIcon,
 } from '../src/pedagogy/ui/ExerciseTags.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 const STATUSES: ExerciseStatus[] = ['idle', 'attempted', 'solved'];
 
@@ -103,7 +104,7 @@ const ROW_STYLE: CSSProperties = {
 
 const PAIR_STYLE: CSSProperties = {
   alignItems: 'center',
-  color: '#5b6875',
+  color: TOKEN.textMuted,
   display: 'flex',
   fontSize: 13,
   gap: 6,
@@ -121,7 +122,7 @@ const LIST_STYLE: CSSProperties = {
 
 const ITEM_STYLE: CSSProperties = {
   alignItems: 'center',
-  borderTop: '1px solid var(--border, #dfe3e8)',
+  borderTop: `1px solid ${TOKEN.border}`,
   display: 'flex',
   gap: 8,
   padding: '5px 2px',

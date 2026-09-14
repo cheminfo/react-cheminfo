@@ -11,6 +11,7 @@ import type { ReactElement } from 'react';
 
 import type { ChartBand } from '../core/chartBand.ts';
 import type { ChartScale } from '../core/chartScale.ts';
+import { chartRoundPixel } from '../core/chartScale.ts';
 
 import type { ChartSeries } from './TrackedLineChart.tsx';
 
@@ -48,7 +49,7 @@ export function ChartSeriesMarks(props: ChartSeriesMarksProps): ReactElement {
   const muted = item.muted === true;
   const grounded = item.kind === 'bar';
   const lanes = Math.max(1, lane.count);
-  const wide = round(band.bandWidth / lanes);
+  const wide = chartRoundPixel(band.bandWidth / lanes);
   const shift = band.bandWidth * ((lane.index + 0.5) / lanes - 0.5);
   const rects: ReactElement[] = [];
   let path = '';
@@ -62,13 +63,13 @@ export function ChartSeriesMarks(props: ChartSeriesMarksProps): ReactElement {
     const x = band.offset + band.step * (index + 0.5);
     const at = y.offset + value * y.factor;
     if (!grounded) {
-      path += `${pen}${round(x)} ${round(at)}`;
+      path += `${pen}${chartRoundPixel(x)} ${chartRoundPixel(at)}`;
       pen = 'L';
       continue;
     }
-    const near = round(x + shift - band.bandWidth / lanes / 2);
-    const high = round(Math.min(at, y.offset));
-    const tall = round(Math.abs(at - y.offset));
+    const near = chartRoundPixel(x + shift - band.bandWidth / lanes / 2);
+    const high = chartRoundPixel(Math.min(at, y.offset));
+    const tall = chartRoundPixel(Math.abs(at - y.offset));
     rects.push(
       <rect key={index} x={near} y={high} width={wide} height={tall} />,
     );
@@ -94,5 +95,3 @@ export function ChartSeriesMarks(props: ChartSeriesMarksProps): ReactElement {
 
 /** What a series drawn on its own is told, which is that it has the slot. */
 const SOLE_LANE = { index: 0, count: 1 } as const;
-
-const round = (value: number): number => Math.round(value * 100) / 100;

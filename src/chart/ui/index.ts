@@ -16,6 +16,7 @@ export type {
   ChartPlotArea,
 } from './ChartFrame.tsx';
 export { ChartFrame } from './ChartFrame.tsx';
+export { chartFrameGeometry } from './chartFrameGeometry.ts';
 export type { ChartSeriesMarksProps } from './ChartSeriesMarks.tsx';
 export { ChartSeriesMarks } from './ChartSeriesMarks.tsx';
 export type { ChartTrackingLayerProps } from './ChartTrackingLayer.tsx';
@@ -27,8 +28,6 @@ export type {
   TrackedLineChartProps,
 } from './TrackedLineChart.tsx';
 export { TrackedLineChart } from './TrackedLineChart.tsx';
-export type {
-  ChartStickSeries,
-  TrackedStickChartProps,
-} from './TrackedStickChart.tsx';
+export type { ChartStickSeries } from './stickChartModel.ts';
+export type { TrackedStickChartProps } from './TrackedStickChart.tsx';
 export { TrackedStickChart } from './TrackedStickChart.tsx';

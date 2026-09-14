@@ -1,6 +1,12 @@
 import { expect, test } from 'vitest';
 
-import { formatQueryString, parseQueryString } from '../query.ts';
+import {
+  firstQueryValues,
+  formatQueryEntries,
+  formatQueryString,
+  parseQueryEntries,
+  parseQueryString,
+} from '../query.ts';
 
 test('a query is read into decoded entries, the leading ? optional', () => {
   expect(parseQueryString('?mf=C6H6&hide=examples,hints')).toStrictEqual({
@@ -28,12 +34,40 @@ test('literalPlus off reads a plus as the space URLSearchParams decodes', () => 
   expect(parseQueryString('?q=one%2Btwo', options).q).toBe('one+two');
 });
 
-test('a bare key reads as present, a repeated one keeps its last value', () => {
+test('a bare key reads as present, a repeated one keeps its first value', () => {
   expect(parseQueryString('?embed&hide=hints')).toStrictEqual({
     embed: '',
     hide: 'hints',
   });
-  expect(parseQueryString('?mf=C6H6&mf=C5H12')).toStrictEqual({ mf: 'C5H12' });
+  expect(parseQueryString('?mf=C6H6&mf=C5H12')).toStrictEqual({ mf: 'C6H6' });
+});
+
+test('the pairs of a query are read in order, repeats and bare keys kept', () => {
+  const entries = parseQueryEntries('?mf=C6H6&embed&&=x&mf=C5H12');
+
+  expect(entries).toStrictEqual([
+    ['mf', 'C6H6'],
+    ['embed', ''],
+    ['mf', 'C5H12'],
+  ]);
+  expect(firstQueryValues(entries)).toStrictEqual(
+    new Map([
+      ['mf', 'C6H6'],
+      ['embed', ''],
+    ]),
+  );
+});
+
+test('pairs are written in order, a bare key for an empty value', () => {
+  expect(
+    formatQueryEntries([
+      ['hide', 'hints,examples'],
+      ['embed', ''],
+      ['smiles', 'CC[N+]'],
+      ['', 'dropped'],
+    ]),
+  ).toBe('hide=hints,examples&embed&smiles=CC%5BN%2B%5D');
+  expect(formatQueryEntries([])).toBe('');
 });
 
 test('an escape that does not decode is taken literally', () => {

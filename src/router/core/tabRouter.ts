@@ -1,6 +1,6 @@
-import { splitAddress, splitPath } from './address.ts';
+import { splitAddress, splitPath, trimTrailingSlash } from './address.ts';
 import { joinBasePath, normalizeBasePath, stripBasePath } from './basePath.ts';
-import { pathFromLegacyHash } from './legacyHash.ts';
+import { adoptLegacyHashAddress, pathFromLegacyHash } from './legacyHash.ts';
 import type { QueryStringOptions } from './query.ts';
 import { formatQueryString, parseQueryString } from './query.ts';
 
@@ -72,7 +72,17 @@ export function createTabRouter<Tab extends string>(
     return search === '' ? address : `${address}?${search}`;
   }
 
-  return { parse, format, isTab };
+  function legacyAddress(address: string): string | null {
+    if (mode !== 'path' || !adoptLegacyHash) return null;
+    const adopted = adoptLegacyHashAddress(address, { basePath });
+    if (adopted === null) return null;
+    const route = parse(adopted);
+    const path = format({ tab: route.tab, id: route.id });
+    const { search } = splitAddress(adopted);
+    return search === '' ? path : `${path}?${search}`;
+  }
+
+  return { mode, parse, format, isTab, legacyAddress };
 }
 
 /** A tab whose address carries more than the tab's own name. */
@@ -167,6 +177,8 @@ export interface TabRouteInput<Tab extends string = string> {
 
 /** The string ↔ route mapping of a site. */
 export interface TabRouter<Tab extends string = string> {
+  /** Whether the route lives in the path or in the fragment. */
+  mode: 'path' | 'hash';
   /**
    * The route an address denotes. An unknown tab, a trailing slash, an empty
    * address and an escape that does not decode all resolve to something
@@ -177,6 +189,13 @@ export interface TabRouter<Tab extends string = string> {
   format: (route: TabRouteInput<Tab>) => string;
   /** Whether a string read out of an address names one of the site's tabs. */
   isTab: (value: string) => value is Tab;
+  /**
+   * The address to put in the bar in place of a link written before the site
+   * routed by path: the page it names as this router writes it, with the query
+   * string kept as it was. `null` when the address is no such link, or when the
+   * router does not adopt them.
+   */
+  legacyAddress: (address: string) => string | null;
 }
 
 interface NormalizedTab {
@@ -208,7 +227,5 @@ function readAddress(
 }
 
 function normalizeTabPath(path: string): string {
-  const opened = path.startsWith('/') ? path : `/${path}`;
-  const closed = opened.replace(/\/+$/, '');
-  return closed === '' ? '/' : closed;
+  return trimTrailingSlash(path.startsWith('/') ? path : `/${path}`);
 }

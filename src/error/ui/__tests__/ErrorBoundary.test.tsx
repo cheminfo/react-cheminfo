@@ -1,9 +1,9 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { toError } from '../../core/toError.ts';
 import { ErrorBoundary } from '../ErrorBoundary.tsx';
 import { ErrorFallback } from '../ErrorFallback.tsx';
-import { toError } from '../toError.ts';
 
 test('a boundary that has caught nothing renders its children', () => {
   const html = renderToStaticMarkup(

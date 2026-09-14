@@ -12,8 +12,6 @@
 
 export type { CloudFrameLayerProps } from './CloudFrameLayer.tsx';
 export { CloudFrameLayer } from './CloudFrameLayer.tsx';
-export type { CloudPointLayerProps } from './CloudPointLayer.tsx';
-export { CloudPointLayer } from './CloudPointLayer.tsx';
 export type { CloudShell, CloudShellLayerProps } from './CloudShellLayer.tsx';
 export { CloudShellLayer } from './CloudShellLayer.tsx';
 export type {
@@ -35,7 +33,7 @@ export { SHELL_FILL_OPACITY, shellGlassStops } from './cloudShellStyles.ts';
 export { CLOUD_ZOOM_RANGE, clampCloudZoom } from './cloudZoom.ts';
 export type { CloudShellsInput } from './scatterCloudModel.ts';
 export { cloudLabel, cloudShells } from './scatterCloudModel.ts';
-export type { CloudGesture, ScatterCloudProps } from './scatterCloudProps.ts';
+export type { ScatterCloudProps } from './scatterCloudProps.ts';
 export { ScatterCloud } from './ScatterCloud.tsx';
 export type { OrbitDrag, OrbitDragOptions } from './useOrbitDrag.ts';
 export { useOrbitDrag } from './useOrbitDrag.ts';

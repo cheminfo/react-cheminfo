@@ -3,6 +3,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { CHART_WHEEL_SPEED, chartWheelFactor } from '../core/chartViewport.ts';
 
+import type { WheelDwellEvent } from './wheelDwell.ts';
+import { WHEEL_DWELL_IDLE, wheelDwellStep, wheelShare } from './wheelDwell.ts';
+
 /** How long the pointer rests on a chart before its wheel is caught, in ms. */
 export const CHART_WHEEL_DWELL = 500;
 
@@ -63,7 +66,8 @@ export interface WheelZoomApi<T extends Element> {
  * their scroll, however slowly they pass over it — and the momentum a trackpad
  * keeps sending after the fingers lift holds it off for exactly as long as it
  * lasts. A reader who came to look at the picture has already rested on it by
- * the time they reach for the wheel, and pays nothing.
+ * the time they reach for the wheel, and pays nothing. The rules themselves
+ * are in `wheelDwell`; this hook carries them out.
  *
  * The listener is attached by hand rather than through `onWheel`, because
  * React registers that one on the root as passive: `preventDefault` inside a
@@ -83,7 +87,6 @@ export function useWheelZoom<T extends Element>(
   } = options;
 
   const ref = useRef<T | null>(null);
-  const armedRef = useRef(false);
   const [armed, setArmed] = useState(false);
 
   // Held in a ref so the inline arrow every caller writes does not tear the
@@ -98,32 +101,34 @@ export function useWheelZoom<T extends Element>(
     if (target === null || !enabled) return undefined;
 
     let timer: ReturnType<typeof setTimeout> | null = null;
-    function arm(state: boolean): void {
-      armedRef.current = state;
-      setArmed(state);
-    }
-    function rest(): void {
-      if (timer !== null) clearTimeout(timer);
-      timer = setTimeout(() => {
+    let dwell = WHEEL_DWELL_IDLE;
+    function apply(event: WheelDwellEvent): boolean {
+      const step = wheelDwellStep(dwell, event);
+      if (step.timer !== 'keep' && timer !== null) {
+        clearTimeout(timer);
         timer = null;
-        arm(true);
-      }, delay);
-    }
-    function forget(): void {
-      if (timer !== null) clearTimeout(timer);
-      timer = null;
-      arm(false);
+      }
+      if (step.timer === 'restart') {
+        timer = setTimeout(() => {
+          timer = null;
+          apply({ type: 'elapsed' });
+        }, delay);
+      }
+      if (step.state.armed !== dwell.armed) setArmed(step.state.armed);
+      dwell = step.state;
+      return step.zoom;
     }
     function enter(): void {
-      if (!armedRef.current) rest();
+      apply({ type: 'enter' });
     }
     // A pointer already resting over the plot when this was attached — a panel
     // that has just been resized under it — never sends an enter event, so the
-    // dwell also starts on the first move that finds nothing pending. It must
-    // be the first: restarting it on every move would ask the reader to hold
-    // the pointer perfectly still, which is not what resting means.
+    // dwell also starts on a move.
     function move(): void {
-      if (!armedRef.current && timer === null) rest();
+      apply({ type: 'move' });
+    }
+    function forget(): void {
+      apply({ type: 'leave' });
     }
     // An arrow rather than a declaration, and typed as the plain `Event` the
     // element's own listener map hands it: a hoisted function would be told
@@ -131,19 +136,12 @@ export function useWheelZoom<T extends Element>(
     // the guard above.
     const wheel = (event: Event): void => {
       if (!(event instanceof WheelEvent)) return;
-      // A wheel with a button down belongs to the drag that claimed the
-      // pointer: moving the ground under a lasso would leave the outline
-      // pointing at rows nobody drew a ring around.
-      if (event.buttons !== 0) return;
-      if (!armedRef.current) {
-        rest();
-        return;
-      }
+      if (!apply({ type: 'wheel', buttons: event.buttons })) return;
       event.preventDefault();
       const box = target.getBoundingClientRect();
       zoom.current(
-        share(event.clientX - box.left, box.width),
-        share(event.clientY - box.top, box.height),
+        wheelShare(event.clientX - box.left, box.width),
+        wheelShare(event.clientY - box.top, box.height),
         chartWheelFactor(event.deltaY, event.deltaMode, speed),
       );
     };
@@ -162,16 +160,4 @@ export function useWheelZoom<T extends Element>(
   }, [enabled, delay, speed]);
 
   return { ref, armed: enabled && armed };
-}
-
-/**
- * How far along a side a position sits, from 0 to 1.
- * @param position - The position, in pixels from the near edge.
- * @param size - The side's length.
- * @returns The share. The middle of an element with no size, which is the only
- * place a pointer can be said to be on one.
- */
-function share(position: number, size: number): number {
-  if (!(size > 0) || !Number.isFinite(position)) return 0.5;
-  return Math.min(1, Math.max(0, position / size));
 }

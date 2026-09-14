@@ -4,8 +4,9 @@ import type { ChartBins } from '../../chart/core/chartBins.ts';
 import type { ChartExtent } from '../../chart/core/chartExtent.ts';
 import type { MatrixLike } from '../../chart/core/matrix.ts';
 import type { ChartFrameRender } from '../../chart/ui/ChartFrame.tsx';
+import { formatPercent } from '../../format/core/numbers.ts';
+import type { ScatterGroupSpread } from '../core/scatterGroupSpread.ts';
 
-import type { ScatterGroupSpread } from './scatterGroupSpread.ts';
 import type { ScatterMatrixAxis } from './scatterMatrixProps.ts';
 
 /**
@@ -102,7 +103,7 @@ export function ScatterMatrixDiagonal(
           textAnchor="end"
           style={SHARE_STYLE}
         >
-          {`${(share * 100).toFixed(1)} %`}
+          {formatPercent(share)}
         </text>
       )}
     </g>

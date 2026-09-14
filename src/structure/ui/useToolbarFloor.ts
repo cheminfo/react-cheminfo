@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef } from 'react';
 
 import { toolbarFloorHeight } from '../core/toolbarFloor.ts';
 
+/** What {@link useToolbarFloor} needs. */
 export interface ToolbarFloorOptions {
   /**
    * Smallest height of the drawing area, in pixels. Raised to whatever the

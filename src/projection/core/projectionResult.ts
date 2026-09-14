@@ -5,7 +5,7 @@ import type { VariableAxis } from './variableAxis.ts';
 
 /** One axis of a reduced space — a component, a UMAP dimension. */
 export interface ProjectionAxis {
-  /** What it is called on an axis: `PC 1`, `UMAP 1`. */
+  /** What it is called on an axis: `PC1`, `UMAP 1`. */
   name: string;
   /**
    * The share of the differences between the samples it accounts for, between

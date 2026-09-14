@@ -166,11 +166,33 @@ test('a formula field is monospace and refuses every browser correction', () => 
     />,
   );
 
-  expect(html).toContain('style="font-family:monospace"');
+  expect(html).toContain(
+    'style="font-family:var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)"',
+  );
   expect(html).toContain(
     'spellCheck="false" autoCapitalize="off" autoCorrect="off" autoComplete="off"',
   );
   expect(html).toContain('value="-log10(y)"');
+});
+
+test('a zone with a bound written as text stays a row, numbered as the problems number it, so editing another zone cannot drop it', () => {
+  const html = renderToStaticMarkup(
+    <FilterFieldControl
+      field={zonesField('zones', 'Zones to keep')}
+      filter={setFilterOption({ name: 'filterX' }, 'zones', [
+        { from: '3', to: 5 },
+        { from: 1, to: 2 },
+      ])}
+      onChange={() => null}
+    />,
+  );
+
+  expect(html.match(/aria-label="Remove Zones to keep \d"/g)).toStrictEqual([
+    'aria-label="Remove Zones to keep 1"',
+    'aria-label="Remove Zones to keep 2"',
+  ]);
+  expect(html).toContain('value="5"');
+  expect(html).not.toContain('value="3"');
 });
 
 test('a zones field lists the stretches the step holds, both bounds each', () => {

@@ -8,9 +8,10 @@
  * Wire it as an npm script:
  *   "check-tokens": "node node_modules/react-cheminfo/bin/check-tokens.mjs src"
  *
- * Usage: check-tokens.mjs [directory...] [--allow=#aabbcc,#ddeeff] [--quiet]
+ * Usage: check-tokens.mjs [directory...] [--allow=#aabbcc,#ddeeff] [--fallbacks] [--quiet]
  *   directory   what to walk, `src` when none is given
  *   --allow     colours the project legitimately owns
+ *   --fallbacks also read the fallback inside var(): a family token's must be its value
  *   --quiet     say nothing when the scan is clean
  *
  * Exits 1 when anything is reported, 2 when it was called wrongly, 0 otherwise.
@@ -21,23 +22,27 @@ import process from 'node:process';
 
 import { findTokenViolations } from '../lib/core.js';
 
+import { countOf, listOption, usageError } from './cli.mjs';
+
 const EXTENSIONS = new Set(['.css', '.ts', '.tsx', '.jsx', '.js']);
 const SKIPPED = new Set(['node_modules', 'dist', 'lib', 'coverage']);
 const ALLOW_PREFIX = '--allow=';
+const TOOL = 'check-tokens';
 
 const roots = [];
 const allow = [];
 let quiet = false;
+let fallbacks = false;
 
 for (const argument of process.argv.slice(2)) {
   if (argument.startsWith(ALLOW_PREFIX)) {
-    for (const colour of argument.slice(ALLOW_PREFIX.length).split(',')) {
-      if (colour.trim() !== '') allow.push(colour.trim());
-    }
+    allow.push(...listOption(argument.slice(ALLOW_PREFIX.length)));
   } else if (argument === '--quiet') {
     quiet = true;
+  } else if (argument === '--fallbacks') {
+    fallbacks = true;
   } else if (argument.startsWith('-')) {
-    fail(`unknown option: ${argument}`);
+    process.exit(usageError(TOOL, `unknown option: ${argument}`));
   } else {
     roots.push(argument);
   }
@@ -47,20 +52,20 @@ if (roots.length === 0) roots.push('src');
 const files = [];
 for (const root of roots) collect(root, files);
 
-const violations = findTokenViolations(files, { allow });
+const violations = findTokenViolations(files, { allow, fallbacks });
 let report = '';
 for (const violation of violations) {
   report += `${violation.file}:${violation.line}:${violation.column}  ${violation.kind}  ${violation.text}  -> ${violation.hint}\n`;
 }
 
 if (violations.length > 0) {
-  report += `${count(violations.length, 'violation')} in ${count(files.length, 'file')}\n`;
+  report += `${countOf(violations.length, 'violation')} in ${countOf(files.length, 'file')}\n`;
   process.stdout.write(report);
   process.exit(1);
 }
 if (!quiet) {
   process.stdout.write(
-    `no token violation in ${count(files.length, 'file')}\n`,
+    `no token violation in ${countOf(files.length, 'file')}\n`,
   );
 }
 
@@ -72,7 +77,9 @@ if (!quiet) {
  */
 function collect(path, files) {
   const stats = statSync(path, { throwIfNoEntry: false });
-  if (stats === undefined) fail(`no such path: ${path}`);
+  if (stats === undefined) {
+    process.exit(usageError(TOOL, `no such path: ${path}`));
+  }
   if (stats.isDirectory()) {
     for (const entry of readdirSync(path, { withFileTypes: true })) {
       if (entry.name.startsWith('.') || SKIPPED.has(entry.name)) continue;
@@ -82,24 +89,4 @@ function collect(path, files) {
   }
   if (!EXTENSIONS.has(extname(path))) return;
   files.push({ path, text: readFileSync(path, 'utf8') });
-}
-
-/**
- * A count with its noun, so a summary line reads as a sentence.
- * @param {number} total - How many.
- * @param {string} noun - What of, in the singular.
- * @returns {string} The two, with the plural `s` when it is needed.
- */
-function count(total, noun) {
-  return `${total} ${noun}${total === 1 ? '' : 's'}`;
-}
-
-/**
- * Stop on a call the script cannot honour, which is not a clean scan.
- * @param {string} message - What was wrong with it.
- * @returns {never} It never comes back: the process ends here.
- */
-function fail(message) {
-  process.stderr.write(`check-tokens: ${message}\n`);
-  process.exit(2);
 }

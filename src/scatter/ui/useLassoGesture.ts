@@ -1,5 +1,5 @@
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import type { LassoPath } from '../core/lassoPath.ts';
 import {
@@ -10,38 +10,22 @@ import {
 } from '../core/lassoPath.ts';
 import type { ScatterSelectionMode } from '../core/scatterSelection.ts';
 
-import type {
-  LassoGesture,
-  LassoGestureOptions,
-  ScatterSurfaceProps,
-} from './lassoGesture.ts';
+import type { LassoGesture, LassoGestureOptions } from './lassoGesture.ts';
 import {
   DEFAULT_LASSO_MIN_DISTANCE,
   MINIMUM_RING_VERTICES,
-  capturePointer,
-  dropFrame,
   modifierMode,
-  scheduleFrame,
   surfacePosition,
 } from './lassoGesture.ts';
-
-export type {
-  LassoGesture,
-  LassoGestureOptions,
-  ScatterSurfaceProps,
-} from './lassoGesture.ts';
+import { useCapturedPointer } from './useCapturedPointer.ts';
 
 /**
  * A free-hand outline drawn over a plot with the pointer.
  *
- * The pointer is captured on the way down, so a drag that wanders off the
- * figure, or off the window, keeps drawing and still finishes. All three ways
- * a capture can end lead to one function: a lasso left half-drawn because
- * `pointercancel` was handled and `lostpointercapture` was not is the classic
- * fault here, and it leaves a stroke on screen that nothing can clear.
- *
- * Moves are coalesced to one a frame, because a pointer emits many per frame
- * and each one that reaches the caller costs a walk over every point.
+ * The pointer is claimed through `useCapturedPointer`, which is what makes a
+ * drag that wanders off the figure keep drawing and still finish, and what
+ * coalesces the moves to one a frame — each one that reaches the caller costs
+ * a walk over every point. What is left here is the path itself.
  * @param options - See {@link LassoGestureOptions}.
  * @returns The gesture. See {@link LassoGesture}.
  */
@@ -66,39 +50,62 @@ export function useLassoGesture(
   pathRef.current ??= createLassoPath();
   const path = pathRef.current;
 
-  const pointerRef = useRef<number | null>(null);
   const modeRef = useRef<ScatterSelectionMode>(restingMode);
-  const frameRef = useRef<number | null>(null);
   const pendingRef = useRef<PendingMove | null>(null);
 
   const [drawing, setDrawing] = useState(false);
   const [pathData, setPathData] = useState('');
   const [mode, setMode] = useState<ScatterSelectionMode>(restingMode);
 
-  const flush = useCallback(() => {
-    frameRef.current = null;
-    const next = pendingRef.current;
-    pendingRef.current = null;
-    if (next === null) return;
-    if (pointerRef.current === null) {
-      onMove?.(next.x, next.y, false);
-      return;
-    }
-    modeRef.current = next.mode;
-    setMode(next.mode);
-    if (appendLassoPoint(path, next.x, next.y, minDistance)) {
+  const press = useCallback(
+    (event: ReactPointerEvent<Element>) => {
+      if (!enabled) return false;
+      const position = surfacePosition(event, originX, originY);
+      const gesture = modifierMode(event, restingMode);
+      modeRef.current = gesture;
+      resetLassoPath(path);
+      appendLassoPoint(path, position.x, position.y, 0);
+      setMode(gesture);
+      setDrawing(true);
       setPathData(lassoPathData(path, false));
-      onDraw?.(path, next.mode);
-    }
-    onMove?.(next.x, next.y, true);
-  }, [minDistance, onDraw, onMove, path]);
+      return true;
+    },
+    [enabled, originX, originY, path, restingMode],
+  );
 
-  const end = useCallback(
-    (commit: boolean) => {
-      if (pointerRef.current === null) return;
-      pointerRef.current = null;
+  const follow = useCallback(
+    (event: ReactPointerEvent<Element>, claimed: boolean) => {
+      const { x, y } = surfacePosition(event, originX, originY);
+      const gesture = claimed ? modifierMode(event, restingMode) : restingMode;
+      pendingRef.current = { x, y, mode: gesture };
+      return true;
+    },
+    [originX, originY, restingMode],
+  );
+
+  const flush = useCallback(
+    (claimed: boolean) => {
+      const next = pendingRef.current;
       pendingRef.current = null;
-      dropFrame(frameRef);
+      if (next === null) return;
+      if (!claimed) {
+        onMove?.(next.x, next.y, false);
+        return;
+      }
+      modeRef.current = next.mode;
+      setMode(next.mode);
+      if (appendLassoPoint(path, next.x, next.y, minDistance)) {
+        setPathData(lassoPathData(path, false));
+        onDraw?.(path, next.mode);
+      }
+      onMove?.(next.x, next.y, true);
+    },
+    [minDistance, onDraw, onMove, path],
+  );
+
+  const finish = useCallback(
+    (_event: ReactPointerEvent<Element> | null, commit: boolean) => {
+      pendingRef.current = null;
       const gesture = modeRef.current;
       setDrawing(false);
       setPathData('');
@@ -112,94 +119,27 @@ export function useLassoGesture(
     [onClick, onComplete, onDraw, path],
   );
 
-  const handleDown = useCallback(
-    (event: ReactPointerEvent<Element>) => {
-      if (!enabled || pointerRef.current !== null || event.button > 0) return;
-      if (event.pointerType === 'touch' && !touch) return;
-      const position = surfacePosition(event, originX, originY);
-      const gesture = modifierMode(event, restingMode);
-      pointerRef.current = event.pointerId;
-      modeRef.current = gesture;
-      resetLassoPath(path);
-      appendLassoPoint(path, position.x, position.y, 0);
-      setMode(gesture);
-      setDrawing(true);
-      setPathData(lassoPathData(path, false));
-      capturePointer(event);
-    },
-    [enabled, originX, originY, path, restingMode, touch],
-  );
-
-  const handleMove = useCallback(
-    (event: ReactPointerEvent<Element>) => {
-      const active = pointerRef.current;
-      if (active !== null && event.pointerId !== active) return;
-      const { x, y } = surfacePosition(event, originX, originY);
-      const drawn = active !== null;
-      pendingRef.current = {
-        x,
-        y,
-        mode: drawn ? modifierMode(event, restingMode) : restingMode,
-      };
-      scheduleFrame(frameRef, flush);
-    },
-    [flush, originX, originY, restingMode],
-  );
-
-  const handleUp = useCallback(
-    (event: ReactPointerEvent<Element>) => {
-      if (event.pointerId === pointerRef.current) end(true);
-    },
-    [end],
-  );
-
-  const handleAbandon = useCallback(
-    (event: ReactPointerEvent<Element>) => {
-      if (event.pointerId === pointerRef.current) end(false);
-    },
-    [end],
-  );
-
-  const handleLeave = useCallback(() => {
-    if (pointerRef.current !== null) return;
+  const forget = useCallback(() => {
     pendingRef.current = null;
     onLeave?.();
   }, [onLeave]);
 
-  const cancel = useCallback(() => {
-    end(false);
-  }, [end]);
-
-  const surface = useMemo<ScatterSurfaceProps>(
-    () => ({
-      onPointerDown: handleDown,
-      onPointerMove: handleMove,
-      onPointerUp: handleUp,
-      onPointerCancel: handleAbandon,
-      onLostPointerCapture: handleAbandon,
-      onPointerLeave: handleLeave,
-      style: {
-        cursor: enabled ? 'crosshair' : 'default',
-        touchAction: touch ? 'none' : 'auto',
-      },
-    }),
-    [
-      enabled,
-      handleAbandon,
-      handleDown,
-      handleLeave,
-      handleMove,
-      handleUp,
-      touch,
-    ],
-  );
+  const { surface, abandon } = useCapturedPointer({
+    touch,
+    cursor: enabled ? 'crosshair' : 'default',
+    onPress: press,
+    onMove: follow,
+    onFrame: flush,
+    onRelease: finish,
+    onLeave: forget,
+  });
 
   return {
     surface,
     drawing,
     pathData,
     mode: drawing ? mode : restingMode,
-    cancel,
+    cancel: abandon,
   };
 }
 

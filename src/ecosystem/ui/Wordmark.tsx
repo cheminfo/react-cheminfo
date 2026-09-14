@@ -1,8 +1,11 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { siteById } from '../core/lookup.ts';
+import { siteNameColors } from '../core/nameColors.ts';
 import type { SiteId } from '../core/sites.ts';
 
+/** What a site's written name needs. */
 export interface WordmarkProps {
   /** The site whose name is written. */
   siteId: SiteId;
@@ -33,31 +36,28 @@ export interface WordmarkProps {
 export function Wordmark(props: WordmarkProps): ReactElement {
   const { siteId, size = 17, className } = props;
   const site = siteById(siteId);
+  const { lead, alt, dot } = site.name;
+  const colors = siteNameColors(site);
 
   return (
     <span
-      className={className ? `wordmark ${className}` : 'wordmark'}
+      className={joinClassNames('wordmark', className)}
       style={{ ...WORDMARK_STYLE, fontSize: size }}
     >
-      <span className="wordmark__lead" style={{ color: site.brand }}>
-        {site.name.lead}
+      <span className="wordmark__lead" style={{ color: colors.lead }}>
+        {lead}
       </span>
-      {site.name.dot ? (
-        <span className="wordmark__dot" style={{ color: DOT_COLOR }}>
+      {dot ? (
+        <span className="wordmark__dot" style={{ color: colors.dot }}>
           .
         </span>
       ) : null}
-      <span className="wordmark__alt" style={{ color: site.brandAlt }}>
-        {site.name.alt}
+      <span className="wordmark__alt" style={{ color: colors.alt }}>
+        {alt}
       </span>
     </span>
   );
 }
-
-// The separating dot is neutral so the two coloured halves read as the name
-// rather than as three equal parts, and it takes the family's own token when
-// the page defines one.
-const DOT_COLOR = 'var(--text-faint, #8a96a3)';
 
 const WORDMARK_STYLE: CSSProperties = {
   letterSpacing: '-0.01em',

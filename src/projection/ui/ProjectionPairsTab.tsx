@@ -3,12 +3,13 @@ import { useMemo } from 'react';
 
 import type { OverlayLegendEntry } from '../../overlay/ui/OverlayLegend.tsx';
 import { OverlayLegend } from '../../overlay/ui/OverlayLegend.tsx';
-import type { ScatterMatrixAxis } from '../../scatter/ui/ScatterMatrix.tsx';
 import { ScatterMatrix } from '../../scatter/ui/ScatterMatrix.tsx';
-import type { ScatterGroup } from '../../scatter/ui/ScatterPlot.tsx';
+import type { ScatterGroup } from '../../scatter/ui/scatterFigureProps.ts';
 import { SCATTER_MATRIX_MOST_AXES } from '../../scatter/ui/scatterMatrixLayout.ts';
+import type { ScatterMatrixAxis } from '../../scatter/ui/scatterMatrixProps.ts';
+import { fillCopy } from '../core/fillCopy.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import { PROJECTION_COPY, fillCopy } from '../core/projectionCopy.ts';
+import { PROJECTION_COPY } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import { DEFAULT_PROJECTION_OPTIONS } from '../core/projectionOptions.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
@@ -19,7 +20,7 @@ import { MINIMUM_OUTLINE_POINTS } from './projectionMapModel.ts';
 import { PROJECTION_TAB_HEIGHT } from './projectionTabStyles.ts';
 
 /** What {@link ProjectionPairsTab} needs. */
-export interface ProjectionPairsTabProps {
+interface ProjectionPairsTabProps {
   /** What the run produced. */
   result: ProjectionResult;
   /** The groups as every figure of this viewer draws them. */

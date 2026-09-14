@@ -13,8 +13,9 @@ import type { ProjectionResult } from '../core/projectionResult.ts';
 import type { ProjectionSamples } from '../core/projectionSamples.ts';
 import type { ProjectionTab } from '../core/projectionTabs.ts';
 
-import type { ProjectionVariableTrack } from './ProjectionVariablesTab.tsx';
+import type { ProjectionViewer } from './ProjectionViewer.tsx';
 import type { ProjectionSelection } from './projectionSelection.ts';
+import type { ProjectionVariableTrack } from './projectionVariablesModel.ts';
 
 /** A sample the reader opened, and where they opened it. */
 export interface ProjectionSampleOpen {

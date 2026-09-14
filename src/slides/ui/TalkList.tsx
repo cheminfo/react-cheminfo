@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 import { isModifiedClick } from '../../chrome/ui/navItem.ts';
 import { pluralize } from '../../format/core/index.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { TalkManifest, TalkSummary } from '../core/index.ts';
 
 /** The talks to list, and what opening one means. */
@@ -27,6 +28,11 @@ export interface TalkListProps {
    * @default 'No talk yet.'
    */
   emptyNote?: string;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -40,6 +46,7 @@ export interface TalkListProps {
  */
 export function TalkList(props: TalkListProps): ReactElement {
   const {
+    className,
     manifests,
     onOpen,
     renderHref,
@@ -54,7 +61,7 @@ export function TalkList(props: TalkListProps): ReactElement {
   }
 
   return (
-    <div className="talk-list">
+    <div className={joinClassNames('talk-list', className)}>
       {groups.map((group) => (
         <section key={group.site} className="talk-list-group">
           {showSite ? (

@@ -11,6 +11,7 @@
 import type { ReactElement, ReactNode } from 'react';
 import { Suspense, lazy } from 'react';
 
+import type { AtomLabelPlacement } from '../core/atomLabels.ts';
 import { structureSource } from '../core/structureSource.ts';
 
 import { StructurePlaceholder } from './StructurePlaceholder.tsx';
@@ -38,12 +39,18 @@ export interface StructureLabels {
    */
   mapping?: boolean;
   /**
+   * Write the CIP descriptor, R or S, next to every stereocentre.
+   * @default false
+   */
+  stereo?: boolean;
+  /**
    * A caption drawn inside the picture, under the structure.
    * @default undefined
    */
   caption?: string;
 }
 
+/** What {@link Structure} needs. */
 export interface StructureProps {
   /**
    * A canonical openchemlib idCode, coordinates included or not. The most
@@ -83,6 +90,20 @@ export interface StructureProps {
    */
   labels?: StructureLabels;
   /**
+   * Text of the caller's own written on atoms — ring numbers, canonical
+   * numbers, an assignment — keyed by atom index as openchemlib counts atoms,
+   * from 0. An empty text, or an index the structure has no atom at, writes
+   * nothing.
+   * @default undefined
+   */
+  atomLabels?: ReadonlyMap<number, string>;
+  /**
+   * Where the `atomLabels` go: beside each element symbol, as a small
+   * superscript, or in place of it.
+   * @default 'beside'
+   */
+  atomLabelPlacement?: AtomLabelPlacement;
+  /**
    * Crop the picture to the atoms rather than centring them in the box.
    * @default true
    */
@@ -113,6 +134,17 @@ export interface StructureProps {
    */
   bondHighlightColor?: string;
   /**
+   * Called with the index of the atom that was clicked, counted from 0 as
+   * openchemlib counts atoms.
+   * @default undefined
+   */
+  onAtomClick?: (atom: number) => void;
+  /**
+   * Called with the index of the bond that was clicked, counted from 0.
+   * @default undefined
+   */
+  onBondClick?: (bond: number) => void;
+  /**
    * What is shown when there is no structure, or when the one supplied cannot
    * be read. An em dash rather than a red box: a missing structure is a row of
    * a table far more often than it is a bug worth shouting about.
@@ -141,12 +173,16 @@ export function Structure(props: StructureProps): ReactElement {
     width = 200,
     height = 140,
     labels = {},
+    atomLabels,
+    atomLabelPlacement = 'beside',
     autoCrop = true,
     autoCropMargin = 4,
     atomHighlight,
     atomHighlightColor = '#a5d8ff',
     bondHighlight,
     bondHighlightColor = '#ffd8a8',
+    onAtomClick,
+    onBondClick,
     fallback = '—',
   } = props;
 
@@ -175,7 +211,12 @@ export function Structure(props: StructureProps): ReactElement {
         showAtomNumber={labels.atoms ?? false}
         showBondNumber={labels.bonds ?? false}
         showMapping={labels.mapping ?? false}
+        showCIPParity={labels.stereo ?? false}
         label={labels.caption}
+        atomLabels={atomLabels}
+        atomLabelPlacement={atomLabelPlacement}
+        onAtomClick={onAtomClick}
+        onBondClick={onBondClick}
         fallback={fallback}
       />
     </Suspense>

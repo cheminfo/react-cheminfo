@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 
+import { formatSuperscript as superscript } from '../../../format/core/superscript.ts';
 import {
   ELEMENT_ANOMALIES,
   MADELUNG_ORDER,
@@ -10,7 +11,6 @@ import {
   isAnomalous,
   subshellCapacity,
   subshellLabel,
-  superscript,
 } from '../electronConfiguration.ts';
 
 import { ALL_ATOMIC_NUMBERS, atomicNumberOf } from './symbols.ts';

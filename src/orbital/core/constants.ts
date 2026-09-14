@@ -30,7 +30,10 @@ export const ENCLOSED_WEIGHT = 0.85;
  * object.
  */
 export interface Vec3 {
+  /** Along the x axis. */
   x: number;
+  /** Along the y axis. */
   y: number;
+  /** Along the z axis. */
   z: number;
 }

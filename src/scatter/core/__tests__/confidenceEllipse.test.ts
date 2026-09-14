@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest';
 
 import type { EllipsePoint } from '../confidenceEllipse.ts';
-import { confidenceEllipse, ellipseAxes } from '../confidenceEllipse.ts';
+import { confidenceEllipse } from '../confidenceEllipse.ts';
+import { ellipseAxes } from '../ellipseAxes.ts';
 
 const TRIANGLE = pointsAt(0, 0, 1, 2, 2, 1);
 

@@ -58,6 +58,31 @@ export const Default: Story = {};
 /** A site with a paper of its own, and a version it knows. */
 export const WithCitation: Story = { args: { content: CITED } };
 
+/** A site provided by one person at EPFL. */
+export const ProvidedBy: Story = {
+  args: {
+    content: {
+      ...CITED,
+      people: [{ name: 'Luc Patiny' }],
+      providedBy: ['epfl'],
+    },
+  },
+};
+
+/** Several people, each with the one line they contributed. */
+export const ProvidedByATeam: Story = {
+  args: {
+    content: {
+      ...CITED,
+      people: [
+        { name: 'Daniel Kostro', role: 'wrote the solver every page runs on.' },
+        { name: 'Luc Patiny', role: 'maintains the tooling and the data.' },
+      ],
+      providedBy: ['epfl'],
+    },
+  },
+};
+
 /** Another site, to show that only the two colours and the words change. */
 export const AnotherSite: Story = {
   args: {

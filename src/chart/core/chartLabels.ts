@@ -1,3 +1,5 @@
+import { formatDecimal, formatPercent } from '../../format/core/numbers.ts';
+
 /** How an axis title is written. */
 export interface ChartAxisTitleOptions {
   /**
@@ -39,7 +41,7 @@ export function chartAxisTitle(
 ): string {
   const { share, digits = DEFAULT_DIGITS } = options;
   if (share === undefined || !Number.isFinite(share)) return name;
-  return `${name} — ${chartShare(share, digits)} %`;
+  return `${name} — ${formatPercent(share, digits)}`;
 }
 
 /**
@@ -56,13 +58,7 @@ export function chartAxisTitle(
  */
 export function chartShare(share: number, digits = DEFAULT_DIGITS): string {
   if (!Number.isFinite(share)) return '';
-  return (share * 100).toFixed(readableDigits(digits));
+  return formatDecimal(share * 100, Number.isFinite(digits) ? digits : 1);
 }
 
 const DEFAULT_DIGITS = 1;
-const MOST_DIGITS = 20;
-
-function readableDigits(digits: number): number {
-  if (!Number.isFinite(digits)) return DEFAULT_DIGITS;
-  return Math.min(MOST_DIGITS, Math.max(0, Math.floor(digits)));
-}

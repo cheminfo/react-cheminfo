@@ -12,11 +12,12 @@ import type { ReactNode } from 'react';
 import type { MatrixLike } from '../../chart/core/matrix.ts';
 import type { EllipseSize } from '../core/confidenceEllipse.ts';
 
-import type { ScatterGroup } from './scatterPlotProps.ts';
+import type { ScatterMatrix } from './ScatterMatrix.tsx';
+import type { ScatterGroup } from './scatterFigureProps.ts';
 
 /** One axis of a {@link ScatterMatrix}. */
 export interface ScatterMatrixAxis {
-  /** What it is called, e.g. `PC 1`. */
+  /** What it is called, e.g. `PC1`. */
   name: string;
   /**
    * The share of the differences it accounts for, between 0 and 1.
@@ -100,4 +101,9 @@ export interface ScatterMatrixProps {
    * @default undefined
    */
   testId?: string;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }

@@ -91,6 +91,7 @@ test('the default orbital of an element can always be sampled', async () => {
   );
 
   for (const result of sampled) {
-    expect(result.grid.data.length).toBeGreaterThan(0);
+    expect(result.grid.dimensions).toStrictEqual([12, 12, 12]);
+    expect(result.grid.data).toHaveLength(12 ** 3);
   }
 });

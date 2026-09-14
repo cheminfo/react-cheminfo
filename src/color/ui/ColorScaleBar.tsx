@@ -32,6 +32,11 @@ export interface ColorScaleBarProps {
    * @default {}
    */
   style?: CSSProperties;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -44,6 +49,7 @@ export interface ColorScaleBarProps {
  */
 export function ColorScaleBar(props: ColorScaleBarProps): ReactElement {
   const {
+    className,
     scale,
     height = DEFAULT_HEIGHT,
     samples = DEFAULT_SAMPLES,
@@ -53,6 +59,7 @@ export function ColorScaleBar(props: ColorScaleBarProps): ReactElement {
 
   return (
     <span
+      className={className}
       role={label === '' ? undefined : 'img'}
       aria-label={label === '' ? undefined : label}
       aria-hidden={label === '' ? true : undefined}

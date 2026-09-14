@@ -1,6 +1,5 @@
 import { Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
-import { useState } from 'react';
 
 import { OverlaySwatchIcon } from './OverlaySwatchIcon.tsx';
 import { useOverlaySurface } from './overlaySurface.ts';
@@ -10,6 +9,7 @@ import {
   overlayValueKeyStyle,
   overlayValueTextStyle,
 } from './overlayValueStyles.ts';
+import { useOverlayInteraction } from './useOverlayInteraction.ts';
 
 /** What {@link OverlayValueButton} needs. */
 export interface OverlayValueButtonProps {
@@ -81,9 +81,8 @@ export interface OverlayValueButtonProps {
 /**
  * A setting written as its own value, with a caret saying it can be changed.
  *
- * It replaces the two idioms a bar used to hold for the same job — a caption
- * beside an outlined segmented control, and a caption beside a native select —
- * with one that costs no box at all. The reader scans the bar and reads
+ * It does the job of a caption beside a segmented control or a native select
+ * at the cost of no box at all. The reader scans the bar and reads
  * `Species` and `95%`, which is how the figure is drawn; the names of the two
  * settings are one press away and in every announcement.
  * @param props - See {@link OverlayValueButtonProps}.
@@ -96,8 +95,7 @@ export function OverlayValueButton(
   const { active = false, disabled = false, disabledReason } = props;
   const { opensMenu = false, onClick, testId } = props;
   const { metrics } = useOverlaySurface();
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
+  const { hovered, focused, handlers } = useOverlayInteraction();
 
   const name = `${label} — ${value}`;
   const told = disabled && disabledReason !== undefined ? disabledReason : name;
@@ -118,10 +116,7 @@ export function OverlayValueButton(
         disabled,
       })}
       onClick={onClick}
-      onPointerEnter={() => setHovered(true)}
-      onPointerLeave={() => setHovered(false)}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      {...handlers}
     >
       {swatches === undefined || swatches.length === 0 ? null : (
         <OverlaySwatchIcon colors={swatches} />

@@ -1,8 +1,10 @@
 import { afterEach, expect, expectTypeOf, test, vi } from 'vitest';
 
 import { CancelledRequestError, RequestTimeoutError } from '../errors.ts';
-import type { WorkerEventLike, WorkerLike } from '../messages.ts';
+import type { WorkerLike } from '../messages.ts';
 import { createWorkerChannel } from '../workerChannel.ts';
+
+import { FakeWorker } from './fakeWorker.ts';
 
 interface Job {
   smiles: string;
@@ -203,43 +205,3 @@ test('a payload the worker refuses rejects that call alone', async () => {
   );
   expect(channel.pendingCount).toBe(0);
 });
-
-class FakeWorker implements WorkerLike {
-  public readonly sent: unknown[] = [];
-  public terminated = false;
-  public refusePostMessage = false;
-  readonly #listeners = new Map<
-    string,
-    Array<(event: WorkerEventLike) => void>
-  >();
-
-  public postMessage(message: unknown): void {
-    if (this.refusePostMessage) throw new Error('the job could not be cloned');
-    this.sent.push(message);
-  }
-
-  public addEventListener(
-    type: 'message' | 'error',
-    listener: (event: WorkerEventLike) => void,
-  ): void {
-    const listeners = this.#listeners.get(type) ?? [];
-    listeners.push(listener);
-    this.#listeners.set(type, listeners);
-  }
-
-  public terminate(): void {
-    this.terminated = true;
-  }
-
-  public emit(type: 'message' | 'error', event: WorkerEventLike): void {
-    for (const listener of this.#listeners.get(type) ?? []) listener(event);
-  }
-
-  public reply(id: number, response: unknown): void {
-    this.emit('message', { data: { id, ok: true, response } });
-  }
-
-  public fail(id: number, message: string): void {
-    this.emit('message', { data: { id, ok: false, message } });
-  }
-}

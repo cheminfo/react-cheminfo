@@ -8,6 +8,7 @@
 
 /** How one test case came out. */
 export interface TestCaseResult {
+  /** Whether the answer did what the case asks. */
   passed: boolean;
   /**
    * What happened, written the way a tutor would say it — `match was "cat",
@@ -31,6 +32,7 @@ export interface TestCaseResult {
 export interface ValidationResult<
   TCase extends TestCaseResult = TestCaseResult,
 > {
+  /** Whether the answer ran, carries every required option and passed every case. */
   passed: boolean;
   /**
    * The one thing that stopped the cases from running at all: an answer that
@@ -38,6 +40,7 @@ export interface ValidationResult<
    * badly it did.
    */
   error: string | null;
+  /** Every graded case, in the order they were run. */
   cases: TCase[];
   /**
    * The options the exercise requires and the answer does not carry — a regex

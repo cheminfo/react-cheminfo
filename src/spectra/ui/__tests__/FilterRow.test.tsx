@@ -135,12 +135,20 @@ test('a step’s problems are drawn after its options, errors in danger and advi
       problems={[
         problem(
           'error',
-          'Step 1 — Rescale between two values',
+          {
+            part: 'chain',
+            index: 0,
+            where: 'Step 1 — Rescale between two values',
+          },
           'The minimum is not below the maximum.',
         ),
         problem(
           'warning',
-          'Step 1 — Rescale between two values',
+          {
+            part: 'chain',
+            index: 0,
+            where: 'Step 1 — Rescale between two values',
+          },
           'Only the last scaling shows.',
         ),
       ]}
@@ -159,4 +167,5 @@ test('a step’s problems are drawn after its options, errors in danger and advi
   expect(html.indexOf('The minimum is not below the maximum.')).toBeLessThan(
     html.indexOf('Only the last scaling shows.'),
   );
+  expect(html).not.toContain('Step 1 — Rescale between two values');
 });

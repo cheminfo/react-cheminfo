@@ -34,7 +34,7 @@ import { IRIS_UMAP_COORDINATES } from './projectionEmbedding.ts';
 export const IRIS_ROWS: readonly number[][] = getNumbers();
 
 /** Which species each flower is, in the same order. */
-export const IRIS_SPECIES: readonly string[] = getClasses();
+const IRIS_SPECIES: readonly string[] = getClasses();
 
 /**
  * What the four columns are, named.

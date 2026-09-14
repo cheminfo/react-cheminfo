@@ -1,5 +1,5 @@
 import { filterStepLabel, findFilterEntry } from './filterCatalog.ts';
-import type { SettingsProblem } from './problems.ts';
+import type { ProblemPlace, SettingsProblem } from './problems.ts';
 import { problem } from './problems.ts';
 import type { SpectrumFilter, SpectrumFilterName } from './settings.ts';
 import { stepProblems } from './stepProblems.ts';
@@ -18,11 +18,31 @@ const UNTYPES_X: ReadonlySet<SpectrumFilterName> = new Set([
   'filterX',
 ]);
 
+/**
+ * The steps that hand on a typed x whenever they change it, which is every
+ * time but the one where x already sits where they would put it.
+ */
+const RETYPES_X: ReadonlySet<SpectrumFilterName> = new Set([
+  'setMaxX',
+  'setMinX',
+]);
+
 /** The steps that read x as a typed array and throw on a plain one. */
 const NEEDS_TYPED_X: ReadonlySet<SpectrumFilterName> = new Set([
   'calibrateX',
   'fromTo',
 ]);
+
+/** The steps that rewrite the x values themselves rather than crop them. */
+const MOVES_X: ReadonlySet<SpectrumFilterName> = new Set([
+  'calibrateX',
+  'setMaxX',
+  'setMinX',
+  'xFunction',
+]);
+
+/** Where the problems about the chain as a whole are filed. */
+const WHOLE_CHAIN: ProblemPlace = { part: 'chain', where: 'The chain' };
 
 /**
  * Everything wrong, or probably wrong, with one chain.
@@ -46,15 +66,19 @@ export function chainProblems(
   let mayBePlainX = resampleFirst;
 
   for (const [index, step] of chain.entries()) {
-    const where = filterStepLabel(step.name, index);
+    const place: ProblemPlace = {
+      part: 'chain',
+      index,
+      where: filterStepLabel(step.name, index),
+    };
     const entry = findFilterEntry(step.name);
-    problems.push(...stepProblems(step, where));
+    problems.push(...stepProblems(step, place));
 
     if (entry === undefined) {
       problems.push(
         problem(
           'warning',
-          where,
+          place,
           `${step.name} is not one of the steps this editor knows, so its options are left as they are. The processor throws on a name it cannot dispatch.`,
         ),
       );
@@ -63,15 +87,16 @@ export function chainProblems(
 
     if (NEEDS_TYPED_X.has(step.name)) {
       if (plainX) {
-        problems.push(problem('error', where, TYPED_X_MESSAGE));
+        problems.push(problem('error', place, TYPED_X_MESSAGE));
       } else if (mayBePlainX) {
-        problems.push(problem('warning', where, MAY_BE_PLAIN_MESSAGE));
+        problems.push(problem('warning', place, MAY_BE_PLAIN_MESSAGE));
       }
     }
     if (UNTYPES_X.has(step.name)) {
       plainX = true;
       mayBePlainX = true;
     }
+    if (RETYPES_X.has(step.name)) plainX = false;
     if (step.name === 'ensureGrowing') mayBePlainX = true;
 
     const { group } = entry;
@@ -81,7 +106,7 @@ export function chainProblems(
         problems.push(
           problem(
             'warning',
-            where,
+            place,
             `Step ${String(firstScaling + 1)} scales the signal before this levels it, so the scaling is measured against an offset that then changes. Level first.`,
           ),
         );
@@ -92,54 +117,14 @@ export function chainProblems(
       scalings++;
       firstScaling ??= index;
     }
-    if (step.name === 'reverseIfNeeded') {
-      problems.push(
-        problem(
-          'warning',
-          where,
-          'The chain already turns a descending axis round before every step, so this one does nothing.',
-        ),
-      );
-    }
-    if (step.name === 'equallySpaced') {
-      problems.push(
-        problem(
-          'warning',
-          where,
-          resampleFirst
-            ? 'The settings resample before the chain runs, so this resamples a second time and the point count set here is the one the matrix ends up with.'
-            : 'The settings resample after the chain runs, so this resamples a second time and the point count set above is the one the matrix ends up with.',
-        ),
-      );
-    }
-    if (
-      !resampleFirst &&
-      (step.name === 'xFunction' || step.name === 'calibrateX')
-    ) {
-      problems.push(
-        problem(
-          'warning',
-          where,
-          'This changes the x axis before the resampling runs, so the range and the exclusions above are read in the new units.',
-        ),
-      );
-    }
-    if (resampleFirst && step.name === 'filterX') {
-      problems.push(
-        problem(
-          'warning',
-          where,
-          'Cropping after the resampling can leave each spectrum on its own grid, and the matrix then lines up rows that do not match. Pin the range above, or turn resampling back to last.',
-        ),
-      );
-    }
+    problems.push(...orderAdvice(step.name, place, resampleFirst));
   }
 
   if (baselines > 1) {
     problems.push(
       problem(
         'warning',
-        'The chain',
+        WHOLE_CHAIN,
         `${String(baselines)} baselines are subtracted one after another, each estimated from what the last one left.`,
       ),
     );
@@ -148,12 +133,66 @@ export function chainProblems(
     problems.push(
       problem(
         'warning',
-        'The chain',
+        WHOLE_CHAIN,
         `${String(scalings)} steps set the y scale; only the last of them still shows in the result.`,
       ),
     );
   }
   return problems;
+}
+
+/**
+ * The advice a step earns from where it sits against the resampling.
+ * @param name - The step's name.
+ * @param place - Which step it is.
+ * @param resampleFirst - Whether the settings resample before the chain runs.
+ * @returns Its advice.
+ */
+function orderAdvice(
+  name: SpectrumFilterName,
+  place: ProblemPlace,
+  resampleFirst: boolean,
+): SettingsProblem[] {
+  const advice: SettingsProblem[] = [];
+  if (name === 'reverseIfNeeded') {
+    advice.push(
+      problem(
+        'warning',
+        place,
+        'The chain already turns a descending axis round before every step, so this one does nothing.',
+      ),
+    );
+  }
+  if (name === 'equallySpaced') {
+    advice.push(
+      problem(
+        'warning',
+        place,
+        resampleFirst
+          ? 'The settings resample before the chain runs, so this resamples a second time and the point count set here is the one the matrix ends up with.'
+          : 'The settings resample after the chain runs, so this resamples a second time and the point count set above is the one the matrix ends up with.',
+      ),
+    );
+  }
+  if (!resampleFirst && MOVES_X.has(name)) {
+    advice.push(
+      problem(
+        'warning',
+        place,
+        'This changes the x axis before the resampling runs, so the range and the exclusions above are read in the new units.',
+      ),
+    );
+  }
+  if (resampleFirst && name === 'filterX') {
+    advice.push(
+      problem(
+        'warning',
+        place,
+        'Cropping after the resampling can leave each spectrum on its own grid, and the matrix then lines up rows that do not match. Pin the range above, or turn resampling back to last.',
+      ),
+    );
+  }
+  return advice;
 }
 
 /** What a step reading x as a typed array is told when it cannot be one. */

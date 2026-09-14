@@ -13,7 +13,7 @@ import { SpectrumSelection } from './SpectrumSelection.tsx';
 import { problemsAbout } from './problemsAbout.ts';
 
 /** What {@link PostProcessingEditor} edits. */
-export interface PostProcessingEditorProps {
+interface PostProcessingEditorProps {
   /** What `getPostProcessedData` would be handed. */
   value: PostProcessingSettings;
   /** Called with the edited settings on every change. */
@@ -67,7 +67,7 @@ export function PostProcessingEditor(
             onChange({ ...value, filters });
           }}
         />
-        <ProblemList problems={problemsAbout(problems, 'Matrix step')} />
+        <ProblemList problems={problemsAbout(problems, 'matrix')} />
       </SettingsPart>
 
       <SettingsPart
@@ -81,7 +81,7 @@ export function PostProcessingEditor(
             onChange({ ...value, scale });
           }}
         />
-        <ProblemList problems={problemsAbout(problems, 'Scaling')} />
+        <ProblemList problems={problemsAbout(problems, 'scaling')} />
       </SettingsPart>
 
       <SettingsPart
@@ -94,7 +94,7 @@ export function PostProcessingEditor(
             onChange({ ...value, ranges });
           }}
         />
-        <ProblemList problems={problemsAbout(problems, 'Range')} />
+        <ProblemList problems={problemsAbout(problems, 'range')} />
       </SettingsPart>
 
       <SettingsPart
@@ -107,7 +107,7 @@ export function PostProcessingEditor(
             onChange({ ...value, calculations });
           }}
         />
-        <ProblemList problems={problemsAbout(problems, 'Calculation')} />
+        <ProblemList problems={problemsAbout(problems, 'calculation')} />
       </SettingsPart>
     </div>
   );

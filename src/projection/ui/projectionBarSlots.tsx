@@ -27,7 +27,7 @@ import {
 import type { ProjectionModels } from './projectionTabModels.ts';
 
 /** The three things one tab puts in the bar. */
-export interface ProjectionBarSlots {
+interface ProjectionBarSlots {
   /** The settings of the tab showing, written to the rung the bar is on. */
   end: ReactNode;
   /** What waits behind the cog; nothing at all draws no cog. */
@@ -37,7 +37,7 @@ export interface ProjectionBarSlots {
 }
 
 /** What the tab showing is asked for, to fill the bar with. */
-export interface ProjectionBarSlotsInput {
+interface ProjectionBarSlotsInput {
   /** The tab showing. */
   tab: ProjectionTab;
   /** What the run produced. */

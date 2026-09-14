@@ -8,8 +8,9 @@
  * off at a face. {@link enclosingRadius} gives the sphere holding almost all of
  * the electron, and the cube is drawn around that.
  *
- * Pure: no React, no molstar. `src/viewer` turns the returned field into a
- * surface, and the worker calls this off the main thread.
+ * Pure: no React, no molstar. `renderSampledVolume` in `react-cheminfo/orbital`
+ * turns the returned field into a surface, and a worker-backed
+ * `AtomicSampler` can call this off the main thread.
  */
 
 import type { AtomicOrbital } from './atomicOrbitals.ts';

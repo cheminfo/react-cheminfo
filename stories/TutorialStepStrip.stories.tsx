@@ -7,6 +7,7 @@ import { GlossaryProvider } from '../src/pedagogy/ui/GlossaryProvider.tsx';
 import { GlossaryText } from '../src/pedagogy/ui/GlossaryText.tsx';
 import type { TutorialStepStripProps } from '../src/pedagogy/ui/TutorialStepStrip.tsx';
 import { TutorialStepStrip } from '../src/pedagogy/ui/TutorialStepStrip.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import type { SmilesStepPayload } from './pedagogyFixtures.ts';
 import { SMILES_GLOSSARY, SMILES_TUTORIAL } from './pedagogyFixtures.ts';
@@ -152,8 +153,8 @@ const COLUMN_STYLE: CSSProperties = {
 };
 
 const STEP_STYLE: CSSProperties = {
-  background: 'var(--surface, #fff)',
-  border: '1px solid var(--border, #dfe3e8)',
+  background: TOKEN.surface,
+  border: `1px solid ${TOKEN.border}`,
   borderRadius: 8,
   display: 'flex',
   flexDirection: 'column',
@@ -167,7 +168,7 @@ const PROSE_STYLE: CSSProperties = { margin: 0, lineHeight: 1.5 };
 
 const CODE_STYLE: CSSProperties = {
   alignSelf: 'flex-start',
-  background: 'var(--surface-sunken, #f5f7fa)',
+  background: TOKEN.surfaceSunken,
   borderRadius: 4,
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   padding: '4px 8px',

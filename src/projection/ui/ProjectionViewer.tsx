@@ -2,7 +2,8 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useId, useMemo, useRef } from 'react';
 
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
-import { mergeProjectionCopy } from '../core/projectionCopy.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+import { mergeProjectionCopy } from '../core/mergeProjectionCopy.ts';
 
 import { ProjectionBar } from './ProjectionBar.tsx';
 import { ProjectionPanel } from './ProjectionPanel.tsx';
@@ -12,11 +13,6 @@ import { useProjectionModels } from './projectionTabModels.ts';
 import { PROJECTION_TAB_HEIGHT } from './projectionTabStyles.ts';
 import type { ProjectionViewerProps } from './projectionViewerProps.ts';
 import { useProjectionState } from './useProjectionState.ts';
-
-export type { ProjectionVariableTrack } from './ProjectionVariablesTab.tsx';
-export type { ProjectionSelection } from './projectionSelection.ts';
-export type { ProjectionSampleOpen } from './projectionViewerProps.ts';
-export type { ProjectionViewerProps } from './projectionViewerProps.ts';
 
 /**
  * A dimension-reduction result, shown as a map a reader can interrogate.
@@ -31,8 +27,8 @@ export type { ProjectionViewerProps } from './projectionViewerProps.ts';
  * question mark that explains it share a single thirty-pixel row above the
  * picture, and every pixel below that row is the picture. Nothing stands under
  * it — the key floats in the emptiest corner of the plot, and the paragraph
- * that used to sit beneath the figure is behind the question mark, kept whole
- * for the reader who wants it and costing nothing to the reader who does not.
+ * that explains the figure is behind the question mark, kept whole for the
+ * reader who wants it and costing nothing to the reader who does not.
  *
  * The four tabs are one tool rather than four because they share one piece of
  * state: a pair promoted from the grid arrives on the map, and the lasso drawn
@@ -60,6 +56,7 @@ export function ProjectionViewer(props: ProjectionViewerProps): ReactElement {
   const models = useProjectionModels({
     result,
     samples,
+    copy,
     options: state.options,
     selected: state.selected,
   });
@@ -79,11 +76,7 @@ export function ProjectionViewer(props: ProjectionViewerProps): ReactElement {
   return (
     <div
       ref={figure}
-      className={
-        className === undefined
-          ? 'projection-viewer'
-          : `projection-viewer ${className}`
-      }
+      className={joinClassNames('projection-viewer', className)}
       data-testid={testId}
       style={VIEWER_STYLE}
     >

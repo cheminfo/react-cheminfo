@@ -3,13 +3,15 @@
  *
  * It is the outline of `scatter/core` with one dimension more, and it is
  * described the same way — a centre and the axes of the group's own spread,
- * in the data's units — so that turning it into something an SVG can draw
- * stays a separate step. Here that step matters more than it does on a map:
- * a shell has no `<ellipse>` to fall back on and has to be tessellated,
- * projected and painted back to front.
+ * in the data's units, measured by the same scan the map's outlines are — so
+ * that turning it into something an SVG can draw stays a separate step: the
+ * silhouette a camera sees of it.
  */
 
+import { rowMatrix } from '../../chart/core/matrix.ts';
 import type { EllipseSize } from '../../scatter/core/confidenceEllipse.ts';
+import { DEFAULT_ELLIPSE_SIZE } from '../../scatter/core/confidenceEllipse.ts';
+import { scatterGroupMoments } from '../../scatter/core/scatterGroupMoments.ts';
 
 import { standardDeviationsForCoverage3 } from './ellipsoidCoverage.ts';
 import type { Vector3 } from './orbitCamera.ts';
@@ -62,25 +64,22 @@ export function confidenceEllipsoid(
   points: readonly Vector3[],
   options: ConfidenceEllipsoidOptions = {},
 ): ConfidenceEllipsoid | null {
-  const { size = DEFAULT_SIZE, minimumPoints = 4 } = options;
-  const floor = Math.max(4, minimumPoints);
+  const { size = DEFAULT_ELLIPSE_SIZE, minimumPoints = 4 } = options;
+  const moments = scatterGroupMoments(rowMatrix(points), null, 1, 3);
+  const count = moments.counts[0] ?? 0;
+  if (moments.axes < 3 || count < Math.max(4, minimumPoints)) return null;
 
-  let count = 0;
-  let sumX = 0;
-  let sumY = 0;
-  let sumZ = 0;
-  for (const point of points) {
-    if (!isFinitePoint(point)) continue;
-    count++;
-    sumX += point[0];
-    sumY += point[1];
-    sumZ += point[2];
-  }
-  if (count < floor) return null;
-
-  const center: Vector3 = [sumX / count, sumY / count, sumZ / count];
-  const covariance = spreadAbout(points, center, count);
-  if (covariance === null) return null;
+  const { means, covariances: spread } = moments;
+  const center: Vector3 = [means[0] ?? 0, means[1] ?? 0, means[2] ?? 0];
+  const covariance: SymmetricMatrix3 = {
+    xx: spread[0] ?? 0,
+    xy: spread[1] ?? 0,
+    xz: spread[2] ?? 0,
+    yy: spread[4] ?? 0,
+    yz: spread[5] ?? 0,
+    zz: spread[8] ?? 0,
+  };
+  if (!isFinitePoint(center) || !isFiniteMatrix(covariance)) return null;
 
   const radius = ellipsoidStandardDeviations(size);
   if (!Number.isFinite(radius)) return null;
@@ -111,59 +110,13 @@ export function confidenceEllipsoid(
  * Public because a legend has to be able to say what a share came to without
  * building a shell to ask it.
  * @param size - How large the shell was asked to be.
- * @returns The number of standard deviations.
+ * @returns The number of standard deviations, never below zero — the same floor the map's outline keeps.
  */
 export function ellipsoidStandardDeviations(size: EllipseSize): number {
-  if (size.kind === 'standardDeviations') return size.standardDeviations;
+  if (size.kind === 'standardDeviations') {
+    return Math.max(size.standardDeviations, 0);
+  }
   return standardDeviationsForCoverage3(size.probability);
-}
-
-function spreadAbout(
-  points: readonly Vector3[],
-  center: Vector3,
-  count: number,
-): SymmetricMatrix3 | null {
-  let xx = 0;
-  let xy = 0;
-  let xz = 0;
-  let yy = 0;
-  let yz = 0;
-  let zz = 0;
-  for (const point of points) {
-    if (!isFinitePoint(point)) continue;
-    const dx = point[0] - center[0];
-    const dy = point[1] - center[1];
-    const dz = point[2] - center[2];
-    xx += dx * dx;
-    xy += dx * dy;
-    xz += dx * dz;
-    yy += dy * dy;
-    yz += dy * dz;
-    zz += dz * dz;
-  }
-  const divisor = count - 1;
-  const covariance: SymmetricMatrix3 = {
-    xx: xx / divisor,
-    xy: xy / divisor,
-    xz: xz / divisor,
-    yy: yy / divisor,
-    yz: yz / divisor,
-    zz: zz / divisor,
-  };
-  if (
-    !Number.isFinite(center[0]) ||
-    !Number.isFinite(center[1]) ||
-    !Number.isFinite(center[2]) ||
-    !Number.isFinite(covariance.xx) ||
-    !Number.isFinite(covariance.yy) ||
-    !Number.isFinite(covariance.zz) ||
-    !Number.isFinite(covariance.xy) ||
-    !Number.isFinite(covariance.xz) ||
-    !Number.isFinite(covariance.yz)
-  ) {
-    return null;
-  }
-  return covariance;
 }
 
 function isFinitePoint(point: Vector3): boolean {
@@ -174,4 +127,13 @@ function isFinitePoint(point: Vector3): boolean {
   );
 }
 
-const DEFAULT_SIZE: EllipseSize = { kind: 'coverage', probability: 0.95 };
+function isFiniteMatrix(matrix: SymmetricMatrix3): boolean {
+  return (
+    Number.isFinite(matrix.xx) &&
+    Number.isFinite(matrix.xy) &&
+    Number.isFinite(matrix.xz) &&
+    Number.isFinite(matrix.yy) &&
+    Number.isFinite(matrix.yz) &&
+    Number.isFinite(matrix.zz)
+  );
+}

@@ -4,8 +4,35 @@ import {
   formatCompact,
   formatDecimal,
   formatInteger,
+  formatPercent,
   formatTrimmed,
 } from '../numbers.ts';
+
+test('a precision in significant digits counts from the first digit that is not zero', () => {
+  expect(formatTrimmed(0.000_123_45, { significant: 3 })).toBe('0.000123');
+  expect(formatTrimmed(1234.5678, { significant: 4 })).toBe('1235');
+  expect(formatTrimmed(123_456, { significant: 3 })).toBe('123000');
+  expect(formatTrimmed(2.5, { significant: 4 })).toBe('2.5');
+  expect(formatTrimmed(-0.012_345, { significant: 2 })).toBe('-0.012');
+  expect(formatTrimmed(1.234e-7, { significant: 3 })).toBe('1.23e-7');
+});
+
+test('a significant-digit count out of range is clamped, and one that is not a number falls back to two', () => {
+  expect(formatTrimmed(0.456, { significant: 0 })).toBe('0.5');
+  expect(formatTrimmed(1 / 3, { significant: 99 })).toBe('0.3333333333333333');
+  expect(formatTrimmed(0.456, { significant: Number.NaN })).toBe('0.46');
+  expect(formatTrimmed(Number.NaN, { significant: 3 })).toBe('–');
+});
+
+test('a share is written as a percentage with its unit, to one decimal unless asked', () => {
+  expect(formatPercent(0.742)).toBe('74.2 %');
+  expect(formatPercent(0.729_6, 2)).toBe('72.96 %');
+  expect(formatPercent(1)).toBe('100.0 %');
+  expect(formatPercent(0.003, 0)).toBe('0 %');
+  expect(formatPercent(12.5)).toBe('1,250.0 %');
+  expect(formatPercent(0.5, Number.NaN)).toBe('50.0 %');
+  expect(formatPercent(Number.NaN)).toBe('–');
+});
 
 test('a whole number is grouped in thousands', () => {
   expect(formatInteger(0)).toBe('0');

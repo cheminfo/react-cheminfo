@@ -1,16 +1,19 @@
+import {
+  SCALE_METHODS,
+  SCALE_METHOD_LABELS,
+  isScaleMethod,
+} from '../core/matrixCatalog.ts';
 import type { ScaleSettings } from '../core/settings.ts';
-import { SCALE_METHODS } from '../core/settingsProblems.ts';
 
 /** The stretch of x a scaling is measured over. */
 export type ScaleRange = NonNullable<ScaleSettings['range']>;
 
-/** What each scaling is called, in the order the processor's switch lists them. */
-const METHOD_LABELS: Readonly<Record<string, string>> = {
-  min: 'Smallest value',
-  max: 'Largest value',
-  minmax: 'Both ends',
-  integration: 'Integral',
-};
+/**
+ * How the processor resolves a window given both ways, said once for the
+ * scaling and for the ranges, which resolve theirs with the same call.
+ */
+export const POINT_NUMBER_WINS =
+  'A point number silently wins over an x value: with From point set, From is never read.';
 
 /** The method menu: leaving the spectra alone, then the only four that run. */
 export const SCALE_METHOD_OPTIONS: ReadonlyArray<{
@@ -20,7 +23,7 @@ export const SCALE_METHOD_OPTIONS: ReadonlyArray<{
   { value: '', label: 'None — every spectrum is left as it is' },
   ...SCALE_METHODS.map((method) => ({
     value: method,
-    label: METHOD_LABELS[method] ?? method,
+    label: SCALE_METHOD_LABELS[method],
   })),
 ];
 
@@ -43,7 +46,10 @@ export function scaleMethodOptions(
   for (const option of SCALE_METHOD_OPTIONS) {
     if (option.value === method) return SCALE_METHOD_OPTIONS;
   }
-  const known = METHOD_LABELS[method.toLowerCase()];
+  const lowered = method.toLowerCase();
+  const known = isScaleMethod(lowered)
+    ? SCALE_METHOD_LABELS[lowered]
+    : undefined;
   return [
     ...SCALE_METHOD_OPTIONS,
     {

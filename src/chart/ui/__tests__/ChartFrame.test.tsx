@@ -1,8 +1,13 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
-import type { ChartFrameProps, ChartPlotArea } from '../ChartFrame.tsx';
+import type {
+  ChartFrameProps,
+  ChartFrameRender,
+  ChartPlotArea,
+} from '../ChartFrame.tsx';
 import { ChartFrame } from '../ChartFrame.tsx';
+import { chartFrameGeometry } from '../chartFrameGeometry.ts';
 
 const TITLED = {
   width: 800,
@@ -147,6 +152,28 @@ test('the wrapper carries the handle the end-to-end tests reach for', () => {
   );
 });
 
+test('the geometry worked out ahead of the frame is the one the frame works out', () => {
+  expect(chartFrameGeometry(800, 400, TITLED.x, TITLED.y)).toStrictEqual(
+    frameOf(TITLED),
+  );
+  expect(
+    chartFrameGeometry(800, 400, BARE.x, BARE.y, { left: 70 }).plot,
+  ).toStrictEqual(plotOf({ ...BARE, margins: { left: 70 } }));
+});
+
+test('a frame handed its geometry passes that very geometry to its marks', () => {
+  const geometry = chartFrameGeometry(800, 400, TITLED.x, TITLED.y);
+
+  expect(frameOf({ ...TITLED, geometry })).toBe(geometry);
+});
+
+test('a class a site adds is kept beside the frame’s own', () => {
+  expect(render({ ...TITLED, className: 'pca-map' })).toContain(
+    'class="chart-frame pca-map"',
+  );
+  expect(render(TITLED)).toContain('class="chart-frame"');
+});
+
 function render(props: Omit<ChartFrameProps, 'children'>): string {
   return renderToStaticMarkup(<ChartFrame {...props}>{() => null}</ChartFrame>);
 }
@@ -164,4 +191,19 @@ function plotOf(
     </ChartFrame>,
   );
   return plot;
+}
+
+function frameOf(
+  props: Omit<ChartFrameProps, 'children'>,
+): ChartFrameRender | undefined {
+  let seen: ChartFrameRender | undefined;
+  renderToStaticMarkup(
+    <ChartFrame {...props}>
+      {(frame) => {
+        seen = frame;
+        return null;
+      }}
+    </ChartFrame>,
+  );
+  return seen;
 }

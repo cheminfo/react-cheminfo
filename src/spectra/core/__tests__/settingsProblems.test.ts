@@ -28,6 +28,7 @@ test('a grid running backwards is an error, because the resampling throws on it'
   expect(found).toStrictEqual([
     {
       severity: 'error',
+      part: 'resampling',
       where: 'Resampling',
       message: 'From is not below to.',
     },
@@ -54,6 +55,8 @@ test('an excluded zone hidden from the chart is still dropped from the data, and
   expect(found).toStrictEqual([
     {
       severity: 'warning',
+      part: 'exclusion',
+      index: 0,
       where: 'Excluded zone 1',
       message:
         'Hidden only from the chart: the zone is still dropped from the data.',
@@ -122,6 +125,8 @@ test('scaling measured before a baseline is levelled is called out', () => {
   expect(found).toStrictEqual([
     {
       severity: 'warning',
+      part: 'chain',
+      index: 1,
       where: 'Step 2 — airPLS baseline',
       message:
         'Step 1 scales the signal before this levels it, so the scaling is measured against an offset that then changes. Level first.',
@@ -165,6 +170,7 @@ test('a memory budget of zero is an error, because the processor keeps no origin
   ).toStrictEqual([
     {
       severity: 'error',
+      part: 'memory',
       where: 'Memory',
       message: 'The budget must be a number above zero.',
     },
@@ -180,6 +186,8 @@ test('an excluded zone running backwards is an error, and names the zone it is a
   ).toStrictEqual([
     {
       severity: 'error',
+      part: 'exclusion',
+      index: 0,
       where: 'Excluded zone 1',
       message: 'From is not below to.',
     },

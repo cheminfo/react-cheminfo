@@ -1,5 +1,8 @@
 import type { PCAOptions } from 'ml-pca';
 
+import { clampAxisPair } from '../../chart/core/chartAxisPair.ts';
+import { chartAxisTitle } from '../../chart/core/chartLabels.ts';
+
 /**
  * How the principal components are computed.
  *
@@ -49,10 +52,9 @@ export function principalComponentLabel(
   index: number,
   explainedVariance?: readonly number[],
 ): string {
-  const name = `PC${String(index + 1)}`;
-  const share = explainedVariance?.[index];
-  if (share === undefined || !Number.isFinite(share)) return name;
-  return `${name} — ${(share * 100).toFixed(1)} %`;
+  return chartAxisTitle(`PC${String(index + 1)}`, {
+    share: explainedVariance?.[index],
+  });
 }
 
 /**
@@ -94,12 +96,7 @@ export function clampPrincipalComponents(
   selection: PrincipalComponentSelection,
   count: number,
 ): PrincipalComponentSelection {
-  if (count < 1) return { x: 0, y: 0 };
-  const last = count - 1;
-  const x = clamp(selection.x, last);
-  let y = clamp(selection.y, last);
-  if (y === x && count > 1) y = x === 0 ? 1 : x - 1;
-  return { x, y };
+  return clampAxisPair(selection.x, selection.y, count);
 }
 
 /**
@@ -116,15 +113,4 @@ export function selectedExplainedVariance(
   const up = explainedVariance[selection.y];
   if (along === undefined || up === undefined) return undefined;
   return along + up;
-}
-
-/**
- * A component index brought inside the components that exist.
- * @param index - What was asked for.
- * @param last - The highest component there is.
- * @returns A whole number between zero and `last`.
- */
-function clamp(index: number, last: number): number {
-  if (!Number.isFinite(index)) return 0;
-  return Math.min(Math.max(Math.round(index), 0), last);
 }

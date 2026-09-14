@@ -3,11 +3,11 @@ import { useCallback, useMemo, useState } from 'react';
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
 import type { SelectionChange } from '../../scatter/ui/useScatterSelection.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
-import { resolveProjectionOptions } from '../core/projectionOptions.ts';
 import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 import { resolveProjectionGroups } from '../core/projectionSamples.ts';
 import type { ProjectionTab } from '../core/projectionTabs.ts';
 import { projectionTabs } from '../core/projectionTabs.ts';
+import { resolveProjectionOptions } from '../core/resolveProjectionOptions.ts';
 
 import type { ProjectionSelection } from './projectionSelection.ts';
 import {
@@ -25,7 +25,7 @@ import type { ProjectionViewerProps } from './projectionViewerProps.ts';
  * eleven fields, so a default documented on the component is the default the
  * hook actually applies and the two cannot drift apart.
  */
-export type ProjectionStateOptions = Pick<
+type ProjectionStateOptions = Pick<
   ProjectionViewerProps,
   | 'result'
   | 'samples'

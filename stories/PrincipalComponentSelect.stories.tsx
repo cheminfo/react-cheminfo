@@ -8,6 +8,7 @@ import type {
 } from '../src/spectra/core/principalComponents.ts';
 import type { PrincipalComponentSelectProps } from '../src/spectra/ui/PrincipalComponentSelect.tsx';
 import { PrincipalComponentSelect } from '../src/spectra/ui/PrincipalComponentSelect.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import { EXPLAINED_VARIANCE } from './spectraFixtures.ts';
 
@@ -112,5 +113,5 @@ const STACK_STYLE = {
 
 const CALLBACK_STYLE = {
   fontSize: 12,
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
 } as const satisfies CSSProperties;

@@ -35,6 +35,19 @@ export const VOCABULARY: ShareVocabulary<typeof PARAMS> = {
   params: PARAMS,
 };
 
+/** A vocabulary whose tab bar lives in the site header, which embedding drops. */
+export const HEADER_VOCABULARY: ShareVocabulary = {
+  parts: [
+    {
+      key: 'tabs',
+      label: 'The tabs',
+      description: 'The tab bar in the header.',
+      inHeader: true,
+    },
+    { key: 'hints', label: 'Hints', description: 'The hint ladder.' },
+  ],
+};
+
 /** A vocabulary of parts alone, as a tool with nothing of its own to carry has. */
 export const BARE_VOCABULARY: ShareVocabulary = {
   parts: [

@@ -8,6 +8,7 @@
 
 import type { ReactElement } from 'react';
 
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { OverlayMarkShape } from '../../overlay/core/overlayMarks.ts';
 
 /** A point drawn over the cloud that is not a sample, already in pixels. */
@@ -44,10 +45,10 @@ export function markGlyph(
 ): ReactElement {
   const { label, x, y, color, shape = 'cross' } = mark;
   const half = size / 2;
-  const near = round(x - half);
-  const far = round(x + half);
-  const top = round(y - half);
-  const foot = round(y + half);
+  const near = chartRoundPixel(x - half);
+  const far = chartRoundPixel(x + half);
+  const top = chartRoundPixel(y - half);
+  const foot = chartRoundPixel(y + half);
   // `key` is passed on each element rather than spread: React reads a key
   // out of JSX itself, and one arriving through a spread is dropped with a
   // warning that only shows up once the page is running.
@@ -58,8 +59,8 @@ export function markGlyph(
       <circle
         key={key}
         {...shared}
-        cx={round(x)}
-        cy={round(y)}
+        cx={chartRoundPixel(x)}
+        cy={chartRoundPixel(y)}
         r={half}
         fill={filled ? color : 'none'}
         stroke={filled ? 'none' : color}
@@ -90,5 +91,3 @@ export function markGlyph(
     />
   );
 }
-
-const round = (value: number): number => Math.round(value * 100) / 100;

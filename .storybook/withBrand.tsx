@@ -1,19 +1,19 @@
 import type { Decorator } from '@storybook/react-vite';
 import type { ReactElement } from 'react';
 
-import { brandNamed } from '../stories/brands.ts';
+import { brandSiteNamed } from '../stories/brands.ts';
 
 import { BrandTokens } from './BrandTokens.tsx';
 
 /**
- * Reads the Brand toolbar and hands its pair to the story, so a component is
- * looked at under the two colours a real site would give it.
+ * Reads the Brand toolbar and hands its site to the story, so a component is
+ * looked at under the two colours a real site gives it.
  * @param Story - The story being rendered.
  * @param context - The story's context, which carries the toolbar's values.
- * @returns The story, under the colours the toolbar names.
+ * @returns The story, under the colours of the site the toolbar names.
  */
 export const withBrand: Decorator = (Story, context): ReactElement => (
-  <BrandTokens brand={brandNamed(context.globals.brand)}>
+  <BrandTokens siteId={brandSiteNamed(context.globals.brand)}>
     <Story />
   </BrandTokens>
 );

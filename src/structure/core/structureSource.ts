@@ -3,13 +3,25 @@ import { molfileAtomCount } from './molfile.ts';
 
 /** Every notation a read-only depiction may be handed. */
 export interface StructureSourceInput {
-  /** A canonical openchemlib idCode, coordinates included or not. */
+  /**
+   * A canonical openchemlib idCode, coordinates included or not.
+   * @default undefined
+   */
   idCode?: string;
-  /** Encoded 2D coordinates, when they did not travel with the idCode. */
+  /**
+   * Encoded 2D coordinates, when they did not travel with the idCode.
+   * @default undefined
+   */
   coordinates?: string;
-  /** A molfile, V2000 or V3000. */
+  /**
+   * A molfile, V2000 or V3000.
+   * @default undefined
+   */
   molfile?: string;
-  /** A SMILES. */
+  /**
+   * A SMILES.
+   * @default undefined
+   */
   smiles?: string;
 }
 
@@ -19,7 +31,10 @@ export interface StructureSource {
   kind: 'idcode' | 'molfile' | 'smiles' | 'empty';
   /** The text to draw, empty when there is nothing to draw. */
   value: string;
-  /** Encoded 2D coordinates, only ever set beside an idCode. */
+  /**
+   * Encoded 2D coordinates, only ever set beside an idCode.
+   * @default undefined
+   */
   coordinates?: string;
 }
 

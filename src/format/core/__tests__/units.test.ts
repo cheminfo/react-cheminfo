@@ -2,6 +2,26 @@ import { expect, test } from 'vitest';
 
 import { formatBytes, formatDuration } from '../units.ts';
 
+test('the spaced style writes each unit out, for a sentence', () => {
+  expect(formatDuration(45_000, { style: 'spaced' })).toBe('45 s');
+  expect(formatDuration(200_000, { style: 'spaced' })).toBe('3 min 20 s');
+  expect(formatDuration(7_500_000, { style: 'spaced' })).toBe('2 h 05 min');
+});
+
+test('a sub-second duration is written in milliseconds, and under a minute with a tenth', () => {
+  expect(formatDuration(450, { subSecond: true })).toBe('450ms');
+  expect(formatDuration(450.4, { subSecond: true, style: 'spaced' })).toBe(
+    '450 ms',
+  );
+  expect(formatDuration(999.6, { subSecond: true })).toBe('1.0s');
+  expect(formatDuration(2345, { subSecond: true, style: 'spaced' })).toBe(
+    '2.3 s',
+  );
+  expect(formatDuration(59_960, { subSecond: true })).toBe('1m 00s');
+  expect(formatDuration(200_000, { subSecond: true })).toBe('3m 20s');
+  expect(formatDuration(-1, { subSecond: true })).toBe('–');
+});
+
 test('a size is written in the largest unit that keeps it under a thousand', () => {
   expect(formatBytes(0)).toBe('0 B');
   expect(formatBytes(512)).toBe('512 B');

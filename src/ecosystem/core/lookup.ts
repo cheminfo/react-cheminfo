@@ -1,5 +1,43 @@
+import type { SiteGroup, SiteGroupId } from './groups.ts';
+import { SITE_GROUPS } from './groups.ts';
 import type { EcosystemSite, SiteId } from './sites.ts';
 import { ECOSYSTEM_SITES } from './sites.ts';
+
+/** One topic and the sites written under it. */
+export interface GroupedSites {
+  /** The topic. */
+  group: SiteGroup;
+  /** Its sites, in the order they are declared. */
+  sites: EcosystemSite[];
+}
+
+/**
+ * The family gathered under its topics, which is how a menu and a footer list
+ * it. A topic nobody is written under is left out rather than headed over an
+ * empty space.
+ * @returns Each topic that has sites, in the order the topics are declared.
+ */
+export function groupedSites(): GroupedSites[] {
+  const grouped: GroupedSites[] = [];
+  for (const group of SITE_GROUPS) {
+    const sites = sitesInGroup(group.id);
+    if (sites.length > 0) grouped.push({ group, sites });
+  }
+  return grouped;
+}
+
+/**
+ * The sites written under one topic.
+ * @param id - The topic being asked for.
+ * @returns Its sites, in the order they are declared.
+ */
+export function sitesInGroup(id: SiteGroupId): EcosystemSite[] {
+  const sites: EcosystemSite[] = [];
+  for (const site of ECOSYSTEM_SITES) {
+    if (site.group === id) sites.push(site);
+  }
+  return sites;
+}
 
 /**
  * One site of the family, by the identifier its entry carries.

@@ -1,3 +1,5 @@
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
+
 const DEFAULT_CAPACITY = 256;
 
 /**
@@ -122,6 +124,5 @@ function growLassoPath(path: LassoPath): void {
 }
 
 function roundToTenth(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.round(value * 10) / 10;
+  return Number.isFinite(value) ? chartRoundPixel(value, 1) : 0;
 }

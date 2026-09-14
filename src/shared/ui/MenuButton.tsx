@@ -23,6 +23,7 @@ export interface HeaderButtonProps {
   placement?: PopoverNextProps['placement'];
 }
 
+/** What one menu-opening button of a header needs. */
 export interface MenuButtonProps extends HeaderButtonProps {
   /** Class the holder carries, so a site can reach the button from its bar. */
   className: string;

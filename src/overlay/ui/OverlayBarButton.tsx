@@ -6,11 +6,12 @@ import { useState } from 'react';
 import type { OverlayPlacement } from '../core/overlayPlacement.ts';
 
 import { OverlayIconButton } from './OverlayIconButton.tsx';
+import type { OverlayPanel } from './OverlayPanel.tsx';
 import { overlayPanelStyle } from './overlayStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
 
 /** What {@link OverlayBarButton} opens. */
-export interface OverlayBarButtonProps {
+interface OverlayBarButtonProps {
   /**
    * The controls it holds: whatever has folded away, then the second tier —
    * everything an expert changes and a reader never does.

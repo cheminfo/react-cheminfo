@@ -25,7 +25,7 @@ export type ChartSeriesKind = 'line' | 'bar';
 export interface ChartSeries {
   /** A stable id, used as the React key and named in the tracking callback. */
   id: string;
-  /** What the legend calls it, e.g. `PC 1`. */
+  /** What the legend calls it, e.g. `PC1`. */
   label: string;
   /** One value per slot, in the slots' order. */
   values: ArrayLike<number>;
@@ -142,6 +142,11 @@ export interface TrackedLineChartProps {
    * @default undefined
    */
   testId?: string;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -155,7 +160,16 @@ export interface TrackedLineChartProps {
  * @returns The chart.
  */
 export function TrackedLineChart(props: TrackedLineChartProps): ReactElement {
-  const { categories, series, width, height, y, trackedIndex, xLabel } = props;
+  const {
+    className,
+    categories,
+    series,
+    width,
+    height,
+    y,
+    trackedIndex,
+    xLabel,
+  } = props;
   const { onTrack, onSelect, overlay, label, testId, maxTickLabels } = props;
   const { tickLabels = categories } = props;
   const [ownIndex, setOwnIndex] = useState<number | null>(null);
@@ -187,6 +201,7 @@ export function TrackedLineChart(props: TrackedLineChartProps): ReactElement {
       margins={margins}
       label={label}
       testId={testId}
+      className={className}
       x={{ domain: [0, slots], showTicks: false, showGrid: false, nice: false }}
       y={{ ...y, domain }}
       overlay={

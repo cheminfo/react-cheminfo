@@ -6,7 +6,7 @@ import type { ProjectionAxis } from './projectionResult.ts';
 export interface ComponentShare {
   /** The number written on the axis, counting from one. */
   number: number;
-  /** What it is called, e.g. `PC 3`. */
+  /** What it is called, e.g. `PC3`. */
   label: string;
   /** Its colour, the same one it carries on every other tab. */
   color: string;

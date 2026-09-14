@@ -1,6 +1,7 @@
 import type { MatrixLike } from '../../chart/core/matrix.ts';
 import { mappedMatrix, stackedMatrix } from '../../chart/core/matrix.ts';
 
+import { columnStats, widenedLoadings } from './pcaColumns.ts';
 import type { PcaLike } from './pcaLike.ts';
 import type { ProjectionAxis, ProjectionResult } from './projectionResult.ts';
 import type { VariableAxis } from './variableAxis.ts';
@@ -41,8 +42,9 @@ export interface PcaResultOptions {
   scores?: MatrixLike;
   /**
    * Whether the model divided each measurement by its spread — the `scale`
-   * given to `new PCA(...)`. It cannot be read back from the model's public
-   * surface, and getting it wrong offers a view that is the same drawing
+   * given to `new PCA(...)`. A model that reports it through `toJSON`, as
+   * `ml-pca`'s does, is believed instead, so this is read only for a model
+   * that does not. Getting it wrong offers a view that is the same drawing
    * twice.
    * @default false
    */
@@ -82,9 +84,11 @@ export interface PcaResultOptions {
  * @returns The result, with every tab's data filled in.
  * @throws {Error} When `rows` is empty, when a row's length differs from the
  * first row's, when a measurement is not a finite number, or when the model's
- * loadings are not as wide as a row — which is what happens when the model was
- * fitted with `ignoreZeroVariance` and silently dropped a column, and which
- * would otherwise label every loadings panel one measurement out.
+ * loadings are not as wide as a row and the model does not report which
+ * columns it dropped — which is what `ignoreZeroVariance` leaves behind, and
+ * which would otherwise label every loadings panel one measurement out. A
+ * model that does report them keeps each measurement in its own place, with
+ * no weight on the ones it dropped.
  */
 export function pcaResult(
   pca: PcaLike,
@@ -108,8 +112,13 @@ export function pcaResult(
   }
   const width = first.length;
   const { mean, deviation } = columnStats(rows, width);
+  const record = pca.toJSON?.();
 
-  const weights = pca.getLoadings();
+  const weights = widenedLoadings(
+    pca.getLoadings(),
+    record?.excludedFeatures ?? NO_COLUMNS,
+    width,
+  );
   if (weights.columns < width) {
     throw new Error(
       `pcaResult was given rows ${width} measurements wide but a model holding ${weights.columns} weights, which is what \`ignoreZeroVariance\` leaves behind when it drops a column that never moves. Every panel after the dropped one would carry its neighbour's name.`,
@@ -147,50 +156,13 @@ export function pcaResult(
       variables: variables ?? numberedVariables(width),
       mean,
       spread,
-      scales: scaled ? deviation : undefined,
+      scales: (record?.scale ?? scaled) ? deviation : undefined,
       valueLabel,
     },
   };
 }
 
-function columnStats(
-  rows: readonly number[][],
-  width: number,
-): { mean: number[]; deviation: number[] } {
-  // Centred on the average so far, in one pass: a running total of the raw
-  // values squared loses the low bits of a spectrum sitting on a baseline.
-  // `deviation` carries the squared spread until the last loop roots it.
-  const mean = new Array<number>(width).fill(0);
-  const deviation = new Array<number>(width).fill(0);
-  for (let index = 0; index < rows.length; index++) {
-    const row = rows[index];
-    if (row?.length !== width) {
-      throw new Error(
-        `pcaResult was given a row ${row?.length ?? 0} measurements wide at index ${index}, where the first row is ${width} wide.`,
-      );
-    }
-    const seen = index + 1;
-    for (let column = 0; column < width; column++) {
-      const value = row[column];
-      if (value === undefined || !Number.isFinite(value)) {
-        throw new Error(
-          `pcaResult was given ${String(value)} at row ${index}, measurement ${column}. A model carries it on into a map of nothing at all.`,
-        );
-      }
-      const before = mean[column] ?? 0;
-      const step = value - before;
-      const after = before + step / seen;
-      mean[column] = after;
-      deviation[column] = (deviation[column] ?? 0) + step * (value - after);
-    }
-  }
-
-  const divisor = Math.max(1, rows.length - 1);
-  for (let column = 0; column < width; column++) {
-    deviation[column] = Math.sqrt((deviation[column] ?? 0) / divisor);
-  }
-  return { mean, deviation };
-}
+const NO_COLUMNS: readonly number[] = [];
 
 function signsOf(weights: MatrixLike, flip: boolean): Float64Array {
   const signs = new Float64Array(weights.rows).fill(1);

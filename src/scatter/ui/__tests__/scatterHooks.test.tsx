@@ -203,6 +203,41 @@ test('the interaction hands a plot four pieces a key press reaches through', () 
   ]);
 });
 
+test('a click the plot does not own selects and pins the nearest point, and empty ground clears', () => {
+  const changes: SelectionChange[] = [];
+  const pins: number[] = [];
+  const { value } = probe(() =>
+    useScatterInteraction({
+      points: POINTS,
+      onSelectionChange: (change) => changes.push(change),
+      onPinChange: (index) => pins.push(index),
+    }),
+  );
+  value.clickAt(11, 0, 'replace');
+  value.clickAt(100, 100, 'replace');
+  value.clickAt(100, 100, 'add');
+
+  expect(changes).toStrictEqual([
+    { indices: [1], mode: 'replace', source: 'point' },
+    { indices: [], mode: 'replace', source: 'clear' },
+  ]);
+  expect(pins).toStrictEqual([1]);
+});
+
+test('a double click opens the point it landed on, placed in both the figure and the window', () => {
+  const { value } = probe(() => useScatterInteraction({ points: POINTS }));
+  const surface = {
+    getBoundingClientRect: () => ({ left: 100, top: 50 }),
+  } as unknown as Element;
+
+  expect(
+    value.openAt({ currentTarget: surface, clientX: 121, clientY: 50 }),
+  ).toStrictEqual({ index: 2, x: 21, y: 0, clientX: 121, clientY: 50 });
+  expect(
+    value.openAt({ currentTarget: surface, clientX: 400, clientY: 50 }),
+  ).toBeNull();
+});
+
 /** Four points on a line, ten pixels apart, for the hit tests to find. */
 const POINTS: ScreenPoints = {
   x: Float64Array.from([0, 10, 20, 30]),

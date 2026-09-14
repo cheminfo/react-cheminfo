@@ -68,7 +68,14 @@ test('one component is all there is when only one came back', () => {
 test('a selection that is not a number at all falls back to the first component', () => {
   expect(clampPrincipalComponents({ x: Number.NaN, y: 1.6 }, 5)).toStrictEqual({
     x: 0,
-    y: 2,
+    y: 1,
+  });
+});
+
+test('a fractional index is floored, as the projection viewer floors an axis, so one saved selection lands on the same component in both', () => {
+  expect(clampPrincipalComponents({ x: 2.9, y: 0.4 }, 5)).toStrictEqual({
+    x: 2,
+    y: 0,
   });
 });
 

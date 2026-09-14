@@ -1,6 +1,8 @@
 import type { ReactElement } from 'react';
 import { memo } from 'react';
 
+import { chartGroupIndex } from '../../chart/core/chartGroups.ts';
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { ScreenPoints } from '../core/screenPoints.ts';
 
 /** What {@link ScatterPointLayer} draws. */
@@ -41,6 +43,18 @@ export interface ScatterPointLayerProps {
    */
   radius?: number;
   /**
+   * One radius per point, in pixels, for a figure whose dots are not all the
+   * same size — a cloud draws the dots at the front of its box larger.
+   * @default undefined — every dot takes `radius`
+   */
+  radii?: ArrayLike<number>;
+  /**
+   * The rows in the order they are painted, for a figure where a dot in front
+   * has to cover the one behind it.
+   * @default undefined — the rows are painted in their own order
+   */
+  order?: ArrayLike<number>;
+  /**
    * The index from which points are drawn as outlines rather than filled.
    *
    * It is how a sample the model was built from is told from one placed into
@@ -77,30 +91,36 @@ export const ScatterPointLayer = memo(function ScatterPointLayer(
     opacities,
     fallbackColor = 'var(--text-faint)',
     radius = 3.5,
+    radii,
+    order,
     outlinedFrom,
   } = props;
 
   const xs = points.x;
   const ys = points.y;
   const count = Math.min(xs.length, ys.length);
+  const steps = order === undefined ? count : Math.min(count, order.length);
   const hollowFrom = outlineStart(outlinedFrom, count);
+  const groups = colors?.length ?? 0;
   const ink = groupInk(colors, opacities, fallbackColor);
 
   const dots: ReactElement[] = [];
-  for (let index = 0; index < count; index++) {
+  for (let step = 0; step < steps; step++) {
+    const index = order === undefined ? step : (order[step] as number);
     const x = xs[index];
     const y = ys[index];
-    if (x === undefined || y === undefined) break;
+    if (x === undefined || y === undefined) continue;
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-    const slot = (groupOf?.[index] ?? -1) + 1;
+    const slot = chartGroupIndex(groupOf, index, groups) + 1;
     const color = ink.colors[slot] ?? fallbackColor;
     const hollow = index >= hollowFrom;
+    const size = radii?.[index];
     dots.push(
       <circle
         key={index}
-        cx={round(x)}
-        cy={round(y)}
-        r={radius}
+        cx={chartRoundPixel(x)}
+        cy={chartRoundPixel(y)}
+        r={size === undefined ? radius : chartRoundPixel(size)}
         fill={hollow ? 'none' : color}
         stroke={hollow ? color : undefined}
         strokeWidth={hollow ? OUTLINE_WIDTH : undefined}
@@ -130,9 +150,8 @@ function outlineStart(outlinedFrom: number | undefined, count: number): number {
  *
  * Both arrays are offset by one, so a point in no group — which arrives as
  * `-1` — reads its fallback through the same indexed read as every other
- * point, and a group index past the end simply reads past the end. An opacity
- * of one is stored as `undefined` because that is the value the attribute is
- * then left out with.
+ * point. An opacity of one is stored as `undefined` because that is the value
+ * the attribute is then left out with.
  * @param colors - The colour of each group, in group order.
  * @param opacities - How strongly each group is drawn, in the same order.
  * @param fallbackColor - Colour of a point belonging to no group.
@@ -160,9 +179,3 @@ function groupInk(
  * exactly the wrong thing to say about a projected sample.
  */
 const OUTLINE_WIDTH = 1.5;
-
-/*
- * Two decimals, which is under a tenth of a device pixel at any zoom a browser
- * offers and keeps the markup short enough to read in a failing test.
- */
-const round = (value: number): number => Math.round(value * 100) / 100;

@@ -7,7 +7,7 @@
  */
 
 /** A colour found in the text, and where it ends. */
-export interface ColorMatch {
+interface ColorMatch {
   /** The value, as six lowercase hex digits, without its `#`. */
   color: string;
   /** The index just past the last character the colour is written with. */

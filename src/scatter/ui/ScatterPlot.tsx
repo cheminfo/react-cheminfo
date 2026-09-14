@@ -1,21 +1,13 @@
 import type { MouseEvent as ReactMouseEvent, ReactElement } from 'react';
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 
 import { ChartFrame } from '../../chart/ui/ChartFrame.tsx';
 
 import { ScatterEllipseLayer } from './ScatterEllipseLayer.tsx';
-import { ScatterLabelLayer } from './ScatterLabelLayer.tsx';
 import { ScatterMarkLayer } from './ScatterMarkLayer.tsx';
+import { ScatterOverlayLayers } from './ScatterOverlayLayers.tsx';
 import { ScatterPointLayer } from './ScatterPointLayer.tsx';
-import { surfacePosition } from './lassoGesture.ts';
 import {
-  SCATTER_GROUP_LABEL_SIZE,
-  SCATTER_LABEL_SIZE,
-} from './scatterLabelBoxes.ts';
-import { placeScatterLabels } from './scatterLabelPlacement.ts';
-import { scatterGroupLabels, scatterPointLabels } from './scatterLabels.ts';
-import {
-  LASSO_STYLE,
   SCATTER_HOVER_SLACK,
   scatterGroupInk,
   scatterPixelMarks,
@@ -24,13 +16,7 @@ import {
 import type { ScatterPlotProps } from './scatterPlotProps.ts';
 import { useScatterFrame } from './useScatterFrame.ts';
 import { useScatterInteraction } from './useScatterInteraction.ts';
-
-export type {
-  ScatterGroup,
-  ScatterMarker,
-  ScatterPlotProps,
-  ScatterPointOpen,
-} from './scatterPlotProps.ts';
+import { useScatterLabels } from './useScatterLabels.ts';
 
 /**
  * A cloud of points with a lasso, group outlines and a hover card.
@@ -45,42 +31,15 @@ export type {
  * @returns The plot.
  */
 export function ScatterPlot(props: ScatterPlotProps): ReactElement {
-  const {
-    x,
-    y,
-    width,
-    height,
-    xAxis,
-    yAxis,
-    groupOf,
-    groups,
-    mutedGroups,
-    ellipse = null,
-    ellipseMinimumPoints,
-    ellipseFillOpacity,
-    showGroupMeans,
-    markers,
-    pointRadius = 3.5,
-    outlinedFrom,
-    pointLabels,
-    showGroupLabels = false,
-    selected,
-    defaultSelected,
-    onSelectionChange,
-    selectMode,
-    onHoverChange,
-    onPinChange,
-    onPointDoubleClick,
-    onLassoChange,
-    touchLasso,
-    viewport,
-    onViewportChange,
-    wheelZoom,
-    wheelZoomDelay,
-    overlay,
-    label,
-    testId,
-  } = props;
+  const { x, y, width, height, xAxis, yAxis, groupOf, groups } = props;
+  const { mutedGroups, ellipse = null, ellipseMinimumPoints } = props;
+  const { ellipseFillOpacity, showGroupMeans, markers } = props;
+  const { pointRadius = 3.5, outlinedFrom, pointLabels } = props;
+  const { showGroupLabels = false, selected, defaultSelected } = props;
+  const { onSelectionChange, selectMode, onHoverChange, onPinChange } = props;
+  const { onPointDoubleClick, onLassoChange, touchLasso, viewport } = props;
+  const { onViewportChange, wheelZoom, wheelZoomDelay, overlay } = props;
+  const { label, className, testId } = props;
 
   const frame = useScatterFrame({
     x,
@@ -94,51 +53,21 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
     wheelZoom,
     wheelZoomDelay,
   });
-  const { points, rect, toX, toY, inside, ref: surface, reset } = frame;
+  const { points, rect, toX, toY, inside, geometry } = frame;
+  const { ref: surface, reset } = frame;
   const ink = useMemo(
     () => scatterGroupInk(groups, mutedGroups),
     [groups, mutedGroups],
   );
-  const named = useMemo(
-    () =>
-      pointLabels === undefined
-        ? undefined
-        : placeScatterLabels(
-            scatterPointLabels(points, pointLabels, {
-              groupOf,
-              colors: ink.colors,
-            }),
-            {
-              fontSize: SCATTER_LABEL_SIZE,
-              radius: pointRadius,
-              bounds: rect,
-            },
-          ),
-    [points, pointLabels, groupOf, ink.colors, pointRadius, rect],
-  );
-  const crowds = useMemo(
-    () =>
-      showGroupLabels && groups !== undefined
-        ? placeScatterLabels(
-            scatterGroupLabels(
-              points,
-              groups.map((group) => group.label),
-              {
-                groupOf,
-                colors: ink.colors,
-              },
-            ),
-            {
-              fontSize: SCATTER_GROUP_LABEL_SIZE,
-              bold: true,
-              centered: true,
-              radius: pointRadius,
-              bounds: rect,
-            },
-          )
-        : undefined,
-    [points, showGroupLabels, groups, groupOf, ink.colors, pointRadius, rect],
-  );
+  const labels = useScatterLabels(points, {
+    pointLabels,
+    showGroupLabels,
+    groups,
+    groupOf,
+    colors: ink.colors,
+    radius: pointRadius,
+    bounds: rect,
+  });
   const interaction = useScatterInteraction({
     points,
     originX: rect.x,
@@ -152,35 +81,17 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
     hoverRadius: pointRadius + SCATTER_HOVER_SLACK,
     onHoverChange,
     onPinChange,
+    onLassoChange,
   });
 
   function handleDoubleClick(event: ReactMouseEvent<SVGRectElement>): void {
-    const at = surfacePosition(event, rect.x, rect.y);
-    const index = interaction.pointAt(at.x, at.y);
-    if (index === -1 || onPointDoubleClick === undefined) {
+    const opened = interaction.openAt(event);
+    if (opened === null || onPointDoubleClick === undefined) {
       reset();
       return;
     }
-    onPointDoubleClick({
-      index,
-      x: at.x,
-      y: at.y,
-      clientX: event.clientX,
-      clientY: event.clientY,
-    });
+    onPointDoubleClick(opened);
   }
-
-  // Held in a ref so an inline arrow, which is how every caller writes it, does
-  // not put the callback in the effect's dependencies and report a drag that
-  // never changed on every render.
-  const report = useRef(onLassoChange);
-  useLayoutEffect(() => {
-    report.current = onLassoChange;
-  });
-  const drawing = interaction.lasso.drawing;
-  useEffect(() => {
-    report.current?.(drawing);
-  }, [drawing]);
 
   return (
     <ChartFrame
@@ -188,8 +99,10 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
       height={height}
       x={frame.xAxis}
       y={frame.yAxis}
-      busy={drawing}
+      geometry={geometry}
+      busy={interaction.lasso.drawing}
       overlay={overlay}
+      className={className}
       testId={testId}
       label={label ?? scatterPlotLabel(xAxis, yAxis, points.x.length)}
     >
@@ -228,15 +141,11 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
             showGroupMeans={showGroupMeans}
             marks={scatterPixelMarks(markers, toX, toY)}
           />
-          {named === undefined ? null : (
-            <ScatterLabelLayer labels={named} radius={pointRadius} />
-          )}
-          {crowds === undefined ? null : (
-            <ScatterLabelLayer labels={crowds} radius={pointRadius} strong />
-          )}
-          {interaction.lasso.pathData === '' ? null : (
-            <path d={interaction.lasso.pathData} {...LASSO_STYLE} />
-          )}
+          <ScatterOverlayLayers
+            labels={labels}
+            radius={pointRadius}
+            lassoPath={interaction.lasso.pathData}
+          />
           <rect
             {...rect}
             ref={surface}

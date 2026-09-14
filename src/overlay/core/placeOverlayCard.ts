@@ -1,3 +1,5 @@
+import { clamp } from '../../format/core/clamp.ts';
+
 /** What {@link placeOverlayCard} has to know. */
 export interface OverlayCardPlacementOptions {
   /** Pointer position inside the figure, in pixels from its left. */
@@ -87,7 +89,5 @@ const DEFAULT_OFFSET = 14;
  * @returns The offset, brought back between zero and that limit.
  */
 function withinBox(value: number, furthest: number): number {
-  if (!Number.isFinite(value)) return 0;
-  const limit = Number.isFinite(furthest) ? Math.max(0, furthest) : 0;
-  return Math.max(0, Math.min(value, limit));
+  return clamp(value, 0, Number.isFinite(furthest) ? Math.max(0, furthest) : 0);
 }

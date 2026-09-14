@@ -7,10 +7,138 @@ import {
   filterOptions,
   moveFilter,
   readFilterOption,
+  readNumberOption,
   removeFilter,
+  reorder,
   setFilterOption,
 } from '../filterChain.ts';
-import type { SpectrumFilter } from '../settings.ts';
+import type { MatrixFilter, SpectrumFilter } from '../settings.ts';
+
+test('an entry moves to its new position and the rest close up behind it', () => {
+  expect(reorder(['a', 'b', 'c'], 0, 2)).toStrictEqual(['b', 'c', 'a']);
+  expect(reorder(['a', 'b', 'c'], 2, 0)).toStrictEqual(['c', 'a', 'b']);
+});
+
+test('moving an entry that is not there leaves the list as it was', () => {
+  expect(reorder(['a', 'b'], 5, 0)).toStrictEqual(['a', 'b']);
+});
+
+test('removing a step that is not there leaves the chain as it was', () => {
+  const chain: readonly SpectrumFilter[] = [
+    { name: 'centerMean' },
+    { name: 'divideBySD' },
+  ];
+
+  expect(removeFilter(chain, 5)).toStrictEqual([...chain]);
+  expect(removeFilter(chain, -1)).toStrictEqual([...chain]);
+});
+
+test('a shift opens with no options, like any step upstream can default', () => {
+  expect(defaultFilter('setMaxY')).toStrictEqual({ name: 'setMaxY' });
+});
+
+test('a matrix option that is set reads back as the number it holds, zero included', () => {
+  expect(
+    readNumberOption({ name: 'rescale', options: { min: 0, max: 1 } }, 'min'),
+  ).toBe(0);
+  expect(readNumberOption({ name: 'pqn', options: { max: 100 } }, 'max')).toBe(
+    100,
+  );
+});
+
+test('a matrix option left to upstream reads back as nothing, whatever shape the step options are in', () => {
+  expect(readNumberOption({ name: 'rescale' }, 'min')).toBeUndefined();
+  expect(
+    readNumberOption({ name: 'rescale', options: {} }, 'min'),
+  ).toBeUndefined();
+  expect(
+    readNumberOption({ name: 'rescale', options: null }, 'min'),
+  ).toBeUndefined();
+  expect(
+    readNumberOption({ name: 'rescale', options: 'min=0' }, 'min'),
+  ).toBeUndefined();
+});
+
+test('an option holding something that is not a number reads back as nothing, so the box shows its placeholder instead of junk', () => {
+  expect(
+    readNumberOption({ name: 'rescale', options: { min: '0' } }, 'min'),
+  ).toBeUndefined();
+  expect(
+    readNumberOption({ name: 'rescale', options: { min: null } }, 'min'),
+  ).toBeUndefined();
+});
+
+test('setting a number on a matrix step that had no options creates them with only that option in it', () => {
+  const step: MatrixFilter = { name: 'rescale' };
+  const next = setFilterOption(step, 'min', 0);
+
+  expect(next).toStrictEqual({ name: 'rescale', options: { min: 0 } });
+  expect(step).toStrictEqual({ name: 'rescale' });
+});
+
+test('setting a number keeps every sibling option, including ones the editor has no field for', () => {
+  const step: MatrixFilter = {
+    name: 'pqn',
+    options: { max: 100, unit: 'ppm' },
+  };
+  const next = setFilterOption(step, 'min', 3);
+
+  expect(next).toStrictEqual({
+    name: 'pqn',
+    options: { max: 100, unit: 'ppm', min: 3 },
+  });
+  expect(step).toStrictEqual({
+    name: 'pqn',
+    options: { max: 100, unit: 'ppm' },
+  });
+});
+
+test('rewriting an option keeps its siblings, and its place among them', () => {
+  const step: MatrixFilter = { name: 'rescale', options: { min: 0, max: 1 } };
+  const next = setFilterOption(step, 'min', -1);
+
+  expect(next).toStrictEqual({ name: 'rescale', options: { min: -1, max: 1 } });
+  expect(Object.keys(filterOptions(next))).toStrictEqual(['min', 'max']);
+});
+
+test('clearing the last option of a matrix step drops the whole options object, which is the only way back to what upstream does', () => {
+  const step: MatrixFilter = { name: 'rescale', options: { min: 0 } };
+  const next = setFilterOption(step, 'min', undefined);
+
+  expect(next).toStrictEqual({ name: 'rescale' });
+  expect(Object.hasOwn(next, 'options')).toBe(false);
+});
+
+test('clearing an option a matrix step never held leaves it with no options rather than an empty object', () => {
+  const step: MatrixFilter = { name: 'centerMean' };
+  const next = setFilterOption(step, 'min', undefined);
+
+  expect(next).toStrictEqual({ name: 'centerMean' });
+  expect(Object.hasOwn(next, 'options')).toBe(false);
+});
+
+test('a zero is written like any other number, because zero is a bound the reader meant', () => {
+  const step: MatrixFilter = { name: 'rescale', options: { max: 1 } };
+
+  expect(setFilterOption(step, 'min', 0)).toStrictEqual({
+    name: 'rescale',
+    options: { max: 1, min: 0 },
+  });
+});
+
+test('options that are not an object are thrown away rather than read, so a written step is always one the processor can take', () => {
+  const text: MatrixFilter = { name: 'pqn', options: 'max=100' };
+  const empty: MatrixFilter = { name: 'pqn', options: null };
+
+  expect(setFilterOption(text, 'min', 3)).toStrictEqual({
+    name: 'pqn',
+    options: { min: 3 },
+  });
+  expect(setFilterOption(empty, 'min', 3)).toStrictEqual({
+    name: 'pqn',
+    options: { min: 3 },
+  });
+});
 
 const CHAIN: readonly SpectrumFilter[] = [
   { name: 'centerMean' },

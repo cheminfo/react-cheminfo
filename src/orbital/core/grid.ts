@@ -36,8 +36,11 @@ export interface OrbitalGrid {
   origin: Vec3;
   /** Distance between neighbouring samples on every axis, ångström. */
   spacing: number;
+  /** Smallest sample. */
   min: number;
+  /** Largest sample. */
   max: number;
+  /** Mean of the samples. */
   mean: number;
   /** Population standard deviation of the samples. */
   sigma: number;

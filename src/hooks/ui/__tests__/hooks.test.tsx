@@ -3,10 +3,66 @@ import { useRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { useActiveHeading } from '../useActiveHeading.ts';
+import { useAsync } from '../useAsync.ts';
 import { useContainerSize } from '../useContainerSize.ts';
 import { useDebouncedValue } from '../useDebouncedValue.ts';
+import { useDocumentListNavigation } from '../useDocumentListNavigation.ts';
 import { useListKeyboardNavigation } from '../useListKeyboardNavigation.ts';
+import { usePolling } from '../usePolling.ts';
 import { useResizeObserver } from '../useResizeObserver.ts';
+
+const neverSettles = () =>
+  new Promise<number>(() => {
+    // Never settles, so the first render is all there is to read.
+  });
+
+test('a task, a poll and a heading all start from nothing on the first render', () => {
+  function Probe() {
+    const task = useAsync(neverSettles);
+    const poll = usePolling(neverSettles, { interval: 1000 });
+    const heading = useActiveHeading(null);
+    return (
+      <output>
+        {task.status} {String(poll.value)} {String(poll.done)} {String(heading)}
+      </output>
+    );
+  }
+
+  expect(renderToStaticMarkup(<Probe />)).toBe(
+    '<output>loading undefined false null</output>',
+  );
+});
+
+test('a document-navigated list renders with its container ref attached', () => {
+  function Probe() {
+    const listRef = useDocumentListNavigation<HTMLUListElement>({
+      length: 3,
+      selectedIndex: 1,
+      onSelect: () => null,
+    });
+    return (
+      <ul ref={listRef}>
+        <li data-selected="true">ethanol</li>
+      </ul>
+    );
+  }
+
+  expect(renderToStaticMarkup(<Probe />)).toBe(
+    '<ul><li data-selected="true">ethanol</li></ul>',
+  );
+});
+
+test('a resize observer given no element yet renders instead of throwing', () => {
+  function Probe() {
+    useResizeObserver(null, () => {
+      throw new Error('nothing to observe');
+    });
+    return <div>viewer</div>;
+  }
+
+  expect(renderToStaticMarkup(<Probe />)).toBe('<div>viewer</div>');
+});
 
 test('a debounced value starts on its source, so nothing flashes empty', () => {
   function Probe() {

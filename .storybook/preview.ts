@@ -1,10 +1,11 @@
-// The family's own tokens are in `preview-head.html`, which is what puts them
-// on the canvas the stories render in.
+// The family's tokens come from `chrome.css` itself, so a component is looked at
+// under the values the sites load; `preview-head.html` only adds the canvas.
 import '@blueprintjs/core/lib/css/blueprint.css';
+import '../styles/chrome.css';
 
 import type { Preview } from '@storybook/react-vite';
 
-import { BRANDS, DEFAULT_BRAND } from '../stories/brands.ts';
+import { BRAND_SITES, DEFAULT_BRAND_SITE } from '../stories/brands.ts';
 
 import { withBrand } from './withBrand.tsx';
 
@@ -16,16 +17,13 @@ const preview: Preview = {
       toolbar: {
         title: 'Brand',
         icon: 'paintbrush',
-        items: BRANDS.map((brand) => ({
-          value: brand.name,
-          title: brand.name,
-        })),
+        items: BRAND_SITES.map((site) => ({ value: site, title: site })),
         dynamicTitle: true,
       },
     },
   },
   initialGlobals: {
-    brand: DEFAULT_BRAND.name,
+    brand: DEFAULT_BRAND_SITE,
   },
   parameters: {
     layout: 'centered',

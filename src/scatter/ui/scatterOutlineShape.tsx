@@ -11,6 +11,7 @@
 import type { ReactElement } from 'react';
 
 import type { ChartScale } from '../../chart/core/chartScale.ts';
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { ConfidenceEllipse } from '../core/confidenceEllipse.ts';
 import type { PixelEllipse } from '../core/ellipseProjection.ts';
 import { ellipsePolygon, projectEllipse } from '../core/ellipseProjection.ts';
@@ -97,11 +98,11 @@ function projectedOutline(
         key={group}
         {...shared}
         {...fillOf(ink)}
-        cx={round(cx)}
-        cy={round(cy)}
-        rx={round(rx)}
-        ry={round(ry)}
-        transform={`rotate(${round(angleDegrees)} ${round(cx)} ${round(cy)})`}
+        cx={chartRoundPixel(cx)}
+        cy={chartRoundPixel(cy)}
+        rx={chartRoundPixel(rx)}
+        ry={chartRoundPixel(ry)}
+        transform={`rotate(${chartRoundPixel(angleDegrees)} ${chartRoundPixel(cx)} ${chartRoundPixel(cy)})`}
       />
     );
   }
@@ -115,10 +116,10 @@ function projectedOutline(
       fill="none"
       stroke={ink.color}
       strokeWidth={SEGMENT_STROKE_WIDTH}
-      x1={round(cx - alongX)}
-      y1={round(cy - alongY)}
-      x2={round(cx + alongX)}
-      y2={round(cy + alongY)}
+      x1={chartRoundPixel(cx - alongX)}
+      y1={chartRoundPixel(cy - alongY)}
+      x2={chartRoundPixel(cx + alongX)}
+      y2={chartRoundPixel(cy + alongY)}
     />
   );
 }
@@ -141,8 +142,8 @@ function sampledOutline(
   for (let index = 0; index < outline.length; index++) {
     const point = outline[index];
     if (point === undefined) continue;
-    const px = round(scaleX.offset + point.x * scaleX.factor);
-    const py = round(scaleY.offset + point.y * scaleY.factor);
+    const px = chartRoundPixel(scaleX.offset + point.x * scaleX.factor);
+    const py = chartRoundPixel(scaleY.offset + point.y * scaleY.factor);
     path += `${index === 0 ? 'M' : 'L'}${px} ${py}`;
   }
   return (
@@ -165,5 +166,3 @@ function fillOf(ink: ScatterOutlineInk): {
   if (!(share > 0)) return { fill: 'none' };
   return { fill: ink.color, fillOpacity: share };
 }
-
-const round = (value: number): number => Math.round(value * 100) / 100;

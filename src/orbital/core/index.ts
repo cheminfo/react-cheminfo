@@ -49,6 +49,11 @@ export {
 } from './occupancy.ts';
 export type { PhasePalette, PhasePaletteId } from './palette.ts';
 export { DEFAULT_PHASE_PALETTE_ID, PHASE_PALETTES } from './palette.ts';
+export type {
+  RadialDistribution,
+  RadialDistributionOptions,
+} from './radialDistribution.ts';
+export { radialDistribution } from './radialDistribution.ts';
 export type { RealHarmonic } from './realHarmonics.ts';
 export {
   REAL_HARMONICS,

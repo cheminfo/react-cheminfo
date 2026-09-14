@@ -11,11 +11,11 @@
 
 import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
+import { trimTrailingSlash } from '../../router/core/address.ts';
 import { basePathOf } from '../../router/core/basePath.ts';
 import { escapeText } from '../../share/core/escape.ts';
 
 import type { RouteMeta } from './routes.ts';
-import { trimTrailingSlash } from './routes.ts';
 
 // A crawler fetches what it is given over HTTP, so an origin is written in one
 // of the two schemes it speaks. Parsing alone does not say that: `localhost:3000`

@@ -7,6 +7,7 @@ import { Wordmark } from '../../ecosystem/ui/Wordmark.tsx';
 import { SiteMark } from '../../ecosystem/ui/marks.tsx';
 
 import { NavLink } from './NavLink.tsx';
+import { NavMenuButton } from './NavMenuButton.tsx';
 import type { NavItem } from './navItem.ts';
 import { isModifiedClick } from './navItem.ts';
 
@@ -66,12 +67,22 @@ export interface SiteHeaderProps {
    * @default 'page'
    */
   width?: 'page' | 'full';
+  /**
+   * What the menu the pages fold into on a phone is called, for the pointer
+   * and a screen reader.
+   * @default 'Pages'
+   */
+  pagesLabel?: string;
 }
 
 /**
  * The bar every site of the family carries: the brand linking home at the left,
  * the pages next to it, and the utilities pushed to the right edge by the
  * spacer.
+ *
+ * The bar folds on its own width, with no hook to wire: under 48rem the
+ * utilities keep only their icons, under 36rem the pages fold into one menu,
+ * and under 22rem the name gives way to the mark.
  * @param props - The site, its pages, its utilities, and whether the page is
  * framed in another site.
  * @returns The bar, or nothing at all on an embedded page.
@@ -88,6 +99,7 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
     onHome,
     markSize = 28,
     width = 'page',
+    pagesLabel = 'Pages',
   } = props;
 
   if (embedded) return null;
@@ -121,6 +133,17 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
             </Fragment>
           ))}
         </nav>
+        {nav.length > 1 ? (
+          <div className="app-header-nav-menu">
+            <NavMenuButton
+              label={pagesLabel}
+              icon="menu"
+              compact
+              items={nav}
+              activeId={activeId}
+            />
+          </div>
+        ) : null}
         <span className="spacer" />
         {actions === undefined ? null : (
           <div className="app-header-actions">{actions}</div>

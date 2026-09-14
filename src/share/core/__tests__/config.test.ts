@@ -6,10 +6,15 @@ import {
   isShareConfigured,
   parseShareConfig,
   suggestedShareConfig,
+  visibleShareParts,
 } from '../config.ts';
 import { parseQuery } from '../query.ts';
 
-import { BARE_VOCABULARY, VOCABULARY } from './vocabulary.ts';
+import {
+  BARE_VOCABULARY,
+  HEADER_VOCABULARY,
+  VOCABULARY,
+} from './vocabulary.ts';
 
 test('an address that configures nothing reads as an unconfigured page', () => {
   const config = parseShareConfig('', VOCABULARY);
@@ -195,6 +200,58 @@ test('the dialog opens framed, on the parts a host page has no use for', () => {
     hidden: [],
     params: {},
   });
+});
+
+test('a part in the header is offered only while the header is shown', () => {
+  const { parts } = HEADER_VOCABULARY;
+
+  expect(visibleShareParts(parts, false).map((part) => part.key)).toStrictEqual(
+    ['tabs', 'hints'],
+  );
+  expect(visibleShareParts(parts, true).map((part) => part.key)).toStrictEqual([
+    'hints',
+  ]);
+});
+
+test('an embedded link does not name a part of the header it has dropped', () => {
+  const hidden = ['tabs', 'hints'];
+
+  expect(
+    applyShareConfig(
+      '',
+      { embed: true, hidden, params: {} },
+      HEADER_VOCABULARY,
+    ),
+  ).toBe('embed=1&hide=hints');
+  expect(
+    applyShareConfig(
+      '',
+      { embed: false, hidden, params: {} },
+      HEADER_VOCABULARY,
+    ),
+  ).toBe('hide=tabs,hints');
+  expect(
+    applyShareConfig(
+      '',
+      { embed: true, hidden: ['tabs'], params: {} },
+      HEADER_VOCABULARY,
+    ),
+  ).toBe('embed=1');
+});
+
+test('an existing embedded link naming a header part still opens, and is written shorter', () => {
+  const search = 'embed=1&hide=tabs,hints';
+  const config = parseShareConfig(search, HEADER_VOCABULARY);
+
+  expect(config).toStrictEqual({
+    embed: true,
+    hidden: ['tabs', 'hints'],
+    params: {},
+  });
+  expect(isHidden(config, 'tabs')).toBe(true);
+  expect(applyShareConfig(search, config, HEADER_VOCABULARY)).toBe(
+    'embed=1&hide=hints',
+  );
 });
 
 test('a tool with nothing of its own carries only embed and hide', () => {

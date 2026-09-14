@@ -4,7 +4,13 @@
  * rather than retyped, so a change upstream is a compile error here instead of
  * a settings object the processor quietly rejects.
  */
-import type { FilterXYType } from 'ml-signal-processing';
+import type {
+  FilterXYType,
+  SetMaxXFilter,
+  SetMaxYFilter,
+  SetMinXFilter,
+  SetMinYFilter,
+} from 'ml-signal-processing';
 import type { SpectraProcessor } from 'spectra-processor';
 
 /** Everything `new SpectraProcessor(…)` is built with. */
@@ -52,19 +58,16 @@ export type MatrixFilter = NonNullable<
  * One step of the per-spectrum chain.
  *
  * `spectra-processor` types the same array as `{ name: string }`, which accepts
- * names `filterXY` throws on. The editor holds the union `filterXY` actually
- * dispatches, so a chain that type-checks is a chain that runs.
+ * names `filterXY` throws on. The editor holds the names `filterXY` actually
+ * dispatches, so a chain that type-checks is a chain that runs. That is
+ * `FilterXYType` plus the four `set…` shifts it leaves out: `filterXY` looks a
+ * name up among every export of its filters module, and those four are there.
  */
-export type SpectrumFilter = FilterXYType;
+export type SpectrumFilter =
+  FilterXYType | SetMaxXFilter | SetMaxYFilter | SetMinXFilter | SetMinYFilter;
 
-/** The name of a chain step — the 23 `filterXY` knows. */
-export type SpectrumFilterName = FilterXYType['name'];
-
-/** The three names `getPostProcessedData`'s own switch matches. */
-export type MatrixFilterName = 'centerMean' | 'pqn' | 'rescale';
-
-/** The four scalings `getPostProcessedData` matches, lower-cased. */
-export type ScaleMethod = 'integration' | 'max' | 'min' | 'minmax';
+/** The name of a chain step — the 27 `filterXY` dispatches. */
+export type SpectrumFilterName = SpectrumFilter['name'];
 
 /** Both settings objects the processor takes, which are independent of each other. */
 export interface SpectraSettings {
@@ -89,10 +92,10 @@ export const EMPTY_SETTINGS: SpectraSettings = {
 /**
  * The chain as the editor understands it.
  *
- * The single cast in the package. Upstream types the array as
- * `{ name: string; options?: any }[]` while its own `getNormalized` types the
- * very same array as `FilterXYType[]`; this reads it back at the narrower type
- * its consumer already assumes.
+ * The cast is sound because upstream types the array as
+ * `{ name: string; options?: any }[]` while its own `getNormalized` hands the
+ * very same array to `filterXY`; this reads it back at the narrower type that
+ * consumer already assumes.
  * @param settings - What the constructor would be handed.
  * @returns The chain steps, in the order they run.
  */

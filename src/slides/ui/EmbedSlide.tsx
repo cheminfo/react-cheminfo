@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 
+import { frameTitle } from '../core/familyFrame.ts';
 import type { Slide } from '../core/talk.ts';
 
 import { SlideBody } from './SlideBody.tsx';
@@ -69,17 +70,4 @@ function splitEmbedAddress(body: string): {
     return { prose, src: line };
   }
   return { prose: body.trim(), src: null };
-}
-
-/**
- * A frame without a title is unreadable to a screen reader.
- * @param src - The address being framed.
- * @returns What the frame is called.
- */
-function frameTitle(src: string): string {
-  try {
-    return `${new URL(src).hostname}, embedded`;
-  } catch {
-    return 'Embedded tool';
-  }
 }

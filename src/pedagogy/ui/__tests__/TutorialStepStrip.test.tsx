@@ -56,7 +56,7 @@ test('the open step is darker, bordered and marked as the current one', () => {
   );
 
   expect(html).toContain('background:#6ee7b7');
-  expect(html).toContain('border:2px solid #1c2127');
+  expect(html).toContain('border:2px solid var(--text, #16202c)');
   expect(html).toContain('aria-current="step"');
   expect(html).toContain('Step 2 of 3');
 });

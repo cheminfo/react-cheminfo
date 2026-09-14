@@ -30,17 +30,6 @@ export function siteTokensCss(id: SiteId): string {
   return `:root {\n  ${declarations.join('\n  ')}\n}\n`;
 }
 
-/**
- * What a browser paints its own chrome with on that site — the address bar on
- * Android, the title bar of an installed page — which is the site's leading
- * colour.
- * @param id - The site whose colour is wanted.
- * @returns The colour, as the `<meta name="theme-color">` content.
- */
-export function siteThemeColor(id: SiteId): string {
-  return siteById(id).brand;
-}
-
 // The second colour as the site's mark draws it: on the accent element, unless
 // the mark inverts the pair and gives the plate the answering colour instead.
 function answeringColor(site: EcosystemSite): string {

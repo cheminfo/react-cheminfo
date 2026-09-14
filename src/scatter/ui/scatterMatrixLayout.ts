@@ -61,7 +61,7 @@ export const SCATTER_MATRIX_SMALLEST_PLOT = 50;
 /**
  * The narrowest cell that writes its share into its axis title.
  *
- * `PC 1 — 73.0 %` is about a hundred pixels of type, and an axis title is
+ * `PC1 — 73.0 %` is about a hundred pixels of type, and an axis title is
  * centred on a cell that may be seventy: three of them along the foot of a
  * narrow grid run into one another and none of the three can be read. Under
  * this the title is the component's name alone, which is the half a reader

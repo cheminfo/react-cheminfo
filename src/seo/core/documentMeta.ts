@@ -1,3 +1,5 @@
+import { withoutQueryOrFragment } from '../../router/core/address.ts';
+
 /**
  * Keep the head in step with the page on screen after an in-app move.
  *
@@ -35,7 +37,7 @@ export function documentTitle(title: string): void {
  */
 export function canonicalLink(href: string): void {
   if (typeof document === 'undefined') return;
-  const address = withoutQuery(href);
+  const address = withoutQueryOrFragment(href);
   if (address === '') return;
 
   const existing = document.querySelector<HTMLLinkElement>(
@@ -84,9 +86,4 @@ function metaDescription(content: string): void {
   meta.name = 'description';
   document.head.append(meta);
   meta.content = content;
-}
-
-function withoutQuery(href: string): string {
-  const cut = href.search(/[?#]/);
-  return cut === -1 ? href : href.slice(0, cut);
 }

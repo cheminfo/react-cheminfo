@@ -5,6 +5,7 @@ export type StructureKind = 'molfile' | 'smiles' | 'smarts' | 'empty';
 
 /** A piece of structure text, and the notation it should be read as. */
 export interface ReadStructureResult {
+  /** The notation the text is written in. */
   kind: StructureKind;
   /**
    * The text to hand a parser. A line notation is trimmed; a molfile is left

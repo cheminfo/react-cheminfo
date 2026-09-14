@@ -13,7 +13,7 @@
 import type { CSSProperties, KeyboardEvent, ReactElement } from 'react';
 import { useEffect, useRef } from 'react';
 
-import type { Swatch } from '../../color/core/scale.ts';
+import type { Swatch } from '../../color/core/interpolate.ts';
 import { categorySwatch } from '../core/categories.ts';
 import type { PeriodicElement } from '../core/elements.ts';
 import type { ElementRange } from '../core/layout.ts';
@@ -88,7 +88,8 @@ export interface PeriodicTableProps {
    */
   markers?: boolean;
   /**
-   * Whether the arrow keys walk the table by atomic number.
+   * Whether the arrow keys walk the grid: down from carbon is silicon, and
+   * right from the end of a period is the start of the next.
    * @default true
    */
   keyboard?: boolean;
@@ -97,6 +98,11 @@ export interface PeriodicTableProps {
    * @default undefined
    */
   onHover?: (symbol: string | null) => void;
+  /**
+   * Class of the outermost element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -118,6 +124,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     markers = true,
     keyboard = true,
     onHover,
+    className,
   } = props;
 
   const gridRef = useRef<HTMLDivElement>(null);
@@ -144,7 +151,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   }
 
   return (
-    <div style={rootStyle}>
+    <div className={className} style={rootStyle}>
       <div
         ref={gridRef}
         role="grid"

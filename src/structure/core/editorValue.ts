@@ -60,8 +60,12 @@ export function splitEditorValue(text: string): EditorValue {
 
 /** An idCode and, when the writer emitted one, the atom layout beside it. */
 export interface IdCodeValue {
+  /** The idCode alone, empty for a blank value. */
   idCode: string;
-  /** Absent when the value carried no coordinates. */
+  /**
+   * The encoded atom coordinates; absent when the value carried none.
+   * @default undefined
+   */
   coordinates?: string;
 }
 

@@ -12,6 +12,7 @@ import { GLYPHS } from './glyphs.tsx';
 // into a flat shape at 16 px.
 const MARK_STYLE: CSSProperties = { display: 'block', flex: 'none' };
 
+/** What a site's mark needs. */
 export interface SiteMarkProps {
   /**
    * The site whose mark is drawn, with the two colours it owns. One of `site`
@@ -45,6 +46,11 @@ export interface SiteMarkProps {
    * @default 'literal'
    */
   colors?: 'literal' | 'tokens';
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -54,7 +60,14 @@ export interface SiteMarkProps {
  * @throws {Error} When neither `site` nor `siteId` is given.
  */
 export function SiteMark(props: SiteMarkProps): ReactElement {
-  const { site, siteId, size = 28, plate = true, colors = 'literal' } = props;
+  const {
+    className,
+    site,
+    siteId,
+    size = 28,
+    plate = true,
+    colors = 'literal',
+  } = props;
 
   const drawn = site ?? (siteId === undefined ? undefined : siteById(siteId));
   if (drawn === undefined) {
@@ -68,6 +81,7 @@ export function SiteMark(props: SiteMarkProps): ReactElement {
 
   return (
     <svg
+      className={className}
       style={MARK_STYLE}
       width={size}
       height={size}

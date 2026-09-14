@@ -7,7 +7,9 @@ import { HelpIcon } from '../src/help/ui/HelpIcon.tsx';
 
 import {
   ADDUCT_HELP,
+  MINIMUM_RMSD_HELP,
   MONOISOTOPIC_MASS_HELP,
+  NOMINAL_MASS_HELP,
   SMILES_HELP,
 } from './helpContent.ts';
 
@@ -37,6 +39,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+/** Help whose rule takes more than one case to see, each read in turn. */
+export const SeveralExamples: Story = {
+  args: { content: NOMINAL_MASS_HELP },
+};
+
+/**
+ * Free-form help with no title, behind the glyph a site already uses; the
+ * label names it for a screen reader.
+ */
+export const PlainContent: Story = {
+  args: {
+    content: MINIMUM_RMSD_HELP,
+    label: 'Minimum RMSD',
+    icon: 'info-sign',
+  },
+};
 
 /** Where the glyph actually lives: on the line of the label it follows. */
 export const BesideFieldLabels: Story = {

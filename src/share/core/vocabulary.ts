@@ -20,6 +20,14 @@ export interface HideablePart {
    * @default false
    */
   hiddenByDefault?: boolean;
+  /**
+   * Whether the part sits inside the site header, as a tab bar does. An
+   * embedded page has no header, so while `embed` is on the dialog does not
+   * offer the part and a link does not name it in `?hide=`; what the draft
+   * says about it is kept for when `embed` is switched off again.
+   * @default false
+   */
+  inHeader?: boolean;
 }
 
 /**

@@ -11,7 +11,7 @@ import {
 import { useOverlaySurface } from './overlaySurface.ts';
 
 /** What {@link OverlayBarCard} needs on top of the shape both bars share. */
-export interface OverlayBarCardProps extends OverlayBarShapeProps {
+interface OverlayBarCardProps extends OverlayBarShapeProps {
   /** How opaque the ground is while nothing is pointing at the figure. */
   restingOpacity: number;
 }

@@ -6,11 +6,18 @@
  * anything else in the page knowing where the work went.
  */
 
-import { readJsonEntry, writeJsonEntry } from './jsonStorage.ts';
+import { isPlainRecord, mergeStored } from '../../state/core/mergeStored.ts';
+import {
+  readStorageEntry,
+  versionedStorageKey,
+  writeStorageEntry,
+} from '../../state/core/storageEntry.ts';
+
 import type { ExerciseStatus } from './types.ts';
 
 /** What is remembered about one exercise. */
 export interface ExerciseProgress {
+  /** Where the student stands on it: untouched, handed in, or right. */
   status: ExerciseStatus;
   /** What the student last wrote or drew, exactly as they left it. */
   answer: string;
@@ -54,48 +61,34 @@ export function emptyProgress(): ExerciseProgress {
 }
 
 /**
- * Read one stored record over its defaults, field by field.
+ * Read one stored {@link ExerciseProgress} into a record the page can trust.
  *
- * A stored field is taken only when it has the same shape as its default, so a
- * payload written by an older version of the page, or a corrupted one, falls
- * back field by field rather than wholesale — and a field added after the last
- * save simply keeps its default. A `null` default accepts anything.
+ * The record is merged over {@link emptyProgress} field by field, as a
+ * preferences bucket is, and its two constrained fields are checked rather
+ * than merely shape-matched: a status outside the three the page knows reads
+ * as `idle`, and a hint count that is negative, fractional or not finite reads
+ * as the whole hints it names, none when below one.
  * @param stored - Whatever came out of the store for this exercise.
- * @param defaults - The record a fresh exercise starts from.
- * @returns A complete record, with nothing unreadable carried over.
- */
-export function mergeProgressRecord<TProgress extends object>(
-  stored: unknown,
-  defaults: TProgress,
-): TProgress {
-  const merged = { ...defaults } as Record<string, unknown>;
-  if (!isPlainRecord(stored)) return merged as TProgress;
-  for (const [field, fallback] of Object.entries(defaults)) {
-    const value = stored[field];
-    if (value !== undefined && isSameShape(fallback, value)) {
-      merged[field] = value;
-    }
-  }
-  return merged as TProgress;
-}
-
-/**
- * Read one stored {@link ExerciseProgress}, with its two constrained fields
- * checked rather than merely shape-matched: a status outside the three the
- * page knows reads as `idle`, and a hint count that is negative or fractional
- * reads as none revealed.
- * @param stored - Whatever came out of the store for this exercise.
- * @returns A record the page can trust.
+ * @returns A complete record.
  */
 export function mergeExerciseProgress(stored: unknown): ExerciseProgress {
-  const merged = mergeProgressRecord(stored, emptyProgress());
+  const merged = mergeStored(emptyProgress(), stored);
+  const { status, hintsRevealed } = merged;
   return {
     ...merged,
-    status: STATUSES.has(merged.status) ? merged.status : 'idle',
+    status: EXERCISE_STATUSES.has(status) ? status : 'idle',
     hintsRevealed:
-      merged.hintsRevealed > 0 ? Math.floor(merged.hintsRevealed) : 0,
+      Number.isFinite(hintsRevealed) && hintsRevealed >= 1
+        ? Math.floor(hintsRevealed)
+        : 0,
   };
 }
+
+const EXERCISE_STATUSES: ReadonlySet<string> = new Set([
+  'idle',
+  'attempted',
+  'solved',
+]);
 
 /** What {@link localStorageProgressStore} is built from. */
 export interface LocalStorageProgressStoreOptions<TProgress> {
@@ -109,8 +102,10 @@ export interface LocalStorageProgressStoreOptions<TProgress> {
   version?: number;
   /**
    * The record a fresh exercise starts from. When given, every stored record is
-   * read over it with {@link mergeProgressRecord}; when left out, a stored
-   * record is handed back as it was written.
+   * merged over it field by field, as a preferences bucket is: a missing field
+   * keeps its default, a field of the wrong shape is discarded, and a field the
+   * defaults do not name is kept. When left out, a stored record is handed back
+   * as it was written.
    * @default undefined
    */
   defaults?: TProgress;
@@ -119,6 +114,12 @@ export interface LocalStorageProgressStoreOptions<TProgress> {
    * @default 'this browser'
    */
   name?: string;
+  /**
+   * Called when a save was refused because the store is full, so the page can
+   * tell the student their work is no longer being kept.
+   * @default undefined
+   */
+  onQuotaExceeded?: (error: unknown) => void;
 }
 
 /**
@@ -129,25 +130,31 @@ export interface LocalStorageProgressStoreOptions<TProgress> {
 export function localStorageProgressStore<TProgress extends object>(
   options: LocalStorageProgressStoreOptions<TProgress>,
 ): ProgressStore<TProgress> {
-  const { key, version = 1, defaults, name = 'this browser' } = options;
-  const storageKey = `${key}:v${version}`;
+  const {
+    key,
+    version = 1,
+    defaults,
+    name = 'this browser',
+    onQuotaExceeded,
+  } = options;
+  const storageKey = versionedStorageKey(key, version);
   return {
     name,
     load(): ProgressRecords<TProgress> {
       const records: ProgressRecords<TProgress> = {};
-      const stored = readJsonEntry(storageKey);
+      const stored = readStorageEntry(storageKey);
       if (!isPlainRecord(stored)) return records;
       for (const [id, value] of Object.entries(stored)) {
         if (!isPlainRecord(value)) continue;
         records[id] =
           defaults === undefined
             ? (value as TProgress)
-            : mergeProgressRecord(value, defaults);
+            : mergeStored(defaults, value);
       }
       return records;
     },
     save(records: ProgressRecords<TProgress>): void {
-      writeJsonEntry(storageKey, records);
+      writeStorageEntry(storageKey, records, onQuotaExceeded);
     },
   };
 }
@@ -186,20 +193,4 @@ export function progressSummary<TProgress extends { status: ExerciseStatus }>(
   }
   const total = keys.length;
   return { solved, attempted, total, ratio: total === 0 ? 0 : solved / total };
-}
-
-const STATUSES: ReadonlySet<ExerciseStatus> = new Set([
-  'idle',
-  'attempted',
-  'solved',
-]);
-
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function isSameShape(fallback: unknown, stored: unknown): boolean {
-  if (fallback === null) return true;
-  if (Array.isArray(fallback) !== Array.isArray(stored)) return false;
-  return typeof fallback === typeof stored && stored !== null;
 }

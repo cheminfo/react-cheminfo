@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import type { ExerciseActionsProps } from '../src/pedagogy/ui/ExerciseActions.tsx';
 import { ExerciseActions } from '../src/pedagogy/ui/ExerciseActions.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import { ALANINE_HINTS } from './pedagogyFixtures.ts';
 
@@ -144,11 +145,11 @@ const COLUMN_STYLE: CSSProperties = {
   gap: 8,
 };
 
-const NOTE_STYLE: CSSProperties = { color: '#5b6875', fontSize: 12 };
+const NOTE_STYLE: CSSProperties = { color: TOKEN.textMuted, fontSize: 12 };
 
 const SOLUTION_STYLE: CSSProperties = {
-  background: '#f5f7fa',
-  border: '1px solid #dfe3e8',
+  background: TOKEN.surfaceSunken,
+  border: `1px solid ${TOKEN.border}`,
   borderRadius: 4,
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   padding: '4px 8px',

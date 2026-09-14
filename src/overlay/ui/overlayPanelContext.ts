@@ -10,6 +10,9 @@
 
 import { createContext, useContext } from 'react';
 
+import type { OverlayPanel } from './OverlayPanel.tsx';
+import type { OverlayRow } from './OverlayRow.tsx';
+
 /** What every row inside an {@link OverlayPanel} reads from it. */
 export interface OverlayPanelShape {
   /**

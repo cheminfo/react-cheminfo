@@ -1,3 +1,5 @@
+import { clamp } from '../../format/core/clamp.ts';
+
 import type { ReadableInkOptions } from './contrast.ts';
 import { readableInk } from './contrast.ts';
 import { parseHexColor, toHexColor } from './hex.ts';
@@ -76,7 +78,7 @@ export function colorAt(scale: ColorScale, position: number): string {
   if (stops.length === 0) {
     throw new Error('a colour scale needs at least one stop');
   }
-  const at = clampUnit(position);
+  const at = clamp(position, 0, 1);
   const first = stops[0];
   const last = stops.at(-1);
   if (first === undefined || last === undefined) {
@@ -171,9 +173,4 @@ function hueStep(
   // Two anchors of the same hue are a full turn apart the long way round,
   // which is what draws a rainbow from one colour back to itself.
   return shortest > 0 ? shortest - TURN : shortest + TURN;
-}
-
-function clampUnit(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(1, Math.max(0, value));
 }

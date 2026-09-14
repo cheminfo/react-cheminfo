@@ -1,8 +1,9 @@
 import type { ErrorInfo, ReactNode } from 'react';
 import { Component } from 'react';
 
+import { toError } from '../core/toError.ts';
+
 import { ErrorFallback } from './ErrorFallback.tsx';
-import { toError } from './toError.ts';
 
 /** What {@link ErrorBoundary} wraps, and what it does when that part fails. */
 export interface ErrorBoundaryProps {

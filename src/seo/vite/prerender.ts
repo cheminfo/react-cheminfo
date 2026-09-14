@@ -23,13 +23,14 @@ import { dirname, join, resolve } from 'node:path';
 import type { Logger, Plugin } from 'vite';
 
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
+import { trimTrailingSlash } from '../../router/core/address.ts';
 import type { NoscriptText } from '../core/noscript.ts';
 import { noscriptIndex } from '../core/noscript.ts';
 import { pageHeadTags } from '../core/pageMeta.ts';
 import type { RobotsDisallow } from '../core/robots.ts';
 import { robotsTxt } from '../core/robots.ts';
 import type { RouteMeta } from '../core/routes.ts';
-import { assertRoutes, homeRoute, trimTrailingSlash } from '../core/routes.ts';
+import { assertRoutes, homeRoute } from '../core/routes.ts';
 import { sitemapXml } from '../core/siteFiles.ts';
 import { structuredDataScript } from '../core/structuredData.ts';
 import { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from '../core/template.ts';

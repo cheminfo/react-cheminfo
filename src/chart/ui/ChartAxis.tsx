@@ -150,7 +150,9 @@ function axisMarks(
       const value = scale.values[index];
       const text = scale.labels[index];
       if (value === undefined || text === undefined) continue;
-      marks.push(tickMark(horizontal, chartPixel(pixels, value), text, plot));
+      marks.push(
+        tickMark(horizontal, value, chartPixel(pixels, value), text, plot),
+      );
     }
   }
   if (title !== '') marks.push(axisTitle(horizontal, plot, showTicks, title));
@@ -159,6 +161,7 @@ function axisMarks(
 
 function tickMark(
   horizontal: boolean,
+  value: number,
   at: number,
   text: string,
   plot: ChartPlotArea,
@@ -175,7 +178,7 @@ function tickMark(
         dominantBaseline: 'middle',
       };
   return (
-    <g key={`tick-${at}`}>
+    <g key={`tick-${value}`}>
       <line {...mark} style={CHART_TICK_MARK_STYLE} />
       <text {...caption} style={CHART_TICK_LABEL_STYLE}>
         {text}

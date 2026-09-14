@@ -36,23 +36,24 @@ export function projectionViewChoices(
 ): ReadonlyArray<OverlayOption<ProjectionVariablesView>> {
   const { canShowEffect, canRescale, canPickSample } = available;
   const { view } = copy.bar;
+  const { reason } = copy;
 
   return [
     {
       value: 'effect',
       label: view.effect,
-      ...whenOff(canShowEffect, NO_AVERAGE),
+      ...whenOff(canShowEffect, reason.noAverage),
     },
     { value: 'weights', label: view.weights },
     {
       value: 'rescaled',
       label: view.rescaled,
-      ...whenOff(canRescale, NO_SCALES),
+      ...whenOff(canRescale, reason.noScales),
     },
     {
       value: 'sample',
       label: view.sample,
-      ...whenOff(canPickSample, NO_SAMPLE),
+      ...whenOff(canPickSample, reason.noSample),
     },
   ];
 }
@@ -69,9 +70,3 @@ function whenOff(
 ): { disabled?: true; title?: string } {
   return available ? {} : { disabled: true, title: reason };
 }
-
-/** Why a view is greyed, written as the thing the reader would have to change. */
-const NO_AVERAGE =
-  'Only when the run reported an average sample to push along the component.';
-const NO_SCALES = 'Only when the model divided each measurement by its spread.';
-const NO_SAMPLE = 'Select exactly one sample on the map first.';

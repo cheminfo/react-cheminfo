@@ -4,6 +4,9 @@ import { credits } from '../../credits/core/credits.ts';
 import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
 
+import type { ProviderEntry, ProviderId } from './providers.ts';
+import { providers } from './providers.ts';
+
 /**
  * What a site says about itself: the one page a visitor opens to find out what
  * the tool is, what it stands on, and who to tell when it breaks.
@@ -34,6 +37,18 @@ export interface AboutContent {
    */
   cite?: readonly CitedWork[];
   /**
+   * Who provides the site, named under "Provided by"; a role, when given,
+   * is listed under the names.
+   * @default undefined
+   */
+  people?: readonly AboutPerson[];
+  /**
+   * Ids into the provider registry: the institutions that provide the site,
+   * drawn as logos under "Provided by".
+   * @default undefined
+   */
+  providedBy?: readonly ProviderId[];
+  /**
    * Licence the site itself is published under.
    * @default 'MIT'
    */
@@ -55,6 +70,17 @@ export interface AboutContent {
   issues?: string;
 }
 
+/** One person who made a site. */
+export interface AboutPerson {
+  /** Their name, as they write it. */
+  name: string;
+  /**
+   * What they contributed, in one line.
+   * @default undefined
+   */
+  role?: string;
+}
+
 /**
  * The same record with nothing left to look up: every default filled in, and
  * every credit id replaced by the entry it names.
@@ -70,6 +96,10 @@ export interface ResolvedAbout {
   credits: CreditEntry[];
   /** The works to cite, empty when the site asks for none. */
   cite: readonly CitedWork[];
+  /** Who made the site, empty when the site names nobody. */
+  people: readonly AboutPerson[];
+  /** The institutions providing the site, empty when the site names none. */
+  providedBy: ProviderEntry[];
   license: string;
   repository: string;
   /** The running version, or `undefined` when the site does not know it. */
@@ -96,6 +126,8 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
     can: content.can,
     credits: credits(content.credits),
     cite: content.cite ?? [],
+    people: content.people ?? [],
+    providedBy: providers(content.providedBy ?? []),
     license: content.license ?? DEFAULT_LICENSE,
     repository,
     version: content.version,

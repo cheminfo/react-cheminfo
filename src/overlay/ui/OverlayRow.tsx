@@ -4,6 +4,10 @@ import { useId } from 'react';
 import type { HelpContent } from '../../help/ui/HelpBody.tsx';
 import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
 
+import type { OverlayBar } from './OverlayBar.tsx';
+import type { OverlayPanel } from './OverlayPanel.tsx';
+import type { OverlaySegmented } from './OverlaySegmented.tsx';
+import type { OverlaySelect } from './OverlaySelect.tsx';
 import { useOverlayPanelShape } from './overlayPanelContext.ts';
 import {
   OVERLAY_GRID_CELL_STYLE,
@@ -119,8 +123,8 @@ export interface OverlayRowProps extends OverlayControlProps {
  * word; a dotted underline says the same thing and costs nothing. The name is
  * reachable by tab for the same reason the glyph was, so the explanation is
  * not reserved to whoever is holding a pointer, and it carries the class
- * `help-name` — the counterpart of the glyph's `help-icon` — so that whatever
- * used to look for the glyph has something to look for. In a panel the name
+ * `help-name` — the counterpart of the glyph's `help-icon` — so that a style
+ * or a test looking for either has something to find. In a panel the name
  * also names its row out loud, since a name a whole column away from its
  * control is not associated with it by proximity alone.
  * @param props - See {@link OverlayRowProps}.

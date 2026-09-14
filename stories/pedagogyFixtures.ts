@@ -14,6 +14,7 @@ import type { BaseExercise, TutorialStep } from '../src/pedagogy/core/types.ts';
 import type { TestCaseResult } from '../src/pedagogy/core/validation.ts';
 import type { ReferenceSection } from '../src/pedagogy/ui/ReferenceSectionBlock.tsx';
 import type { SyntaxTooltipContent } from '../src/pedagogy/ui/SyntaxTooltip.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 /** The jargon a first lesson on SMILES cannot avoid. */
 export const SMILES_GLOSSARY: Glossary = {
@@ -648,7 +649,7 @@ export const SCREEN_ONLY_SECTION: ReferenceSection = {
   id: 'on-screen',
   title: 'Only on screen',
   intro: 'Hover any dotted row for the long story.',
-  color: '#5b6875',
+  color: TOKEN.textMuted,
   noPrint: true,
   rows: [
     {

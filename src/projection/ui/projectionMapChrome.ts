@@ -8,19 +8,19 @@
  * honest as the controls around it change.
  */
 
+import { formatInteger } from '../../format/core/numbers.ts';
 import type { OverlayLegendEntry } from '../../overlay/ui/OverlayLegend.tsx';
 import type { EllipseSize } from '../../scatter/core/confidenceEllipse.ts';
+import { fillCopy } from '../core/fillCopy.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import { fillCopy } from '../core/projectionCopy.ts';
 import type { ProjectionMarker } from '../core/projectionResult.ts';
 import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 
 import { ellipseCoverageText } from './projectionEllipse.ts';
-import { ellipsoidCoverageText } from './projectionEllipsoid.ts';
 import { UNGROUPED_INK } from './projectionMapModel.ts';
 
 /** What the map's chrome is built from. */
-export interface ProjectionMapChromeInput {
+interface ProjectionMapChromeInput {
   /** The words the map writes, already merged over the defaults. */
   copy: ProjectionCopy;
   /** The groups as the map colours them. */
@@ -96,7 +96,7 @@ export function projectionMapChrome(
         color: entry.color,
         shape: 'dot',
         count: entry.count,
-        note: thin ? NOT_OUTLINED_NOTE : undefined,
+        note: thin ? copy.legend.notOutlined : undefined,
       });
     }
     if (showGroupMeans) {
@@ -114,7 +114,7 @@ export function projectionMapChrome(
   if (hollow) {
     entries.push({
       id: 'projected',
-      label: HOLLOW_LEGEND_LABEL,
+      label: copy.legend.projected,
       color: 'var(--text-muted)',
       shape: 'ring',
     });
@@ -149,31 +149,28 @@ export function projectionSelectionSentence(
 ): string {
   if (count === 0) return copy.sentence.selectionNone;
   return fillCopy(copy.sentence.selection, {
-    count: count.toLocaleString(),
-    total: total.toLocaleString(),
+    count: formatInteger(count),
+    total: formatInteger(total),
   });
 }
 
-const NOT_OUTLINED_NOTE = 'Not outlined: too few samples.';
-const HOLLOW_LEGEND_LABEL = 'Hollow = added after the map was built';
-const HOLLOW_SENTENCE =
-  'The hollow dots were placed on the finished map afterwards, so one of them landing far out is a finding rather than a fault.';
-
 /**
- * What the legend says when colour stands for nothing.
+ * The sentence over the legend.
  *
- * The entries left are all shape, so the title names the shape channel: a
- * legend naming no encoding at all is the one fault this title exists to
- * prevent, and it is not fixed by leaving the title out.
+ * When colour stands for nothing the entries left are all shape, so the title
+ * names the shape channel: a legend naming no encoding at all is the one fault
+ * this title exists to prevent, and it is not fixed by leaving the title out.
+ * @param copy - The words the map writes.
+ * @param groups - The groups as the map colours them.
+ * @param colored - Whether colour stands for the group at all.
+ * @returns The title.
  */
-const SHAPE_LEGEND_TITLE = 'Shape = what each mark is.';
-
 function legendTitle(
   copy: ProjectionCopy,
   groups: ResolvedProjectionGroups,
   colored: boolean,
 ): string {
-  if (!colored || groups.entries.length === 0) return SHAPE_LEGEND_TITLE;
+  if (!colored || groups.entries.length === 0) return copy.legend.shapes;
   return fillCopy(copy.legend.mapNoEllipse, {
     groups: groups.label.toLowerCase(),
   });
@@ -196,16 +193,14 @@ function captionFor(
   if (colored && ellipse !== null) {
     sentence += ` ${fillCopy(solid ? copy.legend.space : copy.legend.map, {
       groups: groups.label.toLowerCase(),
-      coverage: solid
-        ? ellipsoidCoverageText(ellipse)
-        : ellipseCoverageText(ellipse),
+      coverage: ellipseCoverageText(ellipse, figure),
     })}`;
   }
   if (skipped.length > 0) {
     const names = skipped.join(', ');
     sentence += ` ${fillCopy(copy.sentence.skippedGroups, { names })}`;
   }
-  if (hollow) sentence += ` ${HOLLOW_SENTENCE}`;
+  if (hollow) sentence += ` ${copy.sentence.projected}`;
   return sentence;
 }
 

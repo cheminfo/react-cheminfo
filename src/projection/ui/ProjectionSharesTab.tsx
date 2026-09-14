@@ -7,7 +7,8 @@ import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import { PROJECTION_COPY } from '../core/projectionCopy.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 
-import { SharesAxis, SharesMarks } from './ProjectionSharesMarks.tsx';
+import { SharesAxis } from './ProjectionSharesAxis.tsx';
+import { SharesMarks } from './ProjectionSharesMarks.tsx';
 import {
   PROJECTION_TAB_HEIGHT,
   SHARES_BOTTOM_ROOM,
@@ -15,7 +16,7 @@ import {
 } from './projectionTabStyles.ts';
 
 /** What {@link ProjectionSharesTab} needs. */
-export interface ProjectionSharesTabProps {
+interface ProjectionSharesTabProps {
   /** What the run produced; every axis must carry a share. */
   result: ProjectionResult;
   /** The bars, worked out once by the viewer and explained in its bar. */
@@ -93,6 +94,7 @@ export function ProjectionSharesTab(
         {(frame) => (
           <SharesMarks
             shares={shares}
+            copy={copy}
             frame={frame}
             band={chartBand(slots, frame.plot.left, frame.plot.right, {
               padding: BAR_GAP,

@@ -11,8 +11,8 @@
  * this file is where that fact becomes visible: `s` has none, every `p` has one
  * plane, every `d` two surfaces, every `f` three.
  *
- * `key` is ascii and appears in a URL — `#/elements/Fe/3dx2-y2`; `label` is the
- * typeset subscript a student reads.
+ * `key` is ascii and url-safe, so an orbital id such as `3dx2-y2` can sit in
+ * an address; `label` is the typeset subscript a student reads.
  */
 
 /** Subshell letter for an angular momentum, `s p d f`. */
@@ -150,7 +150,7 @@ export const REAL_HARMONICS: RealHarmonic[][] = [
  * The harmonics of one subshell.
  * @param l - Angular momentum quantum number, 0 to 3.
  * @returns Its `2ℓ + 1` real harmonics, in list order.
- * @throws {Error} When ℓ is outside the s, p, d and f shells this site draws.
+ * @throws {Error} When ℓ is outside the s, p, d and f shells.
  */
 export function harmonicsOf(l: number): RealHarmonic[] {
   const shell = REAL_HARMONICS[l];

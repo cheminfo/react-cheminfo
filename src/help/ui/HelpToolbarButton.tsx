@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 
 import type { HelpContent } from './HelpBody.tsx';
 import { HelpTooltip } from './HelpTooltip.tsx';
+import { helpName } from './helpName.ts';
 
 /** What {@link HelpToolbarButton} explains, and what pressing it does. */
 export interface HelpToolbarButtonProps {
@@ -63,7 +64,7 @@ export function HelpToolbarButton(props: HelpToolbarButtonProps): ReactElement {
         size={small ? 'small' : 'medium'}
         icon={icon}
         text={label}
-        aria-label={label ?? content.title}
+        aria-label={label ?? helpName(content)}
         className={className}
         onClick={onClick}
       />

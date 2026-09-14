@@ -15,11 +15,9 @@ import { PROJECTION_COPY, fillCopy } from '../src/projection/core/index.ts';
 import { ellipseCoverageText } from '../src/projection/ui/projectionEllipse.ts';
 import { projectionSelectionSentence } from '../src/projection/ui/projectionMapChrome.ts';
 import type { EllipseSize } from '../src/scatter/core/index.ts';
-import type {
-  ScatterPlotProps,
-  ScatterPointOpen,
-} from '../src/scatter/ui/ScatterPlot.tsx';
 import { ScatterPlot } from '../src/scatter/ui/ScatterPlot.tsx';
+import type { ScatterPointOpen } from '../src/scatter/ui/scatterFigureProps.ts';
+import type { ScatterPlotProps } from '../src/scatter/ui/scatterPlotProps.ts';
 
 import {
   IRIS_GROUPS,

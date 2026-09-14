@@ -3,10 +3,9 @@
  *
  * The server, or the build that wrote one file per address, already titled the
  * page it handed out; this is what a move inside the app changes, and what a
- * crawler that renders the page reads afterwards. Every site did the same three
- * things around it — read the address it is on, look it up in its route table,
- * write the head — so all three live here, and a site says only where its
- * address is read and how a change to it is noticed.
+ * crawler that renders the page reads afterwards. Reading the address, looking
+ * it up in the route table and writing the head happen together here, so a site
+ * says only where its address is read and how a change to it is noticed.
  */
 
 import { writeDocumentMeta } from './documentMeta.ts';

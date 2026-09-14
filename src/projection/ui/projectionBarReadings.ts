@@ -8,15 +8,15 @@
  * `Colour by species` and folding the bar at the wrong width.
  */
 
+import { chartShare } from '../../chart/core/chartLabels.ts';
 import type { OverlayMetrics } from '../../overlay/core/overlayMetrics.ts';
+import type { OverlayChipSetting } from '../../overlay/ui/OverlayChip.tsx';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 import type { ProjectionTab } from '../core/projectionTabs.ts';
 
 import { ellipseCoverageText } from './projectionEllipse.ts';
-import { ellipsoidCoverageText } from './projectionEllipsoid.ts';
-import { WHOLE_SHARE } from './projectionTabStyles.ts';
 
 /** One setting on the bar, as the reader sees it right now. */
 export interface ProjectionReading {
@@ -41,7 +41,7 @@ export interface ProjectionReading {
 }
 
 /** What the readings of the tab showing are built from. */
-export interface ProjectionReadingsInput {
+interface ProjectionReadingsInput {
   /** The tab showing, whose own settings sit at the far end of the bar. */
   tab: ProjectionTab;
   /** The words the viewer writes, already merged over the defaults. */
@@ -61,7 +61,7 @@ export function projectionBarReadings(
   input: ProjectionReadingsInput,
 ): readonly ProjectionReading[] {
   const { tab, copy, options, groups } = input;
-  const { bar, help } = copy;
+  const { bar, choice, help } = copy;
 
   if (tab === 'pairs') {
     return [
@@ -83,19 +83,20 @@ export function projectionBarReadings(
     ];
   }
   if (tab === 'space') {
+    const coverage =
+      options.colorBy === 'group' && groups.entries.length > 0
+        ? ellipseCoverageText(options.ellipse, 'space')
+        : '';
     return [
       {
         key: bar.key.cloudGesture,
         label: help.cloudGesture.title,
-        value: options.cloudGesture === 'turn' ? 'Turn' : 'Select',
+        value: choice.cloudGesture[options.cloudGesture],
       },
       {
         key: bar.key.ellipse,
         label: help.ellipse.title,
-        value:
-          options.colorBy === 'group' && groups.entries.length > 0
-            ? ellipsoidCoverageText(options.ellipse)
-            : bar.noOutlines,
+        value: coverage === '' ? bar.noOutlines : coverage,
       },
     ];
   }
@@ -104,7 +105,7 @@ export function projectionBarReadings(
       {
         key: bar.key.shareTarget,
         label: help.shareTarget.title,
-        value: `${Math.round(options.shareTarget * WHOLE_SHARE)}%`,
+        value: `${chartShare(options.shareTarget, 0)}%`,
         stepper: true,
       },
     ];
@@ -134,6 +135,26 @@ export function projectionUnwrittenRoom(
     }
   }
   return extra;
+}
+
+/**
+ * What the chip a narrow bar gathers the settings into reads out, which is
+ * every reading spelled in full.
+ * @param readings - What the settings currently read.
+ * @returns The chip's own settings.
+ */
+export function projectionChipSettings(
+  readings: readonly ProjectionReading[],
+): readonly OverlayChipSetting[] {
+  const settings: OverlayChipSetting[] = [];
+  for (const reading of readings) {
+    settings.push({
+      label: reading.label,
+      value: reading.value,
+      swatches: reading.swatches,
+    });
+  }
+  return settings;
 }
 
 /**

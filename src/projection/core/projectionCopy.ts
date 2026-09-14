@@ -1,5 +1,16 @@
-import type { ProjectionCopyPatch } from './projectionCopyPatch.ts';
 import type { ProjectionOptionId } from './projectionOptions.ts';
+import type {
+  ProjectionChoiceWords,
+  ProjectionOutlineWords,
+  ProjectionPanelWords,
+  ProjectionReasonWords,
+} from './projectionPanelWords.ts';
+import {
+  PROJECTION_CHOICE_WORDS,
+  PROJECTION_OUTLINE_WORDS,
+  PROJECTION_PANEL_WORDS,
+  PROJECTION_REASON_WORDS,
+} from './projectionPanelWords.ts';
 import type {
   ProjectionBarWords,
   ProjectionHelp,
@@ -11,12 +22,6 @@ import {
 } from './projectionStrings.ts';
 import type { ProjectionTab } from './projectionTabs.ts';
 
-export type {
-  ProjectionBarWords,
-  ProjectionHelp,
-  ProjectionHelpExample,
-} from './projectionStrings.ts';
-
 /** Every word a projection viewer writes. */
 export interface ProjectionCopy {
   /** What each tab is called. */
@@ -25,6 +30,14 @@ export interface ProjectionCopy {
   shortTab: Record<ProjectionTab, string>;
   /** The words the settings bar writes on itself. */
   bar: ProjectionBarWords;
+  /** The words a settings panel writes around its rows. */
+  panel: ProjectionPanelWords;
+  /** What a greyed control or an unreachable choice tells the pointer. */
+  reason: ProjectionReasonWords;
+  /** What the choices of the settings that offer a few words read. */
+  choice: ProjectionChoiceWords;
+  /** How the size of an outline or a shell is written in full. */
+  outline: ProjectionOutlineWords;
   /** The sentence under each tab and above its figure. */
   intro: {
     /** The map. */
@@ -67,6 +80,12 @@ export interface ProjectionCopy {
     variablesSample: string;
     /** The shares tab. */
     shares: string;
+    /** The note beside a group too small to outline. */
+    notOutlined: string;
+    /** The entry naming the hollow marks of samples placed after fitting. */
+    projected: string;
+    /** The title of a key whose colour stands for nothing, so only shape is left. */
+    shapes: string;
   };
   /** The sentences the viewer builds from the data. */
   sentence: {
@@ -88,6 +107,15 @@ export interface ProjectionCopy {
     lassoRemove: string;
     /** Carries `{names}`. */
     skippedGroups: string;
+    /** Why the hollow dots of samples placed after fitting are worth a look. */
+    projected: string;
+    /** The running total's name on the shares chart. Carries `{percent}`. */
+    runningTotal: string;
+    /**
+     * What pointing at one bar of the shares chart says. Carries `{component}`,
+     * `{share}`, `{count}` and `{total}`.
+     */
+    shareCard: string;
   };
   /** What the buttons read. */
   action: {
@@ -114,6 +142,8 @@ export interface ProjectionCopy {
     component: string;
     /** What many are called. */
     components: string;
+    /** What the vertical axis of a panel drawing weights measures. */
+    weight: string;
   };
 }
 
@@ -137,6 +167,10 @@ export const PROJECTION_COPY: ProjectionCopy = {
   },
   shortTab: PROJECTION_SHORT_TAB,
   bar: PROJECTION_BAR_WORDS,
+  panel: PROJECTION_PANEL_WORDS,
+  reason: PROJECTION_REASON_WORDS,
+  choice: PROJECTION_CHOICE_WORDS,
+  outline: PROJECTION_OUTLINE_WORDS,
   intro: {
     map: 'Each dot is one sample. Dots that sit together are alike; dots far apart are the ones that differ most. The two axes are the strongest patterns of difference, called components.',
     space:
@@ -171,6 +205,9 @@ export const PROJECTION_COPY: ProjectionCopy = {
       'Grey is the average sample; the coloured line is {sample} rebuilt from the components shown.',
     shares:
       'Each bar carries the colour its component has on the other tabs; the grey line is the running total.',
+    notOutlined: 'Not outlined: too few samples.',
+    projected: 'Hollow = added after the map was built',
+    shapes: 'Shape = what each mark is.',
   },
   sentence: {
     sharesFirst:
@@ -185,6 +222,11 @@ export const PROJECTION_COPY: ProjectionCopy = {
     lassoAdd: 'Adding to selection',
     lassoRemove: 'Removing from selection',
     skippedGroups: '{names} not outlined: too few samples.',
+    projected:
+      'The hollow dots were placed on the finished map afterwards, so one of them landing far out is a finding rather than a fault.',
+    runningTotal: 'Running total {percent}%',
+    shareCard:
+      '{component} — {share}% of the differences. The first {count} together: {total}%.',
   },
   action: {
     zoomToSelection: 'Zoom to selection',
@@ -199,63 +241,6 @@ export const PROJECTION_COPY: ProjectionCopy = {
     samples: 'samples',
     component: 'component',
     components: 'components',
+    weight: 'Weight',
   },
 };
-
-/**
- * The words the viewer will write, with a site's overrides merged in one key
- * at a time, so a site fixing a single sentence keeps every other default.
- * @param overrides - What the site wants said differently.
- * @returns Every word, complete.
- */
-export function mergeProjectionCopy(
-  overrides?: ProjectionCopyPatch<ProjectionCopy>,
-): ProjectionCopy {
-  if (overrides === undefined) return { ...PROJECTION_COPY };
-  return mergeBranch(
-    PROJECTION_COPY as unknown as Branch,
-    overrides,
-  ) as unknown as ProjectionCopy;
-}
-
-/**
- * A sentence with its placeholders filled in.
- *
- * The placeholders are `{name}`, and one with no value is left in place rather
- * than replaced by an empty string, so a site that mistypes a key sees the
- * mistake in the figure instead of a sentence that quietly loses a number.
- * @param template - The sentence, from {@link ProjectionCopy}.
- * @param values - What each placeholder stands for.
- * @returns The filled sentence.
- */
-export function fillCopy(
-  template: string,
-  values: Readonly<Record<string, string>>,
-): string {
-  return template.replaceAll(PLACEHOLDER, (match: string, name: string) => {
-    const value = values[name];
-    return value === undefined ? match : value;
-  });
-}
-
-const PLACEHOLDER = /\{(?<name>[^{}]+)\}/gu;
-
-type Branch = Record<string, unknown>;
-
-function mergeBranch(base: Branch, overrides: Branch): Branch {
-  const merged: Branch = { ...base };
-  for (const key of Object.keys(overrides)) {
-    const value = overrides[key];
-    if (value === undefined) continue;
-    const current = merged[key];
-    merged[key] =
-      isBranch(current) && isBranch(value)
-        ? mergeBranch(current, value)
-        : value;
-  }
-  return merged;
-}
-
-function isBranch(value: unknown): value is Branch {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}

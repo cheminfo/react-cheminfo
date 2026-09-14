@@ -1,26 +1,22 @@
 import type { ReactElement } from 'react';
 
-import { chartAxisTitle } from '../../chart/core/chartLabels.ts';
 import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
 import { OverlayGroup } from '../../overlay/ui/OverlayGroup.tsx';
 import { OverlayNumber } from '../../overlay/ui/OverlayNumber.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
-import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
 import { OverlayToggle } from '../../overlay/ui/OverlayToggle.tsx';
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
-import {
-  PROJECTION_PANEL_NAME,
-  PROJECTION_PANEL_SECTION,
-} from '../core/projectionStrings.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
 import type { ProjectionMapControlsProps } from './ProjectionMapControls.tsx';
+import { projectionAxisChoices } from './projectionAxisChoices.ts';
+import { projectionSelectModeChoices } from './projectionWordChoices.ts';
 
 /** What {@link ProjectionMapMore} needs beyond the map's own controls. */
-export interface ProjectionMapMoreProps extends ProjectionMapControlsProps {
+interface ProjectionMapMoreProps extends ProjectionMapControlsProps {
   /** The reduced space the controls apply to; its axes fill the two pickers. */
   result: ProjectionResult;
   /**
@@ -61,7 +57,7 @@ export function ProjectionMapMore(props: ProjectionMapMoreProps): ReactElement {
   const { result, options, onChange, copy, hasGroups = false } = props;
   const { selectedCount = 0, onZoomToSelection } = props;
   const { onResetView, onClearSelection } = props;
-  const { action, help, tab } = copy;
+  const { action, help, panel, reason, tab } = copy;
 
   const nothingPicked = selectedCount === 0;
   const uncoloured = !hasGroups || options.colorBy === 'none';
@@ -92,25 +88,33 @@ export function ProjectionMapMore(props: ProjectionMapMoreProps): ReactElement {
         </>
       }
     >
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.axes} divider={false}>
+      <OverlayGroup label={panel.section.axes} divider={false}>
         <OverlaySelect
-          label={PROJECTION_PANEL_NAME.xAxis}
+          label={panel.name.xAxis}
           help={help.xAxis}
           value={String(options.xAxis)}
-          options={axisChoices(result, options.yAxis)}
+          options={projectionAxisChoices(
+            result,
+            [options.yAxis],
+            reason.axisTakenOnMap,
+          )}
           onChange={(value) => onChange({ xAxis: Number(value) })}
         />
         <OverlaySelect
-          label={PROJECTION_PANEL_NAME.yAxis}
+          label={panel.name.yAxis}
           help={help.yAxis}
           value={String(options.yAxis)}
-          options={axisChoices(result, options.xAxis)}
+          options={projectionAxisChoices(
+            result,
+            [options.xAxis],
+            reason.axisTakenOnMap,
+          )}
           onChange={(value) => onChange({ yAxis: Number(value) })}
         />
       </OverlayGroup>
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.drawing}>
+      <OverlayGroup label={panel.section.drawing}>
         <OverlayNumber
-          label={PROJECTION_PANEL_NAME.pointRadius}
+          label={panel.name.pointRadius}
           help={help.pointRadius}
           value={options.pointRadius}
           min={1}
@@ -121,58 +125,22 @@ export function ProjectionMapMore(props: ProjectionMapMoreProps): ReactElement {
           onChange={(pointRadius) => onChange({ pointRadius })}
         />
         <OverlayToggle
-          label={PROJECTION_PANEL_NAME.showGroupMeans}
+          label={panel.name.showGroupMeans}
           help={help.showGroupMeans}
           checked={options.showGroupMeans}
           disabled={uncoloured}
           onChange={(showGroupMeans) => onChange({ showGroupMeans })}
         />
       </OverlayGroup>
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.selecting}>
+      <OverlayGroup label={panel.section.selecting}>
         <OverlaySegmented<ScatterSelectionMode>
-          label={PROJECTION_PANEL_NAME.selectMode}
+          label={panel.name.selectMode}
           help={help.selectMode}
           value={options.selectMode}
-          options={SELECT_MODE_CHOICES}
+          options={projectionSelectModeChoices(copy)}
           onChange={(selectMode) => onChange({ selectMode })}
         />
       </OverlayGroup>
     </OverlayPanel>
   );
-}
-
-const AXIS_TAKEN_NOTE = 'Already drawn on the other axis.';
-
-/**
- * What a plain drag does. Three words rather than a sentence, because a
- * segment has room for one word and the line over the plot says the rest while
- * the drag is under way.
- */
-const SELECT_MODE_CHOICES: ReadonlyArray<OverlayOption<ScatterSelectionMode>> =
-  [
-    { value: 'replace', label: 'Replace' },
-    { value: 'add', label: 'Add' },
-    { value: 'remove', label: 'Remove' },
-  ];
-
-/**
- * The axes one picker offers, with the one already drawn kept but unreachable.
- * @param result - The reduced space being drawn.
- * @param taken - The axis the other picker is showing.
- * @returns The choices, in the order the run produced them.
- */
-function axisChoices(result: ProjectionResult, taken: number): OverlayOption[] {
-  const choices: OverlayOption[] = [];
-  for (let index = 0; index < result.axes.length; index++) {
-    const axis = result.axes[index];
-    if (axis === undefined) continue;
-    const drawn = index === taken;
-    choices.push({
-      value: String(index),
-      label: chartAxisTitle(axis.name, { share: axis.share }),
-      disabled: drawn,
-      title: drawn ? AXIS_TAKEN_NOTE : undefined,
-    });
-  }
-  return choices;
 }

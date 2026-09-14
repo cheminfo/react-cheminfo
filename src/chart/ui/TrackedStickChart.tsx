@@ -36,8 +36,6 @@ import {
   valueAt,
 } from './stickChartModel.ts';
 
-export type { ChartStickSeries } from './stickChartModel.ts';
-
 /** What {@link TrackedStickChart} needs. */
 export interface TrackedStickChartProps {
   /**
@@ -91,6 +89,11 @@ export interface TrackedStickChartProps {
    * @default undefined
    */
   testId?: string;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -99,7 +102,8 @@ export interface TrackedStickChartProps {
  * @returns The chart.
  */
 export function TrackedStickChart(props: TrackedStickChartProps): ReactElement {
-  const { positions, categories, series, width, height, y, xLabel } = props;
+  const { className, positions, categories, series, width, height, y, xLabel } =
+    props;
   const { onTrack, label, overlay, testId, trackedIndex } = props;
   const [ownIndex, setOwnIndex] = useState<number | null>(null);
   const held = trackedIndex === undefined ? ownIndex : trackedIndex;
@@ -144,6 +148,7 @@ export function TrackedStickChart(props: TrackedStickChartProps): ReactElement {
       height={height}
       label={label}
       testId={testId}
+      className={className}
       overlay={overlay}
       x={{ domain: across, label: xLabel, showGrid: false }}
       y={{ ...y, domain }}

@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 import { useId } from 'react';
 
+import { formatInteger } from '../../format/core/numbers.ts';
 import type { OverlayMarkShape } from '../core/overlayMarks.ts';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 import type { OverlayPlacement } from '../core/overlayPlacement.ts';
@@ -183,7 +184,7 @@ function LegendEntry(props: LegendEntryProps): ReactElement {
 
 function entryLabel(entry: OverlayLegendEntry): string {
   if (entry.count === undefined) return entry.label;
-  return `${entry.label} (${entry.count.toLocaleString()})`;
+  return `${entry.label} (${formatInteger(entry.count)})`;
 }
 
 function foldStyle(metrics: OverlayMetrics): CSSProperties {

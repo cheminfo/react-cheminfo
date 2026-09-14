@@ -81,7 +81,7 @@ export const OVERLAY_GRID_CELL_STYLE = {
 } as const satisfies CSSProperties;
 
 /** How a row's name stands. */
-export interface OverlayNameLook {
+interface OverlayNameLook {
   /**
    * Whether the name carries the control's explanation.
    * @default false
@@ -142,7 +142,7 @@ export const OVERLAY_HELP_NAME_STYLE = {
  * A control that does not apply is greyed rather than removed, because one
  * that vanishes teaches the reader nothing about why it went.
  */
-export const OVERLAY_FADED_NAME_STYLE = {
+const OVERLAY_FADED_NAME_STYLE = {
   opacity: 0.6,
 } as const satisfies CSSProperties;
 

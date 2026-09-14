@@ -1,7 +1,11 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+
 import type { SyntaxTooltipContent } from './SyntaxTooltip.tsx';
 import { SyntaxTooltip } from './SyntaxTooltip.tsx';
+import { MONOSPACE } from './pedagogyStyle.ts';
 
 /** One line of the cheatsheet: a construct and what it does. */
 export interface ReferenceRow {
@@ -22,6 +26,7 @@ export interface ReferenceRow {
 export interface ReferenceSection {
   /** Stable and URL-safe: a heading can be linked to. */
   id: string;
+  /** The heading of the block. */
   title: string;
   /**
    * One line under the heading, when the block needs framing.
@@ -34,6 +39,7 @@ export interface ReferenceSection {
    * @default undefined — the heading takes the surrounding text colour
    */
   color?: string;
+  /** The lines of the block, in reading order. */
   rows: ReferenceRow[];
   /**
    * Whether the block is dropped from the printed sheet — a section that is
@@ -43,7 +49,9 @@ export interface ReferenceSection {
   noPrint?: boolean;
 }
 
+/** What {@link ReferenceSectionBlock} needs. */
 export interface ReferenceSectionBlockProps {
+  /** The block to draw. */
   section: ReferenceSection;
   /**
    * Width of the syntax column, so the blocks of one grid line up.
@@ -74,7 +82,11 @@ export function ReferenceSectionBlock(
   return (
     <section
       id={section.id}
-      className={blockClassName(section, className)}
+      className={joinClassNames(
+        'reference-section',
+        section.noPrint === true && 'no-print',
+        className,
+      )}
       style={SECTION_STYLE}
     >
       <h4 style={headingStyle(section.color)}>{section.title}</h4>
@@ -108,16 +120,6 @@ function ReferenceRowLine(props: {
   );
 }
 
-function blockClassName(
-  section: ReferenceSection,
-  className: string | undefined,
-): string {
-  const names = ['reference-section'];
-  if (section.noPrint === true) names.push('no-print');
-  if (className !== undefined) names.push(className);
-  return names.join(' ');
-}
-
 function headingStyle(color: string | undefined): CSSProperties {
   return {
     margin: '0 0 4px',
@@ -135,13 +137,13 @@ function syntaxStyle(
 ): CSSProperties {
   return {
     flex: `0 0 ${typeof width === 'number' ? `${width}px` : width}`,
-    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+    fontFamily: MONOSPACE,
     fontSize: 12,
     fontWeight: 600,
-    color: '#1c2127',
+    color: TOKEN.text,
     ...(interactive
       ? {
-          borderBottom: '1px dotted var(--text-muted, #5b6875)',
+          borderBottom: `1px dotted ${TOKEN.textMuted}`,
           alignSelf: 'flex-start',
         }
       : {}),
@@ -156,7 +158,7 @@ const SECTION_STYLE: CSSProperties = {
 
 const INTRO_STYLE: CSSProperties = {
   margin: '0 0 4px',
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: 12,
 };
 
@@ -164,7 +166,7 @@ const ROW_STYLE: CSSProperties = {
   display: 'flex',
   gap: 8,
   padding: '3px 0',
-  borderTop: '1px solid #e5e7eb',
+  borderTop: `1px solid ${TOKEN.border}`,
   width: '100%',
 };
 
@@ -174,5 +176,5 @@ const DESCRIPTION_STYLE: CSSProperties = {
   flex: '1 1 auto',
   fontSize: 12,
   lineHeight: 1.4,
-  color: '#404854',
+  color: TOKEN.text,
 };

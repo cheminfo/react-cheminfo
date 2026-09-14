@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import { useState } from 'react';
 
+import type { StructureProps } from '../src/structure/ui/Structure.tsx';
 import { Structure } from '../src/structure/ui/Structure.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import {
   ASPIRIN,
@@ -154,6 +157,54 @@ export const Highlighted: Story = {
 };
 
 /**
+ * Text of the caller's own beside every atom — here each heavy atom numbered
+ * from one, the way a guide or a ring count points at atoms.
+ */
+export const AtomLabels: Story = {
+  args: {
+    width: 260,
+    height: 200,
+    autoCrop: false,
+    atomLabels: numberedAtoms(14),
+  },
+};
+
+/** Clicking an atom paints it, which is how an attachment point is picked. */
+export const ClickableAtoms: Story = {
+  args: { smiles: ASPIRIN, width: 280, height: 200, autoCrop: false },
+  render: (args) => <ClickToHighlight {...args} />,
+};
+
+/**
+ * Number atoms from one, keyed by the index openchemlib gives them.
+ * @param count - How many atoms to number.
+ * @returns The labels.
+ */
+function numberedAtoms(count: number): Map<number, string> {
+  const labels = new Map<number, string>();
+  for (let atom = 0; atom < count; atom++) labels.set(atom, String(atom + 1));
+  return labels;
+}
+
+/**
+ * A structure whose clicked atom is highlighted, with a caption naming it.
+ * @param props - The structure to draw.
+ * @returns The figure.
+ */
+function ClickToHighlight(props: StructureProps): ReactElement {
+  const [atom, setAtom] = useState<number | null>(null);
+  return (
+    <Figure caption={atom === null ? 'click an atom' : `atom ${atom}`}>
+      <Structure
+        {...props}
+        atomHighlight={atom === null ? undefined : [atom]}
+        onAtomClick={setAtom}
+      />
+    </Figure>
+  );
+}
+
+/**
  * A caption under a picture, for the cases the depiction itself cannot name.
  * @param props - What the caption says, and the picture it sits under.
  * @param props.caption - The one line naming what the drawing is showing, such
@@ -182,14 +233,14 @@ const FIGURE_STYLE: CSSProperties = {
   flexDirection: 'column',
   alignItems: 'center',
   padding: 0,
-  border: '1px dashed var(--border-strong, #c3cad3)',
-  borderRadius: 'var(--radius, 10px)',
+  border: `1px dashed ${TOKEN.borderStrong}`,
+  borderRadius: TOKEN.radius,
   margin: 0,
   gap: 4,
 };
 
 const CAPTION_STYLE: CSSProperties = {
   padding: '0 8px 6px',
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: '0.75rem',
 };

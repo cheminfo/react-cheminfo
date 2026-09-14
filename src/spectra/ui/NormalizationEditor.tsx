@@ -13,17 +13,20 @@ import {
   normalizationFilters,
   withNormalizationFilters,
 } from '../core/settings.ts';
+import type { ZoneEntry } from '../core/zones.ts';
+import { readZones } from '../core/zones.ts';
 
 import { FilterChainEditor } from './FilterChainEditor.tsx';
 import { NumberField } from './NumberField.tsx';
 import { ProblemList } from './ProblemList.tsx';
 import { SettingsPart } from './SettingsPart.tsx';
-import type { Zone } from './ZoneRows.tsx';
+import { XWindowFields } from './XWindowFields.tsx';
 import { ZoneRows } from './ZoneRows.tsx';
+import { HELP_STYLE, ROW_STYLE } from './fieldStyles.ts';
 import { problemsAbout } from './problemsAbout.ts';
 
 /** What {@link NormalizationEditor} edits. */
-export interface NormalizationEditorProps {
+interface NormalizationEditorProps {
   /** What `new SpectraProcessor(…)` would be handed. */
   value: SpectraProcessorSettings;
   /** Called with the edited settings on every change. */
@@ -73,7 +76,7 @@ export function NormalizationEditor(
           away and keeps only what it has already resampled, so nothing below
           can be changed afterwards without loading the files again.
         </Callout>
-        <ProblemList problems={problemsAbout(problems, 'Memory')} />
+        <ProblemList problems={problemsAbout(problems, 'memory')} />
       </SettingsPart>
 
       <SettingsPart
@@ -81,22 +84,7 @@ export function NormalizationEditor(
         summary="The x grid every spectrum is put on, which is what makes them comparable."
       >
         <div style={ROW_STYLE}>
-          <NumberField
-            label="From"
-            value={normalization.from}
-            placeholder="the first x"
-            onChange={(from) => {
-              write({ from });
-            }}
-          />
-          <NumberField
-            label="To"
-            value={normalization.to}
-            placeholder="the last x"
-            onChange={(to) => {
-              write({ to });
-            }}
-          />
+          <XWindowFields value={normalization} onChange={write} />
           <NumberField
             label="Number of points"
             value={normalization.numberOfPoints}
@@ -107,7 +95,7 @@ export function NormalizationEditor(
             }}
           />
         </div>
-        <ProblemList problems={problemsAbout(problems, 'Resampling')} />
+        <ProblemList problems={problemsAbout(problems, 'resampling')} />
       </SettingsPart>
 
       <SettingsPart
@@ -132,13 +120,13 @@ export function NormalizationEditor(
         <ZoneRows
           label="Excluded zones"
           withIgnore
-          value={normalization.exclusions ?? []}
+          value={readZones(normalization.exclusions)}
           help="A zone is dropped from the grid; the points it would have held are shared out over the rest."
           onChange={(zones) => {
             write({ exclusions: asExclusions(zones) });
           }}
         />
-        <ProblemList problems={problemsAbout(problems, 'Excluded zone')} />
+        <ProblemList problems={problemsAbout(problems, 'exclusion')} />
       </SettingsPart>
 
       <SettingsPart
@@ -195,8 +183,9 @@ function withMaxMemory(
  * @param zones - The rows as they were edited.
  * @returns The same rows, at the type the settings carry.
  */
-function asExclusions(zones: readonly Zone[]): ExclusionZone[] {
-  return zones as ExclusionZone[];
+function asExclusions(zones: readonly ZoneEntry[]): ExclusionZone[] {
+  const rows: readonly unknown[] = zones;
+  return rows as ExclusionZone[];
 }
 
 /**
@@ -221,15 +210,4 @@ const STAGE_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   gap: 12,
-} as const satisfies CSSProperties;
-
-const ROW_STYLE = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 8,
-} as const satisfies CSSProperties;
-
-const HELP_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
 } as const satisfies CSSProperties;

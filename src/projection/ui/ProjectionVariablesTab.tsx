@@ -30,10 +30,8 @@ import {
 } from './projectionVariablesModel.ts';
 import { axisCaption, legendTitle } from './projectionVariablesWords.ts';
 
-export type { ProjectionVariableTrack } from './projectionVariablesModel.ts';
-
 /** What {@link ProjectionVariablesTab} needs. */
-export interface ProjectionVariablesTabProps {
+interface ProjectionVariablesTabProps {
   /**
    * The panels as the viewer built them, or `null` when the run reported no
    * weights and there is nothing to draw.
@@ -89,7 +87,7 @@ export interface ProjectionVariablesTabProps {
  *
  * Colour is the component here and nothing else: the palette's component order
  * is disjoint from its group order over the first four of each, so a reader
- * who learnt "blue is setosa" on the map never reads "blue is PC 1" here as
+ * who learnt "blue is setosa" on the map never reads "blue is PC1" here as
  * though it meant the same thing. A component's direction is arbitrary, so its
  * sign is carried by geometry — above or below the zero line — and never by a
  * second colour, which would advertise a meaning the arithmetic does not have.

@@ -3,7 +3,6 @@ import type { ReactElement } from 'react';
 import { OverlayGroup } from '../../overlay/ui/OverlayGroup.tsx';
 import { OverlayNumber } from '../../overlay/ui/OverlayNumber.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
-import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
 import { OverlayToggle } from '../../overlay/ui/OverlayToggle.tsx';
@@ -12,17 +11,14 @@ import type {
   ProjectionOptions,
   ProjectionVariablesView,
 } from '../core/projectionOptions.ts';
-import {
-  PROJECTION_PANEL_NAME,
-  PROJECTION_PANEL_SECTION,
-} from '../core/projectionStrings.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
 import type { ProjectionVariablesAvailability } from './projectionViewChoices.ts';
 import { projectionViewChoices } from './projectionViewChoices.ts';
+import { projectionVariableOrderChoices } from './projectionWordChoices.ts';
 
 /** What the panels keep behind the cog is drawn from. */
-export interface ProjectionVariablesMoreProps extends ProjectionVariablesAvailability {
+interface ProjectionVariablesMoreProps extends ProjectionVariablesAvailability {
   /** Every option the panels are drawn from. */
   options: ProjectionOptions;
   /** The words the bar writes, already merged over the defaults. */
@@ -54,7 +50,7 @@ export function ProjectionVariablesMore(
 ): ReactElement {
   const { options, copy, axisCount, continuous, onChange } = props;
   const { canShowEffect, canRescale, canPickSample } = props;
-  const { help, tab } = copy;
+  const { help, panel, tab } = copy;
 
   return (
     <OverlayPanel
@@ -62,7 +58,7 @@ export function ProjectionVariablesMore(
       onReset={() => onChange(PROJECTION_TAB_DEFAULTS.variables)}
     >
       <OverlaySelect<ProjectionVariablesView>
-        label={PROJECTION_PANEL_NAME.variablesView}
+        label={panel.name.variablesView}
         help={help.variablesView}
         value={options.variablesView}
         options={projectionViewChoices(copy, {
@@ -73,22 +69,22 @@ export function ProjectionVariablesMore(
         onChange={(variablesView) => onChange({ variablesView })}
       />
       <OverlayNumber
-        label={PROJECTION_PANEL_NAME.variablesCount}
+        label={panel.name.variablesCount}
         help={help.variablesCount}
         value={options.variablesCount}
         min={1}
         max={Math.max(1, axisCount)}
         onChange={(variablesCount) => onChange({ variablesCount })}
       />
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.scale}>
+      <OverlayGroup label={panel.section.scale}>
         <OverlayToggle
-          label={PROJECTION_PANEL_NAME.sharedScale}
+          label={panel.name.sharedScale}
           help={help.sharedScale}
           checked={options.sharedScale}
           onChange={(sharedScale) => onChange({ sharedScale })}
         />
         <OverlayNumber
-          label={PROJECTION_PANEL_NAME.spread}
+          label={panel.name.spread}
           help={help.spread}
           value={options.spread}
           min={SMALLEST_REACH}
@@ -99,39 +95,25 @@ export function ProjectionVariablesMore(
           onChange={(spread) => onChange({ spread })}
         />
       </OverlayGroup>
-      <OverlayGroup label={PROJECTION_PANEL_SECTION.drawing}>
+      <OverlayGroup label={panel.section.drawing}>
         <OverlayToggle
-          label={PROJECTION_PANEL_NAME.showAverage}
+          label={panel.name.showAverage}
           help={help.showAverage}
           checked={options.showAverage}
           onChange={(showAverage) => onChange({ showAverage })}
         />
         <OverlaySegmented
-          label={PROJECTION_PANEL_NAME.variableOrder}
+          label={panel.name.variableOrder}
           help={help.variableOrder}
           value={options.variableOrder}
           disabled={continuous}
-          options={ORDER_CHOICES}
+          options={projectionVariableOrderChoices(copy)}
           onChange={(variableOrder) => onChange({ variableOrder })}
         />
       </OverlayGroup>
     </OverlayPanel>
   );
 }
-
-/**
- * The two orders the bars of a panel can be drawn in.
- *
- * Both are written as what the reader gets rather than as what the code does,
- * because "original" and "strongest" name the sort rather than the picture it
- * produces.
- */
-const ORDER_CHOICES: ReadonlyArray<
-  OverlayOption<ProjectionOptions['variableOrder']>
-> = [
-  { value: 'original', label: 'Your order' },
-  { value: 'strongest', label: 'Strongest first' },
-];
 
 /**
  * How far the average sample may be pushed, in standard deviations.

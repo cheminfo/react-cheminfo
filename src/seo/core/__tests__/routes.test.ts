@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest';
 
+import { trimTrailingSlash } from '../../../router/core/address.ts';
 import type { RouteMeta } from '../routes.ts';
-import { homeRoute, routeFor, trimTrailingSlash } from '../routes.ts';
+import { homeRoute, routeFor } from '../routes.ts';
 
 const ROUTES: RouteMeta[] = [
   { path: '/', title: 'Home', description: 'The home page.' },

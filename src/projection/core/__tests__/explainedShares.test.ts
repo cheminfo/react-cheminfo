@@ -1,13 +1,12 @@
-import { getNumbers } from 'ml-dataset-iris';
-import { PCA } from 'ml-pca';
 import { expect, test } from 'vitest';
 
 import { explainedShares } from '../explainedShares.ts';
 import { pcaResult } from '../pcaResult.ts';
 import type { ProjectionAxis } from '../projectionResult.ts';
 
-const rows = getNumbers();
-const result = pcaResult(new PCA(rows, { scale: true }), {
+import { IRIS_PCA, IRIS_ROWS as rows } from './iris.ts';
+
+const result = pcaResult(IRIS_PCA, {
   rows,
   scaled: true,
 });

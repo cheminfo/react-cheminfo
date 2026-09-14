@@ -2,18 +2,13 @@ import type { ReactElement, ReactNode } from 'react';
 import { useId } from 'react';
 
 import { OverlayLayer } from '../../overlay/ui/OverlayLayer.tsx';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { ChartAxisScale } from '../core/chartAxisScale.ts';
-import { chartAxisScale } from '../core/chartAxisScale.ts';
 import type { ChartScale } from '../core/chartScale.ts';
-import { chartScale } from '../core/chartScale.ts';
 
 import { ChartAxis } from './ChartAxis.tsx';
-import {
-  CHART_SVG_STYLE,
-  chartFrameStyle,
-  chartOuterRoom,
-  chartPlotArea,
-} from './chartStyles.ts';
+import { chartFrameGeometry } from './chartFrameGeometry.ts';
+import { CHART_SVG_STYLE, chartFrameStyle } from './chartStyles.ts';
 
 /** How one axis of a {@link ChartFrame} is drawn. */
 export interface ChartAxisSpec {
@@ -133,6 +128,18 @@ export interface ChartFrameProps {
    */
   margins?: Partial<ChartMargins>;
   /**
+   * The plot rectangle and mappings, already worked out by
+   * `chartFrameGeometry` from the same size, axes and margins — for a figure
+   * that needed them before it rendered.
+   * @default undefined — the frame works them out itself
+   */
+  geometry?: ChartFrameRender;
+  /**
+   * A class added to the wrapper, for a site placing the figure.
+   * @default undefined
+   */
+  className?: string;
+  /**
    * Value of the `data-testid` attribute of the wrapper, for the end-to-end
    * tests.
    * @default undefined
@@ -162,28 +169,19 @@ export function ChartFrame(props: ChartFrameProps): ReactElement {
     busy = false,
     label = '',
     margins = {},
+    geometry,
+    className,
     testId,
   } = props;
   const clipId = useId();
 
-  const xAxis = chartAxisScale(x.domain[0], x.domain[1], {
-    count: x.tickCount,
-    nice: x.nice,
-  });
-  const yAxis = chartAxisScale(y.domain[0], y.domain[1], {
-    count: y.tickCount,
-    nice: y.nice,
-  });
-
-  const plot = chartPlotArea(width, height, margins, {
-    bottom: chartOuterRoom('bottom', x, xAxis),
-    left: chartOuterRoom('left', y, yAxis),
-  });
+  const frame = geometry ?? chartFrameGeometry(width, height, x, y, margins);
+  const { plot, xAxis, yAxis, x: xPixels, y: yPixels } = frame;
 
   const horizontal = {
     orientation: 'bottom',
     scale: xAxis,
-    pixels: chartScale(xAxis.domain[0], xAxis.domain[1], plot.left, plot.right),
+    pixels: xPixels,
     plot,
     label: x.label,
     showGrid: x.showGrid,
@@ -192,23 +190,16 @@ export function ChartFrame(props: ChartFrameProps): ReactElement {
   const vertical = {
     orientation: 'left',
     scale: yAxis,
-    pixels: chartScale(yAxis.domain[0], yAxis.domain[1], plot.bottom, plot.top),
+    pixels: yPixels,
     plot,
     label: y.label,
     showGrid: y.showGrid,
     showTicks: y.showTicks ?? true,
   } as const;
-  const frame: ChartFrameRender = {
-    plot,
-    x: horizontal.pixels,
-    y: vertical.pixels,
-    xAxis,
-    yAxis,
-  };
 
   return (
     <div
-      className="chart-frame"
+      className={joinClassNames('chart-frame', className)}
       style={chartFrameStyle(width, height)}
       data-testid={testId}
     >

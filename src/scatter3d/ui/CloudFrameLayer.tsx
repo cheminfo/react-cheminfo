@@ -50,7 +50,7 @@ export const CloudFrameLayer = memo(function CloudFrameLayer(
     <g data-layer="frame" pointerEvents="none">
       {edges.map((edge, at) => (
         <line
-          key={at}
+          key={EDGE_KEYS[at]}
           x1={edge.x1}
           y1={edge.y1}
           x2={edge.x2}
@@ -92,6 +92,11 @@ export const CloudFrameLayer = memo(function CloudFrameLayer(
 
 /** Cut once, because the corners of a cube do not depend on the camera. */
 const EDGES = cubeEdges();
+
+/** Each edge named by its two corners, which stay put however the box turns. */
+const EDGE_KEYS = EDGES.map(
+  ([from, to]) => `${from.join(' ')}|${to.join(' ')}`,
+);
 
 /** The same size a chart writes an axis title at, so the two read alike. */
 const ARM_LABEL_SIZE = 11;

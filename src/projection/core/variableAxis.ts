@@ -1,3 +1,6 @@
+import { chartValuesExtent } from '../../chart/core/chartExtent.ts';
+import { roundTo } from '../../format/core/roundTo.ts';
+
 /** Measurements laid out along a number line — a spectrum, a chromatogram. */
 export interface ContinuousVariableAxis {
   /** Discriminant. */
@@ -116,7 +119,7 @@ export function variableLabel(
   // wavenumber to a tidier one would name a slot the reader cannot find in
   // their own file.
   const written =
-    decimals === undefined ? String(value) : String(rounded(value, decimals));
+    decimals === undefined ? String(value) : String(roundTo(value, decimals));
   const unit = axis.unit ?? '';
   return unit === '' ? written : `${written} ${unit}`;
 }
@@ -135,23 +138,11 @@ export function variableLabel(
  */
 export function variableDecimals(axis: VariableAxis): number {
   if (axis.kind === 'named') return 0;
-  let min = Number.POSITIVE_INFINITY;
-  let max = Number.NEGATIVE_INFINITY;
-  for (const value of axis.values) {
-    if (!Number.isFinite(value)) continue;
-    if (value < min) min = value;
-    if (value > max) max = value;
-  }
+  const { min, max } = chartValuesExtent(axis.values);
   const span = max - min;
   if (!Number.isFinite(span) || span <= 0) return MOST_DECIMALS;
   const decimals = AXIS_DIGITS - Math.ceil(Math.log10(span));
   return Math.min(MOST_DECIMALS, Math.max(0, decimals));
-}
-
-function rounded(value: number, decimals: number): number {
-  if (!Number.isFinite(value)) return value;
-  const factor = 10 ** decimals;
-  return Math.round(value * factor) / factor;
 }
 
 /** Digits kept above the decimal point when the axis writes a value. */

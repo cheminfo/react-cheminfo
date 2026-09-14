@@ -32,7 +32,7 @@ import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 export type OverlaySegmentedSize = 'strip' | 'setting';
 
 /** How one segment stands among the others. */
-export interface OverlayPillLook {
+interface OverlayPillLook {
   /** Whether it is the choice in force. */
   selected: boolean;
   /**

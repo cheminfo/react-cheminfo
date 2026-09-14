@@ -1,6 +1,7 @@
 import { HTMLSelect, Switch } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { chartShare } from '../../chart/core/chartLabels.ts';
 import type {
   PrincipalComponentSelection,
   PrincipalComponentSettings,
@@ -13,6 +14,13 @@ import {
 } from '../core/principalComponents.ts';
 
 import { NumberField } from './NumberField.tsx';
+import {
+  HELP_STYLE,
+  LABEL_STYLE,
+  ROW_STYLE,
+  SWITCH_STYLE,
+  sizedFieldStyle,
+} from './fieldStyles.ts';
 
 /** What {@link PrincipalComponentSelect} picks. */
 export interface PrincipalComponentSelectProps {
@@ -37,6 +45,11 @@ export interface PrincipalComponentSelectProps {
    * @default undefined — the decomposition's own options are not offered
    */
   onSettingsChange?: (settings: PrincipalComponentSettings) => void;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -55,6 +68,7 @@ export function PrincipalComponentSelect(
   props: PrincipalComponentSelectProps,
 ): ReactElement {
   const {
+    className,
     value,
     onChange,
     count,
@@ -77,7 +91,7 @@ export function PrincipalComponentSelect(
   }
 
   return (
-    <div style={ROOT_STYLE}>
+    <div className={className} style={ROOT_STYLE}>
       <div style={ROW_STYLE}>
         <label style={FIELD_STYLE}>
           <span style={LABEL_STYLE}>Horizontal axis</span>
@@ -106,7 +120,7 @@ export function PrincipalComponentSelect(
       </div>
       {share === undefined ? null : (
         <span style={HELP_STYLE}>
-          {`Together they carry ${(share * 100).toFixed(1)} % of the variance.`}
+          {`Together they carry ${chartShare(share)} % of the variance.`}
         </span>
       )}
       {settings === undefined || onSettingsChange === undefined ? null : (
@@ -205,41 +219,12 @@ const ROOT_STYLE = {
   gap: 6,
 } as const satisfies CSSProperties;
 
-const ROW_STYLE = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  alignItems: 'flex-end',
-  gap: 8,
-} as const satisfies CSSProperties;
-
 const OPTIONS_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   gap: 6,
   paddingTop: 6,
-  borderTop: '1px solid var(--border, #d8dee6)',
+  borderTop: '1px solid var(--border)',
 } as const satisfies CSSProperties;
 
-const FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-  minWidth: 160,
-  flex: '1 1 160px',
-} as const satisfies CSSProperties;
-
-const LABEL_STYLE = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: 'var(--text-muted, #5b6875)',
-} as const satisfies CSSProperties;
-
-const SWITCH_STYLE = {
-  margin: 0,
-  fontSize: 12,
-} as const satisfies CSSProperties;
-
-const HELP_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;
+const FIELD_STYLE = sizedFieldStyle(160);

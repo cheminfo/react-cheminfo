@@ -1,6 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+/** What {@link ExerciseActions} needs: its handlers, and the labels of its buttons. */
 export interface ExerciseActionsProps {
   /**
    * Records the attempt. Grading itself runs on every keystroke, so this

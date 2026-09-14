@@ -2,17 +2,13 @@ import type { ReactElement } from 'react';
 
 import { OverlayNumber } from '../../overlay/ui/OverlayNumber.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
-import { PROJECTION_PANEL_NAME } from '../core/projectionStrings.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
 import type { ProjectionSharesControlsProps } from './ProjectionSharesControls.tsx';
 import { PROJECTION_SHARE_STEP, WHOLE_SHARE } from './projectionTabStyles.ts';
 
 /** What the shares panel behind the cog is drawn from. */
-export type ProjectionSharesMoreProps = Omit<
-  ProjectionSharesControlsProps,
-  'tier'
->;
+type ProjectionSharesMoreProps = Omit<ProjectionSharesControlsProps, 'tier'>;
 
 /**
  * What the shares figure keeps behind the cog: the one target it has, named
@@ -31,7 +27,7 @@ export function ProjectionSharesMore(
   props: ProjectionSharesMoreProps,
 ): ReactElement {
   const { options, onChange, copy } = props;
-  const { help, tab } = copy;
+  const { help, panel, tab } = copy;
 
   return (
     <OverlayPanel
@@ -39,7 +35,7 @@ export function ProjectionSharesMore(
       onReset={() => onChange(PROJECTION_TAB_DEFAULTS.shares)}
     >
       <OverlayNumber
-        label={PROJECTION_PANEL_NAME.shareTarget}
+        label={panel.name.shareTarget}
         help={help.shareTarget}
         value={Math.round(options.shareTarget * WHOLE_SHARE)}
         min={0}

@@ -2,21 +2,15 @@ import type { Placement } from '@blueprintjs/core';
 import { Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
-/** The one worked example a documented construct carries. */
-export interface SyntaxTooltipExample {
-  /** The construct in use: a pattern, a SMILES, a LaTeX fragment, a layer. */
-  code: string;
-  /**
-   * What it is shown working on, for a construct whose example takes an input.
-   * @default undefined — the example is about notation only
-   */
-  input?: string;
-  /**
-   * What the example demonstrates, in one line.
-   * @default undefined
-   */
-  note?: string;
-}
+import type { GlossaryExample } from '../core/glossary.ts';
+
+import { HOVER_OPEN_DELAY, MONOSPACE, PROSE_INK } from './pedagogyStyle.ts';
+
+/**
+ * The one worked example a documented construct carries: the same shape as
+ * the examples of a glossary entry.
+ */
+export type SyntaxTooltipExample = GlossaryExample;
 
 /** Everything the rich tooltip says about one construct. */
 export interface SyntaxTooltipContent {
@@ -33,9 +27,11 @@ export interface SyntaxTooltipContent {
   summary: string;
   /** The longer story, in a sentence or two. */
   detail: string;
+  /** The worked example shown under the detail. */
   example: SyntaxTooltipExample;
 }
 
+/** What {@link SyntaxTooltip} needs. */
 export interface SyntaxTooltipProps {
   /** What to explain. */
   content: SyntaxTooltipContent;
@@ -63,6 +59,11 @@ export interface SyntaxTooltipProps {
    * @default undefined — the tooltip follows the pointer
    */
   isOpen?: boolean;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -74,6 +75,7 @@ export interface SyntaxTooltipProps {
  */
 export function SyntaxTooltip(props: SyntaxTooltipProps): ReactElement {
   const {
+    className,
     content,
     children,
     placement = 'bottom',
@@ -84,6 +86,7 @@ export function SyntaxTooltip(props: SyntaxTooltipProps): ReactElement {
 
   return (
     <Tooltip
+      className={className}
       content={
         <SyntaxTooltipBody
           content={content}
@@ -100,7 +103,7 @@ export function SyntaxTooltip(props: SyntaxTooltipProps): ReactElement {
   );
 }
 
-export interface SyntaxTooltipBodyProps {
+interface SyntaxTooltipBodyProps {
   /** What to explain. */
   content: SyntaxTooltipContent;
   /**
@@ -155,11 +158,6 @@ export function SyntaxTooltipBody(props: SyntaxTooltipBodyProps): ReactElement {
   );
 }
 
-/** Long enough that the pointer can cross a row without opening it. */
-const HOVER_OPEN_DELAY = 150;
-
-const MONOSPACE = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-
 const BODY_STYLE: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -175,7 +173,7 @@ const HEADER_STYLE: CSSProperties = {
 };
 
 const SYNTAX_STYLE: CSSProperties = {
-  background: 'rgb(255 255 255 / 15%)',
+  background: PROSE_INK.tooltip.rule,
   borderRadius: 3,
   color: '#ffffff',
   fontFamily: MONOSPACE,
@@ -186,18 +184,21 @@ const SYNTAX_STYLE: CSSProperties = {
 
 const NAME_STYLE: CSSProperties = { fontWeight: 600, fontSize: 13 };
 
-const TAG_STYLE: CSSProperties = { color: '#abb3bf', fontSize: 11 };
+const TAG_STYLE: CSSProperties = {
+  color: PROSE_INK.tooltip.muted,
+  fontSize: 11,
+};
 
 const SUMMARY_STYLE: CSSProperties = { fontSize: 12, lineHeight: 1.4 };
 
 const DETAIL_STYLE: CSSProperties = {
-  color: 'var(--border, #d3d8de)',
+  color: PROSE_INK.tooltip.text,
   fontSize: 12,
   lineHeight: 1.45,
 };
 
 const EXAMPLE_STYLE: CSSProperties = {
-  borderTop: '1px solid rgb(255 255 255 / 15%)',
+  borderTop: `1px solid ${PROSE_INK.tooltip.rule}`,
   display: 'flex',
   flexDirection: 'column',
   gap: 2,
@@ -206,16 +207,19 @@ const EXAMPLE_STYLE: CSSProperties = {
 
 const ROW_STYLE: CSSProperties = { display: 'flex', gap: 6, fontSize: 12 };
 
-const LABEL_STYLE: CSSProperties = { color: '#abb3bf', flex: '0 0 68px' };
+const LABEL_STYLE: CSSProperties = {
+  color: PROSE_INK.tooltip.muted,
+  flex: '0 0 68px',
+};
 
 const VALUE_STYLE: CSSProperties = {
-  color: 'var(--surface-sunken, #f6f7f9)',
+  color: PROSE_INK.tooltip.text,
   fontFamily: MONOSPACE,
   overflowWrap: 'anywhere',
 };
 
 const NOTE_STYLE: CSSProperties = {
-  color: '#abb3bf',
+  color: PROSE_INK.tooltip.muted,
   fontSize: 12,
   fontStyle: 'italic',
   marginTop: 2,

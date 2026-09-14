@@ -2,11 +2,12 @@ import type { IconName } from '@blueprintjs/core';
 import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { overlayBarFolded } from '../core/overlayCollapse.ts';
 import type { OverlayPlacement } from '../core/overlayPlacement.ts';
 
 import { OverlayBarCard } from './OverlayBarCard.tsx';
 import { OverlayBarStrip } from './OverlayBarStrip.tsx';
-import { overlayBarFolded, useFoldReport } from './overlayBarShape.ts';
+import type { OverlayPanel } from './OverlayPanel.tsx';
 import { OVERLAY_RESTING_OPACITY } from './overlayStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
 
@@ -74,7 +75,9 @@ export interface OverlayBarProps {
   /**
    * Whether the bar is reduced to a button opening the same controls in a
    * popover. Left out, it folds on its own once the figure is narrower than
-   * `collapseBelow`.
+   * `collapseBelow`. A caller that needs to know whether a bar left to decide
+   * has folded asks `overlayBarFolded` with the width `useOverlaySurface`
+   * reads, which is the answer the bar itself draws from.
    * @default undefined — the bar decides from the figure's width
    */
   collapsed?: boolean;
@@ -83,11 +86,6 @@ export interface OverlayBarProps {
    * @default false
    */
   defaultCollapsed?: boolean;
-  /**
-   * Called when the reader opens or closes it.
-   * @default undefined
-   */
-  onCollapsedChange?: (collapsed: boolean) => void;
   /**
    * Figure width, in pixels, under which the bar folds on its own.
    * @default 420
@@ -132,7 +130,7 @@ export function OverlayBar(props: OverlayBarProps): ReactElement {
   const { children, end, tools, info, more } = props;
   const { placement = 'top-right' } = props;
   const { label = 'Options', restingOpacity = OVERLAY_RESTING_OPACITY } = props;
-  const { collapsed, defaultCollapsed = false, onCollapsedChange } = props;
+  const { collapsed, defaultCollapsed = false } = props;
   const { collapseBelow = 420, moreIcon = 'cog', testId } = props;
   const { morePadded = true } = props;
   const { width } = useOverlaySurface();
@@ -144,10 +142,6 @@ export function OverlayBar(props: OverlayBarProps): ReactElement {
     width,
     collapseBelow,
   });
-  useFoldReport(
-    folded,
-    collapsed === undefined ? onCollapsedChange : undefined,
-  );
 
   if (placement === 'stretch') {
     return (

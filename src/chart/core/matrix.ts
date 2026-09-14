@@ -46,6 +46,30 @@ export function rowMatrix(rows: ReadonlyArray<ArrayLike<number>>): MatrixLike {
 }
 
 /**
+ * Parallel columns read as a matrix, one column per array.
+ *
+ * How a figure holding its coordinates as separate `x` and `y` runs hands them
+ * to anything that reads a matrix, without zipping them into rows first.
+ * @param columns - One array per column, in column order.
+ * @returns The matrix view, as many rows as the shortest column holds.
+ */
+export function columnMatrix(
+  columns: ReadonlyArray<ArrayLike<number>>,
+): MatrixLike {
+  let rows = columns.length === 0 ? 0 : Number.POSITIVE_INFINITY;
+  for (const column of columns) rows = Math.min(rows, column.length);
+  return {
+    rows,
+    columns: columns.length,
+    get(rowIndex: number, columnIndex: number): number {
+      if (rowIndex < 0 || rowIndex >= rows) return Number.NaN;
+      const value = columns[columnIndex]?.[rowIndex];
+      return value === undefined ? Number.NaN : value;
+    },
+  };
+}
+
+/**
  * A matrix whose values pass through a function on the way out.
  *
  * It exists for the sign convention: a principal component's direction is

@@ -1,13 +1,8 @@
-import { Callout, HTMLSelect } from '@blueprintjs/core';
+import { HTMLSelect } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
-import { useState } from 'react';
 
 import { chainProblems } from '../core/chainProblems.ts';
-import {
-  filterEntry,
-  filterMenu,
-  filterStepLabel,
-} from '../core/filterCatalog.ts';
+import { filterEntry, filterMenu } from '../core/filterCatalog.ts';
 import {
   addFilter,
   duplicateFilter,
@@ -19,7 +14,9 @@ import type { SettingsProblem } from '../core/problems.ts';
 import type { SpectrumFilter, SpectrumFilterName } from '../core/settings.ts';
 
 import { FilterRow } from './FilterRow.tsx';
-import { fitKeys, nextKey } from './rowKeys.ts';
+import { ProblemList } from './ProblemList.tsx';
+import { EMPTY_STYLE } from './fieldStyles.ts';
+import { useRowKeys } from './rowKeys.ts';
 
 /** What {@link FilterChainEditor} edits. */
 export interface FilterChainEditorProps {
@@ -38,6 +35,11 @@ export interface FilterChainEditorProps {
    * @default false — the resampling runs after the chain
    */
   resampleFirst?: boolean;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -52,46 +54,35 @@ export interface FilterChainEditorProps {
  * @returns The chain editor.
  */
 export function FilterChainEditor(props: FilterChainEditorProps): ReactElement {
-  const { value, onChange, problems, resampleFirst = false } = props;
-  const [rowKeys, setRowKeys] = useState<readonly number[]>(() =>
-    value.map((_, index) => index),
-  );
-
-  // A step carries no identity of its own, so one is kept beside the chain:
-  // without it React reuses a removed step's boxes for the step that slides up,
-  // and a half-typed number goes with the wrong filter.
-  if (rowKeys.length !== value.length) {
-    setRowKeys(fitKeys(rowKeys, value.length));
-  }
+  const { className, value, onChange, problems, resampleFirst = false } = props;
+  const rows = useRowKeys(value.length);
 
   // Not given and given empty mean different things: a panel that has already
   // checked the whole settings passes its own list, which may legitimately be
   // empty, while a panel that has not passes nothing and gets the chain's own.
   const found = problems ?? chainProblems(value, resampleFirst);
   const chainWide: SettingsProblem[] = [];
-  const byStep = new Map<string, SettingsProblem[]>();
+  const byStep = new Map<number, SettingsProblem[]>();
   for (const issue of found) {
-    if (issue.where === CHAIN_WIDE) {
+    if (issue.part !== 'chain') continue;
+    if (issue.index === undefined) {
       chainWide.push(issue);
       continue;
     }
-    const held = byStep.get(issue.where);
-    if (held === undefined) byStep.set(issue.where, [issue]);
+    const held = byStep.get(issue.index);
+    if (held === undefined) byStep.set(issue.index, [issue]);
     else held.push(issue);
   }
 
   function move(index: number, offset: number): void {
     const target = index + offset;
     if (target < 0 || target >= value.length) return;
-    const keys = [...rowKeys];
-    const [moved] = keys.splice(index, 1);
-    if (moved !== undefined) keys.splice(target, 0, moved);
-    setRowKeys(keys);
+    rows.move(index, target);
     onChange(moveFilter(value, index, offset));
   }
 
   return (
-    <div style={CHAIN_STYLE}>
+    <div className={className} style={CHAIN_STYLE}>
       {value.length === 0 ? (
         <span style={EMPTY_STYLE}>
           No steps — every spectrum is only brought onto the shared x grid.
@@ -99,40 +90,28 @@ export function FilterChainEditor(props: FilterChainEditorProps): ReactElement {
       ) : null}
       {value.map((step, index) => (
         <FilterRow
-          key={rowKeys[index] ?? index}
+          key={rows.keys[index] ?? index}
           filter={step}
           position={index}
           count={value.length}
-          problems={
-            byStep.get(filterStepLabel(step.name, index)) ?? NO_PROBLEMS
-          }
+          problems={byStep.get(index) ?? NO_PROBLEMS}
           onChange={(edited) => {
-            onChange(value.map((held, at) => (at === index ? edited : held)));
+            onChange(value.with(index, edited));
           }}
           onMove={(offset) => {
             move(index, offset);
           }}
           onDuplicate={() => {
-            const keys = [...rowKeys];
-            keys.splice(index + 1, 0, nextKey(rowKeys));
-            setRowKeys(keys);
+            rows.insertAfter(index);
             onChange(duplicateFilter(value, index));
           }}
           onRemove={() => {
-            setRowKeys(rowKeys.filter((_, at) => at !== index));
+            rows.removeAt(index);
             onChange(removeFilter(value, index));
           }}
         />
       ))}
-      {chainWide.map((issue) => (
-        <Callout
-          key={issue.message}
-          intent={issue.severity === 'error' ? 'danger' : 'warning'}
-          compact
-        >
-          {issue.message}
-        </Callout>
-      ))}
+      <ProblemList problems={chainWide} showWhere={false} />
       <div style={ADD_STYLE}>
         <HTMLSelect
           value=""
@@ -140,7 +119,7 @@ export function FilterChainEditor(props: FilterChainEditorProps): ReactElement {
           onChange={(event) => {
             const name = stepNamed(event.currentTarget.value);
             if (name === undefined) return;
-            setRowKeys([...rowKeys, nextKey(rowKeys)]);
+            rows.append();
             onChange(addFilter(value, name));
           }}
         >
@@ -177,9 +156,6 @@ function stepNamed(chosen: string): SpectrumFilterName | undefined {
   return undefined;
 }
 
-/** How `chainProblems` labels what the chain as a whole gets wrong. */
-const CHAIN_WIDE = 'The chain';
-
 /** One shared empty list, so a step with no problems re-renders nothing. */
 const NO_PROBLEMS: readonly SettingsProblem[] = [];
 
@@ -187,11 +163,6 @@ const CHAIN_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   gap: 8,
-} as const satisfies CSSProperties;
-
-const EMPTY_STYLE = {
-  fontSize: 12,
-  color: 'var(--text-faint, #8a96a3)',
 } as const satisfies CSSProperties;
 
 const ADD_STYLE = {

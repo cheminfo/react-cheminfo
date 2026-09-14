@@ -11,8 +11,9 @@
  * absolute `1e-5` and returns no isovalue at all — a guard against degenerate
  * data that instead reads the amplitude *scale*. Amplitudes are Å^(-3/2), so a
  * diffuse orbital is normalised straight into that range and draws nothing:
- * caesium's 6s reaches 13 Å, and 2588 of the 7460 orbitals lcao.cheminfo.org
- * offers came back blank. A quantile has no scale of its own and cannot.
+ * caesium's 6s reaches 13 Å and falls under it, as does about a third of the
+ * orbitals of the periodic table. A quantile has no scale of its own and
+ * cannot.
  *
  * Every pass below touches each of the million-odd samples, so all of them are
  * indexed loops: `for…of` over a `Float32Array` measures 6.7× slower.

@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
 import type { ScreenPoints } from '../screenPoints.ts';
-import { nearestPointIndex } from '../screenPoints.ts';
+import { nearestPointIndex, scatterGroupPixelSums } from '../screenPoints.ts';
 
 const points: ScreenPoints = {
   x: new Float64Array([0, 10, 20]),
@@ -62,4 +62,31 @@ test('an empty cloud finds nothing', () => {
   };
 
   expect(nearestPointIndex(empty, 0, 0, 10)).toBe(-1);
+});
+
+test('a point that is not a number never wins, even when it comes first', () => {
+  const broken: ScreenPoints = {
+    x: new Float64Array([Number.NaN, 10]),
+    y: new Float64Array([0, 0]),
+  };
+
+  expect(nearestPointIndex(broken, 0, 0, 20)).toBe(1);
+  expect(nearestPointIndex(broken, 0, 0, 5)).toBe(-1);
+});
+
+test('group pixel sums skip rows with no group or no position and read a fraction by its whole part', () => {
+  const cloud: ScreenPoints = {
+    x: new Float64Array([0, 10, 20, 30, Number.NaN, 50]),
+    y: new Float64Array([0, 2, 4, 6, 8, 10]),
+  };
+
+  expect(scatterGroupPixelSums(cloud, [0, 1, 0, 1.5, 0, -1], 2)).toStrictEqual(
+    Float64Array.from([20, 4, 2, 40, 8, 2]),
+  );
+});
+
+test('no groups gives no sums', () => {
+  expect(scatterGroupPixelSums(points, [0, 0, 0], 0)).toStrictEqual(
+    new Float64Array(0),
+  );
 });

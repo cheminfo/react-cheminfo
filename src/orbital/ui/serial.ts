@@ -9,7 +9,7 @@
  */
 
 /** Runs what it is given after everything handed to it before. */
-export interface SerialRunner {
+interface SerialRunner {
   /**
    * Queue `task`, and resolve to what it returns.
    * @param task - The work to run once the queue reaches it.

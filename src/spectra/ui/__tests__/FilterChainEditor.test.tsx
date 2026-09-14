@@ -11,12 +11,12 @@ const THREE: readonly SpectrumFilter[] = [
   { name: 'centerMean' },
 ];
 
-test('every one of the twenty-three steps is offered exactly once', () => {
+test('every one of the twenty-seven steps is offered exactly once', () => {
   const html = renderToStaticMarkup(
     <FilterChainEditor value={[]} onChange={() => null} />,
   );
 
-  expect(FILTER_NAMES).toHaveLength(23);
+  expect(FILTER_NAMES).toHaveLength(27);
 
   for (const name of FILTER_NAMES) {
     expect(html.match(new RegExp(`<option value="${name}"`, 'g'))).toHaveLength(
@@ -24,7 +24,39 @@ test('every one of the twenty-three steps is offered exactly once', () => {
     );
   }
 
-  expect(html.match(/<option value="/g)).toHaveLength(24);
+  expect(html.match(/<option value="/g)).toHaveLength(28);
+});
+
+test('a problem is drawn on the step its index names whatever its label says, and a problem about another part is not drawn', () => {
+  const html = renderToStaticMarkup(
+    <FilterChainEditor
+      value={THREE}
+      onChange={() => null}
+      problems={[
+        {
+          severity: 'warning',
+          part: 'chain',
+          index: 1,
+          where: 'Smoothing',
+          message: 'Advice for the second step.',
+        },
+        {
+          severity: 'error',
+          part: 'resampling',
+          where: 'Resampling',
+          message: 'From is not below to.',
+        },
+      ]}
+    />,
+  );
+
+  expect(html.indexOf('>Savitzky–Golay smoothing<')).toBeLessThan(
+    html.indexOf('Advice for the second step.'),
+  );
+  expect(html.indexOf('Advice for the second step.')).toBeLessThan(
+    html.indexOf('>Centre on the mean<'),
+  );
+  expect(html).not.toContain('From is not below to.');
 });
 
 test('the menu is cut into the six groups, each named after what it touches', () => {

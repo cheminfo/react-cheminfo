@@ -24,6 +24,8 @@ test('a matrix step the processor does not know is an error naming the three it 
   expect(found).toStrictEqual([
     {
       severity: 'error',
+      part: 'matrix',
+      index: 0,
       where: 'Matrix step 1',
       message:
         'The matrix stage only knows pqn, centerMean, rescale; it throws on anything else.',
@@ -116,6 +118,8 @@ test('one name given to two ranges is an error, because the second silently wins
   ).toStrictEqual([
     {
       severity: 'error',
+      part: 'range',
+      index: 1,
       where: 'Range 2',
       message: 'amide names two ranges; the second wins.',
     },
@@ -131,6 +135,7 @@ test('a relative scaling with no target is a warning, because the reference is w
   ).toStrictEqual([
     {
       severity: 'warning',
+      part: 'scaling',
       where: 'Scaling',
       message:
         'The difference is taken against the first spectrum the processor holds, which is not necessarily one of those selected.',

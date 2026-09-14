@@ -4,6 +4,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -24,6 +25,11 @@ export interface CategoryLegendProps {
    * @default undefined — none is
    */
   selected?: ElementCategory;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -32,10 +38,10 @@ export interface CategoryLegendProps {
  * @returns The legend.
  */
 export function CategoryLegend(props: CategoryLegendProps): ReactElement {
-  const { onSelect, selected } = props;
+  const { className, onSelect, selected } = props;
 
   return (
-    <div style={legendStyle}>
+    <div className={className} style={legendStyle}>
       {CATEGORY_ORDER.map((category) => {
         const swatch = categorySwatch(category);
         const label = CATEGORY_LABELS[category];
@@ -74,7 +80,7 @@ export function CategoryLegend(props: CategoryLegendProps): ReactElement {
 }
 
 const legendStyle = {
-  color: 'var(--text-muted, rgb(95 107 124))',
+  color: TOKEN.textMuted,
   display: 'flex',
   flexWrap: 'wrap',
   fontSize: 11,

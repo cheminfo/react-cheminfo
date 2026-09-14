@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 
 import { ReferenceGrid } from '../src/pedagogy/ui/ReferenceGrid.tsx';
+import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import { SCREEN_ONLY_SECTION, SMILES_REFERENCE } from './pedagogyFixtures.ts';
 
@@ -65,8 +66,8 @@ export const WideSyntaxColumn: Story = {
 };
 
 const SHEET_STYLE: CSSProperties = {
-  background: 'var(--surface, #fff)',
-  border: '1px solid var(--border, #dfe3e8)',
+  background: TOKEN.surface,
+  border: `1px solid ${TOKEN.border}`,
   borderRadius: 10,
   boxShadow: '0 1px 2px rgb(16 32 48 / 8%)',
   display: 'flex',
@@ -82,6 +83,6 @@ const SHEET_HEADER_STYLE: CSSProperties = {
 };
 
 const SUBTITLE_STYLE: CSSProperties = {
-  color: 'var(--text-muted, #5b6875)',
+  color: TOKEN.textMuted,
   fontSize: 12,
 };

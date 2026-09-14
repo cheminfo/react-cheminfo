@@ -13,7 +13,6 @@
 export type {
   ConfidenceEllipse,
   ConfidenceEllipseOptions,
-  EllipseCovariance,
   EllipseCoverageSize,
   EllipsePoint,
   EllipseSize,
@@ -21,9 +20,10 @@ export type {
 } from './confidenceEllipse.ts';
 export {
   confidenceEllipse,
-  ellipseAxes,
   ellipseStandardDeviations,
 } from './confidenceEllipse.ts';
+export type { EllipseAxes, EllipseCovariance } from './ellipseAxes.ts';
+export { ellipseAxes } from './ellipseAxes.ts';
 export {
   coverageForStandardDeviations,
   standardDeviationsForCoverage,
@@ -38,6 +38,16 @@ export {
   resetLassoPath,
 } from './lassoPath.ts';
 export { pointInPolygon, pointsInPolygon, polygonBounds } from './polygon.ts';
+export type { ScatterGroupMoments } from './scatterGroupMoments.ts';
+export type {
+  ScatterGroupSpread,
+  ScatterGroupSpreadOptions,
+} from './scatterGroupSpread.ts';
+export {
+  scatterGroupSpread,
+  scatterPairEllipse,
+  scatterSkippedGroups,
+} from './scatterGroupSpread.ts';
 export type { ScatterSelectionMode } from './scatterSelection.ts';
 export {
   mergeScatterSelection,

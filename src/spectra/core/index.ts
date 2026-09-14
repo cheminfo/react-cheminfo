@@ -1,4 +1,8 @@
-export type { ProblemSeverity, SettingsProblem } from './problems.ts';
+export type {
+  ProblemPart,
+  ProblemSeverity,
+  SettingsProblem,
+} from './problems.ts';
 export { formulaProblem, isUsableLabel } from './problems.ts';
 export type { FilterCatalogEntry } from './filterEntries.ts';
 export type {
@@ -15,6 +19,7 @@ export {
   filterMenu,
   filterNamesInGroup,
 } from './filterCatalog.ts';
+export type { FilterStep } from './filterChain.ts';
 export {
   addFilter,
   defaultFilter,
@@ -40,10 +45,8 @@ export {
 export type {
   ExclusionZone,
   MatrixFilter,
-  MatrixFilterName,
   NormalizationSettings,
   PostProcessingSettings,
-  ScaleMethod,
   ScaleSettings,
   SpectraCalculation,
   SpectraProcessorSettings,
@@ -59,9 +62,7 @@ export {
   normalizationFilters,
   withNormalizationFilters,
 } from './settings.ts';
-export {
-  MATRIX_FILTER_NAMES,
-  SCALE_METHODS,
-  settingsProblems,
-} from './settingsProblems.ts';
+export type { MatrixFilterName, ScaleMethod } from './matrixCatalog.ts';
+export { MATRIX_FILTER_NAMES, SCALE_METHODS } from './matrixCatalog.ts';
+export { settingsProblems } from './settingsProblems.ts';
 export { chainProblems } from './chainProblems.ts';

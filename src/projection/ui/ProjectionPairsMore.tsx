@@ -8,14 +8,13 @@ import type {
   ProjectionColorBy,
   ProjectionOptions,
 } from '../core/projectionOptions.ts';
-import { PROJECTION_PANEL_NAME } from '../core/projectionStrings.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
 import { projectionColourChoices } from './projectionMapChoices.ts';
 import { projectionPairsCeiling } from './projectionPairsCeiling.ts';
 
 /** What the grid keeps behind the cog is drawn from. */
-export interface ProjectionPairsMoreProps {
+interface ProjectionPairsMoreProps {
   /** What the grid is showing, already resolved against the result. */
   options: ProjectionOptions;
   /** Called with only the options that changed, for the viewer to merge. */
@@ -55,7 +54,7 @@ export function ProjectionPairsMore(
 ): ReactElement {
   const { options, onChange, copy, groupLabel, hasGroups = false } = props;
   const { axisCount, width } = props;
-  const { bar, help, tab } = copy;
+  const { bar, help, panel, tab } = copy;
   const ceiling = projectionPairsCeiling(axisCount, width);
 
   return (
@@ -64,7 +63,7 @@ export function ProjectionPairsMore(
       onReset={() => onChange(PROJECTION_TAB_DEFAULTS.pairs)}
     >
       <OverlayNumber
-        label={PROJECTION_PANEL_NAME.pairCount}
+        label={panel.name.pairCount}
         help={help.pairCount}
         value={options.pairCount}
         min={ceiling.min}
@@ -72,7 +71,7 @@ export function ProjectionPairsMore(
         onChange={(pairCount) => onChange({ pairCount })}
       />
       <OverlaySegmented<ProjectionColorBy>
-        label={PROJECTION_PANEL_NAME.colorBy}
+        label={panel.name.colorBy}
         help={help.colorBy}
         value={options.colorBy}
         disabled={!hasGroups}
@@ -80,7 +79,7 @@ export function ProjectionPairsMore(
         onChange={(colorBy) => onChange({ colorBy })}
       />
       <OverlayNumber
-        label={PROJECTION_PANEL_NAME.pointRadius}
+        label={panel.name.pointRadius}
         help={help.pointRadius}
         value={options.pointRadius}
         min={1}

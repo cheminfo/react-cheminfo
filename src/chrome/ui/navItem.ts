@@ -1,5 +1,5 @@
 import type { IconName } from '@blueprintjs/core';
-import type { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent, ReactElement, ReactNode } from 'react';
 
 /**
  * One entry of a site's chrome: a page in the bar, a utility beside it, or a
@@ -19,10 +19,12 @@ export interface NavItem {
    */
   href?: string;
   /**
-   * Glyph before the label, drawn at 14 px.
+   * Glyph before the label, drawn at 14 px: a Blueprint icon name, or an
+   * element such as the site's own mark. An entry with a glyph is the kind that
+   * keeps only it when the bar runs out of room.
    * @default undefined
    */
-  icon?: IconName;
+  icon?: IconName | ReactElement;
   /**
    * What the pointer is told, and what names the entry to a screen reader when
    * the label is not text.

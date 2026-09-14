@@ -3,13 +3,15 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { chartAxisScale } from '../../chart/core/chartAxisScale.ts';
 import type { ChartViewport } from '../../chart/core/chartViewport.ts';
-import { chartZoomViewport } from '../../chart/core/chartViewport.ts';
 import type { ChartAxisSpec } from '../../chart/ui/ChartFrame.tsx';
 import { useWheelZoom } from '../../chart/ui/useWheelZoom.ts';
 import { pointsWithinBounds } from '../core/screenPoints.ts';
 
 import type { ScatterPlotView } from './scatterPlotModel.ts';
-import { scatterPlotGeometry } from './scatterPlotModel.ts';
+import {
+  scatterPlotGeometry,
+  scatterWheelViewport,
+} from './scatterPlotModel.ts';
 
 /** What {@link useScatterFrame} needs. */
 export interface ScatterFrameOptions {
@@ -130,18 +132,7 @@ export function useScatterFrame(options: ScatterFrameOptions): ScatterFrame {
     enabled: wheelZoom,
     delay: wheelZoomDelay,
     onZoom: (alongX, alongY, factor) => {
-      const frame = shown ?? full;
-      change(
-        chartZoomViewport(
-          full,
-          shown,
-          along(frame.x, alongX),
-          // The vertical axis grows upward while the pointer's share grows
-          // downward, so the share is read from the top of the frame.
-          along(frame.y, 1 - alongY),
-          factor,
-        ),
-      );
+      change(scatterWheelViewport(full, shown, alongX, alongY, factor));
     },
   });
 
@@ -178,14 +169,4 @@ function nicedDomain(axis: ChartAxisSpec): readonly [number, number] {
     count: axis.tickCount,
     nice: axis.nice,
   }).domain;
-}
-
-/**
- * The value a share of the way along a range stands for.
- * @param domain - The range.
- * @param share - How far along, from 0 to 1.
- * @returns The value.
- */
-function along(domain: readonly [number, number], share: number): number {
-  return domain[0] + share * (domain[1] - domain[0]);
 }

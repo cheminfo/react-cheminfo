@@ -10,7 +10,7 @@ import {
 } from '../../overlay/ui/overlaySurface.ts';
 
 /** What {@link ProjectionSurface} needs. */
-export interface ProjectionSurfaceProps {
+interface ProjectionSurfaceProps {
   /** The chrome drawn at the compact size: the settings bar, a floating key. */
   children: ReactNode;
   /**

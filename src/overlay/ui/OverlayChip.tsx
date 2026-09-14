@@ -13,6 +13,7 @@ import {
   overlayChipStyle,
   overlayValueTextStyle,
 } from './overlayValueStyles.ts';
+import { useOverlayInteraction } from './useOverlayInteraction.ts';
 
 /** One setting a chip reads out. */
 export interface OverlayChipSetting {
@@ -78,8 +79,7 @@ export function OverlayChip(props: OverlayChipProps): ReactElement {
   const { metrics } = useOverlaySurface();
   const headingId = useId();
   const [open, setOpen] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
+  const { hovered, focused, handlers } = useOverlayInteraction();
 
   const swatches = leadingSwatches(settings);
   const name = announce(settings);
@@ -117,10 +117,7 @@ export function OverlayChip(props: OverlayChipProps): ReactElement {
           active: open,
           disabled,
         })}
-        onPointerEnter={() => setHovered(true)}
-        onPointerLeave={() => setHovered(false)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        {...handlers}
       >
         {swatches === undefined ? null : (
           <OverlaySwatchIcon colors={swatches} />

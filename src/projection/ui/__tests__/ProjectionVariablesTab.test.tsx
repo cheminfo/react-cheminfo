@@ -1,9 +1,12 @@
-import { getNumbers } from 'ml-dataset-iris';
-import { PCA } from 'ml-pca';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import { rowMatrix } from '../../../chart/core/index.ts';
+import {
+  IRIS_AXIS,
+  IRIS_PCA,
+  IRIS_ROWS as rows,
+} from '../../core/__tests__/iris.ts';
 import type {
   LoadingProfiles,
   ProjectionOptions,
@@ -18,13 +21,7 @@ import {
 import { ProjectionVariablesTab } from '../ProjectionVariablesTab.tsx';
 import { variableTrack, writeValue } from '../projectionVariablesModel.ts';
 
-const IRIS_AXIS: VariableAxis = {
-  kind: 'named',
-  names: ['Sepal length', 'Sepal width', 'Petal length', 'Petal width'],
-};
-
-const rows = getNumbers();
-const iris = pcaResult(new PCA(rows, { scale: true }), {
+const iris = pcaResult(IRIS_PCA, {
   rows,
   scaled: true,
   variables: IRIS_AXIS,

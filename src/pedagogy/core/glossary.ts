@@ -8,12 +8,19 @@
  * both are unit-tested without rendering anything.
  */
 
-/** One worked example inside a glossary entry. */
+/**
+ * One worked example: a construct, what it runs on, and what it shows.
+ *
+ * A glossary entry lists several and a documented construct carries one. A
+ * tool whose example is not a line of code — a drawn structure, a typeset
+ * formula — writes its own shape instead and hands the component showing it a
+ * renderer for that shape.
+ */
 export interface GlossaryExample {
   /** The construct itself: a pattern, a SMILES, a LaTeX fragment, a layer. */
   code: string;
   /**
-   * What the construct is shown working on, for a term whose examples take an
+   * What the construct is shown working on, for an example that takes an
    * input. Left out when the example is about notation only.
    * @default undefined
    */
@@ -26,13 +33,16 @@ export interface GlossaryExample {
 }
 
 /** One glossary term, shown wherever a `[[marker]]` names it. */
-export interface GlossaryEntry {
-  /** The term, spelled out as the heading of the tooltip. */
+export interface GlossaryEntry<TExample = GlossaryExample> {
+  /** The term, spelled out as the heading of the definition. */
   title: string;
-  /** One short paragraph — the whole definition. */
+  /** One short paragraph — the whole definition. May carry inline marks. */
   summary: string;
-  /** Worked examples, shown under the summary. */
-  examples: GlossaryExample[];
+  /**
+   * Worked examples, shown under the summary. A `note` string on an example,
+   * whatever its shape, is written under it.
+   */
+  examples: TExample[];
 }
 
 /**
@@ -41,7 +51,10 @@ export interface GlossaryEntry {
  * A key that no marker names is simply never shown, and a marker naming no key
  * renders as plain prose — so the two sides may be written in either order.
  */
-export type Glossary = Record<string, GlossaryEntry>;
+export type Glossary<TExample = GlossaryExample> = Record<
+  string,
+  GlossaryEntry<TExample>
+>;
 
 /**
  * One piece of parsed prose: either a run of text, or one marker.
@@ -69,7 +82,7 @@ export type GlossarySegment =
 export function parseGlossaryMarkers(text: string): GlossarySegment[] {
   const segments: GlossarySegment[] = [];
   // A fresh regexp per call: a /g/ literal carries `lastIndex` between calls.
-  const marker = new RegExp(MARKER_SOURCE, 'g');
+  const marker = new RegExp(GLOSSARY_MARKER_SOURCE, 'g');
   let cursor = 0;
   let match = marker.exec(text);
   while (match !== null) {
@@ -80,7 +93,7 @@ export function parseGlossaryMarkers(text: string): GlossarySegment[] {
         text: text.slice(cursor, match.index),
       });
     }
-    segments.push(toTermSegment(match.groups?.term ?? '', match.index));
+    segments.push(readMarker(match.groups?.term ?? '', match.index));
     cursor = match.index + match[0].length;
     match = marker.exec(text);
   }
@@ -96,18 +109,26 @@ export function parseGlossaryMarkers(text: string): GlossarySegment[] {
  * @param term - The text before the pipe of a `[[marker]]`, in any case.
  * @returns The entry, or `undefined` when no such term has been written yet.
  */
-export function lookupGlossaryTerm(
-  glossary: Glossary,
+export function lookupGlossaryTerm<TExample>(
+  glossary: Glossary<TExample>,
   term: string,
-): GlossaryEntry | undefined {
+): GlossaryEntry<TExample> | undefined {
   const key = term.trim().toLowerCase();
   // `[[constructor]]` and `[[tostring]]` are prose, not inherited members.
   return Object.hasOwn(glossary, key) ? glossary[key] : undefined;
 }
 
-const MARKER_SOURCE = String.raw`\[\[(?<term>[^\]]+)\]\]`;
-
-function toTermSegment(inner: string, start: number): GlossarySegment {
+/**
+ * Read the inside of one `[[...]]` marker into its lookup term and the text it
+ * displays. Shared with the inline-marks parser, which reads the same markers.
+ * @param inner - What sits between the double brackets.
+ * @param start - Offset of the marker in its source string.
+ * @returns The term segment.
+ */
+export function readMarker(
+  inner: string,
+  start: number,
+): Extract<GlossarySegment, { kind: 'term' }> {
   const pipe = inner.indexOf('|');
   const rawTerm = pipe === -1 ? inner : inner.slice(0, pipe);
   const rawText = pipe === -1 ? inner : inner.slice(pipe + 1);
@@ -120,3 +141,6 @@ function toTermSegment(inner: string, start: number): GlossarySegment {
     text: text === '' ? rawTerm.trim() : text,
   };
 }
+
+/** The pattern of one marker, with the inside captured as `term`. */
+export const GLOSSARY_MARKER_SOURCE = String.raw`\[\[(?<term>[^\]]+)\]\]`;

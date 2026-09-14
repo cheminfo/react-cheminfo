@@ -1,8 +1,8 @@
 // tokens-ok: file — the colours a site may not write are listed here.
-import type { TokenViolationKind } from './checkTokens.ts';
+import type { TokenViolationKind } from './types.ts';
 
 /** What a colour a site may not write should have been. */
-export interface ColorRule {
+interface ColorRule {
   /** Which kind of violation writing it raises. */
   kind: TokenViolationKind;
   /** The token to write instead, in one line. */

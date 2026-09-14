@@ -2,10 +2,12 @@ import type { ReactElement } from 'react';
 
 import type { HeaderButtonProps } from '../../shared/ui/MenuButton.tsx';
 import { MenuButton } from '../../shared/ui/MenuButton.tsx';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { SiteId } from '../core/sites.ts';
 
 import { EcosystemMenu } from './EcosystemMenu.tsx';
 
+/** What the Tools entry of a header needs. */
 export interface EcosystemButtonProps extends HeaderButtonProps {
   /**
    * The site this button sits on, which is shown but never linked.
@@ -18,6 +20,11 @@ export interface EcosystemButtonProps extends HeaderButtonProps {
    * @default 'Tools'
    */
   label?: string;
+  /**
+   * Class names added to the root element, after the component's own.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -27,12 +34,12 @@ export interface EcosystemButtonProps extends HeaderButtonProps {
  * @returns The button and its menu.
  */
 export function EcosystemButton(props: EcosystemButtonProps): ReactElement {
-  const { currentSiteId, label = 'Tools', ...rest } = props;
+  const { currentSiteId, label = 'Tools', className, ...rest } = props;
 
   return (
     <MenuButton
       {...rest}
-      className="ecosystem-button"
+      className={joinClassNames('ecosystem-button', className)}
       icon="grid-view"
       label={label}
       menu={<EcosystemMenu currentSiteId={currentSiteId} />}

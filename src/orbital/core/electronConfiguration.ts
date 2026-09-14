@@ -12,10 +12,13 @@
  * writes them in — `[Ar]3d⁵4s¹`, not `[Ar]4s¹3d⁵`.
  */
 
+import { formatSuperscript } from '../../format/core/superscript.ts';
+
 import { subshellLetter } from './realHarmonics.ts';
 
 /** One subshell, e.g. `{ n: 3, l: 2 }` for 3d. */
 export interface Subshell {
+  /** Principal quantum number, from 1. */
   n: number;
   /** Angular momentum quantum number: 0 = s, 1 = p, 2 = d, 3 = f. */
   l: number;
@@ -23,11 +26,12 @@ export interface Subshell {
 
 /** A subshell and how many electrons sit in it. */
 export interface SubshellOccupancy extends Subshell {
+  /** How many electrons sit in it. */
   electrons: number;
 }
 
 /** No known element occupies a shell above n = 7. */
-const MAXIMUM_PRINCIPAL_NUMBER = 7;
+export const MAXIMUM_PRINCIPAL_NUMBER = 7;
 
 /** Protons in the heaviest element that has been made. */
 export const HIGHEST_ATOMIC_NUMBER = 118;
@@ -40,7 +44,7 @@ export const NOBLE_GASES: readonly number[] = [2, 10, 18, 36, 54, 86, 118];
  * @param atomicNumber - Proton count to check.
  * @throws {Error} When it is not an integer between 1 and 118.
  */
-export function assertAtomicNumber(atomicNumber: number): void {
+function assertAtomicNumber(atomicNumber: number): void {
   if (
     !Number.isInteger(atomicNumber) ||
     atomicNumber < 1 ||
@@ -76,26 +80,26 @@ export function subshellCapacity(l: number): number {
  * rather than observed, so nothing beyond Z = 103 is listed here.
  */
 export const ELEMENT_ANOMALIES: Record<number, SubshellOccupancy[]> = {
-  24: [o(3, 2, 5), o(4, 0, 1)],
-  29: [o(3, 2, 10), o(4, 0, 1)],
-  41: [o(4, 2, 4), o(5, 0, 1)],
-  42: [o(4, 2, 5), o(5, 0, 1)],
-  44: [o(4, 2, 7), o(5, 0, 1)],
-  45: [o(4, 2, 8), o(5, 0, 1)],
-  46: [o(4, 2, 10)],
-  47: [o(4, 2, 10), o(5, 0, 1)],
-  57: [o(5, 2, 1), o(6, 0, 2)],
-  58: [o(4, 3, 1), o(5, 2, 1), o(6, 0, 2)],
-  64: [o(4, 3, 7), o(5, 2, 1), o(6, 0, 2)],
-  78: [o(4, 3, 14), o(5, 2, 9), o(6, 0, 1)],
-  79: [o(4, 3, 14), o(5, 2, 10), o(6, 0, 1)],
-  89: [o(6, 2, 1), o(7, 0, 2)],
-  90: [o(6, 2, 2), o(7, 0, 2)],
-  91: [o(5, 3, 2), o(6, 2, 1), o(7, 0, 2)],
-  92: [o(5, 3, 3), o(6, 2, 1), o(7, 0, 2)],
-  93: [o(5, 3, 4), o(6, 2, 1), o(7, 0, 2)],
-  96: [o(5, 3, 7), o(6, 2, 1), o(7, 0, 2)],
-  103: [o(5, 3, 14), o(7, 0, 2), o(7, 1, 1)],
+  24: [occupancy(3, 2, 5), occupancy(4, 0, 1)],
+  29: [occupancy(3, 2, 10), occupancy(4, 0, 1)],
+  41: [occupancy(4, 2, 4), occupancy(5, 0, 1)],
+  42: [occupancy(4, 2, 5), occupancy(5, 0, 1)],
+  44: [occupancy(4, 2, 7), occupancy(5, 0, 1)],
+  45: [occupancy(4, 2, 8), occupancy(5, 0, 1)],
+  46: [occupancy(4, 2, 10)],
+  47: [occupancy(4, 2, 10), occupancy(5, 0, 1)],
+  57: [occupancy(5, 2, 1), occupancy(6, 0, 2)],
+  58: [occupancy(4, 3, 1), occupancy(5, 2, 1), occupancy(6, 0, 2)],
+  64: [occupancy(4, 3, 7), occupancy(5, 2, 1), occupancy(6, 0, 2)],
+  78: [occupancy(4, 3, 14), occupancy(5, 2, 9), occupancy(6, 0, 1)],
+  79: [occupancy(4, 3, 14), occupancy(5, 2, 10), occupancy(6, 0, 1)],
+  89: [occupancy(6, 2, 1), occupancy(7, 0, 2)],
+  90: [occupancy(6, 2, 2), occupancy(7, 0, 2)],
+  91: [occupancy(5, 3, 2), occupancy(6, 2, 1), occupancy(7, 0, 2)],
+  92: [occupancy(5, 3, 3), occupancy(6, 2, 1), occupancy(7, 0, 2)],
+  93: [occupancy(5, 3, 4), occupancy(6, 2, 1), occupancy(7, 0, 2)],
+  96: [occupancy(5, 3, 7), occupancy(6, 2, 1), occupancy(7, 0, 2)],
+  103: [occupancy(5, 3, 14), occupancy(7, 0, 2), occupancy(7, 1, 1)],
 };
 
 /**
@@ -169,7 +173,7 @@ export function formatConfiguration(
  * @returns The label with a superscript electron count.
  */
 export function formatOccupancy(occupancy: SubshellOccupancy): string {
-  return `${subshellLabel(occupancy)}${superscript(occupancy.electrons)}`;
+  return `${subshellLabel(occupancy)}${formatSuperscript(occupancy.electrons)}`;
 }
 
 /**
@@ -181,22 +185,7 @@ export function subshellLabel(subshell: Subshell): string {
   return `${subshell.n}${subshellLetter(subshell.l)}`;
 }
 
-/**
- * Render a number in unicode superscript digits.
- * @param value - A non-negative integer.
- * @returns The digits as superscripts, e.g. `14` becomes `¹⁴`.
- */
-export function superscript(value: number): string {
-  let text = '';
-  for (const digit of String(value)) {
-    text += SUPERSCRIPT_DIGITS[Number(digit)] ?? digit;
-  }
-  return text;
-}
-
-const SUPERSCRIPT_DIGITS = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
-
-function o(n: number, l: number, electrons: number): SubshellOccupancy {
+function occupancy(n: number, l: number, electrons: number): SubshellOccupancy {
   return { n, l, electrons };
 }
 
@@ -226,7 +215,7 @@ function sortByShell(occupancies: SubshellOccupancy[]): SubshellOccupancy[] {
 /**
  * Madelung order: ascending `n + ℓ`, then ascending `n`. Capped at ℓ = 3 — the
  * g subshells a Madelung diagram shows after 8s are unoccupied in every known
- * element, and this site has no g harmonics to draw them with.
+ * element, and `REAL_HARMONICS` holds no g harmonics to draw them with.
  * @returns The subshells, in filling order.
  */
 function buildMadelungOrder(): Subshell[] {

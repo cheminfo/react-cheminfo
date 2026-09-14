@@ -25,7 +25,7 @@ export interface StructureEditorChange {
   smiles: string;
 }
 
-export interface EditorCanvasProps {
+interface EditorCanvasProps {
   /** Called on every stroke, with the editor read out synchronously. */
   onChange: (change: StructureEditorChange) => void;
   /**

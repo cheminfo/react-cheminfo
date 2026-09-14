@@ -1,3 +1,5 @@
+import { clamp } from '../../format/core/clamp.ts';
+
 /**
  * How far the reader may stand back from the box, and how near they may get.
  *
@@ -17,6 +19,5 @@ export const CLOUD_ZOOM_RANGE = { min: 0.4, max: 4 } as const;
  * @returns The zoom to draw at; `1` for anything that is not a number.
  */
 export function clampCloudZoom(zoom: number): number {
-  if (!Number.isFinite(zoom)) return 1;
-  return Math.min(CLOUD_ZOOM_RANGE.max, Math.max(CLOUD_ZOOM_RANGE.min, zoom));
+  return clamp(zoom, CLOUD_ZOOM_RANGE.min, CLOUD_ZOOM_RANGE.max, 1);
 }

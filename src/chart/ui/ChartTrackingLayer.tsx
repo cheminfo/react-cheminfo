@@ -12,6 +12,7 @@ import type { ChartAxisScale } from '../core/chartAxisScale.ts';
 import type { ChartBand } from '../core/chartBand.ts';
 import { chartBandCenter, chartBandIndexAt } from '../core/chartBand.ts';
 import type { ChartScale } from '../core/chartScale.ts';
+import { chartRoundPixel } from '../core/chartScale.ts';
 
 import { ChartAxis } from './ChartAxis.tsx';
 import type { ChartPlotArea } from './ChartFrame.tsx';
@@ -159,7 +160,7 @@ function markers(
   for (const item of series) {
     const value = item.values[slot];
     if (value === undefined || !Number.isFinite(value)) continue;
-    const cy = round(y.offset + value * y.factor);
+    const cy = chartRoundPixel(y.offset + value * y.factor);
     dots.push(
       <circle key={item.id} cx={at} cy={cy} r={3.5} fill={item.color} />,
     );
@@ -188,5 +189,3 @@ const CROSSHAIR_STYLE = {
   strokeWidth: 1,
   strokeDasharray: '3 3',
 } as const satisfies CSSProperties;
-
-const round = (value: number): number => Math.round(value * 100) / 100;

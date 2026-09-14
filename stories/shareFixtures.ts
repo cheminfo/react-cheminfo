@@ -1,4 +1,4 @@
-import type { ShareVocabulary } from '../src/share/core/index.ts';
+import type { SharePreset, ShareVocabulary } from '../src/share/core/index.ts';
 import { integerParam, suggestedShareConfig } from '../src/share/core/index.ts';
 
 /** The largest page of hits a link may ask for, so an embed cannot hang the page. */
@@ -20,12 +20,19 @@ export const SHARE_PARAMS = {
 export type ShareParams = typeof SHARE_PARAMS;
 
 /**
- * What one structure search's links can say: the four panels a host page may
- * have no use for, and the result cap. Modelled on what a real tool offers, so
- * the dialog has something honest to configure.
+ * What one structure search's links can say: the tab bar in its header, the
+ * four panels a host page may have no use for, and the result cap. Modelled on
+ * what a real tool offers, so the dialog has something honest to configure.
  */
 export const SHARE_VOCABULARY: ShareVocabulary<ShareParams> = {
   parts: [
+    {
+      key: 'tabs',
+      label: 'Tabs',
+      description:
+        'The tab bar in the site header; only offered while the page is not embedded.',
+      inHeader: true,
+    },
     {
       key: 'examples',
       label: 'Examples',
@@ -53,6 +60,25 @@ export const SHARE_VOCABULARY: ShareVocabulary<ShareParams> = {
   ],
   params: SHARE_PARAMS,
 };
+
+/** The links a structure search is usually handed out as. */
+export const SHARE_PRESETS: ReadonlyArray<SharePreset<ShareParams>> = [
+  {
+    key: 'exact',
+    label: 'Exact match',
+    description:
+      'The structure of the link and its hits, with nothing to change it.',
+    hidden: ['tabs', 'examples', 'substructure', 'hints', 'limits'],
+    params: { limit: 10 },
+  },
+  {
+    key: 'explore',
+    label: 'Explore',
+    description:
+      'Both searches and the examples, capped at the default number of hits.',
+    hidden: ['tabs', 'hints', 'limits'],
+  },
+];
 
 /** Every part key, for a control that ticks them one by one. */
 export const SHARE_PART_KEYS = SHARE_VOCABULARY.parts.map((part) => part.key);

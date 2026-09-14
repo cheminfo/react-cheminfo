@@ -18,3 +18,35 @@ export function shouldCollapseOverlay(
   if (!Number.isFinite(collapseBelow)) return false;
   return width < collapseBelow;
 }
+
+/** What decides whether a bar of controls is folded. */
+export interface OverlayBarFoldOptions {
+  /** What the caller asked for, when it is holding the fold itself. */
+  collapsed: boolean | undefined;
+  /** Whether the bar was asked to start folded. */
+  startedFolded: boolean;
+  /** Width of the figure, in pixels; `0` before it has been measured. */
+  width: number;
+  /** The width under which the bar folds on its own. */
+  collapseBelow: number;
+}
+
+/**
+ * Whether a bar of controls is folded.
+ *
+ * A caller holding `collapsed` is obeyed outright, so a bar driven from
+ * outside never argues with the figure's width; every other bar folds itself
+ * once the figure is too narrow, or because it was asked to start that way.
+ *
+ * It is the answer `OverlayBar` draws from, so a caller that needs to know —
+ * to word a caption for a folded bar, say — passes the same options, with the
+ * width `useOverlaySurface` reads, and gets the same answer.
+ * @param options - See {@link OverlayBarFoldOptions}.
+ * @returns Whether it is folded.
+ */
+export function overlayBarFolded(options: OverlayBarFoldOptions): boolean {
+  const { collapsed, startedFolded, width, collapseBelow } = options;
+  return (
+    collapsed ?? (startedFolded || shouldCollapseOverlay(width, collapseBelow))
+  );
+}

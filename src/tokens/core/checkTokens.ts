@@ -1,10 +1,13 @@
 // tokens-ok: file — the checker names the colours it looks for.
 import { normalizeColor, readHexColor, readRgbColor } from './colors.ts';
+import type { OpenParen } from './cssReading.ts';
+import {
+  driftedFallback,
+  readBrandDeclaration,
+  readVarToken,
+} from './cssReading.ts';
 import { BANNED_COLORS } from './rules.ts';
-
-/** What a site got wrong where a token was called for. */
-export type TokenViolationKind =
-  'blueprint-grey' | 'blueprint-blue' | 'retyped-token' | 'redeclared-brand';
+import type { TokenViolationKind } from './types.ts';
 
 /** One place a site writes a colour that is not its own to write. */
 export interface TokenViolation {
@@ -35,6 +38,14 @@ export interface CheckTokensOptions {
    * @default 'tokens-ok'
    */
   ignoreMarker?: string;
+  /**
+   * Whether the fallback written inside `var()` is read too: the fallback of
+   * one of the family's tokens that is not that token's value in `chrome.css`,
+   * and a banned colour in the fallback of any other property, are then
+   * reported.
+   * @default false
+   */
+  fallbacks?: boolean;
 }
 
 /**
@@ -46,8 +57,9 @@ export interface CheckTokensOptions {
  * Blueprint grey because a component used it, `#f5f7fa` because that is what
  * the token holds today, `--brand` because the palette was declared by hand —
  * leaves its page unable to follow the family. Both spellings of one colour
- * are caught, `#5f6b7c` and `rgb(95 107 124)` alike, and reading a token
- * through `var()` is never a violation.
+ * are caught, `#5f6b7c` and `rgb(95 107 124)` alike. Reading a token through
+ * `var()` is never a violation; its fallback is read only when `fallbacks` is
+ * set.
  * @param files - The files to read, each with the path a report names it by.
  * @param options - The colours the project owns, and the marker waiving a line.
  * @returns Every violation, in file order and then in reading order.
@@ -69,7 +81,7 @@ export function findTokenViolations(
     // than consuming it — the token block itself, the registry of banned
     // colours, an image generated outside any page.
     if (waivesWholeFile(file.text, marker)) continue;
-    const scan = scanFile(file.text, marker);
+    const scan = scanFile(file.text, marker, options.fallbacks === true);
     for (const candidate of scan.candidates) {
       if (scan.markedLines.has(candidate.line)) continue;
       if (candidate.color !== null && allowed.has(candidate.color)) continue;
@@ -98,9 +110,6 @@ function waivesWholeFile(text: string, marker: string): boolean {
   return head.includes(`${marker}: file`);
 }
 
-// Longest first, so `--brand-alt` is never read as `--brand`.
-const BRAND_PROPERTIES = ['--brand-alt', '--brand', '--accent'] as const;
-
 interface Candidate extends Omit<TokenViolation, 'file'> {
   /** The colour written, or `null` for a property that should not be declared. */
   color: string | null;
@@ -113,14 +122,18 @@ interface FileScan {
 
 // One pass over the file: the marker, the block structure and every colour are
 // all read from the same walk, so nothing is matched a second time per line.
-function scanFile(text: string, marker: string): FileScan {
+function scanFile(
+  text: string,
+  marker: string,
+  checkFallbacks: boolean,
+): FileScan {
   const lower = text.toLowerCase();
   const candidates: Candidate[] = [];
   const markedLines = new Set<number>();
   const rootBlocks: boolean[] = [];
   // Which parentheses are open, and whether each is a `var(` past its comma —
   // a colour there is a fallback for the token named beside it.
-  const parens: Array<{ isVar: boolean; sawComma: boolean }> = [];
+  const parens: OpenParen[] = [];
   let selectorStart = 0;
   let line = 1;
   let lineStart = 0;
@@ -142,19 +155,33 @@ function scanFile(text: string, marker: string): FileScan {
       continue;
     }
     if (char === '(') {
+      const isVar = lower.startsWith('var(', index - 3);
       parens.push({
-        isVar: lower.startsWith('var(', index - 3),
-        sawComma: false,
+        isVar,
+        token: isVar ? readVarToken(lower, index + 1) : null,
+        fallbackStart: -1,
+        fallbackLine: line,
+        fallbackLineStart: lineStart,
       });
       continue;
     }
     if (char === ')') {
-      parens.pop();
+      const open = parens.pop();
+      if (checkFallbacks && open !== undefined) {
+        const drifted = driftedFallback(text, open, index);
+        if (drifted !== null) {
+          candidates.push({ ...drifted, kind: 'drifted-fallback' });
+        }
+      }
       continue;
     }
     if (char === ',') {
       const open = parens.at(-1);
-      if (open !== undefined) open.sawComma = true;
+      if (open?.fallbackStart === -1) {
+        open.fallbackStart = index + 1;
+        open.fallbackLine = line;
+        open.fallbackLineStart = lineStart;
+      }
       continue;
     }
     if (char === '{') {
@@ -174,8 +201,11 @@ function scanFile(text: string, marker: string): FileScan {
       if (match === null) continue;
       const rule = BANNED_COLORS.get(match.color);
       const open = parens.at(-1);
-      const isFallback = open !== undefined && open.isVar && open.sawComma;
-      if (rule !== undefined && !isFallback) {
+      const isFallback = open?.isVar === true && open.fallbackStart !== -1;
+      // A token's own fallback is judged whole when its `var(` closes; the
+      // fallback of any other property still may not be a banned colour.
+      const judged = !isFallback || (checkFallbacks && open.token === null);
+      if (rule !== undefined && judged) {
         candidates.push({
           line,
           column: index - lineStart + 1,
@@ -206,37 +236,4 @@ function scanFile(text: string, marker: string): FileScan {
     }
   }
   return { candidates, markedLines };
-}
-
-// A declaration of one of the palette properties. Reading one — `var(--brand)`
-// — has no colon after the name, so it never lands here.
-function readBrandDeclaration(
-  lower: string,
-  start: number,
-): { name: string; end: number } | null {
-  for (const name of BRAND_PROPERTIES) {
-    if (!lower.startsWith(name, start)) continue;
-    const after = start + name.length;
-    // `--brand-alt-text` is its own property, not `--brand-alt`.
-    if (isNameChar(lower[after])) return null;
-    let index = after;
-    while (isSpace(lower[index])) index++;
-    if (lower[index] !== ':') return null;
-    return { name, end: after };
-  }
-  return null;
-}
-
-function isNameChar(char: string | undefined): boolean {
-  if (char === undefined) return false;
-  return (
-    (char >= '0' && char <= '9') ||
-    (char >= 'a' && char <= 'z') ||
-    char === '-' ||
-    char === '_'
-  );
-}
-
-function isSpace(char: string | undefined): boolean {
-  return char === ' ' || char === '\t';
 }

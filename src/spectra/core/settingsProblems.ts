@@ -1,27 +1,29 @@
 import { chainProblems } from './chainProblems.ts';
-import type { SettingsProblem } from './problems.ts';
-import { isNumber, isUsableLabel, isWholeNumber, problem } from './problems.ts';
-import type {
-  MatrixFilterName,
-  ScaleMethod,
-  SpectraSettings,
-} from './settings.ts';
+import {
+  MATRIX_FILTER_NAMES,
+  SCALE_METHODS,
+  isMatrixFilterName,
+  isScaleMethod,
+} from './matrixCatalog.ts';
+import type { ProblemPlace, SettingsProblem } from './problems.ts';
+import {
+  bracketProblem,
+  isNumber,
+  isUsableLabel,
+  isWholeNumber,
+  problem,
+} from './problems.ts';
+import type { SpectraSettings } from './settings.ts';
 import { normalizationFilters } from './settings.ts';
+import { readZones } from './zones.ts';
 
-/** The only three names `getPostProcessedData` matches; anything else throws. */
-export const MATRIX_FILTER_NAMES: readonly MatrixFilterName[] = [
-  'pqn',
-  'centerMean',
-  'rescale',
-];
-
-/** The only four scalings it matches, which it lower-cases before comparing. */
-export const SCALE_METHODS: readonly ScaleMethod[] = [
-  'min',
-  'max',
-  'minmax',
-  'integration',
-];
+const MEMORY: ProblemPlace = { part: 'memory', where: 'Memory' };
+const RESAMPLING: ProblemPlace = { part: 'resampling', where: 'Resampling' };
+const SCALING: ProblemPlace = { part: 'scaling', where: 'Scaling' };
+const CALCULATIONS: ProblemPlace = {
+  part: 'calculation',
+  where: 'Calculations',
+};
 
 /**
  * Everything wrong, or probably wrong, with a whole settings object.
@@ -36,35 +38,36 @@ export const SCALE_METHODS: readonly ScaleMethod[] = [
 export function settingsProblems(settings: SpectraSettings): SettingsProblem[] {
   const problems: SettingsProblem[] = [];
   const normalization = settings.processor.normalization ?? {};
-  const where = 'Resampling';
 
   const { from, to, numberOfPoints, exclusions } = normalization;
   if (isNumber(from) && isNumber(to) && from >= to) {
-    problems.push(problem('error', where, 'From is not below to.'));
+    problems.push(problem('error', RESAMPLING, 'From is not below to.'));
   }
   if (
     numberOfPoints !== undefined &&
     (!isWholeNumber(numberOfPoints) || numberOfPoints < 2)
   ) {
-    problems.push(problem('error', where, 'A grid needs at least two points.'));
+    problems.push(
+      problem('error', RESAMPLING, 'A grid needs at least two points.'),
+    );
   }
   const { maxMemory } = settings.processor;
   if (maxMemory !== undefined && (!isNumber(maxMemory) || maxMemory <= 0)) {
     problems.push(
-      problem('error', 'Memory', 'The budget must be a number above zero.'),
+      problem('error', MEMORY, 'The budget must be a number above zero.'),
     );
   }
 
-  for (const [index, zone] of (exclusions ?? []).entries()) {
-    const zoneWhere = `Excluded zone ${String(index + 1)}`;
+  for (const [index, zone] of readZones(exclusions).entries()) {
+    const place = numbered('exclusion', 'Excluded zone', index);
     if (!isNumber(zone.from) || !isNumber(zone.to) || zone.from >= zone.to) {
-      problems.push(problem('error', zoneWhere, 'From is not below to.'));
+      problems.push(problem('error', place, 'From is not below to.'));
     }
     if (zone.ignore === true) {
       problems.push(
         problem(
           'warning',
-          zoneWhere,
+          place,
           'Hidden only from the chart: the zone is still dropped from the data.',
         ),
       );
@@ -92,16 +95,12 @@ function postProcessingProblems(settings: SpectraSettings): SettingsProblem[] {
   const { filters, scale, ranges, calculations } = settings.postProcessing;
 
   for (const [index, step] of (filters ?? []).entries()) {
-    const where = `Matrix step ${String(index + 1)}`;
-    if (
-      step.name !== undefined &&
-      step.name !== '' &&
-      !MATRIX_FILTER_NAMES.includes(step.name as MatrixFilterName)
-    ) {
+    const { name } = step;
+    if (name !== undefined && name !== '' && !isMatrixFilterName(name)) {
       problems.push(
         problem(
           'error',
-          where,
+          numbered('matrix', 'Matrix step', index),
           `The matrix stage only knows ${MATRIX_FILTER_NAMES.join(', ')}; it throws on anything else.`,
         ),
       );
@@ -112,12 +111,12 @@ function postProcessingProblems(settings: SpectraSettings): SettingsProblem[] {
   if (
     method !== undefined &&
     method !== '' &&
-    !SCALE_METHODS.includes(method.toLowerCase() as ScaleMethod)
+    !isScaleMethod(method.toLowerCase())
   ) {
     problems.push(
       problem(
         'error',
-        'Scaling',
+        SCALING,
         `Unknown scaling: ${method}. It throws on anything but ${SCALE_METHODS.join(', ')}.`,
       ),
     );
@@ -126,7 +125,7 @@ function postProcessingProblems(settings: SpectraSettings): SettingsProblem[] {
     problems.push(
       problem(
         'warning',
-        'Scaling',
+        SCALING,
         'The difference is taken against the first spectrum the processor holds, which is not necessarily one of those selected.',
       ),
     );
@@ -134,58 +133,73 @@ function postProcessingProblems(settings: SpectraSettings): SettingsProblem[] {
 
   const labels = new Set<string>();
   for (const [index, range] of (ranges ?? []).entries()) {
-    const where = `Range ${String(index + 1)}`;
+    const place = numbered('range', 'Range', index);
     const label = range.label ?? '';
     if (label === '') {
       problems.push(
-        problem('error', where, 'A range with no name is silently skipped.'),
+        problem('error', place, 'A range with no name is silently skipped.'),
       );
     } else if (!isUsableLabel(label)) {
       problems.push(
         problem(
           'error',
-          where,
+          place,
           `${label} cannot be the name of a variable, and the calculations read it as one.`,
         ),
       );
     } else if (labels.has(label)) {
       problems.push(
-        problem('error', where, `${label} names two ranges; the second wins.`),
+        problem('error', place, `${label} names two ranges; the second wins.`),
       );
     } else {
       labels.add(label);
     }
     if (isNumber(range.from) && isNumber(range.to) && range.from >= range.to) {
-      problems.push(problem('error', where, 'From is not below to.'));
+      problems.push(problem('error', place, 'From is not below to.'));
     }
   }
 
   for (const [index, calculation] of (calculations ?? []).entries()) {
-    const where = `Calculation ${String(index + 1)}`;
+    const place = numbered('calculation', 'Calculation', index);
     if (!isUsableLabel(calculation.label)) {
       problems.push(
         problem(
           'error',
-          where,
+          place,
           'A calculation needs a name that can be a variable.',
         ),
       );
     }
     const complaint = calculationProblem(calculation.formula, labels);
     if (complaint !== undefined) {
-      problems.push(problem('error', where, complaint));
+      problems.push(problem('error', place, complaint));
     }
   }
   if ((calculations ?? []).length > 0 && labels.size === 0) {
     problems.push(
       problem(
         'error',
-        'Calculations',
+        CALCULATIONS,
         'A calculation reads the range integrals, and no range is named.',
       ),
     );
   }
   return problems;
+}
+
+/**
+ * The place of one entry of a listed part, labelled as the panel numbers it.
+ * @param part - Which part of the settings.
+ * @param label - What one entry of it is called.
+ * @param index - Which entry, counting from zero.
+ * @returns The place, labelled counting from one.
+ */
+function numbered(
+  part: ProblemPlace['part'],
+  label: string,
+  index: number,
+): ProblemPlace {
+  return { part, index, where: `${label} ${String(index + 1)}` };
 }
 
 /**
@@ -200,13 +214,8 @@ function calculationProblem(
 ): string | undefined {
   const trimmed = formula.trim();
   if (trimmed === '') return 'The formula is empty.';
-  let depth = 0;
-  for (const character of trimmed) {
-    if (character === '(') depth++;
-    if (character === ')') depth--;
-    if (depth < 0) return 'A closing bracket has nothing to close.';
-  }
-  if (depth > 0) return 'A bracket is left open.';
+  const unbalanced = bracketProblem(trimmed);
+  if (unbalanced !== undefined) return unbalanced;
 
   // The lookbehind keeps the exponent of a number such as `1e3` from reading
   // as the name of a range.

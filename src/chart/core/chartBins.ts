@@ -1,4 +1,5 @@
 import type { ChartExtent } from './chartExtent.ts';
+import { chartGroupIndex } from './chartGroups.ts';
 import type { MatrixLike } from './matrix.ts';
 
 /** Counts over one shared set of bin edges, optionally split by series. */
@@ -87,10 +88,5 @@ function groupOf(
   row: number,
   seriesCount: number,
 ): number {
-  if (groups === null) return 0;
-  const raw = groups[row];
-  if (raw === undefined || !Number.isFinite(raw)) return -1;
-  const group = Math.trunc(raw);
-  if (group < 0 || group >= seriesCount) return -1;
-  return group;
+  return groups === null ? 0 : chartGroupIndex(groups, row, seriesCount);
 }

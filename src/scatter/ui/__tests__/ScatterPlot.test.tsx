@@ -2,8 +2,8 @@ import { getClassesAsNumber, getNumbers } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
-import type { ScatterPlotProps } from '../ScatterPlot.tsx';
 import { ScatterPlot } from '../ScatterPlot.tsx';
+import type { ScatterPlotProps } from '../scatterPlotProps.ts';
 
 const rows = getNumbers();
 const irisX = rows.map((row) => row[0] as number);
@@ -131,6 +131,15 @@ test('the gesture rectangle is the plot itself and carries no dot handlers', () 
   expect(html).toContain('data-testid="map"');
   expect(occurrences(html, '<rect')).toBe(2);
   expect(occurrences(html, 'fill="transparent"')).toBe(1);
+});
+
+test('a class a site adds lands on the frame the plot is drawn in', () => {
+  const html = renderToStaticMarkup(
+    <ScatterPlot {...IRIS} className="pca-map" />,
+  );
+
+  expect(html).toContain('class="chart-frame pca-map"');
+  expect(occurrences(html, 'tabindex="0"')).toBe(1);
 });
 
 function layer(html: string, name: string): string {

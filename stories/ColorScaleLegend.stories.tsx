@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { contrastRatio } from '../src/color/core/contrast.ts';
-import {
-  VIRIDIS_SCALE,
-  positionInRange,
-  swatchFromScale,
-} from '../src/color/core/scale.ts';
+import type { ColorScale } from '../src/color/core/interpolate.ts';
+import { evenScale, swatchAt } from '../src/color/core/interpolate.ts';
+import { positionInRange } from '../src/color/core/scale.ts';
+import { resolveColorScale } from '../src/color/core/scaleText.ts';
 import { ColorScaleLegend } from '../src/color/ui/ColorScaleLegend.tsx';
+
+const VIRIDIS = resolveColorScale('viridis').scale;
 
 // Universal indicator, from the red of a strong acid to the violet of a strong
 // base — a scale a chemist reads without a key.
@@ -37,7 +38,7 @@ const meta = {
   title: 'Color/ColorScaleLegend',
   component: ColorScaleLegend,
   args: {
-    stops: VIRIDIS_SCALE,
+    scale: VIRIDIS,
     min: -12.4,
     max: -3.1,
     unit: 'eV',
@@ -48,7 +49,7 @@ const meta = {
     max: { control: 'number' },
     unit: { control: 'text' },
     label: { control: 'text' },
-    stops: { control: 'object' },
+    scale: { control: 'object' },
   },
   parameters: {
     layout: 'padded',
@@ -73,10 +74,10 @@ type Story = StoryObj<typeof meta>;
 /** The orbital energies of a Hückel calculation, in electronvolts. */
 export const Default: Story = {};
 
-/** A scale whose colours already mean something: universal indicator over pH. */
+/** A scale whose colours already mean something: universal indicator over pH, as a plain list. */
 export const UniversalIndicator: Story = {
   args: {
-    stops: UNIVERSAL_INDICATOR,
+    scale: UNIVERSAL_INDICATOR,
     min: 1,
     max: 14,
     unit: '',
@@ -92,36 +93,43 @@ export const UniversalIndicator: Story = {
  * case, and is why the two inks are compared rather than thresholded.
  */
 export const ReadableSwatches: Story = {
-  args: { stops: VIRIDIS_SCALE, min: 0, max: 14, unit: '', label: 'pKa' },
-  render: (args) => (
-    <div style={{ display: 'grid', gap: 12, width: 'min(46rem, 92vw)' }}>
-      <ColorScaleLegend {...args} />
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {ACIDS.map((acid) => {
-          const swatch = swatchFromScale(
-            args.stops,
-            positionInRange(acid.pKa, args.min, args.max),
-          );
-          const ratio = contrastRatio(swatch.background, swatch.foreground);
-          return (
-            <div
-              key={acid.id}
-              style={{
-                padding: '6px 10px',
-                borderRadius: 8,
-                background: swatch.background,
-                color: swatch.foreground,
-                fontSize: 12,
-              }}
-            >
-              <div style={{ fontWeight: 600 }}>{acid.name}</div>
-              <div style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {`pKa ${acid.pKa.toFixed(2)} · ${ratio.toFixed(1)}:1`}
+  args: { scale: VIRIDIS, min: 0, max: 14, unit: '', label: 'pKa' },
+  render: (args) => {
+    const scale = asScale(args.scale);
+    return (
+      <div style={{ display: 'grid', gap: 12, width: 'min(46rem, 92vw)' }}>
+        <ColorScaleLegend {...args} />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {ACIDS.map((acid) => {
+            const swatch = swatchAt(
+              scale,
+              positionInRange(acid.pKa, args.min, args.max),
+            );
+            const ratio = contrastRatio(swatch.background, swatch.foreground);
+            return (
+              <div
+                key={acid.id}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: 8,
+                  background: swatch.background,
+                  color: swatch.foreground,
+                  fontSize: 12,
+                }}
+              >
+                <div style={{ fontWeight: 600 }}>{acid.name}</div>
+                <div style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {`pKa ${acid.pKa.toFixed(2)} · ${ratio.toFixed(1)}:1`}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
 };
+
+function asScale(scale: ColorScale | readonly string[]): ColorScale {
+  return 'stops' in scale ? scale : evenScale(scale);
+}

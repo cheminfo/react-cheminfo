@@ -8,7 +8,7 @@
  */
 
 import { readableInk } from '../../color/core/contrast.ts';
-import type { Swatch } from '../../color/core/scale.ts';
+import type { Swatch } from '../../color/core/interpolate.ts';
 
 import type { ElementCategory } from './elements.ts';
 

@@ -26,6 +26,11 @@ export interface HelpTooltipProps {
    * @default undefined
    */
   popoverClassName?: string;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -39,6 +44,7 @@ export interface HelpTooltipProps {
  */
 export function HelpTooltip(props: HelpTooltipProps): ReactElement {
   const {
+    className,
     content,
     children,
     placement = 'top',
@@ -49,6 +55,7 @@ export function HelpTooltip(props: HelpTooltipProps): ReactElement {
 
   return (
     <Tooltip
+      className={className}
       content={<HelpBody content={content} width={width} />}
       placement={placement}
       hoverOpenDelay={HOVER_OPEN_DELAY}

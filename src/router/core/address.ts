@@ -1,5 +1,5 @@
 /** An address cut into the three parts a router reads separately. */
-export interface AddressParts {
+interface AddressParts {
   /** Path of the address, `/` when it carries none. */
   path: string;
   /** Query string, without its leading `?`. */
@@ -47,14 +47,26 @@ export function splitPath(path: string): string[] {
 }
 
 /**
- * A path in the one shape the lookups compare: a leading slash, no trailing
- * one, its segments decoded, and neither query nor fragment.
- * @param path - Path of an address.
- * @returns The same address, normalized.
+ * Drop the trailing slashes, so `/about/` and `/about` are one page and an
+ * origin written `https://host/surge//` composes one address rather than one
+ * with an empty segment in it.
+ * @param value - A path or an origin.
+ * @returns It, without the trailing slashes `/` itself keeps.
  */
-export function normalizePath(path: string): string {
-  const segments = splitPath(splitAddress(path).path);
-  return segments.length === 0 ? '/' : `/${segments.join('/')}`;
+export function trimTrailingSlash(value: string): string {
+  const trimmed = value.replace(TRAILING_SLASHES, '');
+  return trimmed === '' && value !== '' ? '/' : trimmed;
+}
+
+/**
+ * An address cut at its first `?` or `#`, for a lookup or a canonical link that
+ * must not depend on the configuration a link carries.
+ * @param address - A path or an absolute address.
+ * @returns Everything before the query string and the fragment.
+ */
+export function withoutQueryOrFragment(address: string): string {
+  const cut = address.search(QUERY_OR_FRAGMENT);
+  return cut === -1 ? address : address.slice(0, cut);
 }
 
 /**
@@ -72,3 +84,7 @@ export function safeDecode(value: string): string {
     return value;
   }
 }
+
+const TRAILING_SLASHES = /\/+$/;
+
+const QUERY_OR_FRAGMENT = /[?#]/;

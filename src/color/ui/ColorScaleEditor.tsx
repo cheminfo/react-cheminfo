@@ -1,7 +1,8 @@
 import { Button, HTMLSelect } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
-import { parseHexColor, toHexColor } from '../core/hex.ts';
+import { formatDecimal } from '../../format/core/numbers.ts';
+import { normalizeHexColor } from '../core/hex.ts';
 import type {
   ColorInterpolation,
   ColorScale,
@@ -16,6 +17,10 @@ const MINIMUM_STOPS = 2;
 const POSITION_STEP = 0.01;
 const PREVIEW_HEIGHT = 16;
 const PREVIEW_SAMPLES = 48;
+const POSITION_DECIMALS = 2;
+// A `type="color"` input only takes six hex digits; an anchor that is not a
+// hex colour is shown as black until it is picked again.
+const UNREADABLE_COLOR = '#000000';
 
 /** What each path between two anchors is called. */
 const INTERPOLATION_LABELS: Array<{
@@ -33,6 +38,11 @@ export interface ColorScaleEditorProps {
   value: ColorScale;
   /** Called with the edited scale on every change. */
   onChange: (scale: ColorScale) => void;
+  /**
+   * Class names added to the root element.
+   * @default undefined
+   */
+  className?: string;
 }
 
 /**
@@ -46,7 +56,7 @@ export interface ColorScaleEditorProps {
  * @returns The preview, the anchors, and the picker of the path between them.
  */
 export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
-  const { value, onChange } = props;
+  const { className, value, onChange } = props;
   const stops = value.stops;
 
   function write(next: readonly ColorStop[]): void {
@@ -54,7 +64,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
   }
 
   return (
-    <div style={PANEL_STYLE}>
+    <div className={className} style={PANEL_STYLE}>
       <ColorScaleBar
         scale={value}
         height={PREVIEW_HEIGHT}
@@ -68,7 +78,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
             <input
               type="color"
               aria-label={`Colour of anchor ${String(index + 1)}`}
-              value={normalizeColor(stop.color)}
+              value={normalizeHexColor(stop.color) ?? UNREADABLE_COLOR}
               style={SWATCH_STYLE}
               onChange={(event) => {
                 write(replace(stops, index, { color: event.target.value }));
@@ -90,7 +100,9 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
                 );
               }}
             />
-            <span style={POSITION_STYLE}>{stop.position.toFixed(2)}</span>
+            <span style={POSITION_STYLE}>
+              {formatDecimal(stop.position, POSITION_DECIMALS)}
+            </span>
             <Button
               icon="cross"
               variant="minimal"
@@ -180,16 +192,6 @@ function withAddedStop(scale: ColorScale): ColorStop[] {
     ((stops[at]?.position ?? 1) + (stops[at - 1]?.position ?? 0)) / 2;
   stops.splice(at, 0, { position, color: colorAt(scale, position) });
   return stops;
-}
-
-/**
- * A colour a `type="color"` input reads: it takes six digits and nothing else,
- * so a short hex is spelled out first.
- * @param color - The anchor's colour, `#rgb` or `#rrggbb`.
- * @returns The same colour, in six digits.
- */
-function normalizeColor(color: string): string {
-  return toHexColor(parseHexColor(color));
 }
 
 const PANEL_STYLE = {

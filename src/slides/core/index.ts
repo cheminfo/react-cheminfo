@@ -14,9 +14,4 @@ export {
   talkSummary,
 } from './talkManifest.ts';
 export type { TalkOrigin } from './talkOrigin.ts';
-export {
-  TALK_ORIGIN_PARAM,
-  formatTalkOrigin,
-  parseTalkOrigin,
-  withTalkOrigin,
-} from './talkOrigin.ts';
+export { parseTalkOrigin, withTalkOrigin } from './talkOrigin.ts';

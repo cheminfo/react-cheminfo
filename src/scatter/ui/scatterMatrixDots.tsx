@@ -11,9 +11,13 @@
 
 import type { CSSProperties, PointerEvent, ReactElement } from 'react';
 
+import { chartGroupIndex } from '../../chart/core/chartGroups.ts';
+import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { ChartFrameRender } from '../../chart/ui/ChartFrame.tsx';
 
 import type { ScatterMatrixGrid } from './ScatterMatrixDiagonal.tsx';
+import { surfacePosition } from './lassoGesture.ts';
+import { SCATTER_HOVER_SLACK } from './scatterPlotModel.ts';
 
 /**
  * Every dot of one cell, as one path per colour, plus the rectangle that turns
@@ -39,8 +43,8 @@ export function scatterMatrixDots(
     const valueX = scores.get(index, column);
     const valueY = scores.get(index, row);
     if (!Number.isFinite(valueX) || !Number.isFinite(valueY)) continue;
-    const atX = Math.round((x.offset + valueX * x.factor) * 10) / 10;
-    const atY = Math.round((y.offset + valueY * y.factor) * 10) / 10;
+    const atX = chartRoundPixel(x.offset + valueX * x.factor, 1);
+    const atY = chartRoundPixel(y.offset + valueY * y.factor, 1);
     const slot =
       inkOf(groupOf, index, inks - 1) * 2 + (mask?.[index] === 0 ? 1 : 0);
     paths[slot] = `${paths[slot] ?? ''}M${atX} ${atY}h0`;
@@ -73,9 +77,6 @@ export function scatterMatrixDots(
   return marks;
 }
 
-/** How far from a dot the pointer still counts as resting on it, in pixels. */
-const HOVER_REACH = 10;
-
 /** Opacity of a dot in the selection, of one outside it, and the ungrouped ink. */
 const POINT_OPACITY = 0.85;
 const FAINT_OPACITY = 0.16;
@@ -94,17 +95,22 @@ function nearestRow(
   column: number,
   frame: ChartFrameRender,
 ): number {
-  const { offsetX, offsetY } = event.nativeEvent;
-  const { scores } = grid;
-  const { x, y } = frame;
+  const { scores, pointRadius } = grid;
+  const { x, y, plot } = frame;
+  const at = surfacePosition(event, plot.left, plot.top);
+  const reach = pointRadius + SCATTER_HOVER_SLACK;
+  const limit = reach * reach;
   let best = -1;
-  let closest = HOVER_REACH * HOVER_REACH;
+  let closest = 0;
 
   for (let index = 0; index < scores.rows; index++) {
-    const awayX = x.offset + scores.get(index, column) * x.factor - offsetX;
-    const awayY = y.offset + scores.get(index, row) * y.factor - offsetY;
+    const awayX = x.offset + scores.get(index, column) * x.factor - at.x;
+    const awayY = y.offset + scores.get(index, row) * y.factor - at.y;
     const away = awayX * awayX + awayY * awayY;
-    if (away < closest) {
+    // The rule `nearestPointIndex` keeps on the map: a dot exactly at the reach
+    // counts, a tie goes to the lower row, a missing value is never in reach.
+    if (!(away <= limit)) continue;
+    if (best === -1 || away < closest) {
       closest = away;
       best = index;
     }
@@ -127,8 +133,6 @@ function inkOf(
   row: number,
   groups: number,
 ): number {
-  const raw = groupOf?.[row];
-  if (raw === undefined || !Number.isFinite(raw)) return groups;
-  const group = Math.trunc(raw);
-  return group < 0 || group >= groups ? groups : group;
+  const group = chartGroupIndex(groupOf, row, groups);
+  return group === -1 ? groups : group;
 }

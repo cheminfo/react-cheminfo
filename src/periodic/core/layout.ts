@@ -16,13 +16,17 @@ import { PERIODIC_ELEMENTS, elementBySymbol } from './elements.ts';
 
 /** A whole run of the table: one group, or one period. */
 export interface ElementRange {
+  /** Whether the run is a group or a period. */
   kind: 'group' | 'period';
+  /** Its number: a group from 1 to 18, a period from 1 to 7. */
   value: number;
 }
 
 /** A cell of the grid, one-based as CSS grid lines are. */
 export interface Cell {
+  /** Grid column, one-based. */
   column: number;
+  /** Grid row, one-based. */
   row: number;
 }
 
@@ -64,7 +68,7 @@ export function placedElements(): ReadonlyArray<{
   element: PeriodicElement;
   cell: Cell;
 }> {
-  PLACED ??= PERIODIC_ELEMENTS.map((element) => ({
+  placedCache ??= PERIODIC_ELEMENTS.map((element) => ({
     element,
     cell: cellOf(element),
   })).toSorted((first, second) =>
@@ -72,11 +76,13 @@ export function placedElements(): ReadonlyArray<{
       ? first.cell.column - second.cell.column
       : first.cell.row - second.cell.row,
   );
-  return PLACED;
+  return placedCache;
 }
 
-let PLACED: ReadonlyArray<{ element: PeriodicElement; cell: Cell }> | null =
-  null;
+let placedCache: ReadonlyArray<{
+  element: PeriodicElement;
+  cell: Cell;
+}> | null = null;
 
 /**
  * The two cells the lanthanoids and the actinoids were lifted out of.
@@ -145,25 +151,25 @@ const ARROW_DIRECTIONS: Record<string, { column: number; row: number }> = {
 };
 
 function readingOrderIndex(): Map<string, number> {
-  READING_ORDER ??= new Map(
+  readingOrderCache ??= new Map(
     placedElements().map(({ element }, index) => [element.symbol, index]),
   );
-  return READING_ORDER;
+  return readingOrderCache;
 }
 
-let READING_ORDER: Map<string, number> | null = null;
+let readingOrderCache: Map<string, number> | null = null;
 
 function byCell(): Map<string, PeriodicElement> {
-  BY_CELL ??= new Map(
+  cellIndexCache ??= new Map(
     placedElements().map(({ element, cell }) => [
       cellKey(cell.column, cell.row),
       element,
     ]),
   );
-  return BY_CELL;
+  return cellIndexCache;
 }
 
-let BY_CELL: Map<string, PeriodicElement> | null = null;
+let cellIndexCache: Map<string, PeriodicElement> | null = null;
 
 function cellKey(column: number, row: number): string {
   return `${String(column)}:${String(row)}`;

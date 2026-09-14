@@ -1,5 +1,8 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+
 import { CopyButton } from './CopyButton.tsx';
 
 /** How a code block sits on the page it is shown in. */
@@ -20,8 +23,8 @@ const BASE_PRE_STYLE: CSSProperties = {
 const TONE_STYLE: Record<CodeBlockTone, CSSProperties> = {
   default: {},
   muted: {
-    background: 'var(--surface-sunken, #f6f7f9)',
-    border: '1px solid var(--border, #d3d8de)',
+    background: TOKEN.surfaceSunken,
+    border: `1px solid ${TOKEN.border}`,
   },
   dark: {
     background: '#1e293b',
@@ -30,6 +33,7 @@ const TONE_STYLE: Record<CodeBlockTone, CSSProperties> = {
   },
 };
 
+/** What {@link CodeBlock} shows, how it is painted, and whether it copies. */
 export interface CodeBlockProps {
   /** The text shown, and what the copy button hands over. */
   code: string;
@@ -80,7 +84,14 @@ export function CodeBlock(props: CodeBlockProps): ReactElement {
   } = props;
 
   return (
-    <div className={holderClassName(tone, className)} style={HOLDER_STYLE}>
+    <div
+      className={joinClassNames(
+        'code-block',
+        tone !== 'default' && `code-block--${tone}`,
+        className,
+      )}
+      style={HOLDER_STYLE}
+    >
       <pre style={preStyle(tone, copyable, maxHeight)}>{children ?? code}</pre>
       {copyable ? (
         <span style={COPY_STYLE}>
@@ -89,13 +100,6 @@ export function CodeBlock(props: CodeBlockProps): ReactElement {
       ) : null}
     </div>
   );
-}
-
-function holderClassName(tone: CodeBlockTone, className?: string): string {
-  const names = ['code-block'];
-  if (tone !== 'default') names.push(`code-block--${tone}`);
-  if (className !== undefined) names.push(className);
-  return names.join(' ');
 }
 
 function preStyle(

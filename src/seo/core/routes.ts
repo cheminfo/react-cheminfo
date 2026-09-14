@@ -8,11 +8,14 @@
  * the table is a page a search engine only ever sees as the home page.
  */
 
+import {
+  safeDecode,
+  trimTrailingSlash,
+  withoutQueryOrFragment,
+} from '../../router/core/address.ts';
 import { stripBasePath } from '../../router/core/basePath.ts';
 
 const QUERY_OR_FRAGMENT = /[?#]/;
-
-const TRAILING_SLASHES = /\/+$/;
 
 // A scheme and an authority: what `location.href` hands out, and the one shape
 // that cannot be confused with a path. `//host/path` is left as a path, because
@@ -54,7 +57,8 @@ export interface RouteMeta {
  *
  * An address a route claims exactly always wins over one that claims it as a
  * subtree, and between two subtrees the longer claim wins, so `/molecules/HEM`
- * is a molecule rather than whatever `/` answers.
+ * is a molecule rather than whatever `/` answers. Segments are compared
+ * decoded, so `/exercises/caf%C3%A9` is the route written `/exercises/café`.
  * @param routes - Every address the site answers.
  * @param path - Absolute path, without a query string.
  * @returns Its entry, or `undefined` when the site does not know the address.
@@ -136,14 +140,13 @@ export function homeRoute(routes: readonly RouteMeta[]): RouteMeta {
  *
  * An address written twice ships two sitemap entries and two links to a page
  * only the first entry describes, and one carrying a `..` segment writes its
- * file outside the build output — a real build asked for `/../escaped` and got
- * a sibling of `dist`. Two addresses that differ only in an empty segment or in
- * case are the same defect wearing a disguise: `//x` and `/x` both write
- * `dist/x/index.html`, and so do `/About` and `/about` on the case-insensitive
- * filesystem macOS and Windows ship by default — one file, two sitemap entries,
- * and only one of the two descriptions survives. All of it is author
- * configuration read at build time, so it is refused where it is written rather
- * than repaired where it lands.
+ * file outside the build output. Two addresses that differ only in an empty
+ * segment or in case are the same defect wearing a disguise: `//x` and `/x`
+ * both write `dist/x/index.html`, and so do `/About` and `/about` on the
+ * case-insensitive filesystem macOS and Windows ship by default — one file, two
+ * sitemap entries, and only one of the two descriptions survives. All of it is
+ * author configuration read at build time, so it is refused where it is written
+ * rather than repaired where it lands.
  * @param routes - Every address the site answers.
  * @throws {Error} When the table is empty, names one address twice — under any
  * of those spellings — or carries a path that is not one.
@@ -174,18 +177,6 @@ export function assertRoutes(routes: readonly RouteMeta[]): void {
   }
 }
 
-/**
- * Drop the trailing slashes, so `/about/` and `/about` are one page and an
- * origin written `https://host/surge//` composes one address rather than one
- * with an empty segment in it.
- * @param value - A path or an origin.
- * @returns It, without the trailing slashes `/` itself keeps.
- */
-export function trimTrailingSlash(value: string): string {
-  const trimmed = value.replace(TRAILING_SLASHES, '');
-  return trimmed === '' && value !== '' ? '/' : trimmed;
-}
-
 function assertPath(path: string, written: string): void {
   if (!path.startsWith('/')) {
     throw new Error(`a route path starts at the site root: ${written}`);
@@ -204,17 +195,31 @@ function assertPath(path: string, written: string): void {
 // path already, with the query string and the fragment cut off either way.
 function pathOf(url: string): string {
   if (ABSOLUTE_URL.test(url) && URL.canParse(url)) return new URL(url).pathname;
-  const cut = url.search(QUERY_OR_FRAGMENT);
-  return cut === -1 ? url : url.slice(0, cut);
+  return withoutQueryOrFragment(url);
+}
+
+// The one shape two paths are compared in: no trailing slash, and each segment
+// decoded, so a browser's `caf%C3%A9` names the table's `café`. A segment whose
+// escapes decode to a `/` stays escaped: `/a%2Fb` is one segment, not `/a/b`.
+function comparable(path: string): string {
+  const trimmed = trimTrailingSlash(path) || '/';
+  if (!trimmed.includes('%')) return trimmed;
+  const segments = trimmed.split('/');
+  for (let index = 0; index < segments.length; index++) {
+    const segment = segments[index] ?? '';
+    const decoded = safeDecode(segment);
+    segments[index] = decoded.includes('/') ? segment : decoded;
+  }
+  return segments.join('/');
 }
 
 function exactRoute(
   routes: readonly RouteMeta[],
   path: string,
 ): RouteMeta | undefined {
-  const wanted = trimTrailingSlash(path) || '/';
+  const wanted = comparable(path);
   for (const route of routes) {
-    if ((trimTrailingSlash(route.path) || '/') === wanted) return route;
+    if (comparable(route.path) === wanted) return route;
   }
   return undefined;
 }
@@ -223,13 +228,13 @@ function prefixRoute(
   routes: readonly RouteMeta[],
   path: string,
 ): RouteMeta | undefined {
-  const wanted = trimTrailingSlash(path) || '/';
+  const wanted = comparable(path);
   let claimed: RouteMeta | undefined;
   let claimedLength = -1;
 
   for (const route of routes) {
     if (route.prefix !== true) continue;
-    const routePath = trimTrailingSlash(route.path) || '/';
+    const routePath = comparable(route.path);
     if (!isUnder(routePath, wanted)) continue;
     if (routePath.length > claimedLength) {
       claimed = route;

@@ -3,8 +3,16 @@ import type { CSSProperties, ReactElement } from 'react';
 
 import type { ScaleSettings } from '../core/settings.ts';
 
-import { NumberField } from './NumberField.tsx';
+import { XWindowFields } from './XWindowFields.tsx';
 import {
+  FIELD_STYLE,
+  HELP_STYLE,
+  LABEL_STYLE,
+  ROW_STYLE,
+  SWITCH_STYLE,
+} from './fieldStyles.ts';
+import {
+  POINT_NUMBER_WINS,
   scaleMethodOptions,
   withScaleMethod,
   withScaleRange,
@@ -12,7 +20,7 @@ import {
 } from './scaleOptions.ts';
 
 /** What {@link ScaleFields} edits. */
-export interface ScaleFieldsProps {
+interface ScaleFieldsProps {
   /** How every spectrum is scaled onto the reference one. */
   value: ScaleSettings;
   /** Called with the edited scaling on every change. */
@@ -38,7 +46,6 @@ export interface ScaleFieldsProps {
  */
 export function ScaleFields(props: ScaleFieldsProps): ReactElement {
   const { value, onChange, spectrumIds } = props;
-  const range = value.range ?? {};
 
   return (
     <div style={FIELDS_STYLE}>
@@ -96,45 +103,15 @@ export function ScaleFields(props: ScaleFieldsProps): ReactElement {
       </label>
 
       <div style={ROW_STYLE}>
-        <NumberField
-          label="From"
-          value={range.from}
-          placeholder="the first x"
-          onChange={(from) => {
-            onChange(withScaleRange(value, { from }));
-          }}
-        />
-        <NumberField
-          label="To"
-          value={range.to}
-          placeholder="the last x"
-          onChange={(to) => {
-            onChange(withScaleRange(value, { to }));
-          }}
-        />
-        <NumberField
-          label="From point"
-          value={range.fromIndex}
-          integer
-          placeholder="0"
-          onChange={(fromIndex) => {
-            onChange(withScaleRange(value, { fromIndex }));
-          }}
-        />
-        <NumberField
-          label="To point"
-          value={range.toIndex}
-          integer
-          placeholder="the last point"
-          onChange={(toIndex) => {
-            onChange(withScaleRange(value, { toIndex }));
+        <XWindowFields
+          value={value.range ?? {}}
+          withPoints
+          onChange={(patch) => {
+            onChange(withScaleRange(value, patch));
           }}
         />
       </div>
-      <span style={HELP_STYLE}>
-        A point number silently wins over an x value: with From point set, From
-        is never read.
-      </span>
+      <span style={HELP_STYLE}>{POINT_NUMBER_WINS}</span>
 
       <Switch
         checked={value.relative === true}
@@ -152,32 +129,4 @@ const FIELDS_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   gap: 8,
-} as const satisfies CSSProperties;
-
-const FIELD_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-} as const satisfies CSSProperties;
-
-const ROW_STYLE = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 8,
-} as const satisfies CSSProperties;
-
-const LABEL_STYLE = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: 'var(--text-muted, #5b6875)',
-} as const satisfies CSSProperties;
-
-const HELP_STYLE = {
-  fontSize: 11,
-  color: 'var(--text-faint, #8a96a3)',
-} as const satisfies CSSProperties;
-
-const SWITCH_STYLE = {
-  margin: 0,
-  fontSize: 12,
 } as const satisfies CSSProperties;

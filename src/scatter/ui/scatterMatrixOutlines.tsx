@@ -12,9 +12,9 @@
 import type { ReactElement } from 'react';
 
 import type { ChartFrameRender } from '../../chart/ui/ChartFrame.tsx';
+import { scatterPairEllipse } from '../core/scatterGroupSpread.ts';
 
 import type { ScatterMatrixGrid } from './ScatterMatrixDiagonal.tsx';
-import { scatterPairEllipse } from './scatterGroupSpread.ts';
 import { scatterOutlineShape } from './scatterOutlineShape.tsx';
 
 /**

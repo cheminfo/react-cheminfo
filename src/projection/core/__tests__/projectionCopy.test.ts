@@ -1,10 +1,8 @@
 import { expect, test } from 'vitest';
 
-import {
-  PROJECTION_COPY,
-  fillCopy,
-  mergeProjectionCopy,
-} from '../projectionCopy.ts';
+import { fillCopy } from '../fillCopy.ts';
+import { mergeProjectionCopy } from '../mergeProjectionCopy.ts';
+import { PROJECTION_COPY } from '../projectionCopy.ts';
 import { DEFAULT_PROJECTION_OPTIONS } from '../projectionOptions.ts';
 
 test('the word reconstructed appears nowhere in the copy', () => {

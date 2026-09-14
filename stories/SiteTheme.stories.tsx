@@ -11,6 +11,7 @@ import { createPortal } from 'react-dom';
 import type { SiteId } from '../src/ecosystem/core/sites.ts';
 import { ECOSYSTEM_SITES } from '../src/ecosystem/core/sites.ts';
 import { SiteTheme } from '../src/ecosystem/ui/SiteTheme.tsx';
+import { FAMILY_TOKEN_VALUES, TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 // What SiteTheme writes is a `:root` rule, so it only reaches a document root:
 // two of them on one page would be one page, and the Brand toolbar's pair —
@@ -18,7 +19,7 @@ import { SiteTheme } from '../src/ecosystem/ui/SiteTheme.tsx';
 // win over both. Each pane is therefore a page of its own, which is also what
 // lets two sites be looked at at the same time.
 const PAGE_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
-body { margin: 0; padding: 16px; background: #f5f7fa; color: #16202c;
+body { margin: 0; padding: 16px; background: ${FAMILY_TOKEN_VALUES['--surface-sunken']}; color: ${FAMILY_TOKEN_VALUES['--text']};
   font: 15px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
 button { font: inherit; }
 </style></head><body></body></html>`;
@@ -200,17 +201,17 @@ const SWATCH_FRAME_HEIGHT = 195;
 const FRAME_STYLE: CSSProperties = {
   display: 'block',
   width: '100%',
-  border: '1px solid var(--border, #dfe3e8)',
-  borderRadius: 'var(--radius, 10px)',
-  background: '#f5f7fa',
+  border: `1px solid ${TOKEN.border}`,
+  borderRadius: TOKEN.radius,
+  background: TOKEN.surfaceSunken,
 };
 
 const CARD_STYLE: CSSProperties = {
   padding: 14,
-  border: '1px solid #dfe3e8',
-  borderRadius: 10,
-  background: '#fff',
-  boxShadow: '0 1px 2px rgb(16 32 48 / 8%)',
+  border: `1px solid ${TOKEN.border}`,
+  borderRadius: TOKEN.radius,
+  background: TOKEN.surface,
+  boxShadow: TOKEN.shadowSmall,
 };
 
 const CARD_HEAD_STYLE: CSSProperties = {
@@ -238,7 +239,7 @@ const CARD_TAG_STYLE: CSSProperties = {
 };
 
 const CARD_FORMULA_STYLE: CSSProperties = {
-  color: '#5b6875',
+  color: TOKEN.textMuted,
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontSize: '0.8125rem',
 };

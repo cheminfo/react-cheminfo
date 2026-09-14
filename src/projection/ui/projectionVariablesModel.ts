@@ -7,7 +7,8 @@
  */
 
 import type { ChartSeries } from '../../chart/ui/TrackedLineChart.tsx';
-import type { ChartStickSeries } from '../../chart/ui/TrackedStickChart.tsx';
+import type { ChartStickSeries } from '../../chart/ui/stickChartModel.ts';
+import { formatTrimmed } from '../../format/core/numbers.ts';
 import type {
   LoadingProfile,
   LoadingProfiles,
@@ -30,14 +31,14 @@ export interface ProjectionVariableTrack {
   series: ReadonlyArray<{
     /** Which component, from 0. */
     axis: number;
-    /** What it is called, e.g. `PC 2`. */
+    /** What it is called, e.g. `PC2`. */
     name: string;
     /** The colour it carries on every tab. */
     color: string;
     /** Its value at this measurement, in whatever the current view draws. */
     value: number;
   }>;
-  /** The line the tab writes, e.g. `1650 cm⁻¹ · PC 2 weight +0.081`. */
+  /** The line the tab writes, e.g. `1650 cm⁻¹ · PC2 weight +0.081`. */
   readout: string;
 }
 
@@ -204,7 +205,7 @@ export function ticksOfSlots(built: LoadingProfiles | null): string[] {
  */
 export function writeValue(value: number): string {
   if (!Number.isFinite(value)) return '';
-  return String(Math.round(value * DECIMALS) / DECIMALS);
+  return formatTrimmed(value, READOUT_DECIMALS);
 }
 
 function slotLabels(
@@ -228,4 +229,4 @@ function signed(value: number, format: (value: number) => string): string {
   return `${sign}${format(Math.abs(value))}`;
 }
 
-const DECIMALS = 1000;
+const READOUT_DECIMALS = 3;

@@ -97,16 +97,17 @@ test('the licence, the sources and the version come from the ecosystem record', 
   expect(html).toContain('This page is running version 2.4.0.');
 });
 
-test('the work to cite is previewed, and its DOI is a link', () => {
+test('each work is cited through the shared Cite button, and nothing else', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
   expect(html).toContain('Data processing in the browser');
   expect(html).toContain(
     'Cite it for the site itself, which runs in the browser.',
   );
-  expect(html).toContain('Chimia');
-  expect(html).toContain('href="https://doi.org/10.2533/chimia.2025.66"');
-  expect(html).toContain('doi:10.2533/chimia.2025.66');
+  expect(html).toContain('citation-button');
+  expect(html).toContain('aria-label="Cite Data processing in the browser"');
+  expect(html).not.toContain('citation-preview');
+  expect(html).not.toContain('doi:10.2533/chimia.2025.66');
 });
 
 test('a site asking for no citation loses that section and nothing else', () => {
@@ -152,6 +153,71 @@ test('the page carries the class the site gives it, and its own', () => {
   expect(html).toContain('<div class="about-page page"');
 });
 
+test('provided by: the EPFL logo, the name and the institution, right under the hero', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        people: [{ name: 'Luc Patiny' }],
+        providedBy: ['epfl'],
+      }}
+    />,
+  );
+
+  expect(html).toContain('Provided by');
+  expect(html).toContain('>Luc Patiny</p>');
+  expect(html).toContain('École polytechnique fédérale de Lausanne');
+  expect(html).toContain('Lausanne, Switzerland');
+  expect(html).toContain('href="https://www.epfl.ch"');
+  expect(html).toContain(
+    'aria-label="EPFL — École polytechnique fédérale de Lausanne"',
+  );
+  expect(html).not.toContain('<ul style="margin:16px 0 0');
+  expect(html.indexOf('about-hero')).toBeLessThan(html.indexOf('Provided by'));
+  expect(html.indexOf('Provided by')).toBeLessThan(
+    html.indexOf('What you can do here'),
+  );
+});
+
+test('several people are joined into one line, and their roles listed under it', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        people: [
+          { name: 'Daniel Kostro', role: 'wrote the solver.' },
+          { name: 'Michaël Zasso' },
+          { name: 'Luc Patiny', role: 'curates the data.' },
+        ],
+        providedBy: ['epfl'],
+      }}
+    />,
+  );
+
+  expect(html).toContain('>Daniel Kostro, Michaël Zasso and Luc Patiny</p>');
+  expect(html).toContain(
+    '<li><strong>Daniel Kostro</strong> — wrote the solver.</li>',
+  );
+  expect(html).toContain(
+    '<li><strong>Luc Patiny</strong> — curates the data.</li>',
+  );
+  expect(html).not.toContain('<li><strong>Michaël Zasso</strong>');
+});
+
+test('a site naming nobody and no provider has no "Provided by" section', () => {
+  const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
+
+  expect(html).not.toContain('Provided by');
+});
+
+test('a provider no registry entry answers to stops the page being drawn', () => {
+  expect(() =>
+    renderToStaticMarkup(
+      <AboutPage content={{ ...SMILES, providedBy: ['epf' as 'epfl'] }} />,
+    ),
+  ).toThrow('unknown provider: epf');
+});
+
 test('a credit no registry entry answers to stops the page being drawn', () => {
   expect(() =>
     renderToStaticMarkup(
@@ -160,4 +226,20 @@ test('a credit no registry entry answers to stops the page being drawn', () => {
       />,
     ),
   ).toThrow('unknown credit: ml-matrx');
+});
+
+test('a site with a drawn lockup shows it instead of the mark and the name', () => {
+  const plain = renderToStaticMarkup(<AboutPage content={SMILES} />);
+  const drawn = renderToStaticMarkup(
+    <AboutPage content={SMILES} logo={<img src="/logo.svg" alt="SMILES" />} />,
+  );
+
+  expect(plain).toContain('wordmark__lead');
+  expect(plain).toContain('<svg');
+  expect(drawn).toContain('<img src="/logo.svg" alt="SMILES"/>');
+  expect(drawn).not.toContain('wordmark__lead');
+  expect(drawn).not.toContain('<svg');
+  expect(drawn).toContain(
+    'Draw a structure and read the SMILES that describes it, atom by atom.',
+  );
 });

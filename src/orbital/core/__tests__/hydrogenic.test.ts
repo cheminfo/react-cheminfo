@@ -11,6 +11,37 @@ import {
   radialNodeRadii,
   radialProfile,
 } from '../hydrogenic.ts';
+import { factorial, laguerre } from '../numerics.ts';
+
+/**
+ * `R(r)` written with the generic power, exactly as the closed form reads: the
+ * reference the per-ℓ multiplications are checked against.
+ * @param n - Principal quantum number.
+ * @param l - Angular momentum quantum number.
+ * @param charge - Effective nuclear charge.
+ * @returns The radial function.
+ */
+function radialWithPower(
+  n: number,
+  l: number,
+  charge: number,
+): (distance: number) => number {
+  const degree = n - l - 1;
+  const alpha = 2 * l + 1;
+  const rho = (2 * charge) / (n * BOHR_IN_ANGSTROM);
+  const normalisation = Math.sqrt(
+    rho * rho * rho * (factorial(degree) / (2 * n * factorial(n + l))),
+  );
+  return (distance) => {
+    const scaled = rho * distance;
+    return (
+      normalisation *
+      scaled ** l *
+      Math.exp(-scaled / 2) *
+      laguerre(degree, alpha, scaled)
+    );
+  };
+}
 
 /**
  * Textbook node positions are quoted in bohr, so the tests compare in bohr.
@@ -194,4 +225,36 @@ test('impossible quantum numbers are rejected', () => {
   expect(() => radialProfile({ n: 1, l: 0, charge: 1 }, 5, 1)).toThrow(
     /2 samples/,
   );
+});
+
+test('the radial function is the generic power bit for bit, and within 4 ulp for f', () => {
+  const mismatches: string[] = [];
+  for (let n = 1; n <= 7; n++) {
+    for (let l = 0; l < n; l++) {
+      for (const charge of [1, 3.25, 11.4]) {
+        const radial = createRadialFunction({ n, l, charge });
+        const reference = radialWithPower(n, l, charge);
+        const limit = meanRadius({ n, l, charge }) * 10;
+        const distances = [-0.4, 1e-300, Number.NaN, Number.POSITIVE_INFINITY];
+        for (let index = 0; index <= 2000; index++) {
+          distances.push((limit * index) / 2000);
+        }
+        for (const distance of distances) {
+          const actual = radial(distance);
+          const expected = reference(distance);
+          // x * x * x is not x ** 3 to the last bit, and ℓ = 3 is the only such power.
+          const matches =
+            Object.is(actual, expected) ||
+            (l === 3 &&
+              Math.abs(actual - expected) <=
+                4 * Number.EPSILON * Math.abs(expected));
+          if (!matches) {
+            mismatches.push(`${n},${l},${charge} at ${distance}: ${actual}`);
+          }
+        }
+      }
+    }
+  }
+
+  expect(mismatches).toStrictEqual([]);
 });

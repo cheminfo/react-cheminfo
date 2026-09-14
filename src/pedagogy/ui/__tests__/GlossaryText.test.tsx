@@ -2,8 +2,9 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import type { Glossary } from '../../core/glossary.ts';
+import { GlossaryDefinition } from '../GlossaryDefinition.tsx';
 import { GlossaryProvider } from '../GlossaryProvider.tsx';
-import { GlossaryText, GlossaryTooltipBody } from '../GlossaryText.tsx';
+import { GlossaryText } from '../GlossaryText.tsx';
 
 const ANCHOR = {
   title: 'Anchor',
@@ -72,7 +73,7 @@ test('the same term twice in one sentence keeps both chips', () => {
 });
 
 test('the body shows the title, the summary and every example', () => {
-  const html = renderToStaticMarkup(<GlossaryTooltipBody entry={ANCHOR} />);
+  const html = renderToStaticMarkup(<GlossaryDefinition entry={ANCHOR} />);
 
   expect(html).toContain('Anchor');
   expect(html).toContain('Matches a position rather than a character.');
@@ -84,7 +85,7 @@ test('the body shows the title, the summary and every example', () => {
 
 test('an entry with no example renders no list at all', () => {
   const html = renderToStaticMarkup(
-    <GlossaryTooltipBody
+    <GlossaryDefinition
       entry={{
         title: 'Layer',
         summary: 'One slash-separated part.',
