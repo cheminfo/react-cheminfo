@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/cheminfo/react-cheminfo/compare/v0.13.0...v0.14.0) (2026-09-15)
+
+
+### Features
+
+* **molecule3d:** add frameNewMolecule to frame a new molecule from the front ([8c5525f](https://github.com/cheminfo/react-cheminfo/commit/8c5525ff3a60ae011a9474c21f5060d11ad7603b))
+
 ## [0.13.0](https://github.com/cheminfo/react-cheminfo/compare/v0.12.0...v0.13.0) (2026-09-15)
 
 
