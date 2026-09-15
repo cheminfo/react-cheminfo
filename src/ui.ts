@@ -23,9 +23,3 @@ export * from './scatter/ui/index.ts';
 export * from './scatter3d/ui/index.ts';
 export * from './share/ui/index.ts';
 export * from './shared/ui/index.ts';
-export type {
-  BucketRead,
-  PersistBucketOptions,
-  PersistedBucket,
-} from './state/core/index.ts';
-export { persistBucket } from './state/core/index.ts';
