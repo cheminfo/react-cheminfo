@@ -1,0 +1,10 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-Bh_4mKxw.js";import{n,t as r}from"./icon-k2iH-Atz.js";import{n as i}from"./joinClassNames-BbK_6p9Z.js";import{n as a,t as o}from"./HelpTooltip-CQrlPLOl.js";import{t as s}from"./helpName-DxpXVq-8.js";function c(e){let{content:t,label:n=s(t),icon:a=`help`,size:c=13,placement:u=`right`,className:d}=e;return(0,l.jsx)(o,{content:t,placement:u,children:(0,l.jsx)(r,{icon:a,size:c,tabIndex:0,"aria-label":n,className:i(`help-icon`,d)})})}var l;function u(){return(u=e((()=>{n(),a(),l=t(),c.__docgenInfo={description:`The small question mark that sits beside a field label.
+
+It is reachable by tab, so the explanation is not reserved to whoever is
+holding a pointer.
+@param props - See {@link HelpIconProps}.
+@returns The glyph and its help.`,methods:[],displayName:`HelpIcon`,props:{content:{required:!0,tsType:{name:`HelpContent`},description:"The help the glyph reveals. A site with free-form help passes only a\n`body`."},label:{required:!1,tsType:{name:`string`},description:"What a screen reader calls the glyph.\n@default the help's title, or `'Help'` when it has none"},icon:{required:!1,tsType:{name:`IconName`},description:`Glyph drawn, for a site that marks help with another sign.
+@default 'help'`},size:{required:!1,tsType:{name:`number`},description:`Size of the glyph in pixels, so it sits on the line of the label it
+follows.
+@default 13`},placement:{required:!1,tsType:{name:`union`,raw:`'top' | 'right' | 'bottom' | 'left'`,elements:[{name:`literal`,value:`'top'`},{name:`literal`,value:`'right'`},{name:`literal`,value:`'bottom'`},{name:`literal`,value:`'left'`}]},description:`Which side the help opens on.
+@default 'right'`},className:{required:!1,tsType:{name:`string`},description:"Class the glyph carries, in addition to `help-icon`.\n@default undefined"}}}})))()}export{u as n,c as t};
