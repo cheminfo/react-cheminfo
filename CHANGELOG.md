@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.13.0](https://github.com/cheminfo/react-cheminfo/compare/v0.12.0...v0.13.0) (2026-09-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* persistBucket and its types (BucketRead, PersistBucketOptions, PersistedBucket) are exported from react-cheminfo/core only.
+
+### Features
+
+* remove the persistBucket re-export from react-cheminfo/ui ([85421e0](https://github.com/cheminfo/react-cheminfo/commit/85421e0ab381cf570b32c817d47c0ae7185cd454))
+
+
+### Bug Fixes
+
+* **chrome:** name a text NavLink by its label, not its title ([8cd9a87](https://github.com/cheminfo/react-cheminfo/commit/8cd9a876b57c6428c3a27d1af3bfbd0d05ced349))
+
 ## [0.12.0](https://github.com/cheminfo/react-cheminfo/compare/v0.11.0...v0.12.0) (2026-09-15)
 
 
