@@ -45,7 +45,10 @@ A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
 sampling an orbital loads neither React nor molstar. **Every peer is optional**,
 so a site that only wants the Tools menu downloads none of them, and a project
-that only prerenders installs neither React nor Vite.
+that only prerenders installs neither React nor Vite. The Markdown stack of the
+slides (`react-markdown`, `rehype-raw`, `rehype-sanitize`, about 9 MB installed)
+is a regular dependency instead: it is small enough to always install, and a
+site that never imports `react-cheminfo/slides` bundles none of it.
 
 `react-cheminfo/vite` is the one door with a split bill: `cheminfoPrerender`
 needs nothing beyond Vite's own plugin type, while `ogCardHtml` renders a mark
