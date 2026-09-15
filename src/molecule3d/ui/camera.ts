@@ -28,6 +28,10 @@ const SPIN_AXIS = Vec3.create(0, 1, 0);
 /** Smallest radius framed, in ångström, so a single atom is not a close-up. */
 const MIN_FRAMING_RADIUS = 0.5;
 
+/** Screen up and viewing direction when the model is seen as its file lays it. */
+const FRONT_UP = Vec3.create(0, 1, 0);
+const FRONT_DIRECTION = Vec3.create(0, 0, -1);
+
 /**
  * Frame everything currently in the scene.
  *
@@ -38,19 +42,25 @@ const MIN_FRAMING_RADIUS = 0.5;
  * after that commit.
  * @param plugin - The molstar context.
  * @param durationMilliseconds - Transition length. Pass 0 for an instant jump.
+ * @param fromFront - Look down -z with y up, instead of keeping the current
+ * direction.
  */
 export function resetCamera(
   plugin: PluginContext,
   durationMilliseconds = DEFAULT_CAMERA_DURATION,
+  fromFront = false,
 ): void {
   plugin.canvas3d?.requestCameraReset({
     durationMs: durationMilliseconds,
     snapshot: (scene, camera) => {
       const { center, radius } = scene.boundingSphereVisible;
-      return camera.getFocus(
-        center,
-        Math.max(radius * (1 + FRAMING_MARGIN), MIN_FRAMING_RADIUS),
+      const framed = Math.max(
+        radius * (1 + FRAMING_MARGIN),
+        MIN_FRAMING_RADIUS,
       );
+      return fromFront
+        ? camera.getFocus(center, framed, FRONT_UP, FRONT_DIRECTION)
+        : camera.getFocus(center, framed);
     },
   });
 }

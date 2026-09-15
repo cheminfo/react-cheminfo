@@ -11,7 +11,9 @@ import type { Molecule3DViewer } from './viewer.ts';
  * @param molfile - What to draw, or `null` to empty the scene.
  * @param settings - How to draw it.
  * @param measurements - What to draw over it.
- * @param frameCamera - Whether to frame the camera once everything is there.
+ * @param frameCamera - How to frame the camera once everything is there:
+ * `keep` glides to it along the current direction, `front` jumps to it looking
+ * down -z, `none` leaves the camera alone.
  * @returns Nothing; resolves once the scene is complete.
  */
 export async function drawScene(
@@ -19,7 +21,7 @@ export async function drawScene(
   molfile: Molecule3DFile | null,
   settings: Molecule3DSettings,
   measurements: readonly Measurement[],
-  frameCamera: boolean,
+  frameCamera: 'none' | 'keep' | 'front',
 ): Promise<void> {
   if (molfile === null) {
     await viewer.hideMolecule();
@@ -39,5 +41,6 @@ export async function drawScene(
     });
   }
   await viewer.showMeasurements(measurements);
-  if (frameCamera) await viewer.resetCamera();
+  if (frameCamera === 'keep') await viewer.resetCamera();
+  if (frameCamera === 'front') await viewer.resetCamera(0, true);
 }

@@ -44,6 +44,7 @@ export interface MoleculeCanvas3DProps extends Omit<
 export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
   const {
     molfile,
+    frameNewMolecule = 'keep',
     tools: toolsProp,
     settings: settingsProp,
     defaultSettings,
@@ -134,10 +135,11 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
       // Framed on a new molecule or a new viewer, never on a restyle: a slider
       // that snapped the camera back would undo the reader's orientation.
       const framed = framedRef.current;
-      const frameCamera =
+      const isNew =
         molfile !== null &&
         (framed?.molfile !== molfile || framed.viewer !== viewer);
       framedRef.current = molfile === null ? null : { molfile, viewer };
+      const frameCamera = isNew ? frameNewMolecule : 'none';
       void drawScene(viewer, molfile, settings, measurements, frameCamera)
         .then(() => {
           if (!cancelled) latest.current.onFailureChange(null);
@@ -153,7 +155,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
       cancelled = true;
       cancelAnimationFrame(frame);
     };
-  }, [container, molfile, settings, measurements]);
+  }, [container, molfile, frameNewMolecule, settings, measurements]);
 
   useEffect(() => {
     void viewerRef.current?.setSpin(spinning, spinSpeed);

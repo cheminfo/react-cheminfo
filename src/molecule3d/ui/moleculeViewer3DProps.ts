@@ -19,6 +19,14 @@ export interface MoleculeViewer3DProps {
   /** The molecule to draw, with 3D coordinates, or `null` for none. */
   molfile: Molecule3DFile | null;
   /**
+   * How the camera meets a new molecule. `keep` glides to it along the current
+   * direction, which suits conformers of one molecule; `front` jumps to it
+   * looking down -z with y up, so unrelated molecules, each laid out in its
+   * file the way it reads best, never swing in from the previous view.
+   * @default 'keep'
+   */
+  frameNewMolecule?: 'keep' | 'front';
+  /**
    * Which buttons the toolbar over the canvas shows; tools not named stay on.
    * @default every tool
    */

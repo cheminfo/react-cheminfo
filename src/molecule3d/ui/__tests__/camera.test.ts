@@ -83,6 +83,37 @@ test('a single atom is framed at the minimum radius, not as a close-up', () => {
   expect(frame(snapshot, 0.2).radius).toBe(0.5);
 });
 
+test('framing from the front looks down -z with y up, instantly', () => {
+  const requestCameraReset =
+    vi.fn<(options: Canvas3DCameraResetOptions) => void>();
+  const plugin = {
+    canvas3d: { requestCameraReset },
+  } as unknown as PluginContext;
+  resetCamera(plugin, 0, true);
+  const options = requestCameraReset.mock.calls[0]?.[0] ?? {};
+  const getFocus = vi.fn(
+    (target: Vec3, radius: number, up?: Vec3, direction?: Vec3) => ({
+      target,
+      radius,
+      up,
+      direction,
+    }),
+  );
+  const scene = {
+    boundingSphereVisible: { center: Vec3.create(1, 2, 3), radius: 10 },
+  } as unknown as Scene;
+  (options.snapshot as SnapshotFunction)(scene, {
+    getFocus,
+  } as unknown as Camera);
+
+  expect(options.durationMs).toBe(0);
+
+  const [, , up, direction] = getFocus.mock.calls[0] ?? [];
+
+  expect([...(up ?? [])]).toStrictEqual([0, 1, 0]);
+  expect([...(direction ?? [])]).toStrictEqual([0, 0, -1]);
+});
+
 test('a viewer without a canvas asks for nothing', () => {
   const plugin = { canvas3d: undefined } as unknown as PluginContext;
 

@@ -182,11 +182,15 @@ export class Molecule3DViewer {
   /**
    * Frame everything on screen.
    * @param durationMilliseconds - Transition length; 0 jumps.
+   * @param fromFront - Look down -z with y up instead of keeping the direction.
    * @returns Nothing; resolves once the move has been ordered.
    */
-  resetCamera(durationMilliseconds = DEFAULT_CAMERA_DURATION): Promise<void> {
+  resetCamera(
+    durationMilliseconds = DEFAULT_CAMERA_DURATION,
+    fromFront = false,
+  ): Promise<void> {
     return this.#run((plugin) => {
-      resetCamera(plugin, durationMilliseconds);
+      resetCamera(plugin, durationMilliseconds, fromFront);
     });
   }
 
