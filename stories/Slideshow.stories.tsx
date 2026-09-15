@@ -58,7 +58,7 @@ https://www.chemcalc.org/?mf=C6H12O6&embed=1
 
 # Questions?
 
-luc.patiny@epfl.ch
+jane.doe@example.org
 `;
 
 const TALK = parseTalk(SOURCE);
