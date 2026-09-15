@@ -55,7 +55,56 @@ test('an address leaving the site opens in a tab of its own', () => {
   expect(html).toContain('target="_blank"');
   expect(html).toContain('rel="noreferrer"');
   expect(html).toContain('title="Source on GitHub"');
-  expect(html).toContain('aria-label="Source on GitHub"');
+});
+
+test('a text label names the entry, and its title stays the tooltip', () => {
+  const html = renderToStaticMarkup(
+    <NavLink
+      item={{
+        id: 'spec',
+        label: 'Spec',
+        href: 'https://tc39.es/ecma262/',
+        title: 'Official specification — ECMA-262 (TC39)',
+      }}
+    />,
+  );
+
+  expect(html).toBe(
+    '<a class="nav-link" href="https://tc39.es/ecma262/" title="Official specification — ECMA-262 (TC39)">Spec</a>',
+  );
+});
+
+test('a text label beside a glyph still names the entry once the bar hides it', () => {
+  const html = renderToStaticMarkup(
+    <NavLink
+      item={{
+        id: 'jobs',
+        label: 'Jobs',
+        icon: 'database',
+        href: '/jobs',
+        title: 'Every job submitted',
+      }}
+    />,
+  );
+
+  expect(html).toContain('aria-label="Jobs"');
+  expect(html).toContain('title="Every job submitted"');
+});
+
+test('a label that is not text is named by its title', () => {
+  const html = renderToStaticMarkup(
+    <NavLink
+      item={{
+        id: 'home',
+        label: <svg className="mark" />,
+        href: '/',
+        title: 'Home',
+      }}
+    />,
+  );
+
+  expect(html).toContain('aria-label="Home"');
+  expect(html).toContain('title="Home"');
 });
 
 test('the glyph comes before the label, and what the entry reports after it', () => {
@@ -71,8 +120,10 @@ test('the glyph comes before the label, and what the entry reports after it', ()
   );
 
   expect(html).toContain('bp6-icon-database');
-  expect(html.indexOf('bp6-icon-database')).toBeLessThan(html.indexOf('Jobs'));
-  expect(html.indexOf('Jobs')).toBeLessThan(html.indexOf('class="badge"'));
+  expect(html.indexOf('bp6-icon-database')).toBeLessThan(
+    html.indexOf('>Jobs<'),
+  );
+  expect(html.indexOf('>Jobs<')).toBeLessThan(html.indexOf('class="badge"'));
 });
 
 test('a plain click is taken over, a modified one is left to the browser', () => {

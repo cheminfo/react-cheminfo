@@ -37,7 +37,9 @@ export function NavLink(props: NavLinkProps): ReactElement {
     title,
     disabled = false,
     icon,
+    label,
   } = item;
+  const ariaLabel = accessibleName(label, icon !== undefined, title);
 
   const classes = [
     'nav-link',
@@ -55,7 +57,7 @@ export function NavLink(props: NavLinkProps): ReactElement {
         type="button"
         className={classes}
         title={title}
-        aria-label={title}
+        aria-label={ariaLabel}
         disabled={disabled}
         onClick={disabled ? undefined : onSelect}
       >
@@ -69,7 +71,7 @@ export function NavLink(props: NavLinkProps): ReactElement {
       className={classes}
       href={href}
       title={title}
-      aria-label={title}
+      aria-label={ariaLabel}
       target={external ? '_blank' : undefined}
       rel={external ? 'noreferrer' : undefined}
       onClick={(event) => {
@@ -103,4 +105,16 @@ function NavLinkBody(props: { item: NavItem }): ReactNode {
       {after}
     </>
   );
+}
+
+// Visible text names the entry by itself. Beside a glyph it is repeated as the
+// label, because a narrow bar hides that text; anything else falls back to the
+// title, which otherwise stays the tooltip.
+function accessibleName(
+  label: ReactNode,
+  hasIcon: boolean,
+  title: string | undefined,
+): string | undefined {
+  if (typeof label !== 'string' && typeof label !== 'number') return title;
+  return hasIcon ? String(label) : undefined;
 }
