@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.12.0](https://github.com/cheminfo/react-cheminfo/compare/v0.11.0...v0.12.0) (2026-09-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* spectra moves to react-cheminfo/spectra; persistBucket, toError, scatterGroupSpread, scatterPairEllipse and CloudGesture move to react-cheminfo/core; GlossaryTooltipBody is renamed GlossaryDefinition; ColorScaleLegend `stops` is now `scale`; the colourBlindSafe palette id is colorBlindSafe; react-markdown, rehype-raw and rehype-sanitize are optional peers of react-cheminfo/slides; removed createPageAddresses, documentTitle, canonicalLink, siteThemeColor, renderEcosystemLinksHtml, VIRIDIS_SCALE, colorFromScale, swatchFromScale, rowsToDelimited, formatTalkOrigin, TALK_ORIGIN_PARAM, CloudPointLayer, the deploy checker from react-cheminfo/core, and the OverlayBar onCollapsedChange and ScatterEllipseLayer onSkippedGroups props.
+
+### Features
+
+* consolidate the library and add molecule3d, share presets and site providers ([856f587](https://github.com/cheminfo/react-cheminfo/commit/856f587c13e168f058c9a929ea9efeee0614e969))
+
+
+### Bug Fixes
+
+* **slides:** install the Markdown stack as dependencies ([7639dfd](https://github.com/cheminfo/react-cheminfo/commit/7639dfd2e1d853b50e42787c8792d91f25ee8875))
+
 ## [0.11.0](https://github.com/cheminfo/react-cheminfo/compare/v0.10.0...v0.11.0) (2026-09-10)
 
 
