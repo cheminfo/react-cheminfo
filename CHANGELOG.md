@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0](https://github.com/cheminfo/react-cheminfo/compare/v0.14.0...v0.15.0) (2026-09-16)
+
+
+### Features
+
+* **about:** say which build is running ([5f54f65](https://github.com/cheminfo/react-cheminfo/commit/5f54f65f6295d15bd4f5bc5461d34f334c46beb8))
+
 ## [0.14.0](https://github.com/cheminfo/react-cheminfo/compare/v0.13.0...v0.14.0) (2026-09-15)
 
 
