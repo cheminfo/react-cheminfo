@@ -6,6 +6,7 @@ import { SiteMark } from '../../ecosystem/ui/marks.tsx';
 import type { AboutContent } from '../core/about.ts';
 import { resolveAbout } from '../core/about.ts';
 
+import { AboutBuild } from './AboutBuild.tsx';
 import { AboutCitations } from './AboutCitations.tsx';
 import { AboutProvidedBy } from './AboutProvidedBy.tsx';
 import { AboutSection } from './AboutSection.tsx';
@@ -25,6 +26,13 @@ export interface AboutPageProps {
    * @default undefined
    */
   children?: ReactNode;
+  /**
+   * The site's own mark, for a site the shared glyph set does not hold —
+   * one that is deliberately not listed in `ECOSYSTEM_SITES`. It stands where
+   * `SiteMark` would, and the hero is otherwise unchanged.
+   * @default undefined — the family's mark for that site
+   */
+  mark?: ReactNode;
   /**
    * The site's own drawn lockup, for a site that has one. It stands in the
    * hero in place of the mark and the written name, above the tagline, and
@@ -48,7 +56,7 @@ export interface AboutPageProps {
  * @throws {Error} When the record names a site or a credit that does not exist.
  */
 export function AboutPage(props: AboutPageProps): ReactElement {
-  const { content, className, children, logo } = props;
+  const { content, className, children, logo, mark } = props;
   const about = resolveAbout(content);
   const site = about.site;
 
@@ -63,10 +71,12 @@ export function AboutPage(props: AboutPageProps): ReactElement {
         className="about-hero"
         style={logo === undefined ? HERO_STYLE : LOGO_HERO_STYLE}
       >
-        {logo === undefined ? <SiteMark siteId={site.id} size={56} /> : null}
+        {logo === undefined
+          ? (mark ?? <SiteMark site={site} size={56} />)
+          : null}
         <div>
           <h1 style={logo === undefined ? NAME_STYLE : LOGO_NAME_STYLE}>
-            {logo ?? <Wordmark siteId={site.id} size={26} />}
+            {logo ?? <Wordmark site={site} size={26} />}
           </h1>
           <p style={TAGLINE_STYLE}>{site.tagline}</p>
           <p style={WHAT_STYLE}>{about.what}</p>
@@ -118,10 +128,8 @@ export function AboutPage(props: AboutPageProps): ReactElement {
           piece of it into something else. The sources are at{' '}
           <ExternalLink href={about.repository} />.
         </p>
-        {about.version === undefined ? null : (
-          <p style={PARAGRAPH_STYLE}>
-            This page is running version {about.version}.
-          </p>
+        {about.build === undefined ? null : (
+          <AboutBuild build={about.build} repository={about.repository} />
         )}
       </AboutSection>
 

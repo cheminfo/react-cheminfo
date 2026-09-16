@@ -25,7 +25,11 @@ const SMILES: AboutContent = {
 const CITED: AboutContent = {
   ...SMILES,
   cite: [PLATFORM_WORK],
-  version: '1.4.0',
+  build: {
+    version: '1.4.0',
+    builtAt: '2026-09-16T09:41:07Z',
+    commit: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
+  },
 };
 
 const meta = {
@@ -43,7 +47,7 @@ const meta = {
   },
   render: (args) => (
     <div style={{ background: 'var(--surface-sunken)', padding: 24 }}>
-      <SiteTheme siteId={args.content.siteId} />
+      <SiteTheme siteId="smiles" />
       <AboutPage {...args} />
     </div>
   ),

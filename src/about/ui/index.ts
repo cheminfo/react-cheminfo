@@ -1,3 +1,5 @@
+export type { AboutBuildProps } from './AboutBuild.tsx';
+export { AboutBuild } from './AboutBuild.tsx';
 export type { AboutCitationsProps } from './AboutCitations.tsx';
 export { AboutCitations } from './AboutCitations.tsx';
 export type { AboutPageProps } from './AboutPage.tsx';

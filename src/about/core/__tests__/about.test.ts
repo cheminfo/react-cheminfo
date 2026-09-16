@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
 import { PLATFORM_WORK } from '../../../citation/core/platformPaper.ts';
-import type { SiteId } from '../../../ecosystem/core/sites.ts';
+import type { EcosystemSite, SiteId } from '../../../ecosystem/core/sites.ts';
 import type { AboutContent } from '../about.ts';
 import { aboutProblems, resolveAbout } from '../about.ts';
 
@@ -16,6 +16,30 @@ const SMILES: AboutContent = {
   credits: ['openchemlib', 'react'],
 };
 
+const OUTSIDE: EcosystemSite = {
+  id: 'images' as SiteId,
+  name: { lead: 'images', alt: 'cheminfo', dot: true },
+  host: 'images.cheminfo.org',
+  repository: 'https://github.com/cheminfo/images.cheminfo.org',
+  group: 'computing',
+  tagline: 'Crop, rotate, adjust, resize and compress images, in your browser.',
+  brand: '#a21caf',
+  brandAlt: '#b45309',
+  mark: { plate: '#a21caf', accent: '#f59e0b' },
+};
+
+test('a site that is not in the Tools menu may pass its own record', () => {
+  const about = resolveAbout({ ...SMILES, siteId: OUTSIDE });
+
+  expect(about.site.host).toBe('images.cheminfo.org');
+  expect(about.repository).toBe(
+    'https://github.com/cheminfo/images.cheminfo.org',
+  );
+  expect(about.issues).toBe(
+    'https://github.com/cheminfo/images.cheminfo.org/issues',
+  );
+});
+
 test('what the site left to the family comes from its ecosystem record', () => {
   const about = resolveAbout(SMILES);
 
@@ -27,7 +51,7 @@ test('what the site left to the family comes from its ecosystem record', () => {
     'https://github.com/cheminfo/smiles.cheminfo.org/issues',
   );
   expect(about.license).toBe('MIT');
-  expect(about.version).toBeUndefined();
+  expect(about.build).toBeUndefined();
   expect(about.paragraphs).toStrictEqual([]);
   expect(about.cite).toStrictEqual([]);
 });
@@ -37,13 +61,16 @@ test('a site that publishes elsewhere is reported there, issues included', () =>
     ...SMILES,
     license: 'BSD-3-Clause',
     repository: 'https://gitlab.com/cheminfo/elsewhere/',
-    version: '2.4.0',
+    build: { version: '2.4.0', builtAt: '2026-09-16T09:41:07Z' },
   });
 
   expect(about.license).toBe('BSD-3-Clause');
   expect(about.repository).toBe('https://gitlab.com/cheminfo/elsewhere/');
   expect(about.issues).toBe('https://gitlab.com/cheminfo/elsewhere/issues');
-  expect(about.version).toBe('2.4.0');
+  expect(about.build).toStrictEqual({
+    version: '2.4.0',
+    builtAt: '2026-09-16T09:41:07Z',
+  });
 });
 
 test('the issues link a site writes itself is the one that is used', () => {

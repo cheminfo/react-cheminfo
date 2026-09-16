@@ -15,6 +15,7 @@
     "./styles/*.css"
   ],
   "exports": {
+    "./build-info": "./lib/build-info.js",
     "./core": "./lib/core.js",
     "./molecule3d": "./lib/molecule3d.js",
     "./orbital": "./lib/orbital.js",

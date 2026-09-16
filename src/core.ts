@@ -1,4 +1,5 @@
 export * from './about/core/index.ts';
+export * from './build/core/index.ts';
 export * from './chart/core/index.ts';
 export * from './citation/core/index.ts';
 export * from './clipboard/core/index.ts';

@@ -1,3 +1,4 @@
+import type { BuildInfo } from '../../build/core/buildInfo.ts';
 import type { CitedWork } from '../../citation/core/works.ts';
 import type { CreditEntry, CreditId } from '../../credits/core/credits.ts';
 import { credits } from '../../credits/core/credits.ts';
@@ -17,8 +18,12 @@ import { providers } from './providers.ts';
  * each crediting a different half of what it runs on.
  */
 export interface AboutContent {
-  /** The site the page belongs to. */
-  siteId: SiteId;
+  /**
+   * The site the page belongs to: its id, or the record itself for a site that
+   * is deliberately not listed in the family's Tools menu and therefore not in
+   * `ECOSYSTEM_SITES`.
+   */
+  siteId: SiteId | EcosystemSite;
   /** One sentence: what this tool is. */
   what: string;
   /**
@@ -59,10 +64,11 @@ export interface AboutContent {
    */
   repository?: string;
   /**
-   * The running version, when the site knows it.
-   * @default undefined
+   * Which build is running, from `virtual:cheminfo-build-info` — never written
+   * by hand, which is what keeps it true after the next release.
+   * @default undefined — the site's build does not publish one
    */
-  version?: string;
+  build?: BuildInfo;
   /**
    * Where a problem is reported.
    * @default the repository's /issues
@@ -102,8 +108,8 @@ export interface ResolvedAbout {
   providedBy: ProviderEntry[];
   license: string;
   repository: string;
-  /** The running version, or `undefined` when the site does not know it. */
-  version: string | undefined;
+  /** Which build is running, or `undefined` when the site does not say. */
+  build: BuildInfo | undefined;
   issues: string;
 }
 
@@ -116,7 +122,10 @@ export interface ResolvedAbout {
  *   credits nobody.
  */
 export function resolveAbout(content: AboutContent): ResolvedAbout {
-  const site = siteById(content.siteId);
+  const site =
+    typeof content.siteId === 'string'
+      ? siteById(content.siteId)
+      : content.siteId;
   const repository = content.repository ?? site.repository;
 
   return {
@@ -130,7 +139,7 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
     providedBy: providers(content.providedBy ?? []),
     license: content.license ?? DEFAULT_LICENSE,
     repository,
-    version: content.version,
+    build: content.build,
     issues: content.issues ?? `${withoutTrailingSlash(repository)}/issues`,
   };
 }

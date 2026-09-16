@@ -62,27 +62,28 @@ through a wildcard subpath exactly as `react-science` serves its own.
 
 ## What is in it
 
-| Area                    | `…/core`                                                                                                                                                                                                                                                | `…/ui`                                                                                                                                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Site identity**       | `siteById`, `findSiteByHost`, `siteTokensCss`                                                                                                                                                                                                           | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                    |
-| **Chrome**              | —                                                                                                                                                                                                                                                       | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                                                                |
-| **Citation**            | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                                                | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                         |
-| **Share & embed**       | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, `visibleShareParts`, `applySharePreset`, `findSharePreset`, the param codecs, `syncPreferencesWithUrl`, `applyPreferencesFromSearch`, `writePreferencesToSearch` | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                                                          |
-| **Routing & head**      | `createTabRouter`, `readRoute`, `writeRoute`, `subscribeToRoute`, `adoptLegacyHashAddress`, `writeDocumentMeta`                                                                                                                                         | `useTabRoute`                                                                                                                                                                           |
-| **Indexing**            | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute`                                       | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                                                                |
-| **Pedagogy**            | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                                                              | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList`                                        |
-| **Clipboard & files**   | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`, `downloadFigure`, `figureSvg`, `figurePng`, `figureSize`                                                                                        | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`, `FigureDownload`                                                                                                                      |
-| **Formatting & colour** | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv`                           | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                                                             |
-| **Widgets**             | `CREDITS`, `credits`                                                                                                                                                                                                                                    | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                    |
-| **Hooks & state**       | `createWorkerChannel`, `persistBucket`, `persistSignalBucket`                                                                                                                                                                                           | `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                                   |
-| **Chemistry**           | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                                                               | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                       |
-| **Spectra**             | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                    | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                               |
-| **About**               | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                         | `AboutPage`                                                                                                                                                                             |
-| **Slideshows**          | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                                              | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                                                         |
-| **Token guard**         | `findTokenViolations`                                                                                                                                                                                                                                   | `cheminfo-check-tokens` (the bin)                                                                                                                                                       |
-| **Figures**             | `chartScale`, `chartAxisScale`, `chartAxisTitle`, `chartShare`, `chartColumnExtent`, `chartBinCounts`, `chartSeriesColor`, `rowMatrix`, `stackedMatrix`, `emptiestCorner`, `placeOverlayCard`, `overlayMetrics`                                         | `ChartFrame`, `ChartAxis`, `TrackedLineChart`, `OverlayBar`, `OverlaySelect`, `OverlaySegmented`, `OverlayToggle`, `OverlayNumber`, `OverlayLegend`, `OverlayCaption`, `OverlayReadout` |
-| **Projections**         | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `PROJECTION_COPY`                                                          | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                         |
-| **Periodic table**      | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                   | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                        |
+| Area                       | `…/core`                                                                                                                                                                                                                                                | `…/ui`                                                                                                                                                                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Site identity**          | `siteById`, `findSiteByHost`, `siteTokensCss`                                                                                                                                                                                                           | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                    |
+| **Chrome**                 | —                                                                                                                                                                                                                                                       | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                                                                |
+| **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                                                | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                         |
+| **Share & embed**          | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, `visibleShareParts`, `applySharePreset`, `findSharePreset`, the param codecs, `syncPreferencesWithUrl`, `applyPreferencesFromSearch`, `writePreferencesToSearch` | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                                                          |
+| **Routing & head**         | `createTabRouter`, `readRoute`, `writeRoute`, `subscribeToRoute`, `adoptLegacyHashAddress`, `writeDocumentMeta`                                                                                                                                         | `useTabRoute`                                                                                                                                                                           |
+| **Indexing**               | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute`                                       | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                                                                |
+| **Pedagogy**               | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                                                              | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList`                                        |
+| **Clipboard & files**      | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`, `downloadFigure`, `figureSvg`, `figurePng`, `figureSize`                                                                                        | `CopyButton`, `CodeBlock`, `DelimitedTextDialog`, `FigureDownload`                                                                                                                      |
+| **Formatting & colour**    | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv`                           | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                                                             |
+| **Widgets**                | `CREDITS`, `credits`                                                                                                                                                                                                                                    | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                    |
+| **Hooks & state**          | `createWorkerChannel`, `persistBucket`, `persistSignalBucket`                                                                                                                                                                                           | `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                                   |
+| **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                                                               | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                       |
+| **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                    | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                               |
+| **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                         | `AboutPage`                                                                                                                                                                             |
+| **Which build is running** | `formatBuiltAt`, `shortCommit`, `BuildInfo`                                                                                                                                                                                                             | `AboutBuild`, `cheminfoBuildInfo` (`/vite`)                                                                                                                                             |
+| **Slideshows**             | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                                              | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                                                         |
+| **Token guard**            | `findTokenViolations`                                                                                                                                                                                                                                   | `cheminfo-check-tokens` (the bin)                                                                                                                                                       |
+| **Figures**                | `chartScale`, `chartAxisScale`, `chartAxisTitle`, `chartShare`, `chartColumnExtent`, `chartBinCounts`, `chartSeriesColor`, `rowMatrix`, `stackedMatrix`, `emptiestCorner`, `placeOverlayCard`, `overlayMetrics`                                         | `ChartFrame`, `ChartAxis`, `TrackedLineChart`, `OverlayBar`, `OverlaySelect`, `OverlaySegmented`, `OverlayToggle`, `OverlayNumber`, `OverlayLegend`, `OverlayCaption`, `OverlayReadout` |
+| **Projections**            | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `PROJECTION_COPY`                                                          | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                         |
+| **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                   | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                        |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -685,6 +686,63 @@ served page is the same template, with the same two markers. `robotsTxt` and
 disk. A server writing more into the same place composes it itself, with
 `pageHeadTags` and `fill(page, PAGE_BODY_MARKER, noscriptIndex(…))`. All of that
 is `react-cheminfo/core`, so a backend loads no React and no Vite.
+
+## Saying which build is running
+
+A report of something going wrong is worth answering only when we know what was
+running, and a hand-written version in a source file is wrong by the next
+release. So the build states it: `cheminfoBuildInfo` resolves the release, the
+instant and the commit once, and the About page reads them.
+
+```ts
+// vite.config.ts
+import { cheminfoBuildInfo } from 'react-cheminfo/vite';
+
+plugins: [react(), cheminfoBuildInfo(), cheminfoPrerender({ ... })];
+```
+
+```ts
+// src/about.ts
+import { BUILD_INFO } from 'react-cheminfo/build-info';
+
+export const ABOUT: AboutContent = { siteId: 'smiles', build: BUILD_INFO, ... };
+```
+
+`react-cheminfo/build-info` is a real module that exports `undefined`, and the
+plugin fills it in during the build. So a Playwright spec or a unit test that
+imports the same About record in plain Node still resolves it — a virtual
+specifier does not, and the whole suite dies on the import — and a build without
+the plugin simply shows no build line.
+
+Where each value comes from:
+
+- **version** — the `package.json` at the repository root, which is the one
+  release-please bumps. A site whose tool lives in `frontend` still reports the
+  root version rather than the `0.0.0` that workspace was scaffolded with.
+- **builtAt** — the instant the build ran, to the second, honouring
+  `SOURCE_DATE_EPOCH`.
+- **commit** — read out of `.git` as files, never by running git: the image
+  build has no git binary and the shared `docker-image` workflow passes no build
+  argument. A site therefore lets three paths back into the build context, which
+  costs a few kilobytes:
+
+  ```
+  # .dockerignore
+  .git
+  !.git/HEAD
+  !.git/refs
+  !.git/packed-refs
+  ```
+
+  Without them the commit is simply left out, and `GITHUB_SHA` is used when the
+  environment names one.
+
+The same record is written to **`build-info.json`** in the build, so the whole
+family answers one question with one request each:
+
+```sh
+curl -s https://smiles.cheminfo.org/build-info.json
+```
 
 ## Styling
 

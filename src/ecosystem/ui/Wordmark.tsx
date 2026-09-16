@@ -3,12 +3,22 @@ import type { CSSProperties, ReactElement } from 'react';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { siteById } from '../core/lookup.ts';
 import { siteNameColors } from '../core/nameColors.ts';
-import type { SiteId } from '../core/sites.ts';
+import type { EcosystemSite, SiteId } from '../core/sites.ts';
 
 /** What a site's written name needs. */
 export interface WordmarkProps {
-  /** The site whose name is written. */
-  siteId: SiteId;
+  /**
+   * The site whose name is written, passed rather than named — for a site that
+   * is deliberately not one of `ECOSYSTEM_SITES`. One of `site` and `siteId` is
+   * required.
+   * @default undefined
+   */
+  site?: EcosystemSite;
+  /**
+   * The same site, named rather than passed, which is what a header knows.
+   * @default undefined
+   */
+  siteId?: SiteId;
   /**
    * Size of the name, in pixels. The weight comes from the surrounding
    * context, so the same wordmark suits a header bar and a heading.
@@ -32,12 +42,17 @@ export interface WordmarkProps {
  * its address.
  * @param props - The site, the size of the name, and extra class names.
  * @returns The name, as one inline element that never wraps mid-address.
+ * @throws {Error} When neither `site` nor `siteId` is given.
  */
 export function Wordmark(props: WordmarkProps): ReactElement {
-  const { siteId, size = 17, className } = props;
-  const site = siteById(siteId);
-  const { lead, alt, dot } = site.name;
-  const colors = siteNameColors(site);
+  const { site, siteId, size = 17, className } = props;
+  const written = site ?? (siteId === undefined ? undefined : siteById(siteId));
+  if (written === undefined) {
+    throw new Error('Wordmark needs one of its `site` and `siteId` props');
+  }
+
+  const { lead, alt, dot } = written.name;
+  const colors = siteNameColors(written);
 
   return (
     <span

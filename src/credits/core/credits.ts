@@ -195,6 +195,27 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'react-roi',
+    name: 'react-roi',
+    href: 'https://github.com/zakodium-oss/react-roi',
+    description: 'the box a region of an image is drawn with.',
+    license: 'MIT',
+  },
+  {
+    id: 'file-collection',
+    name: 'file-collection',
+    href: 'https://github.com/cheminfo/file-collection',
+    description: 'the reader that takes dropped files, folders and archives.',
+    license: 'MIT',
+  },
+  {
+    id: 'zip-js',
+    name: 'zip.js',
+    href: 'https://github.com/gildas-lormeau/zip.js',
+    description: 'the ZIP archives that are read and written in the browser.',
+    license: 'BSD-3-Clause',
+  },
+  {
     id: 'preact-signals',
     name: 'Preact Signals',
     href: 'https://preactjs.com/guide/v10/signals/',

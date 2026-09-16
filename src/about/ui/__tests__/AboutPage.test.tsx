@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import { PLATFORM_WORK } from '../../../citation/core/platformPaper.ts';
+import type { SiteId } from '../../../ecosystem/core/sites.ts';
 import type { AboutContent } from '../../core/about.ts';
 import { AboutPage } from '../AboutPage.tsx';
 
@@ -16,7 +17,11 @@ const SMILES: AboutContent = {
   ],
   credits: ['openchemlib', 'react'],
   cite: [PLATFORM_WORK],
-  version: '2.4.0',
+  build: {
+    version: '2.4.0',
+    builtAt: '2026-09-16T09:41:07Z',
+    commit: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
+  },
 };
 
 /**
@@ -94,7 +99,43 @@ test('the licence, the sources and the version come from the ecosystem record', 
   expect(html).toContain(
     'href="https://github.com/cheminfo/smiles.cheminfo.org/issues"',
   );
-  expect(html).toContain('This page is running version 2.4.0.');
+  expect(html).toContain('Running version ');
+  expect(html).toContain(
+    'href="https://github.com/cheminfo/smiles.cheminfo.org/releases/tag/v2.4.0"',
+  );
+  expect(html).toContain('built 2026-09-16 09:41:07 UTC');
+  expect(html).toContain(
+    'href="https://github.com/cheminfo/smiles.cheminfo.org/commit/a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"',
+  );
+  expect(html).toContain('>a1b2c3d</code>');
+});
+
+test('a build that does not know its commit says only what it knows', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        build: { version: '2.4.0', builtAt: '2026-09-16T09:41:07Z' },
+      }}
+    />,
+  );
+
+  expect(html).toContain('built 2026-09-16 09:41:07 UTC');
+  expect(html).not.toContain('from commit');
+});
+
+test('a site published off GitHub shows the build without inventing links', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        repository: 'https://gitlab.com/cheminfo/elsewhere',
+      }}
+    />,
+  );
+
+  expect(html).toContain('>2.4.0</code>');
+  expect(html).not.toContain('gitlab.com/cheminfo/elsewhere/releases');
 });
 
 test('each work is cited through the shared Cite button, and nothing else', () => {
@@ -242,4 +283,29 @@ test('a site with a drawn lockup shows it instead of the mark and the name', () 
   expect(drawn).toContain(
     'Draw a structure and read the SMILES that describes it, atom by atom.',
   );
+});
+
+test('a site outside the family draws its own mark and name from its record', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      mark={<svg data-testid="own-mark" />}
+      content={{
+        ...SMILES,
+        siteId: {
+          id: 'images' as SiteId,
+          name: { lead: 'images', alt: 'cheminfo', dot: true },
+          host: 'images.cheminfo.org',
+          repository: 'https://github.com/cheminfo/images.cheminfo.org',
+          group: 'computing',
+          tagline: 'Crop, rotate, adjust, resize and compress images.',
+          brand: '#a21caf',
+          brandAlt: '#b45309',
+          mark: { plate: '#a21caf', accent: '#f59e0b' },
+        },
+      }}
+    />,
+  );
+
+  expect(html).toContain('Crop, rotate, adjust, resize and compress images.');
+  expect(html).toContain('>images</span>');
 });
