@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.16.0](https://github.com/cheminfo/react-cheminfo/compare/v0.15.0...v0.16.0) (2026-09-17)
+
+
+### Features
+
+* **ecosystem:** add dbe, ocl-cache, symmetry and osiris ([e940edf](https://github.com/cheminfo/react-cheminfo/commit/e940edfed8d5cb817e8b5e699474241fb1c705ae))
+* **parallel:** add ParallelCoordinates ([05c2a14](https://github.com/cheminfo/react-cheminfo/commit/05c2a1415b4116f576c5a3cd84c3fc83d874c3e3))
+
+
+### Bug Fixes
+
+* **ecosystem:** drop ocl-cache, which is not indexed ([4171995](https://github.com/cheminfo/react-cheminfo/commit/417199513e3f29161bd26d5dd356d48e270c3d24))
+* **structure:** size the editor when its toolbar arrives ([c25464a](https://github.com/cheminfo/react-cheminfo/commit/c25464a650a3bf9bb7e9ccabeefd3036cedcdc65))
+
 ## [0.15.0](https://github.com/cheminfo/react-cheminfo/compare/v0.14.0...v0.15.0) (2026-09-16)
 
 
