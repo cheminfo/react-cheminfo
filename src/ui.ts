@@ -15,6 +15,7 @@ export * from './error/ui/index.ts';
 export * from './help/ui/index.ts';
 export * from './hooks/ui/index.ts';
 export * from './overlay/ui/index.ts';
+export * from './parallel/ui/index.ts';
 export * from './pedagogy/ui/index.ts';
 export * from './periodic/ui/index.ts';
 export * from './projection/ui/index.ts';

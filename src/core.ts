@@ -12,6 +12,7 @@ export * from './error/core/index.ts';
 export * from './format/core/index.ts';
 export * from './orbital/core/index.ts';
 export * from './overlay/core/index.ts';
+export * from './parallel/core/index.ts';
 export * from './pedagogy/core/index.ts';
 export * from './periodic/core/index.ts';
 export * from './projection/core/index.ts';

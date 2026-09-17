@@ -83,6 +83,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Token guard**            | `findTokenViolations`                                                                                                                                                                                                                                   | `cheminfo-check-tokens` (the bin)                                                                                                                                                       |
 | **Figures**                | `chartScale`, `chartAxisScale`, `chartAxisTitle`, `chartShare`, `chartColumnExtent`, `chartBinCounts`, `chartSeriesColor`, `rowMatrix`, `stackedMatrix`, `emptiestCorner`, `placeOverlayCard`, `overlayMetrics`                                         | `ChartFrame`, `ChartAxis`, `TrackedLineChart`, `OverlayBar`, `OverlaySelect`, `OverlaySegmented`, `OverlayToggle`, `OverlayNumber`, `OverlayLegend`, `OverlayCaption`, `OverlayReadout` |
 | **Projections**            | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `PROJECTION_COPY`                                                          | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                         |
+| **Parallel coordinates**   | `parallelAxisOf`, `parallelAxisLayouts`, `parallelIncludedMask`, `parallelKeptCount`, `parallelNearestRow`, `parallelSegmentAt`, `parallelBandAt`, `parallelRangeOf`, `parallelPalette`, `parallelColorSteps`, `paintParallelLines`                     | `ParallelCoordinates`                                                                                                                                                                   |
 | **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                   | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                        |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
@@ -501,6 +502,101 @@ marks itself, so the cog in the corner never lands in the middle of the scatter.
 
 `downloadFigure(target, options)`, `figureSvg` and `figurePng` are the same thing
 without the button, for a site saving a figure from its own menu.
+
+### `ParallelCoordinates`
+
+Many rows against many properties at once: one vertical axis per column, one
+line per row, and a brush on every axis.
+
+```tsx
+import { ParallelCoordinates } from 'react-cheminfo/ui';
+import { parallelAxisOf, parallelIncludedMask } from 'react-cheminfo/core';
+
+const axes = useMemo(
+  () => [
+    parallelAxisOf(rows, {
+      id: 'mw',
+      label: 'MW',
+      unit: 'g/mol',
+      value: (r) => r.weight,
+    }),
+    parallelAxisOf(rows, { id: 'clogp', label: 'cLogP', value: (r) => r.logP }),
+    parallelAxisOf(rows, {
+      id: 'mutagenic',
+      label: 'Mutagenic',
+      domain: [0, 2],
+      ticks: [
+        { value: 0, label: 'none' },
+        { value: 1, label: 'low' },
+        { value: 2, label: 'high' },
+      ],
+      value: (r) => r.mutagenic,
+    }),
+  ],
+  [rows],
+);
+const included = useMemo(
+  () => parallelIncludedMask(axes, ranges, rows.length),
+  [axes, ranges, rows.length],
+);
+
+<ParallelCoordinates
+  axes={axes}
+  width={width}
+  height={340}
+  colorAxis="clogp"
+  ranges={ranges}
+  onRangeChange={setRange}
+  included={included}
+  hovered={hovered}
+  onHoverChange={setHovered}
+  selected={picked}
+  onRowClick={pick}
+  renderTooltip={({ index }) => <MF mf={rows[index].mf} />}
+/>;
+<MoleculeTable included={included} />;
+```
+
+- **It is told nothing about what the rows are.** Every axis hands over one
+  `ArrayLike<number>` read in place, so a repaint costs an indexed read rather
+  than a call per value, and the same figure draws a library of molecules, a set
+  of runs and a table of measurements. `parallelAxisOf` is the one place a row
+  type is named, and it runs once per data change.
+- **The table beside it filters on the same answer.** `parallelIncludedMask` is
+  exported and is what the figure itself uses: a plot drawing one line under a
+  table showing fourteen rows is not a rounding error, it is two programs.
+- **A brush reports on release, never during the drag.** The band follows the
+  pointer live — that costs nothing, it is one component's own state — while the
+  interval reaches the caller once per gesture, so a table filtering on it is
+  asked to re-render once rather than sixty times a second. `onRangePreview` is
+  there for a caption, and for nothing else.
+- **The brush is arithmetic, not a library.** Create by dragging on a bare axis,
+  move the band, drag either edge, clear by pressing outside it: four answers to
+  one question, which part of the axis the press landed on. Written that way the
+  whole gesture is unit-tested in a runtime with no DOM, which is what a brush
+  attached to an element can never be — and it keeps 15.8 kB of `d3-brush` out
+  of every site that draws one.
+- **The axes end exactly on the data.** No nicing, because the reader is
+  comparing rows against each other and the best one has to touch the top of its
+  axis rather than float below a round number nothing reached. `nice` turns it on
+  per axis when round numbers really are the point, and a column with no spread
+  at all is opened by half a unit so that it still draws.
+- **A coded quantity writes its own graduations.** `domain: [0, 2]` with `ticks`
+  reading `none`, `low`, `high` is what a risk column needs; `2` on an axis means
+  nothing to anybody.
+- **The lines are a canvas, everything else is not.** Ten thousand polylines are
+  not ten thousand elements, so the mass is painted — the rows a brush left out
+  in one batched path underneath, the kept ones over them — while the axes, the
+  bands, the names and the card stay SVG and HTML. The consequence is worth
+  knowing before choosing it: `FigureDownload` copies SVG off the page, so a
+  saved figure keeps the axes and loses the lines.
+- **A canvas cannot read a custom property**, and the accent is the one colour a
+  site owns, so the figure asks the browser what its own `--accent`, `--text`,
+  `--text-muted` and `--surface` resolved to and paints with the answer. `ink`
+  overrides any of them.
+- **The card is a render prop**, because what belongs in it is the caller's
+  subject — a formula through `react-mf`, a structure, a name — and a readout of
+  strings cannot hold any of that.
 
 ## Carrying talks
 
