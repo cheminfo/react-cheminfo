@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.17.0](https://github.com/cheminfo/react-cheminfo/compare/v0.16.0...v0.17.0) (2026-09-17)
+
+
+### Features
+
+* **parallel:** keep several intervals per axis, and move an axis by its name ([731fa09](https://github.com/cheminfo/react-cheminfo/commit/731fa09c585001012b68d5dc44587220514cbd4b))
+
+
+### Bug Fixes
+
+* **parallel:** break a line at an axis the row has no value on ([41ccbde](https://github.com/cheminfo/react-cheminfo/commit/41ccbdefbcb4312d64e8a9aa298a1b802ca84835))
+
 ## [0.16.0](https://github.com/cheminfo/react-cheminfo/compare/v0.15.0...v0.16.0) (2026-09-17)
 
 
