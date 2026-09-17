@@ -78,6 +78,13 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'osiris-property-explorer',
+    name: 'OSIRIS Property Explorer',
+    href: 'https://www.organic-chemistry.org/prog/peo/',
+    description:
+      'the original toxicity and property predictions, by Thomas Sander at Actelion, now Idorsia.',
+  },
+  {
     id: 'react-ocl',
     name: 'react-ocl',
     href: 'https://github.com/zakodium-oss/react-ocl',
@@ -113,6 +120,20 @@ export const CREDITS = [
     name: 'ml-matrix',
     href: 'https://github.com/mljs/matrix',
     description: 'the linear algebra behind the numbers on the page.',
+    license: 'MIT',
+  },
+  {
+    id: 'ml-xsadd',
+    name: 'ml-xsadd',
+    href: 'https://github.com/mljs/xsadd',
+    description: 'the seeded generator a reproducible series is drawn from.',
+    license: 'MIT',
+  },
+  {
+    id: 'cif-to-json',
+    name: 'cif-to-json',
+    href: 'https://github.com/cheminfo/cif-to-json',
+    description: 'the reader that turns a crystallographic file into data.',
     license: 'MIT',
   },
   {

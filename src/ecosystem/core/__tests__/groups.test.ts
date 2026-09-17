@@ -43,9 +43,11 @@ test('the topics between them hold every site, each exactly once', () => {
 test('the tools a course opens with are the ones under the basics', () => {
   expect(sitesInGroup('basics').map((site) => site.id)).toStrictEqual([
     'chemcalc',
+    'dbe',
     'lcao',
     'equilibrium',
     'periodic-table',
+    'symmetry',
   ]);
   expect(sitesInGroup('spectra').map((site) => site.id)).toStrictEqual([
     'nmrium',

@@ -75,7 +75,7 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(30);
+  expect(CREDITS).toHaveLength(33);
 });
 
 test('every entry names a work, an address and what it does', () => {

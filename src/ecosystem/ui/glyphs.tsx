@@ -129,6 +129,18 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <path d="M23 24V18" stroke="#ffffff" />
     </g>
   ),
+  // A ring with a double bond drawn inside it: the two things a DBE adds up,
+  // and the equals sign the E of the name already is.
+  dbe: (alt) => (
+    <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path
+        d="M16 5 25.53 10.5 25.53 21.5 16 27 6.47 21.5 6.47 10.5Z"
+        stroke="#ffffff"
+        strokeWidth="2.4"
+      />
+      <path d="M10.8 12.9h10.4M10.8 19.1h10.4" stroke={alt} strokeWidth="2.9" />
+    </g>
+  ),
   // The ring and the substituent dots of the DerepFlow logo do not survive
   // 16 px, so the mark keeps the two elements that carry its meaning: the
   // compound, and the tick that says it has been identified.
@@ -361,6 +373,68 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
         fill="#ffffff"
       />
       <ellipse cx="16" cy="9.4" rx="10.2" ry="3.9" fill={alt} />
+    </>
+  ),
+  // A ring in the answering colour over two kept rows: the molecule is asked
+  // for once and the answer is what stays behind. Drawn as a ring rather than
+  // as the neighbouring site's platters, so the two never read as one mark.
+  'ocl-cache': (alt) => (
+    <>
+      <polygon
+        points="16,3.2 21.54,6.4 21.54,12.8 16,16 10.46,12.8 10.46,6.4"
+        fill={alt}
+      />
+      <rect
+        x="6.4"
+        y="19.2"
+        width="19.2"
+        height="3.4"
+        rx="1.7"
+        fill="#ffffff"
+      />
+      <rect
+        x="6.4"
+        y="24.4"
+        width="19.2"
+        height="3.4"
+        rx="1.7"
+        fill="#ffffff"
+        opacity="0.55"
+      />
+    </>
+  ),
+  // A tetrahedron seen from slightly above, four balls at its corners: the
+  // first shape a chemist meets symmetry in. The apex carries the answering
+  // colour, which is also the C3 axis every base triangle turns about.
+  symmetry: (alt) => (
+    <>
+      <g stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" fill="none">
+        <path d="M16 6.4 6.6 24.4M16 6.4 25.4 24.4M16 6.4 16 17.6" />
+        <path d="M6.6 24.4 25.4 24.4" />
+        <path d="M6.6 24.4 16 17.6M25.4 24.4 16 17.6" opacity="0.5" />
+      </g>
+      <circle cx="16" cy="17.6" r="2.5" fill="#ffffff" opacity="0.55" />
+      <circle cx="6.6" cy="24.4" r="3.2" fill="#ffffff" />
+      <circle cx="25.4" cy="24.4" r="3.2" fill="#ffffff" />
+      <circle cx="16" cy="6.4" r="3.6" fill={alt} />
+    </>
+  ),
+  // Three axes with one line crossing them: a parallel-coordinates plot, which
+  // is how this site reads a set of molecules against one another. The line
+  // carries the answering colour because the line is the molecule.
+  osiris: (alt) => (
+    <>
+      <g stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" fill="none">
+        <path d="M7.4 6.8V25.2M16 6.8V25.2M24.6 6.8V25.2" />
+      </g>
+      <path
+        d="M7.4 21.6 16 10.4 24.6 17.2"
+        fill="none"
+        stroke={alt}
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </>
   ),
 };

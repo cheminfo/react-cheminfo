@@ -8,6 +8,7 @@ export type SiteId =
   | 'smiles'
   | 'openbabel'
   | 'chemcalc'
+  | 'dbe'
   | 'nmrium'
   | 'metabo'
   | 'derepflow'
@@ -21,7 +22,10 @@ export type SiteId =
   | 'polycarp'
   | '3d'
   | 'periodic-table'
-  | 'database';
+  | 'database'
+  | 'ocl-cache'
+  | 'symmetry'
+  | 'osiris';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

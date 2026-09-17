@@ -80,6 +80,19 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#5b52e0', accent: '#ff8ac2' },
   },
   {
+    id: 'dbe',
+    name: { lead: 'dbe', alt: 'cheminfo', dot: true },
+    host: 'dbe.cheminfo.org',
+    repository: 'https://github.com/cheminfo/dbe.cheminfo.org',
+    tagline: 'Count rings and double bonds from a formula or a structure.',
+    group: 'basics',
+    brand: '#63123f',
+    // The emerald the mark's double bond is drawn in sits at 2.5:1 on white,
+    // so the second half of the wordmark takes this darkened form instead.
+    brandAlt: '#047857',
+    mark: { plate: '#63123f', accent: '#10b981' },
+  },
+  {
     id: 'nmrium',
     name: { lead: 'NMR', alt: 'ium' },
     host: 'www.nmrium.org',
@@ -235,6 +248,45 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brand: '#7c2d12',
     brandAlt: '#0b6e85',
     mark: { plate: '#7c2d12', accent: '#06b6d4' },
+  },
+  {
+    id: 'ocl-cache',
+    name: { lead: 'ocl-', alt: 'cache' },
+    host: 'ocl-cache.cheminfo.org',
+    repository: 'https://github.com/cheminfo/ocl-cache',
+    tagline:
+      'Look up a molecule and read the properties already computed for it.',
+    group: 'research',
+    brand: '#334155',
+    brandAlt: '#b45309',
+    mark: { plate: '#334155', accent: '#f59e0b' },
+  },
+  {
+    id: 'symmetry',
+    name: { lead: 'Symme', alt: 'Try' },
+    host: 'symmetry.cheminfo.org',
+    repository: 'https://github.com/cheminfo/symmetry.cheminfo.org',
+    tagline: 'Find the symmetry of a molecule, a crystal or a pattern.',
+    group: 'basics',
+    brand: '#9f1239',
+    // The gold that carries the apex of the mark sits at 2.2:1 on white, so
+    // the second half of the wordmark takes this darkened amber instead.
+    brandAlt: '#b45309',
+    mark: { plate: '#9f1239', accent: '#f59e0b' },
+  },
+  {
+    id: 'osiris',
+    name: { lead: 'osiris', alt: 'cheminfo', dot: true },
+    host: 'osiris.cheminfo.org',
+    repository: 'https://github.com/cheminfo/osiris.cheminfo.org',
+    tagline: 'Predicted toxicity risks and properties, one molecule or many.',
+    group: 'research',
+    brand: '#854d0e',
+    // The lapis and the gold are equiluminant — 1.02:1 against each other — so
+    // the mark draws the same blue lightened, and this darkened form is what
+    // the second half of the wordmark is set in.
+    brandAlt: '#1d4ed8',
+    mark: { plate: '#854d0e', accent: '#60a5fa' },
   },
 ];
 
