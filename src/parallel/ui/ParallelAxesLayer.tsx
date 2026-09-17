@@ -20,8 +20,8 @@ export interface ParallelAxesLayerProps {
   layouts: readonly ParallelAxisLayout[];
   /** Height of the drawing area, in pixels. */
   innerHeight: number;
-  /** The band each axis carries right now, the one being dragged included. */
-  bands: ReadonlyMap<string, ParallelBand>;
+  /** The bands each axis carries right now, the one being dragged included. */
+  bands: ReadonlyMap<string, ParallelBand[]>;
   /** The ink the axes, their ticks and their labels are drawn in. */
   axisInk: string;
   /** The ink a band is filled and outlined in. */
@@ -49,7 +49,7 @@ export function ParallelAxesLayer(props: ParallelAxesLayerProps): ReactElement {
       textAnchor="middle"
     >
       {layouts.map((layout) => {
-        const band = bands.get(layout.id) ?? null;
+        const drawn = bands.get(layout.id);
         return (
           <g
             key={layout.id}
@@ -83,7 +83,13 @@ export function ParallelAxesLayer(props: ParallelAxesLayerProps): ReactElement {
               fill="transparent"
               pointerEvents="none"
             />
-            {band === null ? null : <BrushBand band={band} ink={bandInk} />}
+            {drawn?.map((band) => (
+              <BrushBand
+                key={`${band.top}:${band.bottom}`}
+                band={band}
+                ink={bandInk}
+              />
+            ))}
           </g>
         );
       })}

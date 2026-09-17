@@ -29,6 +29,14 @@ export {
 } from './parallelInk.ts';
 export { ParallelLabels } from './ParallelLabels.tsx';
 export type { ParallelLabelsProps } from './ParallelLabels.tsx';
+export type { ParallelCommit, ParallelDraft } from './parallelGestureModel.ts';
+export {
+  parallelAxisById,
+  parallelAxisNear,
+  parallelBandsOf,
+  parallelCommitOf,
+  parallelPointOf,
+} from './parallelGestureModel.ts';
 export {
   parallelColorOf,
   parallelFigureLabel,
@@ -43,6 +51,13 @@ export type {
   ParallelCanvases,
 } from './useParallelCanvas.ts';
 export { useParallelCanvas } from './useParallelCanvas.ts';
+export type {
+  ParallelAxisDrag,
+  ParallelAxisDragOptions,
+  ParallelAxisDragState,
+  ParallelAxisHandleProps,
+} from './useParallelAxisDrag.ts';
+export { useParallelAxisDrag } from './useParallelAxisDrag.ts';
 export type {
   ParallelGesture,
   ParallelGestureOptions,

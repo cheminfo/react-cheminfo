@@ -28,6 +28,8 @@ export type ParallelBrushGrip = 'create' | 'move' | 'top' | 'bottom';
 export interface ParallelBrushDrag {
   /** The axis being brushed, by its id. */
   axis: string;
+  /** Which of that axis's intervals is being written, or `-1` for a new one. */
+  index: number;
   /** What the press took hold of. */
   grip: ParallelBrushGrip;
   /** Where the press landed, in pixels from the top of the drawing area. */
@@ -46,6 +48,15 @@ export const PARALLEL_BRUSH_SMALLEST = 1;
 export const PARALLEL_BRUSH_HALF_WIDTH = 9;
 
 /**
+ * How close to an axis's own end a band edge counts as standing on it.
+ *
+ * Half a pixel is below anything a pointer can aim at, and the two ends are
+ * where the rows a reader most wants sit: the axes end exactly on the data,
+ * so the extreme row is drawn on the end itself.
+ */
+const END_REACH = 0.5;
+
+/**
  * What a press at that height takes hold of.
  * @param y - Where the press landed, in pixels from the top of the drawing area.
  * @param band - The band already on that axis, or `null` when it carries none.
@@ -62,6 +73,52 @@ export function parallelBrushGrip(
   if (Math.abs(y - band.bottom) <= PARALLEL_BRUSH_HANDLE_REACH) return 'bottom';
   if (y > band.top && y < band.bottom) return 'move';
   return 'create';
+}
+
+/** Which of an axis's bands a press took hold of, and by what. */
+export interface ParallelBrushTarget {
+  /** The band, as an index into the list, or `-1` when none was under it. */
+  index: number;
+  /** What the press took hold of. */
+  grip: ParallelBrushGrip;
+}
+
+/** Nothing under the press, so it starts a band of its own. */
+const NEW_BAND: ParallelBrushTarget = { index: -1, grip: 'create' };
+
+/**
+ * Which band a press at that height took hold of, on an axis carrying several.
+ * @param y - Where the press landed, in pixels from the top of the drawing area.
+ * @param bands - The bands on that axis, in any order.
+ * @returns The band and the grip. An edge wins over the band it belongs to and
+ * over any band it lies inside, so two bands dragged flush against each other
+ * can still be pulled apart; a press on bare axis starts a new band.
+ */
+export function parallelBrushTarget(
+  y: number,
+  bands: readonly ParallelBand[],
+): ParallelBrushTarget {
+  let nearest = NEW_BAND;
+  let nearestDistance = PARALLEL_BRUSH_HANDLE_REACH;
+  for (let index = 0; index < bands.length; index++) {
+    const band = bands[index] as ParallelBand;
+    const toTop = Math.abs(y - band.top);
+    if (toTop <= nearestDistance) {
+      nearestDistance = toTop;
+      nearest = { index, grip: 'top' };
+    }
+    const toBottom = Math.abs(y - band.bottom);
+    if (toBottom <= nearestDistance) {
+      nearestDistance = toBottom;
+      nearest = { index, grip: 'bottom' };
+    }
+  }
+  if (nearest !== NEW_BAND) return nearest;
+  for (let index = 0; index < bands.length; index++) {
+    const band = bands[index] as ParallelBand;
+    if (y > band.top && y < band.bottom) return { index, grip: 'move' };
+  }
+  return NEW_BAND;
 }
 
 /**
@@ -123,14 +180,23 @@ export function parallelBandOf(
  * @param band - The band, in pixels from the top of the drawing area.
  * @param axis - The axis it belongs to.
  * @returns The interval, low value first — which is the order every filter in
- * the family reads, and getting it backwards keeps nothing at all.
+ * the family reads, and getting it backwards keeps nothing at all. An edge
+ * standing on an end of the axis reports that end verbatim: inverting the
+ * placement is not exact, and one ulp is enough to drop the row the axis ends
+ * on from its own full-range brush.
  */
 export function parallelRangeOf(
   band: ParallelBand,
   axis: ParallelAxisLayout,
 ): ParallelRange {
-  const low = parallelYToValue(band.bottom, axis);
-  const high = parallelYToValue(band.top, axis);
+  const low =
+    band.bottom >= parallelValueToY(axis.min, axis) - END_REACH
+      ? axis.min
+      : parallelYToValue(band.bottom, axis);
+  const high =
+    band.top <= parallelValueToY(axis.max, axis) + END_REACH
+      ? axis.max
+      : parallelYToValue(band.top, axis);
   return low <= high ? [low, high] : [high, low];
 }
 

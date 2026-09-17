@@ -10,6 +10,7 @@
 
 import { formatInteger } from '../../format/core/numbers.ts';
 import type { ParallelHighlight } from '../core/parallelPaint.ts';
+import { parallelHasRange } from '../core/parallelSelection.ts';
 import type {
   ParallelAxis,
   ParallelColorBy,
@@ -71,7 +72,7 @@ export function parallelColorOf(
 /**
  * Whether any axis on the figure carries an interval at all.
  * @param axes - The axes, whose ids the intervals are keyed by.
- * @param ranges - The interval each axis keeps.
+ * @param ranges - What each axis keeps.
  * @returns Whether anything is brushed, which is what decides whether a line
  * is ever drawn in the excluded ink.
  */
@@ -80,8 +81,7 @@ export function parallelIsBrushed(
   ranges: ParallelRanges,
 ): boolean {
   for (const axis of axes) {
-    const range = ranges[axis.id];
-    if (range !== null && range !== undefined) return true;
+    if (parallelHasRange(ranges[axis.id])) return true;
   }
   return false;
 }

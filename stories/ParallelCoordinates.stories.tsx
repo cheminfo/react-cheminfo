@@ -14,6 +14,7 @@ import {
   parallelExtent,
   parallelIncludedMask,
   parallelKeptCount,
+  parallelRangeList,
 } from '../src/parallel/core/index.ts';
 import { ParallelCoordinates } from '../src/parallel/ui/ParallelCoordinates.tsx';
 import type { ParallelCoordinatesProps } from '../src/parallel/ui/parallelCoordinatesProps.ts';
@@ -117,6 +118,34 @@ export const CodedAxis: Story = {
 };
 
 /**
+ * Several intervals on one axis: the light molecules and the heavy ones, with
+ * nothing in between — which one band cannot say.
+ *
+ * Drag on a bare part of an axis that already carries a band and it keeps
+ * both; click a band to be rid of that one; drag one onto its neighbour and
+ * they become one. Down an axis the intervals are read as a union, across the
+ * axes as an intersection, so brushing a second axis can only ever narrow what
+ * the first one left.
+ */
+export const SeveralIntervals: Story = {
+  render: (args) => <BrushingDemo {...args} several />,
+};
+
+/**
+ * Moving an axis: drag a name sideways, or focus one and press the left and
+ * right arrow keys.
+ *
+ * Two columns only show their relationship when they stand next to each other,
+ * so the order is a question the reader asks rather than one the caller
+ * answers once. The name follows the pointer and a dashed line marks where the
+ * axis would land; the figure is repainted once, when it is let go, rather
+ * than on every frame of the drag.
+ */
+export const MovingAnAxis: Story = {
+  render: (args) => <OrderDemo {...args} />,
+};
+
+/**
  * Picking a line: clicking one singles it out, and clicking empty ground puts
  * it back. A picked line is drawn over the mass in the site's own accent, with
  * a halo under it so that it reads whatever the mass is doing there.
@@ -136,8 +165,8 @@ function BrushingDemo(props: ParallelCoordinatesProps): ReactElement {
       <ParallelCoordinates
         {...props}
         ranges={ranges}
-        onRangeChange={(axisId, range) => {
-          setRanges((previous) => ({ ...previous, [axisId]: range }));
+        onRangeChange={(axisId, kept) => {
+          setRanges((previous) => ({ ...previous, [axisId]: kept }));
         }}
         overlay={
           <OverlayCaption tone="strong" live>
@@ -146,6 +175,24 @@ function BrushingDemo(props: ParallelCoordinatesProps): ReactElement {
         }
       />
       <p style={READOUT_STYLE}>{brushedSentence(ranges)}</p>
+    </div>
+  );
+}
+
+function OrderDemo(props: ParallelCoordinatesProps): ReactElement {
+  const [order, setOrder] = useState<readonly string[]>(() =>
+    props.axes.map((axis) => axis.id),
+  );
+  const axes = order
+    .map((id) => props.axes.find((axis) => axis.id === id))
+    .filter((axis) => axis !== undefined);
+
+  return (
+    <div style={STACK_STYLE}>
+      <ParallelCoordinates {...props} axes={axes} onAxisOrder={setOrder} />
+      <p style={READOUT_STYLE} data-testid="order">
+        {axes.map((axis) => axis.label).join(' · ')}
+      </p>
     </div>
   );
 }
@@ -193,9 +240,9 @@ function PickingDemo(props: ParallelCoordinatesProps): ReactElement {
 function brushedSentence(ranges: ParallelRanges): string {
   const parts: string[] = [];
   for (const axis of DRUG_AXES_WITH_RULES) {
-    const range = ranges[axis.id];
-    if (range === null || range === undefined) continue;
-    parts.push(`${axis.label} ${written(range)}`);
+    const list = parallelRangeList(ranges[axis.id]);
+    if (list.length === 0) continue;
+    parts.push(`${axis.label} ${list.map(written).join(' or ')}`);
   }
   if (parts.length === 0) return 'Nothing brushed — drag down any axis.';
   return `Kept: ${parts.join(', ')}.`;

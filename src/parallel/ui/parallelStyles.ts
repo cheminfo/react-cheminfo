@@ -62,22 +62,64 @@ export const PARALLEL_LABELS_STYLE = {
   pointerEvents: 'none',
 } as const satisfies CSSProperties;
 
+/** How one axis name is placed, and whether it is being moved. */
+export interface ParallelLabelPlacement {
+  /** Where the axis stands, in pixels from the figure's left edge. */
+  left: number;
+  /**
+   * Whether the name can be dragged to move its axis.
+   * @default false
+   */
+  draggable?: boolean;
+  /**
+   * How far it has been dragged, in pixels, or `null` when it is not moving.
+   * @default null
+   */
+  dx?: number | null;
+}
+
 /**
  * One axis name, centred over its axis and taking the pointer back.
- * @param left - Where the axis stands, in pixels from the figure's left edge.
- * @returns The name's rules.
+ * @param placement - See {@link ParallelLabelPlacement}.
+ * @returns The name's rules. A name being dragged follows the pointer and is
+ * drawn over its neighbours, so it is never hidden behind the name it is
+ * about to change places with.
  */
-export function parallelLabelStyle(left: number): CSSProperties {
+export function parallelLabelStyle(
+  placement: ParallelLabelPlacement,
+): CSSProperties {
+  const { left, draggable = false, dx = null } = placement;
+  const moving = dx !== null;
   return {
     position: 'absolute',
+    zIndex: moving ? 2 : undefined,
     top: 2,
     left,
-    transform: 'translateX(-50%)',
+    transform:
+      dx === null ? 'translateX(-50%)' : `translateX(calc(-50% + ${dx}px))`,
     color: TOKEN.text,
     fontSize: 11,
     fontWeight: 600,
     whiteSpace: 'nowrap',
     pointerEvents: 'auto',
+    cursor: draggable ? (moving ? 'grabbing' : 'grab') : undefined,
+    opacity: moving ? 0.85 : undefined,
+    touchAction: draggable ? 'none' : undefined,
+    userSelect: draggable ? 'none' : undefined,
+  };
+}
+
+/**
+ * The axis a dragged name would take the place of, marked while it is moving.
+ * @param ink - The colour the figure singles things out in.
+ * @returns The mark's rules.
+ */
+export function parallelDropMarkStyle(ink: string): CSSProperties {
+  return {
+    stroke: ink,
+    strokeWidth: 2,
+    strokeOpacity: 0.7,
+    strokeDasharray: '4 3',
   };
 }
 

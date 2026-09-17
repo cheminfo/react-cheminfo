@@ -30,8 +30,10 @@ import {
 import {
   PARALLEL_SVG_STYLE,
   parallelCanvasStyle,
+  parallelDropMarkStyle,
   parallelFigureStyle,
 } from './parallelStyles.ts';
+import { useParallelAxisDrag } from './useParallelAxisDrag.ts';
 import { useParallelCanvas } from './useParallelCanvas.ts';
 import { useParallelGesture } from './useParallelGesture.ts';
 
@@ -70,6 +72,7 @@ export function ParallelCoordinates(
   const { ranges: ownedRanges, defaultRanges, included: givenMask } = props;
   const { color: givenColor, colorAxis, onRangeChange: report } = props;
   const { onRangePreview, hovered, onHoverChange, onRowClick } = props;
+  const { several = false, onAxisOrder } = props;
   const count = parallelRowCount(axes, props.count);
   const innerWidth = Math.max(
     width - PARALLEL_MARGIN.left - PARALLEL_MARGIN.right,
@@ -109,11 +112,11 @@ export function ParallelCoordinates(
     return parallelIncludedMask(axes, ranges, count);
   }, [givenMask, axes, ranges, count]);
 
-  function commitRange(axisId: string, range: ParallelRange | null): void {
+  function commitRange(axisId: string, kept: readonly ParallelRange[]): void {
     if (ownedRanges === undefined) {
-      setOwnRanges((previous) => ({ ...previous, [axisId]: range }));
+      setOwnRanges((previous) => ({ ...previous, [axisId]: kept }));
     }
-    report?.(axisId, range);
+    report?.(axisId, kept);
   }
 
   const gesture = useParallelGesture({
@@ -123,6 +126,7 @@ export function ParallelCoordinates(
     innerHeight,
     included,
     ranges,
+    several,
     onRangeChange: commitRange,
     onRangePreview,
     hovered,
@@ -147,6 +151,10 @@ export function ParallelCoordinates(
     highlights,
     ink,
   });
+
+  const axisDrag = useParallelAxisDrag({ layouts, onAxisOrder });
+  const dropAt =
+    axisDrag.active === null ? undefined : layouts[axisDrag.active.to];
 
   const label = given ?? parallelFigureLabel(axes, count);
   const canvasStyle = parallelCanvasStyle(height);
@@ -199,11 +207,22 @@ export function ParallelCoordinates(
               onClick={gesture.onClick}
               {...gesture.surface}
             />
+            {dropAt === undefined ? null : (
+              <line
+                data-parallel-drop={dropAt.id}
+                x1={PARALLEL_MARGIN.left + dropAt.x}
+                x2={PARALLEL_MARGIN.left + dropAt.x}
+                y1={PARALLEL_MARGIN.top}
+                y2={PARALLEL_MARGIN.top + innerHeight}
+                style={parallelDropMarkStyle(ink.selection)}
+              />
+            )}
           </svg>
           <ParallelLabels
             axes={axes}
             layouts={layouts}
             render={renderAxisLabel}
+            drag={axisDrag}
           />
           {hover === null || renderTooltip === undefined ? null : (
             <ParallelTooltip

@@ -86,8 +86,20 @@ export interface ParallelAxis {
 /** An interval kept on one axis, in that axis's own units, low first. */
 export type ParallelRange = readonly [number, number];
 
+/**
+ * What one axis keeps: nothing, one interval, or several disjoint ones.
+ *
+ * A reader comparing molecules wants the light ones *and* the heavy ones, with
+ * nothing in between, which one interval cannot say. Several are read as a
+ * union — a row is kept when it falls in any of them — while the axes are
+ * still read as an intersection, so each axis narrows what the ones before it
+ * left. A bare interval means the same as a list holding only it, so a caller
+ * that only ever keeps one writes one.
+ */
+export type ParallelSelection = ParallelRange | readonly ParallelRange[] | null;
+
 /** Which rows a set of brushes keeps, keyed by axis id. */
-export type ParallelRanges = Readonly<Record<string, ParallelRange | null>>;
+export type ParallelRanges = Readonly<Record<string, ParallelSelection>>;
 
 /** How the lines are coloured. */
 export interface ParallelColorBy {

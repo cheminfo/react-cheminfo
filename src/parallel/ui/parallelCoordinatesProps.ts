@@ -84,10 +84,11 @@ export interface ParallelCoordinatesProps {
   height?: number;
 
   /**
-   * The interval each axis keeps, keyed by axis id. Present, the caller owns
-   * the brushes — which is what lets a table beside the figure filter on the
-   * same ranges. The band being dragged stays inside the component either way,
-   * so a controlled parent is never asked to re-render sixty times a second.
+   * What each axis keeps, keyed by axis id: one interval, several, or `null`.
+   * Present, the caller owns the brushes — which is what lets a table beside
+   * the figure filter on the same ranges. The band being dragged stays inside
+   * the component either way, so a controlled parent is never asked to
+   * re-render sixty times a second.
    * @default undefined — the figure keeps its own
    */
   ranges?: ParallelRanges;
@@ -97,17 +98,25 @@ export interface ParallelCoordinatesProps {
    */
   defaultRanges?: ParallelRanges;
   /**
-   * Called when a brush is released, with the interval it keeps or `null` when
-   * it was cleared — never while the band is being dragged.
+   * Whether one axis may keep several intervals at once — the light molecules
+   * and the heavy ones, with nothing in between. A reader brushes a second
+   * interval by dragging on a bare part of an axis that already carries one,
+   * and takes one away by clicking it.
+   * @default false — a new brush replaces the one the axis carried
+   */
+  several?: boolean;
+  /**
+   * Called when a brush is released, with every interval that axis now keeps —
+   * empty when the reader cleared it, and never while a band is being dragged.
    * @default undefined
    */
-  onRangeChange?: (axisId: string, range: ParallelRange | null) => void;
+  onRangeChange?: (axisId: string, ranges: readonly ParallelRange[]) => void;
   /**
    * Called on every frame a band grows, for a caption saying what letting go
    * would keep. Nothing else should be wired to it.
    * @default undefined
    */
-  onRangePreview?: (axisId: string, range: ParallelRange | null) => void;
+  onRangePreview?: (axisId: string, ranges: readonly ParallelRange[]) => void;
   /**
    * Which rows the brushes keep, one entry per row, a zero meaning excluded.
    * Left out, it is worked out from the ranges with `parallelIncludedMask`,
@@ -170,6 +179,15 @@ export interface ParallelCoordinatesProps {
    * @default the axis label, and its unit after it
    */
   renderAxisLabel?: (axis: ParallelAxis, index: number) => ReactNode;
+  /**
+   * Called with the axis ids in the order the reader dragged them into.
+   * Present, every axis name becomes a handle: drag it, or focus it and press
+   * the left and right arrow keys. Two columns only show their relationship
+   * when they stand next to each other, so this is how a reader asks a
+   * different question of the same figure.
+   * @default undefined — the axes stand in the order the caller gave them
+   */
+  onAxisOrder?: (ids: readonly string[]) => void;
   /**
    * What is shown in place of the figure when there is nothing to draw.
    * @default undefined — an empty figure of the given height

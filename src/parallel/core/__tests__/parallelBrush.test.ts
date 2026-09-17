@@ -125,18 +125,64 @@ test('a logarithmic axis brushes in its own units', () => {
   expect(high).toBeCloseTo(1000, 6);
 });
 
+test('a band dragged to the top of an axis keeps the row sitting on its maximum', () => {
+  // Inverting the placement is not exact: for this domain over osiris's own
+  // drawing area it lands one ulp below the maximum, so the row drawn on the
+  // top of the axis fell outside its own full-range brush.
+  const axis = axisAt(180.15851999999998, 418.57171999999997, undefined, 292);
+
+  expect(parallelRangeOf({ top: 0, bottom: 150 }, axis)[1]).toBe(axis.max);
+  expect(parallelRangeOf({ top: 0, bottom: 292 }, axis)).toStrictEqual([
+    axis.min,
+    axis.max,
+  ]);
+});
+
+test('a band dragged to the bottom of an axis keeps the row sitting on its minimum', () => {
+  const axis = axisAt(46.07, 285.34, undefined, 292);
+
+  expect(parallelRangeOf({ top: 150, bottom: 292 }, axis)[0]).toBe(axis.min);
+});
+
+test('an end whose own pixel falls outside the drawing area is still reachable', () => {
+  // These two domains place `max` a hair above the top of the area, and `min`
+  // a hair below its bottom, so a band clamped to the area never covers the
+  // pixel the extreme row is drawn on.
+  const high = axisAt(422.03, 916.3799999999999, undefined, 292);
+  const low = axisAt(442.72, 775.6600000000001, undefined, 292);
+
+  expect(parallelRangeOf({ top: 0, bottom: 150 }, high)[1]).toBe(high.max);
+  expect(parallelRangeOf({ top: 150, bottom: 292 }, low)[0]).toBe(low.min);
+});
+
+test('a logarithmic band reaching an end reports that end exactly', () => {
+  const axis = axisAt(1.7, 9_400, 'log', 292);
+
+  expect(parallelRangeOf({ top: 0, bottom: 292 }, axis)).toStrictEqual([
+    axis.min,
+    axis.max,
+  ]);
+});
+
 function dragging(
   grip: ParallelBrushDrag['grip'],
   originY: number,
   origin: ParallelBand,
 ): ParallelBrushDrag {
-  return { axis: 'mw', grip, originY, origin };
+  return {
+    axis: 'mw',
+    index: grip === 'create' ? -1 : 0,
+    grip,
+    originY,
+    origin,
+  };
 }
 
 function axisAt(
   min: number,
   max: number,
   scale?: 'linear' | 'log',
+  height: number = HEIGHT,
 ): ParallelAxisLayout {
   const layouts = parallelAxisLayouts(
     [
@@ -150,7 +196,7 @@ function axisAt(
     ],
     0,
     0,
-    HEIGHT,
+    height,
   );
   return layouts[0] as ParallelAxisLayout;
 }

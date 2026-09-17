@@ -82,6 +82,37 @@ test('a brushed interval is drawn as a band over the pixels it keeps', () => {
 
 test('an unbrushed figure carries no band at all', () => {
   expect(figure()).not.toContain('class="parallel-axis-band"');
+  expect(figure({ ranges: { mw: [] } })).not.toContain(
+    'class="parallel-axis-band"',
+  );
+});
+
+test('every interval of an axis that keeps several is drawn', () => {
+  const html = figure({
+    ranges: {
+      mw: [
+        [0, 50],
+        [150, 200],
+      ],
+    },
+    several: true,
+  });
+
+  expect(occurrences(html, 'class="parallel-axis-band"')).toBe(2);
+  expect(html).toContain('y="0"');
+  expect(html).toContain('y="150"');
+});
+
+test('the axis names are handles only when the caller takes the order', () => {
+  expect(figure()).not.toContain('role="button"');
+
+  const html = figure({ onAxisOrder: () => undefined });
+
+  expect(occurrences(html, 'data-parallel-label=')).toBe(2);
+  expect(html).toContain('role="button"');
+  expect(html).toContain('tabindex="0"');
+  expect(html).toContain('move this axis with the left and right arrow keys');
+  expect(html).toContain('cursor:grab');
 });
 
 test('a figure with nothing to draw shows what the caller put in its place', () => {

@@ -22,6 +22,7 @@ export type {
   ParallelBand,
   ParallelBrushDrag,
   ParallelBrushGrip,
+  ParallelBrushTarget,
 } from './parallelBrush.ts';
 export {
   PARALLEL_BRUSH_HALF_WIDTH,
@@ -30,6 +31,7 @@ export {
   parallelBandAt,
   parallelBandOf,
   parallelBrushGrip,
+  parallelBrushTarget,
   parallelIsBand,
   parallelRangeOf,
 } from './parallelBrush.ts';
@@ -42,6 +44,7 @@ export {
   parallelIncludedMask,
   parallelKeptCount,
   parallelRangeKeeps,
+  parallelSelectionKeeps,
 } from './parallelFilter.ts';
 export type { ParallelPoint, ParallelSegment } from './parallelHit.ts';
 export {
@@ -49,6 +52,11 @@ export {
   parallelNearestRow,
   parallelSegmentAt,
 } from './parallelHit.ts';
+export {
+  parallelAxisOrder,
+  parallelDropIndex,
+  parallelMoveAxis,
+} from './parallelOrder.ts';
 export type {
   ParallelHighlight,
   ParallelHighlightPaint,
@@ -63,9 +71,16 @@ export {
 } from './parallelPaint.ts';
 export {
   PARALLEL_PALETTE_STEPS,
+  PARALLEL_PALETTE_UNKNOWN,
   parallelColorSteps,
   parallelPalette,
 } from './parallelPalette.ts';
+export {
+  parallelHasRange,
+  parallelMergeRanges,
+  parallelRangeList,
+  parallelWriteRange,
+} from './parallelSelection.ts';
 export type { ParallelGraduation } from './parallelTicks.ts';
 export { PARALLEL_TICK_COUNT, parallelTicks } from './parallelTicks.ts';
 export type {
@@ -75,6 +90,7 @@ export type {
   ParallelColorBy,
   ParallelRange,
   ParallelRanges,
+  ParallelSelection,
   ParallelTick,
 } from './parallelTypes.ts';
 export { parallelAxisOf } from './parallelTypes.ts';

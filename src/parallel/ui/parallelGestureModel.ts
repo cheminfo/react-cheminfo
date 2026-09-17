@@ -15,13 +15,21 @@ import type { ParallelBand } from '../core/parallelBrush.ts';
 import {
   PARALLEL_BRUSH_HALF_WIDTH,
   parallelBandOf,
+  parallelIsBand,
+  parallelRangeOf,
 } from '../core/parallelBrush.ts';
-import type { ParallelRanges } from '../core/parallelTypes.ts';
+import {
+  parallelRangeList,
+  parallelWriteRange,
+} from '../core/parallelSelection.ts';
+import type { ParallelRange, ParallelRanges } from '../core/parallelTypes.ts';
 
 /** A band being dragged, before the interval it keeps is reported. */
 export interface ParallelDraft {
   /** The axis it is on. */
   axis: string;
+  /** Which of that axis's bands it is, or `-1` when it is a new one. */
+  index: number;
   /** Where it stands this frame. */
   band: ParallelBand;
 }
@@ -83,27 +91,69 @@ export function parallelAxisById(
 }
 
 /**
- * The band to draw on each axis: the one being dragged where there is one, and
- * the interval in force everywhere else.
+ * The bands to draw on each axis: the one being dragged where there is one,
+ * and the intervals in force everywhere else.
  * @param axes - The axes, from left to right.
- * @param ranges - The interval each axis keeps, or `null` for none.
+ * @param ranges - What each axis keeps: one interval, several, or none.
  * @param draft - The band being dragged, or `null` when nothing is.
- * @returns The bands, keyed by axis id; an axis with none is left out.
+ * @returns The bands, keyed by axis id; an axis with none is left out. The
+ * band being dragged replaces the interval it came from rather than being
+ * drawn beside it, so an interval never appears twice mid-gesture.
  */
 export function parallelBandsOf(
   axes: readonly ParallelAxisLayout[],
   ranges: ParallelRanges,
   draft: ParallelDraft | null,
-): ReadonlyMap<string, ParallelBand> {
-  const drawn = new Map<string, ParallelBand>();
+): ReadonlyMap<string, ParallelBand[]> {
+  const drawn = new Map<string, ParallelBand[]>();
   for (const axis of axes) {
-    if (draft !== null && draft.axis === axis.id) {
-      drawn.set(axis.id, draft.band);
-      continue;
+    const list = parallelRangeList(ranges[axis.id]);
+    const dragging = draft !== null && draft.axis === axis.id;
+    const bands: ParallelBand[] = [];
+    for (let index = 0; index < list.length; index++) {
+      if (dragging && index === draft.index) continue;
+      bands.push(parallelBandOf(list[index] as ParallelRange, axis));
     }
-    const range = ranges[axis.id];
-    if (range === null || range === undefined) continue;
-    drawn.set(axis.id, parallelBandOf(range, axis));
+    if (dragging) bands.push(draft.band);
+    if (bands.length > 0) drawn.set(axis.id, bands);
   }
   return drawn;
+}
+
+/** What a released band does to the intervals its axis already kept. */
+export interface ParallelCommit {
+  /** The intervals in force on that axis. */
+  list: readonly ParallelRange[];
+  /** Which of them the drag took hold of, or `-1` when it began a new one. */
+  index: number;
+  /** The band as the pointer left it. */
+  band: ParallelBand;
+  /** The axis it is on, to read the band back into its own units. */
+  layout: ParallelAxisLayout;
+  /** Whether the press took an interval and let it go without moving it. */
+  still: boolean;
+  /** Whether the axis may keep more than one interval. */
+  several: boolean;
+}
+
+/**
+ * The intervals an axis keeps once a band has been let go.
+ *
+ * A press that keeps nothing is a click, and a click says "take this away":
+ * the interval under the pointer when it landed on one, and every interval on
+ * the axis when it landed on bare axis. That is the only way to be rid of one
+ * interval on an axis carrying four, and it is the gesture that already
+ * cleared an axis before it could carry more than one.
+ * @param commit - See {@link ParallelCommit}.
+ * @returns The intervals, sorted and disjoint.
+ */
+export function parallelCommitOf(commit: ParallelCommit): ParallelRange[] {
+  const { list, index, band, layout, still, several } = commit;
+  if (still) return parallelWriteRange(list, index, null);
+  if (!parallelIsBand(band)) {
+    return index === -1 ? [] : parallelWriteRange(list, index, null);
+  }
+  const range = parallelRangeOf(band, layout);
+  if (!several && index === -1) return [range];
+  return parallelWriteRange(list, index, range);
 }

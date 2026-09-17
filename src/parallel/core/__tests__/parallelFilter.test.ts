@@ -4,6 +4,7 @@ import {
   parallelIncludedMask,
   parallelKeptCount,
   parallelRangeKeeps,
+  parallelSelectionKeeps,
 } from '../parallelFilter.ts';
 import type { ParallelAxis, ParallelRanges } from '../parallelTypes.ts';
 
@@ -77,5 +78,52 @@ test('a row the column is too short for falls out of a brushed axis', () => {
 
   expect([...parallelIncludedMask(axes, { mw: [0, 1000] }, 4)]).toStrictEqual([
     1, 1, 0, 0,
+  ]);
+});
+
+test('an axis keeping several intervals keeps a value in any of them', () => {
+  const ranges = [
+    [0, 1],
+    [10, 11],
+  ] as const;
+
+  expect(parallelSelectionKeeps(ranges, 0.5)).toBe(true);
+  expect(parallelSelectionKeeps(ranges, 10.5)).toBe(true);
+  expect(parallelSelectionKeeps(ranges, 5)).toBe(false);
+  expect(parallelSelectionKeeps(ranges, Number.NaN)).toBe(false);
+  // An axis that keeps nothing narrows nothing.
+  expect(parallelSelectionKeeps([], 5)).toBe(true);
+});
+
+test('two intervals on one axis keep the rows in either of them', () => {
+  const ranges: ParallelRanges = {
+    mw: [
+      [100, 150],
+      [350, 450],
+    ],
+  };
+
+  expect([...parallelIncludedMask(AXES, ranges, 4)]).toStrictEqual([
+    1, 0, 0, 1,
+  ]);
+});
+
+test('a second axis narrows what the first one left, never widens it', () => {
+  const ranges: ParallelRanges = {
+    mw: [
+      [100, 150],
+      [350, 450],
+    ],
+    logP: [[-2, 0]],
+  };
+
+  expect([...parallelIncludedMask(AXES, ranges, 4)]).toStrictEqual([
+    1, 0, 0, 0,
+  ]);
+});
+
+test('an axis keeping an empty list is an axis nothing is brushed on', () => {
+  expect([...parallelIncludedMask(AXES, { mw: [] }, 4)]).toStrictEqual([
+    1, 1, 1, 1,
   ]);
 });
