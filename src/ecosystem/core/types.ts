@@ -23,7 +23,6 @@ export type SiteId =
   | '3d'
   | 'periodic-table'
   | 'database'
-  | 'ocl-cache'
   | 'symmetry'
   | 'osiris';
 

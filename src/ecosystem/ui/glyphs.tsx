@@ -375,34 +375,6 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <ellipse cx="16" cy="9.4" rx="10.2" ry="3.9" fill={alt} />
     </>
   ),
-  // A ring in the answering colour over two kept rows: the molecule is asked
-  // for once and the answer is what stays behind. Drawn as a ring rather than
-  // as the neighbouring site's platters, so the two never read as one mark.
-  'ocl-cache': (alt) => (
-    <>
-      <polygon
-        points="16,3.2 21.54,6.4 21.54,12.8 16,16 10.46,12.8 10.46,6.4"
-        fill={alt}
-      />
-      <rect
-        x="6.4"
-        y="19.2"
-        width="19.2"
-        height="3.4"
-        rx="1.7"
-        fill="#ffffff"
-      />
-      <rect
-        x="6.4"
-        y="24.4"
-        width="19.2"
-        height="3.4"
-        rx="1.7"
-        fill="#ffffff"
-        opacity="0.55"
-      />
-    </>
-  ),
   // A tetrahedron seen from slightly above, four balls at its corners: the
   // first shape a chemist meets symmetry in. The apex carries the answering
   // colour, which is also the C3 axis every base triangle turns about.

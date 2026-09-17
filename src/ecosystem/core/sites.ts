@@ -250,18 +250,6 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#7c2d12', accent: '#06b6d4' },
   },
   {
-    id: 'ocl-cache',
-    name: { lead: 'ocl-', alt: 'cache' },
-    host: 'ocl-cache.cheminfo.org',
-    repository: 'https://github.com/cheminfo/ocl-cache',
-    tagline:
-      'Look up a molecule and read the properties already computed for it.',
-    group: 'research',
-    brand: '#334155',
-    brandAlt: '#b45309',
-    mark: { plate: '#334155', accent: '#f59e0b' },
-  },
-  {
     id: 'symmetry',
     name: { lead: 'Symme', alt: 'Try' },
     host: 'symmetry.cheminfo.org',
