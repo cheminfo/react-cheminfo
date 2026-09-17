@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t}from"./iframe-CG5cU-6a.js";import{n,t as r}from"./useResizeObserver-10ps7ee2.js";function i(e){let[t,r]=(0,a.useState)(o);return n(e,e=>{r(t=>t.width===e.width&&t.height===e.height?t:e)}),t}var a,o;function s(){return(s=e((()=>{a=t(),r(),o={width:0,height:0}})))()}export{i as n,s as t};
