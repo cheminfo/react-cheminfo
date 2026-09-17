@@ -21,6 +21,15 @@ import type { ParallelColorBy } from './parallelTypes.ts';
 export const PARALLEL_PALETTE_STEPS = 120;
 
 /**
+ * The step a row whose colouring quantity is unknown takes.
+ *
+ * Past the end of the ramp on purpose: no colour indexes it, so the painter
+ * leaves such a row in the neutral ink rather than claiming for it the ink of
+ * the smallest value in the set.
+ */
+export const PARALLEL_PALETTE_UNKNOWN = PARALLEL_PALETTE_STEPS + 1;
+
+/**
  * The ramp, sampled into the steps a line's colour is looked up by.
  * @param scale - The ramp, as the registry hands it over or as a plain list of colours. Defaults to viridis.
  * @returns `PARALLEL_PALETTE_STEPS + 1` colours, from the low end to the high end.
@@ -39,13 +48,16 @@ export function parallelPalette(
  * loop reads an integer instead of placing a value on a ramp.
  * @param color - The quantity the lines are coloured by.
  * @param count - How many rows there are.
- * @returns One step per row, from `0` to {@link PARALLEL_PALETTE_STEPS}.
+ * @returns One step per row, from `0` to {@link PARALLEL_PALETTE_STEPS}, or
+ * {@link PARALLEL_PALETTE_UNKNOWN} for a row whose value is not a number.
  */
 export function parallelColorSteps(
   color: ParallelColorBy,
   count: number,
 ): Uint8Array {
   const steps = new Uint8Array(count);
+  // A row the column does not reach is as unknown as one holding no number.
+  steps.fill(PARALLEL_PALETTE_UNKNOWN);
   const extent = parallelExtent(color.values, count);
   const min = color.min ?? extent.min;
   const max = color.max ?? extent.max;
@@ -54,6 +66,7 @@ export function parallelColorSteps(
   const rows = Math.min(count, color.values.length);
   for (let row = 0; row < rows; row++) {
     const value = color.values[row] as number;
+    if (!Number.isFinite(value)) continue;
     steps[row] = logarithmic
       ? Math.round(
           positionInRange(value, min, max, { logarithmic: true }) *

@@ -89,6 +89,38 @@ test('asking for round numbers moves both ends of the axis', () => {
   expect(labels(ticks)).toStrictEqual(['-2', '-1', '0', '1', '2', '3']);
 });
 
+test('a niced graduation is written at its own magnitude', () => {
+  // `chartAxisScale` lifts a common power of ten out of its labels on the
+  // understanding that the caller writes it beside the axis name; nothing in
+  // this figure does, so the label has to carry the whole value itself.
+  const { domain, ticks } = parallelTicks(
+    { ...axis(), nice: true },
+    2.4e6,
+    9.8e6,
+  );
+
+  expect(domain).toStrictEqual([2e6, 1e7]);
+  expect(labels(ticks)).toStrictEqual([
+    '2,000,000',
+    '4,000,000',
+    '6,000,000',
+    '8,000,000',
+    '10,000,000',
+  ]);
+});
+
+test('a niced graduation far below one keeps every decimal it needs', () => {
+  const { ticks } = parallelTicks({ ...axis(), nice: true }, 1e-5, 5e-5);
+
+  expect(labels(ticks)).toStrictEqual([
+    '0.00001',
+    '0.00002',
+    '0.00003',
+    '0.00004',
+    '0.00005',
+  ]);
+});
+
 test('the number of graduations is the caller s to ask for', () => {
   const { ticks } = parallelTicks({ ...axis(), tickCount: 3 }, 0, 100);
 

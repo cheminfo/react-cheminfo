@@ -149,8 +149,10 @@ export function paintParallelLines(
     if (steps !== null) {
       const step = steps[row] as number;
       if (step !== previousStep) {
-        const color = palette[step];
-        if (color !== undefined) context.strokeStyle = color;
+        // A step past the end of the ramp is a quantity nobody knows for this
+        // row; it is drawn in the neutral ink rather than in the ramp's first
+        // colour, which means the smallest value in the set.
+        context.strokeStyle = palette[step] ?? line;
         previousStep = step;
       }
     }
@@ -201,6 +203,10 @@ export function paintParallelHighlights(
 
 /**
  * Add one row's line to the path being built.
+ *
+ * The line is one polyline per unbroken run of known values, so a row with a
+ * gap in the middle is drawn as two, and nothing is painted over an axis the
+ * row has no value on.
  * @param context - A context already scaled and moved to the drawing area.
  * @param row - The row to trace.
  * @param layouts - The axes, from left to right.
@@ -218,9 +224,14 @@ export function traceParallelRow(
     const column = values[index];
     if (layout === undefined || column === undefined) continue;
     const y = parallelPixelAt(layout.pixels, column[row] as number);
-    // A row whose value on this axis is not known yet has no point to draw:
-    // the line skips that axis rather than collapsing onto one of its ends.
-    if (!Number.isFinite(y)) continue;
+    // A row whose value on this axis is not known yet has no point to draw,
+    // and the line breaks rather than bridging the axis: a segment drawn
+    // across it reads as a value the row does not hold, and the hit test,
+    // which has no endpoint there, cannot pick it back.
+    if (!Number.isFinite(y)) {
+      started = false;
+      continue;
+    }
     if (started) {
       context.lineTo(layout.x, y);
     } else {

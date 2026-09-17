@@ -10,6 +10,7 @@
 import {
   chartAxisScale,
   chartTickDecimals,
+  chartTickLabel,
 } from '../../chart/core/chartAxisScale.ts';
 import { formatDecimal } from '../../format/core/numbers.ts';
 import { roundTo } from '../../format/core/roundTo.ts';
@@ -71,12 +72,15 @@ function nicedGraduation(
   wanted: number,
 ): ParallelGraduation {
   const scale = chartAxisScale(min, max, { count: wanted, nice: true });
+  // Not `scale.labels`: those have a common power of ten lifted out of them,
+  // on the understanding that the caller writes it beside the axis name, and
+  // this figure writes only the name. Each graduation carries its own value.
+  const decimals = chartTickDecimals(scale.step);
   const ticks: ParallelTick[] = [];
-  for (let index = 0; index < scale.values.length; index++) {
-    const value = scale.values[index] as number;
+  for (const value of scale.values) {
     const label =
       axis.format === undefined
-        ? (scale.labels[index] ?? formatDecimal(value, scale.decimals))
+        ? chartTickLabel(value, decimals)
         : axis.format(value);
     if (ticks.at(-1)?.label === label) continue;
     ticks.push({ value, label });

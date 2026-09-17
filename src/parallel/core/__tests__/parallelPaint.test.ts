@@ -80,7 +80,7 @@ test('the kept rows are drawn at the alpha the figure reads them at, and it is p
   expect(log.at(-1)).toBe('globalAlpha=1');
 });
 
-test('an axis a row has no number for is skipped rather than pinned to an end', () => {
+test('an axis a row has no number for breaks the line rather than pinning it to an end', () => {
   const gappy = Float64Array.from([Number.NaN, 1, 2, 3]);
   const { context, log } = recorder();
   paintParallelLines(context, {
@@ -91,8 +91,8 @@ test('an axis a row has no number for is skipped rather than pinned to an end', 
     excluded: '#eeeeee',
   });
 
-  expect(count(log, 'moveTo')).toBe(1);
-  expect(count(log, 'lineTo')).toBe(1);
+  expect(count(log, 'moveTo')).toBe(2);
+  expect(count(log, 'lineTo')).toBe(0);
 });
 
 test('fewer than two axes draws nothing at all', () => {
