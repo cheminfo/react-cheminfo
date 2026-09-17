@@ -329,6 +329,8 @@ const STORY_IDS = [
   'structure-structureeditor--fragment',
   'structure-structureeditor--no-debounce',
   'structure-structureeditor--reaction',
+  'structure-structureeditor--reloadable',
+  'structure-structureeditor--small-box',
 ];
 
 // React reports every caught error-boundary hit through `console.error`, so the

@@ -38,43 +38,48 @@ export function useToolbarFloor(
     const container = containerRef.current;
     if (container === null) return;
 
-    let observer: ResizeObserver | null = null;
-    let frame = 0;
-    let attempts = 0;
+    let toolbar: HTMLCanvasElement | null = null;
+    let size: ResizeObserver | null = null;
 
-    // The editor builds itself asynchronously, so the toolbar is usually not
-    // there yet on the first look; watching for it is what keeps a slow first
-    // paint from leaving the container at its unmeasured height for good.
     const attach = (): void => {
-      const toolbar = findToolbar(container);
-      if (toolbar === null) {
-        attempts++;
-        if (attempts > MAX_ATTEMPTS) return;
-        frame = globalThis.requestAnimationFrame(attach);
-        return;
-      }
-      observer = new ResizeObserver(() => {
+      const found = findToolbar(container);
+      if (found === null) return;
+      size?.disconnect();
+      toolbar = found;
+      size = new ResizeObserver(() => {
         // offsetHeight, because a dialog opens under a scaling transform and a
         // measured rectangle would be that of the half drawn toolbar.
-        const floor = toolbarFloorHeight(toolbar.offsetHeight, minHeight);
-        container.style.minHeight = `${floor}px`;
+        const height = found.offsetHeight;
+        // Zero is a toolbar being torn down or not yet laid out, never a
+        // toolbar that needs no room: writing the fallback for it would undo a
+        // correct floor and leave the palette cut off.
+        if (height === 0) return;
+        container.style.minHeight = `${toolbarFloorHeight(height, minHeight)}px`;
       });
-      observer.observe(toolbar);
+      size.observe(found);
     };
 
+    // The editor is imported lazily and builds itself asynchronously, so it is
+    // almost never there on the first look, and how long it takes is a cold
+    // module graph and a network away from anything this code can predict. So
+    // the arrival is watched for rather than waited out: a deadline that
+    // expires leaves the toolbar cut off for the life of the page, with
+    // nothing on screen to say why.
+    const arrivals = new MutationObserver(() => {
+      if (toolbar?.isConnected === true) return;
+      attach();
+    });
+    arrivals.observe(container, { childList: true, subtree: true });
     attach();
 
     return () => {
-      if (frame !== 0) globalThis.cancelAnimationFrame(frame);
-      observer?.disconnect();
+      arrivals.disconnect();
+      size?.disconnect();
     };
   }, [minHeight, revision]);
 
   return containerRef;
 }
-
-/** Roughly two seconds of frames, after which the editor is not coming. */
-const MAX_ATTEMPTS = 120;
 
 /**
  * Find the toolbar canvas of the editor.

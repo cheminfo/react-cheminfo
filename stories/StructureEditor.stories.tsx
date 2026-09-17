@@ -80,10 +80,52 @@ export const NoDebounce: Story = {
   args: { debounce: 0 },
 };
 
+/**
+ * A box smaller than the toolbar, which is the case the measured floor exists
+ * for: the toolbar is one canvas of a fixed height, so a container shorter than
+ * it cuts the last buttons off rather than scrolling them.
+ */
+export const SmallBox: Story = {
+  args: { minHeight: 200, style: {} },
+};
+
 /** The reaction canvas, with its own toolbar and its own arrow. */
 export const Reaction: Story = {
   args: { mode: 'reaction', inputFormat: 'idcode', value: '' },
 };
+
+/**
+ * Reload puts the structure on the canvas again by bumping `revision`, which is
+ * what an example, a share link or a Clear button does. The box is measured
+ * again each time, so a reload never leaves the toolbar cut off.
+ */
+export const Reloadable: Story = {
+  args: { minHeight: 200, style: {}, value: BENZENE },
+  render: (args) => <ReloadDemo {...args} />,
+};
+
+/**
+ * The editor with a button that reloads it, so the sizing after a remount can
+ * be watched rather than reasoned about.
+ * @param props - Whatever the story's controls hold.
+ * @returns The button and the editor.
+ */
+function ReloadDemo(props: StructureEditorProps): ReactElement {
+  const [revision, setRevision] = useState(0);
+
+  return (
+    <div style={DEMO_STYLE}>
+      <button
+        type="button"
+        style={RELOAD_STYLE}
+        onClick={() => setRevision((previous) => previous + 1)}
+      >
+        Reload
+      </button>
+      <StructureEditor {...props} revision={revision} />
+    </div>
+  );
+}
 
 /**
  * The editor with everything it holds printed under it, so a reader can draw
@@ -134,6 +176,17 @@ const DEMO_STYLE: CSSProperties = {
   display: 'grid',
   width: 'min(52rem, 92vw)',
   gap: 12,
+};
+
+const RELOAD_STYLE: CSSProperties = {
+  padding: '4px 10px',
+  border: `1px solid ${TOKEN.border}`,
+  borderRadius: 6,
+  background: TOKEN.surface,
+  color: TOKEN.text,
+  cursor: 'pointer',
+  fontSize: '0.8125rem',
+  justifySelf: 'start',
 };
 
 const HINT_STYLE: CSSProperties = {
