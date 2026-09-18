@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.0](https://github.com/cheminfo/react-cheminfo/compare/v0.20.0...v0.21.0) (2026-09-18)
+
+
+### Features
+
+* **chrome:** draw a site outside the family from its own record ([b8258b6](https://github.com/cheminfo/react-cheminfo/commit/b8258b651950388f19de891635f209f1d98d1933))
+
 ## [0.20.0](https://github.com/cheminfo/react-cheminfo/compare/v0.19.0...v0.20.0) (2026-09-18)
 
 
