@@ -2,8 +2,8 @@ import { Button, PopoverNext, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, RefObject } from 'react';
 import { useEffect, useState } from 'react';
 
-import type { StructureEditorMode } from './EditorCanvas.tsx';
 import { StructureEditorHelp } from './StructureEditorHelp.tsx';
+import type { StructureEditorMode } from './editorChange.ts';
 
 /** What {@link EditorHelpButton} needs. */
 export interface EditorHelpButtonProps {

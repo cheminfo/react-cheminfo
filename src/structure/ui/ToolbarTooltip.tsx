@@ -7,8 +7,8 @@ import {
   isEditorToolbarButtonAvailable,
 } from '../core/editorToolbar.ts';
 
-import type { StructureEditorMode } from './EditorCanvas.tsx';
 import { KeyCaps } from './KeyCaps.tsx';
+import type { StructureEditorMode } from './editorChange.ts';
 import { useToolbarHover } from './useToolbarHover.ts';
 
 /** What {@link ToolbarTooltip} needs. */

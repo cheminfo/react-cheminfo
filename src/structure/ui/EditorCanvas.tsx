@@ -7,23 +7,11 @@ import type {
 } from 'react-ocl';
 import { CanvasMoleculeEditor, CanvasReactionEditor } from 'react-ocl';
 
-/** What the editor draws: one structure, or a reaction with its arrow. */
-export type StructureEditorMode = 'molecule' | 'reaction';
-
-/** Everything the editor holds at the moment it changed. */
-export interface StructureEditorChange {
-  /** Which kind of editor produced it. */
-  mode: StructureEditorMode;
-  /**
-   * The idCode, with the coordinates the editor laid out written after a
-   * space. `splitIdCode` takes the two apart.
-   */
-  idCode: string;
-  /** The V2000 molfile of a molecule, or the RXN file of a reaction. */
-  molfile: string;
-  /** The SMILES of a molecule, or the reaction SMILES. */
-  smiles: string;
-}
+import type {
+  StructureEditorChange,
+  StructureEditorMode,
+} from './editorChange.ts';
+import { moleculeChange, reactionChange } from './editorChange.ts';
 
 interface EditorCanvasProps {
   /** Called on every stroke, with the editor read out synchronously. */
@@ -71,29 +59,15 @@ export function EditorCanvas(props: EditorCanvasProps): ReactElement {
   } = props;
   const [initialValue] = useState(value);
 
+  // The event describes the editor only while the callback runs, so it is read
+  // out now and whatever waiting there is happens afterwards.
   const handleMolecule = useCallback(
-    (event: CanvasEditorOnChangeMolecule) => {
-      // The event describes the editor only while the callback runs, so every
-      // notation is read now and whatever waiting there is happens afterwards.
-      onChange({
-        mode: 'molecule',
-        idCode: event.getIdcode(),
-        molfile: event.getMolfile(),
-        smiles: event.getSmiles(),
-      });
-    },
+    (event: CanvasEditorOnChangeMolecule) => onChange(moleculeChange(event)),
     [onChange],
   );
 
   const handleReaction = useCallback(
-    (event: CanvasEditorOnChangeReaction) => {
-      onChange({
-        mode: 'reaction',
-        idCode: event.getIdcode(),
-        molfile: event.getRxn(),
-        smiles: event.getSmiles(),
-      });
-    },
+    (event: CanvasEditorOnChangeReaction) => onChange(reactionChange(event)),
     [onChange],
   );
 

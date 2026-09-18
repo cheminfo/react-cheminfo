@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
-import type { StructureEditorChange } from '../src/structure/ui/EditorCanvas.tsx';
 import type { StructureEditorProps } from '../src/structure/ui/StructureEditor.tsx';
 import { StructureEditor } from '../src/structure/ui/StructureEditor.tsx';
+import type { StructureEditorChange } from '../src/structure/ui/editorChange.ts';
 import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import { BENZENE, CAFFEINE } from './structureFixtures.ts';
@@ -138,7 +138,8 @@ function ReloadDemo(props: StructureEditorProps): ReactElement {
 
 /**
  * The editor with everything it holds printed under it, so a reader can draw
- * and watch the notations a page would store.
+ * and watch the notations a page would store, and the formula read off the
+ * molecule a molecule editor hands over.
  * @param props - Whatever the story's controls hold.
  * @returns The editor and its readout.
  */
@@ -154,6 +155,12 @@ function EditorDemo(props: StructureEditorProps): ReactElement {
         </p>
       ) : (
         <div style={READOUT_STYLE}>
+          {change.mode === 'molecule' ? (
+            <Field
+              label="Formula, from the molecule"
+              value={change.molecule.getMolecularFormula().formula}
+            />
+          ) : null}
           <Field label="SMILES" value={change.smiles} />
           <Field label="idCode" value={change.idCode} />
           <Field label="Molfile" value={change.molfile} />

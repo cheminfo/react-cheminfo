@@ -13,7 +13,9 @@
 export type {
   StructureEditorChange,
   StructureEditorMode,
-} from './EditorCanvas.tsx';
+  StructureEditorMoleculeChange,
+  StructureEditorReactionChange,
+} from './editorChange.ts';
 export type { StructureLabels, StructureProps } from './Structure.tsx';
 export { Structure } from './Structure.tsx';
 export type { StructureEditorProps } from './StructureEditor.tsx';

@@ -13,12 +13,12 @@ import type { CanvasEditorInputFormat } from 'react-ocl';
 
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
+import { EditorHelpButton } from './EditorHelpButton.tsx';
+import { ToolbarTooltip } from './ToolbarTooltip.tsx';
 import type {
   StructureEditorChange,
   StructureEditorMode,
-} from './EditorCanvas.tsx';
-import { EditorHelpButton } from './EditorHelpButton.tsx';
-import { ToolbarTooltip } from './ToolbarTooltip.tsx';
+} from './editorChange.ts';
 import { useToolbarFloor } from './useToolbarFloor.ts';
 
 const EditorCanvas = lazy(async () => {
