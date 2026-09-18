@@ -64,19 +64,23 @@ export const Default: Story = {};
 export const WithCitation: Story = { args: { content: CITED } };
 
 /**
- * A site whose sources are not open: no licence-and-source section, and a
- * version that is read rather than followed.
+ * A site whose sources are not open: no licence-and-source section, no tracker
+ * a visitor cannot open, and a version that is read rather than followed.
  */
 export const PrivateSources: Story = {
   args: { content: { ...CITED, publicRepository: false } },
 };
 
-/** A site that has never been released shows no version at all. */
+/** A site with no release yet is named by the commit it was built from. */
 export const NeverReleased: Story = {
   args: {
     content: {
       ...CITED,
-      build: { version: '0.0.0', builtAt: '2026-09-16T09:41:07Z' },
+      build: {
+        version: '0.0.0',
+        builtAt: '2026-09-16T09:41:07Z',
+        commit: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
+      },
     },
   },
 };

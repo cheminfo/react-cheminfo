@@ -136,7 +136,7 @@ test('a site published off GitHub shows the build without inventing links', () =
     />,
   );
 
-  expect(html).toContain('>2.4.0</span>');
+  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
   expect(html).not.toContain('gitlab.com/cheminfo/elsewhere/releases');
   expect(html).not.toContain('gitlab.com/cheminfo/elsewhere/commit');
 });
@@ -145,7 +145,7 @@ test('the version is read in the hero, above everything the page says', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
   expect(html).toContain('class="about-version"');
-  expect(html).toContain('>2.4.0</a>');
+  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</a>');
   expect(html.indexOf('about-version')).toBeLessThan(
     html.indexOf('What you can do here'),
   );
@@ -153,7 +153,32 @@ test('the version is read in the hero, above everything the page says', () => {
   expect(html).not.toContain('Running version');
 });
 
-test('a site that has never been released shows no version at all', () => {
+test('a site that has never been released is named by its commit instead', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        build: {
+          version: '0.0.0',
+          builtAt: '2026-09-16T09:41:07Z',
+          commit: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
+        },
+      }}
+    />,
+  );
+
+  // `0.0.0` names no release anybody can look up; the commit names one build.
+  expect(html).not.toContain('0.0.0');
+  expect(html).toContain('class="about-version"');
+  expect(html).toContain('>a1b2c3d · 2026-09-16 09:41 UTC</a>');
+  expect(html).toContain(
+    'href="https://github.com/cheminfo/smiles.cheminfo.org/commit/a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"',
+  );
+  // What the build knows is still worth saying.
+  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
+});
+
+test('a build with neither a release nor a commit shows no badge', () => {
   const html = renderToStaticMarkup(
     <AboutPage
       content={{
@@ -165,8 +190,29 @@ test('a site that has never been released shows no version at all', () => {
 
   expect(html).not.toContain('about-version');
   expect(html).not.toContain('0.0.0');
-  // What the build knows is still worth saying.
-  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
+});
+
+test('a private site that has never been released still names its build', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        publicRepository: false,
+        build: {
+          version: '0.0.0',
+          builtAt: '2026-09-16T09:41:07Z',
+          commit: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
+        },
+      }}
+    />,
+  );
+
+  // The hero badge is the whole of what the page says about the build, so it
+  // carries the instant a reader would otherwise read under the licence.
+  expect(html).toContain('title="Built 2026-09-16 09:41:07 UTC from commit');
+  expect(html).toContain('>a1b2c3d · 2026-09-16 09:41 UTC</span>');
+  expect(html).not.toContain('smiles.cheminfo.org/commit');
+  expect(html).not.toContain('Licence and source');
 });
 
 test('a site with no build record shows no version', () => {
@@ -186,16 +232,38 @@ test('a private repository is named nowhere, and the version stops linking', () 
   expect(html).not.toContain('MIT, © cheminfo.');
   expect(html).not.toContain('smiles.cheminfo.org/releases');
   expect(html).not.toContain('smiles.cheminfo.org/commit');
-  expect(html).not.toContain('Built 2026-09-16 09:41:07 UTC');
 
-  // The build a reader is asked to quote is still on the page, as plain text.
+  // The build a reader is asked to quote is still on the page, as plain text,
+  // and the badge it is read from carries the instant the licence used to.
   expect(html).toContain('class="about-version"');
-  expect(html).toContain('>2.4.0</span>');
+  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
+  expect(html).toContain(
+    'title="Built 2026-09-16 09:41:07 UTC from commit a1b2c3d"',
+  );
+
+  // A tracker nobody outside can open is not offered either.
+  expect(html).not.toContain('Found a problem?');
+  expect(html).not.toContain('smiles.cheminfo.org/issues');
 
   // Everything else the page says is untouched.
   expect(html).toContain('What you can do here');
   expect(html).toContain('Built on');
+});
+
+test('a private site naming a report address of its own keeps that section', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        publicRepository: false,
+        issues: 'https://github.com/cheminfo/feedback/issues',
+      }}
+    />,
+  );
+
   expect(html).toContain('Found a problem?');
+  expect(html).toContain('href="https://github.com/cheminfo/feedback/issues"');
+  expect(html).not.toContain('Licence and source');
 });
 
 test('a site inherits the visibility of its own repository from the family record', () => {

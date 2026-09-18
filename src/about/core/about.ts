@@ -71,14 +71,15 @@ export interface AboutContent {
    */
   publicRepository?: boolean;
   /**
-   * Which build is running, from `virtual:cheminfo-build-info` — never written
+   * Which build is running, from `react-cheminfo/build-info` — never written
    * by hand, which is what keeps it true after the next release.
    * @default undefined — the site's build does not publish one
    */
   build?: BuildInfo;
   /**
-   * Where a problem is reported.
-   * @default the repository's /issues
+   * Where a problem is reported: an address a visitor can actually open, so a
+   * site whose sources are private names one of its own or says nothing.
+   * @default the repository's /issues, and none at all when it is private
    */
   issues?: string;
 }
@@ -119,7 +120,8 @@ export interface ResolvedAbout {
   publicRepository: boolean;
   /** Which build is running, or `undefined` when the site does not say. */
   build: BuildInfo | undefined;
-  issues: string;
+  /** Where a problem is reported, or `undefined` when there is nowhere open. */
+  issues: string | undefined;
 }
 
 /**
@@ -136,6 +138,8 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
       ? siteById(content.siteId)
       : content.siteId;
   const repository = content.repository ?? site.repository;
+  const publicRepository =
+    content.publicRepository ?? site.publicRepository ?? false;
 
   return {
     site,
@@ -148,10 +152,15 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
     providedBy: providers(content.providedBy ?? []),
     license: content.license ?? DEFAULT_LICENSE,
     repository,
-    publicRepository:
-      content.publicRepository ?? site.publicRepository ?? false,
+    publicRepository,
     build: content.build,
-    issues: content.issues ?? `${withoutTrailingSlash(repository)}/issues`,
+    // A tracker behind a private repository answers 404 to every visitor, so
+    // a site that names none of its own asks for a report nowhere.
+    issues:
+      content.issues ??
+      (publicRepository
+        ? `${withoutTrailingSlash(repository)}/issues`
+        : undefined),
   };
 }
 

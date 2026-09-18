@@ -21,6 +21,7 @@ const OUTSIDE: EcosystemSite = {
   name: { lead: 'images', alt: 'cheminfo', dot: true },
   host: 'images.cheminfo.org',
   repository: 'https://github.com/cheminfo/images.cheminfo.org',
+  publicRepository: true,
   group: 'computing',
   tagline: 'Crop, rotate, adjust, resize and compress images, in your browser.',
   brand: '#a21caf',
@@ -41,7 +42,7 @@ test('a site that is not in the Tools menu may pass its own record', () => {
 });
 
 test('what the site left to the family comes from its ecosystem record', () => {
-  const about = resolveAbout(SMILES);
+  const about = resolveAbout({ ...SMILES, publicRepository: true });
 
   expect(about.site.host).toBe('smiles.cheminfo.org');
   expect(about.repository).toBe(
@@ -61,6 +62,7 @@ test('a site that publishes elsewhere is reported there, issues included', () =>
     ...SMILES,
     license: 'BSD-3-Clause',
     repository: 'https://gitlab.com/cheminfo/elsewhere/',
+    publicRepository: true,
     build: { version: '2.4.0', builtAt: '2026-09-16T09:41:07Z' },
   });
 
@@ -79,9 +81,19 @@ test('the issues link a site writes itself is the one that is used', () => {
     issues: 'https://github.com/cheminfo/smiles.cheminfo.org/discussions',
   });
 
+  // It stands even behind private sources: the site vouches for the address.
+  expect(about.publicRepository).toBe(false);
   expect(about.issues).toBe(
     'https://github.com/cheminfo/smiles.cheminfo.org/discussions',
   );
+});
+
+test('a site with private sources asks for a report nowhere', () => {
+  const about = resolveAbout(SMILES);
+
+  // A tracker behind a private repository answers 404 to every visitor.
+  expect(about.publicRepository).toBe(false);
+  expect(about.issues).toBeUndefined();
 });
 
 test('credit ids become the entries of the shared registry, in order', () => {

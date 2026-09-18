@@ -143,12 +143,18 @@ export function AboutPage(props: AboutPageProps): ReactElement {
         </AboutSection>
       )}
 
-      <AboutSection title="Found a problem?" className="about-issues">
-        <p style={FIRST_PARAGRAPH_STYLE}>
-          Tell us: a report naming what you typed and what came back is the
-          fastest fix there is. <ExternalLink href={about.issues} />.
-        </p>
-      </AboutSection>
+      {/*
+        Asking for a report is worth nothing without somewhere to send it, and
+        the tracker of a private repository answers 404 to every visitor.
+      */}
+      {about.issues === undefined ? null : (
+        <AboutSection title="Found a problem?" className="about-issues">
+          <p style={FIRST_PARAGRAPH_STYLE}>
+            Tell us: a report naming what you typed and what came back is the
+            fastest fix there is. <ExternalLink href={about.issues} />.
+          </p>
+        </AboutSection>
+      )}
     </div>
   );
 }
