@@ -34,6 +34,7 @@ const meta = {
   argTypes: {
     fragment: { control: 'boolean' },
     mode: { control: 'inline-radio', options: ['molecule', 'reaction'] },
+    help: { control: 'boolean' },
     inputFormat: {
       control: 'inline-radio',
       options: ['idcode', 'molfile', 'smiles'],
@@ -47,7 +48,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The canvas structure editor, sized so its toolbar is never clipped. It is uncontrolled: the value is read when the editor appears and again whenever `revision` changes, and an edit is reported once the drawing has been still.',
+          'The canvas structure editor, sized so its toolbar is never clipped. Hovering a toolbar button names it, shows its key and says what it does; the button in the corner, or F1, opens a guide to the keys. It is uncontrolled: the value is read when the editor appears and again whenever `revision` changes, and an edit is reported once the drawing has been still.',
       },
     },
   },
@@ -73,6 +74,14 @@ export const Empty: Story = {
  */
 export const Fragment: Story = {
   args: { fragment: true, value: BENZENE },
+};
+
+/**
+ * No tooltips and no help button, for a site that explains the editor on a
+ * page of its own.
+ */
+export const NoHelp: Story = {
+  args: { help: false },
 };
 
 /** Every stroke reported, rather than only the last one of a burst. */

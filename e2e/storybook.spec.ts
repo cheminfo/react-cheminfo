@@ -330,6 +330,7 @@ const STORY_IDS = [
   'structure-structureeditor--empty',
   'structure-structureeditor--fragment',
   'structure-structureeditor--no-debounce',
+  'structure-structureeditor--no-help',
   'structure-structureeditor--reaction',
   'structure-structureeditor--reloadable',
   'structure-structureeditor--small-box',

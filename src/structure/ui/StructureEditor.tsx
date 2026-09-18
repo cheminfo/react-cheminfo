@@ -17,6 +17,8 @@ import type {
   StructureEditorChange,
   StructureEditorMode,
 } from './EditorCanvas.tsx';
+import { EditorHelpButton } from './EditorHelpButton.tsx';
+import { ToolbarTooltip } from './ToolbarTooltip.tsx';
 import { useToolbarFloor } from './useToolbarFloor.ts';
 
 const EditorCanvas = lazy(async () => {
@@ -77,6 +79,12 @@ export interface StructureEditorProps {
    */
   mode?: StructureEditorMode;
   /**
+   * Explain each toolbar button in a tooltip, and put a button in the corner
+   * that opens a guide to the mouse and the keyboard, which F1 opens too.
+   * @default true
+   */
+  help?: boolean;
+  /**
    * Class the container carries, so a site can reach it from its stylesheet.
    * @default undefined
    */
@@ -90,7 +98,8 @@ export interface StructureEditorProps {
 
 /**
  * The canvas structure editor, sized to fill its container and never to hide
- * part of its toolbar.
+ * part of its toolbar, with a tooltip on every toolbar button and a guide to
+ * the keys.
  * @param props - What to draw, when to reload it, and where to send it.
  * @returns The editor.
  */
@@ -104,6 +113,7 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
     debounce = 300,
     minHeight = 320,
     mode = 'molecule',
+    help = true,
     className,
     style,
   } = props;
@@ -126,6 +136,16 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
           value={value}
           mode={mode}
         />
+        {help ? (
+          <>
+            <ToolbarTooltip containerRef={containerRef} mode={mode} />
+            <EditorHelpButton
+              containerRef={containerRef}
+              mode={mode}
+              fragment={fragment}
+            />
+          </>
+        ) : null}
       </Suspense>
     </div>
   );

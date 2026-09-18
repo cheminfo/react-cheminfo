@@ -48,6 +48,73 @@ test('the box clears the toolbar again after the editor is reloaded', async ({
   expect(size.box).toBeGreaterThanOrEqual(size.toolbar);
 });
 
+test('a toolbar button names itself when the pointer rests on it', async ({
+  page,
+}) => {
+  await openStory(page, 'structure-structureeditor--default');
+  await editorSize(page);
+  const toolbar = await toolbarRect(page);
+  const tooltip = page.getByTestId('structure-editor-tooltip');
+
+  // Button 5, the single bond, is the sixth down the first column.
+  await page.mouse.move(toolbar.x + 12, toolbar.y + 2 + 5 * 21 + 10);
+  await expect(tooltip).toContainText('Single bond');
+  await expect(tooltip.locator('kbd')).toHaveText('1');
+
+  // Button 19, atom mapping, is greyed in a molecule editor and says why.
+  await page.mouse.move(toolbar.x + 33, toolbar.y + 2 + 2 * 21 + 10);
+  await expect(tooltip).toContainText('Atom mapping');
+  await expect(tooltip).toContainText('Only when drawing a reaction.');
+  await page.screenshot({ path: 'test-results/structure-editor-tooltip.png' });
+
+  await page.mouse.move(toolbar.x + 300, toolbar.y + 200);
+  await expect(tooltip).toHaveCount(0);
+});
+
+test('the help button and F1 open the guide to the keys', async ({ page }) => {
+  await openStory(page, 'structure-structureeditor--default');
+  await editorSize(page);
+  const help = page.getByTestId('structure-editor-help');
+
+  await page.getByRole('button', { name: 'Mouse and keyboard' }).click();
+  await expect(
+    help.getByText('Pointer on an atom', { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({ path: 'test-results/structure-editor-help.png' });
+  await page.keyboard.press('Escape');
+  await expect(help).toHaveCount(0);
+
+  // The drawing takes the keys once focused, and F1 is openchemlib's own
+  // help key, which it leaves unimplemented on the web.
+  await page.evaluate(() => {
+    const root = document.querySelector('[data-openchemlib-canvas-editor]');
+    const canvas = root?.shadowRoot?.querySelector('canvas[tabindex]');
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('the editor drew no canvas');
+    }
+    canvas.focus();
+  });
+  await page.keyboard.press('F1');
+  await expect(help).toBeVisible();
+});
+
+/**
+ * Where the toolbar canvas is on the page.
+ * @param page - The page the story is open in.
+ * @returns The toolbar's top left corner, in CSS pixels.
+ */
+async function toolbarRect(page: Page): Promise<{ x: number; y: number }> {
+  return page.evaluate(() => {
+    const root = document.querySelector('[data-openchemlib-canvas-editor]');
+    const toolbar = root?.shadowRoot?.firstElementChild;
+    if (!(toolbar instanceof HTMLCanvasElement)) {
+      throw new Error('the editor drew no toolbar');
+    }
+    const rect = toolbar.getBoundingClientRect();
+    return { x: rect.x, y: rect.y };
+  });
+}
+
 /**
  * Serve openchemlib late, so the editor appears well after a deadline would
  * have expired.
