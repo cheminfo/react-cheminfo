@@ -167,7 +167,7 @@ function labelOf(route: NoscriptRoute): string {
 }
 
 function familyList(
-  current: SiteId,
+  current: string,
   ecosystem: boolean | NoscriptEcosystem | undefined,
 ): string {
   if (ecosystem === undefined || ecosystem === false) return '';

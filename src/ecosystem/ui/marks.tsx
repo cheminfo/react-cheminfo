@@ -1,7 +1,7 @@
-import type { CSSProperties, ReactElement } from 'react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import { siteById } from '../core/lookup.ts';
-import type { EcosystemSite, SiteId } from '../core/sites.ts';
+import type { SiteId, SiteRecord } from '../core/sites.ts';
 
 import { GLYPHS } from './glyphs.tsx';
 
@@ -19,13 +19,21 @@ export interface SiteMarkProps {
    * and `siteId` is required.
    * @default undefined
    */
-  site?: EcosystemSite;
+  site?: SiteRecord;
   /**
    * The same site, named rather than passed, for a header that knows only
    * which site it is.
    * @default undefined
    */
   siteId?: SiteId;
+  /**
+   * What is drawn on the plate, in the same 32×32 box, given the colour its one
+   * answering element takes. It is how a site that is not one of the family,
+   * and so has no drawing in the shared set, still gets a mark of the family's
+   * shape.
+   * @default the family's drawing for that site
+   */
+  glyph?: (accent: string) => ReactNode;
   /**
    * Edge of the square the mark is drawn in, in pixels.
    * @default 28
@@ -57,13 +65,15 @@ export interface SiteMarkProps {
  * The little logo of one site of the family.
  * @param props - Which site, how big, and where its colours come from.
  * @returns The mark, as an inline SVG.
- * @throws {Error} When neither `site` nor `siteId` is given.
+ * @throws {Error} When neither `site` nor `siteId` is given, or when the site
+ *   is not one of the family and no `glyph` is.
  */
 export function SiteMark(props: SiteMarkProps): ReactElement {
   const {
     className,
     site,
     siteId,
+    glyph,
     size = 28,
     plate = true,
     colors = 'literal',
@@ -72,6 +82,10 @@ export function SiteMark(props: SiteMarkProps): ReactElement {
   const drawn = site ?? (siteId === undefined ? undefined : siteById(siteId));
   if (drawn === undefined) {
     throw new Error('SiteMark needs one of its `site` and `siteId` props');
+  }
+  const draw = glyph ?? familyGlyph(drawn.id);
+  if (draw === undefined) {
+    throw new Error(`SiteMark has no drawing for ${drawn.id}: pass its glyph`);
   }
 
   const usesTokens = colors === 'tokens';
@@ -100,7 +114,11 @@ export function SiteMark(props: SiteMarkProps): ReactElement {
           stroke={edge}
         />
       ) : null}
-      {GLYPHS[drawn.id](accent)}
+      {draw(accent)}
     </svg>
   );
+}
+
+function familyGlyph(id: string): ((accent: string) => ReactNode) | undefined {
+  return Object.hasOwn(GLYPHS, id) ? GLYPHS[id as SiteId] : undefined;
 }

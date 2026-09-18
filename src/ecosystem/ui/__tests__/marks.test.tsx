@@ -2,6 +2,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { OUTSIDE_SITE } from '../../core/__tests__/outsideSite.ts';
 import { siteById } from '../../core/lookup.ts';
 import { ECOSYSTEM_SITES } from '../../core/sites.ts';
 import { SiteMark } from '../marks.tsx';
@@ -57,4 +58,24 @@ test('every site of the family has a mark that draws', () => {
     expect(html.startsWith('<svg')).toBe(true);
     expect(html).not.toContain('undefined');
   }
+});
+
+test('a site outside the family is drawn with the glyph it brings', () => {
+  const html = renderToStaticMarkup(
+    <SiteMark
+      site={OUTSIDE_SITE}
+      glyph={(accent) => <circle cx="16" cy="16" r="6" fill={accent} />}
+    />,
+  );
+
+  expect(html).toContain('fill="#0f5132"');
+  expect(html).toContain(
+    '<circle cx="16" cy="16" r="6" fill="#facc15"></circle>',
+  );
+});
+
+test('a site outside the family with no glyph says so', () => {
+  expect(() => renderToStaticMarkup(<SiteMark site={OUTSIDE_SITE} />)).toThrow(
+    'SiteMark has no drawing for spectra: pass its glyph',
+  );
 });

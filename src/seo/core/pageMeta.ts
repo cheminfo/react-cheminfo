@@ -13,7 +13,7 @@
  */
 
 import { siteDisplayName } from '../../ecosystem/core/lookup.ts';
-import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
+import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
 
 import type { DocumentMeta } from './documentMeta.ts';
@@ -25,7 +25,7 @@ import { PAGE_HEAD_MARKER, fill } from './template.ts';
 /** Which site is being served, and what it answers. */
 export interface PageMetaOptions {
   /** The site, named or passed. */
-  site: EcosystemSite | SiteId;
+  site: SiteRecord | SiteId;
   /** Every address it answers, each with its title and description. */
   routes: readonly RouteMeta[];
   /**

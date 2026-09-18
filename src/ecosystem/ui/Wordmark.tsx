@@ -3,7 +3,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { siteById } from '../core/lookup.ts';
 import { siteNameColors } from '../core/nameColors.ts';
-import type { EcosystemSite, SiteId } from '../core/sites.ts';
+import type { SiteId, SiteRecord } from '../core/sites.ts';
 
 /** What a site's written name needs. */
 export interface WordmarkProps {
@@ -13,7 +13,7 @@ export interface WordmarkProps {
    * required.
    * @default undefined
    */
-  site?: EcosystemSite;
+  site?: SiteRecord;
   /**
    * The same site, named rather than passed, which is what a header knows.
    * @default undefined

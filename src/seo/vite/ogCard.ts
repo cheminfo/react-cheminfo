@@ -11,8 +11,10 @@
  * a site must be able to import with none of the optional peers installed.
  */
 
+import type { ReactNode } from 'react';
+
 import { siteNameColors } from '../../ecosystem/core/nameColors.ts';
-import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
+import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { escapeText } from '../../share/core/escape.ts';
 import { FAMILY_TOKEN_VALUES } from '../../tokens/core/familyTokens.ts';
 import { resolveSite } from '../core/siteFiles.ts';
@@ -26,12 +28,18 @@ export const OG_HEIGHT = 630;
 /** What the card says, beyond the site's own name and mark. */
 export interface OgCardOptions {
   /** The site, named or passed. */
-  site: EcosystemSite | SiteId;
+  site: SiteRecord | SiteId;
   /**
    * The sentence under the name.
    * @default the site's tagline
    */
   description?: string;
+  /**
+   * The drawing on the mark's plate, for a site the shared glyph set does not
+   * hold — see `SiteMark`.
+   * @default the family's drawing for that site
+   */
+  glyph?: (accent: string) => ReactNode;
 }
 
 /**
@@ -58,7 +66,12 @@ export async function ogCardHtml(options: OgCardOptions): Promise<string> {
       import('../../ecosystem/ui/marks.tsx'),
     ]);
   const mark = renderToStaticMarkup(
-    createElement(SiteMark, { site, size: 132, colors: 'literal' }),
+    createElement(SiteMark, {
+      site,
+      glyph: options.glyph,
+      size: 132,
+      colors: 'literal',
+    }),
   );
   const dot = site.name.dot === true ? '<span class="dot">.</span>' : '';
 

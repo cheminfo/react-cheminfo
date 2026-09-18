@@ -23,6 +23,11 @@ import { PAPER } from './paper.ts';
 
 const SITE_IDS = ECOSYSTEM_SITES.map((site) => site.id);
 
+// Every story but one draws a site of the family, picked from the controls.
+function familySite(props: SiteHeaderProps): SiteId {
+  return props.siteId ?? 'smiles';
+}
+
 // chrome.css writes this on `:hover`. A story has no pointer to hold there, so
 // the same declarations are put on a class one page carries.
 const HOVER_RULE = `
@@ -73,8 +78,8 @@ const meta = {
     },
   },
   render: (args) => (
-    <SiteTokens siteId={args.siteId}>
-      <SiteHeader {...args} actions={<Utilities siteId={args.siteId} />} />
+    <SiteTokens siteId={familySite(args)}>
+      <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} />
     </SiteTokens>
   ),
 } satisfies Meta<typeof SiteHeader>;
@@ -112,11 +117,11 @@ export const EverySite: Story = {
  */
 export const ActiveAndHovered: Story = {
   render: (args) => (
-    <SiteTokens siteId={args.siteId}>
+    <SiteTokens siteId={familySite(args)}>
       <style>{HOVER_RULE}</style>
       <SiteHeader
         {...args}
-        actions={<Utilities siteId={args.siteId} />}
+        actions={<Utilities siteId={familySite(args)} />}
         renderNavItem={(item, isActive) => (
           <NavLink
             item={item}
@@ -144,9 +149,12 @@ export const Narrow: Story = {
 /** Header, page and footer together — the whole chrome a site imports. */
 export const WholePage: Story = {
   render: (args) => (
-    <SiteTokens siteId={args.siteId}>
+    <SiteTokens siteId={familySite(args)}>
       <div style={PAGE_STYLE}>
-        <SiteHeader {...args} actions={<Utilities siteId={args.siteId} />} />
+        <SiteHeader
+          {...args}
+          actions={<Utilities siteId={familySite(args)} />}
+        />
         <main style={MAIN_STYLE}>
           <div style={CARD_STYLE}>
             <h1 style={{ margin: 0, fontSize: '1.25rem' }}>{CAFFEINE.name}</h1>
@@ -157,7 +165,7 @@ export const WholePage: Story = {
             <code style={CODE_STYLE}>{CAFFEINE.inchiKey}</code>
           </div>
         </main>
-        <SiteFooter siteId={args.siteId} layout="row" />
+        <SiteFooter siteId={familySite(args)} layout="row" />
       </div>
     </SiteTokens>
   ),
@@ -166,8 +174,8 @@ export const WholePage: Story = {
 /** A framed page is given no bar at all: what frames it carries its own. */
 export const Embedded: Story = {
   render: (args) => (
-    <SiteTokens siteId={args.siteId}>
-      <SiteHeader {...args} actions={<Utilities siteId={args.siteId} />} />
+    <SiteTokens siteId={familySite(args)}>
+      <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} />
       <p style={CAPTION_STYLE}>
         Above, the bar. Below, the same bar with <code>embedded</code>, which
         draws nothing.
@@ -239,7 +247,8 @@ const PAGES_ITEM: NavItem = { id: 'pages', label: 'Pages' };
 function NarrowBar(props: SiteHeaderProps): ReactElement {
   const holder = useRef<HTMLDivElement>(null);
   const compact = useCompactHeader(holder, { maxWidth: 640 });
-  const { nav, activeId, siteId } = props;
+  const { nav, activeId } = props;
+  const siteId = familySite(props);
 
   return (
     <SiteTokens siteId={siteId}>

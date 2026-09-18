@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { Fragment } from 'react';
 
 import { siteById } from '../../ecosystem/core/lookup.ts';
-import type { SiteId } from '../../ecosystem/core/sites.ts';
+import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { Wordmark } from '../../ecosystem/ui/Wordmark.tsx';
 import { SiteMark } from '../../ecosystem/ui/marks.tsx';
 
@@ -12,8 +12,24 @@ import type { NavItem } from './navItem.ts';
 import { isModifiedClick } from './navItem.ts';
 
 export interface SiteHeaderProps {
-  /** The site the bar belongs to, which draws its mark and writes its name. */
-  siteId: SiteId;
+  /**
+   * The site the bar belongs to, which draws its mark and writes its name. One
+   * of `site` and `siteId` is required.
+   * @default undefined
+   */
+  siteId?: SiteId;
+  /**
+   * The same site, passed rather than named — for a site that is deliberately
+   * not one of `ECOSYSTEM_SITES`, and so is linked from no other site's menu.
+   * @default undefined
+   */
+  site?: SiteRecord;
+  /**
+   * The site's own mark, for a site the shared glyph set does not hold. It
+   * stands where `SiteMark` would, at the size the site draws it.
+   * @default undefined — the family's mark for that site
+   */
+  mark?: ReactNode;
   /** The pages, in the order the bar lists them. */
   nav: readonly NavItem[];
   /**
@@ -86,10 +102,13 @@ export interface SiteHeaderProps {
  * @param props - The site, its pages, its utilities, and whether the page is
  * framed in another site.
  * @returns The bar, or nothing at all on an embedded page.
+ * @throws {Error} When neither `site` nor `siteId` is given.
  */
 export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
   const {
     siteId,
+    site: record,
+    mark,
     nav,
     activeId,
     actions,
@@ -104,7 +123,10 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
 
   if (embedded) return null;
 
-  const site = siteById(siteId);
+  const site = record ?? (siteId === undefined ? undefined : siteById(siteId));
+  if (site === undefined) {
+    throw new Error('SiteHeader needs one of its `site` and `siteId` props');
+  }
 
   return (
     <header className="app-header no-print">
@@ -119,8 +141,8 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
             onHome();
           }}
         >
-          <SiteMark siteId={siteId} size={markSize} />
-          <Wordmark siteId={siteId} />
+          {mark ?? <SiteMark site={site} size={markSize} />}
+          <Wordmark site={site} />
         </a>
         <nav className="app-header-nav">
           {nav.map((item) => (

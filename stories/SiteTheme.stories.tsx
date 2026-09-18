@@ -45,7 +45,7 @@ const meta = {
   },
   render: (args) => (
     <div style={{ width: 'min(26rem, 92vw)' }}>
-      <ThemedPage siteId={args.siteId} height={CARD_FRAME_HEIGHT}>
+      <ThemedPage siteId={args.siteId ?? 'surge'} height={CARD_FRAME_HEIGHT}>
         <ResultCard />
       </ThemedPage>
     </div>
@@ -83,7 +83,7 @@ export const SideBySide: Story = {
 export const Tokens: Story = {
   render: (args) => (
     <div style={{ width: 'min(26rem, 92vw)' }}>
-      <ThemedPage siteId={args.siteId} height={SWATCH_FRAME_HEIGHT}>
+      <ThemedPage siteId={args.siteId ?? 'surge'} height={SWATCH_FRAME_HEIGHT}>
         <TokenSwatches />
       </ThemedPage>
     </div>

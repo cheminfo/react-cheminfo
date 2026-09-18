@@ -1,6 +1,6 @@
 import { FAMILY_TOKEN_VALUES, TOKEN } from '../../tokens/core/familyTokens.ts';
 
-import type { EcosystemSite } from './types.ts';
+import type { SiteRecord } from './types.ts';
 
 /** The colour each half of a site's name is written in. */
 export interface SiteNameColors {
@@ -35,7 +35,7 @@ export interface SiteNameColorsOptions {
  * @returns The colour of each half, and of the dot between them.
  */
 export function siteNameColors(
-  site: EcosystemSite,
+  site: SiteRecord,
   options: SiteNameColorsOptions = {},
 ): SiteNameColors {
   const literal = options.colors === 'literal';

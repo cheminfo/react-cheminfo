@@ -3,7 +3,7 @@ import type { CitedWork } from '../../citation/core/works.ts';
 import type { CreditEntry, CreditId } from '../../credits/core/credits.ts';
 import { credits } from '../../credits/core/credits.ts';
 import { siteById } from '../../ecosystem/core/lookup.ts';
-import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
+import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 
 import type { ProviderEntry, ProviderId } from './providers.ts';
 import { providers } from './providers.ts';
@@ -23,7 +23,7 @@ export interface AboutContent {
    * is deliberately not listed in the family's Tools menu and therefore not in
    * `ECOSYSTEM_SITES`.
    */
-  siteId: SiteId | EcosystemSite;
+  siteId: SiteId | SiteRecord;
   /** One sentence: what this tool is. */
   what: string;
   /**
@@ -101,7 +101,7 @@ export interface AboutPerson {
  */
 export interface ResolvedAbout {
   /** The site's own record, which carries its name, tagline and colours. */
-  site: EcosystemSite;
+  site: SiteRecord;
   what: string;
   /** The context paragraphs, empty when the site writes none. */
   paragraphs: readonly string[];

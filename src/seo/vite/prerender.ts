@@ -22,7 +22,7 @@ import { dirname, join, resolve } from 'node:path';
 
 import type { Logger, Plugin } from 'vite';
 
-import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
+import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 import type { NoscriptText } from '../core/noscript.ts';
 import { noscriptIndex } from '../core/noscript.ts';
@@ -38,7 +38,7 @@ import { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from '../core/template.ts';
 /** What the build needs to know to write the site's addresses. */
 export interface PrerenderOptions {
   /** The site, named or passed. */
-  site: EcosystemSite | SiteId;
+  site: SiteRecord | SiteId;
   /** Every address it answers, each with its title and description. */
   routes: readonly RouteMeta[];
   /**

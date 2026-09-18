@@ -50,10 +50,14 @@ export interface SiteName {
   ink?: 'lead' | 'alt';
 }
 
-/** One site of the family: its name, address, topic and two colours. */
-export interface EcosystemSite {
-  /** The identifier every component and helper names the site by. */
-  id: SiteId;
+/**
+ * What the chrome draws a site from: its name, address and two colours. A site
+ * that is deliberately not one of the family writes its own, and passes it
+ * wherever a family site passes its id.
+ */
+export interface SiteRecord {
+  /** The identifier the site is named by. */
+  id: string;
   /** The name, split the way the site's own wordmark splits it. */
   name: SiteName;
   /** Where the site lives, written the way it is typed. */
@@ -71,11 +75,6 @@ export interface EcosystemSite {
   /** One line on what the site does. */
   tagline: string;
   /**
-   * The topic the site is written under, which is what decides where it sits
-   * in the menu and in the footer.
-   */
-  group: SiteGroupId;
-  /**
    * The colour the name is written in — the first half, or the second when
    * `name.ink` leaves the first in the family's ink.
    */
@@ -88,6 +87,17 @@ export interface EcosystemSite {
   brandAlt: string;
   /** The plate of the site's mark, and the colour one element of it carries. */
   mark: SiteMarkColors;
+}
+
+/** One site of the family: its record, and the topic it is listed under. */
+export interface EcosystemSite extends SiteRecord {
+  /** The identifier every component and helper names the site by. */
+  id: SiteId;
+  /**
+   * The topic the site is written under, which is what decides where it sits
+   * in the menu and in the footer.
+   */
+  group: SiteGroupId;
 }
 
 /** The colours a site's mark is drawn in. */

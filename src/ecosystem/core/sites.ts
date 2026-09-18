@@ -1,11 +1,12 @@
 // tokens-ok: file — every site's two colours are declared here.
-import type { EcosystemSite } from './types.ts';
+import type { EcosystemSite, SiteRecord } from './types.ts';
 
 export type {
   EcosystemSite,
   SiteId,
   SiteMarkColors,
   SiteName,
+  SiteRecord,
 } from './types.ts';
 
 /**
@@ -295,6 +296,6 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
  * @param site - The site being linked to.
  * @returns The URL to open.
  */
-export function siteUrl(site: EcosystemSite): string {
+export function siteUrl(site: SiteRecord): string {
   return `https://${site.host}/`;
 }

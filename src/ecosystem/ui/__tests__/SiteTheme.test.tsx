@@ -2,6 +2,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { OUTSIDE_SITE } from '../../core/__tests__/outsideSite.ts';
 import { siteTokensCss } from '../../core/tokens.ts';
 import { SiteTheme } from '../SiteTheme.tsx';
 
@@ -26,5 +27,25 @@ test('nothing in the rule is escaped into something a browser cannot read', () =
   --accent: var(--brand);
 }
 </style>`,
+  );
+});
+
+test('a site outside the family takes its palette from its own record', () => {
+  const html = renderToStaticMarkup(<SiteTheme site={OUTSIDE_SITE} />);
+
+  expect(html).toBe(
+    `<style>:root {
+  --brand: #0f5132;
+  --brand-alt: #facc15;
+  --brand-alt-text: #a16207;
+  --accent: var(--brand);
+}
+</style>`,
+  );
+});
+
+test('a palette with neither the site nor its identifier says so', () => {
+  expect(() => renderToStaticMarkup(<SiteTheme />)).toThrow(
+    'SiteTheme needs one of its `site` and `siteId` props',
   );
 });

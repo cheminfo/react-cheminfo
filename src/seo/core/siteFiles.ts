@@ -10,7 +10,7 @@
  */
 
 import { siteById } from '../../ecosystem/core/lookup.ts';
-import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
+import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 import { basePathOf } from '../../router/core/basePath.ts';
 import { escapeText } from '../../share/core/escape.ts';
@@ -25,7 +25,7 @@ const HTTP_ORIGIN = /^https?:\/\//i;
 /** What a crawler is told about the site as a whole. */
 export interface SiteFilesOptions {
   /** The site, named or passed. */
-  site: EcosystemSite | SiteId;
+  site: SiteRecord | SiteId;
   /** Every address it answers. */
   routes: readonly RouteMeta[];
   /**
@@ -71,7 +71,7 @@ ${entries}
  * @param site - The site, named or passed.
  * @returns Its record.
  */
-export function resolveSite(site: EcosystemSite | SiteId): EcosystemSite {
+export function resolveSite(site: SiteRecord | SiteId): SiteRecord {
   return typeof site === 'string' ? siteById(site) : site;
 }
 

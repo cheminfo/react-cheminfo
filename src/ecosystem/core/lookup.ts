@@ -1,6 +1,6 @@
 import type { SiteGroup, SiteGroupId } from './groups.ts';
 import { SITE_GROUPS } from './groups.ts';
-import type { EcosystemSite, SiteId } from './sites.ts';
+import type { EcosystemSite, SiteId, SiteRecord } from './sites.ts';
 import { ECOSYSTEM_SITES } from './sites.ts';
 
 /** One topic and the sites written under it. */
@@ -62,7 +62,7 @@ export function siteById(id: SiteId): EcosystemSite {
  * @param site - The site being named.
  * @returns What the site is called, in one string.
  */
-export function siteDisplayName(site: EcosystemSite): string {
+export function siteDisplayName(site: SiteRecord): string {
   return site.name.dot === true
     ? site.host
     : `${site.name.lead}${site.name.alt}`;

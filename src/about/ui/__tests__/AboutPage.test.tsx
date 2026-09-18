@@ -2,7 +2,6 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import { PLATFORM_WORK } from '../../../citation/core/platformPaper.ts';
-import type { SiteId } from '../../../ecosystem/core/sites.ts';
 import type { AboutContent } from '../../core/about.ts';
 import { AboutPage } from '../AboutPage.tsx';
 
@@ -431,11 +430,10 @@ test('a site outside the family draws its own mark and name from its record', ()
       content={{
         ...SMILES,
         siteId: {
-          id: 'images' as SiteId,
+          id: 'images',
           name: { lead: 'images', alt: 'cheminfo', dot: true },
           host: 'images.cheminfo.org',
           repository: 'https://github.com/cheminfo/images.cheminfo.org',
-          group: 'computing',
           tagline: 'Crop, rotate, adjust, resize and compress images.',
           brand: '#a21caf',
           brandAlt: '#b45309',

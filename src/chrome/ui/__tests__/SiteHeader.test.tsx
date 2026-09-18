@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { OUTSIDE_SITE } from '../../../ecosystem/core/__tests__/outsideSite.ts';
 import { SiteHeader } from '../SiteHeader.tsx';
 import type { NavItem } from '../navItem.ts';
 
@@ -143,5 +144,25 @@ test('the bar is capped at the page width unless a site asks otherwise', () => {
   expect(capped).not.toContain('app-header__inner--full');
   expect(full).toContain(
     '<div class="app-header__inner app-header__inner--full">',
+  );
+});
+
+test('a site outside the family is drawn from its own record and mark', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader
+      site={OUTSIDE_SITE}
+      mark={<svg data-testid="own-mark" />}
+      nav={PAGES}
+    />,
+  );
+
+  expect(html).toContain('class="brand" href="/" title="spectra.cheminfo.org"');
+  expect(html).toContain('<svg data-testid="own-mark"></svg>');
+  expect(html).toContain('>spectra</span>');
+});
+
+test('a bar with neither the site nor its identifier says so', () => {
+  expect(() => renderToStaticMarkup(<SiteHeader nav={PAGES} />)).toThrow(
+    'SiteHeader needs one of its `site` and `siteId` props',
   );
 });
