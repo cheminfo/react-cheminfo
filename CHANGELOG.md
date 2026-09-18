@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.18.0](https://github.com/cheminfo/react-cheminfo/compare/v0.17.0...v0.18.0) (2026-09-18)
+
+
+### Features
+
+* **structure:** explain the editor toolbar and its keys ([b2e4462](https://github.com/cheminfo/react-cheminfo/commit/b2e44628ccd8402eb1daa7b3dc2b02e0c227e7f1))
+* **structure:** hand the drawn molecule to onChange ([375fbd8](https://github.com/cheminfo/react-cheminfo/commit/375fbd8bca79650492847ebbcdd9b0eaecb23008))
+
+
+### Bug Fixes
+
+* **structure:** deliver the last edit when the editor unmounts ([51ccf0f](https://github.com/cheminfo/react-cheminfo/commit/51ccf0fc4d86efd7f518115586c2ea8963c012d3))
+
 ## [0.17.0](https://github.com/cheminfo/react-cheminfo/compare/v0.16.0...v0.17.0) (2026-09-17)
 
 
