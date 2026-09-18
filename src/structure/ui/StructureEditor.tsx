@@ -8,10 +8,18 @@
  */
 
 import type { CSSProperties, ReactElement } from 'react';
-import { Suspense, lazy, useCallback, useEffect, useRef } from 'react';
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import type { CanvasEditorInputFormat } from 'react-ocl';
 
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
+import { createPendingCall } from '../core/pendingCall.ts';
 
 import { EditorHelpButton } from './EditorHelpButton.tsx';
 import { ToolbarTooltip } from './ToolbarTooltip.tsx';
@@ -156,6 +164,8 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
  *
  * The editor's own event is read out before the wait starts, so what arrives
  * late is a plain object rather than a handle on an editor that has moved on.
+ * An editor removed mid-burst — a tab switched, a card folded — still reports
+ * its last edit, which would otherwise be lost with the timer.
  * @param onChange - What the caller wants told.
  * @param delay - How long the drawing has to be still, in milliseconds.
  * @param resetKey - Dropped edits: a burst still waiting when the caller
@@ -167,33 +177,21 @@ function useDebounced(
   delay: number,
   resetKey: number,
 ): (change: StructureEditorChange) => void {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [pending] = useState(createPendingCall<StructureEditorChange>);
   const onChangeRef = useRef(onChange);
   useEffect(() => {
     onChangeRef.current = onChange;
   });
   useEffect(() => {
-    return () => {
-      if (timerRef.current !== null) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [resetKey]);
+    pending.drop();
+  }, [pending, resetKey]);
+  useEffect(() => () => pending.flush(), [pending]);
 
   return useCallback(
     (change: StructureEditorChange) => {
-      if (timerRef.current !== null) clearTimeout(timerRef.current);
-      if (delay <= 0) {
-        onChangeRef.current(change);
-        return;
-      }
-      timerRef.current = setTimeout(() => {
-        timerRef.current = null;
-        onChangeRef.current(change);
-      }, delay);
+      pending.push(change, delay, (value) => onChangeRef.current(value));
     },
-    [delay],
+    [pending, delay],
   );
 }
 
