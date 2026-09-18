@@ -60,6 +60,14 @@ export interface EcosystemSite {
   host: string;
   /** Where the sources live, and what a Source link opens. */
   repository: string;
+  /**
+   * Whether a visitor can open that repository. A private one is named
+   * nowhere: no licence-and-source section, no link from the version, no issue
+   * tracker a reader cannot reach. It is stated rather than assumed, so a site
+   * whose record forgets it advertises nothing rather than a dead link.
+   * @default false
+   */
+  publicRepository?: boolean;
   /** One line on what the site does. */
   tagline: string;
   /**

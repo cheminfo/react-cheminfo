@@ -15,6 +15,7 @@ import { dirname, join, resolve } from 'node:path';
 import type { Plugin } from 'vite';
 
 import type { BuildInfo } from '../core/buildInfo.ts';
+import { UNRELEASED_VERSION } from '../core/buildInfo.ts';
 
 import { commitFromEnvironment, readGitHead } from './gitHead.ts';
 
@@ -92,7 +93,7 @@ export function resolveBuildInfo(root: string): BuildInfo {
   const repository = findRepositoryRoot(root);
 
   return {
-    version: readVersion(repository) ?? readVersion(root) ?? UNRELEASED,
+    version: readVersion(repository) ?? readVersion(root) ?? UNRELEASED_VERSION,
     builtAt: buildInstant(),
     commit: readGitHead(repository) ?? commitFromEnvironment(),
     reactCheminfo: readOwnVersion(),
@@ -174,5 +175,4 @@ function buildInstant(): string {
 
 const RESOLVED_MODULE = `\0${BUILD_INFO_MODULE}`;
 const OWN_NAME = 'react-cheminfo';
-const UNRELEASED = '0.0.0';
 const SECOND_LENGTH = 19;

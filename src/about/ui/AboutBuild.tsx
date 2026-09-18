@@ -2,6 +2,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import type { BuildInfo } from '../../build/core/buildInfo.ts';
 import { formatBuiltAt, shortCommit } from '../../build/core/buildInfo.ts';
+import { githubSources } from '../core/repository.ts';
 
 export interface AboutBuildProps {
   /** What the build published about itself. */
@@ -11,38 +12,32 @@ export interface AboutBuildProps {
 }
 
 /**
- * The one line that says which build of the site a visitor has open.
+ * The one line that says when the build a visitor has open was made.
  *
  * A report of something going wrong is worth answering only when we know what
- * was running, and a visitor cannot read that off the page otherwise. The
- * version and the commit link into the repository, so the change that caused a
- * problem is one click from the page that shows it.
+ * was running. The version itself is in the hero, where a reader is asked to
+ * quote it from; this line carries the rest, and the commit links into the
+ * repository, so the change that caused a problem is one click from the page
+ * that shows it.
  * @param props - See {@link AboutBuildProps}.
  * @returns The line.
  */
 export function AboutBuild(props: AboutBuildProps): ReactElement {
   const { build, repository } = props;
-  const sources = repository.endsWith('/')
-    ? repository.slice(0, -1)
-    : repository;
-  const onGitHub = sources.startsWith(GITHUB);
+  const sources = githubSources(repository);
 
   return (
     <p style={PARAGRAPH_STYLE}>
-      Running version{' '}
-      <Reference
-        href={
-          onGitHub ? `${sources}/releases/tag/v${build.version}` : undefined
-        }
-      >
-        {build.version}
-      </Reference>
-      , built {formatBuiltAt(build.builtAt)}
+      Built {formatBuiltAt(build.builtAt)}
       {build.commit === undefined ? null : (
         <>
           {' from commit '}
           <Reference
-            href={onGitHub ? `${sources}/commit/${build.commit}` : undefined}
+            href={
+              sources === undefined
+                ? undefined
+                : `${sources}/commit/${build.commit}`
+            }
           >
             {shortCommit(build.commit)}
           </Reference>
@@ -66,8 +61,6 @@ function Reference(props: {
     </a>
   );
 }
-
-const GITHUB = 'https://github.com/';
 
 const PARAGRAPH_STYLE = {
   margin: '8px 0 0',

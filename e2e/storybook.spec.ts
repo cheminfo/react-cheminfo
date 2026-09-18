@@ -7,6 +7,8 @@ import { openStory } from './story.ts';
 const STORY_IDS = [
   'about-aboutpage--another-site',
   'about-aboutpage--default',
+  'about-aboutpage--never-released',
+  'about-aboutpage--private-sources',
   'about-aboutpage--provided-by',
   'about-aboutpage--provided-by-a-team',
   'about-aboutpage--with-citation',

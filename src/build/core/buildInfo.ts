@@ -26,6 +26,30 @@ export interface BuildInfo {
 }
 
 /**
+ * The version a build reports when the repository has never been released.
+ *
+ * release-please writes the version into the root `package.json`, so a site
+ * whose first release has not happened yet is built from the `0.0.0` it was
+ * scaffolded with. That is not a version anybody can look up, so nothing shows
+ * it: a page saying `0.0.0` reads as a bug rather than as a release.
+ */
+export const UNRELEASED_VERSION = '0.0.0';
+
+/**
+ * The version to show a reader, if there is one.
+ * @param build - What the build published about itself, or `undefined`.
+ * @returns The released version, or `undefined` when the build published none
+ * or has never been released.
+ */
+export function releasedVersion(
+  build: BuildInfo | undefined,
+): string | undefined {
+  const version = build?.version;
+  if (version === undefined || version === UNRELEASED_VERSION) return undefined;
+  return version;
+}
+
+/**
  * The commit as it is written for a reader.
  * @param commit - The full hash.
  * @returns Its first seven characters, which is what git itself shows.

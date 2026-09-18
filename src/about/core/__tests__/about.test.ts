@@ -175,3 +175,25 @@ test('context is two short paragraphs, never a chapter', () => {
     'paragraph 2 is 420 characters: at most 400, or it is documentation rather than context.',
   ]);
 });
+
+test('a repository is private until a record says otherwise', () => {
+  // regexp is one of ours with open sources; 3d is one of ours that is not.
+  expect(resolveAbout({ ...SMILES, siteId: 'regexp' }).publicRepository).toBe(
+    true,
+  );
+  expect(resolveAbout({ ...SMILES, siteId: '3d' }).publicRepository).toBe(
+    false,
+  );
+});
+
+test('a site naming a repository of its own says whether it can be opened', () => {
+  const resolved = resolveAbout({
+    ...SMILES,
+    siteId: '3d',
+    repository: 'https://github.com/cheminfo/elsewhere',
+    publicRepository: true,
+  });
+
+  expect(resolved.publicRepository).toBe(true);
+  expect(resolved.issues).toBe('https://github.com/cheminfo/elsewhere/issues');
+});

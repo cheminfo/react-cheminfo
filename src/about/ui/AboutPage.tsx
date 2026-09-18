@@ -10,6 +10,7 @@ import { AboutBuild } from './AboutBuild.tsx';
 import { AboutCitations } from './AboutCitations.tsx';
 import { AboutProvidedBy } from './AboutProvidedBy.tsx';
 import { AboutSection } from './AboutSection.tsx';
+import { AboutVersion } from './AboutVersion.tsx';
 
 export interface AboutPageProps {
   /** What the site says about itself. */
@@ -67,20 +68,22 @@ export function AboutPage(props: AboutPageProps): ReactElement {
       }
       style={PAGE_STYLE}
     >
-      <header
-        className="about-hero"
-        style={logo === undefined ? HERO_STYLE : LOGO_HERO_STYLE}
-      >
+      <header className="about-hero" style={HERO_STYLE}>
         {logo === undefined
           ? (mark ?? <SiteMark site={site} size={56} />)
           : null}
-        <div>
+        <div style={HERO_BODY_STYLE}>
           <h1 style={logo === undefined ? NAME_STYLE : LOGO_NAME_STYLE}>
             {logo ?? <Wordmark site={site} size={26} />}
           </h1>
           <p style={TAGLINE_STYLE}>{site.tagline}</p>
           <p style={WHAT_STYLE}>{about.what}</p>
         </div>
+        <AboutVersion
+          build={about.build}
+          repository={about.repository}
+          publicRepository={about.publicRepository}
+        />
       </header>
 
       {about.people.length === 0 && about.providedBy.length === 0 ? null : (
@@ -122,16 +125,23 @@ export function AboutPage(props: AboutPageProps): ReactElement {
         </AboutSection>
       )}
 
-      <AboutSection title="Licence and source" className="about-licence">
-        <p style={FIRST_PARAGRAPH_STYLE}>
-          {about.license}, © cheminfo. Use it in a course, fork it, or lift a
-          piece of it into something else. The sources are at{' '}
-          <ExternalLink href={about.repository} />.
-        </p>
-        {about.build === undefined ? null : (
-          <AboutBuild build={about.build} repository={about.repository} />
-        )}
-      </AboutSection>
+      {/*
+        A repository nobody outside can open is named nowhere: a licence a
+        reader cannot act on and a link that answers 404 say less than silence.
+        The version stays in the hero, unlinked, so a report still names a build.
+      */}
+      {!about.publicRepository ? null : (
+        <AboutSection title="Licence and source" className="about-licence">
+          <p style={FIRST_PARAGRAPH_STYLE}>
+            {about.license}, © cheminfo. Use it in a course, fork it, or lift a
+            piece of it into something else. The sources are at{' '}
+            <ExternalLink href={about.repository} />.
+          </p>
+          {about.build === undefined ? null : (
+            <AboutBuild build={about.build} repository={about.repository} />
+          )}
+        </AboutSection>
+      )}
 
       <AboutSection title="Found a problem?" className="about-issues">
         <p style={FIRST_PARAGRAPH_STYLE}>
@@ -162,6 +172,11 @@ const PAGE_STYLE = {
   gap: 10,
 } as const satisfies CSSProperties;
 
+const HERO_BODY_STYLE = {
+  flex: '1 1 auto',
+  minWidth: 0,
+} as const satisfies CSSProperties;
+
 const HERO_STYLE = {
   display: 'flex',
   alignItems: 'flex-start',
@@ -177,13 +192,6 @@ const NAME_STYLE = {
   margin: 0,
   fontSize: 26,
   fontWeight: 700,
-} as const satisfies CSSProperties;
-
-// A drawn lockup already carries the mark and the name at its own proportions,
-// so the hero gives it the full width rather than a column beside a mark.
-const LOGO_HERO_STYLE = {
-  ...HERO_STYLE,
-  display: 'block',
 } as const satisfies CSSProperties;
 
 const LOGO_NAME_STYLE = {

@@ -17,6 +17,9 @@ const SMILES: AboutContent = {
   ],
   credits: ['openchemlib', 'react'],
   cite: [PLATFORM_WORK],
+  // Stated rather than inherited: the real repository is private, and these
+  // tests are about the page a site with open sources draws.
+  publicRepository: true,
   build: {
     version: '2.4.0',
     builtAt: '2026-09-16T09:41:07Z',
@@ -99,11 +102,10 @@ test('the licence, the sources and the version come from the ecosystem record', 
   expect(html).toContain(
     'href="https://github.com/cheminfo/smiles.cheminfo.org/issues"',
   );
-  expect(html).toContain('Running version ');
   expect(html).toContain(
     'href="https://github.com/cheminfo/smiles.cheminfo.org/releases/tag/v2.4.0"',
   );
-  expect(html).toContain('built 2026-09-16 09:41:07 UTC');
+  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
   expect(html).toContain(
     'href="https://github.com/cheminfo/smiles.cheminfo.org/commit/a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"',
   );
@@ -120,7 +122,7 @@ test('a build that does not know its commit says only what it knows', () => {
     />,
   );
 
-  expect(html).toContain('built 2026-09-16 09:41:07 UTC');
+  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
   expect(html).not.toContain('from commit');
 });
 
@@ -134,8 +136,77 @@ test('a site published off GitHub shows the build without inventing links', () =
     />,
   );
 
-  expect(html).toContain('>2.4.0</code>');
+  expect(html).toContain('>2.4.0</span>');
   expect(html).not.toContain('gitlab.com/cheminfo/elsewhere/releases');
+  expect(html).not.toContain('gitlab.com/cheminfo/elsewhere/commit');
+});
+
+test('the version is read in the hero, above everything the page says', () => {
+  const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
+
+  expect(html).toContain('class="about-version"');
+  expect(html).toContain('>2.4.0</a>');
+  expect(html.indexOf('about-version')).toBeLessThan(
+    html.indexOf('What you can do here'),
+  );
+  // It left the line it used to share with the build instant.
+  expect(html).not.toContain('Running version');
+});
+
+test('a site that has never been released shows no version at all', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        build: { version: '0.0.0', builtAt: '2026-09-16T09:41:07Z' },
+      }}
+    />,
+  );
+
+  expect(html).not.toContain('about-version');
+  expect(html).not.toContain('0.0.0');
+  // What the build knows is still worth saying.
+  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
+});
+
+test('a site with no build record shows no version', () => {
+  const { build, ...noBuild } = SMILES;
+  const html = renderToStaticMarkup(<AboutPage content={noBuild} />);
+
+  expect(html).not.toContain('about-version');
+  expect(html).toContain('Licence and source');
+});
+
+test('a private repository is named nowhere, and the version stops linking', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage content={{ ...SMILES, publicRepository: false }} />,
+  );
+
+  expect(html).not.toContain('Licence and source');
+  expect(html).not.toContain('MIT, © cheminfo.');
+  expect(html).not.toContain('smiles.cheminfo.org/releases');
+  expect(html).not.toContain('smiles.cheminfo.org/commit');
+  expect(html).not.toContain('Built 2026-09-16 09:41:07 UTC');
+
+  // The build a reader is asked to quote is still on the page, as plain text.
+  expect(html).toContain('class="about-version"');
+  expect(html).toContain('>2.4.0</span>');
+
+  // Everything else the page says is untouched.
+  expect(html).toContain('What you can do here');
+  expect(html).toContain('Built on');
+  expect(html).toContain('Found a problem?');
+});
+
+test('a site inherits the visibility of its own repository from the family record', () => {
+  const { publicRepository, ...inherited } = SMILES;
+  const open = renderToStaticMarkup(
+    <AboutPage content={{ ...inherited, siteId: 'regexp' }} />,
+  );
+  const closed = renderToStaticMarkup(<AboutPage content={inherited} />);
+
+  expect(open).toContain('Licence and source');
+  expect(closed).not.toContain('Licence and source');
 });
 
 test('each work is cited through the shared Cite button, and nothing else', () => {

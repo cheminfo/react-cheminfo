@@ -64,6 +64,13 @@ export interface AboutContent {
    */
   repository?: string;
   /**
+   * Whether a visitor can open that repository. A site naming a repository of
+   * its own says so here too, since the family's record then describes another
+   * one.
+   * @default the `publicRepository` of the ECOSYSTEM_SITES record
+   */
+  publicRepository?: boolean;
+  /**
    * Which build is running, from `virtual:cheminfo-build-info` — never written
    * by hand, which is what keeps it true after the next release.
    * @default undefined — the site's build does not publish one
@@ -108,6 +115,8 @@ export interface ResolvedAbout {
   providedBy: ProviderEntry[];
   license: string;
   repository: string;
+  /** Whether a visitor can open the repository, and so whether it is named. */
+  publicRepository: boolean;
   /** Which build is running, or `undefined` when the site does not say. */
   build: BuildInfo | undefined;
   issues: string;
@@ -139,6 +148,8 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
     providedBy: providers(content.providedBy ?? []),
     license: content.license ?? DEFAULT_LICENSE,
     repository,
+    publicRepository:
+      content.publicRepository ?? site.publicRepository ?? false,
     build: content.build,
     issues: content.issues ?? `${withoutTrailingSlash(repository)}/issues`,
   };
