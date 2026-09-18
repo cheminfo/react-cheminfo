@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/cheminfo/react-cheminfo/compare/v0.19.0...v0.20.0) (2026-09-18)
+
+
+### Features
+
+* **about:** date the build badge, and name an unreleased build by its commit ([185c32a](https://github.com/cheminfo/react-cheminfo/commit/185c32ac30203bf11ebeeb2b600b08ec1f4e0ac8))
+
 ## [0.19.0](https://github.com/cheminfo/react-cheminfo/compare/v0.18.0...v0.19.0) (2026-09-18)
 
 
