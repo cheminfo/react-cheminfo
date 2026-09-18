@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { CSSProperties, ReactElement } from 'react';
+import { useState } from 'react';
 
+import type { Molecule3DCamera } from '../src/molecule3d/core/camera.ts';
+import { formatMolecule3DCamera } from '../src/molecule3d/core/camera.ts';
 import { MoleculeViewer3D } from '../src/molecule3d/ui/MoleculeViewer3D.tsx';
+import type { MoleculeViewer3DProps } from '../src/molecule3d/ui/moleculeViewer3DProps.ts';
 
 /** One butane conformer, as OpenChemLib's conformer generator wrote it. */
 const BUTANE = `#1
@@ -123,4 +128,72 @@ export const PolarSurface: Story = {
     molfile: { format: 'mol', data: ETHANOL },
     defaultSettings: { showSurface: true, surfaceColoring: 'polarity' },
   },
+};
+
+/**
+ * A camera carried by a link: the viewer opens on butane seen from the side,
+ * reports where the reader leaves the camera once it settles, and "Open the
+ * link" reopens it from that report, as a visitor following the link would.
+ */
+export const SharedCamera: Story = {
+  args: {
+    // A quarter turn about the vertical axis.
+    initialCamera: {
+      rotation: [0, Math.SQRT1_2, 0, Math.SQRT1_2],
+      zoom: 1,
+      offset: [0, 0, 0],
+    },
+  },
+  render: (args) => <SharedCameraDemo {...args} />,
+};
+
+/**
+ * The viewer beside the camera it last reported, and a button that opens it
+ * again from that report.
+ * @param props - Whatever the story's controls hold.
+ * @returns The viewer and its readout.
+ */
+function SharedCameraDemo(props: MoleculeViewer3DProps): ReactElement {
+  const [linked, setLinked] = useState(props.initialCamera ?? null);
+  const [reported, setReported] = useState<Molecule3DCamera | null>(null);
+  const [opened, setOpened] = useState(0);
+
+  return (
+    <div style={DEMO_STYLE}>
+      <div style={VIEWER_STYLE}>
+        <MoleculeViewer3D
+          key={opened}
+          {...props}
+          initialCamera={linked}
+          onCameraChange={setReported}
+        />
+      </div>
+      <button
+        type="button"
+        disabled={reported === null}
+        onClick={() => {
+          setLinked(reported);
+          setReported(null);
+          setOpened((previous) => previous + 1);
+        }}
+      >
+        Open the link
+      </button>
+      <code data-testid="molecule3d-camera">
+        {reported === null ? '—' : formatMolecule3DCamera(reported)}
+      </code>
+    </div>
+  );
+}
+
+const DEMO_STYLE: CSSProperties = {
+  display: 'grid',
+  gap: 8,
+  justifyItems: 'start',
+};
+
+const VIEWER_STYLE: CSSProperties = {
+  width: 'min(36rem, 90vw)',
+  height: 420,
+  display: 'flex',
 };

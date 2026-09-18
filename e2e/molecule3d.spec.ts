@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+import type { Molecule3DCamera } from '../src/molecule3d/core/camera.ts';
+import { parseMolecule3DCamera } from '../src/molecule3d/core/camera.ts';
+
 import { openStory } from './story.ts';
 
 // molstar needs a real WebGL2 context, which headless Chromium only gets from
@@ -66,3 +69,79 @@ test('the surface is coloured by polarity and states its TPSA', async ({
 
   expect(problems).toStrictEqual([]);
 });
+
+/** The camera the SharedCamera story opens on: a quarter turn about y. */
+const QUARTER_TURN = [0, Math.SQRT1_2, 0, Math.SQRT1_2] as const;
+
+test('a camera a link carries is the one the reopened viewer stands at', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await openStory(page, 'molecule3d-moleculeviewer3d--shared-camera');
+  const canvas = page.locator('canvas').first();
+  await expect(canvas).toBeVisible({ timeout: 60_000 });
+  const readout = page.getByTestId('molecule3d-camera');
+  const box = await canvas.boundingBox();
+  if (box === null) throw new Error('the viewer drew no canvas');
+  const centreX = box.x + box.width / 2;
+  const centreY = box.y + box.height / 2;
+
+  // A view nobody chose is never reported, however the scene settles.
+  await page.waitForTimeout(1500);
+  await expect(readout).toHaveText('—');
+
+  await page.mouse.move(centreX, centreY);
+  await page.mouse.down();
+  // The trackball turns the model about a degree per pixel, so a short drag.
+  await page.mouse.move(centreX + 12, centreY, { steps: 6 });
+  await page.mouse.up();
+  await expect(readout).not.toHaveText('—', { timeout: 10_000 });
+  const left = cameraOf((await readout.textContent()) ?? '');
+  // The link's quarter turn was applied when the model was framed, and the drag
+  // then turned the model a little further.
+  expect(agreement(left.rotation, QUARTER_TURN)).toBeGreaterThan(0.9);
+  expect(agreement(left.rotation, QUARTER_TURN)).toBeLessThan(0.999);
+
+  await page.getByRole('button', { name: 'Open the link' }).click();
+  await expect(readout).toHaveText('—');
+  await expect(canvas).toBeVisible({ timeout: 60_000 });
+
+  // A zoom leaves the rotation alone, so the next report shows where the
+  // reopened viewer stood: the reader's rotation, not a fresh framing.
+  await page.mouse.move(centreX, centreY);
+  await page.mouse.wheel(0, -200);
+  await expect(readout).not.toHaveText('—', { timeout: 10_000 });
+  const reopened = cameraOf((await readout.textContent()) ?? '');
+
+  expect(agreement(reopened.rotation, left.rotation)).toBeGreaterThan(0.999);
+  expect(reopened.zoom).not.toBe(left.zoom);
+});
+
+/**
+ * The camera a readout prints.
+ * @param text - What the readout shows.
+ * @returns The camera.
+ */
+function cameraOf(text: string): Molecule3DCamera {
+  const camera = parseMolecule3DCamera(text);
+  if (camera === null) throw new Error(`not a camera: ${text}`);
+  return camera;
+}
+
+/**
+ * How closely two unit quaternions turn the model the same way: 1 when they
+ * agree, whatever their sign, since q and -q are the same rotation.
+ * @param first - One rotation.
+ * @param second - The other.
+ * @returns The absolute value of their dot product.
+ */
+function agreement(
+  first: Molecule3DCamera['rotation'],
+  second: Molecule3DCamera['rotation'],
+): number {
+  let dot = 0;
+  for (let index = 0; index < 4; index++) {
+    dot += (first[index] ?? 0) * (second[index] ?? 0);
+  }
+  return Math.abs(dot);
+}

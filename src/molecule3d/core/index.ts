@@ -1,3 +1,17 @@
+export type {
+  Molecule3DCamera,
+  Molecule3DRotation,
+  Molecule3DVector,
+} from './camera.ts';
+export {
+  DEFAULT_MOLECULE_3D_CAMERA,
+  MOLECULE_3D_ZOOM_RANGE,
+  formatMolecule3DCamera,
+  molecule3DCameraParam,
+  normalizeMolecule3DCamera,
+  parseMolecule3DCamera,
+  sameMolecule3DCamera,
+} from './camera.ts';
 export type { ImageSize } from './exportImage.ts';
 export { dataUriBytes, rasterSvgMarkup } from './exportImage.ts';
 export type { Molecule3DGesture, Molecule3DGestureKey } from './gestures.ts';

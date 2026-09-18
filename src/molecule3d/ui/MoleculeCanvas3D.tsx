@@ -6,10 +6,9 @@
  */
 
 import type { CSSProperties, ReactElement } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
-import type { Molecule3DFile } from '../core/settings.ts';
 import {
   normalizeMolecule3DSettings,
   resolveMolecule3DTools,
@@ -19,13 +18,13 @@ import { Molecule3DExport } from './Molecule3DExport.tsx';
 import { Molecule3DOptions } from './Molecule3DOptions.tsx';
 import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
 import { DEFAULT_SPIN_SPEED } from './camera.ts';
-import { drawScene } from './drawScene.ts';
+import { createMolecule3DViewer } from './createViewer.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
 import { useControlledState } from './useControlledState.ts';
 import { useImageExport } from './useImageExport.ts';
+import { useMoleculeScene } from './useMoleculeScene.ts';
 import { usePolarSurfaceArea } from './usePolarSurfaceArea.ts';
 import type { Molecule3DViewer } from './viewer.ts';
-import { createMolecule3DViewer } from './viewer.ts';
 
 /** Props of {@link MoleculeCanvas3D}. */
 export interface MoleculeCanvas3DProps extends Omit<
@@ -84,11 +83,6 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
   // effect keyed on it runs again, in order, after the viewer exists.
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const viewerRef = useRef<Molecule3DViewer | null>(null);
-  const framedRef = useRef<{
-    molfile: Molecule3DFile;
-    viewer: Molecule3DViewer;
-  } | null>(null);
-
   // The viewer is created once, so what its callbacks read is kept fresh here.
   const latest = useRef({
     measurements,
@@ -126,37 +120,6 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     };
   }, [container]);
 
-  // One animation frame of coalescing, so dragging a slider costs one rebuild.
-  useEffect(() => {
-    const viewer = viewerRef.current;
-    if (container === null || viewer === null) return;
-    let cancelled = false;
-    const frame = requestAnimationFrame(() => {
-      // Framed on a new molecule or a new viewer, never on a restyle: a slider
-      // that snapped the camera back would undo the reader's orientation.
-      const framed = framedRef.current;
-      const isNew =
-        molfile !== null &&
-        (framed?.molfile !== molfile || framed.viewer !== viewer);
-      framedRef.current = molfile === null ? null : { molfile, viewer };
-      const frameCamera = isNew ? frameNewMolecule : 'none';
-      void drawScene(viewer, molfile, settings, measurements, frameCamera)
-        .then(() => {
-          if (!cancelled) latest.current.onFailureChange(null);
-        })
-        .catch((error: unknown) => {
-          if (cancelled) return;
-          latest.current.onFailureChange(
-            error instanceof Error ? error.message : String(error),
-          );
-        });
-    });
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-    };
-  }, [container, molfile, frameNewMolecule, settings, measurements]);
-
   useEffect(() => {
     void viewerRef.current?.setSpin(spinning, spinSpeed);
   }, [container, spinning, spinSpeed]);
@@ -165,9 +128,17 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     void viewerRef.current?.setMeasureKind(measureKind);
   }, [container, measureKind]);
 
-  const resetView = useCallback(() => {
-    void viewerRef.current?.resetCamera();
-  }, []);
+  const { resetView } = useMoleculeScene({
+    container,
+    viewerRef,
+    molfile,
+    frameNewMolecule,
+    settings,
+    measurements,
+    spinning,
+    onFailureChange,
+    camera: props,
+  });
 
   const { canvasSize, exportImage } = useImageExport(
     container,

@@ -1,21 +1,17 @@
 /**
- * Lifecycle of one molstar molecule viewer.
+ * Lifecycle of one molstar molecule viewer: `createMolecule3DViewer` builds
+ * one, and every operation a component performs on it is a method here.
  *
- * `createMolecule3DViewer` is **synchronous** on purpose. React 19 runs an
- * effect, its cleanup and the effect again on every mount in development, so an
- * awaited constructor hands the cleanup nothing to dispose and leaks a WebGL
- * context per mount. Returning the handle immediately means `dispose()` can
- * always be called; the work is queued behind `ready`.
- *
- * molstar's own UI is not mounted: every control is the component's.
+ * The constructor returns before the canvas exists — see `createViewer.ts` —
+ * so every method queues its work behind `ready` and resolves to nothing once
+ * the viewer has been disposed. molstar's own UI is not mounted: every control
+ * is the component's.
  */
 
-import { PluginViewModel } from 'molstar/lib/extensions/plugin/view-model.js';
+import type { PluginViewModel } from 'molstar/lib/extensions/plugin/view-model.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
-// Lowercased on import: it is a factory, not a constructor.
-import { DefaultPluginSpec as defaultPluginSpec } from 'molstar/lib/mol-plugin/spec.js';
-import { Color } from 'molstar/lib/mol-util/color/color.js';
 
+import type { Molecule3DCamera } from '../core/camera.ts';
 import type { ImageSize } from '../core/exportImage.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 import type { Molecule3DFile } from '../core/settings.ts';
@@ -23,9 +19,12 @@ import type { Molecule3DFile } from '../core/settings.ts';
 import {
   DEFAULT_CAMERA_DURATION,
   DEFAULT_SPIN_SPEED,
+  applyCamera,
   resetCamera,
   setSpin,
+  watchCamera,
 } from './camera.ts';
+import { captureScene } from './captureScene.ts';
 import {
   MeasurementPicker,
   clearMeasurements,
@@ -33,24 +32,12 @@ import {
 } from './measurements.ts';
 import { clearMolecule, renderMolecule } from './renderMolecule.ts';
 import { clearSurface, renderSurface } from './renderSurface.ts';
+import { mountMolecule3DPlugin } from './viewerSpec.ts';
 import type {
   Molecule3DViewerOptions,
   MoleculeStyle,
   SurfaceStyle,
 } from './viewerTypes.ts';
-
-/**
- * Create a viewer inside `container` and start initialising it.
- * @param container - A positioned element; molstar inserts its canvas into it.
- * @param options - See {@link Molecule3DViewerOptions}.
- * @returns A handle that is safe to dispose immediately.
- */
-export function createMolecule3DViewer(
-  container: HTMLElement,
-  options: Molecule3DViewerOptions = {},
-): Molecule3DViewer {
-  return new Molecule3DViewer(container, options);
-}
 
 /**
  * One molstar canvas, and every operation the component performs on it. Every
@@ -74,18 +61,7 @@ export class Molecule3DViewer {
       background = '#ffffff', // tokens-ok: a WebGL clear colour
       onMeasure = ignore,
     } = options;
-    const spec = defaultPluginSpec();
-    this.#model = new PluginViewModel({
-      spec: {
-        ...spec,
-        canvas3d: {
-          ...spec.canvas3d,
-          renderer: { backgroundColor: Color.fromHexStyle(background) },
-          camera: { helper: { axes: { name: 'off', params: {} } } },
-        },
-      },
-    });
-    this.#model.mount(container);
+    this.#model = mountMolecule3DPlugin(container, background);
     this.ready = this.#model.initialized;
     // Registered before any `#run`, so the picker exists by the time one runs.
     this.ready.then(() => {
@@ -164,19 +140,7 @@ export class Molecule3DViewer {
    * @throws {Error} When the plugin has no screenshot helper.
    */
   captureImage(size: ImageSize): Promise<string | undefined> {
-    return this.#run(async (plugin) => {
-      const helper = plugin.helpers.viewportScreenshot;
-      if (helper === undefined) {
-        throw new Error('This viewer cannot take a picture of its scene.');
-      }
-      helper.behaviors.values.next({
-        ...helper.values,
-        resolution: { name: 'custom', params: size },
-        axes: { name: 'off', params: {} },
-        transparent: false,
-      });
-      return helper.getImageDataUri();
-    });
+    return this.#run((plugin) => captureScene(plugin, size));
   }
 
   /**
@@ -192,6 +156,37 @@ export class Molecule3DViewer {
     return this.#run((plugin) => {
       resetCamera(plugin, durationMilliseconds, fromFront);
     });
+  }
+
+  /**
+   * Put the camera where a link says it stood.
+   * @param camera - Where to stand.
+   * @param durationMilliseconds - Transition length; 0 jumps.
+   * @returns Nothing; resolves once the move has been ordered.
+   */
+  setCamera(camera: Molecule3DCamera, durationMilliseconds = 0): Promise<void> {
+    return this.#run((plugin) => {
+      applyCamera(plugin, camera, durationMilliseconds);
+    });
+  }
+
+  /**
+   * Follow the camera, however it moves.
+   * @param listener - Called after every move.
+   * @returns A function that stops calling the listener; safe to call before
+   * the canvas exists.
+   */
+  watchCamera(listener: (camera: Molecule3DCamera | null) => void): () => void {
+    let stop: (() => void) | null = null;
+    let cancelled = false;
+    void this.#run((plugin) => {
+      if (!cancelled) stop = watchCamera(plugin, listener);
+    });
+    return () => {
+      cancelled = true;
+      stop?.();
+      stop = null;
+    };
   }
 
   /**

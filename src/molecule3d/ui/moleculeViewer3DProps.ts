@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { ViewerCapability } from '../../orbital/ui/capability.ts';
+import type { Molecule3DCamera } from '../core/camera.ts';
 import type { Measurement } from '../core/measurement.ts';
 import type {
   Molecule3DFile,
@@ -78,6 +79,26 @@ export interface MoleculeViewer3DProps {
    * @default undefined
    */
   onMeasurementsChange?: (measurements: readonly Measurement[]) => void;
+  /**
+   * Where the camera stands when the first molecule is framed — what a shared
+   * link carries. The camera belongs to whoever is dragging it afterwards, so
+   * this is read once and a later change is ignored; the viewer reports every
+   * move through `onCameraChange` instead.
+   * @default null — the molecule is framed as `frameNewMolecule` says
+   */
+  initialCamera?: Molecule3DCamera | null;
+  /**
+   * Called once the camera has come to rest, with where it stands. Not called
+   * while the model is spinning: a spinning camera has no orientation to keep.
+   * @default undefined
+   */
+  onCameraChange?: (camera: Molecule3DCamera) => void;
+  /**
+   * How long the camera must be still before `onCameraChange` is called,
+   * milliseconds, so one drag is one report rather than one per frame.
+   * @default 400
+   */
+  cameraSettleDelay?: number;
   /**
    * Name of an exported image, without its extension.
    * @default 'molecule'
