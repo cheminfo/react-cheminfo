@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{t}from"./clamp-M7_x50VL.js";function n(e,n=i){if(!Number.isFinite(e))return e;let o=Math.trunc(t(n,0,r,i)),s=a[o]??1;return Math.round(e*s)/s}var r,i,a;function o(){return(o=e((()=>{r=15,i=2,a=[1,10,100,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10,1e11,0xe8d4a51000,0x9184e72a000,0x5af3107a4000,0x38d7ea4c68000]})))()}export{n,o as t};
