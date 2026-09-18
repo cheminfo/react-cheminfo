@@ -1,0 +1,27 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-X62GV0XO.js";import{n,t as r}from"./icon-DTsLHYk6.js";import{n as i,t as a}from"./esm-CVV7O0lL.js";import{n as o,r as s}from"./familyTokens-DsQXXJV4.js";import{c,g as l,v as u}from"./pedagogyFixtures-CJW_gw23.js";function d(e){let{results:t,label:n,pending:i=!1,className:a}=e;if(t.length===0)return null;let o=[];for(let e=0;e<t.length;e++){let a=t[e];o.push((0,h.jsxs)(`li`,{style:m(a.passed,i),children:[(0,h.jsx)(r,{icon:f(a.passed,i),intent:p(a.passed,i)}),(0,h.jsxs)(`span`,{children:[n!==void 0&&(0,h.jsx)(`strong`,{style:_,children:n(a,e)}),a.reason!==``&&(0,h.jsx)(`span`,{style:v,children:a.reason})]})]},`case-${e}`))}return(0,h.jsx)(`ul`,{className:a,style:g,children:o})}function f(e,t){return e?`tick-circle`:t?`circle`:`cross-circle`}function p(e,t){return e?`success`:t?`none`:`danger`}function m(e,t){let n=!e&&!t;return{display:`flex`,alignItems:`start`,gap:8,padding:`4px 8px`,borderRadius:3,borderLeft:`3px solid ${e?a.GREEN2:n?a.RED3:a.GRAY5}`,background:e?`rgb(236 253 245)`:n?`rgb(254 243 242)`:`rgb(245 248 250)`}}var h,g,_,v;function y(){return(y=e((()=>{i(),n(),s(),h=t(),g={display:`flex`,flexDirection:`column`,gap:4,listStyle:`none`,margin:0,padding:0},_={marginRight:6},v={display:`block`,color:o.textMuted,lineHeight:1.4},d.__docgenInfo={description:`One row per graded case: whether it passes, and the sentence saying why not.
+
+The sentence is the validator's own — \`match was "cat", expected "cats"\` —
+and is never rewritten here: the explanation is the teaching, and a
+paraphrase would drop the value the student has to compare.
+@param props - The cases, and whether they could be graded at all.
+@returns The list, or nothing when there is no case to show.`,methods:[],displayName:`TestCaseList`,props:{results:{required:!0,tsType:{name:`unknown`},description:`The graded cases, in the order the validator returned them.`},label:{required:!1,tsType:{name:`signature`,type:`function`,raw:`(result: TCase, position: number) => ReactNode`,signature:{arguments:[{type:{name:`TCase`},name:`result`},{type:{name:`number`},name:`position`}],return:{name:`ReactNode`}}},description:`What names a case: the input it was run on, the atom it asked about. A
+tool that carries no such name lets the sentence speak for itself.
+@default undefined — the row shows only the reason`},pending:{required:!1,tsType:{name:`boolean`},description:`Whether the answer could not be graded at all — it does not compile, or
+there is nothing to mark yet. Every case is then drawn neutral rather than
+red, since none of them actually failed.
+@default false`},className:{required:!1,tsType:{name:`string`},description:`Class the list carries, so a site can reach it from its stylesheet.
+@default undefined`}}}})))()}var b,x,S,C,w,T,E,D,O;function k(){return(k=e((()=>{y(),s(),u(),b=t(),x=e=>(0,b.jsx)(`div`,{style:{width:`min(40rem, 92vw)`},children:(0,b.jsx)(e,{})}),S={title:`Pedagogy/TestCaseList`,component:d,decorators:[x],args:{results:c},argTypes:{pending:{control:`boolean`}},parameters:{layout:`padded`,docs:{description:{component:"One row per graded case, each carrying the validator’s own sentence. The sentence is the teaching — `matched, but an ester is not an acid` is what a student can act on, where `assertion failed` is not — so it is never paraphrased here."}}}},C={},w={render:e=>(0,b.jsx)(d,{results:c,pending:e.pending,label:e=>(0,b.jsxs)(b.Fragment,{children:[e.name,(0,b.jsx)(`code`,{style:D,children:e.smiles})]})})},T={args:{results:l}},E={args:{pending:!0}},D={color:o.textMuted,fontFamily:`ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`,fontWeight:400,marginLeft:8},C.parameters={...C.parameters,docs:{...C.parameters?.docs,source:{originalSource:`{}`,...C.parameters?.docs?.source},description:{story:'`C(=O)O` typed for "every carboxylic acid and nothing else": four cases pass,\nand the two that fail say exactly what to change.',...C.parameters?.docs?.description}}},w.parameters={...w.parameters,docs:{...w.parameters?.docs,source:{originalSource:`{
+  render: args => <TestCaseList results={QUERY_TEST_CASES} pending={args.pending} label={result => <>
+          {result.name}
+          <code style={SMILES_STYLE}>{result.smiles}</code>
+        </>} />
+}`,...w.parameters?.docs?.source},description:{story:`Naming the molecule turns the list into the chemistry problem it is.`,...w.parameters?.docs?.description}}},T.parameters={...T.parameters,docs:{...T.parameters?.docs,source:{originalSource:`{
+  args: {
+    results: SOLVED_TEST_CASES
+  }
+}`,...T.parameters?.docs?.source},description:{story:"The same six once the query reads `[CX3](=O)[OX2H1]` — green all the way down.",...T.parameters?.docs?.description}}},E.parameters={...E.parameters,docs:{...E.parameters?.docs,source:{originalSource:`{
+  args: {
+    pending: true
+  }
+}`,...E.parameters?.docs?.source},description:{story:`The answer did not compile, so nothing actually failed: every case is drawn
+neutral rather than red, and a student is not told they got six wrong.`,...E.parameters?.docs?.description}}},O=[`Default`,`WithTheMoleculeNamed`,`AllPassing`,`NotGradedYet`]})))()}k();export{T as AllPassing,C as Default,E as NotGradedYet,w as WithTheMoleculeNamed,O as __namedExportsOrder,S as default};
