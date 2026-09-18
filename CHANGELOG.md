@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.0](https://github.com/cheminfo/react-cheminfo/compare/v0.18.0...v0.19.0) (2026-09-18)
+
+
+### Features
+
+* **about:** show the version in the hero and name only public sources ([a68081d](https://github.com/cheminfo/react-cheminfo/commit/a68081d58ed4ed3c2a5b52e9920c0fff5ed96973))
+* **molecule3d:** carry the camera in a shareable link ([333d480](https://github.com/cheminfo/react-cheminfo/commit/333d48046e3950bb7a0d10a222bf97e811cb4a57))
+
 ## [0.18.0](https://github.com/cheminfo/react-cheminfo/compare/v0.17.0...v0.18.0) (2026-09-18)
 
 
