@@ -29,11 +29,14 @@ export function readGitHead(start: string): string | undefined {
   // itself and neither `refs` nor `packed-refs` is read at all.
   if (!head.startsWith('ref:')) return asCommit(head);
 
+  // A linked worktree keeps only its own `HEAD`: the branch it names lives in
+  // the repository's common directory, which `commondir` points to.
   const ref = head.slice('ref:'.length).trim();
-  const loose = readText(join(gitDir, ref));
+  const commonDir = findCommonDir(gitDir);
+  const loose = readText(join(gitDir, ref)) ?? readText(join(commonDir, ref));
   return (
     asCommit(loose) ??
-    commitInPackedRefs(readText(join(gitDir, 'packed-refs')), ref)
+    commitInPackedRefs(readText(join(commonDir, 'packed-refs')), ref)
   );
 }
 
@@ -72,6 +75,18 @@ export function findGitDir(start: string): string | undefined {
     if (parent === directory) return undefined;
     directory = parent;
   }
+}
+
+/**
+ * The directory the refs of a repository live in: the `.git` directory itself,
+ * or for a linked worktree the one its `commondir` file names.
+ * @param gitDir - The `.git` directory `HEAD` was read from.
+ * @returns The absolute path of the common directory.
+ */
+function findCommonDir(gitDir: string): string {
+  const pointer = readText(join(gitDir, 'commondir'));
+  if (pointer === undefined || pointer === '') return gitDir;
+  return isAbsolute(pointer) ? pointer : resolve(gitDir, pointer);
 }
 
 /**

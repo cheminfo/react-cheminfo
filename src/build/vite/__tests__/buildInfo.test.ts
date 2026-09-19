@@ -99,6 +99,28 @@ test('a .git file, as a worktree writes one, names the real directory', () => {
   expect(readGitHead(join(root, 'work'))).toBe(COMMIT);
 });
 
+test('a worktree on a branch reads the branch from the common directory', () => {
+  const root = checkout({
+    'work/.git': 'gitdir: ../store/.git/worktrees/one\n',
+    'store/.git/worktrees/one/HEAD': 'ref: refs/heads/feature\n',
+    'store/.git/worktrees/one/commondir': '../..\n',
+    'store/.git/refs/heads/feature': `${COMMIT}\n`,
+  });
+
+  expect(readGitHead(join(root, 'work'))).toBe(COMMIT);
+});
+
+test('a worktree whose branch is packed finds it in the common packed-refs', () => {
+  const root = checkout({
+    'work/.git': 'gitdir: ../store/.git/worktrees/one\n',
+    'store/.git/worktrees/one/HEAD': 'ref: refs/heads/main\n',
+    'store/.git/worktrees/one/commondir': '../..\n',
+    'store/.git/packed-refs': `# pack-refs with: peeled\n${COMMIT} refs/heads/main\n`,
+  });
+
+  expect(readGitHead(join(root, 'work'))).toBe(COMMIT);
+});
+
 test('a build that cannot see the repository reports no commit', () => {
   const root = checkout({ 'package.json': '{"version":"1.0.0"}' });
 
