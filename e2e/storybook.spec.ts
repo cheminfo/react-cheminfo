@@ -63,6 +63,7 @@ const STORY_IDS = [
   'clipboard-clicktocopy--default',
   'clipboard-clicktocopy--formula',
   'clipboard-clicktocopy--inside-clickable-row',
+  'clipboard-clicktocopy--nested-link',
   'clipboard-clicktocopy--selection-policy',
   'clipboard-clicktocopy--table-cells',
   'clipboard-codeblock--copyable',

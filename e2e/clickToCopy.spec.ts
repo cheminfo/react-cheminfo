@@ -68,6 +68,27 @@ test('a formula goes on the clipboard as text', async ({ page }) => {
   expect(await copiedText(page, value)).toBe('C3H4O');
 });
 
+test('a click on a child of the value copies too', async ({ page }) => {
+  await openStory(page, 'clipboard-clicktocopy--formula');
+  const value = page.getByRole('button', { name: /C3H4O/ });
+
+  await value.locator('sub').first().click();
+
+  expect(await copiedText(page, value)).toBe('C3H4O');
+});
+
+test('a link nested in the value keeps its own click and copies nothing', async ({
+  page,
+}) => {
+  await openStory(page, 'clipboard-clicktocopy--nested-link');
+  const value = page.getByRole('button', { name: /CID 7847/ });
+
+  await value.getByRole('link').click();
+
+  await expect(page.getByTestId('followed')).toHaveText('Followed 1 times');
+  await expect(value).not.toHaveAttribute('data-copy', /./);
+});
+
 test('a value inside a clickable row copies without opening the row', async ({
   page,
 }) => {

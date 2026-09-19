@@ -106,6 +106,30 @@ export const InsideClickableRow: Story = {
   },
 };
 
+/** A link inside the value keeps its own click and copies nothing. */
+export const NestedLink: Story = {
+  render: function NestedLink() {
+    const [followed, setFollowed] = useState(0);
+    return (
+      <div style={{ display: 'grid', gap: 8 }}>
+        <ClickToCopy value="7847" label="PubChem CID">
+          CID 7847{' '}
+          <a
+            href="#pubchem"
+            onClick={(event) => {
+              event.preventDefault();
+              setFollowed((count) => count + 1);
+            }}
+          >
+            PubChem
+          </a>
+        </ClickToCopy>
+        <span data-testid="followed">Followed {followed} times</span>
+      </div>
+    );
+  },
+};
+
 /**
  * The family's selection policy: the text of a tool is not selectable, a field
  * is, and a region marked `selectable` is read and quoted.

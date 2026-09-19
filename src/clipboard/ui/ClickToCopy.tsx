@@ -171,7 +171,11 @@ function isOnNestedControl(
   const { target, currentTarget } = event;
   if (!(target instanceof Element) || target === currentTarget) return false;
   const control = target.closest(NESTED_CONTROL);
-  return control !== null && currentTarget.contains(control);
+  return (
+    control !== null &&
+    control !== currentTarget &&
+    currentTarget.contains(control)
+  );
 }
 
 function copyTitle(
