@@ -1,3 +1,5 @@
+export type { ClickToCopyElement, ClickToCopyProps } from './ClickToCopy.tsx';
+export { ClickToCopy } from './ClickToCopy.tsx';
 export type { CodeBlockProps, CodeBlockTone } from './CodeBlock.tsx';
 export { CodeBlock } from './CodeBlock.tsx';
 export type { CopyableValueProps } from './CopyableValue.tsx';

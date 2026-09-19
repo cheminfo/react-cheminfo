@@ -68,7 +68,7 @@ export const CustomLabel: Story = {
     content: CAFFEINE_INCHI,
     label: 'Copy the InChI',
     copiedLabel: 'On the clipboard',
-    icon: 'clipboard',
+    icon: 'paperclip',
   },
 };
 

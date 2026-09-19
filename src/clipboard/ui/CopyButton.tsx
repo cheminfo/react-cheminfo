@@ -44,7 +44,7 @@ export interface CopyButtonProps {
   small?: boolean;
   /**
    * Glyph shown at rest. A tick replaces it while the copy is confirmed.
-   * @default 'duplicate'
+   * @default 'clipboard'
    */
   icon?: IconName;
   /**
@@ -83,7 +83,7 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
     failedLabel = 'Copy failed',
     minimal = false,
     small = false,
-    icon = 'duplicate',
+    icon = 'clipboard',
     disabled = false,
     resetAfter = DEFAULT_COPY_RESET_AFTER,
     title = 'Copy to clipboard',

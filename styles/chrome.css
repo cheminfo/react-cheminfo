@@ -321,6 +321,169 @@ button {
   max-width: none;
 }
 
+/* ── Selection ───────────────────────────────────────────────────────────── */
+
+/* A tool is clicked and dragged, not read: a drag across a viewer, a double
+   click on a control or a stray triple click must not paint the page. What is
+   worth taking away is copied with a click instead (`<ClickToCopy>`). Form
+   controls stay editable, and what a visitor reads, quotes or reports stays
+   selectable: the About page, the glossary, a code block, a reference, an
+   error, and any region a site marks with `text-selectable`. The regions are
+   reopened down to their descendants, so a site's own `* { user-select: none }`
+   cannot close them again. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+select,
+[contenteditable],
+:is(
+  .text-selectable,
+  .about-page,
+  .glossary-index,
+  .code-block,
+  .citation-preview,
+  .error-fallback__message,
+  .bp6-callout.bp6-intent-danger
+),
+:is(
+    .text-selectable,
+    .about-page,
+    .glossary-index,
+    .code-block,
+    .citation-preview,
+    .error-fallback__message,
+    .bp6-callout.bp6-intent-danger
+  )
+  * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* ── Click to copy ───────────────────────────────────────────────────────── */
+
+/* The copy cursor, the tint and the clipboard glyph are the promise; a tick
+   keeps it. The glyph is `clipboard`, never `duplicate`: two overlapping squares
+   read as "add another". Green and red are the confirmation's own colours,
+   the ones Blueprint gives success and danger. */
+.click-to-copy {
+  position: relative;
+  border-radius: 4px;
+  cursor: copy;
+  transition: background-color 120ms ease;
+}
+
+.click-to-copy:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.click-to-copy[data-copy='copied'] {
+  background-color: color-mix(in oklab, #238551 15%, transparent);
+}
+
+.click-to-copy[data-copy='failed'] {
+  background-color: color-mix(in oklab, #cd4246 15%, transparent);
+}
+
+.click-to-copy__icon {
+  position: absolute;
+  top: 50%;
+  color: var(--text-muted);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+/* In a line of text the glyph floats just past the value, so the line keeps
+   its spacing; a block keeps room for it inside its right edge. */
+.click-to-copy--inline .click-to-copy__icon {
+  left: 100%;
+  transform: translate(3px, -50%);
+}
+
+.click-to-copy--block {
+  padding-right: 22px;
+}
+
+.click-to-copy--block .click-to-copy__icon {
+  right: 4px;
+  transform: translateY(-50%);
+}
+
+.click-to-copy:focus-visible .click-to-copy__icon,
+.click-to-copy[data-copy] .click-to-copy__icon {
+  opacity: 1;
+}
+
+.click-to-copy[data-copy='copied'] .click-to-copy__icon {
+  color: #238551;
+}
+
+.click-to-copy[data-copy='failed'] .click-to-copy__icon {
+  color: #cd4246;
+}
+
+/* Only where there is a pointer to hover with: on a touch screen the tint
+   would stay on after the tap, over the tick. */
+@media (hover: hover) {
+  .click-to-copy:not([data-copy]):hover {
+    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+  }
+
+  .click-to-copy:hover .click-to-copy__icon {
+    opacity: 1;
+  }
+}
+
+/* Blueprint's interactive and striped tables paint and point every cell from
+   three classes deep, so a copyable cell repeats its class to stay ahead. */
+.click-to-copy.click-to-copy.click-to-copy.click-to-copy:is(td, th) {
+  border-radius: 0;
+  cursor: copy;
+}
+
+.click-to-copy.click-to-copy.click-to-copy.click-to-copy:is(
+    td,
+    th
+  )[data-copy='copied'] {
+  background-color: color-mix(in oklab, #238551 15%, transparent);
+}
+
+.click-to-copy.click-to-copy.click-to-copy.click-to-copy:is(
+    td,
+    th
+  )[data-copy='failed'] {
+  background-color: color-mix(in oklab, #cd4246 15%, transparent);
+}
+
+@media (hover: hover) {
+  .click-to-copy.click-to-copy.click-to-copy.click-to-copy:is(td, th):not(
+      [data-copy]
+    ):hover {
+    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+  }
+}
+
+/* The glyph carries the confirmation to the eye; this carries it to a reader. */
+.click-to-copy__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media print {
+  .click-to-copy__icon {
+    display: none;
+  }
+}
+
 /* ── Printing ────────────────────────────────────────────────────────────── */
 
 /* Students print the cheatsheet. Let them, without the chrome. */

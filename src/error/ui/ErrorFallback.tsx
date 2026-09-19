@@ -52,7 +52,9 @@ export function ErrorFallback(props: ErrorFallbackProps): ReactElement {
       icon="error"
       title={title}
       description={
-        error.message === '' ? 'No message was given.' : error.message
+        <span className="error-fallback__message">
+          {error.message === '' ? 'No message was given.' : error.message}
+        </span>
       }
       action={
         onRetry === undefined ? undefined : (

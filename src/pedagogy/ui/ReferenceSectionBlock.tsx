@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { ClickToCopy } from '../../clipboard/ui/ClickToCopy.tsx';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
@@ -108,7 +109,15 @@ function ReferenceRowLine(props: {
   const interactive = row.tooltip !== undefined;
   const line = (
     <span style={interactive ? INTERACTIVE_ROW_STYLE : ROW_STYLE}>
-      <span style={syntaxStyle(width, interactive)}>{row.syntax}</span>
+      <span style={syntaxStyle(width, interactive)}>
+        <ClickToCopy
+          value={row.syntax}
+          label="syntax"
+          title={interactive ? '' : undefined}
+        >
+          {row.syntax}
+        </ClickToCopy>
+      </span>
       <span style={DESCRIPTION_STYLE}>{row.description}</span>
     </span>
   );

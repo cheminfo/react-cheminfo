@@ -12,10 +12,14 @@ test('the label, the value and one copy button named after the label', () => {
 
   expect(html).toContain('class="copyable-value"');
   expect(html).toContain('>InChIKey</span>');
-  expect(html).toContain(`>${INCHI_KEY}</code>`);
+  expect(html).toContain(`>${INCHI_KEY}<span`);
   expect(html.match(/<button/g)).toHaveLength(1);
+  expect(html.match(/tabindex/g)).toBeNull();
   expect(html).toContain('title="Copy the InChIKey"');
-  expect(html).toContain('user-select:all');
+  expect(html).toContain(`title="Copy the InChIKey (${INCHI_KEY})"`);
+  expect(html).toContain(
+    'class="click-to-copy click-to-copy--inline copyable-value__value"',
+  );
   expect(html).not.toContain('disabled=""');
 });
 
@@ -54,6 +58,7 @@ test('an empty value reads as the missing marker and offers nothing to copy', ()
 
   expect(html).toContain('>–</code>');
   expect(html).toContain('disabled=""');
+  expect(html).not.toContain('click-to-copy');
 });
 
 test('what the caller puts under the value follows it, and its class joins ours', () => {
@@ -70,7 +75,7 @@ test('what the caller puts under the value follows it, and its class joins ours'
 
   expect(html).toContain('class="copyable-value notation-row"');
   expect(html).toContain('title="Copy the GlyTouCan accession"');
-  expect(html).toContain(
-    'G00055MO</code><a href="https://glytoucan.org/Structures/Glycans/G00055MO">',
+  expect(html).toMatch(
+    /G00055MO<span class="click-to-copy__status" role="status"><\/span><\/code><a href="https:\/\/glytoucan\.org\/Structures\/Glycans\/G00055MO">/,
   );
 });

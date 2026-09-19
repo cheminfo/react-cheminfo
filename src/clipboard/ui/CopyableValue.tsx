@@ -3,6 +3,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { MISSING_VALUE } from '../../format/core/missing.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
+import { ClickToCopy } from './ClickToCopy.tsx';
 import { CopyButton } from './CopyButton.tsx';
 
 const DEFAULT_BLOCK_HEIGHT = 160;
@@ -50,9 +51,9 @@ export interface CopyableValueProps {
  * One read-only value, named, with the button that copies it.
  *
  * A derived notation — a SMILES, an InChIKey, an accession — is only useful
- * somewhere else, so it is shown with the single click that puts it on the
- * clipboard, and selecting the value by hand takes all of it at once. An empty
- * value reads as the missing marker and offers nothing to copy.
+ * somewhere else, so a click on the value or on its button puts it on the
+ * clipboard. An empty value reads as the missing marker and offers nothing to
+ * copy.
  * @param props - See {@link CopyableValueProps}.
  * @returns The labelled value and its copy button.
  */
@@ -93,12 +94,17 @@ export function CopyableValue(props: CopyableValueProps): ReactElement {
           small
         />
       </div>
-      <code
+      <ClickToCopy
+        as="code"
+        value={value}
+        label={label}
+        focusable={false}
+        disabled={isEmpty}
         className="copyable-value__value"
         style={block ? { ...BLOCK_VALUE_STYLE, maxHeight } : VALUE_STYLE}
       >
         {isEmpty ? MISSING_VALUE : value}
-      </code>
+      </ClickToCopy>
       {children}
     </div>
   );
@@ -127,7 +133,6 @@ const VALUE_STYLE = {
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontSize: 12,
   overflowWrap: 'anywhere',
-  userSelect: 'all',
 } as const satisfies CSSProperties;
 
 const BLOCK_VALUE_STYLE = {

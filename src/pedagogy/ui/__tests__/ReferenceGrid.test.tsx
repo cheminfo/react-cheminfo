@@ -87,3 +87,16 @@ test('the grid reflows to the width it is given', () => {
   expect(html).toContain('id="anchors"');
   expect(html).toContain('id="classes"');
 });
+
+test('a syntax is copied with a click, and a row with a tooltip keeps only that tooltip on hover', () => {
+  const html = renderToStaticMarkup(
+    <ReferenceSectionBlock section={SECTION} />,
+  );
+
+  expect(html).toContain(
+    String.raw`<span class="click-to-copy click-to-copy--inline" role="button" tabindex="0" title="">\b<span`,
+  );
+  expect(html).toContain(
+    '<span class="click-to-copy click-to-copy--inline" role="button" tabindex="0" title="Copy the syntax (^)">^<span',
+  );
+});

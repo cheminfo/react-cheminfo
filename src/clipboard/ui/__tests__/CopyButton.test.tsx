@@ -9,7 +9,7 @@ test('the button reads its label and carries the copy glyph', () => {
   );
 
   expect(html).toContain('Copy SMILES');
-  expect(html).toContain('bp6-icon-duplicate');
+  expect(html).toContain('bp6-icon-clipboard');
   expect(html).not.toContain('Copied');
 });
 
@@ -70,11 +70,11 @@ test('a button with nothing to copy is disabled', () => {
 
 test('the glyph a caller picks replaces the default one', () => {
   const html = renderToStaticMarkup(
-    <CopyButton content="CCO" icon="clipboard" label="Copy" />,
+    <CopyButton content="CCO" icon="link" label="Copy" />,
   );
 
-  expect(html).toContain('bp6-icon-clipboard');
-  expect(html).not.toContain('bp6-icon-duplicate');
+  expect(html).toContain('bp6-icon-link');
+  expect(html).not.toContain('bp6-icon-clipboard');
 });
 
 test('the class a site gives reaches the button', () => {

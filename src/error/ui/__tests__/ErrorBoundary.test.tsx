@@ -131,3 +131,13 @@ test('an error carrying no message still says something', () => {
 
   expect(html).toContain('No message was given.');
 });
+
+test('the message is the one piece of the fallback that can be selected, to be reported', () => {
+  const html = renderToStaticMarkup(
+    <ErrorFallback error={new Error('the structure will not parse')} />,
+  );
+
+  expect(html).toContain(
+    '<span class="error-fallback__message">the structure will not parse</span>',
+  );
+});
