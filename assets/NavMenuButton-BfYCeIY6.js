@@ -1,0 +1,13 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-t3BKuE7o.js";import{n,t as r}from"./icon-C-bxFkEB.js";import{i,n as a,r as o,t as s}from"./menuItem-DmmO-4sd.js";import{i as c,r as l}from"./popoverNextMigrationUtils-m74G-m57.js";import{n as u}from"./navItem-6b8YIPQN.js";function d(e){let{label:t,items:n,activeId:i,icon:a,placement:c=`bottom-start`,compact:d=!1,children:p}=e,m=n.some(e=>e.id===i),h=[`nav-link`,a===void 0?null:`nav-link--icon`,m?`nav-link--active`:null].filter(e=>e!==null).join(` `);return(0,f.jsx)(l,{placement:c,content:(0,f.jsxs)(o,{className:`nav-menu`,children:[n.map(e=>(0,f.jsx)(s,{icon:e.icon,text:e.label,href:e.href,target:e.external?`_blank`:void 0,active:e.id===i,onClick:t=>{e.onSelect===void 0||u(t)||(t.preventDefault(),e.onSelect())}},e.id)),p]}),children:(0,f.jsxs)(`button`,{type:`button`,className:h,"aria-label":t,title:d?t:void 0,children:[a===void 0?t:(0,f.jsxs)(f.Fragment,{children:[(0,f.jsx)(r,{icon:a,size:14}),d?null:(0,f.jsx)(`span`,{className:`nav-link__label`,children:t})]}),d?null:(0,f.jsx)(r,{icon:`caret-down`,size:14})]})})}var f;function p(){return(p=e((()=>{n(),i(),a(),c(),f=t(),d.__docgenInfo={description:`The pages that do not need a place of their own in the bar, folded into one
+menu. The trigger is dressed as a \`nav-link\`, so it reads as one of the
+entries beside it rather than as a button dropped among them.
+@param props - The label, the pages, the page on show, and how the menu
+opens.
+@returns The trigger and its menu.`,methods:[],displayName:`NavMenuButton`,props:{label:{required:!0,tsType:{name:`string`},description:`Text of the trigger, which is also what a screen reader is told.`},items:{required:!0,tsType:{name:`unknown`},description:`The pages the menu holds, in the order it lists them.`},activeId:{required:!1,tsType:{name:`string`},description:`Which page is on show, named by its \`id\`. The trigger takes the brand tint
+when the menu is the one holding it.
+@default undefined`},icon:{required:!1,tsType:{name:`IconName`},description:`Glyph before the label.
+@default undefined`},placement:{required:!1,tsType:{name:`PopoverNextProps['placement']`,raw:`PopoverNextProps['placement']`},description:`Side the menu opens on.
+@default 'bottom-start'`},compact:{required:!1,tsType:{name:`boolean`},description:`Whether the trigger is reduced to its glyph, for a bar that has run out of
+room. The label is still what the pointer and a screen reader are told.
+@default false`},children:{required:!1,tsType:{name:`ReactNode`},description:`What the menu adds under the pages — a divider and an action, typically.
+@default undefined`}}}})))()}export{p as n,d as t};
