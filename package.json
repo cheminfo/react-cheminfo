@@ -1,6 +1,6 @@
 {
   "name": "react-cheminfo",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "license": "MIT",
   "description": "React components, hooks and framework-free helpers shared by the cheminfo sites: site chrome, citations, sharing, routing, pedagogy, charts, and the structure, orbital and 3D molecule viewers",
   "author": "Luc Patiny",

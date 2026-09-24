@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.22.0](https://github.com/cheminfo/react-cheminfo/compare/v0.21.0...v0.22.0) (2026-09-24)
+
+
+### Features
+
+* copy values with a click and keep the tool text unselectable ([3540f97](https://github.com/cheminfo/react-cheminfo/commit/3540f97019fcb6d4d785fcb388468a7f17581ccc))
+* **ecosystem:** add the three practice sites under a Practice topic ([5d5f750](https://github.com/cheminfo/react-cheminfo/commit/5d5f7505b30ad92186b4aaf6ff4eef302c281893))
+
+
+### Bug Fixes
+
+* **build:** read the commit of a build made in a linked git worktree ([dcfe638](https://github.com/cheminfo/react-cheminfo/commit/dcfe6386f4c9ecde0c901f66686f9b0bc6135485))
+* copy a value when the click lands on one of its children ([cbc5ef0](https://github.com/cheminfo/react-cheminfo/commit/cbc5ef078a258fc9403eac5aa4787db412fc9da7))
+
 ## [0.21.0](https://github.com/cheminfo/react-cheminfo/compare/v0.20.0...v0.21.0) (2026-09-18)
 
 
