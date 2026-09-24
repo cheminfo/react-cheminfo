@@ -1,1 +1,0 @@
-import"./iframe-t3BKuE7o.js";import"./chunk-W22LQPXL-BpCGh-0i.js";import"./react-dom-Fr8tW8MF.js";import"./shim-BQKZ4ST7.js";import{at as e,ot as t}from"./DocsRenderer-JROSPFPF-u9fFwNSy.js";t();export{e as createCopyToClipboardFunction};
