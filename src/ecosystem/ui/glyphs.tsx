@@ -409,4 +409,55 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // A nucleus with one electron on its orbit. The electron carries the
+  // answering colour because the electron is what every tool here counts.
+  atoms: (alt) => (
+    <>
+      <circle
+        cx="16"
+        cy="16"
+        r="10.5"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+      />
+      <circle cx="16" cy="16" r="3.6" fill="#ffffff" />
+      <circle cx="23.42" cy="8.58" r="3.2" fill={alt} />
+    </>
+  ),
+  // A balance still tipped, its two pans holding the two sides of the
+  // calculation. The pan that carries the answer carries the colour.
+  moles: (alt) => (
+    <>
+      <path
+        d="M6.5 11.5 25.5 15.5M16 13.5V24M10.5 24h11"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="6.5" cy="11.5" r="3.2" fill="#ffffff" />
+      <circle cx="25.5" cy="15.5" r="3.2" fill={alt} />
+    </>
+  ),
+  // One cell of an ionic lattice, cations and anions alternating: the shape of
+  // the compounds this site names. The ion being named carries the colour.
+  inorganic: (alt) => (
+    <>
+      <path
+        d="M9.5 9.5h13v13h-13Z"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="1.6"
+        opacity="0.55"
+      />
+      <g fill="#ffffff">
+        <circle cx="9.5" cy="9.5" r="4.3" />
+        <circle cx="22.5" cy="9.5" r="2.7" />
+        <circle cx="9.5" cy="22.5" r="2.7" />
+      </g>
+      <circle cx="22.5" cy="22.5" r="4.3" fill={alt} />
+    </>
+  ),
 };

@@ -289,6 +289,45 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brandAlt: '#1d4ed8',
     mark: { plate: '#854d0e', accent: '#60a5fa' },
   },
+  {
+    id: 'atoms',
+    name: { lead: 'atoms', alt: 'cheminfo', dot: true },
+    host: 'atoms.cheminfo.org',
+    repository: 'https://github.com/cheminfo/atoms.cheminfo.org',
+    tagline: 'Electrons, neutrons, Lewis structures and oxidation states.',
+    group: 'practice',
+    brand: '#b91c1c',
+    // The sky the mark's electron is drawn in sits at 2.1:1 on white, so the
+    // second half of the wordmark takes this darkened form instead.
+    brandAlt: '#0369a1',
+    mark: { plate: '#b91c1c', accent: '#38bdf8' },
+  },
+  {
+    id: 'moles',
+    name: { lead: 'moles', alt: 'cheminfo', dot: true },
+    host: 'moles.cheminfo.org',
+    repository: 'https://github.com/cheminfo/moles.cheminfo.org',
+    tagline: 'Balance a reaction, and work out its mass composition.',
+    group: 'practice',
+    brand: '#334155',
+    // The amber the mark's loaded pan is drawn in sits at 2.2:1 on white, so
+    // the second half of the wordmark takes this darkened form instead.
+    brandAlt: '#b45309',
+    mark: { plate: '#334155', accent: '#f59e0b' },
+  },
+  {
+    id: 'inorganic',
+    name: { lead: 'inorganic', alt: 'cheminfo', dot: true },
+    host: 'inorganic.cheminfo.org',
+    repository: 'https://github.com/cheminfo/inorganic.cheminfo.org',
+    tagline: 'Name an inorganic compound, and write its formula.',
+    group: 'practice',
+    brand: '#a3620a',
+    // The cyan the mark's named ion is drawn in sits at 1.8:1 on white, so the
+    // second half of the wordmark takes this darkened form instead.
+    brandAlt: '#0e7490',
+    mark: { plate: '#a3620a', accent: '#22d3ee' },
+  },
 ];
 
 /**

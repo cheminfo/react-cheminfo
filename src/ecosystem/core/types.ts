@@ -24,7 +24,10 @@ export type SiteId =
   | 'periodic-table'
   | 'database'
   | 'symmetry'
-  | 'osiris';
+  | 'osiris'
+  | 'atoms'
+  | 'moles'
+  | 'inorganic';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

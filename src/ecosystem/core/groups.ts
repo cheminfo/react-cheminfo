@@ -4,13 +4,14 @@
  * A single grid of tiles tells a visitor nothing about which of them is for
  * a first-year student and which is for a research project. The groups are the
  * answer, and they read as a progression: the chemistry a course opens with,
- * then the molecule itself, then what was measured of it, then the work only a
- * project needs — and last the three tools that are not chemistry at all.
+ * the exercises that practise it, then the molecule itself, then what was
+ * measured of it, then the work only a project needs — and last the tools that
+ * are not chemistry at all.
  */
 
 /** The topics, in the order they are written. */
 export type SiteGroupId =
-  'basics' | 'structures' | 'spectra' | 'research' | 'computing';
+  'basics' | 'practice' | 'structures' | 'spectra' | 'research' | 'computing';
 
 /** One topic the family's tools are gathered under. */
 export interface SiteGroup {
@@ -35,6 +36,12 @@ export const SITE_GROUPS: readonly SiteGroup[] = [
     id: 'basics',
     label: 'Chemistry basics',
     blurb: 'Where a course starts, and what you go back to.',
+  },
+  {
+    id: 'practice',
+    label: 'Practice',
+    blurb:
+      'Where a first course is worked through, one graded series at a time.',
   },
   {
     id: 'structures',

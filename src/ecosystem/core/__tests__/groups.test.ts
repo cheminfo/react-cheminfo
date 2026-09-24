@@ -5,11 +5,12 @@ import { SITE_GROUPS } from '../groups.ts';
 import { groupedSites, sitesInGroup } from '../lookup.ts';
 import { ECOSYSTEM_SITES } from '../sites.ts';
 
-test('the family is gathered under five topics, in a deliberate order', () => {
+test('the family is gathered under six topics, in a deliberate order', () => {
   const ids = SITE_GROUPS.map((group) => group.id);
 
   expect(ids).toStrictEqual([
     'basics',
+    'practice',
     'structures',
     'spectra',
     'research',
@@ -48,6 +49,11 @@ test('the tools a course opens with are the ones under the basics', () => {
     'equilibrium',
     'periodic-table',
     'symmetry',
+  ]);
+  expect(sitesInGroup('practice').map((site) => site.id)).toStrictEqual([
+    'atoms',
+    'moles',
+    'inorganic',
   ]);
   expect(sitesInGroup('spectra').map((site) => site.id)).toStrictEqual([
     'nmrium',
