@@ -8,11 +8,11 @@ import { OverlayToggle } from '../../overlay/ui/OverlayToggle.tsx';
 import { OverlayValueMenu } from '../../overlay/ui/OverlayValueMenu.tsx';
 import type { CloudGesture } from '../../scatter3d/core/cloudGesture.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import type {
-  ProjectionColorBy,
-  ProjectionOptions,
-} from '../core/projectionOptions.ts';
+import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
+import type { ProjectionGrouping } from '../core/projectionSamples.ts';
 
+import { ProjectionColourPicker } from './ProjectionGroupingPickers.tsx';
 import type { ProjectionReading } from './projectionBarReadings.ts';
 import { projectionChipSettings } from './projectionBarReadings.ts';
 import {
@@ -20,7 +20,6 @@ import {
   ellipseKey,
   ellipseSize,
 } from './projectionEllipse.ts';
-import { projectionColourChoices } from './projectionMapChoices.ts';
 import { projectionCloudGestureChoices } from './projectionWordChoices.ts';
 
 /** What the cloud's controls are drawn from, wherever in the bar they sit. */
@@ -31,14 +30,11 @@ export interface ProjectionSpaceControlsProps {
   onChange: (patch: Partial<ProjectionOptions>) => void;
   /** The words the bar writes, already merged over the defaults. */
   copy: ProjectionCopy;
-  /** What the set of groups is called. */
-  groupLabel: string;
   /**
-   * Whether the samples carry groups at all. Without them the shells stand for
+   * Every grouping the samples carry. Without one the shells stand for
    * nothing, so their control is greyed rather than removed.
-   * @default false
    */
-  hasGroups?: boolean;
+  groupings: readonly ProjectionGrouping[];
   /**
    * What the settings currently read, built once for the bar and handed down.
    * @default [] — nothing is written, which is what the cog's panel wants
@@ -71,11 +67,12 @@ export interface ProjectionSpaceControlsProps {
 export function ProjectionSpaceControls(
   props: ProjectionSpaceControlsProps,
 ): ReactElement {
-  const { options, onChange, copy, groupLabel, hasGroups = false } = props;
+  const { options, onChange, copy, groupings } = props;
   const { readings = NO_READINGS, tier = 'full' } = props;
   const { bar, help, outline, reason } = copy;
 
-  const uncoloured = !hasGroups || options.colorBy === 'none';
+  const hasGroups = groupings.length > 0;
+  const uncoloured = !hasGroups || options.colorBy === NO_GROUPING;
   const names = (
     <>
       <OverlayToggle
@@ -109,8 +106,7 @@ export function ProjectionSpaceControls(
             options={options}
             onChange={onChange}
             copy={copy}
-            groupLabel={groupLabel}
-            hasGroups={hasGroups}
+            groupings={groupings}
           />
         </OverlayChip>
         {names}
@@ -151,10 +147,8 @@ interface SpaceSettingsProps {
   onChange: (patch: Partial<ProjectionOptions>) => void;
   /** The words the panel writes. */
   copy: ProjectionCopy;
-  /** What the set of groups is called, which is what `Colour by` offers. */
-  groupLabel: string;
-  /** Whether the samples carry groups at all. */
-  hasGroups: boolean;
+  /** Every grouping the samples carry. */
+  groupings: readonly ProjectionGrouping[];
 }
 
 /**
@@ -163,8 +157,8 @@ interface SpaceSettingsProps {
  * @returns The captioned controls.
  */
 function SpaceSettings(props: SpaceSettingsProps): ReactElement {
-  const { options, onChange, copy, groupLabel, hasGroups } = props;
-  const { bar, help, outline } = copy;
+  const { options, onChange, copy, groupings } = props;
+  const { help, outline } = copy;
 
   return (
     <>
@@ -175,19 +169,18 @@ function SpaceSettings(props: SpaceSettingsProps): ReactElement {
         options={projectionCloudGestureChoices(copy)}
         onChange={(cloudGesture) => onChange({ cloudGesture })}
       />
-      <OverlaySegmented<ProjectionColorBy>
+      <ProjectionColourPicker
         label={help.colorBy.title}
-        help={help.colorBy}
-        value={options.colorBy}
-        disabled={!hasGroups}
-        options={projectionColourChoices(groupLabel, bar.uncoloured)}
-        onChange={(colorBy) => onChange({ colorBy })}
+        options={options}
+        onChange={onChange}
+        copy={copy}
+        groupings={groupings}
       />
       <OverlaySelect
         label={help.ellipse.title}
         help={help.ellipse}
         value={ellipseKey(options.ellipse)}
-        disabled={!hasGroups || options.colorBy === 'none'}
+        disabled={groupings.length === 0 || options.colorBy === NO_GROUPING}
         options={ellipseChoices(options.ellipse, outline, 'space')}
         onChange={(value) => onChange({ ellipse: ellipseSize(value) })}
       />

@@ -11,8 +11,12 @@ export type { EmptiestCornerOptions } from './emptiestCorner.ts';
 export { emptiestCorner } from './emptiestCorner.ts';
 export type { OverlayBarFoldOptions } from './overlayCollapse.ts';
 export { overlayBarFolded, shouldCollapseOverlay } from './overlayCollapse.ts';
-export type { OverlayMarkShape } from './overlayMarks.ts';
-export { OVERLAY_MARK_SHAPES, isFilledMark } from './overlayMarks.ts';
+export type { OverlayMarkShape, OverlaySampleShape } from './overlayMarks.ts';
+export {
+  OVERLAY_MARK_SHAPES,
+  OVERLAY_SAMPLE_SHAPES,
+  isFilledMark,
+} from './overlayMarks.ts';
 export type {
   OverlayDensity,
   OverlayMetrics,

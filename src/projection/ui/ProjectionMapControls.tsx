@@ -2,16 +2,15 @@ import type { ReactElement } from 'react';
 
 import type { OverlayTier } from '../../overlay/core/overlayTiers.ts';
 import { OverlayChip } from '../../overlay/ui/OverlayChip.tsx';
-import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
 import { OverlayToggle } from '../../overlay/ui/OverlayToggle.tsx';
 import { OverlayValueMenu } from '../../overlay/ui/OverlayValueMenu.tsx';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import type {
-  ProjectionColorBy,
-  ProjectionOptions,
-} from '../core/projectionOptions.ts';
+import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
+import type { ProjectionGrouping } from '../core/projectionSamples.ts';
 
+import { ProjectionColourPicker } from './ProjectionGroupingPickers.tsx';
 import type { ProjectionReading } from './projectionBarReadings.ts';
 import { projectionChipSettings } from './projectionBarReadings.ts';
 import {
@@ -21,6 +20,7 @@ import {
 } from './projectionEllipse.ts';
 import {
   projectionColourChoices,
+  projectionColourPatch,
   projectionOutlineChoices,
 } from './projectionMapChoices.ts';
 
@@ -32,15 +32,13 @@ export interface ProjectionMapControlsProps {
   onChange: (patch: Partial<ProjectionOptions>) => void;
   /** The words the bar writes, already merged over the defaults. */
   copy: ProjectionCopy;
-  /** What the set of groups is called, which is what `Colour by` offers. */
-  groupLabel: string;
   /**
-   * Whether the samples carry groups at all. Without them the colour and the
-   * outlines stand for nothing, so their controls are greyed rather than
-   * removed: a reader who cannot find a control assumes the figure has none.
-   * @default false
+   * Every grouping the samples carry, which is what `Colour by` offers.
+   * Without one the colour and the outlines stand for nothing, so their
+   * controls are greyed rather than removed: a reader who cannot find a
+   * control assumes the figure has none.
    */
-  hasGroups?: boolean;
+  groupings: readonly ProjectionGrouping[];
   /**
    * What the two settings currently read, with the figure's own colours. They
    * are built once for the bar and handed down rather than spelled again here,
@@ -88,18 +86,18 @@ export interface ProjectionMapControlsProps {
 export function ProjectionMapControls(
   props: ProjectionMapControlsProps,
 ): ReactElement {
-  const { options, onChange, copy, groupLabel, hasGroups = false } = props;
+  const { options, onChange, copy, groupings } = props;
   const { readings = NO_READINGS, tier = 'full' } = props;
   const { bar, help, reason } = copy;
 
-  const uncoloured = !hasGroups || options.colorBy === 'none';
+  const hasGroups = groupings.length > 0;
+  const uncoloured = !hasGroups || options.colorBy === NO_GROUPING;
   const settings = (
     <MapSettings
       options={options}
       onChange={onChange}
       copy={copy}
-      groupLabel={groupLabel}
-      hasGroups={hasGroups}
+      groupings={groupings}
     />
   );
 
@@ -142,7 +140,7 @@ export function ProjectionMapControls(
 
   return (
     <>
-      <OverlayValueMenu<ProjectionColorBy>
+      <OverlayValueMenu
         label={help.colorBy.title}
         keyWord={bar.key.colorBy}
         showKey={tier === 'full'}
@@ -150,8 +148,10 @@ export function ProjectionMapControls(
         swatches={swatchesOf(readings)}
         disabled={!hasGroups}
         disabledReason={reason.noGroups}
-        options={projectionColourChoices(groupLabel, bar.uncoloured)}
-        onChange={(colorBy) => onChange({ colorBy })}
+        options={projectionColourChoices(groupings, bar.uncoloured)}
+        onChange={(colorBy) =>
+          onChange(projectionColourPatch(options, colorBy))
+        }
       />
       <OverlayValueMenu
         label={help.ellipse.title}
@@ -191,10 +191,8 @@ interface MapSettingsProps {
   onChange: (patch: Partial<ProjectionOptions>) => void;
   /** The words the panel writes. */
   copy: ProjectionCopy;
-  /** What the set of groups is called. */
-  groupLabel: string;
-  /** Whether the samples carry groups at all. */
-  hasGroups: boolean;
+  /** Every grouping the samples carry. */
+  groupings: readonly ProjectionGrouping[];
 }
 
 /**
@@ -207,24 +205,23 @@ interface MapSettingsProps {
  * @returns The captioned controls.
  */
 function MapSettings(props: MapSettingsProps): ReactElement {
-  const { options, onChange, copy, groupLabel, hasGroups } = props;
-  const { bar, help, outline } = copy;
+  const { options, onChange, copy, groupings } = props;
+  const { help, outline } = copy;
 
   return (
     <>
-      <OverlaySegmented<ProjectionColorBy>
+      <ProjectionColourPicker
         label={help.colorBy.title}
-        help={help.colorBy}
-        value={options.colorBy}
-        disabled={!hasGroups}
-        options={projectionColourChoices(groupLabel, bar.uncoloured)}
-        onChange={(colorBy) => onChange({ colorBy })}
+        options={options}
+        onChange={onChange}
+        copy={copy}
+        groupings={groupings}
       />
       <OverlaySelect
         label={help.ellipse.title}
         help={help.ellipse}
         value={ellipseKey(options.ellipse)}
-        disabled={!hasGroups || options.colorBy === 'none'}
+        disabled={groupings.length === 0 || options.colorBy === NO_GROUPING}
         options={ellipseChoices(options.ellipse, outline)}
         onChange={(value) => onChange({ ellipse: ellipseSize(value) })}
       />

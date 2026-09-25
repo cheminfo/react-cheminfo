@@ -10,6 +10,7 @@ import type { ReactElement } from 'react';
 
 import { chartRoundPixel } from '../../chart/core/chartScale.ts';
 import type { OverlayMarkShape } from '../../overlay/core/overlayMarks.ts';
+import { pointShapePath } from '../core/pointShape.ts';
 
 /** A point drawn over the cloud that is not a sample, already in pixels. */
 export interface ScatterPixelMark {
@@ -32,7 +33,8 @@ export interface ScatterPixelMark {
  * One mark, drawn as the glyph its shape asks for.
  *
  * A rule laid across the cloud names no point, so the two rule shapes are
- * drawn as the default cross.
+ * drawn as the default cross. The three filled polygons are the shapes a
+ * sample can take, drawn as large as the disc they stand in for.
  * @param mark - What to draw, already in the frame's pixels.
  * @param size - Side of the square the glyph is drawn in, in pixels.
  * @param key - What React reconciles the glyph by.
@@ -79,6 +81,12 @@ export function markGlyph(
         fill={color}
         stroke="none"
       />
+    );
+  }
+  const polygon = pointShapePath(shape, x, y, half);
+  if (polygon !== null) {
+    return (
+      <path key={key} {...shared} d={polygon} fill={color} stroke="none" />
     );
   }
   return (

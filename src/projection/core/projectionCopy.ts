@@ -86,6 +86,8 @@ export interface ProjectionCopy {
     projected: string;
     /** The title of a key whose colour stands for nothing, so only shape is left. */
     shapes: string;
+    /** What the shape stands for, after what the colour does. Carries `{shapes}`. */
+    shapedBy: string;
   };
   /** The sentences the viewer builds from the data. */
   sentence: {
@@ -208,6 +210,7 @@ export const PROJECTION_COPY: ProjectionCopy = {
     notOutlined: 'Not outlined: too few samples.',
     projected: 'Hollow = added after the map was built',
     shapes: 'Shape = what each mark is.',
+    shapedBy: 'Shape = {shapes}.',
   },
   sentence: {
     sharesFirst:

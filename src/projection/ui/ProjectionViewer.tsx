@@ -64,6 +64,7 @@ export function ProjectionViewer(props: ProjectionViewerProps): ReactElement {
     result,
     copy,
     groups: state.groups,
+    shapes: state.shapes,
     options: state.options,
     selected: state.selected,
     onSettle: state.settleSelection,

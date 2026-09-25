@@ -1,5 +1,5 @@
 /**
- * Where a map's samples land, and which corner of the picture is free.
+ * Where a map's samples land, and what a plot is handed to draw them.
  *
  * It sits beside the component rather than inside it because a plot has to
  * know where its dots fall before it can decide where its controls may sit,
@@ -14,15 +14,17 @@ import {
 import { chartAxisTitle } from '../../chart/core/chartLabels.ts';
 import type { ChartViewport } from '../../chart/core/chartViewport.ts';
 import type { MatrixLike } from '../../chart/core/matrix.ts';
-import { emptiestCorner } from '../../overlay/core/emptiestCorner.ts';
-import type { OverlayCorner } from '../../overlay/core/overlayPlacement.ts';
+import type { OverlaySampleShape } from '../../overlay/core/overlayMarks.ts';
 import type { ScatterGroup } from '../../scatter/ui/scatterFigureProps.ts';
 import type { ScatterMarker } from '../../scatter/ui/scatterPlotProps.ts';
 import type {
   ProjectionMarker,
   ProjectionResult,
 } from '../core/projectionResult.ts';
-import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
+import type {
+  ResolvedProjectionGroups,
+  ResolvedProjectionShapes,
+} from '../core/projectionSamples.ts';
 
 /** Where every sample sits on the map, in the embedding's own units. */
 export interface ProjectionMapCloud {
@@ -120,34 +122,6 @@ export function projectionMapViewport(
 }
 
 /**
- * The corner of the map with the fewest dots under it.
- *
- * All four are offered. The chrome that asks is laid out inside the plot
- * rectangle rather than over the figure's box, so no corner of it costs the
- * reader an axis label, and the only thing left to weigh is how many samples
- * each one would cover.
- * @param cloud - Where every sample sits, in data units.
- * @param xDomain - The range the horizontal axis covers.
- * @param yDomain - The range the vertical axis covers.
- * @param width - Width of the plot rectangle, in pixels.
- * @param height - Its height.
- * @returns The corner the card sits in.
- */
-export function projectionMapCorner(
-  cloud: ProjectionMapCloud,
-  xDomain: readonly [number, number],
-  yDomain: readonly [number, number],
-  width: number,
-  height: number,
-): OverlayCorner {
-  return emptiestCorner(
-    placeAlong(cloud.x, xDomain, width, false),
-    placeAlong(cloud.y, yDomain, height, true),
-    { width, height, cardWidth: CARD_WIDTH, cardHeight: CARD_HEIGHT },
-  );
-}
-
-/**
  * The reference points of a result, placed on the two axes the map draws.
  * @param markers - The reference points, in the embedding's own units.
  * @param groups - The groups, whose colours the markers borrow.
@@ -193,6 +167,20 @@ export function projectionScatterGroups(
 }
 
 /**
+ * The shapes in the order a plot names them by index.
+ * @param shapes - The grouping the dots are shaped by, or `null`.
+ * @returns One shape per group, or nothing while every dot is a disc.
+ */
+export function projectionScatterShapes(
+  shapes: ResolvedProjectionShapes | null,
+): OverlaySampleShape[] | undefined {
+  if (shapes === null) return undefined;
+  const list: OverlaySampleShape[] = [];
+  for (const entry of shapes.entries) list.push(entry.shape);
+  return list;
+}
+
+/**
  * What one axis of the map is called.
  *
  * Built by `chartAxisTitle` rather than assembled here, so a component reads
@@ -219,33 +207,6 @@ function withRoom(
   const extent = chartPadExtent({ min: domain[0], max: domain[1] }, padding);
   return [extent.min, extent.max];
 }
-
-function placeAlong(
-  values: Float64Array,
-  domain: readonly [number, number],
-  size: number,
-  flip: boolean,
-): Float64Array {
-  const span = domain[1] - domain[0];
-  const factor = span === 0 ? 0 : size / span;
-  const pixels = new Float64Array(values.length);
-  for (let index = 0; index < values.length; index++) {
-    const along = ((values[index] ?? Number.NaN) - domain[0]) * factor;
-    pixels[index] = flip ? size - along : along;
-  }
-  return pixels;
-}
-
-/**
- * How much of the plot the floating key is expected to cover.
- *
- * It is an estimate on purpose — the card has not been laid out when the
- * corner is chosen — and it is the compact key's size rather than the roomier
- * card the overlay domain assumes: a corner counted as three species wide
- * would call a corner busy that the key never reaches.
- */
-const CARD_WIDTH = 170;
-const CARD_HEIGHT = 84;
 
 /** Room left around a framed selection, as a share of its own span. */
 const SELECTION_ROOM = 0.1;

@@ -9,6 +9,7 @@ const PAIRS = 'projection-pcaviewer--every-pair';
 const VARIABLES = 'projection-pcaviewer--what-differs';
 const PROJECTED = 'projection-pcaviewer--projected-samples';
 const UMAP = 'projection-projectionviewer--umap';
+const CLUSTERS = 'projection-projectionviewer--clusters';
 
 /** The glyph in the bar that hands the figure's own explanation back. */
 const QUESTION = 'What am I looking at?';
@@ -238,6 +239,29 @@ test('a result that can fill one tab is drawn with no strip at all', async ({
   await expect(
     page.locator('.chart-frame .chart-axis-bottom text').last(),
   ).toHaveText('UMAP1');
+});
+
+test('a clustering is read with its clusters in colour and the species as shapes', async ({
+  page,
+}) => {
+  await openStory(page, CLUSTERS);
+  const points = page.locator('g[data-layer="points"]');
+
+  await expect(
+    page.getByText('Colour = cluster. Shape = species.', { exact: true }),
+  ).toHaveCount(1);
+  // Setosa keeps the disc; versicolor and virginica are squares and triangles.
+  await expect(points.locator('circle')).toHaveCount(50);
+  await expect(points.locator('path')).toHaveCount(100);
+
+  await page.getByRole('button', { name: 'Options', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Shape by — Species', exact: true })
+    .click();
+  await page.getByRole('option', { name: 'Nothing', exact: true }).click();
+
+  await expect(points.locator('circle')).toHaveCount(150);
+  await expect(points.locator('path')).toHaveCount(0);
 });
 
 test('the bar writes less of itself as the figure narrows, and never less than the values', async ({

@@ -66,7 +66,7 @@ const ECSTASY_WAVENUMBERS: ContinuousVariableAxis = {
 /**
  * Who the pills are.
  *
- * No `groupColors`: forty-one seizures is more than any palette can keep apart,
+ * No `colors`: forty-one seizures is more than any palette can keep apart,
  * so the colours cycle and the map's `Category` setting — which writes each
  * seizure's name once over its own crowd — is what actually says which is
  * which. The published colours are still in the JSON, since they are part of
@@ -74,9 +74,14 @@ const ECSTASY_WAVENUMBERS: ContinuousVariableAxis = {
  */
 export const ECSTASY_SAMPLES: ProjectionSamples = {
   ids: ECSTASY_PILLS.map((pill) => pill.id),
-  groups: ECSTASY_PILLS.map((pill) => pill.category),
-  groupOrder: ECSTASY_SEIZURES,
-  groupLabel: data.groupLabel,
+  groupings: [
+    {
+      id: 'seizure',
+      label: data.groupLabel,
+      groups: ECSTASY_PILLS.map((pill) => pill.category),
+      order: ECSTASY_SEIZURES,
+    },
+  ],
   fields: pillFields,
 };
 

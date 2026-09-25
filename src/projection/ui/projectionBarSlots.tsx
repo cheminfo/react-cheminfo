@@ -4,7 +4,10 @@ import type { OverlayTier } from '../../overlay/core/overlayTiers.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
-import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
+import type {
+  ProjectionGrouping,
+  ResolvedProjectionGroups,
+} from '../core/projectionSamples.ts';
 import type { ProjectionTab } from '../core/projectionTabs.ts';
 
 import { ProjectionMapControls } from './ProjectionMapControls.tsx';
@@ -50,8 +53,10 @@ interface ProjectionBarSlotsInput {
   map: ProjectionMapView;
   /** Every option, already made safe against the result. */
   options: ProjectionOptions;
-  /** The groups as every figure draws them. */
+  /** The grouping the figures are coloured by; empty while nothing colours them. */
   groups: ResolvedProjectionGroups;
+  /** Every grouping the samples carry, which the pickers choose between. */
+  groupings: readonly ProjectionGrouping[];
   /** The selected rows, as indices. */
   selected: readonly number[];
   /** Width of the viewer, in pixels. */
@@ -79,16 +84,14 @@ export function projectionBarSlots(
   input: ProjectionBarSlotsInput,
 ): ProjectionBarSlots {
   const { tab, result, copy, models, map, readings, tier } = input;
-  const { options, groups, selected, width, onChange } = input;
+  const { options, groups, groupings, selected, width, onChange } = input;
 
-  const hasGroups = groups.entries.length > 0;
-  const colored = options.colorBy === 'group' && hasGroups;
-  const shared = { options, onChange, copy, groupLabel: groups.label };
+  const colored = groups.entries.length > 0;
+  const shared = { options, onChange, copy, groupings };
 
   if (tab === 'pairs') {
     const pairs = {
       ...shared,
-      hasGroups,
       axisCount: result.axes.length,
       width,
     };
@@ -102,7 +105,6 @@ export function projectionBarSlots(
     const space = {
       ...shared,
       result,
-      hasGroups,
       selectedCount: selected.length,
       onResetView: map.resetSpaceView,
       onClearSelection: map.clearSelection,
@@ -144,7 +146,6 @@ export function projectionBarSlots(
   const forMap = {
     ...shared,
     result,
-    hasGroups,
     selectedCount: selected.length,
     onZoomToSelection: map.zoomToSelection,
     onResetView: map.resetView,

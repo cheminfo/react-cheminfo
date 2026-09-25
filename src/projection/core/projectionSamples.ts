@@ -1,7 +1,4 @@
-import {
-  CHART_SERIES_COLORS,
-  chartSeriesColor,
-} from '../../chart/core/chartPalette.ts';
+import type { OverlaySampleShape } from '../../overlay/core/overlayMarks.ts';
 
 /** One line of the card that appears when the pointer rests on a sample. */
 export interface ProjectionField {
@@ -11,46 +8,72 @@ export interface ProjectionField {
   value: string;
 }
 
-/** Who the rows are: what they are called, what they belong to, what is known. */
-export interface ProjectionSamples {
+/**
+ * One way of sorting the rows into groups — a species, a batch, the cluster a
+ * run put each sample in.
+ */
+export interface ProjectionGrouping {
   /**
-   * A stable name per row, in the score matrix's row order. It is the currency
-   * of the selection callbacks, so a caller never has to keep a second index.
+   * What the options name it by, e.g. `species`. It is kept apart from the
+   * label so that a saved choice still finds the grouping once its label is
+   * reworded, and it may not be `none`, which is the word for no grouping.
    */
-  ids: readonly string[];
+  id: string;
+  /** What the set of groups is called, for the key and the hover card: `Species`. */
+  label: string;
   /**
-   * What each row belongs to — a species, a batch, a cluster. A row with no
+   * Which group each row is in, in the score matrix's row order. A row with no
    * group is drawn in the muted ink and left out of every outline.
-   * @default undefined — every row is one crowd
    */
-  groups?: ReadonlyArray<string | undefined>;
+  groups: ReadonlyArray<string | undefined>;
   /**
-   * The order the groups are listed and coloured in.
+   * The order the groups are listed, coloured and shaped in.
    * @default the order the groups first appear in `groups`
    */
-  groupOrder?: readonly string[];
-  /**
-   * What the set of groups is called, for the legend's heading and the hover
-   * card — `Species`, `Cluster`, `Batch`.
-   * @default 'Group'
-   */
-  groupLabel?: string;
+  order?: readonly string[];
   /**
    * A colour per group. Anything not named here takes the next unused colour
    * of the shared palette, so two groups never share one.
    * @default undefined — every group is coloured from the palette
    */
-  groupColors?: Readonly<Record<string, string>>;
+  colors?: Readonly<Record<string, string>>;
+}
+
+/** Who the rows are: what they are called, what they belong to, what is known. */
+export interface ProjectionSamples {
+  /**
+   * A stable key per row, in the score matrix's row order. It is the currency
+   * of the selection callbacks, so a caller never has to keep a second index.
+   */
+  ids: readonly string[];
+  /**
+   * What each row is written as: the title of its hover card and the name
+   * beside its dot. A page whose keys are not names a reader should read — a
+   * database id, a spectrum's uuid — writes its names here and keeps `ids`
+   * stable, and two samples may then share a name without either becoming
+   * impossible to select.
+   * @default the ids
+   */
+  labels?: readonly string[];
+  /**
+   * The ways the rows are grouped. The first colours the dots until the reader
+   * picks another, and the next one gives them their shapes, so two groupings
+   * of the same samples — the clusters a run found and the classes the reader
+   * gave — are compared on one picture. Every one of them is written on the
+   * hover card.
+   * @default undefined — every row is one crowd
+   */
+  groupings?: readonly ProjectionGrouping[];
   /**
    * Everything else worth showing about one row. A callback rather than an
    * array, so a table of ten thousand rows builds one record when a reader
    * points at one row, and none otherwise.
-   * @default undefined — the card shows the id, the group and the two axes
+   * @default undefined — the card shows the id, the groups and the two axes
    */
   fields?: (index: number) => readonly ProjectionField[];
 }
 
-/** The groups as the viewer draws them, resolved once per change. */
+/** The grouping that colours the dots, as the viewer draws it. */
 export interface ResolvedProjectionGroups {
   /** What the set of groups is called. */
   label: string;
@@ -69,102 +92,21 @@ export interface ResolvedProjectionGroups {
   groupOf: Int32Array;
 }
 
-const NO_GROUP = -1;
-const DEFAULT_GROUP_LABEL = 'Group';
-
-interface GroupEntry {
-  id: string;
+/** The grouping that shapes the dots, as the viewer draws it. */
+export interface ResolvedProjectionShapes {
+  /** What the set of groups is called. */
   label: string;
-  color: string;
-  count: number;
-}
-
-/**
- * The groups a set of samples has, in a shape a legend and a plot can both
- * read.
- *
- * A group named in `groupOrder` but held by no row is kept, so a legend does
- * not reshuffle when a filter empties one; a row naming a group that is not in
- * `groupOrder` is appended in the order it appears.
- * @param samples - Who the rows are.
- * @param count - How many rows there are, which is the score matrix's height.
- * @returns The resolved groups. A set of samples with no `groups` gives no
- * entries at all, and every row lands at `-1`.
- */
-export function resolveProjectionGroups(
-  samples: ProjectionSamples,
-  count: number,
-): ResolvedProjectionGroups {
-  const rowCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
-  const label = samples.groupLabel ?? DEFAULT_GROUP_LABEL;
-  const groupOf = new Int32Array(rowCount).fill(NO_GROUP);
-  const { groups, groupColors, groupOrder } = samples;
-  if (groups === undefined) return { label, entries: [], groupOf };
-
-  const entries: GroupEntry[] = [];
-  const indexOfGroup = new Map<string, number>();
-  if (groupOrder !== undefined) {
-    for (const id of groupOrder) appendGroup(entries, indexOfGroup, id);
-  }
-
-  for (let row = 0; row < rowCount; row++) {
-    const id = groups[row];
-    if (id === undefined) continue;
-    const at = appendGroup(entries, indexOfGroup, id);
-    groupOf[row] = at;
-    const entry = entries[at];
-    if (entry !== undefined) entry.count++;
-  }
-
-  paintGroups(entries, groupColors);
-  return { label, entries, groupOf };
-}
-
-function appendGroup(
-  entries: GroupEntry[],
-  indexOfGroup: Map<string, number>,
-  id: string,
-): number {
-  const known = indexOfGroup.get(id);
-  if (known !== undefined) return known;
-  const at = entries.length;
-  indexOfGroup.set(id, at);
-  entries.push({ id, label: id, color: '', count: 0 });
-  return at;
-}
-
-function paintGroups(
-  entries: GroupEntry[],
-  pinned: Readonly<Record<string, string>> | undefined,
-): void {
-  // Every pinned colour is taken out of the palette before any group draws
-  // from it, so pinning the third group's hue onto the first does not leave
-  // two groups wearing it.
-  const taken = new Set<string>();
-  if (pinned !== undefined) {
-    for (const entry of entries) {
-      const color = pinned[entry.id];
-      if (color !== undefined) taken.add(color.toLowerCase());
-    }
-  }
-
-  let cursor = 0;
-  for (const entry of entries) {
-    const own = pinned?.[entry.id];
-    if (own !== undefined) {
-      entry.color = own;
-      continue;
-    }
-    let color = chartSeriesColor(cursor, 'group');
-    while (
-      cursor < CHART_SERIES_COLORS.length &&
-      taken.has(color.toLowerCase())
-    ) {
-      cursor++;
-      color = chartSeriesColor(cursor, 'group');
-    }
-    cursor++;
-    taken.add(color.toLowerCase());
-    entry.color = color;
-  }
+  /** The groups, in the order they are listed and given their shapes. */
+  entries: ReadonlyArray<{
+    /** The group's own name, which is also its id. */
+    id: string;
+    /** What it is called. */
+    label: string;
+    /** Its shape. */
+    shape: OverlaySampleShape;
+    /** How many rows are in it. */
+    count: number;
+  }>;
+  /** Which group each row is in, as an index into `entries`, or `-1`. */
+  shapeOf: Int32Array;
 }

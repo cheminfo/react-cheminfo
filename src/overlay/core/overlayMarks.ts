@@ -10,23 +10,60 @@
 
 /** Which mark a legend entry, a marker or a series stands for. */
 export type OverlayMarkShape =
-  'dot' | 'ring' | 'square' | 'line' | 'dashed' | 'cross';
+  | 'dot'
+  | 'ring'
+  | 'square'
+  | 'triangle'
+  | 'diamond'
+  | 'triangle-down'
+  | 'line'
+  | 'dashed'
+  | 'cross';
+
+/**
+ * The shapes a sample's own dot can take, which is how a second grouping of
+ * the same samples is drawn while colour keeps the first.
+ */
+export type OverlaySampleShape = Extract<
+  OverlayMarkShape,
+  'dot' | 'square' | 'triangle' | 'diamond' | 'triangle-down'
+>;
 
 /**
  * Every mark, in the order a picker offers them.
  *
- * The first three separate one filled thing from another by colour alone; the
- * last three carry a second meaning on one figure — a line for a component
- * beside dots for the samples — which is what keeps a figure readable when the
- * colours run out or the reader does not separate two of them.
+ * The filled ones come first and separate one thing from another by colour or
+ * by outline alone; the last three carry a second meaning on one figure — a
+ * line for a component beside dots for the samples — which is what keeps a
+ * figure readable when the colours run out or the reader does not separate two
+ * of them.
  */
 export const OVERLAY_MARK_SHAPES: readonly OverlayMarkShape[] = [
   'dot',
   'ring',
   'square',
+  'triangle',
+  'diamond',
+  'triangle-down',
   'line',
   'dashed',
   'cross',
+];
+
+/**
+ * The shapes a second grouping is given, in the order its groups are listed.
+ *
+ * Five, because that is about where a reader stops telling small shapes apart
+ * at a glance. None of them is a ring or a cross: a ring is a sample placed
+ * into a finished model and a cross is a group's average, and a sample drawn
+ * as either would be read as one of those.
+ */
+export const OVERLAY_SAMPLE_SHAPES: readonly OverlaySampleShape[] = [
+  'dot',
+  'square',
+  'triangle',
+  'diamond',
+  'triangle-down',
 ];
 
 /**
@@ -39,5 +76,13 @@ export const OVERLAY_MARK_SHAPES: readonly OverlayMarkShape[] = [
  * @returns `true` for the filled marks, `false` for the drawn ones.
  */
 export function isFilledMark(shape: OverlayMarkShape): boolean {
-  return shape === 'dot' || shape === 'square';
+  return FILLED_MARKS.has(shape);
 }
+
+const FILLED_MARKS: ReadonlySet<OverlayMarkShape> = new Set<OverlayMarkShape>([
+  'dot',
+  'square',
+  'triangle',
+  'diamond',
+  'triangle-down',
+]);

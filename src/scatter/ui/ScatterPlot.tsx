@@ -32,7 +32,8 @@ import { useScatterLabels } from './useScatterLabels.ts';
  */
 export function ScatterPlot(props: ScatterPlotProps): ReactElement {
   const { x, y, width, height, xAxis, yAxis, groupOf, groups } = props;
-  const { mutedGroups, ellipse = null, ellipseMinimumPoints } = props;
+  const { mutedGroups, shapeOf, shapes } = props;
+  const { ellipse = null, ellipseMinimumPoints } = props;
   const { ellipseFillOpacity, showGroupMeans, markers } = props;
   const { pointRadius = 3.5, outlinedFrom, pointLabels } = props;
   const { showGroupLabels = false, selected, defaultSelected } = props;
@@ -127,6 +128,8 @@ export function ScatterPlot(props: ScatterPlotProps): ReactElement {
             groupOf={groupOf}
             colors={ink.colors}
             opacities={ink.opacities}
+            shapeOf={shapeOf}
+            shapes={shapes}
             radius={pointRadius}
             outlinedFrom={outlinedFrom}
           />

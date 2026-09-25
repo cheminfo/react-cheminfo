@@ -59,8 +59,7 @@ export const IRIS_VARIABLES: NamedVariableAxis = {
  */
 export const IRIS_SAMPLES: ProjectionSamples = {
   ids: irisNames(),
-  groups: IRIS_SPECIES,
-  groupLabel: 'Species',
+  groupings: [{ id: 'species', label: 'Species', groups: IRIS_SPECIES }],
   fields: irisMeasurements,
 };
 
@@ -77,7 +76,7 @@ export const IRIS_RESULT: ProjectionResult = pcaResult(IRIS_PCA, {
 
 /** The species as the figures colour them, so every story shares one key. */
 const IRIS_GROUPING = resolveProjectionGroups(
-  IRIS_SAMPLES,
+  IRIS_SAMPLES.groupings?.[0],
   IRIS_RESULT.scores.rows,
 );
 

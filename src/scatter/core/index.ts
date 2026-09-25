@@ -38,6 +38,7 @@ export {
   resetLassoPath,
 } from './lassoPath.ts';
 export { pointInPolygon, pointsInPolygon, polygonBounds } from './polygon.ts';
+export { pointShapePath } from './pointShape.ts';
 export type { ScatterGroupMoments } from './scatterGroupMoments.ts';
 export type {
   ScatterGroupSpread,

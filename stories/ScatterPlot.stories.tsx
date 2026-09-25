@@ -13,7 +13,7 @@ import {
 } from '../src/overlay/ui/index.ts';
 import { PROJECTION_COPY, fillCopy } from '../src/projection/core/index.ts';
 import { ellipseCoverageText } from '../src/projection/ui/projectionEllipse.ts';
-import { projectionSelectionSentence } from '../src/projection/ui/projectionMapChrome.ts';
+import { projectionSelectionSentence } from '../src/projection/ui/projectionSelectionSentence.ts';
 import type { EllipseSize } from '../src/scatter/core/index.ts';
 import { ScatterPlot } from '../src/scatter/ui/ScatterPlot.tsx';
 import type { ScatterPointOpen } from '../src/scatter/ui/scatterFigureProps.ts';

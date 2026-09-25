@@ -44,6 +44,12 @@ export interface ProjectionPanelWords {
 export interface ProjectionReasonWords {
   /** Why the colour cannot be set: the samples carry no groups. */
   noGroups: string;
+  /** Why the shape cannot be set: the samples carry no groups. */
+  noGroupsToShape: string;
+  /** Why a grouping is greyed in the shape picker: the colour already draws it. */
+  shapeIsColour: string;
+  /** Why a grouping is greyed in the shape picker: it has more groups than shapes. */
+  tooManyShapes: string;
   /** Why the map's outlines cannot be set while nothing is coloured. */
   uncolouredOutlines: string;
   /** Why the cloud's shells cannot be set while nothing is coloured. */
@@ -97,6 +103,7 @@ export const PROJECTION_PANEL_WORDS: ProjectionPanelWords = {
     zAxis: 'Into',
     cloudGesture: 'Drag does',
     colorBy: 'Colour by',
+    shapeBy: 'Shape by',
     ellipse: 'Outlines',
     pointRadius: 'Dot size',
     showGroupMeans: 'Averages',
@@ -124,6 +131,9 @@ export const PROJECTION_PANEL_WORDS: ProjectionPanelWords = {
 /** The reasons a greyed control gives when a site overrides nothing. */
 export const PROJECTION_REASON_WORDS: ProjectionReasonWords = {
   noGroups: 'These samples carry no groups to colour by.',
+  noGroupsToShape: 'These samples carry no groups to shape by.',
+  shapeIsColour: 'The colour already stands for these groups.',
+  tooManyShapes: 'More groups than there are shapes to tell apart.',
   uncolouredOutlines:
     'Outlines follow the groups, so colour the map by them first.',
   uncolouredShells:

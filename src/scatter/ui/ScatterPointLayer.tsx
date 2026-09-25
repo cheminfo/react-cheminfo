@@ -3,6 +3,8 @@ import { memo } from 'react';
 
 import { chartGroupIndex } from '../../chart/core/chartGroups.ts';
 import { chartRoundPixel } from '../../chart/core/chartScale.ts';
+import type { OverlaySampleShape } from '../../overlay/core/overlayMarks.ts';
+import { pointShapePath } from '../core/pointShape.ts';
 import type { ScreenPoints } from '../core/screenPoints.ts';
 
 /** What {@link ScatterPointLayer} draws. */
@@ -31,6 +33,17 @@ export interface ScatterPointLayerProps {
    * @default undefined — every group is drawn at full strength
    */
   opacities?: readonly number[];
+  /**
+   * Which shape each point takes, as an index into `shapes`. An entry of `-1`,
+   * or one outside the range, is a disc.
+   * @default undefined — every point is a disc
+   */
+  shapeOf?: ArrayLike<number>;
+  /**
+   * The shapes, in the order `shapeOf` names them.
+   * @default undefined
+   */
+  shapes?: readonly OverlaySampleShape[];
   /**
    * Colour of a point belonging to no group. It has to be the one ink on the
    * plot that names nothing, or a reader counts it as one more group.
@@ -77,7 +90,8 @@ export interface ScatterPointLayerProps {
  *
  * A hollow dot is the same dot at the same radius with its colour moved from
  * the fill to the stroke, so the two read as one kind of thing seen at two
- * levels of confidence rather than as two unrelated marks.
+ * levels of confidence rather than as two unrelated marks. A shaped point
+ * follows the same rule, and covers the area of the disc it stands in for.
  * @param props - See {@link ScatterPointLayerProps}.
  * @returns The cloud.
  */
@@ -89,6 +103,8 @@ export const ScatterPointLayer = memo(function ScatterPointLayer(
     groupOf,
     colors,
     opacities,
+    shapeOf,
+    shapes,
     fallbackColor = 'var(--text-faint)',
     radius = 3.5,
     radii,
@@ -102,6 +118,7 @@ export const ScatterPointLayer = memo(function ScatterPointLayer(
   const steps = order === undefined ? count : Math.min(count, order.length);
   const hollowFrom = outlineStart(outlinedFrom, count);
   const groups = colors?.length ?? 0;
+  const shapeCount = shapes?.length ?? 0;
   const ink = groupInk(colors, opacities, fallbackColor);
 
   const dots: ReactElement[] = [];
@@ -115,17 +132,28 @@ export const ScatterPointLayer = memo(function ScatterPointLayer(
     const color = ink.colors[slot] ?? fallbackColor;
     const hollow = index >= hollowFrom;
     const size = radii?.[index];
+    const reach = size === undefined ? radius : chartRoundPixel(size);
+    const shape = shapes?.[chartGroupIndex(shapeOf, index, shapeCount)];
+    const outline =
+      shape === undefined ? null : pointShapePath(shape, x, y, reach);
+    const paint = {
+      fill: hollow ? 'none' : color,
+      stroke: hollow ? color : undefined,
+      strokeWidth: hollow ? OUTLINE_WIDTH : undefined,
+      opacity: ink.opacities[slot],
+    };
     dots.push(
-      <circle
-        key={index}
-        cx={chartRoundPixel(x)}
-        cy={chartRoundPixel(y)}
-        r={size === undefined ? radius : chartRoundPixel(size)}
-        fill={hollow ? 'none' : color}
-        stroke={hollow ? color : undefined}
-        strokeWidth={hollow ? OUTLINE_WIDTH : undefined}
-        opacity={ink.opacities[slot]}
-      />,
+      outline === null ? (
+        <circle
+          key={index}
+          cx={chartRoundPixel(x)}
+          cy={chartRoundPixel(y)}
+          r={reach}
+          {...paint}
+        />
+      ) : (
+        <path key={index} d={outline} {...paint} />
+      ),
     );
   }
 

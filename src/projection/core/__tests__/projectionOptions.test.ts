@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 import type { MatrixLike } from '../../../chart/core/matrix.ts';
 import { DEFAULT_PROJECTION_OPTIONS } from '../projectionOptions.ts';
 import type { ProjectionResult } from '../projectionResult.ts';
+import type { ProjectionGrouping } from '../projectionSamples.ts';
 import { resolveProjectionOptions } from '../resolveProjectionOptions.ts';
 
 const EMPTY_MATRIX: MatrixLike = { rows: 0, columns: 0, get: () => 0 };
@@ -46,7 +47,8 @@ test('the figure opens on the first two axes, outlined and coloured by group', (
     yAxis: 1,
     zAxis: 2,
     cloudGesture: 'turn',
-    colorBy: 'group',
+    colorBy: '',
+    shapeBy: '',
     ellipse: { kind: 'coverage', probability: 0.95 },
     pointRadius: 3.5,
     showGroupMeans: false,
@@ -159,4 +161,74 @@ test('a result with a single axis cannot separate the two of them', () => {
 
   expect(resolved.xAxis).toBe(0);
   expect(resolved.yAxis).toBe(0);
+});
+
+const CLUSTERS_AND_CLASSES: readonly ProjectionGrouping[] = [
+  { id: 'cluster', label: 'Cluster', groups: [] },
+  { id: 'class', label: 'Class', groups: [] },
+];
+
+test('the colour takes the first grouping and the shape the second', () => {
+  const resolved = resolveProjectionOptions({}, SCALED, CLUSTERS_AND_CLASSES);
+
+  expect(resolved.colorBy).toBe('cluster');
+  expect(resolved.shapeBy).toBe('class');
+});
+
+test('a grouping saved on other data falls back to the usual one, and none stays none', () => {
+  const saved = resolveProjectionOptions(
+    { colorBy: 'batch', shapeBy: 'none' },
+    SCALED,
+    CLUSTERS_AND_CLASSES,
+  );
+
+  expect(saved.colorBy).toBe('cluster');
+  expect(saved.shapeBy).toBe('none');
+  expect(
+    resolveProjectionOptions({ colorBy: 'none' }, SCALED, CLUSTERS_AND_CLASSES)
+      .colorBy,
+  ).toBe('none');
+});
+
+test('the colour taking the second grouping leaves the first to the shape', () => {
+  const resolved = resolveProjectionOptions(
+    { colorBy: 'class' },
+    SCALED,
+    CLUSTERS_AND_CLASSES,
+  );
+
+  expect(resolved.shapeBy).toBe('cluster');
+});
+
+test('the shape never draws the grouping the colour already stands for', () => {
+  const resolved = resolveProjectionOptions(
+    { colorBy: 'cluster', shapeBy: 'cluster' },
+    SCALED,
+    CLUSTERS_AND_CLASSES,
+  );
+
+  expect(resolved.shapeBy).toBe('class');
+});
+
+test('with one grouping, turning the colour off gives the dots no shapes', () => {
+  const one = CLUSTERS_AND_CLASSES.slice(0, 1);
+
+  expect(resolveProjectionOptions({}, SCALED, one).shapeBy).toBe('none');
+  expect(
+    resolveProjectionOptions({ colorBy: 'none' }, SCALED, one).shapeBy,
+  ).toBe('none');
+  expect(
+    resolveProjectionOptions(
+      { colorBy: 'none', shapeBy: 'cluster' },
+      SCALED,
+      one,
+    ).shapeBy,
+  ).toBe('cluster');
+});
+
+test('samples carrying no grouping leave nothing to colour or shape by', () => {
+  const resolved = resolveProjectionOptions({}, SCALED, []);
+
+  expect(resolved.colorBy).toBe('none');
+  expect(resolved.shapeBy).toBe('none');
 });

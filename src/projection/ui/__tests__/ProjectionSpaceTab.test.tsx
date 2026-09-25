@@ -35,8 +35,22 @@ const RESULT: ProjectionResult = {
 
 const SAMPLES: ProjectionSamples = {
   ids: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-  groups: ['left', 'left', 'left', 'left', 'right', 'right', 'right', 'right'],
-  groupLabel: 'Side',
+  groupings: [
+    {
+      id: 'side',
+      label: 'Side',
+      groups: [
+        'left',
+        'left',
+        'left',
+        'left',
+        'right',
+        'right',
+        'right',
+        'right',
+      ],
+    },
+  ],
 };
 
 function draw(extra: Record<string, unknown> = {}): string {

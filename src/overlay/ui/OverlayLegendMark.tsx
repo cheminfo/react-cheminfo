@@ -73,6 +73,11 @@ const MARK_GEOMETRY: Record<OverlayMarkShape, ReactElement> = {
   dot: <circle cx="6" cy="6" r="4.2" />,
   ring: <circle cx="6" cy="6" r="3.4" strokeWidth="2.2" />,
   square: <rect x="2" y="2" width="8" height="8" rx="1.5" />,
+  // Balanced on the centre of the box, as the dots they name are balanced on
+  // their samples.
+  triangle: <path d="M6 0.8L10.5 8.6L1.5 8.6Z" />,
+  diamond: <path d="M6 1L11 6L6 11L1 6Z" />,
+  'triangle-down': <path d="M1.5 3.4L10.5 3.4L6 11.2Z" />,
   line: <line x1="0.5" y1="6" x2="11.5" y2="6" strokeWidth="2.8" />,
   dashed: (
     <line

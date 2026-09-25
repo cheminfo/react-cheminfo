@@ -8,8 +8,12 @@ import type {
   ProjectionOptionId,
   ProjectionOptions,
 } from './projectionOptions.ts';
-import { DEFAULT_PROJECTION_OPTIONS } from './projectionOptions.ts';
+import {
+  DEFAULT_PROJECTION_OPTIONS,
+  NO_GROUPING,
+} from './projectionOptions.ts';
 import type { ProjectionResult } from './projectionResult.ts';
+import type { ProjectionGrouping } from './projectionSamples.ts';
 import { drawableVariablesView } from './variablesView.ts';
 
 /**
@@ -19,15 +23,20 @@ import { drawableVariablesView } from './variablesView.ts';
  * A saved option outlives the data it was made on: reload with fewer samples
  * and axis eight no longer exists. Rather than let a plot ask for a column
  * that is not there, the two axes are pulled back inside what was computed and
- * kept apart, the counts are held inside what exists, and a view whose data is
- * missing falls back to `weights`.
+ * kept apart, the counts are held inside what exists, a view whose data is
+ * missing falls back to `weights`, and the colour and the shape name groupings
+ * the samples actually carry.
  * @param overrides - What the caller asked for.
  * @param result - The reduced space the options will be applied to.
+ * @param groupings - The groupings the samples carry.
+ * @default undefined — the colour and the shape are left as they were asked
+ * for, since nothing says which groupings exist
  * @returns Every option, complete and safe.
  */
 export function resolveProjectionOptions(
   overrides: Partial<ProjectionOptions> | undefined,
   result: ProjectionResult,
+  groupings?: readonly ProjectionGrouping[],
 ): ProjectionOptions {
   const axisCount = result.axes.length;
   const lastAxis = Math.max(0, axisCount - 1);
@@ -36,6 +45,7 @@ export function resolveProjectionOptions(
     pick(overrides, 'yAxis'),
     axisCount,
   );
+  const colorBy = colourChoice(pick(overrides, 'colorBy'), groupings);
 
   return {
     xAxis,
@@ -46,7 +56,8 @@ export function resolveProjectionOptions(
       lastAxis,
     ),
     cloudGesture: pick(overrides, 'cloudGesture'),
-    colorBy: pick(overrides, 'colorBy'),
+    colorBy,
+    shapeBy: shapeChoice(pick(overrides, 'shapeBy'), groupings, colorBy),
     ellipse: pick(overrides, 'ellipse'),
     pointRadius: atLeast(pick(overrides, 'pointRadius'), 3.5, 0),
     showGroupMeans: pick(overrides, 'showGroupMeans'),
@@ -88,6 +99,57 @@ function pick<Key extends ProjectionOptionId>(
   // reader who turned the outlines off, not a reader who said nothing.
   const value = overrides?.[key];
   return value === undefined ? DEFAULT_PROJECTION_OPTIONS[key] : value;
+}
+
+/**
+ * The grouping the colour will actually stand for.
+ *
+ * A saved choice outlives the data it was made on, so an id no grouping
+ * carries — or the empty string, which is how "the usual one" is asked for —
+ * falls to the first grouping, while `none` stays none.
+ * @param wanted - The id asked for.
+ * @param groupings - The groupings the samples carry.
+ * @returns A grouping's id, or `none`.
+ */
+function colourChoice(
+  wanted: string,
+  groupings: readonly ProjectionGrouping[] | undefined,
+): string {
+  if (wanted === NO_GROUPING || groupings === undefined) return wanted;
+  const ids = groupingIds(groupings);
+  return ids.includes(wanted) ? wanted : (ids[0] ?? NO_GROUPING);
+}
+
+/**
+ * The grouping the shape will actually stand for.
+ *
+ * The usual one is the second grouping, since the first is the colour's; it is
+ * never read as "whichever the colour leaves free", or turning the colour off
+ * would suddenly give the dots shapes they did not have. Only when the colour
+ * has taken the second does the shape fall back to the first.
+ * @param wanted - The id asked for.
+ * @param groupings - The groupings the samples carry.
+ * @param colorBy - The grouping the colour already stands for.
+ * @returns A grouping's id, or `none`.
+ */
+function shapeChoice(
+  wanted: string,
+  groupings: readonly ProjectionGrouping[] | undefined,
+  colorBy: string,
+): string {
+  if (wanted === NO_GROUPING || groupings === undefined) return wanted;
+  const ids = groupingIds(groupings);
+  if (wanted !== colorBy && ids.includes(wanted)) return wanted;
+  const [first, second] = ids;
+  if (second === undefined) return NO_GROUPING;
+  if (second !== colorBy) return second;
+  return first ?? NO_GROUPING;
+}
+
+function groupingIds(groupings: readonly ProjectionGrouping[]): string[] {
+  const ids: string[] = [];
+  for (const { id } of groupings) ids.push(id);
+  return ids;
 }
 
 /**

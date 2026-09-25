@@ -8,9 +8,11 @@ import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
 import { OverlayToggle } from '../../overlay/ui/OverlayToggle.tsx';
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
+import { ProjectionShapePicker } from './ProjectionGroupingPickers.tsx';
 import type { ProjectionMapControlsProps } from './ProjectionMapControls.tsx';
 import { projectionAxisChoices } from './projectionAxisChoices.ts';
 import { projectionSelectModeChoices } from './projectionWordChoices.ts';
@@ -34,8 +36,8 @@ interface ProjectionMapMoreProps extends ProjectionMapControlsProps {
 }
 
 /**
- * What the map keeps behind the cog: the axes, the dot size, what a drag does,
- * and the three buttons that act rather than change.
+ * What the map keeps behind the cog: the axes, the dot size and shape, what a
+ * drag does, and the three buttons that act rather than change.
  *
  * Five settings is where a flat list stops being scannable, so they are filed
  * under three headings — the two directions of the picture, the marks drawn in
@@ -54,13 +56,13 @@ interface ProjectionMapMoreProps extends ProjectionMapControlsProps {
  * @returns The panel behind the cog.
  */
 export function ProjectionMapMore(props: ProjectionMapMoreProps): ReactElement {
-  const { result, options, onChange, copy, hasGroups = false } = props;
+  const { result, options, onChange, copy, groupings } = props;
   const { selectedCount = 0, onZoomToSelection } = props;
   const { onResetView, onClearSelection } = props;
   const { action, help, panel, reason, tab } = copy;
 
   const nothingPicked = selectedCount === 0;
-  const uncoloured = !hasGroups || options.colorBy === 'none';
+  const uncoloured = groupings.length === 0 || options.colorBy === NO_GROUPING;
 
   return (
     <OverlayPanel
@@ -123,6 +125,14 @@ export function ProjectionMapMore(props: ProjectionMapMoreProps): ReactElement {
           digits={1}
           unit="px"
           onChange={(pointRadius) => onChange({ pointRadius })}
+        />
+        <ProjectionShapePicker
+          label={panel.name.shapeBy}
+          options={options}
+          onChange={onChange}
+          copy={copy}
+          groupings={groupings}
+          rows={result.scores.rows}
         />
         <OverlayToggle
           label={panel.name.showGroupMeans}

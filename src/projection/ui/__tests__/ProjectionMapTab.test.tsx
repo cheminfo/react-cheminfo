@@ -41,8 +41,20 @@ const RESULT: ProjectionResult = {
 
 const SAMPLES: ProjectionSamples = {
   ids: ['a', 'b', 'c', 'd', 'e', 'f'],
-  groups: ['setosa', 'setosa', 'setosa', 'virginica', 'virginica', 'virginica'],
-  groupLabel: 'Species',
+  groupings: [
+    {
+      id: 'species',
+      label: 'Species',
+      groups: [
+        'setosa',
+        'setosa',
+        'setosa',
+        'virginica',
+        'virginica',
+        'virginica',
+      ],
+    },
+  ],
 };
 
 test('the key names what the colour means, in one line and no more', () => {
@@ -68,8 +80,20 @@ test('a sample in no group is drawn in the one ink that names nothing', () => {
   const html = draw({
     samples: {
       ids: SAMPLES.ids,
-      groups: ['setosa', 'setosa', 'setosa', undefined, undefined, undefined],
-      groupLabel: 'Species',
+      groupings: [
+        {
+          id: 'species',
+          label: 'Species',
+          groups: [
+            'setosa',
+            'setosa',
+            'setosa',
+            undefined,
+            undefined,
+            undefined,
+          ],
+        },
+      ],
     },
   });
 
@@ -118,8 +142,13 @@ test('a group too small to outline says so in the key', () => {
     },
     samples: {
       ids: ['a', 'b', 'c', 'd', 'e'],
-      groups: ['setosa', 'setosa', 'setosa', 'virginica', 'virginica'],
-      groupLabel: 'Species',
+      groupings: [
+        {
+          id: 'species',
+          label: 'Species',
+          groups: ['setosa', 'setosa', 'setosa', 'virginica', 'virginica'],
+        },
+      ],
     },
   };
 

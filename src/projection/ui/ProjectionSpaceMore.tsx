@@ -11,6 +11,7 @@ import type { CloudGesture } from '../../scatter3d/core/cloudGesture.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
+import { ProjectionShapePicker } from './ProjectionGroupingPickers.tsx';
 import type { ProjectionSpaceControlsProps } from './ProjectionSpaceControls.tsx';
 import { projectionAxisChoices } from './projectionAxisChoices.ts';
 import {
@@ -35,8 +36,8 @@ interface ProjectionSpaceMoreProps extends ProjectionSpaceControlsProps {
 }
 
 /**
- * What the cloud keeps behind the cog: its three axes, the dot size, and what
- * the two drags do.
+ * What the cloud keeps behind the cog: its three axes, the dot size and shape,
+ * and what the two drags do.
  *
  * It is the map's panel with one picker more and one action fewer. There is no
  * "zoom to selection" here, because a box has no frame to draw round a crowd:
@@ -49,7 +50,7 @@ interface ProjectionSpaceMoreProps extends ProjectionSpaceControlsProps {
 export function ProjectionSpaceMore(
   props: ProjectionSpaceMoreProps,
 ): ReactElement {
-  const { result, options, onChange, copy } = props;
+  const { result, options, onChange, copy, groupings } = props;
   const { selectedCount = 0, onResetView, onClearSelection } = props;
   const { action, help, panel, reason, tab } = copy;
 
@@ -121,6 +122,14 @@ export function ProjectionSpaceMore(
           digits={1}
           unit="px"
           onChange={(pointRadius) => onChange({ pointRadius })}
+        />
+        <ProjectionShapePicker
+          label={panel.name.shapeBy}
+          options={options}
+          onChange={onChange}
+          copy={copy}
+          groupings={groupings}
+          rows={result.scores.rows}
         />
       </OverlayGroup>
       <OverlayGroup label={panel.section.handling}>

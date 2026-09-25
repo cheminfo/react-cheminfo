@@ -1,26 +1,24 @@
 import { expect, test } from 'vitest';
 
-import type { ProjectionSamples } from '../projectionSamples.ts';
-import { resolveProjectionGroups } from '../projectionSamples.ts';
+import { resolveProjectionGroups } from '../projectionGroupings.ts';
+import type { ProjectionGrouping } from '../projectionSamples.ts';
 
 const SPECIES = ['setosa', 'versicolor', 'virginica'] as const;
 const PER_SPECIES = 50;
 const IRIS_ROWS = SPECIES.length * PER_SPECIES;
 
-function irisSamples(
-  extra: Partial<ProjectionSamples> = {},
-): ProjectionSamples {
-  const ids: string[] = [];
+function irisGrouping(
+  extra: Partial<ProjectionGrouping> = {},
+): ProjectionGrouping {
   const groups: string[] = [];
   for (let row = 0; row < IRIS_ROWS; row++) {
-    ids.push(`Flower ${String(row + 1)}`);
     groups.push(SPECIES[Math.floor(row / PER_SPECIES)] ?? 'setosa');
   }
-  return { ids, groups, ...extra };
+  return { id: 'species', label: 'Group', groups, ...extra };
 }
 
 test('the three species are listed in the order they first appear', () => {
-  const resolved = resolveProjectionGroups(irisSamples(), IRIS_ROWS);
+  const resolved = resolveProjectionGroups(irisGrouping(), IRIS_ROWS);
 
   expect(resolved.label).toBe('Group');
   expect(resolved.entries).toStrictEqual([
@@ -37,7 +35,7 @@ test('the three species are listed in the order they first appear', () => {
 
 test('the caller names what the set of groups is', () => {
   const resolved = resolveProjectionGroups(
-    irisSamples({ groupLabel: 'Species' }),
+    irisGrouping({ label: 'Species' }),
     IRIS_ROWS,
   );
 
@@ -46,7 +44,7 @@ test('the caller names what the set of groups is', () => {
 
 test('a stated order reorders the legend and the colours follow it', () => {
   const resolved = resolveProjectionGroups(
-    irisSamples({ groupOrder: ['virginica', 'setosa', 'versicolor'] }),
+    irisGrouping({ order: ['virginica', 'setosa', 'versicolor'] }),
     IRIS_ROWS,
   );
 
@@ -62,7 +60,7 @@ test('a stated order reorders the legend and the colours follow it', () => {
 
 test('a group the order never named is appended where it appears', () => {
   const resolved = resolveProjectionGroups(
-    irisSamples({ groupOrder: ['virginica'] }),
+    irisGrouping({ order: ['virginica'] }),
     IRIS_ROWS,
   );
 
@@ -75,7 +73,7 @@ test('a group the order never named is appended where it appears', () => {
 
 test('a group named in the order but held by no row keeps its place', () => {
   const resolved = resolveProjectionGroups(
-    irisSamples({ groupOrder: ['setosa', 'hybrid', 'versicolor'] }),
+    irisGrouping({ order: ['setosa', 'hybrid', 'versicolor'] }),
     IRIS_ROWS,
   );
 
@@ -88,11 +86,12 @@ test('a group named in the order but held by no row keeps its place', () => {
 });
 
 test('a row belonging to nothing lands outside every group', () => {
-  const samples: ProjectionSamples = {
-    ids: ['a', 'b', 'c'],
+  const grouping: ProjectionGrouping = {
+    id: 'species',
+    label: 'Group',
     groups: ['setosa', undefined, 'setosa'],
   };
-  const resolved = resolveProjectionGroups(samples, 3);
+  const resolved = resolveProjectionGroups(grouping, 3);
 
   expect(resolved.entries).toStrictEqual([
     { id: 'setosa', label: 'setosa', color: '#0072b2', count: 2 },
@@ -102,7 +101,7 @@ test('a row belonging to nothing lands outside every group', () => {
 
 test('a pinned colour is taken out of the palette before anyone draws from it', () => {
   const resolved = resolveProjectionGroups(
-    irisSamples({ groupColors: { setosa: '#123456' } }),
+    irisGrouping({ colors: { setosa: '#123456' } }),
     IRIS_ROWS,
   );
 
@@ -115,7 +114,7 @@ test('a pinned colour is taken out of the palette before anyone draws from it', 
 
 test('pinning one group onto another group palette colour still leaves them apart', () => {
   const resolved = resolveProjectionGroups(
-    irisSamples({ groupColors: { virginica: '#0072b2' } }),
+    irisGrouping({ colors: { virginica: '#0072b2' } }),
     IRIS_ROWS,
   );
 
@@ -127,18 +126,19 @@ test('pinning one group onto another group palette colour still leaves them apar
 });
 
 test('samples with no groups at all are one undifferentiated crowd', () => {
-  const resolved = resolveProjectionGroups({ ids: ['a', 'b'] }, 2);
+  const resolved = resolveProjectionGroups(undefined, 2);
 
   expect(resolved.entries).toStrictEqual([]);
   expect([...resolved.groupOf]).toStrictEqual([-1, -1]);
 });
 
 test('the row count decides the length, not the group column', () => {
-  const samples: ProjectionSamples = {
-    ids: ['a', 'b', 'c'],
+  const grouping: ProjectionGrouping = {
+    id: 'species',
+    label: 'Group',
     groups: ['setosa'],
   };
-  const resolved = resolveProjectionGroups(samples, 3);
+  const resolved = resolveProjectionGroups(grouping, 3);
 
   expect([...resolved.groupOf]).toStrictEqual([0, -1, -1]);
   expect(resolved.entries).toStrictEqual([

@@ -19,8 +19,14 @@ interface ProjectionReadoutProps {
   result: ProjectionResult;
   /** Who the rows are. */
   samples: ProjectionSamples;
-  /** The groups as the figure draws them, for the row's group and its colour. */
+  /** The grouping the figure is coloured by, for the colour of the row's group. */
   groups: ResolvedProjectionGroups;
+  /**
+   * Which grouping colours the figure, so the row of that grouping carries the
+   * colour its dot is drawn in.
+   * @default undefined — no row carries a colour
+   */
+  colorBy?: string;
   /** Which axis is drawn horizontally, from 0. */
   xAxis: number;
   /** Which axis is drawn vertically. */
@@ -85,6 +91,7 @@ export function ProjectionReadout(props: ProjectionReadoutProps): ReactElement {
     result,
     samples,
     groups,
+    colorBy,
     xAxis,
     yAxis,
     zAxis,
@@ -104,8 +111,12 @@ export function ProjectionReadout(props: ProjectionReadoutProps): ReactElement {
     [xAxis, yAxis, zAxis],
   );
   const rows = useMemo(
-    () => readoutRows(index, result, samples, groups, drawn, formatValue),
-    [drawn, formatValue, groups, index, result, samples],
+    () =>
+      readoutRows(index, result, samples, drawn, formatValue, {
+        groups,
+        colorBy,
+      }),
+    [colorBy, drawn, formatValue, groups, index, result, samples],
   );
 
   return (
@@ -114,7 +125,7 @@ export function ProjectionReadout(props: ProjectionReadoutProps): ReactElement {
       y={y}
       boxWidth={boxWidth}
       boxHeight={boxHeight}
-      title={samples.ids[index] ?? ''}
+      title={samples.labels?.[index] ?? samples.ids[index] ?? ''}
       rows={rows}
       maxRows={maxRows}
       pinned={pinned}
@@ -128,9 +139,9 @@ function readoutRows(
   index: number,
   result: ProjectionResult,
   samples: ProjectionSamples,
-  groups: ResolvedProjectionGroups,
   drawn: readonly number[],
   formatValue: (value: number) => string,
+  coloured: { groups: ResolvedProjectionGroups; colorBy?: string },
 ): OverlayReadoutRow[] {
   const rows: OverlayReadoutRow[] = [];
   const { axes, scores } = result;
@@ -145,9 +156,18 @@ function readoutRows(
     });
   }
 
-  const group = groups.entries[groups.groupOf[index] ?? -1];
-  if (group !== undefined) {
-    rows.push({ label: groups.label, value: group.label, color: group.color });
+  // Every grouping is written, the one the dots are coloured by with its
+  // colour: a card naming only the colour's group would hide the very
+  // grouping the shapes stand for.
+  const { groups, colorBy } = coloured;
+  for (const grouping of samples.groupings ?? []) {
+    const value = grouping.groups[index];
+    if (value === undefined) continue;
+    const group =
+      grouping.id === colorBy
+        ? groups.entries[groups.groupOf[index] ?? -1]
+        : undefined;
+    rows.push({ label: grouping.label, value, color: group?.color });
   }
 
   if (known && samples.fields !== undefined) {

@@ -24,8 +24,7 @@ const IRIS: ProjectionResult = pcaResult(IRIS_PCA, {
 });
 const SAMPLES: ProjectionSamples = {
   ids: rows.map((_, index) => `flower-${index + 1}`),
-  groups: getClasses(),
-  groupLabel: 'Species',
+  groupings: [{ id: 'species', label: 'Species', groups: getClasses() }],
 };
 
 test('the pair grid puts one stepper on the bar and its colours behind the cog', () => {

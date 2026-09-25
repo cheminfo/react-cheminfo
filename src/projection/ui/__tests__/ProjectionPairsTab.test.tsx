@@ -18,10 +18,12 @@ const result = pcaResult(IRIS_PCA, {
 });
 const samples: ProjectionSamples = {
   ids: rows.map((_, at) => `row-${at}`),
-  groups: getClasses(),
-  groupLabel: 'Species',
+  groupings: [{ id: 'species', label: 'Species', groups: getClasses() }],
 };
-const groups = resolveProjectionGroups(samples, result.scores.rows);
+const groups = resolveProjectionGroups(
+  samples.groupings?.[0],
+  result.scores.rows,
+);
 
 /** Six components, which is the most a grid ever lays out. */
 const SIX: ProjectionResult = {
@@ -102,7 +104,7 @@ test('six components lay out thirty-six cells when the width can draw them', () 
   const html = renderToStaticMarkup(
     <ProjectionPairsTab
       result={SIX}
-      groups={resolveProjectionGroups({ ids: [] }, SIX.scores.rows)}
+      groups={resolveProjectionGroups(undefined, SIX.scores.rows)}
       options={{ ...DEFAULT_PROJECTION_OPTIONS, pairCount: 6 }}
       width={900}
       height={520}
@@ -118,7 +120,7 @@ test('a grid asked for more than six components still lays out six', () => {
   const html = renderToStaticMarkup(
     <ProjectionPairsTab
       result={SIX}
-      groups={resolveProjectionGroups({ ids: [] }, SIX.scores.rows)}
+      groups={resolveProjectionGroups(undefined, SIX.scores.rows)}
       options={{ ...DEFAULT_PROJECTION_OPTIONS, pairCount: 9 }}
       width={900}
       height={520}

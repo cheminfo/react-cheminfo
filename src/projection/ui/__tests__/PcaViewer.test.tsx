@@ -12,8 +12,7 @@ import { PcaViewer } from '../PcaViewer.tsx';
 
 const SAMPLES: ProjectionSamples = {
   ids: rows.map((_, index) => `flower-${index + 1}`),
-  groups: getClasses(),
-  groupLabel: 'Species',
+  groupings: [{ id: 'species', label: 'Species', groups: getClasses() }],
 };
 
 test('both axes say how much of the differences they account for', () => {

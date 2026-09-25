@@ -12,12 +12,19 @@ import {
 } from '../../core/index.ts';
 import {
   projectionColourChoices,
+  projectionColourPatch,
   projectionOutlineChoices,
+  projectionShapeChoices,
 } from '../projectionMapChoices.ts';
 
 test('the colour stands for the groups or for nothing, in that order', () => {
-  expect(projectionColourChoices('Species', 'Nothing')).toStrictEqual([
-    { value: 'group', label: 'Species' },
+  expect(
+    projectionColourChoices(
+      [{ id: 'species', label: 'Species', groups: [] }],
+      'Nothing',
+    ),
+  ).toStrictEqual([
+    { value: 'species', label: 'Species' },
     { value: 'none', label: 'Nothing' },
   ]);
 });
@@ -52,4 +59,56 @@ test('a size asked for in spreads keeps its place, written as what it covers', (
     title: '2 SD (about 86%)',
   });
   expect(choices).toHaveLength(6);
+});
+
+const GROUPINGS = [
+  { id: 'cluster', label: 'Cluster', groups: ['1', '2'] },
+  { id: 'class', label: 'Class', groups: ['control', 'treated'] },
+  { id: 'batch', label: 'Batch', groups: ['a', 'b', 'c', 'd', 'e', 'f'] },
+];
+
+test('the shape offers every grouping, greying the colour and one too large to shape', () => {
+  const options = {
+    ...DEFAULT_PROJECTION_OPTIONS,
+    colorBy: 'cluster',
+    shapeBy: 'class',
+  };
+
+  expect(
+    projectionShapeChoices(GROUPINGS, options, 6, PROJECTION_COPY),
+  ).toStrictEqual([
+    {
+      value: 'cluster',
+      label: 'Cluster',
+      disabled: true,
+      title: 'The colour already stands for these groups.',
+    },
+    { value: 'class', label: 'Class', disabled: false, title: undefined },
+    {
+      value: 'batch',
+      label: 'Batch',
+      disabled: true,
+      title: 'More groups than there are shapes to tell apart.',
+    },
+    { value: 'none', label: 'Nothing' },
+  ]);
+});
+
+test('giving the colour to the shaped grouping swaps the two rather than losing one', () => {
+  const options = {
+    ...DEFAULT_PROJECTION_OPTIONS,
+    colorBy: 'cluster',
+    shapeBy: 'class',
+  };
+
+  expect(projectionColourPatch(options, 'class')).toStrictEqual({
+    colorBy: 'class',
+    shapeBy: 'cluster',
+  });
+  expect(projectionColourPatch(options, 'batch')).toStrictEqual({
+    colorBy: 'batch',
+  });
+  expect(projectionColourPatch(options, 'none')).toStrictEqual({
+    colorBy: 'none',
+  });
 });

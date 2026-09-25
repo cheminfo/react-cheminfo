@@ -13,6 +13,7 @@ import type { OverlayMetrics } from '../../overlay/core/overlayMetrics.ts';
 import type { OverlayChipSetting } from '../../overlay/ui/OverlayChip.tsx';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
 import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 import type { ProjectionTab } from '../core/projectionTabs.ts';
 
@@ -48,7 +49,10 @@ interface ProjectionReadingsInput {
   copy: ProjectionCopy;
   /** What the figure is showing, already made safe against the result. */
   options: ProjectionOptions;
-  /** The groups as every figure draws them, whose colours the map writes. */
+  /**
+   * The grouping the figures are coloured by, whose colours the map writes;
+   * empty while nothing colours them.
+   */
   groups: ResolvedProjectionGroups;
 }
 
@@ -83,10 +87,9 @@ export function projectionBarReadings(
     ];
   }
   if (tab === 'space') {
-    const coverage =
-      options.colorBy === 'group' && groups.entries.length > 0
-        ? ellipseCoverageText(options.ellipse, 'space')
-        : '';
+    const coverage = isColoured(options, groups)
+      ? ellipseCoverageText(options.ellipse, 'space')
+      : '';
     return [
       {
         key: bar.key.cloudGesture,
@@ -163,14 +166,14 @@ export function projectionChipSettings(
  * Empty while the colour stands for nothing, so a bar that says `Nothing`
  * does not carry a row of dots contradicting it.
  * @param options - What the figure is showing.
- * @param groups - The groups as every figure draws them.
+ * @param groups - The grouping the figures are coloured by.
  * @returns The colours, in the order the figure draws them.
  */
 function projectionGroupColors(
   options: ProjectionOptions,
   groups: ResolvedProjectionGroups,
 ): readonly string[] {
-  if (options.colorBy !== 'group') return NO_COLORS;
+  if (!isColoured(options, groups)) return NO_COLORS;
   const colors: string[] = [];
   for (const entry of groups.entries) colors.push(entry.color);
   return colors;
@@ -195,7 +198,7 @@ function mapReadings(
   groups: ResolvedProjectionGroups,
 ): readonly ProjectionReading[] {
   const { bar, help } = copy;
-  const colored = options.colorBy === 'group';
+  const colored = isColoured(options, groups);
   const coverage = ellipseCoverageText(options.ellipse);
   return [
     {
@@ -210,6 +213,19 @@ function mapReadings(
       value: coverage === '' ? bar.noOutlines : coverage,
     },
   ];
+}
+
+/**
+ * Whether the colour stands for a grouping at all.
+ * @param options - What the figure is showing.
+ * @param groups - The grouping the figures are coloured by.
+ * @returns `true` when the dots are painted by group.
+ */
+function isColoured(
+  options: ProjectionOptions,
+  groups: ResolvedProjectionGroups,
+): boolean {
+  return options.colorBy !== NO_GROUPING && groups.entries.length > 0;
 }
 
 /** No colours at all, which is what an uncoloured map paints. */

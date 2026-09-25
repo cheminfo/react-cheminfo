@@ -7,8 +7,12 @@ import type { OrbitCamera } from '../../scatter3d/core/orbitCamera.ts';
 import { ScatterCloud } from '../../scatter3d/ui/ScatterCloud.tsx';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
-import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
+import type {
+  ResolvedProjectionGroups,
+  ResolvedProjectionShapes,
+} from '../core/projectionSamples.ts';
 
 import type { SelectionReport } from './ProjectionMapCaption.tsx';
 import { ProjectionMapCaption } from './ProjectionMapCaption.tsx';
@@ -19,6 +23,7 @@ import {
   projectionAxisTitle,
   projectionMapCloud,
   projectionScatterGroups,
+  projectionScatterShapes,
 } from './projectionMapModel.ts';
 import { MINIMUM_SHELL_POINTS } from './projectionSpaceModel.ts';
 
@@ -26,8 +31,16 @@ import { MINIMUM_SHELL_POINTS } from './projectionSpaceModel.ts';
 interface ProjectionSpaceTabProps {
   /** What the run produced, whatever produced it. */
   result: ProjectionResult;
-  /** The groups, resolved once by the viewer so every tab colours alike. */
+  /**
+   * The grouping the dots are coloured by, resolved once by the viewer so every
+   * tab colours alike; empty while the colour stands for nothing.
+   */
   groups: ResolvedProjectionGroups;
+  /**
+   * The grouping the dots are shaped by, resolved once by the viewer.
+   * @default null — every dot is a disc
+   */
+  shapes?: ResolvedProjectionShapes | null;
   /** What the cloud is showing, already resolved against `result`. */
   options: ProjectionOptions;
   /** The words the cloud writes, already merged over the defaults. */
@@ -38,7 +51,7 @@ interface ProjectionSpaceTabProps {
    * What each sample is called, in the score matrix's row order.
    * @default undefined — the setting has nothing to write and draws nothing
    */
-  ids?: readonly string[];
+  names?: readonly string[];
   /** Width of the figure, in pixels. */
   width: number;
   /** Height of the figure, in pixels. */
@@ -113,7 +126,8 @@ export function ProjectionSpaceTab(
   props: ProjectionSpaceTabProps,
 ): ReactElement {
   const { result, groups, options, copy, chrome, width, height } = props;
-  const { ids, selected, report = null, camera, zoom } = props;
+  const { names, shapes = null, selected } = props;
+  const { report = null, camera, zoom } = props;
   const { onCameraChange, onZoomChange, wheelZoom } = props;
   const { onSelectionChange, onHoverChange, hoverCard, testId } = props;
   const { onPointDoubleClick } = props;
@@ -131,7 +145,8 @@ export function ProjectionSpaceTab(
     [scores, zAxis],
   );
 
-  const colored = colorBy === 'group' && groups.entries.length > 0;
+  const shapeList = useMemo(() => projectionScatterShapes(shapes), [shapes]);
+  const colored = colorBy !== NO_GROUPING && groups.entries.length > 0;
 
   return (
     <div style={{ position: 'relative' }} data-testid={testId}>
@@ -146,10 +161,12 @@ export function ProjectionSpaceTab(
         zLabel={axisName(result, zAxis)}
         groupOf={colored ? groups.groupOf : undefined}
         groups={colored ? projectionScatterGroups(groups) : undefined}
+        shapeOf={shapes?.shapeOf}
+        shapes={shapeList}
         ellipsoid={colored ? shells : null}
         ellipsoidMinimumPoints={MINIMUM_SHELL_POINTS}
         showGroupLabels={colored && showGroupLabels}
-        pointLabels={showIds ? ids : undefined}
+        pointLabels={showIds ? names : undefined}
         pointRadius={pointRadius}
         outlinedFrom={fittedCount}
         selected={selected}

@@ -18,23 +18,25 @@ import type { OrbitCamera } from '../../scatter3d/core/orbitCamera.ts';
 import { DEFAULT_ORBIT_CAMERA } from '../../scatter3d/core/orbitCamera.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
 import type {
   ProjectionMarker,
   ProjectionResult,
 } from '../core/projectionResult.ts';
-import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
+import type {
+  ResolvedProjectionGroups,
+  ResolvedProjectionShapes,
+} from '../core/projectionSamples.ts';
 
 import type { SelectionReport } from './ProjectionMapCaption.tsx';
 import type { ProjectionMapChrome } from './projectionMapChrome.ts';
-import {
-  projectionMapChrome,
-  projectionSelectionSentence,
-} from './projectionMapChrome.ts';
+import { projectionMapChrome } from './projectionMapChrome.ts';
 import {
   MINIMUM_OUTLINE_POINTS,
   projectionMapDomain,
   projectionMapViewport,
 } from './projectionMapModel.ts';
+import { projectionSelectionSentence } from './projectionSelectionSentence.ts';
 import { MINIMUM_SHELL_POINTS } from './projectionSpaceModel.ts';
 
 /** What {@link useProjectionMapView} needs. */
@@ -45,6 +47,8 @@ interface ProjectionMapViewInput {
   copy: ProjectionCopy;
   /** The groups as every figure of this viewer draws them. */
   groups: ResolvedProjectionGroups;
+  /** The grouping the dots are shaped by, or `null` while they are all discs. */
+  shapes: ResolvedProjectionShapes | null;
   /** Every option, already made safe against the result. */
   options: ProjectionOptions;
   /** The selected rows, as indices into the score matrix. */
@@ -93,7 +97,7 @@ export interface ProjectionMapView {
 export function useProjectionMapView(
   input: ProjectionMapViewInput,
 ): ProjectionMapView {
-  const { result, copy, groups, options, selected, onSettle } = input;
+  const { result, copy, groups, shapes, options, selected, onSettle } = input;
   const { scores, fittedCount, markers } = result;
   const { colorBy, ellipse, showGroupMeans, xAxis, yAxis } = options;
 
@@ -139,13 +143,14 @@ export function useProjectionMapView(
     setCloudZoom(1);
   }, []);
 
-  const colored = colorBy === 'group' && groups.entries.length > 0;
+  const colored = colorBy !== NO_GROUPING && groups.entries.length > 0;
   const chrome = useMemo(
     () =>
       projectionMapChrome({
         copy,
         groups,
         colored,
+        shapes,
         ellipse: colored ? ellipse : null,
         minimumPoints: MINIMUM_OUTLINE_POINTS,
         showGroupMeans,
@@ -157,6 +162,7 @@ export function useProjectionMapView(
       copy,
       groups,
       colored,
+      shapes,
       ellipse,
       showGroupMeans,
       markers,
@@ -171,6 +177,7 @@ export function useProjectionMapView(
         copy,
         groups,
         colored,
+        shapes,
         ellipse: colored ? ellipse : null,
         minimumPoints: MINIMUM_SHELL_POINTS,
         showGroupMeans: false,
@@ -179,7 +186,7 @@ export function useProjectionMapView(
         total: scores.rows,
         figure: 'space',
       }),
-    [copy, groups, colored, ellipse, fittedCount, scores],
+    [copy, groups, colored, shapes, ellipse, fittedCount, scores],
   );
 
   const settle = useCallback(

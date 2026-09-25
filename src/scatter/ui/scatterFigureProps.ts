@@ -9,6 +9,7 @@
 
 import type { ReactNode } from 'react';
 
+import type { OverlaySampleShape } from '../../overlay/core/overlayMarks.ts';
 import type { ScatterSelectionMode } from '../core/scatterSelection.ts';
 
 import type { SelectionChange } from './useScatterSelection.ts';
@@ -61,6 +62,18 @@ export interface ScatterGroupProps {
    * @default undefined — every group is drawn in full
    */
   mutedGroups?: ReadonlySet<string>;
+  /**
+   * Which shape each point takes, as an index into `shapes`: a second
+   * grouping of the same points, drawn while colour keeps the first. A point
+   * with `-1`, `NaN`, or an index outside the range, is a disc.
+   * @default undefined — every point is a disc
+   */
+  shapeOf?: ArrayLike<number>;
+  /**
+   * The shapes, in the order `shapeOf` names them.
+   * @default undefined
+   */
+  shapes?: readonly OverlaySampleShape[];
   /**
    * Radius of a dot, in pixels. A cloud draws the dot at the middle of its box
    * at this size, one at the front larger and one at the back smaller.

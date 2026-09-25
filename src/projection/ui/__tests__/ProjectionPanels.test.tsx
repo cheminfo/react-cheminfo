@@ -29,12 +29,13 @@ const SHARED = {
   onChange: doNothing,
 };
 
+const GROUPINGS = [{ id: 'species', label: 'Species', groups: [] }];
+
 const MAP = (
   <ProjectionMapMore
     {...SHARED}
     result={IRIS}
-    groupLabel="Species"
-    hasGroups
+    groupings={GROUPINGS}
     onZoomToSelection={doNothing}
     onResetView={doNothing}
     onClearSelection={doNothing}
@@ -44,8 +45,7 @@ const MAP = (
 const PAIRS = (
   <ProjectionPairsMore
     {...SHARED}
-    groupLabel="Species"
-    hasGroups
+    groupings={GROUPINGS}
     axisCount={4}
     width={720}
   />
@@ -100,7 +100,7 @@ test('every row is a cell of one grid, so every control starts at the same x', (
   const html = draw(MAP);
 
   expect(occurrences(html, 'grid-template-columns:88px minmax(0, 1fr)')).toBe(
-    5,
+    6,
   );
 });
 
@@ -165,8 +165,7 @@ test('a site overriding the panel words sees them in the panel', () => {
       {...SHARED}
       copy={copy}
       result={IRIS}
-      groupLabel="Species"
-      hasGroups
+      groupings={GROUPINGS}
       onZoomToSelection={doNothing}
       onResetView={doNothing}
       onClearSelection={doNothing}

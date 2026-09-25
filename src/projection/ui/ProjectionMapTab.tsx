@@ -7,11 +7,15 @@ import type { ScatterPointOpen } from '../../scatter/ui/scatterFigureProps.ts';
 import type { SelectionChange } from '../../scatter/ui/useScatterSelection.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
 import type {
   ProjectionMarker,
   ProjectionResult,
 } from '../core/projectionResult.ts';
-import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
+import type {
+  ResolvedProjectionGroups,
+  ResolvedProjectionShapes,
+} from '../core/projectionSamples.ts';
 
 import type { SelectionReport } from './ProjectionMapCaption.tsx';
 import { ProjectionMapCaption } from './ProjectionMapCaption.tsx';
@@ -25,14 +29,23 @@ import {
   projectionMapDomain,
   projectionMapMarkers,
   projectionScatterGroups,
+  projectionScatterShapes,
 } from './projectionMapModel.ts';
 
 /** What {@link ProjectionMapTab} needs. */
 interface ProjectionMapTabProps {
   /** What the run produced, whatever produced it. */
   result: ProjectionResult;
-  /** The groups, resolved once by the viewer so every tab colours alike. */
+  /**
+   * The grouping the dots are coloured by, resolved once by the viewer so every
+   * tab colours alike; empty while the colour stands for nothing.
+   */
   groups: ResolvedProjectionGroups;
+  /**
+   * The grouping the dots are shaped by, resolved once by the viewer.
+   * @default null — every dot is a disc
+   */
+  shapes?: ResolvedProjectionShapes | null;
   /** What the map is showing, already resolved against `result`. */
   options: ProjectionOptions;
   /** The words the map writes, already merged over the defaults. */
@@ -44,7 +57,7 @@ interface ProjectionMapTabProps {
    * "Sample ID" setting to write beside its dot.
    * @default undefined — the setting has nothing to write and draws nothing
    */
-  ids?: readonly string[];
+  names?: readonly string[];
   /** Width of the figure, in pixels. */
   width: number;
   /** Height of the figure, in pixels. */
@@ -110,9 +123,10 @@ interface ProjectionMapTabProps {
  * The map: one dot per sample, an outline per group, and a key floating in the
  * emptiest corner of the plot.
  *
- * Colour stands for the group and for nothing else, and a selected dot keeps
- * its colour and gains a ring — recolouring it would trade the answer the
- * reader came for against the question they have just asked. A sample the
+ * Colour stands for one grouping and shape, when there is a second, for that
+ * one, and a selected dot keeps both and gains a ring — recolouring it would
+ * trade the answer the reader came for against the question they have just
+ * asked. A sample the
  * model was built from is drawn filled and one placed into the finished model
  * afterwards is drawn hollow, because the second kind can land anywhere and
  * its landing far out is the finding rather than a fault.
@@ -125,7 +139,8 @@ interface ProjectionMapTabProps {
  */
 export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
   const { result, groups, options, copy, chrome, width, height } = props;
-  const { ids, selected, viewport = null, report = null } = props;
+  const { names, shapes = null, selected } = props;
+  const { viewport = null, report = null } = props;
   const { onSelectionChange, onHoverChange, hoverCard } = props;
   const { onPointDoubleClick } = props;
   const { onViewportChange, wheelZoom, touchLasso, testId } = props;
@@ -147,7 +162,8 @@ export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
     [scores, yAxis],
   );
 
-  const colored = colorBy === 'group' && groups.entries.length > 0;
+  const shapeList = useMemo(() => projectionScatterShapes(shapes), [shapes]);
+  const colored = colorBy !== NO_GROUPING && groups.entries.length > 0;
   const ellipse = colored ? outlines : null;
 
   return (
@@ -160,11 +176,13 @@ export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
       yAxis={{ domain: yDomain, label: projectionAxisTitle(result, yAxis) }}
       groupOf={colored ? groups.groupOf : undefined}
       groups={colored ? projectionScatterGroups(groups) : undefined}
+      shapeOf={shapes?.shapeOf}
+      shapes={shapeList}
       ellipse={ellipse}
       ellipseMinimumPoints={MINIMUM_OUTLINE_POINTS}
       showGroupMeans={colored && showGroupMeans}
       showGroupLabels={colored && showGroupLabels}
-      pointLabels={showIds ? ids : undefined}
+      pointLabels={showIds ? names : undefined}
       markers={projectionMapMarkers(
         markers ?? NO_MARKERS,
         groups,

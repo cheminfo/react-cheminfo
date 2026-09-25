@@ -13,10 +13,10 @@ import { ProjectionSharesTab } from './ProjectionSharesTab.tsx';
 import { ProjectionSpaceTab } from './ProjectionSpaceTab.tsx';
 import { ProjectionVariablesTab } from './ProjectionVariablesTab.tsx';
 import type { ProjectionMapView } from './projectionMapView.ts';
+import type { ProjectionStateApi } from './projectionStateApi.ts';
 import type { ProjectionModels } from './projectionTabModels.ts';
 import type { ProjectionVariableTrack } from './projectionVariablesModel.ts';
 import type { ProjectionSampleOpen } from './projectionViewerProps.ts';
-import type { ProjectionStateApi } from './useProjectionState.ts';
 
 /** What {@link ProjectionPanel} needs. */
 interface ProjectionPanelProps {
@@ -172,7 +172,8 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
           options={state.options}
           copy={copy}
           chrome={map.spaceChrome}
-          ids={samples.ids}
+          shapes={state.shapes}
+          names={samples.labels ?? samples.ids}
           width={width}
           height={height}
           selected={state.selected}
@@ -192,6 +193,7 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
                 result={result}
                 samples={samples}
                 groups={state.groups}
+                colorBy={state.options.colorBy}
                 xAxis={state.options.xAxis}
                 yAxis={state.options.yAxis}
                 zAxis={state.options.zAxis}
@@ -212,7 +214,8 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
           options={state.options}
           copy={copy}
           chrome={map.chrome}
-          ids={samples.ids}
+          shapes={state.shapes}
+          names={samples.labels ?? samples.ids}
           viewport={map.viewport}
           onViewportChange={map.setViewport}
           wheelZoom={wheelZoom}
@@ -231,6 +234,7 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
                 result={result}
                 samples={samples}
                 groups={state.groups}
+                colorBy={state.options.colorBy}
                 xAxis={state.options.xAxis}
                 yAxis={state.options.yAxis}
                 x={anchor.x}

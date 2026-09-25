@@ -90,7 +90,7 @@ export function useProjectionModels(
   return {
     profiles,
     shares,
-    sampleName: samples.ids[one] ?? `Row ${one + 1}`,
+    sampleName: samples.labels?.[one] ?? samples.ids[one] ?? `Row ${one + 1}`,
   };
 }
 

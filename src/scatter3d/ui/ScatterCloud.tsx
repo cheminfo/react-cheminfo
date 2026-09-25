@@ -47,6 +47,7 @@ import { useOrbitDrag } from './useOrbitDrag.ts';
 export function ScatterCloud(props: ScatterCloudProps): ReactElement {
   const { x, y, z, width, height, xLabel, yLabel, zLabel } = props;
   const { groupOf, groups, mutedGroups, ellipsoid = null } = props;
+  const { shapeOf, shapes } = props;
   const { ellipsoidMinimumPoints, ellipsoidFillOpacity } = props;
   const { showGroupLabels = false, pointLabels, pointRadius = 3.5 } = props;
   const { outlinedFrom, selected, defaultSelected, onSelectionChange } = props;
@@ -198,6 +199,8 @@ export function ScatterCloud(props: ScatterCloudProps): ReactElement {
           groupOf={groupOf}
           colors={ink.colors}
           opacities={ink.opacities}
+          shapeOf={shapeOf}
+          shapes={shapes}
           radius={pointRadius}
           outlinedFrom={outlinedFrom}
         />

@@ -1,5 +1,5 @@
 /**
- * What the map's two settings offer, in the two lengths the bar needs.
+ * What the map's settings offer, in the lengths the bar needs.
  *
  * The same choices are written twice — once as bare shares on a value menu
  * whose own heading already says what they are shares of, and once as whole
@@ -9,10 +9,10 @@
 
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import type {
-  ProjectionColorBy,
-  ProjectionOptions,
-} from '../core/projectionOptions.ts';
+import { resolveProjectionShapes } from '../core/projectionGroupings.ts';
+import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import { NO_GROUPING } from '../core/projectionOptions.ts';
+import type { ProjectionGrouping } from '../core/projectionSamples.ts';
 
 import {
   ellipseChoices,
@@ -21,19 +21,76 @@ import {
 } from './projectionEllipse.ts';
 
 /**
- * What the colour may stand for.
- * @param groupLabel - What the set of groups is called.
+ * What the colour may stand for: each grouping the samples carry, or nothing.
+ * @param groupings - The groupings the samples carry.
  * @param uncoloured - What "the colour stands for nothing" reads.
- * @returns The two choices.
+ * @returns The choices, in the order the groupings were handed in.
  */
 export function projectionColourChoices(
-  groupLabel: string,
+  groupings: readonly ProjectionGrouping[],
   uncoloured: string,
-): ReadonlyArray<OverlayOption<ProjectionColorBy>> {
-  return [
-    { value: 'group', label: groupLabel },
-    { value: 'none', label: uncoloured },
-  ];
+): readonly OverlayOption[] {
+  const choices: OverlayOption[] = [];
+  for (const { id, label } of groupings) choices.push({ value: id, label });
+  choices.push({ value: NO_GROUPING, label: uncoloured });
+  return choices;
+}
+
+/**
+ * What the shape may stand for: each grouping the samples carry, or nothing.
+ *
+ * A grouping the colour already stands for is kept in the list but greyed, as
+ * is one of more groups than there are shapes, so the reader sees why it cannot
+ * be picked rather than wondering where it went.
+ * @param groupings - The groupings the samples carry.
+ * @param options - What the figure is showing, whose colour is taken.
+ * @param rows - How many rows there are, which is what a grouping is cut over.
+ * @param copy - The words the viewer writes.
+ * @returns The choices, in the order the groupings were handed in.
+ */
+export function projectionShapeChoices(
+  groupings: readonly ProjectionGrouping[],
+  options: ProjectionOptions,
+  rows: number,
+  copy: ProjectionCopy,
+): readonly OverlayOption[] {
+  const choices: OverlayOption[] = [];
+  for (const grouping of groupings) {
+    const { id, label } = grouping;
+    const reason =
+      id === options.colorBy
+        ? copy.reason.shapeIsColour
+        : resolveProjectionShapes(grouping, rows) === null
+          ? copy.reason.tooManyShapes
+          : undefined;
+    choices.push({
+      value: id,
+      label,
+      disabled: reason !== undefined,
+      title: reason,
+    });
+  }
+  choices.push({ value: NO_GROUPING, label: copy.bar.unshaped });
+  return choices;
+}
+
+/**
+ * What changes when the colour is given to another grouping.
+ *
+ * A grouping drawn as the shape that is picked for the colour swaps places
+ * with it rather than being dropped, so the reader never loses one of the two
+ * groupings they were comparing by trading them round.
+ * @param options - What the figure is showing.
+ * @param colorBy - The grouping picked for the colour.
+ * @returns The options that change.
+ */
+export function projectionColourPatch(
+  options: ProjectionOptions,
+  colorBy: string,
+): Partial<ProjectionOptions> {
+  return colorBy !== NO_GROUPING && colorBy === options.shapeBy
+    ? { colorBy, shapeBy: options.colorBy }
+    : { colorBy };
 }
 
 /**

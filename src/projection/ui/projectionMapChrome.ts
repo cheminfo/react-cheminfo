@@ -8,13 +8,15 @@
  * honest as the controls around it change.
  */
 
-import { formatInteger } from '../../format/core/numbers.ts';
 import type { OverlayLegendEntry } from '../../overlay/ui/OverlayLegend.tsx';
 import type { EllipseSize } from '../../scatter/core/confidenceEllipse.ts';
 import { fillCopy } from '../core/fillCopy.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import type { ProjectionMarker } from '../core/projectionResult.ts';
-import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
+import type {
+  ResolvedProjectionGroups,
+  ResolvedProjectionShapes,
+} from '../core/projectionSamples.ts';
 
 import { ellipseCoverageText } from './projectionEllipse.ts';
 import { UNGROUPED_INK } from './projectionMapModel.ts';
@@ -27,6 +29,8 @@ interface ProjectionMapChromeInput {
   groups: ResolvedProjectionGroups;
   /** Whether colour stands for the group at all. */
   colored: boolean;
+  /** The grouping the dots are shaped by, or `null` while they are all discs. */
+  shapes: ResolvedProjectionShapes | null;
   /** How large the group outlines are, or `null` for none. */
   ellipse: EllipseSize | null;
   /** How many samples a group needs before it is outlined at all. */
@@ -82,6 +86,7 @@ export function projectionMapChrome(
   input: ProjectionMapChromeInput,
 ): ProjectionMapChrome {
   const { copy, groups, colored, ellipse, showGroupMeans, markers } = input;
+  const { shapes } = input;
   const { minimumPoints, fittedCount, total, figure = 'map' } = input;
   const entries: OverlayLegendEntry[] = [];
   const skipped: string[] = [];
@@ -108,6 +113,7 @@ export function projectionMapChrome(
       });
     }
   }
+  appendShapeEntries(entries, shapes);
   appendMarkerEntries(entries, markers, groups);
 
   const hollow = fittedCount < total;
@@ -121,7 +127,7 @@ export function projectionMapChrome(
   }
 
   return {
-    title: legendTitle(copy, groups, colored),
+    title: legendTitle(copy, groups, colored, shapes),
     entries,
     caption: captionFor(
       copy,
@@ -136,44 +142,60 @@ export function projectionMapChrome(
 }
 
 /**
- * The sentence reporting what a gesture picked out.
- * @param copy - The words the map writes.
- * @param count - How many samples are selected.
- * @param total - How many there are in all.
- * @returns The sentence.
- */
-export function projectionSelectionSentence(
-  copy: ProjectionCopy,
-  count: number,
-  total: number,
-): string {
-  if (count === 0) return copy.sentence.selectionNone;
-  return fillCopy(copy.sentence.selection, {
-    count: formatInteger(count),
-    total: formatInteger(total),
-  });
-}
-
-/**
- * The sentence over the legend.
+ * The sentence over the legend, naming what the colour and the shape stand
+ * for.
  *
- * When colour stands for nothing the entries left are all shape, so the title
- * names the shape channel: a legend naming no encoding at all is the one fault
- * this title exists to prevent, and it is not fixed by leaving the title out.
+ * When neither stands for a grouping the entries left are all marks, so the
+ * title names the shape channel: a legend naming no encoding at all is the one
+ * fault this title exists to prevent, and it is not fixed by leaving it out.
  * @param copy - The words the map writes.
  * @param groups - The groups as the map colours them.
  * @param colored - Whether colour stands for the group at all.
+ * @param shapes - The grouping the dots are shaped by, or `null`.
  * @returns The title.
  */
 function legendTitle(
   copy: ProjectionCopy,
   groups: ResolvedProjectionGroups,
   colored: boolean,
+  shapes: ResolvedProjectionShapes | null,
 ): string {
-  if (!colored || groups.entries.length === 0) return copy.legend.shapes;
-  return fillCopy(copy.legend.mapNoEllipse, {
-    groups: groups.label.toLowerCase(),
-  });
+  const parts: string[] = [];
+  if (colored && groups.entries.length > 0) {
+    parts.push(
+      fillCopy(copy.legend.mapNoEllipse, {
+        groups: groups.label.toLowerCase(),
+      }),
+    );
+  }
+  if (shapes !== null) {
+    parts.push(
+      fillCopy(copy.legend.shapedBy, { shapes: shapes.label.toLowerCase() }),
+    );
+  }
+  return parts.length === 0 ? copy.legend.shapes : parts.join(' ');
+}
+
+/**
+ * One entry per shape, drawn in the muted ink: a colour on a shape's entry
+ * would claim a group of the colour grouping it does not stand for.
+ * @param entries - The legend, appended to in place.
+ * @param shapes - The grouping the dots are shaped by, or `null`.
+ */
+function appendShapeEntries(
+  entries: OverlayLegendEntry[],
+  shapes: ResolvedProjectionShapes | null,
+): void {
+  if (shapes === null) return;
+  for (const entry of shapes.entries) {
+    entries.push({
+      id: `shape-${entry.id}`,
+      label: entry.label,
+      color: SHAPE_INK,
+      shape: entry.shape,
+      count: entry.count,
+    });
+  }
 }
 
 function captionFor(
@@ -221,3 +243,6 @@ function appendMarkerEntries(
     });
   }
 }
+
+/** The ink a shape's entry is drawn in, the one the key uses for marks that name no colour. */
+const SHAPE_INK = 'var(--text-muted)';

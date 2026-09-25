@@ -82,7 +82,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Slideshows**             | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                                              | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                                                         |
 | **Token guard**            | `findTokenViolations`                                                                                                                                                                                                                                   | `cheminfo-check-tokens` (the bin)                                                                                                                                                       |
 | **Figures**                | `chartScale`, `chartAxisScale`, `chartAxisTitle`, `chartShare`, `chartColumnExtent`, `chartBinCounts`, `chartSeriesColor`, `rowMatrix`, `stackedMatrix`, `emptiestCorner`, `placeOverlayCard`, `overlayMetrics`                                         | `ChartFrame`, `ChartAxis`, `TrackedLineChart`, `OverlayBar`, `OverlaySelect`, `OverlaySegmented`, `OverlayToggle`, `OverlayNumber`, `OverlayLegend`, `OverlayCaption`, `OverlayReadout` |
-| **Projections**            | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `PROJECTION_COPY`                                                          | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                         |
+| **Projections**            | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `resolveProjectionShapes`, `PROJECTION_COPY`                               | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                         |
 | **Parallel coordinates**   | `parallelAxisOf`, `parallelAxisLayouts`, `parallelIncludedMask`, `parallelKeptCount`, `parallelNearestRow`, `parallelSegmentAt`, `parallelBandAt`, `parallelRangeOf`, `parallelPalette`, `parallelColorSteps`, `paintParallelLines`                     | `ParallelCoordinates`                                                                                                                                                                   |
 | **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                   | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                        |
 
@@ -390,8 +390,11 @@ const pca = new PCA(rows, { scale: true });
   }}
   samples={{
     ids,
-    groups: species,
-    groupLabel: 'Species',
+    labels: names, // what the card and the map write; `ids` stay the keys
+    groupings: [
+      { id: 'species', label: 'Species', groups: species }, // colours the dots
+      { id: 'cluster', label: 'Cluster', groups: clusters }, // shapes them
+    ],
     fields: (index) => [
       { label: 'Sepal length', value: `${rows[index][0]} cm` },
     ],
@@ -427,6 +430,13 @@ const pca = new PCA(rows, { scale: true });
   sample helped choose where the axes point and is bound to land somewhere
   reasonable, while a projected one can land anywhere — and landing far out is
   the finding, not a fault.
+- **Two groupings of the same samples, on one picture.** `samples.groupings` is a
+  list: the first colours the dots and the second shapes them, and the reader
+  can give either to any grouping from the bar and the cog. A grouping of more
+  groups than there are shapes is refused as a whole rather than drawn with two
+  groups under one mark, and the hover card names every grouping. It is what a
+  clustering is read with: the clusters it found in colour, the classes you gave
+  as shapes.
 - **Colour means one thing per tab and the legend says which.** Groups on the map
   and the pair grid, components on the other two, drawn from two orders of the
   Okabe–Ito palette that are disjoint over their first four, so blue-is-setosa on

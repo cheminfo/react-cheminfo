@@ -11,7 +11,10 @@ import { fillCopy } from '../core/fillCopy.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import { PROJECTION_COPY } from '../core/projectionCopy.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
-import { DEFAULT_PROJECTION_OPTIONS } from '../core/projectionOptions.ts';
+import {
+  DEFAULT_PROJECTION_OPTIONS,
+  NO_GROUPING,
+} from '../core/projectionOptions.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 
@@ -96,7 +99,7 @@ export function ProjectionPairsTab(
     [groups],
   );
 
-  const colored = options.colorBy === 'group' && inks.length > 0;
+  const colored = options.colorBy !== NO_GROUPING && inks.length > 0;
 
   return (
     <div style={{ minHeight: height }} data-testid={testId}>

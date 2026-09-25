@@ -43,17 +43,27 @@ const SEED_ROWS: readonly number[] = [0, 50, 100];
 const CLUSTER_OF = lloyd(IRIS_PC1, IRIS_PC2, SEED_ROWS);
 
 /**
- * Who the rows are once the clustering has named them.
+ * Who the rows are once the clustering has named them: grouped first by the
+ * cluster each flower fell in, which colours them, and then by its species,
+ * which shapes them.
  *
  * The first cluster comes out as the fifty setosa exactly; the other two cut
  * versicolor and virginica in a place neither species agrees with, which is
- * the honest result and a more useful demonstration than a tidy one.
+ * the honest result and a more useful demonstration than a tidy one — and with
+ * the species as shapes it is there to see, as squares among circles of one
+ * colour.
  */
 export const CLUSTER_SAMPLES: ProjectionSamples = {
   ids: IRIS_SAMPLES.ids,
-  groups: Array.from(CLUSTER_OF, (cluster) => clusterName(cluster)),
-  groupOrder: CLUSTER_NAMES,
-  groupLabel: 'Cluster',
+  groupings: [
+    {
+      id: 'cluster',
+      label: 'Cluster',
+      groups: Array.from(CLUSTER_OF, (cluster) => clusterName(cluster)),
+      order: CLUSTER_NAMES,
+    },
+    ...(IRIS_SAMPLES.groupings ?? []),
+  ],
   fields: IRIS_SAMPLES.fields,
 };
 

@@ -2,15 +2,12 @@ import type { ReactElement } from 'react';
 
 import { OverlayNumber } from '../../overlay/ui/OverlayNumber.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
-import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
-import type {
-  ProjectionColorBy,
-  ProjectionOptions,
-} from '../core/projectionOptions.ts';
+import type { ProjectionOptions } from '../core/projectionOptions.ts';
+import type { ProjectionGrouping } from '../core/projectionSamples.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
-import { projectionColourChoices } from './projectionMapChoices.ts';
+import { ProjectionColourPicker } from './ProjectionGroupingPickers.tsx';
 import { projectionPairsCeiling } from './projectionPairsCeiling.ts';
 
 /** What the grid keeps behind the cog is drawn from. */
@@ -21,17 +18,12 @@ interface ProjectionPairsMoreProps {
   onChange: (patch: Partial<ProjectionOptions>) => void;
   /** The words the bar writes, already merged over the defaults. */
   copy: ProjectionCopy;
-  /** What the set of groups is called, which is what `Colour by` offers. */
-  groupLabel: string;
+  /** Every grouping the samples carry, which is what `Colour by` offers. */
+  groupings: readonly ProjectionGrouping[];
   /** How many components the run produced, which caps the grid. */
   axisCount: number;
   /** Width of the figure, in pixels, which caps it again. */
   width: number;
-  /**
-   * Whether the samples carry groups at all.
-   * @default false
-   */
-  hasGroups?: boolean;
 }
 
 /**
@@ -52,9 +44,9 @@ interface ProjectionPairsMoreProps {
 export function ProjectionPairsMore(
   props: ProjectionPairsMoreProps,
 ): ReactElement {
-  const { options, onChange, copy, groupLabel, hasGroups = false } = props;
+  const { options, onChange, copy, groupings } = props;
   const { axisCount, width } = props;
-  const { bar, help, panel, tab } = copy;
+  const { help, panel, tab } = copy;
   const ceiling = projectionPairsCeiling(axisCount, width);
 
   return (
@@ -70,13 +62,12 @@ export function ProjectionPairsMore(
         max={ceiling.max}
         onChange={(pairCount) => onChange({ pairCount })}
       />
-      <OverlaySegmented<ProjectionColorBy>
+      <ProjectionColourPicker
         label={panel.name.colorBy}
-        help={help.colorBy}
-        value={options.colorBy}
-        disabled={!hasGroups}
-        options={projectionColourChoices(groupLabel, bar.uncoloured)}
-        onChange={(colorBy) => onChange({ colorBy })}
+        options={options}
+        onChange={onChange}
+        copy={copy}
+        groupings={groupings}
       />
       <OverlayNumber
         label={panel.name.pointRadius}

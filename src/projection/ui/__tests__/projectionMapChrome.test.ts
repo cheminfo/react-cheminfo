@@ -8,8 +8,10 @@ import type {
 } from '../../core/index.ts';
 import {
   PROJECTION_COPY,
+  projectionGrouping,
   resolveProjectionGroups,
   resolveProjectionOptions,
+  resolveProjectionShapes,
 } from '../../core/index.ts';
 import { projectionMapChrome } from '../projectionMapChrome.ts';
 import { MINIMUM_OUTLINE_POINTS } from '../projectionMapModel.ts';
@@ -32,8 +34,20 @@ const RESULT: ProjectionResult = {
 
 const SAMPLES: ProjectionSamples = {
   ids: ['a', 'b', 'c', 'd', 'e', 'f'],
-  groups: ['setosa', 'setosa', 'setosa', 'virginica', 'virginica', 'virginica'],
-  groupLabel: 'Species',
+  groupings: [
+    {
+      id: 'species',
+      label: 'Species',
+      groups: [
+        'setosa',
+        'setosa',
+        'setosa',
+        'virginica',
+        'virginica',
+        'virginica',
+      ],
+    },
+  ],
 };
 
 test('the key is titled in one short clause, whatever else is drawn', () => {
@@ -76,8 +90,13 @@ test('a group too small to outline is named in the key and in the paragraph', ()
   };
   const samples: ProjectionSamples = {
     ids: ['a', 'b', 'c', 'd', 'e'],
-    groups: ['setosa', 'setosa', 'setosa', 'virginica', 'virginica'],
-    groupLabel: 'Species',
+    groupings: [
+      {
+        id: 'species',
+        label: 'Species',
+        groups: ['setosa', 'setosa', 'setosa', 'virginica', 'virginica'],
+      },
+    ],
   };
   const built = chrome({}, short, samples);
 
@@ -106,11 +125,20 @@ function chrome(
   result: ProjectionResult = RESULT,
   samples: ProjectionSamples = SAMPLES,
 ) {
-  const options = resolveProjectionOptions(over, result);
+  const options = resolveProjectionOptions(over, result, samples.groupings);
+  const rows = result.scores.rows;
+  const groups = resolveProjectionGroups(
+    projectionGrouping(samples, options.colorBy),
+    rows,
+  );
   return projectionMapChrome({
     copy: PROJECTION_COPY,
-    groups: resolveProjectionGroups(samples, result.scores.rows),
-    colored: options.colorBy === 'group',
+    groups,
+    colored: groups.entries.length > 0,
+    shapes: resolveProjectionShapes(
+      projectionGrouping(samples, options.shapeBy),
+      rows,
+    ),
     ellipse: options.ellipse,
     minimumPoints: MINIMUM_OUTLINE_POINTS,
     showGroupMeans: options.showGroupMeans,

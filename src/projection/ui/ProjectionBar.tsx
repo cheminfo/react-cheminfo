@@ -27,8 +27,8 @@ import {
   projectionFoldedCaptionStyle,
 } from './projectionBarStyles.ts';
 import type { ProjectionMapView } from './projectionMapView.ts';
+import type { ProjectionStateApi } from './projectionStateApi.ts';
 import type { ProjectionModels } from './projectionTabModels.ts';
-import type { ProjectionStateApi } from './useProjectionState.ts';
 
 /** What {@link ProjectionBar} needs. */
 interface ProjectionBarProps {
@@ -81,7 +81,8 @@ interface ProjectionBarProps {
 export function ProjectionBar(props: ProjectionBarProps): ReactElement {
   const { state, result, copy, models, map, baseId, panelId } = props;
   const { fileName, width } = props;
-  const { tab, tabs, options, groups, selected, setOptions, setTab } = state;
+  const { tab, tabs, options, groups, groupings, selected } = state;
+  const { setOptions, setTab } = state;
 
   // Read here rather than off the surface below, because the row the bar is
   // laid into is the surface's own parent: it has to know how tall a control
@@ -119,6 +120,7 @@ export function ProjectionBar(props: ProjectionBarProps): ReactElement {
     map,
     options,
     groups,
+    groupings,
     selected,
     width,
     readings,

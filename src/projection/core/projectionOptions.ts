@@ -14,10 +14,10 @@ export type ProjectionVariablesView =
   | 'sample';
 
 /**
- * What decides a dot's colour on the map: `'group'`, `'none'`, or nothing else
- * in this release.
+ * The word for "no grouping" wherever an option names one, which is why no
+ * grouping may be called it.
  */
-export type ProjectionColorBy = 'group' | 'none';
+export const NO_GROUPING = 'none';
 
 /** What the figure is currently showing. Every field is a control in the floating bar. */
 export interface ProjectionOptions {
@@ -43,10 +43,20 @@ export interface ProjectionOptions {
    */
   cloudGesture: CloudGesture;
   /**
-   * What decides a dot's colour.
-   * @default 'group'
+   * Which grouping colours the dots, by its id, or `'none'`. An id no grouping
+   * carries — the empty string, or one saved on other data — takes the first
+   * grouping.
+   * @default ''
    */
-  colorBy: ProjectionColorBy;
+  colorBy: string;
+  /**
+   * Which grouping gives the dots their shapes, by its id, or `'none'`. An id
+   * no grouping carries takes the second grouping — the first when the colour
+   * has taken the second — and a grouping of more groups than there are
+   * shapes is not drawn.
+   * @default ''
+   */
+  shapeBy: string;
   /**
    * How large the group outlines are, or `null` for none.
    * @default { kind: 'coverage', probability: 0.95 }
@@ -134,7 +144,8 @@ export const DEFAULT_PROJECTION_OPTIONS: ProjectionOptions = {
   yAxis: 1,
   zAxis: 2,
   cloudGesture: 'turn',
-  colorBy: 'group',
+  colorBy: '',
+  shapeBy: '',
   ellipse: { kind: 'coverage', probability: 0.95 },
   pointRadius: 3.5,
   showGroupMeans: false,

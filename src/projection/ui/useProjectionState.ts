@@ -2,9 +2,13 @@ import { useCallback, useMemo, useState } from 'react';
 
 import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
 import type { SelectionChange } from '../../scatter/ui/useScatterSelection.ts';
+import {
+  projectionGrouping,
+  resolveProjectionGroups,
+  resolveProjectionShapes,
+} from '../core/projectionGroupings.ts';
 import type { ProjectionOptions } from '../core/projectionOptions.ts';
-import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
-import { resolveProjectionGroups } from '../core/projectionSamples.ts';
+import type { ProjectionGrouping } from '../core/projectionSamples.ts';
 import type { ProjectionTab } from '../core/projectionTabs.ts';
 import { projectionTabs } from '../core/projectionTabs.ts';
 import { resolveProjectionOptions } from '../core/resolveProjectionOptions.ts';
@@ -15,6 +19,7 @@ import {
   projectionNamesOf,
   projectionRowsOf,
 } from './projectionSelection.ts';
+import type { ProjectionStateApi } from './projectionStateApi.ts';
 import type { ProjectionViewerProps } from './projectionViewerProps.ts';
 
 /**
@@ -40,34 +45,6 @@ type ProjectionStateOptions = Pick<
   | 'defaultOptions'
   | 'onOptionsChange'
 >;
-
-/** What every tab reads, and the five ways any of them changes it. */
-export interface ProjectionStateApi {
-  /** The tabs this result can fill, in reading order. */
-  tabs: readonly ProjectionTab[];
-  /** The one showing. */
-  tab: ProjectionTab;
-  /** Move to another tab. One the result cannot fill is ignored. */
-  setTab: (tab: ProjectionTab) => void;
-  /** The groups as every figure draws them, resolved once per change. */
-  groups: ResolvedProjectionGroups;
-  /** Every option, already made safe against the result. */
-  options: ProjectionOptions;
-  /** Change some of them; the rest are carried over and checked again. */
-  setOptions: (patch: Partial<ProjectionOptions>) => void;
-  /** The selected rows, as indices, which is what a plot draws. */
-  selected: readonly number[];
-  /** Settle a selection a plot's own gesture produced. */
-  settleSelection: (change: SelectionChange) => void;
-  /** Settle one from elsewhere — a legend entry, a table beside the figure. */
-  selectRows: (
-    rows: readonly number[],
-    mode: ScatterSelectionMode,
-    source: ProjectionSelection['source'],
-  ) => void;
-  /** Draw one pair of axes on the map, which is what a cell of the grid does. */
-  selectPair: (xAxis: number, yAxis: number) => void;
-}
 
 /**
  * The tab, the pair of axes, the selection and the options, controlled or not.
@@ -121,13 +98,23 @@ export function useProjectionState(
     () => defaultOptions ?? {},
   );
 
-  const groups = useMemo(
-    () => resolveProjectionGroups(samples, result.scores.rows),
-    [result, samples],
-  );
+  const groupings = samples.groupings ?? NO_GROUPINGS;
   const settled = useMemo(
-    () => resolveProjectionOptions(heldOptions ?? ownOptions, result),
-    [heldOptions, ownOptions, result],
+    () =>
+      resolveProjectionOptions(heldOptions ?? ownOptions, result, groupings),
+    [groupings, heldOptions, ownOptions, result],
+  );
+  const { colorBy, shapeBy } = settled;
+  const rowCount = result.scores.rows;
+  const groups = useMemo(
+    () =>
+      resolveProjectionGroups(projectionGrouping(samples, colorBy), rowCount),
+    [colorBy, rowCount, samples],
+  );
+  const shapes = useMemo(
+    () =>
+      resolveProjectionShapes(projectionGrouping(samples, shapeBy), rowCount),
+    [rowCount, samples, shapeBy],
   );
 
   const setTab = useCallback(
@@ -142,11 +129,15 @@ export function useProjectionState(
 
   const setOptions = useCallback(
     (patch: Partial<ProjectionOptions>) => {
-      const next = resolveProjectionOptions({ ...settled, ...patch }, result);
+      const next = resolveProjectionOptions(
+        { ...settled, ...patch },
+        result,
+        groupings,
+      );
       if (heldOptions === undefined) setOwnOptions(next);
       onOptionsChange?.(next);
     },
-    [heldOptions, onOptionsChange, result, settled],
+    [groupings, heldOptions, onOptionsChange, result, settled],
   );
 
   const selectRows = useCallback(
@@ -189,6 +180,8 @@ export function useProjectionState(
     tab: inReach(tab, tabs) ?? inReach(ownTab, tabs) ?? tabs[0] ?? 'map',
     setTab,
     groups,
+    shapes,
+    groupings,
     options: settled,
     setOptions,
     selected:
@@ -222,3 +215,6 @@ function inReach(
   }
   return undefined;
 }
+
+/** No groupings at all, shared so an absent list keeps one identity. */
+const NO_GROUPINGS: readonly ProjectionGrouping[] = [];

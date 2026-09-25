@@ -70,6 +70,14 @@ export const PROJECTION_HELP: Record<ProjectionOptionId, ProjectionHelp> = {
     title: 'Colour by',
     body: 'What a dot’s colour stands for. Colouring by nothing is useful when the groups are what you are trying to find rather than what you already know.',
   },
+  shapeBy: {
+    title: 'Shape by',
+    body: 'What a dot’s shape stands for. With colour for one grouping and shape for another, you see at a glance where two ways of sorting the same samples disagree — the clusters a run found against the classes you gave. Past five groups the shapes stop being told apart, so a grouping that large is not offered.',
+    example: {
+      code: 'Colour = cluster · Shape = class',
+      note: 'A square among circles of the same colour is a sample the clustering put with another class.',
+    },
+  },
   ellipse: {
     title: 'Group outlines',
     body: 'Each outline is drawn to cover about that share of its group’s samples, assuming the group is roughly bell-shaped. It is a summary of where a group sits, not a boundary.',
@@ -95,7 +103,7 @@ export const PROJECTION_HELP: Record<ProjectionOptionId, ProjectionHelp> = {
     body: 'Writes every sample’s own name beside its dot. It is what turns a dot sitting on its own into something you can go and look up. In a crowd there is only room for some of the names, so the ones that do not fit are left out rather than written over each other.',
     example: {
       code: '0326_3a',
-      note: 'The name is whatever you handed in as the sample’s id, so it is the one you can find again in your own files.',
+      note: 'The name is the one the sample was loaded with, so it is the one you can find again in your own files.',
     },
   },
   pairCount: {
@@ -189,6 +197,8 @@ export interface ProjectionBarWords {
   };
   /** What "the colour stands for nothing" reads. */
   uncoloured: string;
+  /** What "the shape stands for nothing" reads. */
+  unshaped: string;
   /** What "no outlines at all" reads where there is no room for a sentence. */
   noOutlines: string;
   /** What the settings gathered into one chip are called together. */
@@ -218,6 +228,7 @@ export const PROJECTION_BAR_WORDS: ProjectionBarWords = {
     showIds: 'Show sample ID',
   },
   uncoloured: 'Nothing',
+  unshaped: 'Nothing',
   noOutlines: 'None',
   settings: 'How this is drawn',
   view: {

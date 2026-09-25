@@ -35,13 +35,15 @@ export type { ProjectionCopy } from './projectionCopy.ts';
 export { PROJECTION_COPY } from './projectionCopy.ts';
 export type { ProjectionCopyPatch } from './projectionCopyPatch.ts';
 export type {
-  ProjectionColorBy,
   ProjectionOptionId,
   ProjectionOptions,
   ProjectionVariablesView,
 } from './projectionOptions.ts';
 export { mergeProjectionCopy } from './mergeProjectionCopy.ts';
-export { DEFAULT_PROJECTION_OPTIONS } from './projectionOptions.ts';
+export {
+  DEFAULT_PROJECTION_OPTIONS,
+  NO_GROUPING,
+} from './projectionOptions.ts';
 export type {
   ProjectionChoiceWords,
   ProjectionOutlineWords,
@@ -56,10 +58,16 @@ export type {
 } from './projectionResult.ts';
 export type {
   ProjectionField,
+  ProjectionGrouping,
   ProjectionSamples,
   ResolvedProjectionGroups,
+  ResolvedProjectionShapes,
 } from './projectionSamples.ts';
-export { resolveProjectionGroups } from './projectionSamples.ts';
+export {
+  projectionGrouping,
+  resolveProjectionGroups,
+  resolveProjectionShapes,
+} from './projectionGroupings.ts';
 export type {
   ProjectionBarWords,
   ProjectionHelp,

@@ -3,8 +3,8 @@ import type { ReactElement } from 'react';
 import type { OverlayLegendEntry } from '../../overlay/ui/OverlayLegend.tsx';
 import { OverlayLegend } from '../../overlay/ui/OverlayLegend.tsx';
 
+import { projectionMapCorner } from './projectionMapCorner.ts';
 import type { ProjectionMapCloud } from './projectionMapModel.ts';
-import { projectionMapCorner } from './projectionMapModel.ts';
 import {
   PROJECTION_PLOT_AREA_STYLE,
   PROJECTION_PLOT_ROOM,

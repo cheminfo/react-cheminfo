@@ -39,13 +39,15 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * A k-means run over the iris map, seeded from the first flower of each
- * species: the clusters arrive as the groups, and the three cluster centres
+ * species: the clusters arrive as the first grouping, which colours the dots,
+ * the species as the second, which shapes them, and the three cluster centres
  * as markers drawn with a cross and named in the legend.
  *
  * The result is worth reading rather than admiring. The first cluster is the
  * fifty setosa exactly; the other two cut versicolor and virginica in a place
- * neither species agrees with, and the map shows that the moment a reader
- * compares this colouring with the species one.
+ * neither species agrees with, and the map shows where: a square among the
+ * circles of one colour is a flower the clustering put with another species.
+ * Swap the two from the bar and the cog to read it the other way round.
  */
 export const Clusters: Story = {};
 
