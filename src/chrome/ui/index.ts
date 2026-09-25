@@ -1,3 +1,5 @@
+export type { HeaderToggleOption, HeaderToggleProps } from './HeaderToggle.tsx';
+export { HeaderToggle } from './HeaderToggle.tsx';
 export type { NavItem } from './navItem.ts';
 // A site drawing its own link needs the same reading of a click the shared nav
 // items use: a middle click or a modified one belongs to the browser.

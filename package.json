@@ -22,9 +22,10 @@
     "./slides": "./lib/slides.js",
     "./spectra": "./lib/spectra.js",
     "./structure": "./lib/structure.js",
+    "./styles/*.css": "./styles/*.css",
+    "./translate": "./lib/translate.js",
     "./ui": "./lib/ui.js",
-    "./vite": "./lib/vite.js",
-    "./styles/*.css": "./styles/*.css"
+    "./vite": "./lib/vite.js"
   },
   "bin": {
     "cheminfo-check-deploy": "bin/check-deploy.mjs",
@@ -55,7 +56,10 @@
     "tsc-build": "tsc --project tsconfig.build.json"
   },
   "dependencies": {
+    "@formatjs/icu-messageformat-parser": "^3.5.20",
     "cheminfo-font": "^1.28.0",
+    "intl-messageformat": "^11.2.15",
+    "leven": "^4.1.0",
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
     "rehype-sanitize": "^6.0.0",

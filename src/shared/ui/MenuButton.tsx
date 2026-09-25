@@ -11,8 +11,9 @@ const HOLDER_STYLE: CSSProperties = {
 /** What every button of a site header takes, whatever its menu holds. */
 export interface HeaderButtonProps {
   /**
-   * Whether the button is reduced to its icon — no text, no caret — for a
-   * header that has run out of room. The icon still opens the same menu.
+   * Whether the text is left out of the button altogether, rather than only
+   * hidden: a bar that has run out of room drops the caret with it. The glyph
+   * names itself through its tooltip either way.
    * @default false
    */
   compact?: boolean;
@@ -60,7 +61,7 @@ export function MenuButton(props: MenuButtonProps): ReactElement {
           endIcon={compact ? undefined : 'caret-down'}
           text={compact ? undefined : label}
           aria-label={label}
-          title={compact ? label : undefined}
+          title={label}
         />
       </PopoverNext>
     </span>

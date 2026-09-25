@@ -170,6 +170,47 @@ button {
   flex: 1;
 }
 
+/* A utility of the bar is its glyph: the name it carries is the tooltip and the
+   accessible name, never written beside it. About, Cite, Tools and Share read
+   as four marks the eye passes over, and the pages keep the width the labels
+   would take — which in a long language is most of the bar. An entry with no
+   glyph keeps its text, or it would be left an empty button: that is how a
+   toggle of the bar still shows the value it is set to. */
+.app-header-actions .nav-link--icon .nav-link__label,
+.app-header-actions
+  .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down))
+  > .bp6-button-text,
+.app-header-actions
+  .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down))
+  > .bp6-icon-caret-down {
+  display: none;
+}
+
+.app-header-actions .nav-link--icon,
+.citation-button .bp6-button,
+.ecosystem-button .bp6-button {
+  padding: 0.3rem 0.5rem;
+}
+
+/* A setting the bar shows as its own values — the language, the scale a
+   temperature is read on — the one in force pressed. The values carry no
+   glyph, which is what keeps them written where a utility is only its mark. */
+.site-toggle .bp6-button {
+  padding: 0.25rem 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.site-toggle .bp6-button.bp6-active {
+  color: var(--text);
+}
+
+/* Narrow: the one value in force, a click away from the next. */
+.site-toggle--compact {
+  color: var(--text);
+}
+
 /* Carried by a link and by a button alike, so the whole row reads as one menu
    rather than as a button dropped among addresses. */
 .nav-link {
@@ -257,28 +298,10 @@ button {
   flex: none;
 }
 
-/* The utilities give up their labels and keep their icons. An entry with no
-   icon keeps its label, or it would be left an empty button. */
 @container app-header (max-width: 48rem) {
   .app-header__inner {
     padding: 0 0.75rem;
     gap: 0.5rem;
-  }
-
-  .app-header-actions .nav-link--icon .nav-link__label,
-  .app-header-actions
-    .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down))
-    > .bp6-button-text,
-  .app-header-actions
-    .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down))
-    > .bp6-icon-caret-down {
-    display: none;
-  }
-
-  .app-header-actions .nav-link--icon,
-  .citation-button .bp6-button,
-  .ecosystem-button .bp6-button {
-    padding: 0.3rem 0.5rem;
   }
 }
 

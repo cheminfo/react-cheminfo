@@ -1,4 +1,6 @@
 // tokens-ok: file — every site's two colours are declared here.
+import { withLanguageParam } from '../../language/core/languageParam.ts';
+
 import type { EcosystemSite, SiteRecord } from './types.ts';
 
 export type {
@@ -294,6 +296,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     name: { lead: 'atoms', alt: 'cheminfo', dot: true },
     host: 'atoms.cheminfo.org',
     repository: 'https://github.com/cheminfo/atoms.cheminfo.org',
+    publicRepository: true,
     tagline: 'Electrons, neutrons, Lewis structures and oxidation states.',
     group: 'practice',
     brand: '#b91c1c',
@@ -307,6 +310,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     name: { lead: 'moles', alt: 'cheminfo', dot: true },
     host: 'moles.cheminfo.org',
     repository: 'https://github.com/cheminfo/moles.cheminfo.org',
+    publicRepository: true,
     tagline: 'Balance a reaction, and work out its mass composition.',
     group: 'practice',
     brand: '#334155',
@@ -330,11 +334,25 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
   },
 ];
 
+/** How a link to a site is written, beyond the site itself. */
+export interface SiteUrlOptions {
+  /**
+   * The language the visitor is reading in, carried so the site opens in it
+   * rather than in the one it defaults to.
+   * @default undefined — the link names no language
+   */
+  language?: string;
+}
+
 /**
  * The address of a site, which is its host over https.
  * @param site - The site being linked to.
+ * @param options - See {@link SiteUrlOptions}.
  * @returns The URL to open.
  */
-export function siteUrl(site: SiteRecord): string {
-  return `https://${site.host}/`;
+export function siteUrl(
+  site: SiteRecord,
+  options: SiteUrlOptions = {},
+): string {
+  return withLanguageParam(`https://${site.host}/`, options.language);
 }

@@ -15,6 +15,7 @@ export type {
   SiteMarkColors,
   SiteName,
   SiteRecord,
+  SiteUrlOptions,
 } from './sites.ts';
 export { ECOSYSTEM_SITES, siteUrl } from './sites.ts';
 export { siteTokensCss } from './tokens.ts';

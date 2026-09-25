@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useSiteLanguage } from '../../language/ui/siteLanguageContext.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { siteNameColors } from '../core/nameColors.ts';
 import type { EcosystemSite, SiteId } from '../core/sites.ts';
@@ -85,6 +86,7 @@ export interface SiteTileProps {
  * @returns The tile.
  */
 export function SiteTile(props: SiteTileProps): ReactElement {
+  const language = useSiteLanguage();
   const {
     className,
     site,
@@ -140,7 +142,7 @@ export function SiteTile(props: SiteTileProps): ReactElement {
     <a
       className={className}
       style={style}
-      href={siteUrl(site)}
+      href={siteUrl(site, { language })}
       target={newTab ? '_blank' : undefined}
       rel={newTab ? 'noreferrer' : undefined}
       onMouseEnter={() => onHover?.(site.id)}

@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useSiteLanguage } from '../../language/ui/siteLanguageContext.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { groupedSites } from '../core/lookup.ts';
@@ -87,6 +88,7 @@ export interface EcosystemLinksProps {
  * @returns The section of links.
  */
 export function EcosystemLinks(props: EcosystemLinksProps): ReactElement {
+  const language = useSiteLanguage();
   const {
     className,
     currentSiteId,
@@ -117,7 +119,7 @@ export function EcosystemLinks(props: EcosystemLinksProps): ReactElement {
                   <a
                     key={site.id}
                     style={{ ...LINK_STYLE, color: site.brand }}
-                    href={siteUrl(site)}
+                    href={siteUrl(site, { language })}
                   >
                     {site.host}
                   </a>
