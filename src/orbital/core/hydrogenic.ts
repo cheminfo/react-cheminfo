@@ -57,7 +57,8 @@ export function meanRadius(parameters: HydrogenicParameters): number {
 }
 
 /**
- * Orbital energy in the hydrogen-like model, `E = −13.6 Z²/n²` eV.
+ * Orbital energy in the hydrogen-like model, `E = −13.606 Z²/n²` eV — one
+ * rydberg times `Z²/n²`.
  * @param parameters - Which orbital.
  * @returns The energy in electronvolts, always negative.
  */

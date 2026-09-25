@@ -69,3 +69,4 @@ export type {
 export { runAtomicSample } from './sample.ts';
 export type { Screening } from './screening.ts';
 export { groupRank, slaterScreening } from './screening.ts';
+export { slaterRemovalEnergy, slaterTotalEnergy } from './slaterEnergy.ts';

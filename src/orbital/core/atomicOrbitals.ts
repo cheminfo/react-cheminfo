@@ -29,6 +29,7 @@ import {
 import type { RealHarmonic } from './realHarmonics.ts';
 import { harmonicsOf, subshellLetter } from './realHarmonics.ts';
 import { slaterScreening } from './screening.ts';
+import { slaterRemovalEnergy } from './slaterEnergy.ts';
 
 /** One atomic orbital of one element: a shape, a size and an occupancy. */
 export interface AtomicOrbital {
@@ -50,8 +51,16 @@ export interface AtomicOrbital {
   effectiveCharge: number;
   /** Shielding `S` those rules produced. */
   shielding: number;
-  /** `−13.6 Z_eff²/n²`, electronvolts. */
+  /** `−13.606 Z_eff²/n²`, electronvolts: one rydberg times `Z_eff²/n²`. */
   energy: number;
+  /**
+   * Energy to pull this electron off the atom, electronvolts: the difference
+   * of Slater total energies between the ion and the atom. `null` when the
+   * subshell is empty, there being no electron to remove. This, not
+   * {@link AtomicOrbital.energy}, is the number to compare with a measured
+   * ionisation energy — see `slaterEnergy.ts`.
+   */
+  removalEnergy: number | null;
   /** `n − ℓ − 1` spheres on which the wavefunction changes sign. */
   radialNodes: number;
   /** ℓ planes or cones on which it changes sign. */
@@ -120,6 +129,12 @@ export function atomicOrbitalsOf(
       l: subshell.l,
       charge,
     };
+    // Once per subshell, not once per harmonic: the seven orbitals of an f
+    // subshell share one removal energy.
+    const removalEnergy =
+      subshellElectrons === 0
+        ? null
+        : slaterRemovalEnergy(atomicNumber, configuration, subshell);
     const harmonics = harmonicsOf(subshell.l);
     const spread = hundDistribution(subshellElectrons, harmonics.length);
     for (let index = 0; index < harmonics.length; index++) {
@@ -135,6 +150,7 @@ export function atomicOrbitalsOf(
         effectiveCharge: charge,
         shielding: screening.shielding,
         energy: orbitalEnergy(parameters),
+        removalEnergy,
         radialNodes: radialNodeCount(parameters),
         angularNodes: subshell.l,
         meanRadius: meanRadius(parameters),
