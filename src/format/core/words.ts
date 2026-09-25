@@ -15,3 +15,22 @@ export function pluralize(
 ): string {
   return count === 1 ? singular : plural;
 }
+
+/**
+ * English ordinal of a position.
+ *
+ * Only the ordinal comes back, never the noun it counts, so the caller writes
+ * the sentence: `the ${ordinal(n)} conformer produced`.
+ * @param position - 1-based position.
+ * @returns E.g. `1st`, `2nd`, `12th`, `23rd`.
+ */
+export function ordinal(position: number): string {
+  const teens = position % 100;
+  const suffix =
+    teens >= 11 && teens <= 13
+      ? 'th'
+      : (ORDINAL_SUFFIXES[position % 10] ?? 'th');
+  return `${position}${suffix}`;
+}
+
+const ORDINAL_SUFFIXES: Record<number, string> = { 1: 'st', 2: 'nd', 3: 'rd' };

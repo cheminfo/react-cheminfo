@@ -14,4 +14,4 @@ export { roundTo } from './roundTo.ts';
 export { formatSuperscript } from './superscript.ts';
 export type { DurationStyle, FormatDurationOptions } from './units.ts';
 export { formatBytes, formatDuration } from './units.ts';
-export { pluralize } from './words.ts';
+export { ordinal, pluralize } from './words.ts';

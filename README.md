@@ -40,6 +40,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/structure`         | the structure editor and renderer                 | React, react-ocl, OCL                            |
 | `react-cheminfo/slides`            | the deck format and the slideshow player          | React, react-markdown                            |
 | `react-cheminfo/spectra`           | the spectra processing settings editors           | React; types only from spectra-processor, ml-pca |
+| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                    | nothing on import; xtb-wasm on the first call    |
 | `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet      | nothing                                          |
 | `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours | nothing                                          |
 
@@ -51,6 +52,13 @@ that only prerenders installs neither React nor Vite. The Markdown stack of the
 slides (`react-markdown`, `rehype-raw`, `rehype-sanitize`, about 9 MB installed)
 is a regular dependency instead: it is small enough to always install, and a
 site that never imports `react-cheminfo/slides` bundles none of it.
+
+`react-cheminfo/xtb` is the door a page opens only when a visitor asks for a
+better number. `refineConformers` in `react-cheminfo/core` orchestrates a
+refinement against the framework-free `GeometryRelaxer` contract and loads no
+WebAssembly; `xtbRelaxer` from this subpath is the implementation, and it
+`import()`s `xtb-wasm` on the **first call**, so a site that offers refinement as
+an action still ships nothing extra to a visitor who never clicks it.
 
 `react-cheminfo/vite` is the one door with a split bill: `cheminfoPrerender`
 needs nothing beyond Vite's own plugin type, while `ogCardHtml` renders a mark
@@ -75,7 +83,8 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Formatting & colour**    | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv`                           | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                                                             |
 | **Widgets**                | `CREDITS`, `credits`                                                                                                                                                                                                                                    | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                    |
 | **Hooks & state**          | `createWorkerChannel`, `persistBucket`, `persistSignalBucket`                                                                                                                                                                                           | `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                                   |
-| **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`                                                                                                                                                                               | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                       |
+| **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`, `registerResources`                                                                                                                                       | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                       |
+| **Conformers**             | `generateConformers`, `continueConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES`, `MINIMISATION_ALGORITHMS`, `sameConformerOptions`                              | —                                                                                                                                                                                       |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                    | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                               |
 | **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                         | `AboutPage`                                                                                                                                                                             |
 | **Which build is running** | `formatBuiltAt`, `shortCommit`, `BuildInfo`                                                                                                                                                                                                             | `AboutBuild`, `cheminfoBuildInfo` (`/vite`)                                                                                                                                             |

@@ -144,6 +144,22 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'occ',
+    name: 'OCC',
+    href: 'https://github.com/peterspackman/occ',
+    description:
+      'the GFN2-xTB implementation the refined geometries and energies come from.',
+    license: 'GPL-3.0',
+  },
+  {
+    id: 'xtb-wasm',
+    name: 'xtb-wasm',
+    href: 'https://github.com/cheminfo/xtb-wasm',
+    description:
+      'GFN2-xTB compiled to WebAssembly, driven from a pool of web workers.',
+    license: 'MIT',
+  },
+  {
     id: 'molstar',
     name: 'Mol*',
     href: 'https://molstar.org/',
