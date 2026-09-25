@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.23.0](https://github.com/cheminfo/react-cheminfo/compare/v0.22.0...v0.23.0) (2026-09-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* ProjectionSamples takes `groupings` instead of `groups`, `groupOrder`, `groupLabel` and `groupColors`; `colorBy` names a grouping or `none`, and `ProjectionColorBy` is removed; `resolveProjectionGroups` takes one grouping.
+
+### Features
+
+* compare two groupings on one projection map ([6ff380f](https://github.com/cheminfo/react-cheminfo/commit/6ff380f1c5f3d6e45573a58480ec608ad79f7f1a))
+
 ## [0.22.0](https://github.com/cheminfo/react-cheminfo/compare/v0.21.0...v0.22.0) (2026-09-24)
 
 
