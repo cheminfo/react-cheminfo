@@ -5,4 +5,5 @@ export type {
   DeployProblem,
   DeployProblemKind,
 } from './types.ts';
+export { NGINX_CONFIG, PAGE_CACHE_CONFIG } from './pageCache.ts';
 export { DEPLOY_COMPOSE_FILES } from './types.ts';

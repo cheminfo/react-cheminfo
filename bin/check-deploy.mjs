@@ -2,9 +2,10 @@
 /*
  * Report every way a repository would break, or silently mis-deploy, under the
  * server's global deploy script: a compose file it would not find, an image with
- * no selectable tag, an `IMAGE_NAME` naming a package this repository never
- * publishes, an `env_file` that fails on a checkout with no `.env` yet, a
- * service with no health probe to read, an `.env.example` that hides a mode.
+ * no selectable tag, a page the browser keeps across a deploy and then cannot
+ * run, an `IMAGE_NAME` naming a package this repository never publishes, an
+ * `env_file` that fails on a checkout with no `.env` yet, a service with no
+ * health probe to read, an `.env.example` that hides a mode.
  *
  * Wire it as an npm script, next to check-tokens:
  *   "check-deploy": "cheminfo-check-deploy"
@@ -25,6 +26,8 @@ import process from 'node:process';
 
 import {
   DEPLOY_COMPOSE_FILES,
+  NGINX_CONFIG,
+  PAGE_CACHE_CONFIG,
   findDeployProblems,
 } from '../lib/deploy/core/index.js';
 
@@ -67,7 +70,14 @@ if (imageName === undefined) {
 // Every mode is read, present or not: a missing one is itself a problem.
 const expected = composeFiles ?? DEPLOY_COMPOSE_FILES;
 const files = [];
-for (const path of [...expected, '.env.example', '.gitignore']) {
+for (const path of [
+  ...expected,
+  '.env.example',
+  '.gitignore',
+  'Dockerfile',
+  PAGE_CACHE_CONFIG,
+  NGINX_CONFIG,
+]) {
   const text = read(path);
   if (text !== undefined) files.push({ path, text });
 }

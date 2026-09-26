@@ -9,7 +9,8 @@ export type DeployProblemKind =
   | 'floating-sidecar'
   | 'missing-healthcheck'
   | 'missing-env-example'
-  | 'missing-deploy-ignore';
+  | 'missing-deploy-ignore'
+  | 'cacheable-page';
 
 /** One way a repository would fail, or silently mis-deploy, on the server. */
 export interface DeployProblem {

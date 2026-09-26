@@ -1,5 +1,6 @@
 import { readComposeFile } from './composeFile.ts';
 import { readEnvExample } from './envExample.ts';
+import { readPageCache } from './pageCache.ts';
 import type { CheckDeployOptions, DeployFile, DeployProblem } from './types.ts';
 import { DEPLOY_COMPOSE_FILES } from './types.ts';
 
@@ -12,7 +13,9 @@ import { DEPLOY_COMPOSE_FILES } from './types.ts';
  * reports it healthy. So a repository has to hand it a selectable tag on every
  * image we build, an `IMAGE_NAME` that names the package our own workflow
  * publishes, a compose file that parses on a checkout with no `.env` yet, and a
- * health probe to read. Each of those is invisible until a deploy, which is the
+ * health probe to read. It also has to hand the browser a page the browser will
+ * not keep, or the next deploy leaves returning visitors on a blank one. Each
+ * of those is invisible until a deploy, which is the
  * worst moment to discover it — an `env_file` without `required: false` fails
  * before a container starts, and an `IMAGE_NAME` off by a suffix pulls a
  * package that was never published.
@@ -67,6 +70,9 @@ export function findDeployProblems(
   } else {
     readEnvExample(envExample, expected, problems);
   }
+
+  const dockerfile = byPath.get('Dockerfile');
+  if (dockerfile !== undefined) readPageCache(dockerfile, byPath, problems);
 
   const gitignore = byPath.get('.gitignore');
   if (gitignore === undefined || !/^\s*\/?\.deploy\/?\s*$/m.test(gitignore)) {
