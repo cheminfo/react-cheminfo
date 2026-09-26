@@ -62,13 +62,18 @@ test('the original failure travels as the cause', async () => {
   );
 });
 
-/** The rejection of one relaxation attempt, as an `Error`. */
+/**
+ * The rejection of one relaxation attempt, as an `Error`.
+ * @returns What `xtbRelaxer` threw.
+ */
 async function failedLoad(): Promise<Error> {
   try {
     await xtbRelaxer()([water]);
   } catch (error) {
     if (error instanceof Error) return error;
-    throw new TypeError(`the relaxer rejected with ${typeof error}`);
+    throw new TypeError(`the relaxer rejected with ${typeof error}`, {
+      cause: error,
+    });
   }
   throw new Error('the relaxer resolved, but xtb-wasm cannot be loaded');
 }
