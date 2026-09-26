@@ -1,6 +1,0 @@
-import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-DzkT2GF_.js";import{n,t as r}from"./useT-SaARZZCl.js";import{n as i,t as a}from"./MenuButton-CuvqgRQ1.js";import{n as o,t as s}from"./CitationMenu-CQok2icN.js";function c(e){let t=n(),r=e.label??t(`cite.button`);return(0,l.jsx)(a,{compact:e.compact,placement:e.placement,className:`citation-button`,icon:`citation`,label:r,menu:`works`in e?(0,l.jsx)(s,{works:e.works,guidance:e.guidance}):(0,l.jsx)(s,{reference:e.reference})})}var l;function u(){return(u=e((()=>{r(),i(),o(),l=t(),c.__docgenInfo={description:`The Cite entry of a site header: one button opening the article at its DOI,
-the reference in the style a journal asks for, and the files a reference
-manager imports. A site built on several works passes \`works\` rather than
-\`reference\`, and each is then listed behind what citing it credits.
-@param props - The work or works being cited, and how the menu opens.
-@returns The button and its menu.`,methods:[],displayName:`CiteButton`}})))()}export{u as n,c as t};
