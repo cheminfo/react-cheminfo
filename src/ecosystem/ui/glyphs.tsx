@@ -179,30 +179,24 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </g>
   ),
-  // Two groups of samples with the outline that holds each: the picture the
-  // tool exists to draw. One is drawn and one is filled rather than both
-  // outlined, because two rings crossing close up into a blob at 16 px —
-  // checked at 16, 20, 24, 32 and 64 before this was settled on.
+  // A score plot without its axes: four samples, and the three the analysis
+  // sets apart carrying the answering colour — the map the tool exists to
+  // draw. The spacing is irregular so the groups read as measured samples
+  // rather than as a pattern, and the two groups sit six units apart, against
+  // under one inside either.
   metabo: (accent) => (
     <>
-      <ellipse
-        cx="12"
-        cy="12.5"
-        rx="5.8"
-        ry="9"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="3"
-        transform="rotate(-32 12 12.5)"
-      />
-      <ellipse
-        cx="20.5"
-        cy="20"
-        rx="5.4"
-        ry="8.6"
-        fill={accent}
-        transform="rotate(32 20.5 20)"
-      />
+      <g fill="#ffffff">
+        <circle cx="6.6" cy="20.4" r="2.6" />
+        <circle cx="12.4" cy="18.3" r="2.6" />
+        <circle cx="9.3" cy="25.8" r="2.6" />
+        <circle cx="14.9" cy="24.1" r="2.6" />
+      </g>
+      <g fill={accent}>
+        <circle cx="20.1" cy="7.2" r="2.6" />
+        <circle cx="25.8" cy="8.6" r="2.6" />
+        <circle cx="22.2" cy="13.2" r="2.6" />
+      </g>
     </>
   ),
   // One formula branching into every structure it can be.

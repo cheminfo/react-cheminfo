@@ -120,8 +120,10 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     tagline: 'Turn a batch of NMR spectra into a map of your samples.',
     group: 'spectra',
     brand: '#4d7c0f',
-    brandAlt: '#b91c1c',
-    mark: { plate: '#4d7c0f', accent: '#b91c1c' },
+    // A yellow, because it is what stays apart from both this green and the
+    // white for a red–green colour-blind visitor; any red merges with the plate.
+    brandAlt: '#a16207',
+    mark: { plate: '#4d7c0f', accent: '#fde047' },
   },
   {
     id: 'derepflow',
