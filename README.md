@@ -21,8 +21,8 @@ normally depends on both.
 npm i react-cheminfo
 ```
 
-`react`, `react-dom`, `@blueprintjs/core` and `react-science` are peer
-dependencies: a site already has them, and a second copy of `react-science`
+`react` and `react-dom` (19 or later), `@blueprintjs/core` and `react-science`
+are peer dependencies: a site already has them, and a second copy of `react-science`
 would mean two Blueprint style trees in one page.
 
 ## Entry points
@@ -52,7 +52,9 @@ so a site that only wants the Tools menu downloads none of them, and a project
 that only prerenders installs neither React nor Vite. The Markdown stack of the
 slides (`react-markdown`, `rehype-raw`, `rehype-sanitize`, about 9 MB installed)
 is a regular dependency instead: it is small enough to always install, and a
-site that never imports `react-cheminfo/slides` bundles none of it.
+site that never imports `react-cheminfo/slides` bundles none of it. The same holds
+for `openchemlib`, which every function of `react-cheminfo/conformers` runs at
+module scope: a site that never imports that door bundles none of it.
 
 `react-cheminfo/xtb` is the door a page opens only when a visitor asks for a
 better number. `refineConformers` in
