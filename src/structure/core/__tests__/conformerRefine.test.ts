@@ -215,6 +215,57 @@ test('progress and cancellation are handed to the relaxer', async () => {
   expect(onSettled).toHaveBeenCalledWith(1, 2);
 });
 
+test('a conformer the force field could give no energy is refined like any other', async () => {
+  const set = butaneSet(2);
+  // MMFF94 refuses an element it cannot type, and such a conformer is kept with
+  // a null energy. GFN2 has an opinion about it all the same.
+  const withoutEnergy: ConformerSet = {
+    ...set,
+    conformers: set.conformers.map((conformer, index) =>
+      index === 0
+        ? { ...conformer, energy: null, relativeEnergy: null }
+        : conformer,
+    ),
+  };
+
+  const refined = await refineConformers(
+    withoutEnergy,
+    relaxerReturning((index) => ({ energy: index === 0 ? -200 : -100 })),
+  );
+
+  expect(refined.conformers).toHaveLength(2);
+  // It is the most stable of the two by the refined energy, so it ranks first.
+  expect(refined.conformers[0]?.refinement?.energy).toBe(-200);
+  expect(refined.conformers[0]?.refinement?.forceFieldEnergy).toBeNull();
+  expect(refined.conformers[0]?.energy).toBeNull();
+  expect(refined.conformers[1]?.refinement?.forceFieldEnergy).not.toBeNull();
+});
+
+test('a caller may widen the duplicate tolerance, and that decides what merges', async () => {
+  const set = butaneSet(2);
+  const shared = readRelaxableGeometry(
+    Molecule.fromMolfile(only(set).molfile.data),
+  ).coordinates;
+  // One shape, energies 0.005 kcal/mol apart: inside a loose window, outside the
+  // default one.
+  const relax = relaxerReturning((index) => ({
+    energy: -42 - index * 0.005,
+    coordinates: shared,
+  }));
+
+  const kept = await refineConformers(set, relax);
+
+  expect(kept.conformers).toHaveLength(2);
+  expect(kept.refinement?.merged).toBe(0);
+
+  const merged = await refineConformers(set, relax, {
+    sameEnergyTolerance: 0.01,
+  });
+
+  expect(merged.conformers).toHaveLength(1);
+  expect(merged.refinement?.merged).toBe(1);
+});
+
 test('an empty set is refined into an empty refined set', async () => {
   const empty: ConformerSet = { ...butaneSet(1), conformers: [] };
   const refined = await refineConformers(empty, () => {

@@ -61,7 +61,11 @@ test('the reported duration covers the initialisation, not only the loop', () =>
   };
   const set = generateConformers(
     Molecule.fromSmiles(DIPEPTIDE),
-    options({ maxConformers: 1, minimisation: 'none' }),
+    // A budget nothing can spend: this test is about what the duration covers,
+    // and the default ten seconds is a race against the very initialisation it
+    // measures — a second when the machine is idle, more than ten when the rest
+    // of the suite is running beside it, and then there is no conformer at all.
+    options({ maxConformers: 1, minimisation: 'none', timeoutSeconds: 600 }),
     now,
   );
 
@@ -76,7 +80,11 @@ test('the reported duration covers the initialisation, not only the loop', () =>
   expect(set.elapsedMilliseconds).toBeGreaterThanOrEqual(initialisation);
 }, 30_000);
 
-/** Alanyl-alanine: its torsion sets take about a second to set up. */
+/**
+ * Alanyl-alanine: its torsion sets take about a second to set up on an idle
+ * machine, and four under load — which is the point, and also why the run above
+ * is given a budget it cannot spend.
+ */
 const DIPEPTIDE = 'CC(N)C(=O)NC(C)C(=O)O';
 
 function butane(): Molecule {

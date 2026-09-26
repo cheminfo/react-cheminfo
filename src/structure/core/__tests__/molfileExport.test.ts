@@ -50,7 +50,10 @@ test('999 atoms still fit V2000, 1000 switch the writer to V3000', () => {
   expect(large.format).toBe('sdf');
   expect(large.data).toContain('V3000');
   expect(molfileAtomCount(large.data)).toBe(1000);
-});
+  // Building and writing two chains of a thousand atoms takes 1.2 s on an idle
+  // machine, which is close enough to vitest's own five-second default that the
+  // rest of the suite running beside it is the difference.
+}, 30_000);
 
 test('a molfile with an empty atom block is refused', () => {
   const empty = new Molecule(0, 0);
