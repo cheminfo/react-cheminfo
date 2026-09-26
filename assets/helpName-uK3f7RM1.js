@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e,t){return e.title??t(`help.label`)}function n(){return(n=e((()=>{})))()}export{n,t};

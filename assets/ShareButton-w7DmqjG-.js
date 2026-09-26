@@ -1,0 +1,11 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-DzkT2GF_.js";import{n,t as r}from"./icon-CCl7BR5X.js";import{n as i,t as a}from"./useT-SaARZZCl.js";import{n as o,r as s}from"./buttons-Di_tSBMT.js";function c(e){let{onClick:t,variant:n=`nav-link`,label:a,compact:s=!1,title:c,className:u}=e,d=i(),f=a??d(`share.button`),p=c??d(`share.buttonTitle`),m=s?void 0:f;return n===`blueprint`?(0,l.jsx)(o,{className:u,variant:`minimal`,icon:`share`,text:m,title:p,"aria-label":f,onClick:t}):(0,l.jsxs)(`button`,{type:`button`,className:u===void 0?`nav-link nav-link--icon`:`nav-link nav-link--icon ${u}`,title:p,"aria-label":f,onClick:t,children:[(0,l.jsx)(r,{icon:`share`,size:14}),m===void 0?null:(0,l.jsx)(`span`,{className:`nav-link__label`,children:m})]})}var l;function u(){return(u=e((()=>{s(),n(),a(),l=t(),c.__docgenInfo={description:`The Share entry of a site header: the button that offers the open page as a
+link, or as the iframe that frames it in someone else's site.
+@param props - What the button does, how it is dressed, and how it is named.
+@returns The button.`,methods:[],displayName:`ShareButton`,props:{onClick:{required:!0,tsType:{name:`signature`,type:`function`,raw:`() => void`,signature:{arguments:[],return:{name:`void`}}},description:`Called when the button is pressed; what it opens is the caller's business.`},variant:{required:!1,tsType:{name:`union`,raw:`'nav-link' | 'blueprint'`,elements:[{name:`literal`,value:`'nav-link'`},{name:`literal`,value:`'blueprint'`}]},description:`A plain entry of a site's own header bar, or a Blueprint button for a
+toolbar already made of them.
+@default 'nav-link'`},label:{required:!1,tsType:{name:`string`},description:`Text of the button, and what a screen reader is told.
+@default the chrome's own word for it, in the language of the page`},compact:{required:!1,tsType:{name:`boolean`},description:`Whether the button is reduced to its icon, for a bar that has run out of
+room. It is still named to the pointer and to a screen reader.
+@default false`},title:{required:!1,tsType:{name:`string`},description:`What the pointer is told.
+@default the chrome's own line, in the language of the page`},className:{required:!1,tsType:{name:`string`},description:`Class the button carries, on top of the one its variant gives it.
+@default undefined`}}}})))()}export{u as n,c as t};

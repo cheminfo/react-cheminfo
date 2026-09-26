@@ -1,0 +1,19 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-DzkT2GF_.js";import{n,t as r}from"./useT-SaARZZCl.js";import{n as i,t as a}from"./tooltip-z-SxvMGE.js";import{n as o}from"./joinClassNames-BbK_6p9Z.js";function s(e){let{className:t,content:r,width:i=d}=e,a=n(),{title:s,body:b,example:x,link:S}=r;return(0,u.jsxs)(`div`,{className:o(`help-body`,t),style:{...f,maxWidth:i},children:[s===void 0?null:(0,u.jsx)(`div`,{style:p,children:s}),b===void 0?null:(0,u.jsx)(`div`,{style:m,children:b}),l(x).map(e=>(0,u.jsxs)(`div`,{style:h,children:[(0,u.jsx)(`code`,{style:g,children:e.code}),e.input===void 0?null:(0,u.jsxs)(`div`,{style:_,children:[a(`help.on`),` `,(0,u.jsx)(`code`,{style:g,children:e.input})]}),e.note===void 0?null:(0,u.jsx)(`div`,{style:v,children:e.note})]},c(e))),S===void 0?null:(0,u.jsx)(`a`,{href:S,target:`_blank`,rel:`noopener noreferrer`,style:y,children:a(`help.learnMore`)})]})}function c(e){return`${e.code}\n${e.input??``}\n${e.note??``}`}function l(e){if(e===void 0)return[];if(`code`in e)return[e];let t=new Set,n=[];for(let r of e){let e=c(r);t.has(e)||(t.add(e),n.push(r))}return n}var u,d,f,p,m,h,g,_,v,y;function b(){return(b=e((()=>{r(),u=t(),d=280,f={display:`flex`,flexDirection:`column`,gap:6},p={fontWeight:600},m={fontWeight:400,lineHeight:1.45},h={display:`flex`,flexDirection:`column`,gap:2,fontWeight:400},g={fontFamily:`ui-monospace, SFMono-Regular, Menlo, monospace`,fontSize:12},_={fontSize:12},v={fontSize:12,fontStyle:`italic`},y={fontWeight:400},s.__docgenInfo={description:`The one rendering of a piece of help.
+
+A tooltip, a glyph and a toolbar button all draw this, so a construct
+documented once reads identically wherever it is referenced and cannot drift
+between two of its mentions.
+@param props - See {@link HelpBodyProps}.
+@returns The help body.`,methods:[],displayName:`HelpBody`,props:{content:{required:!0,tsType:{name:`HelpContent`},description:`The help to render.`},width:{required:!1,tsType:{name:`number`},description:`How wide the body is allowed to be, in pixels. A tooltip needs a cap; a
+dialog does not.
+@default 280`},className:{required:!1,tsType:{name:`string`},description:`Class names added to the root element, after the component's own.
+@default undefined`}}}})))()}function x(e){let{className:t,content:n,children:r,placement:i=`top`,width:o,popoverClassName:c}=e,l=n.link!==void 0;return(0,S.jsx)(a,{className:t,content:(0,S.jsx)(s,{content:n,width:o}),placement:i,hoverOpenDelay:C,hoverCloseDelay:l?w:0,interactionKind:l?`hover`:`hover-target`,targetTagName:`span`,popoverClassName:c===void 0?`help-tooltip`:`help-tooltip ${c}`,children:r})}var S,C,w;function T(){return(T=e((()=>{i(),b(),S=t(),C=250,w=300,x.__docgenInfo={description:`A piece of help attached to whatever it explains.
+
+The delay before it opens is long enough that sweeping the pointer across a
+row of controls opens nothing, and help carrying a link stays open long
+enough for the pointer to reach the link.
+@param props - See {@link HelpTooltipProps}.
+@returns The target, with its help.`,methods:[],displayName:`HelpTooltip`,props:{content:{required:!0,tsType:{name:`HelpContent`},description:`The help shown when the pointer rests on the target.`},children:{required:!0,tsType:{name:`ReactNode`},description:`What the help is about.`},placement:{required:!1,tsType:{name:`TooltipProps['placement']`,raw:`TooltipProps['placement']`},description:`Which side the tooltip opens on.
+@default 'top'`},width:{required:!1,tsType:{name:`number`},description:`How wide the body is allowed to be, in pixels.
+@default 280`},popoverClassName:{required:!1,tsType:{name:`string`},description:"Class the tooltip popover carries, in addition to `help-tooltip`.\n@default undefined"},className:{required:!1,tsType:{name:`string`},description:`Class names added to the root element.
+@default undefined`}}}})))()}export{T as n,x as t};
