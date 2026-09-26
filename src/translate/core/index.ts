@@ -47,7 +47,7 @@ export type {
   TranslateSessionOptions,
 } from './session.ts';
 export { BRIDGE_GLOBAL, BRIDGE_PROTOCOL, TranslateSession } from './session.ts';
-export type { StartTranslatingOptions } from './start.ts';
+export type { LoadOverlayOptions, StartTranslatingOptions } from './start.ts';
 export {
   TRANSLATE_ORIGIN,
   TRANSLATE_PARAM,

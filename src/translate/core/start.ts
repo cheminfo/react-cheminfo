@@ -63,6 +63,21 @@ export interface StartTranslatingOptions {
    * @default globalThis.document
    */
   document?: Document;
+  /**
+   * Told when the overlay cannot be fetched — translate.cheminfo.org down, a
+   * network that blocks it, an address typed wrong. The site is expected to
+   * stop formatting through the session, so a page nobody can edit goes back
+   * to being an ordinary page rather than staying marked with no editor.
+   * @default undefined
+   */
+  onUnavailable?: () => void;
+  /**
+   * How long to wait for the overlay before giving up on it, in ms. A server
+   * that accepts the connection and then says nothing never fails the script,
+   * so waiting for `error` alone would wait for ever.
+   * @default 10000
+   */
+  timeout?: number;
 }
 
 /**
@@ -85,6 +100,8 @@ export function startTranslating(
     tables = [],
     origin = TRANSLATE_ORIGIN,
     document: target = globalThis.document,
+    onUnavailable,
+    timeout = OVERLAY_TIMEOUT,
   } = options;
 
   const session = new TranslateSession({
@@ -95,27 +112,72 @@ export function startTranslating(
     marked: true,
   });
   Object.assign(globalThis, { [BRIDGE_GLOBAL]: session });
-  loadOverlay(origin, target);
+  loadOverlay(origin, { document: target, onUnavailable, timeout });
   return session;
+}
+
+/** How long the overlay has to arrive before the page gives up on it. */
+const OVERLAY_TIMEOUT = 10_000;
+
+/** How the overlay script is added, and what happens when it does not come. */
+export interface LoadOverlayOptions {
+  /**
+   * The document to add it to.
+   * @default globalThis.document
+   */
+  document?: Document;
+  /**
+   * Told when it cannot be fetched, or does not arrive in time.
+   * @default undefined
+   */
+  onUnavailable?: () => void;
+  /**
+   * How long to wait, in ms.
+   * @default 10000
+   */
+  timeout?: number;
 }
 
 /**
  * Add the overlay script to the page, once.
  * @param origin - Where the overlay is served from.
- * @param target - The document to add it to.
+ * @param options - See {@link LoadOverlayOptions}.
  */
 export function loadOverlay(
   origin: string,
-  target = globalThis.document,
+  options: LoadOverlayOptions = {},
 ): void {
+  const {
+    document: target = globalThis.document,
+    onUnavailable,
+    timeout = OVERLAY_TIMEOUT,
+  } = options;
   if (target === undefined) return;
   const src = `${origin.replace(/\/$/, '')}/overlay.js`;
   for (const loaded of target.querySelectorAll('script')) {
     if (loaded.src === src) return;
   }
+
   const script = target.createElement('script');
   script.type = 'module';
   script.src = src;
   script.async = true;
+
+  // The page is only worth marking while there is an editor to use the marks,
+  // so a script that never arrives takes translate mode down with it.
+  let settled = false;
+  const giveUp = () => {
+    if (settled) return;
+    settled = true;
+    script.remove();
+    onUnavailable?.();
+  };
+  const timer = globalThis.setTimeout(giveUp, timeout);
+  script.addEventListener('error', giveUp);
+  script.addEventListener('load', () => {
+    settled = true;
+    globalThis.clearTimeout(timer);
+  });
+
   target.head.append(script);
 }
