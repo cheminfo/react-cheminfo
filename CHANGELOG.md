@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.27.0](https://github.com/cheminfo/react-cheminfo/compare/v0.26.0...v0.27.0) (2026-09-26)
+
+
+### Features
+
+* **deploy:** report a page a browser keeps across a deploy ([62e5f4c](https://github.com/cheminfo/react-cheminfo/commit/62e5f4c7ca957cbf7724e40ae6eefe7a65419e4d))
+
 ## [0.26.0](https://github.com/cheminfo/react-cheminfo/compare/v0.25.0...v0.26.0) (2026-09-26)
 
 
