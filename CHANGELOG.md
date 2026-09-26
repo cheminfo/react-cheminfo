@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.25.0](https://github.com/cheminfo/react-cheminfo/compare/v0.24.0...v0.25.0) (2026-09-26)
+
+
+### Features
+
+* **ecosystem:** redraw the metabo mark as a score plot ([de5d78c](https://github.com/cheminfo/react-cheminfo/commit/de5d78c49f55f9e8eb3ea4b15b78a6d382f12cef))
+* **translate:** give up on an overlay that never comes ([429be25](https://github.com/cheminfo/react-cheminfo/commit/429be2585c9872a25cdd7bfc146645e72d5489c0))
+
 ## [0.24.0](https://github.com/cheminfo/react-cheminfo/compare/v0.23.0...v0.24.0) (2026-09-26)
 
 
