@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 import { isModifiedClick } from '../../chrome/ui/navItem.ts';
 import { pluralize } from '../../format/core/index.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { TalkManifest, TalkSummary } from '../core/index.ts';
 
@@ -25,7 +26,7 @@ export interface TalkListProps {
   /**
    * What an empty list says. A list that draws nothing at all reads as a
    * broken page rather than as a site that has published no deck yet.
-   * @default 'No talk yet.'
+   * @default the chrome's own line, in the language of the page
    */
   emptyNote?: string;
   /**
@@ -45,19 +46,16 @@ export interface TalkListProps {
  * @returns The listing.
  */
 export function TalkList(props: TalkListProps): ReactElement {
-  const {
-    className,
-    manifests,
-    onOpen,
-    renderHref,
-    siteName,
-    emptyNote = 'No talk yet.',
-  } = props;
+  const { className, manifests, onOpen, renderHref, siteName, emptyNote } =
+    props;
+  const t = useChromeT();
   const groups = groupBySite(manifests);
   const showSite = groups.length > 1;
 
   if (groups.length === 0) {
-    return <p className="talk-list-empty">{emptyNote}</p>;
+    return (
+      <p className="talk-list-empty">{emptyNote ?? t('slides.noTalkYet')}</p>
+    );
   }
 
   return (

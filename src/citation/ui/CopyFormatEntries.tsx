@@ -1,6 +1,7 @@
 import { MenuItem } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { CITATION_FORMATS } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
 import { CITATION_STYLES } from '../core/segments.ts';
@@ -39,6 +40,7 @@ export function CopyFormatEntries(
   props: CopyFormatEntriesProps,
 ): ReactElement[] {
   const { references, feedback, keyPrefix = '', styled = true } = props;
+  const t = useChromeT();
 
   return CITATION_FORMATS.map((format) => {
     if (!styled || !format.styled) {
@@ -60,7 +62,7 @@ export function CopyFormatEntries(
       <MenuItem
         key={format.id}
         icon="clipboard"
-        text={format.label}
+        text={t.or(`cite.format.${format.id}`, format.label)}
         label={format.hint}
       >
         {CITATION_STYLES.map((style) => {

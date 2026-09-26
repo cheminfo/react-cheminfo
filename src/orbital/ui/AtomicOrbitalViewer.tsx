@@ -19,6 +19,7 @@ import { Callout } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { Suspense, lazy, useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
@@ -116,34 +117,33 @@ export interface AtomicOrbitalViewerProps {
 export function AtomicOrbitalViewer(
   props: AtomicOrbitalViewerProps,
 ): ReactElement {
-  const {
-    fallback = 'Loading the 3D viewer…',
-    renderUnsupported,
-    className,
-    ...canvas
-  } = props;
+  const { fallback, renderUnsupported, className, ...canvas } = props;
+  const t = useChromeT();
   const [capability] = useState(probeViewerCapability);
   const [failure, setFailure] = useState<string | null>(null);
 
   if (!capability.supported) {
     return (
       <Callout intent="warning" compact className={className}>
-        {renderUnsupported?.(capability) ?? capability.message}
+        {renderUnsupported?.(capability) ??
+          t.or(`viewer.capability.${capability.reason}`, capability.message)}
       </Callout>
     );
   }
 
   return (
     <div className={className} style={ROOT_STYLE}>
-      <Suspense fallback={<div style={NOTE_STYLE}>{fallback}</div>}>
+      <Suspense
+        fallback={
+          <div style={NOTE_STYLE}>
+            {fallback ?? t('molecule3d.loadingViewer')}
+          </div>
+        }
+      >
         <AtomicOrbitalCanvas {...canvas} onFailureChange={setFailure} />
       </Suspense>
       {failure !== null && (
-        <Callout
-          intent="danger"
-          compact
-          title="This orbital could not be drawn"
-        >
+        <Callout intent="danger" compact title={t('orbital.couldNotDraw')}>
           {failure}
         </Callout>
       )}

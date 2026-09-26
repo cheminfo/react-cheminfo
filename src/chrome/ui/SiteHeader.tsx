@@ -5,6 +5,7 @@ import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { Wordmark } from '../../ecosystem/ui/Wordmark.tsx';
 import { SiteMark } from '../../ecosystem/ui/marks.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 import { NavLink } from './NavLink.tsx';
 import { NavMenuButton } from './NavMenuButton.tsx';
@@ -86,7 +87,7 @@ export interface SiteHeaderProps {
   /**
    * What the menu the pages fold into on a phone is called, for the pointer
    * and a screen reader.
-   * @default 'Pages'
+   * @default the chrome's own word for it, in the language of the page
    */
   pagesLabel?: string;
 }
@@ -118,8 +119,9 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
     onHome,
     markSize = 28,
     width = 'page',
-    pagesLabel = 'Pages',
+    pagesLabel,
   } = props;
+  const t = useChromeT();
 
   if (embedded) return null;
 
@@ -158,7 +160,7 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
         {nav.length > 1 ? (
           <div className="app-header-nav-menu">
             <NavMenuButton
-              label={pagesLabel}
+              label={pagesLabel ?? t('chrome.pages')}
               icon="menu"
               compact
               items={nav}

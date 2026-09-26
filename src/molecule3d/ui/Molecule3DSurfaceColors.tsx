@@ -9,6 +9,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { ColorPickerDropdown } from 'react-science/ui';
 
 import { formatDecimal } from '../../format/core/numbers.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { Molecule3DSettings } from '../core/settings.ts';
 import {
   SURFACE_CHARGE_COLORS,
@@ -34,17 +35,24 @@ export function Molecule3DSurfaceColors(
   props: Molecule3DSurfaceColorsProps,
 ): ReactElement {
   const { settings, onChange, polarSurfaceArea } = props;
+  const t = useChromeT();
   const disabled = !settings.showSurface;
   const { surfaceColoring, surfaceColor } = settings;
 
   return (
     <div style={SECTION_STYLE}>
-      <span style={LABEL_STYLE}>Surface colour</span>
+      <span style={LABEL_STYLE}>{t('molecule3d.surfaceColour')}</span>
       <SegmentedControl
         fill
         size="small"
         disabled={disabled}
-        options={COLORING_OPTIONS}
+        options={SURFACE_COLORINGS.map((coloring) => ({
+          value: coloring,
+          label: t.or(
+            `molecule3d.coloring.${coloring}`,
+            SURFACE_COLORING_LABELS[coloring],
+          ),
+        }))}
         value={surfaceColoring}
         onValueChange={(value) => {
           if (isSurfaceColoringId(value)) {
@@ -54,7 +62,7 @@ export function Molecule3DSurfaceColors(
       />
       {surfaceColoring === 'uniform' && (
         <span style={ROW_STYLE}>
-          <span style={LABEL_STYLE}>Colour</span>
+          <span style={LABEL_STYLE}>{t('molecule3d.colour')}</span>
           {disabled ? (
             <span style={{ ...SWATCH_STYLE, background: surfaceColor }} />
           ) : (
@@ -76,11 +84,14 @@ export function Molecule3DSurfaceColors(
           <span style={ROW_STYLE} data-testid="molecule3d-polarity-legend">
             <LegendItem color={SURFACE_CHARGE_COLORS.positive} label="δ+" />
             <LegendItem color={SURFACE_CHARGE_COLORS.negative} label="δ−" />
-            <LegendItem color={SURFACE_CHARGE_COLORS.neutral} label="neutral" />
+            <LegendItem
+              color={SURFACE_CHARGE_COLORS.neutral}
+              label={t('molecule3d.neutral')}
+            />
           </span>
           <span
             style={LABEL_STYLE}
-            title={TPSA_HELP}
+            title={t('molecule3d.tpsaHelp')}
             data-testid="molecule3d-tpsa-value"
           >
             TPSA:{' '}
@@ -102,14 +113,6 @@ function LegendItem(props: { color: string; label: string }): ReactElement {
     </span>
   );
 }
-
-const COLORING_OPTIONS = SURFACE_COLORINGS.map((coloring) => ({
-  value: coloring,
-  label: SURFACE_COLORING_LABELS[coloring],
-}));
-
-const TPSA_HELP =
-  'Topological polar surface area (Ertl): the area contributed by nitrogen, oxygen and their hydrogens, computed from the structure by openchemlib. It does not depend on the conformer or the probe.';
 
 const SECTION_STYLE: CSSProperties = {
   display: 'flex',

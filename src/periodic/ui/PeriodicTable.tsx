@@ -14,6 +14,7 @@ import type { CSSProperties, KeyboardEvent, ReactElement } from 'react';
 import { useEffect, useRef } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { categorySwatch } from '../core/categories.ts';
 import type { PeriodicElement } from '../core/elements.ts';
 import type { ElementRange } from '../core/layout.ts';
@@ -127,6 +128,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     className,
   } = props;
 
+  const t = useChromeT();
   const gridRef = useRef<HTMLDivElement>(null);
   const cameFromKeyRef = useRef(false);
   const offset = headers ? 1 : 0;
@@ -155,7 +157,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
       <div
         ref={gridRef}
         role="grid"
-        aria-label="Periodic table"
+        aria-label={t('periodic.table')}
         data-testid="periodic-table"
         style={headers ? gridWithHeadersStyle : gridStyle}
         onKeyDown={handleKeyDown}

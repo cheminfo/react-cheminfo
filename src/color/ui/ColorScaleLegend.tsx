@@ -2,6 +2,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useId } from 'react';
 
 import { formatTrimmed } from '../../format/core/numbers.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ColorScale } from '../core/interpolate.ts';
 import { evenScale, sampleScale } from '../core/interpolate.ts';
@@ -66,6 +67,7 @@ export function ColorScaleLegend(props: ColorScaleLegendProps): ReactElement {
     label = '',
     formatValue = defaultFormatValue,
   } = props;
+  const t = useChromeT();
   const gradientId = useId();
 
   const stops = gradientStops('stops' in scale ? scale : evenScale(scale));
@@ -81,7 +83,11 @@ export function ColorScaleLegend(props: ColorScaleLegendProps): ReactElement {
         viewBox={`0 0 ${BAR_WIDTH} ${BAR_HEIGHT}`}
         preserveAspectRatio="none"
         role="img"
-        aria-label={`${label === '' ? 'Colour scale' : label} from ${low} to ${high}`}
+        aria-label={t('color.legendLabel', {
+          what: label === '' ? t('color.colourScale') : label,
+          low,
+          high,
+        })}
       >
         {stops.length === 0 ? null : (
           <defs>

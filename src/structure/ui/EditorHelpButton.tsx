@@ -2,6 +2,8 @@ import { Button, PopoverNext, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, RefObject } from 'react';
 import { useEffect, useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 import { StructureEditorHelp } from './StructureEditorHelp.tsx';
 import type { StructureEditorMode } from './editorChange.ts';
 
@@ -26,6 +28,7 @@ export interface EditorHelpButtonProps {
  */
 export function EditorHelpButton(props: EditorHelpButtonProps): ReactElement {
   const { containerRef, mode, fragment } = props;
+  const t = useChromeT();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -48,20 +51,22 @@ export function EditorHelpButton(props: EditorHelpButtonProps): ReactElement {
         placement="left-start"
         content={<StructureEditorHelp mode={mode} fragment={fragment} />}
       >
-        <Tooltip content={LABEL} placement="left" disabled={isOpen}>
+        <Tooltip
+          content={t('structure.mouseAndKeyboard')}
+          placement="left"
+          disabled={isOpen}
+        >
           <Button
             variant="minimal"
             size="small"
             icon="help"
-            aria-label={LABEL}
+            aria-label={t('structure.mouseAndKeyboard')}
           />
         </Tooltip>
       </PopoverNext>
     </div>
   );
 }
-
-const LABEL = 'Mouse and keyboard';
 
 const CORNER_STYLE: CSSProperties = {
   position: 'absolute',

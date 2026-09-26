@@ -214,6 +214,18 @@ export const CompactCounts: Story = {
 };
 
 /**
+ * A note at the end of the row, for a selection finer than the capsules can
+ * spell — rows picked one by one, or what else picks them. It sits on the line
+ * the picking is done on rather than wherever the result happens to be drawn.
+ */
+export const WithNote: Story = {
+  args: {
+    value: 'failed',
+    note: 'benzene, pyridine and furan picked · click a row to move it',
+  },
+};
+
+/**
  * Several outcomes kept at once, with the capsule that clears them: filled
  * while nothing is picked, because an empty selection keeps every row.
  */

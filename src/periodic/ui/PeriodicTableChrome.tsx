@@ -5,6 +5,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ElementRange } from '../core/layout.ts';
 import {
@@ -33,13 +34,14 @@ interface HeaderStripsProps {
  */
 export function HeaderStrips(props: HeaderStripsProps): ReactElement {
   const { onSelectRange } = props;
+  const t = useChromeT();
   const groups: ReactElement[] = [];
   for (let group = 1; group <= COLUMN_COUNT; group++) {
     groups.push(
       <HeaderCell
         key={`group-${String(group)}`}
         label={String(group)}
-        title={`Group ${String(group)}`}
+        title={t('periodic.group', { group })}
         column={group + 1}
         row={1}
         onClick={
@@ -57,7 +59,7 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
       <HeaderCell
         key={`period-${String(period)}`}
         label={String(period)}
-        title={`Period ${String(period)}`}
+        title={t('periodic.period', { period })}
         column={1}
         row={period + 1}
         onClick={

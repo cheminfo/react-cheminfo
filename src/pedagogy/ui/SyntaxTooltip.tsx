@@ -2,6 +2,7 @@ import type { Placement } from '@blueprintjs/core';
 import { Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { GlossaryExample } from '../core/glossary.ts';
 
 import { HOVER_OPEN_DELAY, MONOSPACE, PROSE_INK } from './pedagogyStyle.ts';
@@ -45,12 +46,12 @@ export interface SyntaxTooltipProps {
   placement?: Placement;
   /**
    * Label of the example's code line.
-   * @default 'Example'
+   * @default the chrome's own word for it, in the language of the page
    */
   codeLabel?: string;
   /**
    * Label of the example's input line.
-   * @default 'Input'
+   * @default the chrome's own word for it, in the language of the page
    */
   inputLabel?: string;
   /**
@@ -108,12 +109,12 @@ interface SyntaxTooltipBodyProps {
   content: SyntaxTooltipContent;
   /**
    * Label of the example's code line.
-   * @default 'Example'
+   * @default the chrome's own word for it, in the language of the page
    */
   codeLabel?: string;
   /**
    * Label of the example's input line.
-   * @default 'Input'
+   * @default the chrome's own word for it, in the language of the page
    */
   inputLabel?: string;
 }
@@ -127,7 +128,8 @@ interface SyntaxTooltipBodyProps {
  * @returns The body.
  */
 export function SyntaxTooltipBody(props: SyntaxTooltipBodyProps): ReactElement {
-  const { content, codeLabel = 'Example', inputLabel = 'Input' } = props;
+  const { content, codeLabel, inputLabel } = props;
+  const t = useChromeT();
   const { syntax, name, tag, summary, detail, example } = content;
 
   return (
@@ -141,12 +143,12 @@ export function SyntaxTooltipBody(props: SyntaxTooltipBodyProps): ReactElement {
       <div style={DETAIL_STYLE}>{detail}</div>
       <div style={EXAMPLE_STYLE}>
         <div style={ROW_STYLE}>
-          <span style={LABEL_STYLE}>{codeLabel}</span>
+          <span style={LABEL_STYLE}>{codeLabel ?? t('pedagogy.example')}</span>
           <code style={VALUE_STYLE}>{example.code}</code>
         </div>
         {example.input !== undefined && (
           <div style={ROW_STYLE}>
-            <span style={LABEL_STYLE}>{inputLabel}</span>
+            <span style={LABEL_STYLE}>{inputLabel ?? t('pedagogy.input')}</span>
             <code style={VALUE_STYLE}>{example.input}</code>
           </div>
         )}

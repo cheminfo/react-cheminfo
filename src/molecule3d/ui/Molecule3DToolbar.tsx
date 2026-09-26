@@ -9,6 +9,7 @@ import { Card } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { Toolbar } from 'react-science/ui';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { MeasurementKind } from '../core/measurement.ts';
 import {
   MEASUREMENT_ATOM_COUNTS,
@@ -62,6 +63,7 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
     options,
     exportPanel,
   } = props;
+  const t = useChromeT();
   const hasView =
     tools.spin ||
     tools.surface ||
@@ -74,12 +76,12 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
     <div style={COLUMN_STYLE}>
       {hasView && (
         <Card elevation={1} style={CARD_STYLE}>
-          <Toolbar vertical aria-label="View">
+          <Toolbar vertical aria-label={t('molecule3d.view')}>
             {tools.reset && (
               <Toolbar.Item
                 icon="zoom-to-fit"
-                aria-label="Reset view"
-                tooltip="Reset view"
+                aria-label={t('molecule3d.resetView')}
+                tooltip={t('molecule3d.resetView')}
                 tooltipProps={TOOLTIP_PROPS}
                 onClick={onResetView}
               />
@@ -88,8 +90,8 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
               <Toolbar.Item
                 icon="refresh"
                 active={spinning}
-                aria-label="Spin"
-                tooltip="Spin"
+                aria-label={t('molecule3d.spin')}
+                tooltip={t('molecule3d.spin')}
                 tooltipProps={TOOLTIP_PROPS}
                 onClick={() => {
                   onSpinningChange(!spinning);
@@ -100,8 +102,8 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
               <Toolbar.Item
                 icon={<SurfaceIcon />}
                 active={showSurface}
-                aria-label="Surface"
-                tooltip="Molecular surface"
+                aria-label={t('molecule3d.surface')}
+                tooltip={t('molecule3d.molecularSurface')}
                 tooltipProps={TOOLTIP_PROPS}
                 onClick={() => {
                   onShowSurfaceChange(!showSurface);
@@ -114,8 +116,8 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
                 content={options}
                 itemProps={{
                   icon: 'cog',
-                  'aria-label': 'Display options',
-                  tooltip: 'Display options',
+                  'aria-label': t('molecule3d.displayOptions'),
+                  tooltip: t('molecule3d.displayOptions'),
                   tooltipProps: TOOLTIP_PROPS,
                 }}
               />
@@ -126,8 +128,8 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
                 content={exportPanel}
                 itemProps={{
                   icon: 'download',
-                  'aria-label': 'Export image',
-                  tooltip: 'Export image',
+                  'aria-label': t('molecule3d.exportImage'),
+                  tooltip: t('molecule3d.exportImage'),
                   tooltipProps: TOOLTIP_PROPS,
                 }}
               />
@@ -138,8 +140,8 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
                 content={<Molecule3DHelp />}
                 itemProps={{
                   icon: 'help',
-                  'aria-label': 'Mouse and keyboard',
-                  tooltip: 'Mouse and keyboard',
+                  'aria-label': t('structure.mouseAndKeyboard'),
+                  tooltip: t('structure.mouseAndKeyboard'),
                   tooltipProps: TOOLTIP_PROPS,
                 }}
               />
@@ -149,14 +151,23 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
       )}
       {tools.measure && (
         <Card elevation={1} style={CARD_STYLE}>
-          <Toolbar vertical aria-label="Measure">
+          <Toolbar vertical aria-label={t('molecule3d.measure')}>
             {MEASUREMENT_KINDS.map((kind) => (
               <Toolbar.Item
                 key={kind}
                 icon={<MeasureIcon kind={kind} />}
                 active={measureKind === kind}
-                aria-label={MEASUREMENT_LABELS[kind]}
-                tooltip={`${MEASUREMENT_LABELS[kind]}: click ${MEASUREMENT_ATOM_COUNTS[kind]} atoms`}
+                aria-label={t.or(
+                  `molecule3d.measurement.${kind}`,
+                  MEASUREMENT_LABELS[kind],
+                )}
+                tooltip={t('molecule3d.measurementTooltip', {
+                  what: t.or(
+                    `molecule3d.measurement.${kind}`,
+                    MEASUREMENT_LABELS[kind],
+                  ),
+                  atoms: MEASUREMENT_ATOM_COUNTS[kind],
+                })}
                 tooltipProps={TOOLTIP_PROPS}
                 onClick={() => {
                   onMeasureKindChange(measureKind === kind ? null : kind);
@@ -166,8 +177,8 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
             <Toolbar.Item
               icon={<ClearMeasurementsIcon />}
               disabled={measurementCount === 0}
-              aria-label="Remove all measurements"
-              tooltip="Remove all measurements"
+              aria-label={t('molecule3d.clearMeasurements')}
+              tooltip={t('molecule3d.clearMeasurements')}
               tooltipProps={TOOLTIP_PROPS}
               onClick={onClearMeasurements}
             />

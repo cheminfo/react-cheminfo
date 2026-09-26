@@ -2,6 +2,7 @@ import { Button, HTMLSelect } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
 import { formatDecimal } from '../../format/core/numbers.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { normalizeHexColor } from '../core/hex.ts';
 import type {
   ColorInterpolation,
@@ -22,14 +23,11 @@ const POSITION_DECIMALS = 2;
 // hex colour is shown as black until it is picked again.
 const UNREADABLE_COLOR = '#000000';
 
-/** What each path between two anchors is called. */
-const INTERPOLATION_LABELS: Array<{
-  value: ColorInterpolation;
-  label: string;
-}> = [
-  { value: 'rgb', label: 'RGB — mix the channels' },
-  { value: 'hsv', label: 'HSV — turn the short way' },
-  { value: 'hsv-long', label: 'HSV — turn the long way' },
+/** The paths between two anchors, in the order the picker lists them. */
+const INTERPOLATIONS: readonly ColorInterpolation[] = [
+  'rgb',
+  'hsv',
+  'hsv-long',
 ];
 
 /** What {@link ColorScaleEditor} edits. */
@@ -57,6 +55,7 @@ export interface ColorScaleEditorProps {
  */
 export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
   const { className, value, onChange } = props;
+  const t = useChromeT();
   const stops = value.stops;
 
   function write(next: readonly ColorStop[]): void {
@@ -69,7 +68,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
         scale={value}
         height={PREVIEW_HEIGHT}
         samples={PREVIEW_SAMPLES}
-        label="The scale being edited"
+        label={t('color.scaleBeingEdited')}
       />
 
       <div style={ROWS_STYLE}>
@@ -77,7 +76,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
           <div key={`${String(index)}-${stop.color}`} style={ROW_STYLE}>
             <input
               type="color"
-              aria-label={`Colour of anchor ${String(index + 1)}`}
+              aria-label={t('color.anchorColour', { index: index + 1 })}
               value={normalizeHexColor(stop.color) ?? UNREADABLE_COLOR}
               style={SWATCH_STYLE}
               onChange={(event) => {
@@ -86,7 +85,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
             />
             <input
               type="range"
-              aria-label={`Position of anchor ${String(index + 1)}`}
+              aria-label={t('color.anchorPosition', { index: index + 1 })}
               min={0}
               max={1}
               step={POSITION_STEP}
@@ -107,7 +106,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
               icon="cross"
               variant="minimal"
               size="small"
-              aria-label={`Remove anchor ${String(index + 1)}`}
+              aria-label={t('color.removeAnchor', { index: index + 1 })}
               disabled={stops.length <= MINIMUM_STOPS}
               onClick={() => {
                 write(stops.filter((_, at) => at !== index));
@@ -121,16 +120,19 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
         <Button
           icon="plus"
           size="small"
-          text="Add a colour"
+          text={t('color.addColour')}
           disabled={stops.length >= MAXIMUM_CUSTOM_STOPS}
           onClick={() => {
             write(withAddedStop(value));
           }}
         />
         <HTMLSelect
-          aria-label="Path between two anchors"
+          aria-label={t('color.path')}
           value={value.interpolation}
-          options={INTERPOLATION_LABELS}
+          options={INTERPOLATIONS.map((interpolation) => ({
+            value: interpolation,
+            label: t(`color.interpolation.${interpolation}`),
+          }))}
           onChange={(event) => {
             onChange({
               stops,

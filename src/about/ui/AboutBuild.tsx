@@ -2,6 +2,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import type { BuildInfo } from '../../build/core/buildInfo.ts';
 import { formatBuiltAt, shortCommit } from '../../build/core/buildInfo.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { githubSources } from '../core/repository.ts';
 
 export interface AboutBuildProps {
@@ -24,26 +25,32 @@ export interface AboutBuildProps {
  */
 export function AboutBuild(props: AboutBuildProps): ReactElement {
   const { build, repository } = props;
+  const t = useChromeT();
   const sources = githubSources(repository);
+  const builtAt = formatBuiltAt(build.builtAt);
+  if (build.commit === undefined) {
+    return <p style={PARAGRAPH_STYLE}>{t('about.built', { builtAt })}</p>;
+  }
+
+  // The commit is a link inside a sentence whose word order is the
+  // translator's, so the message is split where it names it.
+  const [before = '', after = ''] = t('about.builtFromCommit', {
+    builtAt,
+  }).split('{commit}');
 
   return (
     <p style={PARAGRAPH_STYLE}>
-      Built {formatBuiltAt(build.builtAt)}
-      {build.commit === undefined ? null : (
-        <>
-          {' from commit '}
-          <Reference
-            href={
-              sources === undefined
-                ? undefined
-                : `${sources}/commit/${build.commit}`
-            }
-          >
-            {shortCommit(build.commit)}
-          </Reference>
-        </>
-      )}
-      .
+      {before}
+      <Reference
+        href={
+          sources === undefined
+            ? undefined
+            : `${sources}/commit/${build.commit}`
+        }
+      >
+        {shortCommit(build.commit)}
+      </Reference>
+      {after}
     </p>
   );
 }

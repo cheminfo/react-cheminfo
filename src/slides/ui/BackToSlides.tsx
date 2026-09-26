@@ -2,6 +2,7 @@ import { Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
 import { isModifiedClick } from '../../chrome/ui/navItem.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { TalkOrigin } from '../core/index.ts';
 
@@ -35,13 +36,14 @@ export interface BackToSlidesProps {
  */
 export function BackToSlides(props: BackToSlidesProps): ReactElement | null {
   const { className, origin, href, onReturn } = props;
+  const t = useChromeT();
   if (origin === null) return null;
 
   return (
     <a
       className={joinClassNames('back-to-slides no-print', className)}
       href={href}
-      title={`Back to slide ${origin.slide + 1}`}
+      title={t('slides.backToSlide', { slide: origin.slide + 1 })}
       onClick={(event) => {
         if (onReturn === undefined || isModifiedClick(event)) return;
         event.preventDefault();
@@ -49,7 +51,7 @@ export function BackToSlides(props: BackToSlidesProps): ReactElement | null {
       }}
     >
       <Icon icon="presentation" size={14} />
-      Back to slides
+      {t('slides.backToSlides')}
     </a>
   );
 }

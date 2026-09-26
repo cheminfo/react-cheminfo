@@ -3,6 +3,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { CreditsList } from '../../credits/ui/CreditsList.tsx';
 import { Wordmark } from '../../ecosystem/ui/Wordmark.tsx';
 import { SiteMark } from '../../ecosystem/ui/marks.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { AboutContent } from '../core/about.ts';
 import { resolveAbout } from '../core/about.ts';
 
@@ -58,6 +59,7 @@ export interface AboutPageProps {
  */
 export function AboutPage(props: AboutPageProps): ReactElement {
   const { content, className, children, logo, mark } = props;
+  const t = useChromeT();
   const about = resolveAbout(content);
   const site = about.site;
 
@@ -76,7 +78,9 @@ export function AboutPage(props: AboutPageProps): ReactElement {
           <h1 style={logo === undefined ? NAME_STYLE : LOGO_NAME_STYLE}>
             {logo ?? <Wordmark site={site} size={26} />}
           </h1>
-          <p style={TAGLINE_STYLE}>{site.tagline}</p>
+          <p style={TAGLINE_STYLE}>
+            {t.or(`site.${site.id}.tagline`, site.tagline)}
+          </p>
           <p style={WHAT_STYLE}>{about.what}</p>
         </div>
         <AboutVersion
@@ -87,12 +91,15 @@ export function AboutPage(props: AboutPageProps): ReactElement {
       </header>
 
       {about.people.length === 0 && about.providedBy.length === 0 ? null : (
-        <AboutSection title="Provided by" className="about-provided-by">
+        <AboutSection
+          title={t('about.providedBy')}
+          className="about-provided-by"
+        >
           <AboutProvidedBy people={about.people} providers={about.providedBy} />
         </AboutSection>
       )}
 
-      <AboutSection title="What you can do here" className="about-can">
+      <AboutSection title={t('about.whatYouCanDo')} className="about-can">
         <ul style={CAN_LIST_STYLE}>
           {about.can.map((line) => (
             <li key={line}>{line}</li>
@@ -115,12 +122,12 @@ export function AboutPage(props: AboutPageProps): ReactElement {
 
       {children}
 
-      <AboutSection title="Built on" className="about-credits">
+      <AboutSection title={t('about.builtOn')} className="about-credits">
         <CreditsList entries={about.credits} />
       </AboutSection>
 
       {about.cite.length === 0 ? null : (
-        <AboutSection title="How to cite" className="about-cite">
+        <AboutSection title={t('about.howToCite')} className="about-cite">
           <AboutCitations works={about.cite} />
         </AboutSection>
       )}
@@ -131,11 +138,16 @@ export function AboutPage(props: AboutPageProps): ReactElement {
         The version stays in the hero, unlinked, so a report still names a build.
       */}
       {!about.publicRepository ? null : (
-        <AboutSection title="Licence and source" className="about-licence">
+        <AboutSection
+          title={t('about.licenceAndSource')}
+          className="about-licence"
+        >
           <p style={FIRST_PARAGRAPH_STYLE}>
-            {about.license}, © cheminfo. Use it in a course, fork it, or lift a
-            piece of it into something else. The sources are at{' '}
-            <ExternalLink href={about.repository} />.
+            {around(
+              t('about.licence', { license: about.license }),
+              'sources',
+              <ExternalLink key="sources" href={about.repository} />,
+            )}
           </p>
           {about.build === undefined ? null : (
             <AboutBuild build={about.build} repository={about.repository} />
@@ -148,15 +160,29 @@ export function AboutPage(props: AboutPageProps): ReactElement {
         the tracker of a private repository answers 404 to every visitor.
       */}
       {about.issues === undefined ? null : (
-        <AboutSection title="Found a problem?" className="about-issues">
+        <AboutSection title={t('about.foundAProblem')} className="about-issues">
           <p style={FIRST_PARAGRAPH_STYLE}>
-            Tell us: a report naming what you typed and what came back is the
-            fastest fix there is. <ExternalLink href={about.issues} />.
+            {around(
+              t('about.reportIt'),
+              'tracker',
+              <ExternalLink key="tracker" href={about.issues} />,
+            )}
           </p>
         </AboutSection>
       )}
     </div>
   );
+}
+
+// A link sits inside a sentence whose word order is the translator's, so the
+// message names where it goes with a placeholder and is split there.
+function around(
+  message: string,
+  placeholder: string,
+  link: ReactNode,
+): ReactNode[] {
+  const [before = '', after = ''] = message.split(`{${placeholder}}`);
+  return [before, link, after];
 }
 
 function ExternalLink(props: { href: string }): ReactElement {

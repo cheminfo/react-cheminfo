@@ -9,6 +9,7 @@ import type { CSSProperties, ReactElement } from 'react';
 
 import type { HelpContent } from '../../help/ui/HelpBody.tsx';
 import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 /** Props of {@link AtomicOrbitalControls}. */
 interface AtomicOrbitalControlsProps {
@@ -29,47 +30,41 @@ export function AtomicOrbitalControls(
   props: AtomicOrbitalControlsProps,
 ): ReactElement {
   const { axes, onToggleAxes, onResetView } = props;
+  const t = useChromeT();
+  const axesHelp: HelpContent = {
+    title: t('orbital.axesTitle'),
+    body: t('orbital.axesBody'),
+    example: { code: '3d_yz', note: t('orbital.axesExample') },
+  };
+  const resetHelp: HelpContent = {
+    title: t('orbital.resetTitle'),
+    body: t('orbital.resetBody'),
+  };
   return (
     <div style={CONTROLS_STYLE}>
-      <HelpTooltip content={AXES_HELP} placement="bottom">
+      <HelpTooltip content={axesHelp} placement="bottom">
         <Button
           variant="minimal"
           size="small"
           icon="grid"
           active={axes}
-          aria-label="Show the x, y, z axes"
+          aria-label={t('orbital.showAxes')}
           aria-pressed={axes}
           onClick={onToggleAxes}
         />
       </HelpTooltip>
-      <HelpTooltip content={RESET_HELP} placement="bottom">
+      <HelpTooltip content={resetHelp} placement="bottom">
         <Button
           variant="minimal"
           size="small"
           icon="zoom-to-fit"
-          aria-label="Reset the view"
+          aria-label={t('orbital.resetTitle')}
           onClick={onResetView}
         />
       </HelpTooltip>
     </div>
   );
 }
-
-/** What the frame button says it is for. */
-const AXES_HELP: HelpContent = {
-  title: 'Cartesian axes',
-  body: 'Draw x, y and z through the nucleus. The label names an orbital by where its lobes sit against them.',
-  example: {
-    code: '3d_yz',
-    note: 'four lobes between the y and z axes, none on either.',
-  },
-};
-
-/** What the reset button says it is for. */
-const RESET_HELP: HelpContent = {
-  title: 'Reset the view',
-  body: 'Back to the angle and zoom the orbital opened on. A change of orbital keeps whatever view you have turned it to.',
-};
 
 const CONTROLS_STYLE: CSSProperties = {
   position: 'absolute',

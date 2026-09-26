@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { HeaderButtonProps } from '../../shared/ui/MenuButton.tsx';
 import { MenuButton } from '../../shared/ui/MenuButton.tsx';
 
@@ -10,7 +11,7 @@ interface CiteButtonBaseProps extends HeaderButtonProps {
   /**
    * Text of the button. In a compact bar it is not written, but it stays what
    * the pointer and a screen reader are told.
-   * @default 'Cite'
+   * @default the chrome's own word for it, in the language of the page
    */
   label?: string;
 }
@@ -33,7 +34,8 @@ export type CiteButtonProps = CiteOneWorkProps | CiteWorksProps;
  * @returns The button and its menu.
  */
 export function CiteButton(props: CiteButtonProps): ReactElement {
-  const label = props.label ?? 'Cite';
+  const t = useChromeT();
+  const label = props.label ?? t('cite.button');
 
   return (
     <MenuButton

@@ -4,6 +4,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import {
   CATEGORY_LABELS,
@@ -39,12 +40,16 @@ export interface CategoryLegendProps {
  */
 export function CategoryLegend(props: CategoryLegendProps): ReactElement {
   const { className, onSelect, selected } = props;
+  const t = useChromeT();
 
   return (
     <div className={className} style={legendStyle}>
       {CATEGORY_ORDER.map((category) => {
         const swatch = categorySwatch(category);
-        const label = CATEGORY_LABELS[category];
+        const label = t.or(
+          `periodic.category.${category}`,
+          CATEGORY_LABELS[category],
+        );
         const mark = (
           <span style={{ ...swatchStyle, background: swatch.background }} />
         );

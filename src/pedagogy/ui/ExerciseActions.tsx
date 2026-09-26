@@ -1,6 +1,8 @@
 import { Button } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 /** What {@link ExerciseActions} needs: its handlers, and the labels of its buttons. */
 export interface ExerciseActionsProps {
   /**
@@ -11,7 +13,7 @@ export interface ExerciseActionsProps {
   onCheck?: () => void;
   /**
    * Text of the Check button.
-   * @default 'Check'
+   * @default the chrome's own words for it, in the language of the page
    */
   checkLabel?: string;
   /**
@@ -77,7 +79,7 @@ export interface ExerciseActionsProps {
 export function ExerciseActions(props: ExerciseActionsProps): ReactElement {
   const {
     onCheck,
-    checkLabel = 'Check',
+    checkLabel,
     checkDisabled = false,
     onRevealHint,
     hintsRevealed = 0,
@@ -88,6 +90,7 @@ export function ExerciseActions(props: ExerciseActionsProps): ReactElement {
     children,
     className,
   } = props;
+  const t = useChromeT();
 
   return (
     <div className={className} style={ROW_STYLE}>
@@ -95,7 +98,7 @@ export function ExerciseActions(props: ExerciseActionsProps): ReactElement {
         <Button
           intent="primary"
           icon="tick"
-          text={checkLabel}
+          text={checkLabel ?? t('pedagogy.check')}
           disabled={checkDisabled}
           onClick={onCheck}
         />
@@ -103,7 +106,10 @@ export function ExerciseActions(props: ExerciseActionsProps): ReactElement {
       {onRevealHint !== undefined && (
         <Button
           icon="lightbulb"
-          text={`Reveal hint (${Math.min(hintsRevealed, hintCount)}/${hintCount})`}
+          text={t('pedagogy.revealHintCount', {
+            revealed: Math.min(hintsRevealed, hintCount),
+            total: hintCount,
+          })}
           disabled={hintsRevealed >= hintCount}
           onClick={onRevealHint}
         />
@@ -111,12 +117,16 @@ export function ExerciseActions(props: ExerciseActionsProps): ReactElement {
       {onToggleSolution !== undefined && (
         <Button
           icon={showSolution ? 'eye-off' : 'key'}
-          text={showSolution ? 'Hide solution' : 'Reveal solution'}
+          text={
+            showSolution
+              ? t('pedagogy.hideSolution')
+              : t('pedagogy.revealSolution')
+          }
           onClick={onToggleSolution}
         />
       )}
       {onReset !== undefined && (
-        <Button icon="reset" text="Reset" onClick={onReset} />
+        <Button icon="reset" text={t('pedagogy.reset')} onClick={onReset} />
       )}
       {children}
     </div>

@@ -3,6 +3,7 @@ import { PopoverNext } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 
 import { OverlayIconButton } from './OverlayIconButton.tsx';
@@ -18,7 +19,7 @@ export interface OverlayInfoProps {
   /**
    * What the glyph is called, for the pointer and for a screen reader. Phrase
    * it as the question the reader has, not as the name of a feature.
-   * @default 'What am I looking at?'
+   * @default the chrome's own line, in the language of the page
    */
   label?: string;
   /**
@@ -49,7 +50,9 @@ export interface OverlayInfoProps {
  * @returns The glyph and its explanation.
  */
 export function OverlayInfo(props: OverlayInfoProps): ReactElement {
-  const { children, label = 'What am I looking at?' } = props;
+  const { children, label } = props;
+  const t = useChromeT();
+  const name = label ?? t('overlay.whatAmILookingAt');
   const { placement = 'bottom-end', testId } = props;
   const { metrics } = useOverlaySurface();
   const [open, setOpen] = useState(false);
@@ -62,7 +65,7 @@ export function OverlayInfo(props: OverlayInfoProps): ReactElement {
     >
       <OverlayIconButton
         icon="help"
-        label={label}
+        label={name}
         active={open}
         testId={testId}
         opensMenu

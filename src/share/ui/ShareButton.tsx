@@ -1,7 +1,7 @@
 import { Button, Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
-const SHARE_TITLE = 'Share a link to this page, or embed it in your own site';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 /** How the button is dressed for the bar it sits in. */
 export type ShareButtonVariant = 'nav-link' | 'blueprint';
@@ -17,7 +17,7 @@ export interface ShareButtonProps {
   variant?: ShareButtonVariant;
   /**
    * Text of the button, and what a screen reader is told.
-   * @default 'Share'
+   * @default the chrome's own word for it, in the language of the page
    */
   label?: string;
   /**
@@ -28,7 +28,7 @@ export interface ShareButtonProps {
   compact?: boolean;
   /**
    * What the pointer is told.
-   * @default 'Share a link to this page, or embed it in your own site'
+   * @default the chrome's own line, in the language of the page
    */
   title?: string;
   /**
@@ -48,11 +48,14 @@ export function ShareButton(props: ShareButtonProps): ReactElement {
   const {
     onClick,
     variant = 'nav-link',
-    label = 'Share',
+    label: given,
     compact = false,
-    title = SHARE_TITLE,
+    title: givenTitle,
     className,
   } = props;
+  const t = useChromeT();
+  const label = given ?? t('share.button');
+  const title = givenTitle ?? t('share.buttonTitle');
   const text = compact ? undefined : label;
 
   if (variant === 'blueprint') {

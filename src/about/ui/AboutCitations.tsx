@@ -2,6 +2,7 @@ import type { CSSProperties, ReactElement } from 'react';
 
 import type { CitedWork } from '../../citation/core/works.ts';
 import { CiteButton } from '../../citation/ui/CiteButton.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 export interface AboutCitationsProps {
   /** The works the site asks for, in the order it names them. */
@@ -18,6 +19,7 @@ export interface AboutCitationsProps {
  */
 export function AboutCitations(props: AboutCitationsProps): ReactElement {
   const { works } = props;
+  const t = useChromeT();
 
   return (
     <div className="about-citations" style={LIST_STYLE}>
@@ -29,7 +31,7 @@ export function AboutCitations(props: AboutCitationsProps): ReactElement {
           )}
           <CiteButton
             reference={work.reference}
-            label={`Cite ${work.what}`}
+            label={t('about.citeWork', { what: work.what })}
             placement="bottom-start"
           />
         </div>

@@ -1,6 +1,7 @@
 import type { ComponentType, ReactElement } from 'react';
 import { Fragment } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type {
   Slide as SlideData,
   TalkMeta,
@@ -81,6 +82,7 @@ const GENERIC_LAYOUTS = new Set(['content', 'title', 'quote', 'thanks']);
 function GenericSlide(props: SlideLayoutProps): ReactElement {
   const { slide, talkId, slideIndex, meta, renderLink, site, talkOrigin } =
     props;
+  const t = useChromeT();
   const layout = GENERIC_LAYOUTS.has(slide.layout) ? slide.layout : 'content';
   const { body, demos } = splitDemoLinks(slide.body);
   const origin: TalkOrigin =
@@ -102,7 +104,7 @@ function GenericSlide(props: SlideLayoutProps): ReactElement {
         )}
         {demos.length === 0 ? null : (
           <div className="slide-demos">
-            <span className="slide-demos-label">Live demos:</span>
+            <span className="slide-demos-label">{t('slides.liveDemos')}</span>
             {demos.map((demo, index) => (
               <Fragment key={demo.href}>
                 {index === 0 ? null : (

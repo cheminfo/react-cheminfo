@@ -2,6 +2,7 @@ import { Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { SvgLogoDoi } from 'cheminfo-font';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { CITATION_DOWNLOADS } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
 import { doiUrl } from '../core/reference.ts';
@@ -31,7 +32,7 @@ export interface CitedWorksProps {
   /**
    * The line heading the menu, saying which of the works a reader is expected
    * to cite.
-   * @default 'Please cite both works', or 'Please cite every work' past two
+   * @default the chrome's own line, in the language of the page
    */
   guidance?: string;
 }
@@ -69,6 +70,7 @@ export function CitationMenu(props: CitationMenuProps): ReactElement {
  */
 function OneWorkMenu(props: CitedReferenceProps): ReactElement {
   const { reference } = props;
+  const t = useChromeT();
   const feedback = useCopyFeedback();
   const references = [reference];
 
@@ -82,7 +84,7 @@ function OneWorkMenu(props: CitedReferenceProps): ReactElement {
         target="_blank"
         rel="noreferrer"
       />
-      <MenuDivider title="Copy the reference as" />
+      <MenuDivider title={t('cite.copyReferenceAs')} />
       <CopyFormatEntries references={references} feedback={feedback} />
       <ImportSection references={references} />
     </Menu>
@@ -97,6 +99,7 @@ function OneWorkMenu(props: CitedReferenceProps): ReactElement {
  */
 function WorkSetMenu(props: CitedWorksProps): ReactElement {
   const { works, guidance } = props;
+  const t = useChromeT();
   const feedback = useCopyFeedback();
   const references = citedReferences(works);
   const both = works.length === 2;
@@ -106,14 +109,14 @@ function WorkSetMenu(props: CitedWorksProps): ReactElement {
       <MenuDivider
         title={
           guidance ??
-          (both ? 'Please cite both works' : 'Please cite every work')
+          (both ? t('cite.pleaseCiteBoth') : t('cite.pleaseCiteEvery'))
         }
       />
       {works.map((work) => (
         <WorkEntry key={work.reference.doi} work={work} feedback={feedback} />
       ))}
       <MenuDivider
-        title={both ? 'Copy both references as' : 'Copy every reference as'}
+        title={both ? t('cite.copyBothAs') : t('cite.copyEveryAs')}
       />
       <CopyFormatEntries references={references} feedback={feedback} />
       <ImportSection references={references} />
@@ -132,9 +135,10 @@ function ImportSection(props: {
   references: readonly Reference[];
 }): ReactElement {
   const { references } = props;
+  const t = useChromeT();
   return (
     <>
-      <MenuDivider title="Import into a reference manager" />
+      <MenuDivider title={t('cite.importIntoManager')} />
       {CITATION_DOWNLOADS.map((download) => (
         <DownloadEntry
           key={download.format}

@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { HeaderButtonProps } from '../../shared/ui/MenuButton.tsx';
 import { MenuButton } from '../../shared/ui/MenuButton.tsx';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
@@ -17,7 +18,7 @@ export interface EcosystemButtonProps extends HeaderButtonProps {
   /**
    * Text of the button. In a compact bar it is not written, but it stays what
    * the pointer and a screen reader are told.
-   * @default 'Tools'
+   * @default the chrome's own word for it, in the language of the page
    */
   label?: string;
   /**
@@ -34,14 +35,15 @@ export interface EcosystemButtonProps extends HeaderButtonProps {
  * @returns The button and its menu.
  */
 export function EcosystemButton(props: EcosystemButtonProps): ReactElement {
-  const { currentSiteId, label = 'Tools', className, ...rest } = props;
+  const { currentSiteId, label, className, ...rest } = props;
+  const t = useChromeT();
 
   return (
     <MenuButton
       {...rest}
       className={joinClassNames('ecosystem-button', className)}
       icon="grid-view"
-      label={label}
+      label={label ?? t('ecosystem.tools')}
       menu={<EcosystemMenu currentSiteId={currentSiteId} />}
     />
   );

@@ -3,6 +3,8 @@ import { Alert, Button } from '@blueprintjs/core';
 import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 /** Props of {@link ConfirmButton}: a Blueprint button, and what it asks. */
 export interface ConfirmButtonProps extends Omit<ButtonProps, 'onClick'> {
   /**
@@ -14,12 +16,12 @@ export interface ConfirmButtonProps extends Omit<ButtonProps, 'onClick'> {
   onConfirm: () => void;
   /**
    * Text of the button that goes ahead: the verb of what happens, never `OK`.
-   * @default 'Delete'
+   * @default the chrome's own word for it, in the language of the page
    */
   confirmLabel?: string;
   /**
    * Text of the button that backs out.
-   * @default 'Cancel'
+   * @default the chrome's own word for it, in the language of the page
    */
   cancelLabel?: string;
 }
@@ -35,13 +37,9 @@ export interface ConfirmButtonProps extends Omit<ButtonProps, 'onClick'> {
  * @returns The button, and the alert it opens.
  */
 export function ConfirmButton(props: ConfirmButtonProps): ReactElement {
-  const {
-    question,
-    onConfirm,
-    confirmLabel = 'Delete',
-    cancelLabel = 'Cancel',
-    ...buttonProps
-  } = props;
+  const { question, onConfirm, confirmLabel, cancelLabel, ...buttonProps } =
+    props;
+  const t = useChromeT();
   const [asking, setAsking] = useState(false);
 
   return (
@@ -58,8 +56,8 @@ export function ConfirmButton(props: ConfirmButtonProps): ReactElement {
         icon={alertIcon(buttonProps.icon)}
         canEscapeKeyCancel
         canOutsideClickCancel
-        cancelButtonText={cancelLabel}
-        confirmButtonText={confirmLabel}
+        cancelButtonText={cancelLabel ?? t('confirm.cancel')}
+        confirmButtonText={confirmLabel ?? t('confirm.delete')}
         onCancel={() => {
           setAsking(false);
         }}

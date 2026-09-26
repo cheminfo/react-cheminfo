@@ -2,6 +2,7 @@ import { MenuDivider, MenuItem } from '@blueprintjs/core';
 import { SvgLogoDoi } from 'cheminfo-font';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { CITATION_DOWNLOADS } from '../core/formats.ts';
 import { doiUrl } from '../core/reference.ts';
 import type { CitedWork } from '../core/works.ts';
@@ -38,6 +39,7 @@ export interface WorkEntryProps {
  */
 export function WorkEntry(props: WorkEntryProps): ReactElement {
   const { work, feedback } = props;
+  const t = useChromeT();
   const { reference, what, note } = work;
   const references = [reference];
 
@@ -54,20 +56,20 @@ export function WorkEntry(props: WorkEntryProps): ReactElement {
     >
       <MenuItem
         icon={<SvgLogoDoi style={DOI_ICON_STYLE} />}
-        text="Open the article"
+        text={t('cite.openArticle')}
         label={reference.doi}
         href={doiUrl(reference)}
         target="_blank"
         rel="noreferrer"
       />
-      <MenuDivider title="Copy this reference as" />
+      <MenuDivider title={t('cite.copyThisAs')} />
       <CopyFormatEntries
         references={references}
         feedback={feedback}
         keyPrefix={`${reference.doi}:`}
         styled={false}
       />
-      <MenuDivider title="Import this reference" />
+      <MenuDivider title={t('cite.importThis')} />
       {CITATION_DOWNLOADS.map((download) => (
         <DownloadEntry
           key={download.format}

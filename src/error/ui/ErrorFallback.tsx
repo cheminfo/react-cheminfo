@@ -1,6 +1,8 @@
 import { Button, NonIdealState } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 /** What the page shows in place of the part that failed. */
 export interface ErrorFallbackProps {
   /** What was thrown, whose message is what the visitor is told. */
@@ -13,12 +15,12 @@ export interface ErrorFallbackProps {
   onRetry?: () => void;
   /**
    * First line, above the message.
-   * @default 'Something went wrong'
+   * @default the chrome's own line, in the language of the page
    */
   title?: string;
   /**
    * Text of the retry button.
-   * @default 'Try again'
+   * @default the chrome's own words for it, in the language of the page
    */
   retryLabel?: string;
   /**
@@ -38,27 +40,26 @@ export interface ErrorFallbackProps {
  * @returns The non-ideal state.
  */
 export function ErrorFallback(props: ErrorFallbackProps): ReactElement {
-  const {
-    error,
-    onRetry,
-    title = 'Something went wrong',
-    retryLabel = 'Try again',
-    className,
-  } = props;
+  const { error, onRetry, title, retryLabel, className } = props;
+  const t = useChromeT();
 
   return (
     <NonIdealState
       className={className}
       icon="error"
-      title={title}
+      title={title ?? t('error.title')}
       description={
         <span className="error-fallback__message">
-          {error.message === '' ? 'No message was given.' : error.message}
+          {error.message === '' ? t('error.noMessage') : error.message}
         </span>
       }
       action={
         onRetry === undefined ? undefined : (
-          <Button icon="refresh" text={retryLabel} onClick={onRetry} />
+          <Button
+            icon="refresh"
+            text={retryLabel ?? t('error.tryAgain')}
+            onClick={onRetry}
+          />
         )
       }
     />

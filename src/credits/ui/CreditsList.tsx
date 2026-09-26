@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { CreditEntry } from '../core/credits.ts';
@@ -32,6 +33,7 @@ export interface CreditsListProps {
  */
 export function CreditsList(props: CreditsListProps): ReactElement {
   const { entries, showLicense = true, className } = props;
+  const t = useChromeT();
 
   return (
     <ul
@@ -53,7 +55,9 @@ export function CreditsList(props: CreditsListProps): ReactElement {
           ) : (
             ' '
           )}
-          <span>{entry.description}</span>
+          <span>
+            {t.or(`credits.${entry.id}.description`, entry.description)}
+          </span>
         </li>
       ))}
     </ul>

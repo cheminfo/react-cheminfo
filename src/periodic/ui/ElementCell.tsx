@@ -9,6 +9,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 /** What {@link ElementCell} needs to draw one element. */
 export interface ElementCellProps {
@@ -74,6 +75,7 @@ export function ElementCell(props: ElementCellProps): ReactElement {
     isIncluded = true,
     onHover,
   } = props;
+  const t = useChromeT();
 
   return (
     <button
@@ -81,7 +83,11 @@ export function ElementCell(props: ElementCellProps): ReactElement {
       className={className}
       data-testid={`element-${symbol}`}
       data-symbol={symbol}
-      aria-label={`${name} (${symbol}, Z = ${String(atomicNumber)})`}
+      aria-label={t('periodic.cellLabel', {
+        name,
+        symbol,
+        atomicNumber,
+      })}
       aria-pressed={isSelected}
       onClick={() => {
         onSelect(symbol);

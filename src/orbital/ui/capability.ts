@@ -9,8 +9,14 @@
  * page can ask the question before paying for molstar.
  */
 
+/** Why the machine is in the state it is, as the catalog names it. */
+export type ViewerCapabilityReason =
+  'noWindow' | 'noContext' | 'noFloatTextures' | 'ready';
+
 /** What the machine can do, and what to tell the student. */
 export interface ViewerCapability {
+  /** Which of the four states this is, so the message can be translated. */
+  reason: ViewerCapabilityReason;
   /** A 3D scene can be rendered at all. Everything else is degradation. */
   supported: boolean;
   /**
@@ -29,6 +35,7 @@ export interface ViewerCapability {
 export function probeViewerCapability(): ViewerCapability {
   if (typeof document === 'undefined') {
     return {
+      reason: 'noWindow',
       supported: false,
       gpuOrbitals: false,
       message: 'The 3D viewer needs a browser window.',
@@ -38,6 +45,7 @@ export function probeViewerCapability(): ViewerCapability {
   const probe = getContext(canvas);
   if (probe === null) {
     return {
+      reason: 'noContext',
       supported: false,
       gpuOrbitals: false,
       message:
@@ -48,6 +56,7 @@ export function probeViewerCapability(): ViewerCapability {
   loseContext(probe.context);
   if (!gpuOrbitals) {
     return {
+      reason: 'noFloatTextures',
       supported: true,
       gpuOrbitals: false,
       message:
@@ -55,6 +64,7 @@ export function probeViewerCapability(): ViewerCapability {
     };
   }
   return {
+    reason: 'ready',
     supported: true,
     gpuOrbitals: true,
     message: 'This browser can render the 3D viewer and computed orbitals.',

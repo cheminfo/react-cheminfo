@@ -8,6 +8,7 @@ import {
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { formatColorScale, resolveColorScale } from '../core/scaleText.ts';
 import { COLOR_SCALES } from '../core/scales.ts';
@@ -68,6 +69,7 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
     allowCustom = true,
     testId,
   } = props;
+  const t = useChromeT();
   const [isOpen, setOpen] = useState(false);
   const [isEditing, setEditing] = useState(false);
   const resolved = resolveColorScale(value);
@@ -79,14 +81,14 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
           icon="chevron-left"
           variant="minimal"
           size="small"
-          text="Scales"
+          text={t('color.scales')}
           onClick={() => {
             setEditing(false);
           }}
         />
         <Button
           size="small"
-          text="Done"
+          text={t('color.done')}
           onClick={() => {
             setEditing(false);
             setOpen(false);
@@ -119,8 +121,8 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
           <MenuDivider />
           <MenuItem
             icon="edit"
-            text="Custom…"
-            label={resolved.id === null ? 'in use' : undefined}
+            text={t('color.customEllipsis')}
+            label={resolved.id === null ? t('color.inUse') : undefined}
             shouldDismissPopover={false}
             onClick={() => {
               setEditing(true);
@@ -150,13 +152,17 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
       >
         <Button
           alignText="start"
-          aria-label={label === '' ? 'Colour scale' : label}
+          aria-label={label === '' ? t('color.colourScale') : label}
           data-testid={testId}
           endIcon="caret-down"
           fill
           text={
             <span style={BUTTON_TEXT_STYLE}>
-              <span>{resolved.label}</span>
+              <span>
+                {resolved.id === null
+                  ? t('color.custom')
+                  : t.or(`color.scale.${resolved.id}.label`, resolved.label)}
+              </span>
               <ColorScaleBar
                 scale={resolved.scale}
                 style={{ width: BUTTON_BAR_WIDTH }}

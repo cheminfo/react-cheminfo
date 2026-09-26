@@ -16,7 +16,9 @@ export type EditorToolbarAvailability = 'always' | 'reaction' | 'never';
 
 /** One button of the toolbar. */
 export interface EditorToolbarButton {
-  /** What the button is called. */
+  /** How the toolbar's catalog names the button. */
+  id: string;
+  /** What the button is called, in English. */
   name: string;
   /** What it does, in a sentence or two. */
   description: string;
@@ -38,62 +40,76 @@ export interface EditorToolbarButton {
  * then down the second.
  */
 export const EDITOR_TOOLBAR_BUTTONS: readonly EditorToolbarButton[] = [
-  { name: 'Clear', description: 'Erase the whole drawing.' },
+  { id: 'clear', name: 'Clear', description: 'Erase the whole drawing.' },
   {
+    id: 'cleanUp',
     name: 'Clean up',
     description:
       'Redraw the structure with fresh 2D coordinates. With part of it selected, the rest keeps its layout.',
   },
   {
+    id: 'select',
     name: 'Select',
     description:
       'Drag around atoms to select them: hold Alt for a rectangle, Shift to add to the selection. Drag a selection to move it, Shift-drag to copy it.',
     keys: ['Space'],
   },
   {
+    id: 'unknownConfiguration',
     name: 'Unknown configuration',
     description:
       'Click a stereocentre to mark its configuration as unknown; click again to undo it.',
   },
   {
+    id: 'delete',
     name: 'Delete',
     description: 'Click an atom or a bond to delete it.',
     keys: ['0'],
   },
   {
+    id: 'singleBond',
     name: 'Single bond',
     description:
       'Click empty space for a new bond, or drag from an atom. Clicking a bond again makes it double, then triple.',
     keys: ['1'],
   },
   {
+    id: 'upBond',
     name: 'Up bond',
     description:
       'Wedged stereo bond, pointing toward the viewer. Its narrow end goes on the stereocentre.',
     keys: ['u'],
   },
-  ring('3-membered ring', '3'),
-  ring('5-membered ring', '5'),
-  ring('7-membered ring', '7'),
+  ring('ring3', '3-membered ring', '3'),
+  ring('ring5', '5-membered ring', '5'),
+  ring('ring7', '7-membered ring', '7'),
   {
+    id: 'positiveCharge',
     name: 'Positive charge',
     description: 'Click an atom to raise its charge by one.',
     keys: ['+'],
   },
-  atom('Carbon', 'C', 'c'),
-  atom('Nitrogen', 'N', 'n'),
-  atom('Oxygen', 'O', 'o'),
-  atom('Fluorine', 'F', 'f'),
-  atom('Bromine', 'Br', 'b'),
-  atom('Hydrogen', 'H'),
-  { name: 'Undo', description: 'Revert the last change.', keys: ['Mod', 'Z'] },
+  atom('carbon', 'Carbon', 'C', 'c'),
+  atom('nitrogen', 'Nitrogen', 'N', 'n'),
+  atom('oxygen', 'Oxygen', 'O', 'o'),
+  atom('fluorine', 'Fluorine', 'F', 'f'),
+  atom('bromine', 'Bromine', 'Br', 'b'),
+  atom('hydrogen', 'Hydrogen', 'H'),
   {
+    id: 'undo',
+    name: 'Undo',
+    description: 'Revert the last change.',
+    keys: ['Mod', 'Z'],
+  },
+  {
+    id: 'zoomAndRotate',
     name: 'Zoom and rotate',
     description:
       'Press where the centre should be, then drag up or down to zoom and sideways to rotate. With a selection, only that part moves.',
     keys: ['z'],
   },
   {
+    id: 'atomMapping',
     name: 'Atom mapping',
     description:
       'Drag from a reactant atom to the same atom in a product: both get the same number. Click a mapped atom to unmap it.',
@@ -101,41 +117,47 @@ export const EDITOR_TOOLBAR_BUTTONS: readonly EditorToolbarButton[] = [
     availability: 'reaction',
   },
   {
+    id: 'enhancedStereo',
     name: 'Enhanced stereo',
     description:
       'Click a stereo bond to say what its centre means: abs, this enantiomer; &, both (racemic); or, one of the two. Press the button again to switch between the three.',
   },
   {
+    id: 'text',
     name: 'Text',
     description: 'Place a text label in the drawing.',
     availability: 'never',
   },
   {
+    id: 'chain',
     name: 'Chain',
     description:
       'Drag from empty space or from an atom to draw a zigzag carbon chain.',
     keys: ['2'],
   },
   {
+    id: 'downBond',
     name: 'Down bond',
     description:
       'Hashed stereo bond, pointing away from the viewer. Its narrow end goes on the stereocentre.',
     keys: ['d'],
   },
-  ring('4-membered ring', '4'),
-  ring('6-membered ring', '6'),
-  ring('Benzene ring', 'a'),
+  ring('ring4', '4-membered ring', '4'),
+  ring('ring6', '6-membered ring', '6'),
+  ring('benzene', 'Benzene ring', 'a'),
   {
+    id: 'negativeCharge',
     name: 'Negative charge',
     description: 'Click an atom to lower its charge by one.',
     keys: ['-'],
   },
-  atom('Silicon', 'Si'),
-  atom('Phosphorus', 'P', 'p'),
-  atom('Sulfur', 'S', 's'),
-  atom('Chlorine', 'Cl', 'l'),
-  atom('Iodine', 'I', 'i'),
+  atom('silicon', 'Silicon', 'Si'),
+  atom('phosphorus', 'Phosphorus', 'P', 'p'),
+  atom('sulfur', 'Sulfur', 'S', 's'),
+  atom('chlorine', 'Chlorine', 'Cl', 'l'),
+  atom('iodine', 'Iodine', 'I', 'i'),
   {
+    id: 'anyAtom',
     name: 'Any atom',
     description:
       'Pick any element, isotope, valence or radical in a dialog, then click to place it or to change an atom. Alt-click an atom to edit its own properties.',
@@ -158,8 +180,9 @@ export function isEditorToolbarButtonAvailable(
   return availability === 'reaction' && mode === 'reaction';
 }
 
-function ring(name: string, key: string): EditorToolbarButton {
+function ring(id: string, name: string, key: string): EditorToolbarButton {
   return {
+    id,
     name,
     description:
       'Click empty space for a new ring, a bond to fuse one onto it, or an atom for a spiro ring.',
@@ -167,9 +190,14 @@ function ring(name: string, key: string): EditorToolbarButton {
   };
 }
 
-function atom(name: string, symbol: string, key?: string): EditorToolbarButton {
+function atom(
+  id: string,
+  name: string,
+  symbol: string,
+  key?: string,
+): EditorToolbarButton {
   const description = `Click empty space for a new ${symbol} atom, or an atom to turn it into ${symbol}.`;
   return key === undefined
-    ? { name, description }
-    : { name, description, keys: [key] };
+    ? { id, name, description }
+    : { id, name, description, keys: [key] };
 }

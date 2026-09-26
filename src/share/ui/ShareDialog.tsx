@@ -1,6 +1,7 @@
 import { Dialog } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type {
   ShareConfig,
   ShareParamCodecs,
@@ -112,13 +113,14 @@ export function ShareDialog<
   Codecs extends ShareParamCodecs = Record<string, never>,
 >(props: ShareDialogProps<Codecs>): ReactElement {
   const { isOpen, onClose, usePortal = true, ...rest } = props;
+  const t = useChromeT();
 
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
       usePortal={usePortal}
-      title="Share or embed"
+      title={t('share.dialogTitle')}
       icon="share"
       className="share-dialog"
       style={DIALOG_STYLE}

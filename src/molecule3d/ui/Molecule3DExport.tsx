@@ -13,6 +13,7 @@ import {
   FIGURE_SCALES,
 } from '../../download/core/figureScale.ts';
 import { FigureDownloadPanel } from '../../download/ui/FigureDownloadPanel.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 /** Props of {@link Molecule3DExport}. */
 export interface Molecule3DExportProps {
@@ -29,6 +30,7 @@ export interface Molecule3DExportProps {
  */
 export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   const { getSize, onExport } = props;
+  const t = useChromeT();
   const [size] = useState(getSize);
   const [format, setFormat] = useState<FigureFormat>('png');
   const [scale, setScale] = useState(DEFAULT_FIGURE_SCALE);
@@ -49,7 +51,7 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
 
   return (
     <FigureDownloadPanel
-      title="Export image"
+      title={t('molecule3d.exportImage')}
       format={format}
       scale={scale}
       scales={FIGURE_SCALES}

@@ -4,6 +4,7 @@ import { expect, test } from 'vitest';
 
 import type { CapsuleOption } from '../CapsuleFilter.tsx';
 import { CapsuleFilter } from '../CapsuleFilter.tsx';
+import { capsuleFilterCapsules } from '../capsuleFilterCapsules.tsx';
 
 const OPTIONS: readonly CapsuleOption[] = [
   { value: 'all', label: 'All', count: 1204 },
@@ -19,14 +20,12 @@ const TYPES: ReadonlyArray<CapsuleOption<EquationType>> = [
   { value: 'precipitation', label: 'precipitation', intent: 'warning' },
 ];
 
-// The row is a plain function of its props, so its capsules can be read and
-// clicked without mounting it.
-const renderRow = CapsuleFilter;
-
-function capsulesOf(row: ReactElement): Array<ReactElement<ClickableProps>> {
-  return (
-    row as ReactElement<{ children: Array<ReactElement<ClickableProps>> }>
-  ).props.children;
+// The capsules are a plain function of the row's props, so they can be read
+// and clicked without mounting anything.
+function capsulesOf<TValue extends string>(
+  props: Parameters<typeof capsuleFilterCapsules<TValue>>[0],
+): Array<ReactElement<ClickableProps>> {
+  return capsuleFilterCapsules(props) as Array<ReactElement<ClickableProps>>;
 }
 
 interface ClickableProps {
@@ -135,6 +134,38 @@ test('an empty row still renders the group it would fill', () => {
   );
 });
 
+test('a note rides at the end of the row, after the last capsule', () => {
+  const html = renderToStaticMarkup(
+    <CapsuleFilter
+      multiple
+      options={TYPES}
+      values={['acidoBasic']}
+      allOption={{ label: 'all types', count: 431 }}
+      note="C1 and C2 picked"
+      onChange={() => null}
+    />,
+  );
+
+  expect(html).toContain(
+    '<span class="capsule-filter__note" style="margin-left:2px;color:var(--text-muted, #5b6875);font-size:0.75rem">C1 and C2 picked</span></div>',
+  );
+  // The capsules still answer for themselves: the note is not one of them.
+  expect(pressedStates(html)).toStrictEqual([
+    'false',
+    'true',
+    'false',
+    'false',
+  ]);
+});
+
+test('a row given no note is its capsules alone', () => {
+  const html = renderToStaticMarkup(
+    <CapsuleFilter options={OPTIONS} value="all" onChange={() => null} />,
+  );
+
+  expect(html).not.toContain('capsule-filter__note');
+});
+
 test('the class a site gives reaches the row', () => {
   const html = renderToStaticMarkup(
     <CapsuleFilter
@@ -150,13 +181,11 @@ test('the class a site gives reaches the row', () => {
 
 test('picking a capsule of a single row reports its value', () => {
   const picked: string[] = [];
-  const capsules = capsulesOf(
-    renderRow({
-      options: OPTIONS,
-      value: 'all',
-      onChange: (value) => picked.push(value),
-    }),
-  );
+  const capsules = capsulesOf({
+    options: OPTIONS,
+    value: 'all',
+    onChange: (value) => picked.push(value),
+  });
 
   capsules[2]?.props.onClick();
 
@@ -193,6 +222,25 @@ test('a multiple row fills every selected capsule, and the reset only when none 
   ]);
 });
 
+test('a reset capsule saying it is not selected stays empty on an empty row', () => {
+  const html = renderToStaticMarkup(
+    <CapsuleFilter
+      multiple
+      options={TYPES}
+      values={[]}
+      allOption={{ label: 'all types', count: 431, selected: false }}
+      onChange={() => null}
+    />,
+  );
+
+  expect(pressedStates(html)).toStrictEqual([
+    'false',
+    'false',
+    'false',
+    'false',
+  ]);
+});
+
 test('a multiple row without a reset capsule draws only its options', () => {
   const html = renderToStaticMarkup(
     <CapsuleFilter
@@ -209,15 +257,13 @@ test('a multiple row without a reset capsule draws only its options', () => {
 
 test('a capsule toggles within the selection, kept in option order, and the reset clears it', () => {
   const picked: EquationType[][] = [];
-  const capsules = capsulesOf(
-    renderRow<EquationType>({
-      multiple: true,
-      options: TYPES,
-      values: ['precipitation'],
-      allOption: { label: 'all types' },
-      onChange: (values) => picked.push(values),
-    }),
-  );
+  const capsules = capsulesOf<EquationType>({
+    multiple: true,
+    options: TYPES,
+    values: ['precipitation'],
+    allOption: { label: 'all types' },
+    onChange: (values) => picked.push(values),
+  });
 
   capsules[1]?.props.onClick();
   capsules[3]?.props.onClick();

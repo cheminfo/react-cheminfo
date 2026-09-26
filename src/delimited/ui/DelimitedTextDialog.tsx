@@ -1,6 +1,8 @@
 import { Button, Dialog, DialogBody, DialogFooter } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 import type { DelimitedTextPanelProps } from './DelimitedTextPanel.tsx';
 import { DelimitedTextPanel } from './DelimitedTextPanel.tsx';
 
@@ -26,27 +28,25 @@ export interface DelimitedTextDialogProps extends DelimitedTextPanelProps {
 export function DelimitedTextDialog(
   props: DelimitedTextDialogProps,
 ): ReactElement {
-  const {
-    isOpen,
-    onClose,
-    title = 'Copy the table',
-    className,
-    ...panel
-  } = props;
+  const { isOpen, onClose, title, className, ...panel } = props;
+  const t = useChromeT();
+  const heading = title ?? t('delimited.copyTable');
 
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title={title}
+      title={heading}
       icon="th"
       className={className}
       style={DIALOG_STYLE}
     >
       <DialogBody>
-        <DelimitedTextPanel {...panel} label={panel.label ?? title} />
+        <DelimitedTextPanel {...panel} label={panel.label ?? heading} />
       </DialogBody>
-      <DialogFooter actions={<Button text="Close" onClick={onClose} />} />
+      <DialogFooter
+        actions={<Button text={t('delimited.close')} onClick={onClose} />}
+      />
     </Dialog>
   );
 }

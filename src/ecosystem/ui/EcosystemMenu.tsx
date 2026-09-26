@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { SiteId } from '../core/sites.ts';
 
@@ -44,13 +45,14 @@ export interface EcosystemMenuProps {
  */
 export function EcosystemMenu(props: EcosystemMenuProps): ReactElement {
   const { className, currentSiteId } = props;
+  const t = useChromeT();
 
   return (
     <div
       className={joinClassNames('ecosystem-menu', className)}
       style={PANEL_STYLE}
     >
-      <div style={ECOSYSTEM_HEADING_STYLE}>Our tools, all in the browser</div>
+      <div style={ECOSYSTEM_HEADING_STYLE}>{t('ecosystem.menuHeading')}</div>
       <SiteGroupGrid currentSiteId={currentSiteId} lit newTab />
     </div>
   );

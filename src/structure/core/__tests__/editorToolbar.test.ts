@@ -81,6 +81,7 @@ test('atom mapping works only in a reaction, text in no editor', () => {
 
 test('an atom button names its element and its key', () => {
   expect(EDITOR_TOOLBAR_BUTTONS[31]).toStrictEqual({
+    id: 'chlorine',
     name: 'Chlorine',
     description:
       'Click empty space for a new Cl atom, or an atom to turn it into Cl.',

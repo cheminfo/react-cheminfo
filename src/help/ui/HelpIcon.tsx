@@ -2,6 +2,7 @@ import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
 import type { HelpContent } from './HelpBody.tsx';
@@ -17,7 +18,8 @@ export interface HelpIconProps {
   content: HelpContent;
   /**
    * What a screen reader calls the glyph.
-   * @default the help's title, or `'Help'` when it has none
+   * @default the help's title, or the chrome's own word for help when it has
+   * none
    */
   label?: string;
   /**
@@ -54,12 +56,13 @@ export interface HelpIconProps {
 export function HelpIcon(props: HelpIconProps): ReactElement {
   const {
     content,
-    label = helpName(content),
+    label,
     icon = 'help',
     size = 13,
     placement = 'right',
     className,
   } = props;
+  const t = useChromeT();
 
   return (
     <HelpTooltip content={content} placement={placement}>
@@ -67,7 +70,7 @@ export function HelpIcon(props: HelpIconProps): ReactElement {
         icon={icon}
         size={size}
         tabIndex={0}
-        aria-label={label}
+        aria-label={label ?? helpName(content, t)}
         className={joinClassNames('help-icon', className)}
       />
     </HelpTooltip>

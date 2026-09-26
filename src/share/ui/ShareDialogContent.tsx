@@ -5,10 +5,11 @@ import {
   DialogFooter,
   H6,
 } from '@blueprintjs/core';
-import type { CSSProperties, ReactElement } from 'react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { CodeBlock, CopyButton } from '../../clipboard/ui/index.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type {
   ShareConfig,
   ShareParamCodecs,
@@ -77,6 +78,7 @@ export function ShareDialogContent<
     frameHeight,
     children,
   } = props;
+  const t = useChromeT();
 
   const address = globalThis.location;
   const base = baseUrl ?? address?.href ?? '';
@@ -141,9 +143,7 @@ export function ShareDialogContent<
   return (
     <>
       <div className={BODY_CLASS} style={BODY_STYLE}>
-        <p style={LEAD_STYLE}>
-          A link to <b>{title}</b> as you have it set up now.
-        </p>
+        <p style={LEAD_STYLE}>{lead(t('share.lead'), title)}</p>
 
         {presets.length === 0 ? (
           options
@@ -163,13 +163,13 @@ export function ShareDialogContent<
         )}
 
         <section className="share-section" style={SECTION_STYLE}>
-          <H6>Link</H6>
+          <H6>{t('share.link')}</H6>
           <CodeBlock code={url} tone="muted" />
           <div style={ACTIONS_STYLE}>
-            <CopyButton content={url} label="Copy the link" />
+            <CopyButton content={url} label={t('share.copyLink')} />
             <AnchorButton
               icon="share"
-              text="Open in a new tab"
+              text={t('share.openInNewTab')}
               href={url}
               target="_blank"
               rel="noopener noreferrer"
@@ -178,18 +178,28 @@ export function ShareDialogContent<
         </section>
 
         <section className="share-section" style={SECTION_STYLE}>
-          <H6>Iframe</H6>
+          <H6>{t('share.iframe')}</H6>
           <CodeBlock code={frame} tone="muted" />
           <div style={ACTIONS_STYLE}>
-            <CopyButton content={frame} label="Copy the iframe" />
+            <CopyButton content={frame} label={t('share.copyIframe')} />
           </div>
         </section>
       </div>
       <DialogFooter
-        actions={<Button intent="primary" text="Done" onClick={onClose} />}
+        actions={
+          <Button intent="primary" text={t('share.done')} onClick={onClose} />
+        }
       />
     </>
   );
+}
+
+// The name of the page is set in bold inside a sentence whose word order is
+// the translator's, so the message is split at its placeholder rather than
+// written as a prefix and a suffix.
+function lead(message: string, title: string): ReactNode[] {
+  const [before = '', after = ''] = message.split('{title}');
+  return [before, <b key="title">{title}</b>, after];
 }
 
 function initialDraft<Codecs extends ShareParamCodecs>(

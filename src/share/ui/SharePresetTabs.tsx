@@ -1,6 +1,7 @@
 import { Tab, Tabs } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { ShareParamCodecs, SharePreset } from '../core/index.ts';
 
 const SECTION_STYLE: CSSProperties = { marginBottom: 18 };
@@ -35,6 +36,7 @@ export function SharePresetTabs<
   Codecs extends ShareParamCodecs = Record<string, never>,
 >(props: SharePresetTabsProps<Codecs>): ReactElement {
   const { presets, selected, onSelect, custom } = props;
+  const t = useChromeT();
 
   return (
     <section className="share-section" style={SECTION_STYLE}>
@@ -63,7 +65,7 @@ export function SharePresetTabs<
             panel={<p style={DESCRIPTION_STYLE}>{preset.description}</p>}
           />
         ))}
-        <Tab id={CUSTOM_TAB} title="Custom" panel={<>{custom}</>} />
+        <Tab id={CUSTOM_TAB} title={t('share.custom')} panel={<>{custom}</>} />
       </Tabs>
     </section>
   );

@@ -1,6 +1,7 @@
 import { Classes, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, RefObject } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { EditorToolbarButton } from '../core/editorToolbar.ts';
 import {
   EDITOR_TOOLBAR_BUTTONS,
@@ -54,20 +55,23 @@ function ButtonTip(props: {
   mode: StructureEditorMode;
 }): ReactElement {
   const { button, mode } = props;
+  const t = useChromeT();
   const available = isEditorToolbarButtonAvailable(button, mode);
 
   return (
     <div style={TIP_STYLE} data-testid="structure-editor-tooltip">
       <div style={HEAD_STYLE}>
-        <strong>{button.name}</strong>
+        <strong>{t.or(`structure.tool.${button.id}.name`, button.name)}</strong>
         {button.keys === undefined ? null : <KeyCaps keys={button.keys} />}
       </div>
-      <div>{button.description}</div>
+      <div>
+        {t.or(`structure.tool.${button.id}.description`, button.description)}
+      </div>
       {available ? null : (
         <div className={Classes.TEXT_MUTED}>
           {button.availability === 'reaction'
-            ? 'Only when drawing a reaction.'
-            : 'Not available in this editor.'}
+            ? t('structure.tool.reactionOnly')
+            : t('structure.tool.unavailable')}
         </div>
       )}
     </div>

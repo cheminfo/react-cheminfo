@@ -2,6 +2,7 @@ import { InputGroup } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { Glossary, GlossaryExample } from '../core/glossary.ts';
@@ -34,7 +35,7 @@ export interface GlossaryIndexProps<TExample = GlossaryExample> {
   searchable?: boolean;
   /**
    * Placeholder and accessible name of the filter box.
-   * @default 'Filter terms…'
+   * @default the chrome's own words for it, in the language of the page
    */
   searchLabel?: string;
   /**
@@ -74,11 +75,12 @@ export function GlossaryIndex<TExample = GlossaryExample>(
     renderExample,
     renderCode,
     searchable = true,
-    searchLabel = 'Filter terms…',
+    searchLabel,
     minColumnWidth = 280,
     idPrefix = 'glossary-',
     className,
   } = props;
+  const t = useChromeT();
   const context = useGlossary();
   const terms = (glossary ?? context.glossary) as Glossary<TExample>;
   const [query, setQuery] = useState('');
@@ -95,8 +97,8 @@ export function GlossaryIndex<TExample = GlossaryExample>(
             type="search"
             leftIcon="search"
             value={query}
-            placeholder={searchLabel}
-            aria-label={searchLabel}
+            placeholder={searchLabel ?? t('pedagogy.filterTerms')}
+            aria-label={searchLabel ?? t('pedagogy.filterTerms')}
             autoComplete="off"
             spellCheck={false}
             onValueChange={setQuery}
@@ -104,7 +106,11 @@ export function GlossaryIndex<TExample = GlossaryExample>(
         </div>
       )}
       {listings.length === 0 ? (
-        <p style={EMPTY_STYLE}>{emptyMessage(query)}</p>
+        <p style={EMPTY_STYLE}>
+          {query.trim() === ''
+            ? t('pedagogy.noTermDefined')
+            : t('pedagogy.noTermMatches', { query: query.trim() })}
+        </p>
       ) : (
         <div style={gridStyle(minColumnWidth)}>
           {listings.map(({ key, entry }) => (
@@ -126,13 +132,6 @@ export function GlossaryIndex<TExample = GlossaryExample>(
       )}
     </div>
   );
-}
-
-function emptyMessage(query: string): string {
-  const trimmed = query.trim();
-  return trimmed === ''
-    ? 'No term is defined yet.'
-    : `No term matches “${trimmed}”.`;
 }
 
 function anchorOf(key: string): string {

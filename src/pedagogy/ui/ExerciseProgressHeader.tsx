@@ -2,6 +2,7 @@ import { Alert, Button, ProgressBar } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ProgressSummary } from '../core/progress.ts';
 
@@ -17,7 +18,7 @@ export interface ExerciseProgressHeaderProps {
   onClearAll?: () => void;
   /**
    * Text of the button that wipes the work.
-   * @default 'Clear all answers'
+   * @default the chrome's own words for it, in the language of the page
    */
   clearLabel?: string;
   /**
@@ -52,11 +53,12 @@ export function ExerciseProgressHeader(
   const {
     summary,
     onClearAll,
-    clearLabel = 'Clear all answers',
-    clearWarning = DEFAULT_WARNING,
+    clearLabel,
+    clearWarning,
     clearDisabled = false,
     className,
   } = props;
+  const t = useChromeT();
   const [confirming, setConfirming] = useState(false);
   const complete = summary.total > 0 && summary.solved === summary.total;
 
@@ -64,7 +66,10 @@ export function ExerciseProgressHeader(
     <div className={className} style={ROOT_STYLE}>
       <div style={ROW_STYLE}>
         <span style={COUNT_STYLE}>
-          {`${summary.solved} / ${summary.total} solved`}
+          {t('pedagogy.solvedCount', {
+            solved: summary.solved,
+            total: summary.total,
+          })}
         </span>
         <span
           style={PERCENT_STYLE}
@@ -75,7 +80,7 @@ export function ExerciseProgressHeader(
             variant="minimal"
             intent="danger"
             icon="trash"
-            text={clearLabel}
+            text={clearLabel ?? t('pedagogy.clearAll')}
             disabled={clearDisabled}
             onClick={() => {
               setConfirming(true);
@@ -96,8 +101,8 @@ export function ExerciseProgressHeader(
           isOpen={confirming}
           intent="danger"
           icon="trash"
-          cancelButtonText="Keep my answers"
-          confirmButtonText="Clear everything"
+          cancelButtonText={t('pedagogy.keepAnswers')}
+          confirmButtonText={t('pedagogy.clearEverything')}
           onCancel={() => {
             setConfirming(false);
           }}
@@ -106,15 +111,12 @@ export function ExerciseProgressHeader(
             setConfirming(false);
           }}
         >
-          {clearWarning}
+          {clearWarning ?? t('pedagogy.clearWarning')}
         </Alert>
       )}
     </div>
   );
 }
-
-const DEFAULT_WARNING =
-  'This forgets every answer, every revealed hint and every solved exercise, on this browser. There is no undo.';
 
 const ROOT_STYLE: CSSProperties = {
   display: 'flex',

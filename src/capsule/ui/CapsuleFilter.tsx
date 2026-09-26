@@ -1,9 +1,11 @@
 import type { Intent } from '@blueprintjs/core';
-import { Tag } from '@blueprintjs/core';
-import type { CSSProperties, ReactElement } from 'react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
-import { formatInteger } from '../../format/core/numbers.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+
+import { capsuleFilterCapsules } from './capsuleFilterCapsules.tsx';
 
 /** One capsule of a {@link CapsuleFilter} row. */
 export interface CapsuleOption<TValue extends string = string> {
@@ -43,6 +45,13 @@ export interface CapsuleAllOption {
    * @default undefined
    */
   title?: string;
+  /**
+   * Whether the capsule is filled, for a row that reads its selection back
+   * from a richer state: a pick no capsule can spell leaves `values` empty
+   * without meaning every row is kept.
+   * @default undefined — filled while no capsule is selected
+   */
+  selected?: boolean;
 }
 
 /** What every row of filter capsules needs, whatever it selects. */
@@ -51,7 +60,7 @@ export interface CapsuleFilterBaseProps<TValue extends string = string> {
   options: ReadonlyArray<CapsuleOption<TValue>>;
   /**
    * What the group is called, for a screen reader reaching the row.
-   * @default 'Filter'
+   * @default the chrome's own word for it, in the language of the page
    */
   label?: string;
   /**
@@ -64,6 +73,14 @@ export interface CapsuleFilterBaseProps<TValue extends string = string> {
    * @default undefined
    */
   className?: string;
+  /**
+   * What the row reads back, drawn muted after the last capsule: the selection
+   * the capsules cannot spell on their own, or how else it is made. It wraps
+   * with them rather than sitting on a line of its own, so the one place a
+   * selection is made is the one place it is read.
+   * @default undefined — the row is capsules alone
+   */
+  note?: ReactNode;
 }
 
 /** A row where exactly one capsule is selected. */
@@ -109,131 +126,32 @@ export type CapsuleFilterProps<TValue extends string = string> =
  * Every capsule keeps its semantic colour whether or not it is selected, so
  * what a status means stays learnable — the filled shape is what encodes the
  * selection. Each is a real interactive tag, so the row is reachable by tab and
- * a capsule answers to Enter and Space.
+ * a capsule answers to Enter and Space. A `note` rides at the end of the row,
+ * which is where a selection finer than the capsules can spell is read back.
  * @param props - See {@link CapsuleFilterProps}.
  * @returns The capsule row.
  */
 export function CapsuleFilter<TValue extends string = string>(
   props: CapsuleFilterProps<TValue>,
 ): ReactElement {
-  const capsules =
-    props.multiple === true ? multipleCapsules(props) : singleCapsules(props);
-  const { label = 'Filter', className } = props;
+  const { label, className, note } = props;
+  const t = useChromeT();
 
   return (
     <div
       role="group"
-      aria-label={label}
+      aria-label={label ?? t('capsule.filter')}
       className={joinClassNames('capsule-filter', className)}
       style={ROW_STYLE}
     >
-      {capsules}
+      {capsuleFilterCapsules(props)}
+      {note === undefined ? null : (
+        <span className="capsule-filter__note" style={NOTE_STYLE}>
+          {note}
+        </span>
+      )}
     </div>
   );
-}
-
-function singleCapsules<TValue extends string>(
-  props: SingleCapsuleFilterProps<TValue>,
-): ReactElement[] {
-  const { options, value, onChange, formatCount = formatInteger } = props;
-  const capsules: ReactElement[] = [];
-  for (const option of options) {
-    capsules.push(
-      <Capsule
-        key={`option:${option.value}`}
-        text={capsuleText(option, formatCount)}
-        selected={option.value === value}
-        intent={option.intent}
-        title={option.title}
-        onClick={() => onChange(option.value)}
-      />,
-    );
-  }
-  return capsules;
-}
-
-function multipleCapsules<TValue extends string>(
-  props: MultipleCapsuleFilterProps<TValue>,
-): ReactElement[] {
-  const {
-    options,
-    values,
-    onChange,
-    allOption,
-    formatCount = formatInteger,
-  } = props;
-  const capsules: ReactElement[] = [];
-  if (allOption !== undefined) {
-    capsules.push(
-      <Capsule
-        key="all"
-        text={capsuleText(allOption, formatCount)}
-        selected={values.length === 0}
-        title={allOption.title}
-        onClick={() => onChange([])}
-      />,
-    );
-  }
-  for (const option of options) {
-    capsules.push(
-      <Capsule
-        key={`option:${option.value}`}
-        text={capsuleText(option, formatCount)}
-        selected={values.includes(option.value)}
-        intent={option.intent}
-        title={option.title}
-        onClick={() => onChange(toggled(options, values, option.value))}
-      />,
-    );
-  }
-  return capsules;
-}
-
-interface CapsuleProps {
-  text: string;
-  selected: boolean;
-  intent?: Intent;
-  title: string | undefined;
-  onClick: () => void;
-}
-
-function Capsule(props: CapsuleProps): ReactElement {
-  const { text, selected, intent, title, onClick } = props;
-  return (
-    <Tag
-      interactive
-      round
-      minimal={!selected}
-      intent={intent}
-      aria-pressed={selected}
-      htmlTitle={title}
-      onClick={onClick}
-    >
-      {text}
-    </Tag>
-  );
-}
-
-function capsuleText(
-  capsule: { label: string; count?: number },
-  formatCount: (count: number) => string,
-): string {
-  return capsule.count === undefined
-    ? capsule.label
-    : `${capsule.label} (${formatCount(capsule.count)})`;
-}
-
-function toggled<TValue extends string>(
-  options: ReadonlyArray<CapsuleOption<TValue>>,
-  values: readonly TValue[],
-  flipped: TValue,
-): TValue[] {
-  const next: TValue[] = [];
-  for (const option of options) {
-    const kept = values.includes(option.value);
-    if (option.value === flipped ? !kept : kept) next.push(option.value);
-  }
-  return next;
 }
 
 const ROW_STYLE = {
@@ -241,4 +159,10 @@ const ROW_STYLE = {
   flexWrap: 'wrap',
   alignItems: 'center',
   gap: 6,
+} as const satisfies CSSProperties;
+
+const NOTE_STYLE = {
+  marginLeft: 2,
+  color: TOKEN.textMuted,
+  fontSize: '0.75rem',
 } as const satisfies CSSProperties;

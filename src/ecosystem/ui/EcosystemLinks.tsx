@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { useSiteLanguage } from '../../language/ui/siteLanguageContext.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
@@ -60,7 +61,7 @@ export interface EcosystemLinksProps {
   currentSiteId?: SiteId;
   /**
    * What introduces the section.
-   * @default 'Our other tools'
+   * @default the chrome's own line, in the language of the page
    */
   heading?: string;
   /**
@@ -89,27 +90,26 @@ export interface EcosystemLinksProps {
  */
 export function EcosystemLinks(props: EcosystemLinksProps): ReactElement {
   const language = useSiteLanguage();
-  const {
-    className,
-    currentSiteId,
-    heading = 'Our other tools',
-    layout = 'grid',
-  } = props;
+  const { className, currentSiteId, heading, layout = 'grid' } = props;
+  const t = useChromeT();
+  const title = heading ?? t('ecosystem.otherTools');
 
   return (
     <nav
       className={joinClassNames('ecosystem-links', className)}
       style={SECTION_STYLE}
-      aria-label={heading}
+      aria-label={title}
     >
-      <h2 style={ECOSYSTEM_HEADING_STYLE}>{heading}</h2>
+      <h2 style={ECOSYSTEM_HEADING_STYLE}>{title}</h2>
       {layout === 'grid' ? (
         <SiteGroupGrid currentSiteId={currentSiteId} />
       ) : (
         <div style={ROWS_STYLE}>
           {groupedSites().map(({ group, sites }) => (
             <div key={group.id} style={ROW_STYLE}>
-              <span style={ROW_LABEL_STYLE}>{group.label}</span>
+              <span style={ROW_LABEL_STYLE}>
+                {t.or(`ecosystem.group.${group.id}.label`, group.label)}
+              </span>
               {sites.map((site) =>
                 site.id === currentSiteId ? (
                   <span key={site.id} style={CURRENT_STYLE}>

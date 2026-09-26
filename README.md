@@ -78,6 +78,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Site identity**          | `siteById`, `findSiteByHost`, `siteTokensCss`                                                                                                                                                                                                                              | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                    |
 | **Chrome**                 | —                                                                                                                                                                                                                                                                          | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                                                                |
+| **Languages**              | `LANGUAGES`, `DEFAULT_LANGUAGE`, `LANGUAGE_LABELS`, `isLanguage`, `MessageCatalog`, `CHROME_CATALOG`, `setMessageSession`, `loadCatalogs`, `LANGUAGE_PARAM`, `withLanguageParam`                                                                                           | `useT`, `useChromeT`, `useLanguage`, `LanguageSelect`, `SiteLanguage`                                                                                                                   |
 | **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                                                                   | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                         |
 | **Share & embed**          | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, `visibleShareParts`, `applySharePreset`, `findSharePreset`, the param codecs, `syncPreferencesWithUrl`, `applyPreferencesFromSearch`, `writePreferencesToSearch`                    | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                                                          |
 | **Routing & head**         | `createTabRouter`, `readRoute`, `writeRoute`, `subscribeToRoute`, `adoptLegacyHashAddress`, `writeDocumentMeta`                                                                                                                                                            | `useTabRoute`                                                                                                                                                                           |
@@ -93,7 +94,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                                            | `AboutPage`                                                                                                                                                                             |
 | **Which build is running** | `formatBuiltAt`, `shortCommit`, `BuildInfo`                                                                                                                                                                                                                                | `AboutBuild`, `cheminfoBuildInfo` (`/vite`)                                                                                                                                             |
 | **Slideshows**             | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                                                                 | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                                                         |
-| **Token guard**            | `findTokenViolations`                                                                                                                                                                                                                                                      | `cheminfo-check-tokens` (the bin)                                                                                                                                                       |
+| **Token guard**            | `findTokenViolations`                                                                                                                                                                                                                                                      | `cheminfo-check-tokens`, `cheminfo-check-messages`, `cheminfo-check-deploy` (the bins)                                                                                                  |
 | **Figures**                | `chartScale`, `chartAxisScale`, `chartAxisTitle`, `chartShare`, `chartColumnExtent`, `chartBinCounts`, `chartSeriesColor`, `rowMatrix`, `stackedMatrix`, `emptiestCorner`, `placeOverlayCard`, `overlayMetrics`                                                            | `ChartFrame`, `ChartAxis`, `TrackedLineChart`, `OverlayBar`, `OverlaySelect`, `OverlaySegmented`, `OverlayToggle`, `OverlayNumber`, `OverlayLegend`, `OverlayCaption`, `OverlayReadout` |
 | **Projections**            | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `resolveProjectionShapes`, `PROJECTION_COPY`                                                  | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                         |
 | **Parallel coordinates**   | `parallelAxisOf`, `parallelAxisLayouts`, `parallelIncludedMask`, `parallelKeptCount`, `parallelNearestRow`, `parallelSegmentAt`, `parallelBandAt`, `parallelRangeOf`, `parallelPalette`, `parallelColorSteps`, `paintParallelLines`                                        | `ParallelCoordinates`                                                                                                                                                                   |
@@ -621,6 +622,76 @@ const included = useMemo(
   subject — a formula through `react-mf`, a structure, a name — and a readout of
   strings cannot hold any of that.
 
+## Speaking four languages
+
+Every word this library puts on a page — the header, the Tools menu, the Cite
+menu, the share dialog, the About page, the structure editor's guide, the 3D
+toolbar — is in `src/locales`, one flat JSON file per language, `en.json` being
+the source of truth. English, French, German and Spanish are complete, and
+`npm run check-messages` fails on a key English does not declare, a placeholder
+a translation adds or drops, and an empty message.
+
+**A site gets a translated chrome by saying what language it is in, and nothing
+else.** `<SiteLanguage value>` already tells every link out of the page which
+language to carry; the chrome now reads the same declaration:
+
+```tsx
+<SiteLanguage value={language === 'en' ? undefined : language}>
+  <SiteHeader
+    siteId="surge"
+    nav={nav}
+    actions={<ShareButton onClick={open} />}
+  />
+</SiteLanguage>
+```
+
+English is part of the page, because it is what a missing message falls back to;
+the other three arrive as a chunk of their own, so a site nobody reads in German
+never downloads the German. A site with a language switch draws it with
+`<LanguageSelect value onChange>`, which names each language in its own words.
+
+A site's own text is a catalog of its own, read with the same runtime:
+
+```ts
+import { MessageCatalog } from 'react-cheminfo/core';
+import en from '../locales/en.json' with { type: 'json' };
+
+export const SITE_CATALOG = new MessageCatalog({
+  id: 'surge.cheminfo.org',
+  repository: 'cheminfo/surge.cheminfo.org',
+  directory: 'src/locales',
+  source: en,
+  translations: {
+    fr: () => import('../locales/fr.json', { with: { type: 'json' } }),
+  },
+});
+```
+
+`const t = useT(SITE_CATALOG)` then reads it in the language of the page, typed
+by the English keys; `t.or(key, fallback)` is for a key built from the data,
+which the catalog may not have caught up with. Only the plain `{name}` argument
+of ICU MessageFormat is filled — a plural or a select needs the formatter
+itself, which an ordinary visit must not pay for, so `check-messages` refuses
+one and the page is written with a key per branch instead.
+
+In translate mode the page hands both catalogs over at once, so a translator
+editing a site also edits the chrome:
+
+```ts
+const { catalogs, translations } = await loadCatalogs(
+  [CHROME_CATALOG, SITE_CATALOG],
+  locale,
+);
+setMessageSession(startTranslating({ locale, catalogs, translations }));
+```
+
+`setMessageSession` is what every `useT` listens to, so an edit typed in the
+overlay redraws the page without the site holding a version of its own.
+
+Still English, with the runtime in place and no catalog yet: the spectra
+settings editor and the projection panels (`react-cheminfo/spectra`, the
+projection viewers), which no site of the family reads in a second language yet.
+
 ## Carrying talks
 
 A deck is one Markdown file in the repository of the site whose subject it
@@ -906,7 +977,7 @@ Unit tests cover the framework-free half, which is where the citation formats
 and the site list live:
 
 ```console
-npm run test         # vitest + type-check + eslint + prettier
+npm run test         # vitest + type-check + tokens + messages + eslint + prettier
 ```
 
 The components themselves are almost entirely interaction — Blueprint popovers

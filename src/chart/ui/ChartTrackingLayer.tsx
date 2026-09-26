@@ -8,6 +8,7 @@
 import type { CSSProperties, MouseEvent, ReactElement } from 'react';
 import { useRef } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { ChartAxisScale } from '../core/chartAxisScale.ts';
 import type { ChartBand } from '../core/chartBand.ts';
 import { chartBandCenter, chartBandIndexAt } from '../core/chartBand.ts';
@@ -64,6 +65,7 @@ export function ChartTrackingLayer(
 ): ReactElement {
   const { plot, band, y, categories, series, index, onTrack, onSelect } = props;
   const { slotAxis, title } = props;
+  const t = useChromeT();
   const entered = useRef<number | null>(null);
   const slot = index ?? -1;
   const tracked = slot >= 0 && slot < band.count;
@@ -137,8 +139,8 @@ export function ChartTrackingLayer(
         role="button"
         aria-label={
           tracked
-            ? `Measurement ${categories[slot]}`
-            : (title ?? 'Measurements')
+            ? t('chart.measurement', { name: categories[slot] ?? '' })
+            : (title ?? t('chart.measurements'))
         }
         onPointerDown={move}
         onPointerMove={move}

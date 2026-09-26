@@ -1,6 +1,8 @@
 import type { ReactElement } from 'react';
 
-import type { HelpContent } from '../../help/ui/HelpBody.tsx';
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Translate } from '../../i18n/ui/useT.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
@@ -66,16 +68,17 @@ export function FigureDownloadPanel(
 ): ReactElement {
   const { title, format, scale, scales, size, failure, saving } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
+  const t = useChromeT();
 
   const vector = format === 'svg' && !rasterSvg;
 
   return (
     <OverlayPanel
       title={title}
-      hint={hintOf(format, size, scale, failure, rasterSvg)}
+      hint={hintOf(format, size, scale, failure, rasterSvg, t)}
       actions={
         <OverlayAction
-          text="Save"
+          text={t('download.save')}
           icon="download"
           intent="primary"
           disabled={saving || size === null}
@@ -84,15 +87,25 @@ export function FigureDownloadPanel(
       }
     >
       <OverlaySegmented<FigureFormat>
-        label="Format"
-        help={FORMAT_HELP}
+        label={t('download.format')}
+        help={{
+          title: t('download.format'),
+          body: t('download.formatHelp'),
+        }}
         value={format}
         options={FORMAT_CHOICES}
         onChange={onFormatChange}
       />
       <OverlaySegmented
-        label="Resolution"
-        help={RESOLUTION_HELP}
+        label={t('download.resolution')}
+        help={{
+          title: t('download.resolution'),
+          body: t('download.resolutionHelp'),
+          example: {
+            code: '2×',
+            note: t('download.resolutionExample'),
+          },
+        }}
         value={String(scale)}
         options={scaleChoices(scales, size)}
         disabled={vector}
@@ -107,20 +120,6 @@ const FORMAT_CHOICES: ReadonlyArray<OverlayOption<FigureFormat>> = [
   { value: 'png', label: 'PNG' },
   { value: 'svg', label: 'SVG' },
 ];
-
-const FORMAT_HELP: HelpContent = {
-  title: 'Format',
-  body: 'A PNG is a picture of the figure, which is what a slide, a chat window or an issue accepts. An SVG is the figure itself: every line stays sharp however far it is enlarged, and it can still be edited afterwards.',
-};
-
-const RESOLUTION_HELP: HelpContent = {
-  title: 'Resolution',
-  body: 'How many pixels are painted for each pixel of the figure on screen. Two is right for a slide, three or four for print. An SVG carries no resolution of its own, so it is saved sharp at every size.',
-  example: {
-    code: '2×',
-    note: 'A figure 640 pixels wide on screen is saved 1280 pixels wide.',
-  },
-};
 
 /**
  * The multiples offered, each saying what it would actually produce.
@@ -155,6 +154,8 @@ function scaleChoices(
  * @param scale - The multiple it is painted at.
  * @param failure - What went wrong last time, if anything.
  * @param rasterSvg - Whether the SVG embeds a rendered picture.
+ * @param t - The chrome's formatter, so the sentence is in the language of
+ * the page.
  * @returns The sentence.
  */
 function hintOf(
@@ -163,14 +164,19 @@ function hintOf(
   scale: number,
   failure: string | null,
   rasterSvg: boolean,
+  t: Translate<ChromeKey>,
 ): string {
   if (failure !== null) return failure;
-  if (size === null) return 'There is no figure on the page to save yet.';
+  if (size === null) return t('download.noFigure');
   if (format === 'svg' && rasterSvg) {
-    return `An SVG holding a picture of ${formatFigurePixels(figurePixels(size, scale))}: a 3D scene has no vector form.`;
+    return t('download.hintRasterSvg', {
+      pixels: formatFigurePixels(figurePixels(size, scale)),
+    });
   }
   if (format === 'svg') {
-    return `An SVG stays sharp at any size, so the resolution does not apply. Drawn ${formatFigurePixels(size)}.`;
+    return t('download.hintSvg', { pixels: formatFigurePixels(size) });
   }
-  return `Saved ${formatFigurePixels(figurePixels(size, scale))}.`;
+  return t('download.hintPng', {
+    pixels: formatFigurePixels(figurePixels(size, scale)),
+  });
 }

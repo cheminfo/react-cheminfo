@@ -2,6 +2,7 @@ import type { IconName } from '@blueprintjs/core';
 import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { overlayBarFolded } from '../core/overlayCollapse.ts';
 import type { OverlayPlacement } from '../core/overlayPlacement.ts';
 
@@ -59,7 +60,7 @@ export interface OverlayBarProps {
   /**
    * What the group of controls is called, for a reader arriving by tab and for
    * the button the bar folds into.
-   * @default 'Options'
+   * @default the chrome's own word for it, in the language of the page
    */
   label?: string;
   /**
@@ -129,7 +130,9 @@ export interface OverlayBarProps {
 export function OverlayBar(props: OverlayBarProps): ReactElement {
   const { children, end, tools, info, more } = props;
   const { placement = 'top-right' } = props;
-  const { label = 'Options', restingOpacity = OVERLAY_RESTING_OPACITY } = props;
+  const { label, restingOpacity = OVERLAY_RESTING_OPACITY } = props;
+  const t = useChromeT();
+  const name = label ?? t('overlay.options');
   const { collapsed, defaultCollapsed = false } = props;
   const { collapseBelow = 420, moreIcon = 'cog', testId } = props;
   const { morePadded = true } = props;
@@ -151,7 +154,7 @@ export function OverlayBar(props: OverlayBarProps): ReactElement {
         info={info}
         more={more}
         placement={placement}
-        label={label}
+        label={name}
         moreIcon={moreIcon}
         morePadded={morePadded}
         folded={folded}
@@ -169,7 +172,7 @@ export function OverlayBar(props: OverlayBarProps): ReactElement {
       info={info}
       more={more}
       placement={placement}
-      label={label}
+      label={name}
       moreIcon={moreIcon}
       morePadded={morePadded}
       folded={folded}

@@ -2,6 +2,8 @@ import type { IconName, Intent } from '@blueprintjs/core';
 import { Button } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 import {
   DEFAULT_COPY_RESET_AFTER,
   useCopyToClipboard,
@@ -24,12 +26,12 @@ export interface CopyButtonProps {
   label?: string;
   /**
    * Text shown while the copy is being confirmed, when there is a label.
-   * @default 'Copied'
+   * @default the chrome's own word for it, in the language of the page
    */
   copiedLabel?: string;
   /**
    * Text shown while a refused copy is being reported, when there is a label.
-   * @default 'Copy failed'
+   * @default the chrome's own line, in the language of the page
    */
   failedLabel?: string;
   /**
@@ -59,7 +61,7 @@ export interface CopyButtonProps {
   resetAfter?: number;
   /**
    * What the pointer and a screen reader are told.
-   * @default 'Copy to clipboard'
+   * @default the chrome's own line, in the language of the page
    */
   title?: string;
   /**
@@ -79,24 +81,26 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
   const {
     content,
     label,
-    copiedLabel = 'Copied',
-    failedLabel = 'Copy failed',
+    copiedLabel,
+    failedLabel,
     minimal = false,
     small = false,
     icon = 'clipboard',
     disabled = false,
     resetAfter = DEFAULT_COPY_RESET_AFTER,
-    title = 'Copy to clipboard',
+    title,
     className,
   } = props;
+  const t = useChromeT();
   const { copied, failed, copy } = useCopyToClipboard(resetAfter);
+  const hoverTitle = title ?? t('clipboard.copyToClipboard');
   const look = buttonLook({
     copied,
     failed,
     icon,
     label,
-    copiedLabel,
-    failedLabel,
+    copiedLabel: copiedLabel ?? t('clipboard.copied'),
+    failedLabel: failedLabel ?? t('clipboard.failed'),
   });
 
   return (
@@ -108,8 +112,8 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
       intent={look.intent}
       text={look.text}
       disabled={disabled}
-      title={title}
-      aria-label={label ?? title}
+      title={hoverTitle}
+      aria-label={label ?? hoverTitle}
       onClick={() => {
         void copy(typeof content === 'function' ? content() : content);
       }}

@@ -1,6 +1,7 @@
 import { Checkbox, H6 } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { HideablePart } from '../core/index.ts';
 
 import { SharePartOptions } from './SharePartOptions.tsx';
@@ -35,27 +36,25 @@ export function ShareConfigOptions(
   props: ShareConfigOptionsProps,
 ): ReactElement {
   const { embed, parts, hidden, onEmbedChange, onPartChange } = props;
+  const t = useChromeT();
 
   return (
     <>
       <section className="share-section" style={SECTION_STYLE}>
-        <H6>Layout</H6>
+        <H6>{t('share.layout')}</H6>
         <Checkbox
           checked={embed}
-          label="Embed in another page"
+          label={t('share.embed')}
           onChange={(event) => {
             onEmbedChange(event.currentTarget.checked);
           }}
         />
-        <span style={HINT_STYLE}>
-          Drops the site header and its navigation, so the page sits inside a
-          page of your own.
-        </span>
+        <span style={HINT_STYLE}>{t('share.embedHint')}</span>
       </section>
 
       {parts.length > 0 ? (
         <section className="share-section" style={SECTION_STYLE}>
-          <H6>Show on the page</H6>
+          <H6>{t('share.showOnPage')}</H6>
           <SharePartOptions
             parts={parts}
             hidden={hidden}

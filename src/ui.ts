@@ -14,6 +14,7 @@ export * from './ecosystem/ui/index.ts';
 export * from './error/ui/index.ts';
 export * from './help/ui/index.ts';
 export * from './hooks/ui/index.ts';
+export * from './i18n/ui/index.ts';
 export * from './language/ui/index.ts';
 export * from './overlay/ui/index.ts';
 export * from './parallel/ui/index.ts';

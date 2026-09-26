@@ -6,11 +6,15 @@
 import { Classes } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Translate } from '../../i18n/ui/useT.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { EditorGesture, EditorGuideOptions } from '../core/editorGuide.ts';
 import {
   STRUCTURE_EDITOR_DOCS,
   editorGuideSections,
+  editorInputWordId,
 } from '../core/editorGuide.ts';
 
 import { KeyCaps } from './KeyCaps.tsx';
@@ -29,39 +33,47 @@ export type StructureEditorHelpProps = EditorGuideOptions;
 export function StructureEditorHelp(
   props: StructureEditorHelpProps,
 ): ReactElement {
+  const t = useChromeT();
   const sections = editorGuideSections(props);
 
   return (
     <div style={PANEL_STYLE} data-testid="structure-editor-help">
       <p className={Classes.TEXT_MUTED} style={PARAGRAPH_STYLE}>
-        Hover a toolbar button to see what it does and its key.
+        {t('structure.help.hoverToolbar')}
       </p>
       {/* One grid for every section, so all the actions start on one edge. */}
       <div style={GRID_STYLE}>
         {sections.map((section) => (
-          <section key={section.title} style={ROW_STYLE}>
-            <h4 style={HEADING_STYLE}>{section.title}</h4>
+          <section key={section.id} style={ROW_STYLE}>
+            <h4 style={HEADING_STYLE}>
+              {t.or(`structure.guide.${section.id}.title`, section.title)}
+            </h4>
             {section.gestures.map((gesture) => (
               <div key={gestureKey(gesture)} style={ROW_STYLE}>
-                <GestureInput input={gesture.input} />
-                <span>{gesture.action}</span>
+                <GestureInput input={gesture.input} t={t} />
+                <span>
+                  {t.or(
+                    `structure.guide.${section.id}.${gesture.id}`,
+                    gesture.action,
+                  )}
+                </span>
               </div>
             ))}
             {section.note === undefined ? null : (
               <p className={Classes.TEXT_MUTED} style={NOTE_STYLE}>
-                {section.note}
+                {t.or(`structure.guide.${section.id}.note`, section.note)}
               </p>
             )}
           </section>
         ))}
       </div>
       <p style={PARAGRAPH_STYLE}>
-        Learn more:{' '}
+        {t('structure.help.learnMore')}{' '}
         {STRUCTURE_EDITOR_DOCS.map((link, index) => (
           <span key={link.url}>
             {index === 0 ? null : ' · '}
             <a href={link.url} target="_blank" rel="noopener noreferrer">
-              {link.title}
+              {t.or(`structure.docs.${link.id}`, link.title)}
             </a>
           </span>
         ))}
@@ -70,18 +82,29 @@ export function StructureEditorHelp(
   );
 }
 
-function GestureInput(props: { input: EditorGesture['input'] }): ReactElement {
+function GestureInput(props: {
+  input: EditorGesture['input'];
+  t: Translate<ChromeKey>;
+}): ReactElement {
+  const { input, t } = props;
   return (
     <span style={INPUT_STYLE}>
-      {props.input.map((part) =>
+      {input.map((part) =>
         typeof part === 'string' ? (
-          <span key={part}>{part}</span>
+          <span key={part}>{word(part, t)}</span>
         ) : (
           <KeyCaps key={part.key} keys={[part.key]} />
         ),
       )}
     </span>
   );
+}
+
+// A word between two key caps is one catalog entry, shared by every gesture
+// that writes it; punctuation such as `…` is left exactly as it is.
+function word(text: string, t: Translate<ChromeKey>): string {
+  const id = editorInputWordId(text);
+  return id === undefined ? text : t.or(`structure.input.${id}`, text);
 }
 
 function gestureKey(gesture: EditorGesture): string {

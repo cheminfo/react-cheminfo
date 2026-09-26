@@ -14,8 +14,11 @@ export type EditorGuideScope = 'fragment' | 'molecule' | 'reaction';
 
 /** One gesture and what it does. */
 export interface EditorGesture {
+  /** How the guide's catalog names it, unique within its section. */
+  id: string;
   /** Keys, and plain text for the mouse part; unique within one gesture. */
   input: ReadonlyArray<string | EditorGuideKey>;
+  /** What it does, in English; the catalog answers for the other languages. */
   action: string;
   /**
    * The only editor the gesture works in.
@@ -26,6 +29,8 @@ export interface EditorGesture {
 
 /** Gestures that share a context, such as the pointer resting on an atom. */
 export interface EditorGuideSection {
+  /** How the guide's catalog names the section. */
+  id: string;
   title: string;
   gestures: readonly EditorGesture[];
   /**
@@ -37,6 +42,8 @@ export interface EditorGuideSection {
 
 /** A page of the full documentation. */
 export interface EditorGuideLink {
+  /** How the guide's catalog names the page. */
+  id: string;
   title: string;
   url: string;
 }
@@ -44,99 +51,170 @@ export interface EditorGuideLink {
 /** The sections, in the order the guide lists them. */
 export const STRUCTURE_EDITOR_GUIDE: readonly EditorGuideSection[] = [
   {
+    id: 'atom',
     title: 'Pointer on an atom',
     gestures: [
-      { input: ['Type', { key: 'n' }, { key: 'a' }], action: 'Make it Na' },
       {
+        id: 'element',
+        input: ['Type', { key: 'n' }, { key: 'a' }],
+        action: 'Make it Na',
+      },
+      {
+        id: 'group',
         input: ['Type', { key: 'p' }, { key: 'h' }],
         action: 'Attach a phenyl; Me, Et, Boc, TMS… work too',
       },
       {
+        id: 'applyOrForget',
         input: [{ key: 'Enter' }, 'or', { key: 'Esc' }],
         action: 'Apply or forget what was typed',
       },
       {
+        id: 'chain',
         input: [{ key: '1' }, '…', { key: '9' }],
         action: 'Attach a chain of that many carbons',
       },
       {
+        id: 'charge',
         input: [{ key: '+' }, 'or', { key: '-' }],
         action: 'Raise or lower the charge',
       },
-      { input: [{ key: '.' }], action: 'Add or remove a radical' },
-      { input: [{ key: ':' }], action: 'Make it a triplet, then a singlet' },
-      { input: [{ key: '?' }], action: 'Make it a connection point' },
       {
+        id: 'radical',
+        input: [{ key: '.' }],
+        action: 'Add or remove a radical',
+      },
+      {
+        id: 'spin',
+        input: [{ key: ':' }],
+        action: 'Make it a triplet, then a singlet',
+      },
+      {
+        id: 'attachment',
+        input: [{ key: '?' }],
+        action: 'Make it a connection point',
+      },
+      {
+        id: 'query',
         input: [{ key: 'q' }],
         action: 'Edit its query features',
         only: 'fragment',
       },
-      { input: [{ key: 'x' }], action: 'Accept any halogen', only: 'fragment' },
-      { input: [{ key: 'Delete' }], action: 'Delete it' },
+      {
+        id: 'halogen',
+        input: [{ key: 'x' }],
+        action: 'Accept any halogen',
+        only: 'fragment',
+      },
+      { id: 'delete', input: [{ key: 'Delete' }], action: 'Delete it' },
     ],
     note: 'What is typed shows black for an element, blue for a group, grey while incomplete and red when unknown.',
   },
   {
+    id: 'bond',
     title: 'Pointer on a bond',
     gestures: [
       {
+        id: 'order',
         input: [{ key: '1' }, { key: '2' }, { key: '3' }],
         action: 'Single, double or triple',
       },
-      { input: [{ key: '0' }], action: 'Zero-order (metal–ligand) bond' },
       {
+        id: 'zeroOrder',
+        input: [{ key: '0' }],
+        action: 'Zero-order (metal–ligand) bond',
+      },
+      {
+        id: 'stereo',
         input: [{ key: 'u' }, 'or', { key: 'd' }],
         action: 'Up or down stereo bond',
       },
-      { input: [{ key: 'c' }], action: 'Double bond of unknown geometry' },
-      { input: [{ key: 'v' }], action: 'Fuse a 3-membered ring' },
       {
+        id: 'unknownGeometry',
+        input: [{ key: 'c' }],
+        action: 'Double bond of unknown geometry',
+      },
+      {
+        id: 'threeRing',
+        input: [{ key: 'v' }],
+        action: 'Fuse a 3-membered ring',
+      },
+      {
+        id: 'ring',
         input: [{ key: '4' }, '…', { key: '7' }],
         action: 'Fuse a ring of that size',
       },
       {
+        id: 'benzene',
         input: [{ key: 'a' }, 'or', { key: 'b' }],
         action: 'Fuse a benzene ring',
       },
       {
+        id: 'query',
         input: [{ key: 'q' }],
         action: 'Edit its query features',
         only: 'fragment',
       },
-      { input: [{ key: 'Delete' }], action: 'Delete it' },
+      { id: 'delete', input: [{ key: 'Delete' }], action: 'Delete it' },
     ],
   },
   {
+    id: 'anywhere',
     title: 'Anywhere',
     gestures: [
-      { input: [{ key: 'Mod' }, { key: 'Z' }], action: 'Undo' },
-      { input: [{ key: 'Mod' }, { key: 'C' }], action: 'Copy the structure' },
+      { id: 'undo', input: [{ key: 'Mod' }, { key: 'Z' }], action: 'Undo' },
       {
+        id: 'copy',
+        input: [{ key: 'Mod' }, { key: 'C' }],
+        action: 'Copy the structure',
+      },
+      {
+        id: 'paste',
         input: [{ key: 'Mod' }, { key: 'V' }],
         action: 'Paste a molfile, a SMILES or an idCode',
       },
-      { input: [{ key: 'Delete' }], action: 'Delete the selection' },
       {
+        id: 'deleteSelection',
+        input: [{ key: 'Delete' }],
+        action: 'Delete the selection',
+      },
+      {
+        id: 'flip',
         input: [{ key: 'h' }, 'or', { key: 'v' }],
         action: 'Flip horizontally or vertically',
         only: 'molecule',
       },
-      { input: [{ key: 'F1' }], action: 'Open this guide' },
+      { id: 'help', input: [{ key: 'F1' }], action: 'Open this guide' },
     ],
     note: 'Keys act once the drawing has been clicked. On empty canvas, a key picks the tool whose tooltip shows it.',
   },
   {
+    id: 'selecting',
     title: 'Selecting',
     gestures: [
-      { input: ['Drag'], action: 'Select what the lasso encloses' },
-      { input: [{ key: 'Alt' }, '+ drag'], action: 'Select a rectangle' },
-      { input: [{ key: 'Shift' }, '+ drag'], action: 'Add to the selection' },
-      { input: ['Drag the selection'], action: 'Move it' },
       {
+        id: 'lasso',
+        input: ['Drag'],
+        action: 'Select what the lasso encloses',
+      },
+      {
+        id: 'rectangle',
+        input: [{ key: 'Alt' }, '+ drag'],
+        action: 'Select a rectangle',
+      },
+      {
+        id: 'add',
+        input: [{ key: 'Shift' }, '+ drag'],
+        action: 'Add to the selection',
+      },
+      { id: 'move', input: ['Drag the selection'], action: 'Move it' },
+      {
+        id: 'duplicate',
         input: [{ key: 'Shift' }, '+ drag the selection'],
         action: 'Copy it',
       },
       {
+        id: 'queryFeatures',
         input: ['Double-click'],
         action: 'Edit the query features of an atom, a bond or the selection',
         only: 'fragment',
@@ -145,6 +223,7 @@ export const STRUCTURE_EDITOR_GUIDE: readonly EditorGuideSection[] = [
     note: 'These need the Select tool, which Space picks.',
   },
   {
+    id: 'stereochemistry',
     title: 'Stereochemistry',
     gestures: [],
     note: 'Pink bonds flag a stereocentre with too little or too much information. Draw an up or down bond with its narrow end on the centre, then use the enhanced stereo tool to say whether the drawing is this enantiomer (abs), both of them (&) or one of the two (or).',
@@ -153,12 +232,18 @@ export const STRUCTURE_EDITOR_GUIDE: readonly EditorGuideSection[] = [
 
 /** The documentation this guide summarises. */
 export const STRUCTURE_EDITOR_DOCS: readonly EditorGuideLink[] = [
-  { title: 'Tools and keys', url: 'https://docs.nmrium.org/help/ocl/' },
   {
+    id: 'toolsAndKeys',
+    title: 'Tools and keys',
+    url: 'https://docs.nmrium.org/help/ocl/',
+  },
+  {
+    id: 'atomProperties',
     title: 'Atom properties',
     url: 'https://docs.nmrium.org/chemical_structure/ocl/atom-properties/',
   },
   {
+    id: 'stereochemistry',
     title: 'Stereochemistry',
     url: 'https://docs.nmrium.org/ocl/stereochemistry/',
   },
@@ -207,6 +292,28 @@ function appliesTo(
   if (only === undefined) return true;
   if (only === 'fragment') return fragment;
   return only === mode;
+}
+
+// The words a gesture writes between its key caps. They are keyed here rather
+// than slugged from the text, because `Drag` and `+ drag` would slug alike.
+const INPUT_WORD_IDS: Record<string, string> = {
+  Type: 'type',
+  or: 'or',
+  Drag: 'drag',
+  '+ drag': 'plusDrag',
+  'Drag the selection': 'dragSelection',
+  '+ drag the selection': 'plusDragSelection',
+  'Double-click': 'doubleClick',
+};
+
+/**
+ * How the catalog names one of the words a gesture writes between its key
+ * caps.
+ * @param text - The word, in English.
+ * @returns Its id, or `undefined` for punctuation nobody translates.
+ */
+export function editorInputWordId(text: string): string | undefined {
+  return INPUT_WORD_IDS[text];
 }
 
 /**

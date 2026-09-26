@@ -8,6 +8,9 @@ import type {
 } from 'react';
 
 import { onActivateKey } from '../../hooks/ui/activationKey.ts';
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Translate } from '../../i18n/ui/useT.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { ClipboardContent } from '../core/writeToClipboard.ts';
 import { writeToClipboard } from '../core/writeToClipboard.ts';
@@ -104,6 +107,7 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
     className,
     style,
   } = props;
+  const t = useChromeT();
   const { copied, failed, copy } = useCopyToClipboard();
 
   if (disabled) {
@@ -136,7 +140,7 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
       style={style}
       role={focusable && !CELLS.has(Element) ? 'button' : undefined}
       tabIndex={focusable ? 0 : undefined}
-      title={title ?? copyTitle(value, label)}
+      title={title ?? copyTitle(value, label, t)}
       data-copy={outcome}
       onClick={activate}
       onKeyDown={onActivateKey<KeyboardEvent<HTMLElement>>(activate)}
@@ -157,9 +161,9 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
       ) : null}
       <span className="click-to-copy__status" role="status">
         {outcome === 'copied'
-          ? 'Copied'
+          ? t('clipboard.copied')
           : outcome === 'failed'
-            ? 'Copy failed'
+            ? t('clipboard.failed')
             : null}
       </span>
     </Element>
@@ -182,10 +186,16 @@ function isOnNestedControl(
 function copyTitle(
   value: ClickToCopyProps['value'],
   label: string | undefined,
+  t: Translate<ChromeKey>,
 ): string {
-  const what = label === undefined ? 'Copy' : `Copy the ${label}`;
+  const what =
+    label === undefined
+      ? t('clipboard.copy')
+      : t('clipboard.copyThe', { what: label });
   if (typeof value === 'function') return what;
   const text = typeof value === 'string' ? value : value.text;
   if (text === '' || text.length > TITLE_VALUE_MAX) return what;
-  return label === undefined ? `Copy ${text}` : `${what} (${text})`;
+  return label === undefined
+    ? t('clipboard.copyValue', { value: text })
+    : `${what} (${text})`;
 }

@@ -3,6 +3,7 @@ import { useId, useMemo } from 'react';
 
 import type { HelpContent } from '../../help/ui/HelpBody.tsx';
 import { HelpIcon } from '../../help/ui/HelpIcon.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 import type { OverlayAction } from './OverlayAction.tsx';
 import type { OverlayGroup } from './OverlayGroup.tsx';
@@ -40,7 +41,7 @@ export interface OverlayPanelProps {
   onReset?: () => void;
   /**
    * What that way back reads.
-   * @default 'Reset'
+   * @default the chrome's own word for it, in the language of the page
    */
   resetLabel?: string;
   /**
@@ -68,7 +69,7 @@ export interface OverlayPanelProps {
    * the panel says that the dotted names are offering anything, so one
    * sentence says it once. Pass `''` for a panel whose names carry no help at
    * all, where the line would be a promise the panel does not keep.
-   * @default 'Hover a name for what it does.'
+   * @default the chrome's own line, in the language of the page
    */
   hint?: string;
   /**
@@ -101,8 +102,9 @@ export interface OverlayPanelProps {
  * @returns The panel.
  */
 export function OverlayPanel(props: OverlayPanelProps): ReactElement {
-  const { title, children, onReset, resetLabel = 'Reset', help } = props;
-  const { actions, hint = DEFAULT_HINT, nameWidth, testId } = props;
+  const { title, children, onReset, resetLabel, help } = props;
+  const t = useChromeT();
+  const { actions, hint, nameWidth, testId } = props;
   const { metrics } = useOverlaySurface();
   const titleId = useId();
   const reset = useOverlayInteraction();
@@ -134,7 +136,7 @@ export function OverlayPanel(props: OverlayPanelProps): ReactElement {
             onClick={onReset}
             {...reset.handlers}
           >
-            {resetLabel}
+            {resetLabel ?? t('overlay.reset')}
           </button>
         )}
       </div>
@@ -143,7 +145,9 @@ export function OverlayPanel(props: OverlayPanelProps): ReactElement {
           {children}
         </OverlayPanelContext.Provider>
         {hint === '' ? null : (
-          <p style={overlayPanelHintStyle(metrics)}>{hint}</p>
+          <p style={overlayPanelHintStyle(metrics)}>
+            {hint ?? t('overlay.hoverAName')}
+          </p>
         )}
       </div>
       {actions === undefined ? null : (
@@ -160,4 +164,3 @@ export function OverlayPanel(props: OverlayPanelProps): ReactElement {
  * the dotted underlines has already asked this question and one who has not
  * would not recognise a description of them.
  */
-const DEFAULT_HINT = 'Hover a name for what it does.';

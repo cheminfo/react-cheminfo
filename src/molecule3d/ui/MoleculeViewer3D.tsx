@@ -22,6 +22,7 @@ import { Suspense, lazy, useState } from 'react';
 
 // Deep import on purpose: `capability.ts` imports nothing, while the canvas
 // pulls molstar in — which is exactly what this probe exists to avoid.
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { probeViewerCapability } from '../../orbital/ui/capability.ts';
 
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
@@ -37,29 +38,33 @@ const MoleculeCanvas3D = lazy(async () => {
  * @returns The viewer, or an explanation of why this machine cannot show one.
  */
 export function MoleculeViewer3D(props: MoleculeViewer3DProps): ReactElement {
-  const {
-    fallback = 'Loading the 3D viewer…',
-    renderUnsupported,
-    ...canvas
-  } = props;
+  const { fallback, renderUnsupported, ...canvas } = props;
+  const t = useChromeT();
   const [capability] = useState(probeViewerCapability);
   const [failure, setFailure] = useState<string | null>(null);
 
   if (!capability.supported) {
     return (
       <Callout intent="warning" compact>
-        {renderUnsupported?.(capability) ?? capability.message}
+        {renderUnsupported?.(capability) ??
+          t.or(`viewer.capability.${capability.reason}`, capability.message)}
       </Callout>
     );
   }
 
   return (
     <div style={ROOT_STYLE}>
-      <Suspense fallback={<div style={NOTE_STYLE}>{fallback}</div>}>
+      <Suspense
+        fallback={
+          <div style={NOTE_STYLE}>
+            {fallback ?? t('molecule3d.loadingViewer')}
+          </div>
+        }
+      >
         <MoleculeCanvas3D {...canvas} onFailureChange={setFailure} />
       </Suspense>
       {failure !== null && (
-        <Callout intent="danger" compact title="The viewer could not draw this">
+        <Callout intent="danger" compact title={t('molecule3d.couldNotDraw')}>
           {failure}
         </Callout>
       )}

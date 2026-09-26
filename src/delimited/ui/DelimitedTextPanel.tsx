@@ -6,7 +6,7 @@ import { CopyButton } from '../../clipboard/ui/CopyButton.tsx';
 import { downloadText } from '../../download/core/downloadText.ts';
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { formatInteger } from '../../format/core/numbers.ts';
-import { pluralize } from '../../format/core/words.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { DelimiterId } from '../core/delimiters.ts';
@@ -82,9 +82,10 @@ export function DelimitedTextPanel(
     fileName = 'table',
     defaultDelimiter = 'tab',
     downloadable = true,
-    label = 'The table, as text',
+    label,
     height = 320,
   } = props;
+  const t = useChromeT();
   const [delimiterId, setDelimiterId] = useState<string>(defaultDelimiter);
 
   const choice = delimiterChoice(delimiterId);
@@ -96,10 +97,16 @@ export function DelimitedTextPanel(
   return (
     <div className={joinClassNames('delimited-text', className)}>
       <Callout intent="primary" compact icon="info-sign">
-        {description ?? defaultDescription(rows.length)}
+        {description ??
+          t(
+            rows.length === 1
+              ? 'delimited.descriptionOne'
+              : 'delimited.descriptionMany',
+            { count: formatInteger(rows.length) },
+          )}
       </Callout>
       <div style={CONTROLS_STYLE}>
-        <span style={LABEL_STYLE}>Separator</span>
+        <span style={LABEL_STYLE}>{t('delimited.separator')}</span>
         <SegmentedControl
           size="small"
           options={DELIMITER_CHOICES.map((option) => ({
@@ -113,7 +120,7 @@ export function DelimitedTextPanel(
         {downloadable ? (
           <Button
             icon="download"
-            text="Save"
+            text={t('delimited.save')}
             size="small"
             onClick={() =>
               downloadText(
@@ -124,24 +131,24 @@ export function DelimitedTextPanel(
             }
           />
         ) : null}
-        <CopyButton content={text} label="Copy" icon="clipboard" small />
+        <CopyButton
+          content={text}
+          label={t('delimited.copy')}
+          icon="clipboard"
+          small
+        />
       </div>
       <textarea
         readOnly
         value={text}
         spellCheck={false}
-        aria-label={label}
+        aria-label={label ?? t('delimited.tableAsText')}
         className={Classes.INPUT}
         style={{ ...TEXT_STYLE, height }}
         onFocus={(event) => event.currentTarget.select()}
       />
     </div>
   );
-}
-
-function defaultDescription(rowCount: number): string {
-  const rows = `${formatInteger(rowCount)} ${pluralize(rowCount, 'row')}`;
-  return `${rows}, one per line. Copy them, then paste into a spreadsheet.`;
 }
 
 const CONTROLS_STYLE = {

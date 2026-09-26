@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
 /** A worked example under a piece of help: the construct, and what it does. */
@@ -72,6 +73,7 @@ export interface HelpBodyProps {
  */
 export function HelpBody(props: HelpBodyProps): ReactElement {
   const { className, content, width = DEFAULT_WIDTH } = props;
+  const t = useChromeT();
   const { title, body, example, link } = content;
 
   return (
@@ -86,7 +88,7 @@ export function HelpBody(props: HelpBodyProps): ReactElement {
           <code style={CODE_STYLE}>{item.code}</code>
           {item.input === undefined ? null : (
             <div style={INPUT_STYLE}>
-              on <code style={CODE_STYLE}>{item.input}</code>
+              {t('help.on')} <code style={CODE_STYLE}>{item.input}</code>
             </div>
           )}
           {item.note === undefined ? null : (
@@ -101,7 +103,7 @@ export function HelpBody(props: HelpBodyProps): ReactElement {
           rel="noopener noreferrer"
           style={LINK_STYLE}
         >
-          Learn more
+          {t('help.learnMore')}
         </a>
       )}
     </div>

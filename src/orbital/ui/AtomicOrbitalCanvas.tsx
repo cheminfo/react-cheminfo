@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { errorMessage } from '../../error/core/index.ts';
 import { useResizeObserver } from '../../hooks/ui/useResizeObserver.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
@@ -115,6 +116,7 @@ export function AtomicOrbitalCanvas(
     onFailureChange,
   } = props;
 
+  const t = useChromeT();
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<OrbitalViewer | null>(null);
   const [drawn, setDrawn] = useState<string | null>(null);
@@ -201,7 +203,7 @@ export function AtomicOrbitalCanvas(
 
   return (
     <div ref={containerRef} style={CANVAS_STYLE}>
-      {busy && <div style={BUSY_STYLE}>Sampling…</div>}
+      {busy && <div style={BUSY_STYLE}>{t('orbital.sampling')}</div>}
       <AtomicOrbitalControls
         axes={axes}
         onToggleAxes={() => {

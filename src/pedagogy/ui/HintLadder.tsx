@@ -2,6 +2,7 @@ import { Button, Callout } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
 import { clamp } from '../../format/core/clamp.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 import { GlossaryText } from './GlossaryText.tsx';
 
@@ -23,12 +24,12 @@ export interface HintLadderProps {
   onReveal?: () => void;
   /**
    * Text of the button, before its count.
-   * @default 'Reveal hint'
+   * @default the chrome's own words for it, in the language of the page
    */
   revealLabel?: string;
   /**
    * Heading over the hints.
-   * @default 'Hints'
+   * @default the chrome's own words for it, in the language of the page
    */
   title?: string;
   /**
@@ -48,14 +49,8 @@ export interface HintLadderProps {
  * @returns The hints, or nothing while none is open and none can be.
  */
 export function HintLadder(props: HintLadderProps): ReactElement | null {
-  const {
-    className,
-    hints,
-    revealed,
-    onReveal,
-    revealLabel = 'Reveal hint',
-    title = 'Hints',
-  } = props;
+  const { className, hints, revealed, onReveal, revealLabel, title } = props;
+  const t = useChromeT();
   const open = clampRevealed(revealed, hints.length);
   const exhausted = open >= hints.length;
   if (open === 0 && (onReveal === undefined || hints.length === 0)) return null;
@@ -66,7 +61,11 @@ export function HintLadder(props: HintLadderProps): ReactElement | null {
         <div>
           <Button
             icon="lightbulb"
-            text={`${revealLabel} (${open}/${hints.length})`}
+            text={t('pedagogy.revealHintLadder', {
+              label: revealLabel ?? t('pedagogy.revealHint'),
+              open,
+              total: hints.length,
+            })}
             disabled={exhausted}
             onClick={onReveal}
           />
@@ -74,7 +73,11 @@ export function HintLadder(props: HintLadderProps): ReactElement | null {
       )}
 
       {open > 0 && (
-        <Callout intent="primary" icon="lightbulb" title={title}>
+        <Callout
+          intent="primary"
+          icon="lightbulb"
+          title={title ?? t('pedagogy.hints')}
+        >
           <ol style={LIST_STYLE}>
             {hints.slice(0, open).map((hint) => (
               <li key={hint} style={ITEM_STYLE}>

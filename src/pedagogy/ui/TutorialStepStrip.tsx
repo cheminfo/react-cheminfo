@@ -2,6 +2,7 @@ import { Button, Tag, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import { clamp } from '../../format/core/clamp.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ExerciseLevel } from '../core/types.ts';
 
@@ -76,6 +77,7 @@ export function TutorialStepStrip(props: TutorialStepStripProps): ReactElement {
     pagerHint,
     className,
   } = props;
+  const t = useChromeT();
   const active = clampIndex(activeIndex, steps.length);
 
   return (
@@ -101,19 +103,22 @@ export function TutorialStepStrip(props: TutorialStepStripProps): ReactElement {
           <Button
             size="small"
             icon="chevron-left"
-            text="Previous"
+            text={t('pedagogy.previous')}
             disabled={active === 0}
             onClick={() => {
               onSelect(active - 1);
             }}
           />
           <Tag minimal round>
-            {`Step ${active + 1} of ${steps.length}`}
+            {t('pedagogy.stepOf', {
+              step: active + 1,
+              total: steps.length,
+            })}
           </Tag>
           <Button
             size="small"
             endIcon="chevron-right"
-            text="Next"
+            text={t('pedagogy.next')}
             intent="primary"
             disabled={active >= steps.length - 1}
             onClick={() => {

@@ -1,5 +1,8 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Translate } from '../../i18n/ui/useT.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { AboutPerson } from '../core/about.ts';
 import type { ProviderEntry } from '../core/providers.ts';
 
@@ -19,6 +22,7 @@ export interface AboutProvidedByProps {
  */
 export function AboutProvidedBy(props: AboutProvidedByProps): ReactElement {
   const { people, providers } = props;
+  const t = useChromeT();
   const withRoles = people.filter((person) => person.role !== undefined);
 
   return (
@@ -42,7 +46,7 @@ export function AboutProvidedBy(props: AboutProvidedByProps): ReactElement {
           }
         >
           {people.length === 0 ? null : (
-            <p style={NAMES_STYLE}>{joinNames(people)}</p>
+            <p style={NAMES_STYLE}>{joinNames(people, t)}</p>
           )}
           {providers.map((provider) => (
             <p key={provider.id} style={INSTITUTION_STYLE}>
@@ -65,10 +69,16 @@ export function AboutProvidedBy(props: AboutProvidedByProps): ReactElement {
   );
 }
 
-function joinNames(people: readonly AboutPerson[]): string {
+function joinNames(
+  people: readonly AboutPerson[],
+  t: Translate<ChromeKey>,
+): string {
   const names = people.map((person) => person.name);
   if (names.length < 2) return names.join('');
-  return `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
+  return t('about.nameList', {
+    names: names.slice(0, -1).join(', '),
+    last: names.at(-1) ?? '',
+  });
 }
 
 function ProviderLogo(props: { provider: ProviderEntry }): ReactElement {

@@ -2,6 +2,8 @@ import type { IconName } from '@blueprintjs/core';
 import { Button } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 import type { HelpContent } from './HelpBody.tsx';
 import { HelpTooltip } from './HelpTooltip.tsx';
 import { helpName } from './helpName.ts';
@@ -56,6 +58,7 @@ export function HelpToolbarButton(props: HelpToolbarButtonProps): ReactElement {
     small = false,
     className,
   } = props;
+  const t = useChromeT();
 
   return (
     <HelpTooltip content={content} placement="bottom">
@@ -64,7 +67,7 @@ export function HelpToolbarButton(props: HelpToolbarButtonProps): ReactElement {
         size={small ? 'small' : 'medium'}
         icon={icon}
         text={label}
-        aria-label={label ?? helpName(content)}
+        aria-label={label ?? helpName(content, t)}
         className={className}
         onClick={onClick}
       />

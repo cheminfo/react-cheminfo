@@ -1,6 +1,8 @@
 import { Button } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 /** Where the talk stands, and what the presenter may do about it. */
 export interface SlideshowBarProps {
   /** What the bar reads. */
@@ -42,18 +44,24 @@ export function SlideshowBar(props: SlideshowBarProps): ReactElement {
     onToggleFullscreen,
     onExit,
   } = props;
+  const t = useChromeT();
 
   return (
     <div className="slideshow-bar no-print">
       {onExit === undefined ? null : (
-        <Button variant="minimal" icon="cross" text="Exit" onClick={onExit} />
+        <Button
+          variant="minimal"
+          icon="cross"
+          text={t('slides.exit')}
+          onClick={onExit}
+        />
       )}
       <div className="slideshow-title">{title}</div>
       <div className="slideshow-controls">
         <Button
           variant="minimal"
           icon="chevron-left"
-          aria-label="Previous slide"
+          aria-label={t('slides.previousSlide')}
           disabled={index === 0}
           onClick={() => {
             onIndexChange(index - 1);
@@ -65,7 +73,7 @@ export function SlideshowBar(props: SlideshowBarProps): ReactElement {
         <Button
           variant="minimal"
           icon="chevron-right"
-          aria-label="Next slide"
+          aria-label={t('slides.nextSlide')}
           disabled={index >= total - 1}
           onClick={() => {
             onIndexChange(index + 1);
@@ -74,7 +82,7 @@ export function SlideshowBar(props: SlideshowBarProps): ReactElement {
         <Button
           variant="minimal"
           icon={isFullscreen ? 'minimize' : 'fullscreen'}
-          aria-label="Toggle fullscreen"
+          aria-label={t('slides.toggleFullscreen')}
           onClick={onToggleFullscreen}
         />
       </div>

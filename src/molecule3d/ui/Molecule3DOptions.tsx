@@ -8,6 +8,7 @@ import { SegmentedControl, Slider } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
 import { formatDecimal } from '../../format/core/numbers.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { Molecule3DSettings } from '../core/settings.ts';
 import {
   MOLECULE_3D_RANGES,
@@ -33,6 +34,7 @@ export interface Molecule3DOptionsProps {
  */
 export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
   const { settings, onChange, polarSurfaceArea } = props;
+  const t = useChromeT();
 
   return (
     <div style={PANEL_STYLE}>
@@ -40,7 +42,13 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
         fill
         size="small"
         intent="primary"
-        options={REPRESENTATION_OPTIONS}
+        options={REPRESENTATIONS.map((representation) => ({
+          value: representation,
+          label: t.or(
+            `molecule3d.representation.${representation}`,
+            REPRESENTATION_LABELS[representation],
+          ),
+        }))}
         value={settings.representation}
         onValueChange={(value) => {
           if (isRepresentationId(value)) {
@@ -50,7 +58,7 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
       />
       <div style={GRID_STYLE}>
         <SliderRow
-          label="Size"
+          label={t('molecule3d.size')}
           range={MOLECULE_3D_RANGES.sizeFactor}
           digits={1}
           value={settings.sizeFactor}
@@ -60,7 +68,7 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
           }}
         />
         <SliderRow
-          label="Surface opacity"
+          label={t('molecule3d.surfaceOpacity')}
           range={MOLECULE_3D_RANGES.surfaceAlpha}
           digits={2}
           value={settings.surfaceAlpha}
@@ -71,8 +79,8 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
           }}
         />
         <SliderRow
-          label="Solvent probe [Å]"
-          title={PROBE_HELP}
+          label={t('molecule3d.solventProbe')}
+          title={t('molecule3d.solventProbeHelp')}
           range={MOLECULE_3D_RANGES.probeRadius}
           digits={1}
           value={settings.probeRadius}
@@ -131,14 +139,6 @@ function SliderRow(props: SliderRowProps): ReactElement {
     </>
   );
 }
-
-const REPRESENTATION_OPTIONS = REPRESENTATIONS.map((representation) => ({
-  value: representation,
-  label: REPRESENTATION_LABELS[representation],
-}));
-
-const PROBE_HELP =
-  'Radius of the solvent sphere rolled over the atoms. 1.4 Å is a water molecule; a larger probe smooths the surface and closes the narrow pockets.';
 
 const PANEL_STYLE: CSSProperties = {
   display: 'flex',

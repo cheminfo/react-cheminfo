@@ -18,6 +18,7 @@ import {
 } from 'react';
 import type { CanvasEditorInputFormat } from 'react-ocl';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { createPendingCall } from '../core/pendingCall.ts';
 
@@ -126,6 +127,7 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
     style,
   } = props;
 
+  const t = useChromeT();
   const containerRef = useToolbarFloor({ minHeight, revision });
   const handleChange = useDebounced(onChange, debounce, revision);
 
@@ -135,7 +137,11 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
       className={className}
       style={{ ...ROOT_STYLE, minHeight, ...style }}
     >
-      <Suspense fallback={<div style={LOADING_STYLE}>Loading the editor…</div>}>
+      <Suspense
+        fallback={
+          <div style={LOADING_STYLE}>{t('structure.loadingEditor')}</div>
+        }
+      >
         <EditorCanvas
           key={revision}
           onChange={handleChange}

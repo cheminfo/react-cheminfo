@@ -2,6 +2,7 @@ import type { IconName, Intent } from '@blueprintjs/core';
 import { MenuItem, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { downloadCitations } from '../core/download.ts';
 import type { CitationDownload, CitationFormat } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
@@ -49,7 +50,12 @@ export interface CopyEntryProps {
  */
 export function CopyEntry(props: CopyEntryProps): ReactElement {
   const { references, format, style, state, onCopy } = props;
+  const t = useChromeT();
   const entry = style ?? format;
+  const label =
+    style === undefined
+      ? t.or(`cite.format.${format.id}`, format.label)
+      : style.label;
 
   return (
     <PreviewTooltip references={references} format={format.id} style={style}>
@@ -59,7 +65,7 @@ export function CopyEntry(props: CopyEntryProps): ReactElement {
           style={ENTRY_STYLE}
           icon={state?.icon ?? 'clipboard'}
           intent={state?.intent}
-          text={entry.label}
+          text={label}
           labelElement={
             // The hint of a style entry is a list of journals, in italic.
             style !== undefined && state === null ? (
@@ -90,6 +96,7 @@ export interface DownloadEntryProps {
  */
 export function DownloadEntry(props: DownloadEntryProps): ReactElement {
   const { references, download } = props;
+  const t = useChromeT();
   return (
     <PreviewTooltip references={references} format={download.format}>
       {(targetProps) => (
@@ -97,7 +104,7 @@ export function DownloadEntry(props: DownloadEntryProps): ReactElement {
           {...targetProps}
           style={ENTRY_STYLE}
           icon="download"
-          text={download.label}
+          text={t.or(`cite.download.${download.format}`, download.label)}
           labelElement={download.hint}
           onClick={() => {
             downloadCitations(references, download);

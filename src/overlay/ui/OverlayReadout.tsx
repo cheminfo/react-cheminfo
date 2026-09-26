@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { Button } from 'react-science/ui';
 
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 import { placeOverlayCard } from '../core/placeOverlayCard.ts';
 
@@ -84,6 +85,7 @@ export function OverlayReadout(props: OverlayReadoutProps): ReactElement {
     onUnpin,
     testId,
   } = props;
+  const t = useChromeT();
   const { metrics } = useOverlaySurface();
   const card = useRef<HTMLDivElement>(null);
   const measured = useContainerSize(card);
@@ -121,7 +123,7 @@ export function OverlayReadout(props: OverlayReadoutProps): ReactElement {
             variant="minimal"
             size="small"
             icon="cross"
-            aria-label="Dismiss"
+            aria-label={t('overlay.dismiss')}
             onClick={onUnpin}
           />
         ) : null}

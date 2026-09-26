@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useId } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { SiteGroup } from '../core/groups.ts';
 
@@ -50,14 +51,17 @@ interface SiteGroupSectionProps {
  */
 export function SiteGroupSection(props: SiteGroupSectionProps): ReactElement {
   const { group, children } = props;
+  const t = useChromeT();
   const headingId = `${useId()}ecosystem-${group.id}`;
 
   return (
     <section style={SECTION_STYLE} aria-labelledby={headingId}>
       <h3 id={headingId} style={LABEL_STYLE}>
-        {group.label}
+        {t.or(`ecosystem.group.${group.id}.label`, group.label)}
       </h3>
-      <p style={BLURB_STYLE}>{group.blurb}</p>
+      <p style={BLURB_STYLE}>
+        {t.or(`ecosystem.group.${group.id}.blurb`, group.blurb)}
+      </p>
       <div style={BODY_STYLE}>{children}</div>
     </section>
   );

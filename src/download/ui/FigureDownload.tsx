@@ -3,6 +3,7 @@ import { PopoverNext } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayIconButton } from '../../overlay/ui/OverlayIconButton.tsx';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import { downloadFigure } from '../core/downloadFigure.ts';
@@ -50,12 +51,12 @@ export interface FigureDownloadProps {
   background?: string;
   /**
    * What the glyph is called, for the pointer and for a screen reader.
-   * @default 'Save this figure'
+   * @default the chrome's own line, in the language of the page
    */
   label?: string;
   /**
    * What the panel behind it is called.
-   * @default 'Save figure'
+   * @default the chrome's own line, in the language of the page
    */
   title?: string;
   /**
@@ -92,9 +93,10 @@ export interface FigureDownloadProps {
 export function FigureDownload(props: FigureDownloadProps): ReactElement {
   const { targetId, fileName, background, scales = FIGURE_SCALES } = props;
   const { defaultFormat = 'png', defaultScale = DEFAULT_FIGURE_SCALE } = props;
-  const { label = 'Save this figure', title = 'Save figure' } = props;
+  const { label, title } = props;
   const { icon = 'download', testId } = props;
 
+  const t = useChromeT();
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<FigureFormat>(defaultFormat);
   const [scale, setScale] = useState(defaultScale);
@@ -132,7 +134,7 @@ export function FigureDownload(props: FigureDownloadProps): ReactElement {
       onInteraction={interact}
       content={
         <FigureDownloadPanel
-          title={title}
+          title={title ?? t('download.saveFigure')}
           format={format}
           scale={scale}
           scales={scales}
@@ -147,7 +149,7 @@ export function FigureDownload(props: FigureDownloadProps): ReactElement {
     >
       <OverlayIconButton
         icon={icon}
-        label={label}
+        label={label ?? t('download.saveThisFigure')}
         value={format.toUpperCase()}
         active={open}
         testId={testId}

@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Translate } from '../../i18n/ui/useT.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { copyCitations } from '../core/clipboard.ts';
 import type { CitationFormatId } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
@@ -31,6 +34,7 @@ export interface CopyFeedback {
  * @returns The copy action, and the feedback of the entry that used it.
  */
 export function useCopyFeedback(): CopyFeedback {
+  const t = useChromeT();
   const [copied, setCopied] = useState<string | null>(null);
   const [hasFailed, setHasFailed] = useState(false);
   const timeout = useRef<number | null>(null);
@@ -52,7 +56,7 @@ export function useCopyFeedback(): CopyFeedback {
   }
 
   return {
-    stateOf: (key) => (copied === key ? feedback(hasFailed) : null),
+    stateOf: (key) => (copied === key ? feedback(hasFailed, t) : null),
     copy: (key, references, format, style) => {
       copyCitations(references, format, style).then(
         () => {
@@ -68,9 +72,9 @@ export function useCopyFeedback(): CopyFeedback {
   };
 }
 
-function feedback(failed: boolean): CopyState {
+function feedback(failed: boolean, t: Translate<ChromeKey>): CopyState {
   if (failed) {
-    return { icon: 'cross', intent: 'danger', label: 'copy failed' };
+    return { icon: 'cross', intent: 'danger', label: t('clipboard.failed') };
   }
-  return { icon: 'tick', intent: 'success', label: 'copied' };
+  return { icon: 'tick', intent: 'success', label: t('clipboard.copied') };
 }

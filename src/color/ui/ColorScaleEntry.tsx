@@ -1,6 +1,7 @@
 import { MenuDivider, MenuItem } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { resolveColorScale } from '../core/scaleText.ts';
 import type { ColorScaleKind } from '../core/scales.ts';
 import { COLOR_SCALE_KIND_LABELS } from '../core/scales.ts';
@@ -33,14 +34,15 @@ interface ColorScaleEntryProps {
  */
 export function ColorScaleEntry(props: ColorScaleEntryProps): ReactElement {
   const { id, label, kind, description, previous, selected, onChange } = props;
+  const t = useChromeT();
   const entry = (
     <MenuItem
       roleStructure="listoption"
       selected={selected}
-      htmlTitle={description}
+      htmlTitle={t.or(`color.scale.${id}.description`, description)}
       text={
         <span style={ITEM_STYLE}>
-          <span>{label}</span>
+          <span>{t.or(`color.scale.${id}.label`, label)}</span>
           <ColorScaleBar scale={resolveColorScale(id).scale} />
         </span>
       }
@@ -52,7 +54,9 @@ export function ColorScaleEntry(props: ColorScaleEntryProps): ReactElement {
   if (previous === kind) return entry;
   return (
     <>
-      <MenuDivider title={COLOR_SCALE_KIND_LABELS[kind]} />
+      <MenuDivider
+        title={t.or(`color.kind.${kind}`, COLOR_SCALE_KIND_LABELS[kind])}
+      />
       {entry}
     </>
   );

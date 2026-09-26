@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { frameTitle } from '../core/familyFrame.ts';
 import type { Slide } from '../core/talk.ts';
 
@@ -23,6 +24,7 @@ export interface EmbedSlideProps {
  */
 export function EmbedSlide(props: EmbedSlideProps): ReactElement {
   const { slide } = props;
+  const t = useChromeT();
   const { prose, src } = splitEmbedAddress(slide.body);
 
   return (
@@ -30,9 +32,7 @@ export function EmbedSlide(props: EmbedSlideProps): ReactElement {
       <div className="slide-content">
         {prose === '' ? null : <SlideBody body={prose} />}
         {src === null ? (
-          <p className="slide-embed-missing">
-            This slide frames a tool, but carries no address.
-          </p>
+          <p className="slide-embed-missing">{t('slides.noAddress')}</p>
         ) : (
           <iframe
             className="slide-embed-frame"

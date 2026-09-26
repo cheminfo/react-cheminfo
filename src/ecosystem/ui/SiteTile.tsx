@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { useSiteLanguage } from '../../language/ui/siteLanguageContext.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { siteNameColors } from '../core/nameColors.ts';
@@ -95,6 +96,7 @@ export function SiteTile(props: SiteTileProps): ReactElement {
     onHover,
     newTab = false,
   } = props;
+  const t = useChromeT();
   const lit = isHovered && !isCurrent;
   const colors = siteNameColors(site);
 
@@ -119,11 +121,13 @@ export function SiteTile(props: SiteTileProps): ReactElement {
           </span>
           {isCurrent ? (
             <span style={{ ...HERE_STYLE, color: site.brandAlt }}>
-              you are here
+              {t('ecosystem.youAreHere')}
             </span>
           ) : null}
         </div>
-        <div style={TAGLINE_STYLE}>{site.tagline}</div>
+        <div style={TAGLINE_STYLE}>
+          {t.or(`site.${site.id}.tagline`, site.tagline)}
+        </div>
       </div>
     </>
   );
