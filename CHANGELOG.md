@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.26.0](https://github.com/cheminfo/react-cheminfo/compare/v0.25.0...v0.26.0) (2026-09-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* `helpName` takes the chrome's formatter as its second argument, `ViewerCapability` carries a `reason`, and a toolbar button, a guide section, a gesture and a documentation link each carry an `id`.
+
+### Features
+
+* speak French, German and Spanish as well as English ([ff7a2ce](https://github.com/cheminfo/react-cheminfo/commit/ff7a2ce6f5b494fa425f887854914319896d87c6))
+
+
+### Bug Fixes
+
+* **cite:** keep the copy feedback in the register of a menu hint ([db3d2c1](https://github.com/cheminfo/react-cheminfo/commit/db3d2c1784b5e959afb7fd61bafad8babf126720))
+
 ## [0.25.0](https://github.com/cheminfo/react-cheminfo/compare/v0.24.0...v0.25.0) (2026-09-26)
 
 
