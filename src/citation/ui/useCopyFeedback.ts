@@ -72,9 +72,12 @@ export function useCopyFeedback(): CopyFeedback {
   };
 }
 
+// The label rides at the right of a menu row, where the format's own hint
+// otherwise sits — `LaTeX`, `Word, Docs, email` — so it is written in that
+// register rather than as the word a copy button shows on its own.
 function feedback(failed: boolean, t: Translate<ChromeKey>): CopyState {
   if (failed) {
-    return { icon: 'cross', intent: 'danger', label: t('clipboard.failed') };
+    return { icon: 'cross', intent: 'danger', label: t('cite.copyFailed') };
   }
-  return { icon: 'tick', intent: 'success', label: t('clipboard.copied') };
+  return { icon: 'tick', intent: 'success', label: t('cite.copied') };
 }

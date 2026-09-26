@@ -68,6 +68,8 @@
   "cite.openArticle": "Open the article",
   "cite.copyThisAs": "Copy this reference as",
   "cite.importThis": "Import this reference",
+  "cite.copied": "copied",
+  "cite.copyFailed": "copy failed",
   "cite.format.doi": "DOI link",
   "cite.download.ris": "RIS file",
   "cite.download.bibtex": "BibTeX file",

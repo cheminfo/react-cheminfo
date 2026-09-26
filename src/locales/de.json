@@ -68,6 +68,8 @@
   "cite.openArticle": "Den Artikel öffnen",
   "cite.copyThisAs": "Diese Literaturangabe kopieren als",
   "cite.importThis": "Diese Literaturangabe importieren",
+  "cite.copied": "kopiert",
+  "cite.copyFailed": "fehlgeschlagen",
   "cite.format.doi": "DOI-Link",
   "cite.download.ris": "RIS-Datei",
   "cite.download.bibtex": "BibTeX-Datei",

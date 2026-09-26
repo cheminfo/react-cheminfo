@@ -16,6 +16,7 @@ const STORY_IDS = [
   'capsule-capsulefilter--default',
   'capsule-capsulefilter--pre-selected',
   'capsule-capsulefilter--several-outcomes',
+  'capsule-capsulefilter--with-note',
   'capsule-capsulefilter--without-counts',
   'chart-chartframe--default',
   'chart-chartframe--tiny-numbers',
