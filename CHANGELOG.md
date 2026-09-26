@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.24.0](https://github.com/cheminfo/react-cheminfo/compare/v0.23.0...v0.24.0) (2026-09-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* install openchemlib with the package and require React 19
+* give conformers their own door, so core still costs nothing
+
+### Features
+
+* draw a clipboard cursor over a copyable value ([b87ab02](https://github.com/cheminfo/react-cheminfo/commit/b87ab02ea3bd9e99a968cce18c618bdffe237770))
+* generate conformers here, and refine them with GFN2-xTB on demand ([05ec3a3](https://github.com/cheminfo/react-cheminfo/commit/05ec3a393af9ec2388d961610298534d310f9b3a))
+* give an atomic orbital the energy needed to remove its electron ([0753c9c](https://github.com/cheminfo/react-cheminfo/commit/0753c9c1bf4e0257860a8e688aa05dde10d04a33))
+* own the translation of a site, from ICU catalogs to the overlay session ([8ebcd8b](https://github.com/cheminfo/react-cheminfo/commit/8ebcd8bfe4bedf5fcee40cc3bef0937fa9ae2cfe))
+
+
+### Bug Fixes
+
+* declare xtb-wasm as a devDependency, so tsc resolves its types ([5ec718e](https://github.com/cheminfo/react-cheminfo/commit/5ec718eb1475698af03e3cb99362bb69eb938d70))
+* give conformers their own door, so core still costs nothing ([812e095](https://github.com/cheminfo/react-cheminfo/commit/812e095d58eef0ccbf330cea6609adbc91387b5e))
+* install openchemlib with the package and require React 19 ([4c3b530](https://github.com/cheminfo/react-cheminfo/commit/4c3b530cb49a243cb656f54132d139350cac79de))
+
 ## [0.23.0](https://github.com/cheminfo/react-cheminfo/compare/v0.22.0...v0.23.0) (2026-09-25)
 
 
