@@ -28,7 +28,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A value copied by clicking it: the copy cursor, a tint and a clipboard glyph announce it on hover, and a tick confirms the copy.',
+          'A value copied by clicking it: a cursor carrying a clipboard and a tint announce it on hover, and a tick confirms the copy.',
       },
     },
   },

@@ -15,7 +15,10 @@ async function copiedText(page: Page, value: Locator): Promise<string> {
   return page.evaluate(() => navigator.clipboard.readText());
 }
 
-test('hovering shows the copy cursor and the clipboard glyph; a click copies and ticks', async ({
+/** The cursor drawn over a copyable value: a pointer carrying a clipboard. */
+const COPY_CURSOR = /^url\("data:image\/svg\+xml,.*"\) 1 1, copy$/;
+
+test('hovering shows the clipboard cursor and no glyph; a click copies and ticks', async ({
   page,
 }) => {
   await openStory(page, 'clipboard-clicktocopy--default');
@@ -23,20 +26,21 @@ test('hovering shows the copy cursor and the clipboard glyph; a click copies and
   const icon = value.locator('.click-to-copy__icon');
 
   await expect(value).toHaveAttribute('title', 'Copy the SMILES (C=CC=O)');
-  await expect(value).toHaveCSS('cursor', 'copy');
+  await expect(value).toHaveCSS('cursor', COPY_CURSOR);
   await expect(icon).toHaveCSS('opacity', '0');
 
   await value.hover();
-  await expect(icon).toHaveCSS('opacity', '1');
-  await expect(icon).toHaveClass(/bp6-icon-clipboard/);
+  await expect(icon).toHaveCSS('opacity', '0');
 
   await value.click();
   expect(await copiedText(page, value)).toBe('C=CC=O');
   await expect(icon).toHaveClass(/bp6-icon-tick/);
+  await expect(icon).toHaveCSS('opacity', '1');
   await expect(page.getByRole('status')).toHaveText('Copied');
 
   await expect(value).not.toHaveAttribute('data-copy', /./, { timeout: 3000 });
   await expect(icon).toHaveClass(/bp6-icon-clipboard/);
+  await expect(icon).toHaveCSS('opacity', '0');
 });
 
 test('Enter copies a focused value, as a click does', async ({ page }) => {
@@ -53,7 +57,7 @@ test('a table cell copies its own value', async ({ page }) => {
   await openStory(page, 'clipboard-clicktocopy--table-cells');
   const cell = page.getByRole('cell', { name: '-13.19' });
 
-  await expect(cell).toHaveCSS('cursor', 'copy');
+  await expect(cell).toHaveCSS('cursor', COPY_CURSOR);
   await cell.click();
 
   expect(await copiedText(page, cell)).toBe('-13.19');

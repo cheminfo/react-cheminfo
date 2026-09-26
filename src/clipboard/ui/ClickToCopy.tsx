@@ -24,7 +24,7 @@ export interface ClickToCopyProps {
    * function is called only when the value is clicked.
    */
   value: ClipboardContent | (() => ClipboardContent);
-  /** What is shown; the pointer turns into the copy cursor over it. */
+  /** What is shown; the pointer turns into a clipboard over it. */
   children: ReactNode;
   /**
    * What the value is, named in the hover title: `Copy the SMILES (C=CC=O)`.
@@ -46,9 +46,10 @@ export interface ClickToCopyProps {
    */
   as?: ClickToCopyElement;
   /**
-   * Whether the value is a tab stop and a button of its own, with its glyph.
-   * Off when a copy button beside it already copies the same value, so the
-   * keyboard and a screen reader meet one control, and the eye one glyph.
+   * Whether the value is a tab stop and a button of its own, with the glyph a
+   * keyboard is shown instead of the cursor. Off when a copy button beside it
+   * already copies the same value, so the keyboard and a screen reader meet
+   * one control.
    * @default true
    */
   focusable?: boolean;
@@ -83,9 +84,9 @@ const NESTED_CONTROL =
  * A value that is copied by clicking it.
  *
  * Text in a tool is not selectable — a drag across a viewer must not paint the
- * page — so what is worth taking away is copied this way instead: the copy
- * cursor, a tint and a clipboard glyph announce it on hover, a click or `Enter`
- * puts it on the clipboard, and a tick confirms it. The click stops there, so
+ * page — so what is worth taking away is copied this way instead: a cursor
+ * carrying a clipboard and a tint announce it on hover, a click or `Enter` puts
+ * it on the clipboard, and a tick confirms it. The click stops there, so
  * a value inside a clickable row copies without also opening the row, and a
  * link or a button nested in the value keeps its own click.
  * @param props - See {@link ClickToCopyProps}.
