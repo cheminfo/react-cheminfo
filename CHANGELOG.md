@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.28.0](https://github.com/cheminfo/react-cheminfo/compare/v0.27.0...v0.28.0) (2026-09-27)
+
+
+### Features
+
+* **clipboard:** copy a labelled value by clicking the value itself ([488371a](https://github.com/cheminfo/react-cheminfo/commit/488371a706528b098b76c52482d6e08ace0debd1))
+
 ## [0.27.0](https://github.com/cheminfo/react-cheminfo/compare/v0.26.0...v0.27.0) (2026-09-26)
 
 
