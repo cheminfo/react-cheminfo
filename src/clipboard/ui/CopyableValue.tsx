@@ -4,7 +4,6 @@ import { MISSING_VALUE } from '../../format/core/missing.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
 import { ClickToCopy } from './ClickToCopy.tsx';
-import { CopyButton } from './CopyButton.tsx';
 
 const DEFAULT_BLOCK_HEIGHT = 160;
 
@@ -12,7 +11,7 @@ const DEFAULT_BLOCK_HEIGHT = 160;
 export interface CopyableValueProps {
   /** What the value is, written above it, e.g. `InChIKey`. */
   label: string;
-  /** The value itself, which is also what the button copies. */
+  /** The value itself, which is what a click on it copies. */
   value: string;
   /**
    * A longer explanation of the label, shown on hover.
@@ -31,8 +30,9 @@ export interface CopyableValueProps {
    */
   maxHeight?: number | string;
   /**
-   * What the pointer and a screen reader are told the button does.
-   * @default `Copy the ${label}`
+   * What the pointer and a screen reader are told, replacing the title built
+   * from the label and the value.
+   * @default undefined — `Copy the ${label} (${value})`
    */
   copyTitle?: string;
   /**
@@ -48,14 +48,16 @@ export interface CopyableValueProps {
 }
 
 /**
- * One read-only value, named, with the button that copies it.
+ * One read-only value, named, copied by clicking it.
  *
- * A derived notation — a SMILES, an InChIKey, an accession — is only useful
- * somewhere else, so a click on the value or on its button puts it on the
- * clipboard. An empty value reads as the missing marker and offers nothing to
- * copy.
+ * A derived notation — a SMILES, an InChIKey, an accession, a computed energy
+ * — is only useful somewhere else, so the value is the button that copies it:
+ * the cursor carries a clipboard over it, a click or `Enter` puts it on the
+ * clipboard, and a tick confirms. Nothing is drawn beside the label, which
+ * names the value and no more. An empty value reads as the missing marker and
+ * offers nothing to copy.
  * @param props - See {@link CopyableValueProps}.
- * @returns The labelled value and its copy button.
+ * @returns The labelled value.
  */
 export function CopyableValue(props: CopyableValueProps): ReactElement {
   const {
@@ -64,7 +66,7 @@ export function CopyableValue(props: CopyableValueProps): ReactElement {
     hint,
     block = false,
     maxHeight = DEFAULT_BLOCK_HEIGHT,
-    copyTitle = `Copy the ${label}`,
+    copyTitle,
     children,
     className,
   } = props;
@@ -78,27 +80,18 @@ export function CopyableValue(props: CopyableValueProps): ReactElement {
           : `copyable-value ${className}`
       }
     >
-      <div style={HEADER_STYLE}>
-        <span
-          className="copyable-value__label"
-          style={hint === undefined ? LABEL_STYLE : HINTED_LABEL_STYLE}
-          title={hint}
-        >
-          {label}
-        </span>
-        <CopyButton
-          content={value}
-          title={copyTitle}
-          disabled={isEmpty}
-          minimal
-          small
-        />
-      </div>
+      <span
+        className="copyable-value__label"
+        style={hint === undefined ? LABEL_STYLE : HINTED_LABEL_STYLE}
+        title={hint}
+      >
+        {label}
+      </span>
       <ClickToCopy
         as="code"
         value={value}
         label={label}
-        focusable={false}
+        title={copyTitle}
         disabled={isEmpty}
         className="copyable-value__value"
         style={block ? { ...BLOCK_VALUE_STYLE, maxHeight } : VALUE_STYLE}
@@ -110,14 +103,8 @@ export function CopyableValue(props: CopyableValueProps): ReactElement {
   );
 }
 
-const HEADER_STYLE = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 8,
-} as const satisfies CSSProperties;
-
 const LABEL_STYLE = {
+  display: 'block',
   color: TOKEN.textMuted,
   fontSize: 12,
   fontWeight: 600,

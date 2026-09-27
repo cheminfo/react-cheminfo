@@ -5,7 +5,7 @@ import { CopyableValue } from '../CopyableValue.tsx';
 
 const INCHI_KEY = 'LFQSCWFLJHTTHZ-UHFFFAOYSA-N';
 
-test('the label, the value and one copy button named after the label', () => {
+test('the label names the value, and the value is the only control', () => {
   const html = renderToStaticMarkup(
     <CopyableValue label="InChIKey" value={INCHI_KEY} />,
   );
@@ -13,9 +13,8 @@ test('the label, the value and one copy button named after the label', () => {
   expect(html).toContain('class="copyable-value"');
   expect(html).toContain('>InChIKey</span>');
   expect(html).toContain(`>${INCHI_KEY}<span`);
-  expect(html.match(/<button/g)).toHaveLength(1);
-  expect(html.match(/tabindex/g)).toBeNull();
-  expect(html).toContain('title="Copy the InChIKey"');
+  expect(html.match(/<button/g)).toBeNull();
+  expect(html.match(/tabindex/g)).toHaveLength(1);
   expect(html).toContain(`title="Copy the InChIKey (${INCHI_KEY})"`);
   expect(html).toContain(
     'class="click-to-copy click-to-copy--inline copyable-value__value"',
@@ -57,8 +56,8 @@ test('an empty value reads as the missing marker and offers nothing to copy', ()
   const html = renderToStaticMarkup(<CopyableValue label="InChI" value="" />);
 
   expect(html).toContain('>–</code>');
-  expect(html).toContain('disabled=""');
   expect(html).not.toContain('click-to-copy');
+  expect(html).not.toContain('tabindex');
 });
 
 test('what the caller puts under the value follows it, and its class joins ours', () => {
@@ -75,7 +74,7 @@ test('what the caller puts under the value follows it, and its class joins ours'
 
   expect(html).toContain('class="copyable-value notation-row"');
   expect(html).toContain('title="Copy the GlyTouCan accession"');
-  expect(html).toMatch(
-    /G00055MO<span class="click-to-copy__status" role="status"><\/span><\/code><a href="https:\/\/glytoucan\.org\/Structures\/Glycans\/G00055MO">/,
+  expect(html).toContain(
+    '</code><a href="https://glytoucan.org/Structures/Glycans/G00055MO">',
   );
 });
