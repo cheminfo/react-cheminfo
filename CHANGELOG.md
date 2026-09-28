@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.29.0](https://github.com/cheminfo/react-cheminfo/compare/v0.28.0...v0.29.0) (2026-09-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* `createScale`/`Scale` are `chartScale`/`ChartScale` with `chartPixel`/`chartValue`; `niceTicks` is `chartAxisScale` with `step: 'atMost'`; `exportName` is `sanitizeFileName`; `chartWheelFactor` now caps wheel travel rather than the factor it returns.
+
+### Features
+
+* take in the spectrum chart, the editor shell and the infrared viewer ([8a9ca38](https://github.com/cheminfo/react-cheminfo/commit/8a9ca38e63c91fcfc755db427472d3bb6e730cf8))
+
 ## [0.28.0](https://github.com/cheminfo/react-cheminfo/compare/v0.27.0...v0.28.0) (2026-09-27)
 
 
