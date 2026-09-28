@@ -27,7 +27,10 @@ export interface ChartScale {
  * @param rangeMax - The pixel `domainMax` maps to.
  * @returns The mapping. A zero-width or non-finite domain gives a `factor` of
  * zero, which pins every value to the middle of the range so that a constant
- * column still draws instead of vanishing.
+ * column still draws instead of vanishing. A range that is not a range — a
+ * plot measured before it was laid out — gives an `offset` of `NaN` instead,
+ * because there is no pixel a value could honestly be put at, and every mark
+ * already declines to draw what does not map.
  */
 export function chartScale(
   domainMin: number,
@@ -37,9 +40,9 @@ export function chartScale(
 ): ChartScale {
   const span = domainMax - domainMin;
   const reach = rangeMax - rangeMin;
-  if (span === 0 || !Number.isFinite(span) || !Number.isFinite(reach)) {
-    const middle = (rangeMin + rangeMax) / 2;
-    return { offset: Number.isFinite(middle) ? middle : 0, factor: 0 };
+  if (!Number.isFinite(reach)) return { offset: Number.NaN, factor: 0 };
+  if (span === 0 || !Number.isFinite(span)) {
+    return { offset: (rangeMin + rangeMax) / 2, factor: 0 };
   }
   const factor = reach / span;
   return { offset: rangeMin - domainMin * factor, factor };

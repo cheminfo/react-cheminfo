@@ -33,8 +33,20 @@ export const CHART_WHEEL_LINE = 16;
 /** Pixels it is worth where the browser reports pages. */
 export const CHART_WHEEL_PAGE = 400;
 
-/** The most one wheel event may zoom by, so a stray burst cannot jump. */
-export const CHART_WHEEL_LARGEST = 4;
+/**
+ * The most travel one wheel event is read as, in pixels.
+ *
+ * A trackpad flick arrives as a handful of events carrying several hundred
+ * pixels each, and an inertial one keeps arriving after the fingers have left
+ * the glass. Uncapped, a single flick takes an axis through several orders of
+ * magnitude and the data is gone; capped, the gesture stays fast and is always
+ * recoverable by flicking the other way.
+ *
+ * The cap is written in travel rather than as a largest factor because travel
+ * is what the browser reports and what varies between them — so a chart that
+ * zooms at its own pace is held to the same burst as every other.
+ */
+export const CHART_WHEEL_TRAVEL = 240;
 
 /**
  * The viewport a zoom about one point leaves behind.
@@ -130,9 +142,13 @@ export function chartZoomDomain(
  * The travel is normalised first, because the same notch of the same wheel
  * arrives as pixels in one browser and as lines in another, and a zoom that
  * moves three times as fast in Firefox is a fault the reader blames on the
- * figure. One event is capped: a trackpad flick can deliver a whole page of
- * travel at once, and landing four hundred times out is not recoverable by
- * feel.
+ * figure. Then it is capped at {@link CHART_WHEEL_TRAVEL}, so one burst can
+ * only ever be worth one flick.
+ *
+ * The factor is `exp(pixels x rate)`, so the gesture is multiplicative: two
+ * notches in and two notches out land back where they started, whichever way
+ * round they were made, and a zoom deep into one small feature comes back out
+ * at the pace it went in.
  * @param delta - The event's `deltaY`; positive scrolls away and zooms out.
  * @param mode - Its `deltaMode`: 0 pixels, 1 lines, 2 pages. Defaults to `0`.
  * @param speed - Share zoomed per pixel of travel. Defaults to {@link CHART_WHEEL_SPEED}.
@@ -143,15 +159,26 @@ export function chartWheelFactor(
   mode = 0,
   speed = CHART_WHEEL_SPEED,
 ): number {
-  if (!Number.isFinite(delta) || delta === 0) return 1;
-  const pixels = delta * wheelPixels(mode);
+  const travel = chartWheelTravel(delta, mode);
+  if (travel === 0) return 1;
   const rate = Number.isFinite(speed) && speed > 0 ? speed : CHART_WHEEL_SPEED;
-  const factor = Math.exp(pixels * rate);
-  if (!Number.isFinite(factor)) return delta > 0 ? CHART_WHEEL_LARGEST : 1;
-  return Math.min(
-    CHART_WHEEL_LARGEST,
-    Math.max(1 / CHART_WHEEL_LARGEST, factor),
-  );
+  return Math.exp(travel * rate);
+}
+
+/**
+ * The travel one wheel event carries, in pixels, capped.
+ *
+ * Separate from the factor because a gesture that is not a zoom — a wheel that
+ * scales a value axis about its baseline — needs the same normalisation and
+ * the same cap while computing something else entirely.
+ * @param delta - The event's `deltaY`.
+ * @param mode - Its `deltaMode`: 0 pixels, 1 lines, 2 pages. Defaults to `0`.
+ * @returns The travel, `0` for an event that says nothing.
+ */
+export function chartWheelTravel(delta: number, mode = 0): number {
+  if (!Number.isFinite(delta) || delta === 0) return 0;
+  const pixels = delta * wheelPixels(mode);
+  return Math.min(CHART_WHEEL_TRAVEL, Math.max(-CHART_WHEEL_TRAVEL, pixels));
 }
 
 function wheelPixels(mode: number): number {

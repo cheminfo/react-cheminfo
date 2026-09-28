@@ -201,3 +201,117 @@ test('the factor the labels were divided by is written into the title', () => {
   expect(chartExponentSuffix(-12)).toBe(' (×10⁻¹²)');
   expect(chartExponentSuffix(Number.NaN)).toBe('');
 });
+
+/**
+ * An axis divided the way a chart a reader has zoomed divides one: the window
+ * exactly as dragged, and the tick count a budget rather than a wish.
+ * @param from - The low end of the window.
+ * @param to - The high end.
+ * @param count - The most intervals it has room for. Defaults to `6`.
+ * @returns The tick values and the decimals they are written to.
+ */
+function zoomed(from: number, to: number, count = 6) {
+  const axis = chartAxisScale(from, to, { count, nice: false, step: 'atMost' });
+  return { values: axis.values, decimals: axis.decimals };
+}
+
+test('a survey scan gets round ticks and no decimals', () => {
+  expect(zoomed(0, 1000)).toStrictEqual({
+    values: [0, 200, 400, 600, 800, 1000],
+    decimals: 0,
+  });
+});
+
+test('the ticks are multiples of the step, not fractions of the window', () => {
+  expect(zoomed(100, 2000)).toStrictEqual({
+    values: [500, 1000, 1500, 2000],
+    decimals: 0,
+  });
+});
+
+test('a zoom to one isotopologue cluster is written to four decimals', () => {
+  expect(zoomed(0.4995, 0.5005)).toStrictEqual({
+    values: [0.4996, 0.4998, 0.5, 0.5002, 0.5004],
+    decimals: 4,
+  });
+});
+
+test('a step that lands a hair above a power of ten is not doubled', () => {
+  expect(zoomed(0, 0.05, 5)).toStrictEqual({
+    values: [0, 0.01, 0.02, 0.03, 0.04, 0.05],
+    decimals: 2,
+  });
+});
+
+test('the tick at the far end of the window is not lost to floating point', () => {
+  // 0.7 / 0.1 is 6.999999999999999, and 0.3 / 0.05 is 5.999999999999999.
+  expect(zoomed(0.1, 0.7)).toStrictEqual({
+    values: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+    decimals: 1,
+  });
+  expect(zoomed(0, 0.3)).toStrictEqual({
+    values: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3],
+    decimals: 2,
+  });
+});
+
+test('a window too narrow for a step to exist carries no ticks at all', () => {
+  // The step underflows to zero here, and a loop walking it would never end.
+  expect(zoomed(1e-320, 2e-320).values).toStrictEqual([]);
+});
+
+test('a mirrored intensity axis is ticked symmetrically through zero', () => {
+  expect(zoomed(-1200, 1200)).toStrictEqual({
+    values: [-1000, -500, 0, 500, 1000],
+    decimals: 0,
+  });
+});
+
+test('every tick is inside its window and no window gets more than it asked', () => {
+  const windows: Array<[number, number]> = [
+    [0, 0.3],
+    [0.1, 0.7],
+    [-0.7, -0.1],
+    [498.15, 502.85],
+    [0, 1_200_000],
+    [1234.5678, 1234.5679],
+  ];
+  for (const [minimum, maximum] of windows) {
+    for (let count = 3; count <= 10; count++) {
+      const { values } = zoomed(minimum, maximum, count);
+      const where = `${minimum}..${maximum} at ${count}`;
+
+      expect({ where, first: (values[0] as number) >= minimum }).toStrictEqual({
+        where,
+        first: true,
+      });
+      expect({
+        where,
+        last: (values.at(-1) as number) <= maximum,
+      }).toStrictEqual({
+        where,
+        last: true,
+      });
+      expect({ where, count: values.length - 1 <= count }).toStrictEqual({
+        where,
+        count: true,
+      });
+    }
+  }
+});
+
+test('asking for fewer intervals takes the next step up', () => {
+  expect(zoomed(0, 1000, 3)).toStrictEqual({
+    values: [0, 500, 1000],
+    decimals: 0,
+  });
+});
+
+test('a window of one point is one tick at its own precision', () => {
+  expect(zoomed(5, 5)).toStrictEqual({ values: [5], decimals: 0 });
+  expect(zoomed(0.0005, 0.0005)).toStrictEqual({
+    values: [0.0005],
+    decimals: 4,
+  });
+  expect(zoomed(0, 0)).toStrictEqual({ values: [0], decimals: 0 });
+});

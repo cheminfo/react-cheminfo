@@ -14,6 +14,7 @@ export * from './i18n/core/index.ts';
 export * from './language/core/index.ts';
 export * from './orbital/core/index.ts';
 export * from './overlay/core/index.ts';
+export * from './panel/core/index.ts';
 export * from './parallel/core/index.ts';
 export * from './pedagogy/core/index.ts';
 export * from './periodic/core/index.ts';

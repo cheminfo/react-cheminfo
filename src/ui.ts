@@ -17,6 +17,7 @@ export * from './hooks/ui/index.ts';
 export * from './i18n/ui/index.ts';
 export * from './language/ui/index.ts';
 export * from './overlay/ui/index.ts';
+export * from './panel/ui/index.ts';
 export * from './parallel/ui/index.ts';
 export * from './pedagogy/ui/index.ts';
 export * from './periodic/ui/index.ts';

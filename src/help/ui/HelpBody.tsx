@@ -20,6 +20,15 @@ export interface HelpExample {
   note?: string;
 }
 
+/**
+ * Help written as prose: one paragraph, or several.
+ *
+ * Several because an explanation worth reading is rarely one thought, and a
+ * dozen sentences run together into one block is a wall nobody reads to the
+ * end — which is the same as not having written it.
+ */
+export type HelpText = string | readonly string[];
+
 /** Everything a piece of help says, wherever it is shown. */
 export interface HelpContent {
   /**
@@ -28,7 +37,8 @@ export interface HelpContent {
    */
   title?: string;
   /**
-   * The explanation: one or two sentences, or any content of the site's own.
+   * The explanation: one or two sentences, any content of the site's own, or
+   * an array of strings, which is set as one paragraph each.
    * @default undefined
    */
   body?: ReactNode;
@@ -82,7 +92,9 @@ export function HelpBody(props: HelpBodyProps): ReactElement {
       style={{ ...BODY_STYLE, maxWidth: width }}
     >
       {title === undefined ? null : <div style={TITLE_STYLE}>{title}</div>}
-      {body === undefined ? null : <div style={TEXT_STYLE}>{body}</div>}
+      {body === undefined ? null : (
+        <div style={TEXT_STYLE}>{paragraphsOf(body)}</div>
+      )}
       {examplesOf(example).map((item) => (
         <div key={exampleKey(item)} style={EXAMPLE_STYLE}>
           <code style={CODE_STYLE}>{item.code}</code>
@@ -110,6 +122,30 @@ export function HelpBody(props: HelpBodyProps): ReactElement {
   );
 }
 
+/**
+ * The body, with an array of strings set as paragraphs rather than run
+ * together.
+ *
+ * React renders `['one', 'two']` as `onetwo`, which is never what a caller who
+ * wrote two sentences meant. Anything else is handed back untouched: a body
+ * built of elements is the site's own and is laid out by whoever wrote it.
+ * @param body - The body, as the caller wrote it.
+ * @returns What to render.
+ */
+function paragraphsOf(body: ReactNode): ReactNode {
+  if (!Array.isArray(body)) return body;
+  const paragraphs: string[] = [];
+  for (const piece of body) {
+    if (typeof piece !== 'string') return body;
+    paragraphs.push(piece);
+  }
+  return paragraphs.map((paragraph) => (
+    <p key={paragraph} style={PARAGRAPH_STYLE}>
+      {paragraph}
+    </p>
+  ));
+}
+
 // Two examples are only the same when all three of their parts are, and a help
 // that repeats one example has nothing to gain from drawing it twice.
 function exampleKey(example: HelpExample): string {
@@ -129,6 +165,9 @@ function examplesOf(example: HelpContent['example']): readonly HelpExample[] {
   }
   return unique;
 }
+
+/** The gap between paragraphs is the column's, so the margin is nobody's. */
+const PARAGRAPH_STYLE = { margin: 0 } as const satisfies CSSProperties;
 
 /** How wide a piece of help is drawn when the caller does not say. */
 const DEFAULT_WIDTH = 280;

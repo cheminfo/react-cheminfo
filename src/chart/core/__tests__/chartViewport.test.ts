@@ -2,7 +2,8 @@ import { expect, test } from 'vitest';
 
 import type { ChartViewport } from '../chartViewport.ts';
 import {
-  CHART_WHEEL_LARGEST,
+  CHART_WHEEL_SPEED,
+  CHART_WHEEL_TRAVEL,
   chartClampViewport,
   chartWheelFactor,
   chartZoomDomain,
@@ -67,8 +68,11 @@ test('a wheel notch zooms the same whether the browser counts pixels or lines', 
 test('scrolling away zooms out, scrolling towards zooms in, and a flick is capped', () => {
   expect(chartWheelFactor(100)).toBeCloseTo(1.161834, 6);
   expect(chartWheelFactor(-100)).toBeCloseTo(0.860708, 6);
-  expect(chartWheelFactor(100_000)).toBe(CHART_WHEEL_LARGEST);
-  expect(chartWheelFactor(-100_000)).toBe(1 / CHART_WHEEL_LARGEST);
+
+  const largest = Math.exp(CHART_WHEEL_TRAVEL * CHART_WHEEL_SPEED);
+
+  expect(chartWheelFactor(100_000)).toBeCloseTo(largest, 12);
+  expect(chartWheelFactor(-100_000)).toBeCloseTo(1 / largest, 12);
   expect(chartWheelFactor(0)).toBe(1);
   expect(chartWheelFactor(Number.NaN)).toBe(1);
 });

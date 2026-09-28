@@ -13,6 +13,18 @@ export default defineConfig(
   typescript,
   react,
   {
+    // The chart is what makes the viewers built on it siblings rather than a
+    // stack, so it must never learn what any of them measures: an infrared
+    // spectrum, a mass spectrum and a glycan are all drawn by the same axes.
+    files: ['src/chart/**', 'src/panel/**', 'src/download/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: ['**/ir/**', '**/structure/**', '**/spectra/**'] },
+      ],
+    },
+  },
+  {
     // The `./core` entry point must stay React-free.
     files: ['src/*/core/**'],
     rules: {

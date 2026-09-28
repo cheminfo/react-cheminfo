@@ -31,3 +31,38 @@ export { TrackedLineChart } from './TrackedLineChart.tsx';
 export type { ChartStickSeries } from './stickChartModel.ts';
 export type { TrackedStickChartProps } from './TrackedStickChart.tsx';
 export { TrackedStickChart } from './TrackedStickChart.tsx';
+
+export type { AxesProps } from './Axes.tsx';
+export { Axes } from './Axes.tsx';
+export type { AxisGuideProps } from './AxisGuide.tsx';
+export { AxisGuide } from './AxisGuide.tsx';
+export type { ChartStackPane, ChartStackProps } from './ChartStack.tsx';
+export { ChartStack } from './ChartStack.tsx';
+export type { ChartTrackerProps } from './ChartTracker.tsx';
+export { ChartTracker } from './ChartTracker.tsx';
+export type { PlotCaptionProps } from './PlotCaption.tsx';
+export { PlotCaption } from './PlotCaption.tsx';
+export type { SelectionRectProps } from './SelectionRect.tsx';
+export { SelectionRect } from './SelectionRect.tsx';
+export type { LegendEntry, TraceLegendProps } from './TraceLegend.tsx';
+export { TraceLegend } from './TraceLegend.tsx';
+export type { ChartClickModifiers } from './chartGestures.ts';
+export { NO_MODIFIERS } from './chartGestures.ts';
+export { chartSurfaceStyle } from './chartSurface.ts';
+export type { ChartPointer, ChartPointerOptions } from './useChartPointer.ts';
+export {
+  isInsidePlot,
+  leftChart,
+  nextChartPointer,
+  sameReading,
+  useChartPointer,
+} from './useChartPointer.ts';
+export type { ChartSizeHandle } from './useChartSize.ts';
+export { nextChartSize, useChartSize } from './useChartSize.ts';
+export type {
+  ChartZoom,
+  ChartZoomHandlers,
+  ChartZoomOptions,
+} from './useChartZoom.ts';
+export { useChartZoom } from './useChartZoom.ts';
+export { useWheelListener } from './useWheelListener.ts';

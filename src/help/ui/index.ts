@@ -1,4 +1,9 @@
-export type { HelpBodyProps, HelpContent, HelpExample } from './HelpBody.tsx';
+export type {
+  HelpBodyProps,
+  HelpContent,
+  HelpExample,
+  HelpText,
+} from './HelpBody.tsx';
 export { HelpBody } from './HelpBody.tsx';
 export type { HelpIconProps } from './HelpIcon.tsx';
 export { HelpIcon } from './HelpIcon.tsx';

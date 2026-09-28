@@ -12,6 +12,15 @@ const COMFORTABLE_LABEL = 6;
 const STEP_10 = Math.sqrt(50);
 const STEP_5 = Math.sqrt(10);
 const STEP_2 = Math.SQRT2;
+/**
+ * How far a fraction may sit above 1, 2 or 5 and still count as being on it.
+ *
+ * `span / count` is computed in floating point, so a window that ought to give
+ * a step of exactly one lands a hair above it — `1.0000000000000002` — and an
+ * exact comparison would take the next step up and halve the number of ticks
+ * for no visible reason.
+ */
+const STEP_EPSILON = 1e-9;
 
 /** A niced axis: its domain, its ticks, and the labels they are written with. */
 export interface ChartAxisScale {
@@ -29,6 +38,22 @@ export interface ChartAxisScale {
   readonly labels: readonly string[];
 }
 
+/**
+ * How the step is chosen when an even division lands between two nice ones.
+ *
+ * - `nearest` — take whichever of 1, 2 or 5 the division is closest to, which
+ *   puts the tick count near what was asked for from either side.
+ * - `atMost` — always take the larger, so the count asked for is a budget the
+ *   axis never exceeds.
+ *
+ * The difference is not cosmetic. A figure asking for about five ticks wants
+ * them spaced as evenly as the numbers allow, and one either way costs it
+ * nothing. An axis in a two-hundred-pixel panel has worked its count out from
+ * the room it has and the width of a label, so one tick more than it asked for
+ * is two labels touching.
+ */
+export type ChartAxisStep = 'nearest' | 'atMost';
+
 /** How an axis is divided. */
 export interface ChartAxisScaleOptions {
   /**
@@ -39,10 +64,15 @@ export interface ChartAxisScaleOptions {
   /**
    * Whether to widen the domain outward to whole steps, so the axis ends on a
    * labelled tick. Turn it off when the domain is already exact — a share that
-   * must end at 100%.
+   * must end at 100%, or a window a reader dragged out for themselves.
    * @default true
    */
   nice?: boolean;
+  /**
+   * How the step is chosen. See {@link ChartAxisStep}.
+   * @default 'nearest'
+   */
+  step?: ChartAxisStep;
 }
 
 /**
@@ -68,11 +98,34 @@ export function chartAxisScale(
   max: number,
   options: ChartAxisScaleOptions = {},
 ): ChartAxisScale {
-  const { count = DEFAULT_COUNT, nice = true } = options;
+  const { count = DEFAULT_COUNT, nice = true, step: rounding } = options;
   const wanted = tickCount(count);
+  // A window of one point is not a window: there is no step to read a
+  // precision off, so the single label is written at the precision its own
+  // magnitude asks for. Only when the domain is taken as given — a domain that
+  // is to be niced is opened instead, so that a constant column still draws an
+  // axis to stand on.
+  if (!nice && min === max && Number.isFinite(min)) {
+    const decimals = chartTickDecimals(Math.abs(min));
+    return {
+      domain: [min, min],
+      values: [min],
+      step: 0,
+      decimals,
+      exponent: 0,
+      labels: [chartTickLabel(min, decimals)],
+    };
+  }
   const opened = openDomain(min, max);
-  const domain = nice ? chartNiceDomain(opened[0], opened[1], wanted) : opened;
-  const [first, last, increment] = tickSpec(domain[0], domain[1], wanted);
+  const domain = nice
+    ? chartNiceDomain(opened[0], opened[1], wanted, rounding)
+    : opened;
+  const [first, last, increment] = tickSpec(
+    domain[0],
+    domain[1],
+    wanted,
+    rounding,
+  );
   const spacing = increment < 0 ? -1 / increment : increment;
   const step = Number.isFinite(spacing) && spacing > 0 ? spacing : 0;
   const values = step === 0 ? [] : tickValues(first, last, increment);
@@ -93,18 +146,20 @@ export function chartAxisScale(
  * @param min - One end, in either order.
  * @param max - The other end.
  * @param count - Roughly how many ticks the domain will carry. Defaults to `5`.
+ * @param rounding - How the step is chosen. See {@link ChartAxisStep}.
  * @returns The widened domain, ascending.
  */
 export function chartNiceDomain(
   min: number,
   max: number,
   count = DEFAULT_COUNT,
+  rounding: ChartAxisStep = 'nearest',
 ): [number, number] {
   const wanted = tickCount(count);
   let [start, stop] = openDomain(min, max);
   let previous = 0;
   for (let pass = 0; pass < NICE_PASSES; pass++) {
-    const [, , increment] = tickSpec(start, stop, wanted);
+    const [, , increment] = tickSpec(start, stop, wanted, rounding);
     if (increment === previous || !Number.isFinite(increment)) break;
     const low = wholeStep(start, increment, true);
     const high = wholeStep(stop, increment, false);
@@ -163,14 +218,41 @@ export function chartExponentSuffix(exponent: number): string {
 
 type TickSpec = [first: number, last: number, increment: number];
 
-function tickSpec(start: number, stop: number, count: number): TickSpec {
+/**
+ * The nice factor a division is closest to.
+ * @param error - The division's mantissa, between 1 and 10.
+ * @returns 1, 2, 5 or 10.
+ */
+function stepNearest(error: number): number {
+  if (error >= STEP_10) return 10;
+  if (error >= STEP_5) return 5;
+  if (error >= STEP_2) return 2;
+  return 1;
+}
+
+/**
+ * The smallest nice factor at or above a division, so the ticks are never
+ * closer together than asked for.
+ * @param error - The division's mantissa, between 1 and 10.
+ * @returns 1, 2, 5 or 10.
+ */
+function stepAtMost(error: number): number {
+  if (error <= 1 + STEP_EPSILON) return 1;
+  if (error <= 2 + STEP_EPSILON) return 2;
+  if (error <= 5 + STEP_EPSILON) return 5;
+  return 10;
+}
+
+function tickSpec(
+  start: number,
+  stop: number,
+  count: number,
+  rounding: ChartAxisStep = 'nearest',
+): TickSpec {
   const rawStep = (stop - start) / count;
   const power = Math.floor(Math.log10(rawStep));
   const error = rawStep / 10 ** power;
-  let factor = 1;
-  if (error >= STEP_2) factor = 2;
-  if (error >= STEP_5) factor = 5;
-  if (error >= STEP_10) factor = 10;
+  const factor = rounding === 'atMost' ? stepAtMost(error) : stepNearest(error);
   if (power < 0) {
     const divisor = 10 ** -power / factor;
     let first = Math.round(start * divisor);
