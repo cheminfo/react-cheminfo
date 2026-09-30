@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.30.0](https://github.com/cheminfo/react-cheminfo/compare/v0.29.0...v0.30.0) (2026-09-30)
+
+
+### Features
+
+* **chrome:** share the sign-in control as AccountButton ([8ae319d](https://github.com/cheminfo/react-cheminfo/commit/8ae319d60e8a8f30e19a3c8325e24f4b63474e8f))
+* **clipboard:** let a copied value carry a test id ([4606f0a](https://github.com/cheminfo/react-cheminfo/commit/4606f0a55560cd34077a1414fa866aaf650c040e))
+* **structure:** draw a conformer set as a ranked table ([b1993ba](https://github.com/cheminfo/react-cheminfo/commit/b1993ba0d5a0e5d2f0d10aba23a6d122dd294fff))
+
 ## [0.29.0](https://github.com/cheminfo/react-cheminfo/compare/v0.28.0...v0.29.0) (2026-09-28)
 
 
