@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.31.0](https://github.com/cheminfo/react-cheminfo/compare/v0.30.0...v0.31.0) (2026-09-30)
+
+
+### Features
+
+* **download:** save a figure at another size, and an SVG at a larger scale ([34366cc](https://github.com/cheminfo/react-cheminfo/commit/34366cc2be44f217f9d06ecbaae5bf620a0bb2a4))
+
+
+### Bug Fixes
+
+* **overlay:** keep a panel open when a choice is picked from a list inside it ([a09cd7b](https://github.com/cheminfo/react-cheminfo/commit/a09cd7bbf4bd70c2a9e09c18c8a7cb0514951261))
+
 ## [0.30.0](https://github.com/cheminfo/react-cheminfo/compare/v0.29.0...v0.30.0) (2026-09-30)
 
 
