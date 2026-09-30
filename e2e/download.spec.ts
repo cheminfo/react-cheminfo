@@ -195,3 +195,106 @@ test('the glyphs of the controls floating over a figure are left behind', async 
   expect(file.match(/<g data-figure="drawing"/gu)).toHaveLength(1);
   expect(file.match(/<g data-figure="legend"/gu)).toHaveLength(1);
 });
+
+// The same figure, offered at other sizes: one chart told its size, and one
+// that measures the box it is mounted in.
+const ANY_SIZE = 'download-figuredownload--any-size';
+const FILLS_ITS_BOX = 'download-figuredownload--fills-its-box';
+
+/**
+ * Pick one of the sizes the panel offers.
+ * @param page - The page showing the panel.
+ * @param size - What the size is called in the list.
+ */
+async function pickSize(page: Page, size: string): Promise<void> {
+  await page.getByRole('button', { name: /^Size — / }).click();
+  await page.getByRole('option', { name: size, exact: true }).click();
+}
+
+/**
+ * The size written on the outermost `<svg>` of a saved document, then on the
+ * chart inside it.
+ * @param file - The saved document.
+ * @returns Each drawing's `width×height`, outermost first.
+ */
+function drawingSizes(file: string): string[] {
+  const sizes: string[] = [];
+  for (const match of file.matchAll(
+    /<svg[^>]*? width="(?<width>[\d.]+)" height="(?<height>[\d.]+)"/gu,
+  )) {
+    sizes.push(`${match.groups?.width}×${match.groups?.height}`);
+  }
+  return sizes;
+}
+
+test('a figure saved at 16:9 is drawn again at that shape, not stretched', async ({
+  page,
+}) => {
+  await openStory(page, ANY_SIZE);
+  await expect(page.locator('.chart-frame')).toHaveCount(1);
+
+  await openSavePanel(page, SAVE_SVG);
+  await pickSize(page, '16:9');
+  await expect(
+    page.getByText('Opens at 720 × 405 pixels, and stays sharp at any size.', {
+      exact: true,
+    }),
+  ).toHaveCount(1);
+
+  // The file and the chart in it are both the new shape: the chart was laid
+  // out at 405 pixels high rather than the 380 it has on screen.
+  expect(drawingSizes(await savedText(page))).toStrictEqual([
+    '720×405',
+    '720×405',
+  ]);
+  // The copy drawn for the file is gone, and the one on screen is untouched.
+  await expect(page.locator('div[inert]')).toHaveCount(0);
+  await expect(page.locator('.chart-frame')).toHaveCount(1);
+});
+
+test('a chart that measures its own box is saved at the size typed', async ({
+  page,
+}) => {
+  await openStory(page, FILLS_ITS_BOX);
+  await expect(page.locator('.chart-frame')).toHaveCount(1);
+
+  await openSavePanel(page, SAVE_SVG);
+  await pickSize(page, 'Journal column');
+  expect(drawingSizes(await savedText(page)).slice(0, 2)).toStrictEqual([
+    '321×169',
+    '321×169',
+  ]);
+
+  await pickSize(page, 'Custom');
+  await page.getByRole('textbox', { name: 'Width' }).fill('1200');
+  await page.getByRole('textbox', { name: 'Height' }).fill('800');
+  await page.getByRole('textbox', { name: 'Height' }).press('Enter');
+  await page.getByRole('radio', { name: 'PNG' }).click();
+  await page.getByRole('radio', { name: '1×' }).click();
+
+  expect(pngSize(await saved(page))).toStrictEqual({
+    width: 1200,
+    height: 800,
+  });
+});
+
+test('an SVG saved at twice opens twice as large, drawn the same', async ({
+  page,
+}) => {
+  await openStory(page, ANY_SIZE);
+  await expect(page.locator('.chart-frame')).toHaveCount(1);
+
+  await openSavePanel(page, SAVE_SVG);
+  await page.getByRole('radio', { name: '2×' }).click();
+  await expect(
+    page.getByText('Opens at 1440 × 760 pixels, and stays sharp at any size.', {
+      exact: true,
+    }),
+  ).toHaveCount(1);
+
+  const file = await savedText(page);
+  // The document says it is twice the size, while its coordinates — and the
+  // chart inside them — are those of the figure on screen.
+  expect(file).toContain('width="1440" height="760" viewBox="0 0 720 380"');
+  expect(drawingSizes(file)).toStrictEqual(['1440×760', '720×380']);
+});

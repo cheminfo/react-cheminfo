@@ -8,6 +8,7 @@ import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import type { FigureFormat } from '../core/downloadFigure.ts';
+import { figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 import {
   figurePixels,
@@ -15,6 +16,9 @@ import {
   figureScaleLabel,
   formatFigurePixels,
 } from '../core/figureScale.ts';
+
+import type { FigureSizing } from './FigureSizeRows.tsx';
+import { FigureSizeRows } from './FigureSizeRows.tsx';
 
 /** What {@link FigureDownloadPanel} is drawn from. */
 export interface FigureDownloadPanelProps {
@@ -40,21 +44,30 @@ export interface FigureDownloadPanelProps {
   onSave: () => void;
   /**
    * Whether the SVG holds a rendered picture rather than vector drawings, as
-   * for a WebGL scene: its resolution then applies, and the hint says so.
+   * for a WebGL scene: its resolution is then the pixels of that picture, it
+   * meets the same ceiling as a PNG, and the hint says so.
    * @default false
    */
   rasterSvg?: boolean;
+  /**
+   * The shape the figure is drawn at, for a figure that can be drawn again at
+   * another size. Without it the figure is saved at the size it has on screen,
+   * and no size is offered.
+   * @default undefined
+   */
+  sizing?: FigureSizing;
 }
 
 /**
- * The two choices behind the save glyph, and the button that writes the file.
+ * The choices behind the save glyph, and the button that writes the file.
  *
- * The resolution stays in place and greyed while an SVG is selected rather
- * than disappearing, because a control that vanishes is a control the reader
- * concludes the figure does not have — and the sentence at the foot says why
- * it is greyed, which is that an SVG has no resolution to choose.
+ * The resolution applies to both formats, and means what the reader needs it
+ * to: a PNG is painted with that many more pixels, and an SVG, drawn the same,
+ * opens that many times larger in the slide or the document it is dropped
+ * into. Only a PNG meets the ceiling of what a browser can paint, so only its
+ * choices past that ceiling are greyed.
  *
- * That sentence is the panel's own hint line rather than a row of its own: it
+ * The sentence at the foot is the panel's own hint line rather than a row of its own: it
  * is not a setting, it is what the two settings above it currently amount to,
  * and it is the only thing here that answers the question a reader actually
  * has, which is how big the file is going to be. Saving itself is a command
@@ -68,14 +81,21 @@ export function FigureDownloadPanel(
 ): ReactElement {
   const { title, format, scale, scales, size, failure, saving } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
+  const { sizing } = props;
   const t = useChromeT();
 
-  const vector = format === 'svg' && !rasterSvg;
+  // What the file is drawn at: the figure on screen, or the shape picked.
+  const drawn =
+    size === null || sizing === undefined
+      ? size
+      : figureLayoutSize(sizing.layout, size, sizing.custom ?? size);
+
+  const painted = format === 'png' || rasterSvg;
 
   return (
     <OverlayPanel
       title={title}
-      hint={hintOf(format, size, scale, failure, rasterSvg, t)}
+      hint={hintOf(format, drawn, scale, failure, rasterSvg, t)}
       actions={
         <OverlayAction
           text={t('download.save')}
@@ -96,6 +116,9 @@ export function FigureDownloadPanel(
         options={FORMAT_CHOICES}
         onChange={onFormatChange}
       />
+      {sizing === undefined ? null : (
+        <FigureSizeRows sizing={sizing} size={size} />
+      )}
       <OverlaySegmented
         label={t('download.resolution')}
         help={{
@@ -107,8 +130,7 @@ export function FigureDownloadPanel(
           },
         }}
         value={String(scale)}
-        options={scaleChoices(scales, size)}
-        disabled={vector}
+        options={scaleChoices(scales, drawn, painted)}
         onChange={(picked) => onScaleChange(Number(picked))}
       />
     </OverlayPanel>
@@ -125,14 +147,17 @@ const FORMAT_CHOICES: ReadonlyArray<OverlayOption<FigureFormat>> = [
  * The multiples offered, each saying what it would actually produce.
  *
  * One too large for the browser to paint is greyed rather than dropped, so the
- * reader learns the ceiling exists before they meet it as a blank file.
+ * reader learns the ceiling exists before they meet it as a blank file. An SVG
+ * is not painted, so it has no such ceiling.
  * @param scales - The multiples the caller offers.
- * @param size - How big the figure is on the page.
+ * @param size - How big the figure is drawn for the file.
+ * @param painted - Whether the file is painted into pixels.
  * @returns The choices, in the order offered.
  */
 function scaleChoices(
   scales: readonly number[],
   size: FigurePixels | null,
+  painted: boolean,
 ): readonly OverlayOption[] {
   const choices: OverlayOption[] = [];
   for (const scale of scales) {
@@ -141,7 +166,7 @@ function scaleChoices(
       value: String(scale),
       label: figureScaleLabel(scale),
       title: pixels === null ? undefined : formatFigurePixels(pixels),
-      disabled: size !== null && !figureScaleFits(size, scale),
+      disabled: painted && size !== null && !figureScaleFits(size, scale),
     });
   }
   return choices;
@@ -150,8 +175,8 @@ function scaleChoices(
 /**
  * The line at the foot of the panel: what pressing save is about to do.
  * @param format - Which file the reader is about to write.
- * @param size - How big the figure is on the page.
- * @param scale - The multiple it is painted at.
+ * @param size - How big the figure is drawn for the file.
+ * @param scale - The multiple it is saved at.
  * @param failure - What went wrong last time, if anything.
  * @param rasterSvg - Whether the SVG embeds a rendered picture.
  * @param t - The chrome's formatter, so the sentence is in the language of
@@ -173,10 +198,8 @@ function hintOf(
       pixels: formatFigurePixels(figurePixels(size, scale)),
     });
   }
-  if (format === 'svg') {
-    return t('download.hintSvg', { pixels: formatFigurePixels(size) });
-  }
-  return t('download.hintPng', {
-    pixels: formatFigurePixels(figurePixels(size, scale)),
-  });
+  const pixels = formatFigurePixels(figurePixels(size, scale));
+  return format === 'svg'
+    ? t('download.hintSvg', { pixels })
+    : t('download.hintPng', { pixels });
 }

@@ -7,11 +7,19 @@ import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayIconButton } from '../../overlay/ui/OverlayIconButton.tsx';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import { downloadFigure } from '../core/downloadFigure.ts';
+import type { FigureLayout } from '../core/figureLayout.ts';
+import { figureLayoutRedraws, figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
-import { DEFAULT_FIGURE_SCALE, FIGURE_SCALES } from '../core/figureScale.ts';
+import {
+  DEFAULT_FIGURE_SCALE,
+  FIGURE_SCALES,
+  defaultFigureScale,
+} from '../core/figureScale.ts';
 import { figureSize } from '../core/figureTarget.ts';
 
 import { FigureDownloadPanel } from './FigureDownloadPanel.tsx';
+import type { FigureRenderer } from './useFigureRedraw.tsx';
+import { useFigureRedraw } from './useFigureRedraw.tsx';
 
 /** What {@link FigureDownload} needs. */
 export interface FigureDownloadProps {
@@ -34,7 +42,9 @@ export interface FigureDownloadProps {
    */
   defaultFormat?: FigureFormat;
   /**
-   * The resolution it opens on, as a multiple of the figure on screen.
+   * The resolution a PNG opens on, as a multiple of the figure on screen. An
+   * SVG opens at 1×, the size it has on screen, and each format keeps the
+   * multiple the reader last picked for it.
    * @default 2
    */
   defaultScale?: number;
@@ -69,6 +79,16 @@ export interface FigureDownloadProps {
    * @default undefined
    */
   testId?: string;
+  /**
+   * Draws the figure at a size, for a file. When it is given the panel offers
+   * a size — as shown, 4:3, 16:9, a journal column, or typed — and a figure
+   * saved at a size other than its own is drawn again at that size, off the
+   * page, so its axes and labels are laid out for the new shape rather than
+   * stretched into it. Draw exactly what is on screen, with the same data,
+   * zoom and colours; only the box changes.
+   * @default undefined — the figure is saved at the size it has on screen
+   */
+  renderFigure?: FigureRenderer;
 }
 
 /**
@@ -84,9 +104,10 @@ export interface FigureDownloadProps {
  * Both formats are offered because they answer different questions. An SVG is
  * the figure itself, sharp at any size and still editable, which is what a
  * paper wants; a PNG is a picture of it, which is what every chat window and
- * slide deck accepts. The resolution belongs to the second alone, and the
- * panel writes out the pixels it is about to produce so nobody has to guess
- * what `3×` means for the figure in front of them.
+ * slide deck accepts. The resolution paints a PNG with more pixels and makes
+ * an SVG open larger, and the panel writes out the size it is about to
+ * produce so nobody has to guess what `3×` means for the figure in front of
+ * them.
  * @param props - See {@link FigureDownloadProps}.
  * @returns The glyph and its panel.
  */
@@ -94,15 +115,22 @@ export function FigureDownload(props: FigureDownloadProps): ReactElement {
   const { targetId, fileName, background, scales = FIGURE_SCALES } = props;
   const { defaultFormat = 'png', defaultScale = DEFAULT_FIGURE_SCALE } = props;
   const { label, title } = props;
-  const { icon = 'download', testId } = props;
+  const { icon = 'download', testId, renderFigure } = props;
 
   const t = useChromeT();
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<FigureFormat>(defaultFormat);
-  const [scale, setScale] = useState(defaultScale);
+  const [picked, setPicked] = useState<Record<FigureFormat, number>>(() => ({
+    png: defaultScale,
+    svg: defaultFigureScale('svg'),
+  }));
+  const scale = picked[format];
   const [size, setSize] = useState<FigurePixels | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [layout, setLayout] = useState<FigureLayout>('screen');
+  const [custom, setCustom] = useState<FigurePixels | null>(null);
+  const { redraw, portal } = useFigureRedraw(renderFigure);
 
   // The panel is held open from here rather than left to itself, because the
   // figure has to be measured at the moment it opens: its size is what the
@@ -118,7 +146,17 @@ export function FigureDownload(props: FigureDownloadProps): ReactElement {
   async function save(): Promise<void> {
     setSaving(true);
     try {
-      await downloadFigure(targetId, { format, scale, fileName, background });
+      const options = { format, scale, fileName, background };
+      if (
+        renderFigure !== undefined &&
+        size !== null &&
+        figureLayoutRedraws(layout, size, custom ?? size)
+      ) {
+        const drawn = figureLayoutSize(layout, size, custom ?? size);
+        await redraw(targetId, drawn, (box) => downloadFigure(box, options));
+      } else {
+        await downloadFigure(targetId, options);
+      }
       setFailure(null);
     } catch (error) {
       setFailure(error instanceof Error ? error.message : String(error));
@@ -128,33 +166,48 @@ export function FigureDownload(props: FigureDownloadProps): ReactElement {
   }
 
   return (
-    <PopoverNext
-      isOpen={open}
-      placement="bottom-end"
-      onInteraction={interact}
-      content={
-        <FigureDownloadPanel
-          title={title ?? t('download.saveFigure')}
-          format={format}
-          scale={scale}
-          scales={scales}
-          size={size}
-          failure={failure}
-          saving={saving}
-          onFormatChange={setFormat}
-          onScaleChange={setScale}
-          onSave={() => void save()}
+    <>
+      <PopoverNext
+        isOpen={open}
+        placement="bottom-end"
+        onInteraction={interact}
+        content={
+          <FigureDownloadPanel
+            title={title ?? t('download.saveFigure')}
+            format={format}
+            scale={scale}
+            scales={scales}
+            size={size}
+            failure={failure}
+            saving={saving}
+            onFormatChange={setFormat}
+            onScaleChange={(next) =>
+              setPicked((current) => ({ ...current, [format]: next }))
+            }
+            onSave={() => void save()}
+            sizing={
+              renderFigure === undefined
+                ? undefined
+                : {
+                    layout,
+                    custom,
+                    onLayoutChange: setLayout,
+                    onCustomChange: setCustom,
+                  }
+            }
+          />
+        }
+      >
+        <OverlayIconButton
+          icon={icon}
+          label={label ?? t('download.saveThisFigure')}
+          value={format.toUpperCase()}
+          active={open}
+          testId={testId}
+          opensMenu
         />
-      }
-    >
-      <OverlayIconButton
-        icon={icon}
-        label={label ?? t('download.saveThisFigure')}
-        value={format.toUpperCase()}
-        active={open}
-        testId={testId}
-        opensMenu
-      />
-    </PopoverNext>
+      </PopoverNext>
+      {portal}
+    </>
   );
 }

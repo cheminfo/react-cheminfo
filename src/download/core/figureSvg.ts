@@ -27,13 +27,19 @@ export interface FigureSvgOptions {
    * @default the surface the figure is drawn on, which is the page's own
    */
   background?: string;
+  /**
+   * How many times the figure on screen the document says it is. The drawing
+   * is unchanged; only the size the file opens at grows.
+   * @default 1
+   */
+  scale?: number;
 }
 
 /** A figure, as the file that leaves the page. */
 export interface FigureSvg {
   /** The whole SVG document, tokens resolved. */
   markup: string;
-  /** Its width in pixels, at the size the figure was drawn. */
+  /** Its width in pixels, at the size the figure was drawn on screen. */
   width: number;
   /** Its height. */
   height: number;
@@ -94,6 +100,7 @@ export function figureSvg(
     background: options.background ?? surfaceOf(styles),
     fontFamily: styles.fontFamily,
     fontSize: Number.parseFloat(styles.fontSize),
+    scale: options.scale,
   });
 
   return {

@@ -3,12 +3,25 @@ export { downloadBlob } from './downloadBlob.ts';
 export type { DownloadFigureOptions, FigureFormat } from './downloadFigure.ts';
 export { downloadFigure } from './downloadFigure.ts';
 export { downloadText } from './downloadText.ts';
+export type { FigureLayout } from './figureLayout.ts';
+export {
+  FIGURE_COLUMN_WIDTH,
+  FIGURE_LAYOUTS,
+  FIGURE_LAYOUT_MAX,
+  FIGURE_LAYOUT_MIN,
+  figureLayoutRedraws,
+  figureLayoutSide,
+  figureLayoutSize,
+} from './figureLayout.ts';
 export { FIGURE_PNG_TYPE, figurePng } from './figurePng.ts';
+export type { FigureSettleOptions } from './figureSettle.ts';
+export { whenFigureSettles } from './figureSettle.ts';
 export type { FigurePixels } from './figureScale.ts';
 export {
   DEFAULT_FIGURE_SCALE,
   FIGURE_MAX_PIXELS,
   FIGURE_SCALES,
+  defaultFigureScale,
   figurePixels,
   figureScaleFits,
   figureScaleLabel,

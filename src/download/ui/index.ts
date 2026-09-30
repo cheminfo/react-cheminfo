@@ -11,6 +11,8 @@ export type { FigureDownloadProps } from './FigureDownload.tsx';
 export { FigureDownload } from './FigureDownload.tsx';
 export type { FigureDownloadPanelProps } from './FigureDownloadPanel.tsx';
 export { FigureDownloadPanel } from './FigureDownloadPanel.tsx';
+export type { FigureSizing } from './FigureSizeRows.tsx';
+export type { FigureRenderer } from './useFigureRedraw.tsx';
 
 export type { ExportDialogFrameProps } from './ExportDialogFrame.tsx';
 export { ExportDialogFrame } from './ExportDialogFrame.tsx';

@@ -8,6 +8,8 @@
  * to work it out.
  */
 
+import type { FigureFormat } from './downloadFigure.ts';
+
 /** The size of a saved figure, in pixels. */
 export interface FigurePixels {
   /** Its width. */
@@ -27,6 +29,17 @@ export const FIGURE_SCALES: readonly number[] = [1, 2, 3, 4];
  * of these files end up.
  */
 export const DEFAULT_FIGURE_SCALE = 2;
+
+/**
+ * The multiple a figure is saved at in this format unless the reader says
+ * otherwise. An SVG stays sharp however large it is shown, so it opens at the
+ * size it has on screen; a PNG is painted twice over, for a slide.
+ * @param format - The file being written.
+ * @returns The multiple.
+ */
+export function defaultFigureScale(format: FigureFormat): number {
+  return format === 'svg' ? 1 : DEFAULT_FIGURE_SCALE;
+}
 
 /**
  * The longest side a browser will paint into one canvas.

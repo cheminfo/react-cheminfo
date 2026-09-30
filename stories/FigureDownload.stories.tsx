@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import { useRef } from 'react';
 
 import { chartPixel } from '../src/chart/core/index.ts';
 import type { ChartFrameRender } from '../src/chart/ui/index.ts';
 import { ChartFrame } from '../src/chart/ui/index.ts';
 import { FigureDownload } from '../src/download/ui/index.ts';
+import { useContainerSize } from '../src/hooks/ui/index.ts';
 import { OverlayLayer, OverlayLegend } from '../src/overlay/ui/index.ts';
 
 import {
@@ -116,6 +118,71 @@ export const SeveralCharts: Story = {
 export const NoBackground: Story = {
   args: { background: 'transparent', defaultFormat: 'svg' },
 };
+
+/**
+ * A figure that can be drawn again is saved at the shape the reader picks: as
+ * shown, 4:3 or 16:9 for a slide, a journal's 8.5 cm column, or a size typed
+ * in. The chart is laid out again at that size, off the page, so its axes and
+ * labels fit the shape rather than being stretched into it. That is what lets
+ * an SVG, which has no resolution, still change shape.
+ */
+export const AnySize: Story = {
+  args: {
+    defaultFormat: 'svg',
+    renderFigure: (size) => <Figure width={size.width} height={size.height} />,
+  },
+  render: (args) => (
+    <Panel caption="Pick a size, then save: the chart is drawn again at that shape.">
+      <Bar>
+        <FigureDownload {...args} />
+      </Bar>
+      <div id="iris-figure">
+        <Figure />
+      </div>
+    </Panel>
+  ),
+};
+
+/**
+ * A chart that measures its own box rather than being told a size. The copy
+ * drawn for the file measures the box it is given, draws once it knows, and is
+ * saved only once it has stopped moving. Drag the corner to change the chart
+ * on screen, which is what `As shown` saves.
+ */
+export const FillsItsBox: Story = {
+  args: {
+    targetId: 'filling-figure',
+    defaultFormat: 'svg',
+    renderFigure: () => <FillingFigure />,
+  },
+  render: (args) => (
+    <Panel caption="Resize the chart from its corner, pick a size, then save.">
+      <Bar>
+        <FigureDownload {...args} />
+      </Bar>
+      <div id="filling-figure" style={RESIZABLE_STYLE}>
+        <FillingFigure />
+      </div>
+    </Panel>
+  ),
+};
+
+/**
+ * The iris map, drawn at whatever size its box has.
+ * @returns The chart, once the box has been measured.
+ */
+function FillingFigure(): ReactElement {
+  const box = useRef<HTMLDivElement>(null);
+  const { width, height } = useContainerSize(box);
+
+  return (
+    <div ref={box} style={FILL_STYLE}>
+      {width > 0 && height > 0 ? (
+        <Figure width={width} height={height} />
+      ) : null}
+    </div>
+  );
+}
 
 interface FigureProps {
   /** Width of the chart, in pixels. */
@@ -245,6 +312,21 @@ const BAR_STYLE = {
   display: 'flex',
   justifyContent: 'flex-end',
   width: '100%',
+} as const satisfies CSSProperties;
+
+const RESIZABLE_STYLE = {
+  width: FIGURE.width,
+  height: FIGURE.height,
+  minWidth: 240,
+  minHeight: 160,
+  overflow: 'hidden',
+  resize: 'both',
+  border: '1px dashed var(--border-strong)',
+} as const satisfies CSSProperties;
+
+const FILL_STYLE = {
+  width: '100%',
+  height: '100%',
 } as const satisfies CSSProperties;
 
 const GRID_STYLE = {

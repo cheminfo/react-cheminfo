@@ -571,6 +571,26 @@ resolved first — a `var(--border)` that left the site would draw a chart with 
 axes. And the chrome floating over the picture is left behind: an `OverlayLayer`
 marks itself, so the cog in the corner never lands in the middle of the scatter.
 
+The resolution applies to both formats: a PNG is painted with that many more
+pixels, and an SVG, drawn the same, opens that many times larger. Neither
+changes the figure's shape. Pass **`renderFigure`** and the panel also offers a
+size: as shown, 4:3, 16:9, a journal column (8.5 cm, where
+the text prints at the size it reads on screen) or a width × height typed in.
+The figure is then drawn again off the page at that size, so its axes and labels
+are laid out for the new shape rather than stretched, and saved once it has
+stopped moving. Draw exactly what is on screen; only the box changes.
+
+```tsx
+<FigureDownload
+  targetId="spectrum"
+  fileName="spectrum"
+  renderFigure={(size) => <Spectrum width={size.width} height={size.height} />}
+/>
+```
+
+A chart that measures its own container can ignore `size`: the copy is mounted
+in a box of exactly that size.
+
 `downloadFigure(target, options)`, `figureSvg` and `figurePng` are the same thing
 without the button, for a site saving a figure from its own menu.
 

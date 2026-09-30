@@ -53,6 +53,13 @@ export interface FigureSvgDocumentOptions {
    * @default undefined — the reader's own default
    */
   fontSize?: number;
+  /**
+   * How many times the figure on screen the document says it is. Only the
+   * size it opens at changes — the drawing keeps its own coordinates, so every
+   * line and every word grows together and stays as sharp as before.
+   * @default 1
+   */
+  scale?: number;
 }
 
 /** Where an SVG document says it belongs. */
@@ -69,7 +76,8 @@ export function figureSvgDocument(
   pieces: readonly FigurePiece[],
   options: FigureSvgDocumentOptions,
 ): string {
-  const { width, height, background, fontFamily, fontSize } = options;
+  const { width, height, background, fontFamily, fontSize, scale } = options;
+  const factor = positiveOrOne(scale);
   const box = `0 0 ${round(width)} ${round(height)}`;
   const style = documentStyle(fontFamily, fontSize);
 
@@ -86,7 +94,7 @@ export function figureSvgDocument(
 
   return (
     `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<svg xmlns="${SVG_NAMESPACE}" width="${round(width)}" height="${round(height)}" viewBox="${box}"${style}>` +
+    `<svg xmlns="${SVG_NAMESPACE}" width="${round(width * factor)}" height="${round(height * factor)}" viewBox="${box}"${style}>` +
     `${inside}</svg>`
   );
 }
@@ -111,6 +119,15 @@ function documentStyle(
   return rules.length === 0
     ? ''
     : ` style="${escapeAttribute(rules.join(';'))}"`;
+}
+
+/**
+ * A multiple that makes sense, or one.
+ * @param value - The multiple asked for.
+ * @returns It, where it is a positive number; one otherwise.
+ */
+function positiveOrOne(value: number | undefined): number {
+  return value !== undefined && Number.isFinite(value) && value > 0 ? value : 1;
 }
 
 /**

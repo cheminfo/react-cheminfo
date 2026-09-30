@@ -95,3 +95,25 @@ test('a key painted over the drawings says that is what it is', () => {
   );
   expect(document.match(/<g data-figure="drawing"/gu)).toHaveLength(1);
 });
+
+test('a document saved at twice its size opens twice as big, drawn the same', () => {
+  const document = figureSvgDocument([{ markup: CHART, x: 0, y: 0 }], {
+    width: 200,
+    height: 100,
+    scale: 2,
+  });
+
+  expect(document).toContain(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 200 100">',
+  );
+});
+
+test('a multiple that makes no sense leaves the document its own size', () => {
+  const document = figureSvgDocument([{ markup: CHART, x: 0, y: 0 }], {
+    width: 200,
+    height: 100,
+    scale: Number.NaN,
+  });
+
+  expect(document).toContain('width="200" height="100" viewBox="0 0 200 100"');
+});
