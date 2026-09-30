@@ -1,6 +1,9 @@
 {
   "language.label": "Idioma",
   "chrome.pages": "Páginas",
+  "account.signIn": "Iniciar sesión",
+  "account.signOut": "Cerrar sesión",
+  "account.signedInAs": "Sesión iniciada como {name}",
   "ecosystem.tools": "Herramientas",
   "ecosystem.menuHeading": "Nuestras herramientas, todas en el navegador",
   "ecosystem.otherTools": "Nuestras otras herramientas",

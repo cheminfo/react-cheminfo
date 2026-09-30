@@ -1,6 +1,9 @@
 {
   "language.label": "Sprache",
   "chrome.pages": "Seiten",
+  "account.signIn": "Anmelden",
+  "account.signOut": "Abmelden",
+  "account.signedInAs": "Angemeldet als {name}",
   "ecosystem.tools": "Werkzeuge",
   "ecosystem.menuHeading": "Unsere Werkzeuge, alle im Browser",
   "ecosystem.otherTools": "Unsere weiteren Werkzeuge",

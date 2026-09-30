@@ -278,6 +278,61 @@ button {
   color: var(--accent);
 }
 
+/* ── Who is signed in ────────────────────────────────────────────────────── */
+
+/* The invitation keeps its words. It carries no glyph, so the rule above that
+   reduces a utility to its mark leaves it written out — which is the point: an
+   arrow through a door is what being signed in looks like too, and a bar that
+   reports the wrong one of those is a bar nobody can read. */
+.account-button--out {
+  color: var(--text);
+}
+
+/* Signed in, the utility is the account's own mark; the name is in the menu it
+   opens. */
+.account-button--in {
+  padding: 0.25rem 0.35rem;
+}
+
+.account-mark {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--accent) 16%, white);
+  color: var(--accent);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+/* Still asking: the width the mark will take, so the bar does not jump under
+   the pointer when the answer lands. */
+.account-button__pending {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+}
+
+.account-menu__identity {
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0.6rem;
+  gap: 0.1rem;
+}
+
+.account-menu__name {
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.account-menu__detail {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
 /* The share dialog's preset tabs sit on a rule, and wrap onto a second row
    rather than overflow a phone-width dialog. */
 .share-presets > .bp6-tab-list {

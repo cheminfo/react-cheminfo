@@ -1,3 +1,5 @@
+export type { AccountButtonProps, AccountIdentity } from './AccountButton.tsx';
+export { AccountButton } from './AccountButton.tsx';
 export type { HeaderToggleOption, HeaderToggleProps } from './HeaderToggle.tsx';
 export { HeaderToggle } from './HeaderToggle.tsx';
 export type { NavItem } from './navItem.ts';

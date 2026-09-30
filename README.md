@@ -88,7 +88,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | Area                       | `…/core`                                                                                                                                                                                                                                                                                                         | `…/ui`                                                                                                                                                                                                                                                                                             |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Site identity**          | `siteById`, `findSiteByHost`, `siteTokensCss`                                                                                                                                                                                                                                                                    | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                                                                                                                               |
-| **Chrome**                 | —                                                                                                                                                                                                                                                                                                                | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `useCompactHeader`                                                                                                                                                                                                           |
+| **Chrome**                 | —                                                                                                                                                                                                                                                                                                                | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `AccountButton`, `useCompactHeader`                                                                                                                                                                                          |
 | **Languages**              | `LANGUAGES`, `DEFAULT_LANGUAGE`, `LANGUAGE_LABELS`, `isLanguage`, `MessageCatalog`, `CHROME_CATALOG`, `setMessageSession`, `loadCatalogs`, `LANGUAGE_PARAM`, `withLanguageParam`                                                                                                                                 | `useT`, `useChromeT`, `useLanguage`, `LanguageSelect`, `SiteLanguage`                                                                                                                                                                                                                              |
 | **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                                                                                                         | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                    |
 | **Share & embed**          | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, `visibleShareParts`, `applySharePreset`, `findSharePreset`, the param codecs, `syncPreferencesWithUrl`, `applyPreferencesFromSearch`, `writePreferencesToSearch`                                                          | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                                                                                                                                                                     |
@@ -238,6 +238,40 @@ import { EcosystemButton } from 'react-cheminfo/ui';
   and a screen reader are told.
 - A tile **lights up in the colour of the site it opens**, so running the
   pointer down the grid is what makes the pairs of colours read.
+
+### `AccountButton`
+
+The utility that says who a site is answering to: an invitation when nobody is
+signed in, and the account's own mark when somebody is.
+
+```tsx
+import { AccountButton } from 'react-cheminfo/ui';
+
+<AccountButton
+  identity={
+    user === null ? null : { name: user.displayName, detail: user.email }
+  }
+  loading={loading}
+  signInHref="/login"
+  onSignIn={() => navigate({ kind: 'login' })}
+  onSignOut={() => void signOut()}
+  signInLabel="Teacher sign in"
+/>;
+```
+
+- **The two states are told apart by whether an identity is on screen**, never
+  by the direction of an arrow. Blueprint's `log-in` and `log-out` are the same
+  arrow either side of the same door; at 14 px among four other monochrome
+  glyphs, a site drawing one reports a signed-out visitor as signed in. So the
+  invitation is the words _Sign in_ — it carries no glyph, which is what keeps
+  the bar from reducing it to a mark — and being signed in is the person's own
+  initials.
+- `loading` draws **neither** state, at the width the mark will take. A bar that
+  offers to sign in and then turns into a name has told the visitor something
+  false, and that is the state they act on first.
+- `items` are the account's own pages, listed in the menu above Sign out.
+- `signInHref` keeps the invitation a real link, so a middle click opens a tab;
+  a site with no page for it passes `onSignIn` alone and opens a dialog.
 
 ### `AtomicOrbitalViewer`
 

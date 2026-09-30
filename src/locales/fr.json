@@ -1,6 +1,9 @@
 {
   "language.label": "Langue",
   "chrome.pages": "Pages",
+  "account.signIn": "Se connecter",
+  "account.signOut": "Se déconnecter",
+  "account.signedInAs": "Connecté comme {name}",
   "ecosystem.tools": "Outils",
   "ecosystem.menuHeading": "Nos outils, tous dans le navigateur",
   "ecosystem.otherTools": "Nos autres outils",
