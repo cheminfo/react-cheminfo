@@ -354,3 +354,22 @@ test('the map catches the wheel once the pointer has rested on it, and a double 
  * loaded machine and says nothing about the gesture.
  */
 const CAUGHT_MS = 800;
+
+test('picking from a list inside the options panel keeps the panel open', async ({
+  page,
+}) => {
+  await openStory(page, CLUSTERS);
+
+  await page.getByRole('button', { name: 'Options', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Shape by — Species', exact: true })
+    .click();
+  await page.getByRole('option', { name: 'Nothing', exact: true }).click();
+
+  // The list closes on its own choice; the panel it was opened from stays, so
+  // the reader can go on to the next setting.
+  await expect(page.getByRole('option')).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Shape by — Nothing', exact: true }),
+  ).toHaveCount(1);
+});

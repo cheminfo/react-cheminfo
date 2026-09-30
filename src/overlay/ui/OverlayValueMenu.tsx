@@ -108,7 +108,13 @@ export function OverlayValueMenu<TValue extends string = string>(
               text={option.label}
               htmlTitle={option.title}
               disabled={option.disabled}
-              onClick={() => onChange(option.value)}
+              // A menu opened from inside a panel would otherwise dismiss the
+              // panel too, taking the reader's other settings away mid-choice.
+              shouldDismissPopover={false}
+              onClick={() => {
+                onChange(option.value);
+                setOpen(false);
+              }}
             />
           ))}
         </Menu>
