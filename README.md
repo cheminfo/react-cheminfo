@@ -675,10 +675,16 @@ export const SITE_CATALOG = new MessageCatalog({
   directory: 'src/locales',
   source: en,
   translations: {
-    fr: () => import('../locales/fr.json', { with: { type: 'json' } }),
+    fr: () => import('../locales/fr.json'),
   },
 });
 ```
+
+The lazy imports carry **no** `with { type: 'json' }`: a bundler turns a JSON
+file into a JavaScript module, and the attribute makes the browser refuse the
+chunk it is served for being `text/javascript`. The English import is static, so
+the bundler resolves it before a browser ever sees it and may keep the
+attribute.
 
 `const t = useT(SITE_CATALOG)` then reads it in the language of the page, typed
 by the English keys; `t.or(key, fallback)` is for a key built from the data,
