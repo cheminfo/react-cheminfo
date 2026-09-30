@@ -1,5 +1,20 @@
 export type { AtomLabelPlacement, LabelledMolecule } from './atomLabels.ts';
 export { applyAtomLabels, customAtomLabel } from './atomLabels.ts';
+export {
+  GAS_CONSTANT,
+  ROOM_TEMPERATURE,
+  boltzmannConfidence,
+  boltzmannShares,
+} from './conformerBoltzmann.ts';
+export type {
+  ConformerRow,
+  ConformerRowRefinement,
+} from './conformerEnergy.ts';
+export {
+  bestRanking,
+  relativeEnergyOf,
+  totalEnergyOf,
+} from './conformerEnergy.ts';
 export type {
   EditorGesture,
   EditorGuideKey,
