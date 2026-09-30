@@ -71,6 +71,12 @@ export interface ClickToCopyProps {
    * @default undefined
    */
   style?: CSSProperties;
+  /**
+   * `data-testid` the element carries, so an end-to-end suite can select the
+   * value without depending on the text inside it.
+   * @default undefined
+   */
+  testId?: string;
 }
 
 /** Past this length the value is left out of the title: a molfile is no tooltip. */
@@ -106,13 +112,14 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
     disabled = false,
     className,
     style,
+    testId,
   } = props;
   const t = useChromeT();
   const { copied, failed, copy } = useCopyToClipboard();
 
   if (disabled) {
     return (
-      <Element className={className} style={style}>
+      <Element className={className} style={style} data-testid={testId}>
         {children}
       </Element>
     );
@@ -138,6 +145,7 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
         className,
       )}
       style={style}
+      data-testid={testId}
       role={focusable && !CELLS.has(Element) ? 'button' : undefined}
       tabIndex={focusable ? 0 : undefined}
       title={title ?? copyTitle(value, label, t)}
