@@ -449,5 +449,7 @@
   "molecule3d.input.scroll": "Scrollen",
   "molecule3d.input.clickAtom": "Ein Atom anklicken",
   "molecule3d.input.clickBackground": "Den Hintergrund anklicken",
-  "molecule3d.helpNote": "Die Tasten wirken, solange der Zeiger über dem Molekül ist. Auf dem Mac ist Ctrl die Control-Taste, nicht ⌘. Bei eingeschaltetem Messwerkzeug wählt ein Klick ein Atom."
+  "molecule3d.helpNote": "Die Tasten wirken, solange der Zeiger über dem Molekül ist. Auf dem Mac ist Ctrl die Control-Taste, nicht ⌘. Bei eingeschaltetem Messwerkzeug wählt ein Klick ein Atom.",
+  "number.increment": "Erhöhen",
+  "number.decrement": "Verringern"
 }

@@ -449,5 +449,7 @@
   "conformers.strategyDetail.likely-random": "Draws torsions at random from the torsion database, weighted by how often each angle is seen in crystal structures.",
   "conformers.strategyDetail.pure-random": "Draws every torsion uniformly at random, ignoring how likely the angle is — the widest spread and the least realistic set.",
   "conformers.strategyDetail.likely-systematic": "Walks the torsion combinations in decreasing likelihood, so the first conformers are the most probable ones and the set is reproducible.",
-  "conformers.minimisation.none": "None (no energies)"
+  "conformers.minimisation.none": "None (no energies)",
+  "number.increment": "Increase",
+  "number.decrement": "Decrease"
 }

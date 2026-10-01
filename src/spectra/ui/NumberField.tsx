@@ -1,6 +1,6 @@
-import { InputGroup } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
-import { useState } from 'react';
+
+import { NumberInput } from '../../number/ui/NumberInput.tsx';
 
 import { HELP_STYLE, LABEL_STYLE, sizedFieldStyle } from './fieldStyles.ts';
 
@@ -35,77 +35,30 @@ interface NumberFieldProps {
 /**
  * One number of the settings.
  *
- * The box keeps what was typed rather than what parsed, because a reader
- * halfway through `1e-` has typed something no number can hold yet; clearing it
- * under them would make the field unusable. Nothing is handed up until the text
- * reads as a number, and emptying the box hands up nothing at all — which is
- * how a reader gets back to upstream's default after typing over it.
+ * Emptying the box hands up nothing at all, which is how a reader gets back to
+ * upstream's default after typing over it.
  * @param props - See {@link NumberFieldProps}.
  * @returns The labelled box.
  */
 export function NumberField(props: NumberFieldProps): ReactElement {
   const { label, value, placeholder, onChange, integer = false, help } = props;
-  const [draft, setDraft] = useState(() => ({
-    text: asText(value),
-    held: value,
-  }));
-
-  // The settings changed from somewhere else — a preset, a reset, a pasted
-  // configuration — so the box has to follow rather than hold the old text.
-  // `held` is what this box last handed up, not the prop it was rendered with:
-  // comparing against the prop would make the box's own edit look external and
-  // rewrite `-0.` as `0` under the caret before the reader reaches the digits.
-  if (draft.held !== value) setDraft({ text: asText(value), held: value });
 
   return (
     <label style={FIELD_STYLE}>
       <span style={LABEL_STYLE}>{label}</span>
-      <InputGroup
-        size="small"
+      <NumberInput
+        allowEmpty
+        buttons={false}
         fill
-        inputMode={integer ? 'numeric' : 'decimal'}
-        value={draft.text}
+        size="small"
+        value={value}
         placeholder={placeholder}
-        spellCheck={false}
-        autoComplete="off"
-        onValueChange={(text) => {
-          const parsed = read(text, integer);
-          const emptied = text.trim() === '';
-          setDraft({ text, held: emptied ? undefined : (parsed ?? value) });
-          if (emptied) {
-            onChange(undefined);
-          } else if (parsed !== undefined) {
-            onChange(parsed);
-          }
-        }}
+        integer={integer}
+        onChange={onChange}
       />
       {help === undefined ? null : <span style={HELP_STYLE}>{help}</span>}
     </label>
   );
-}
-
-/**
- * The number as the box shows it.
- * @param value - What the settings hold.
- * @returns Its text, empty when nothing is held.
- */
-function asText(value: number | undefined): string {
-  return value === undefined ? '' : String(value);
-}
-
-/**
- * The text as a number, when it reads as one.
- * @param text - What was typed.
- * @param integer - Whether only whole numbers make sense.
- * @returns The number, or undefined while the text is not one yet.
- */
-function read(text: string, integer: boolean): number | undefined {
-  const trimmed = text.trim();
-  if (trimmed === '') return undefined;
-  const parsed = Number(trimmed);
-  if (!Number.isFinite(parsed)) return undefined;
-  if (integer && !Number.isInteger(parsed)) return undefined;
-  return parsed;
 }
 
 const FIELD_STYLE = sizedFieldStyle(120);

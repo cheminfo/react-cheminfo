@@ -449,5 +449,7 @@
   "molecule3d.input.scroll": "Molette",
   "molecule3d.input.clickAtom": "Cliquer un atome",
   "molecule3d.input.clickBackground": "Cliquer le fond",
-  "molecule3d.helpNote": "Les touches agissent tant que le pointeur est sur la molécule. Sur un Mac, Ctrl est la touche Contrôle, pas ⌘. Avec un outil de mesure actif, un clic choisit un atome."
+  "molecule3d.helpNote": "Les touches agissent tant que le pointeur est sur la molécule. Sur un Mac, Ctrl est la touche Contrôle, pas ⌘. Avec un outil de mesure actif, un clic choisit un atome.",
+  "number.increment": "Augmenter",
+  "number.decrement": "Diminuer"
 }
