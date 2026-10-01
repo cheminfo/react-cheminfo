@@ -55,6 +55,15 @@ export interface DelimitedTextPanelProps {
    */
   height?: number;
   /**
+   * What is shown in place of the text area. A caller with more rows than a
+   * text area can hold — a spectrum of a hundred thousand points — passes its
+   * own virtualized table here; what is copied and what is saved stay the
+   * serialized text either way, so the preview can shorten a number the file
+   * keeps in full.
+   * @default undefined — the text itself, in a read-only text area
+   */
+  preview?: ReactNode;
+  /**
    * Class names added to the root element, after the component's own.
    * @default undefined
    */
@@ -84,6 +93,7 @@ export function DelimitedTextPanel(
     downloadable = true,
     label,
     height = 320,
+    preview,
   } = props;
   const t = useChromeT();
   const [delimiterId, setDelimiterId] = useState<string>(defaultDelimiter);
@@ -138,15 +148,19 @@ export function DelimitedTextPanel(
           small
         />
       </div>
-      <textarea
-        readOnly
-        value={text}
-        spellCheck={false}
-        aria-label={label ?? t('delimited.tableAsText')}
-        className={Classes.INPUT}
-        style={{ ...TEXT_STYLE, height }}
-        onFocus={(event) => event.currentTarget.select()}
-      />
+      {preview === undefined ? (
+        <textarea
+          readOnly
+          value={text}
+          spellCheck={false}
+          aria-label={label ?? t('delimited.tableAsText')}
+          className={Classes.INPUT}
+          style={{ ...TEXT_STYLE, height }}
+          onFocus={(event) => event.currentTarget.select()}
+        />
+      ) : (
+        <div style={PREVIEW_STYLE}>{preview}</div>
+      )}
     </div>
   );
 }
@@ -165,6 +179,8 @@ const LABEL_STYLE = {
 } as const satisfies CSSProperties;
 
 const SPACER_STYLE = { flex: 1 } as const satisfies CSSProperties;
+
+const PREVIEW_STYLE = { marginTop: 12 } as const satisfies CSSProperties;
 
 const TEXT_STYLE = {
   width: '100%',

@@ -8,3 +8,5 @@ export type { ReadDelimitedOptions } from './readDelimited.ts';
 export { detectDelimiter, readDelimited } from './readDelimited.ts';
 export type { ToDelimitedOptions } from './toDelimited.ts';
 export { escapeCell, toDelimited } from './toDelimited.ts';
+export type { TableRecord, TableRows, TableRowsOptions } from './tableRows.ts';
+export { columnsOf, tableRows } from './tableRows.ts';
