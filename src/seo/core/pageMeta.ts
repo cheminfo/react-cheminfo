@@ -14,13 +14,25 @@
 
 import { siteDisplayName } from '../../ecosystem/core/lookup.ts';
 import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
+import type { Language } from '../../i18n/core/languages.ts';
+import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
+import {
+  readLanguagePath,
+  withLanguagePath,
+} from '../../language/core/languagePath.ts';
+import { withoutQueryOrFragment } from '../../router/core/address.ts';
+import { stripBasePath } from '../../router/core/basePath.ts';
 import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
 
+import { alternateLinkTags } from './alternates.ts';
 import type { DocumentMeta } from './documentMeta.ts';
 import type { RouteMeta } from './routes.ts';
 import { pageMetaFor } from './routes.ts';
 import { mountPathOf, originOf, resolveSite } from './siteFiles.ts';
 import { PAGE_HEAD_MARKER, fill } from './template.ts';
+
+// A scheme and an authority: what `location.href` hands out.
+const ABSOLUTE_URL = /^[a-z][\d+.a-z-]*:\/\//i;
 
 /** Which site is being served, and what it answers. */
 export interface PageMetaOptions {
@@ -48,6 +60,17 @@ export interface PageMetaOptions {
    * @default '/og.png'
    */
   image?: string;
+  /**
+   * Every language the site is written in, the default one included.
+   *
+   * The language is read off the address — `/fr/tutorial` is the French
+   * tutorial — so the canonical, the card and the `hreflang` set are written
+   * for the page actually being served, and the routes passed are the table in
+   * that language. A site writing one language leaves this out and nothing
+   * about its head changes.
+   * @default [the default language]
+   */
+  languages?: readonly Language[];
 }
 
 /**
@@ -74,12 +97,27 @@ export function injectPageMeta(html: string, options: PageMetaOptions): string {
  */
 export function pageHeadTags(options: PageMetaOptions): string {
   const name = siteDisplayName(resolveSite(options.site));
-  const description = routeMetaOf(options).description;
+  const route = routeMetaOf(options);
+  const description = route.description;
   const origin = originOf(options);
   const { title, canonical } = pageDocumentMeta(options);
   const image = absolute(options.image ?? '/og.png', origin);
+  const alternates = alternateLinkTags({
+    origin,
+    path: route.path,
+    languages: languagesOf(options),
+  });
+
+  // A maintenance screen says so on the page itself. `robots.txt` cannot: it
+  // stops the crawl, and an address nobody crawled is still listed from
+  // whatever links to it, with no description to show for it.
+  const robots =
+    route.indexed === false
+      ? ['<meta name="robots" content="noindex, nofollow" />']
+      : [];
 
   return [
+    ...robots,
     `<title>${escapeText(title)}</title>`,
     `<meta name="description" content="${escapeAttribute(description)}" />`,
     `<link rel="canonical" href="${escapeAttribute(canonical)}" />`,
@@ -90,6 +128,7 @@ export function pageHeadTags(options: PageMetaOptions): string {
     `<meta property="og:url" content="${escapeAttribute(canonical)}" />`,
     `<meta property="og:image" content="${escapeAttribute(image)}" />`,
     '<meta name="twitter:card" content="summary_large_image" />',
+    ...(alternates === '' ? [] : [alternates]),
   ].join('\n');
 }
 
@@ -112,15 +151,47 @@ export function pageDocumentMeta(
   return {
     title: `${meta.title} — ${siteDisplayName(site)}`,
     description: meta.description,
-    canonical: `${originOf(options)}${meta.path}`,
+    canonical: `${originOf(options)}${withLanguagePath(pageLanguage(options), meta.path)}`,
   };
+}
+
+/**
+ * The language an address is being served in.
+ *
+ * Read off the address itself rather than passed beside it, so the catalog a
+ * server picks and the canonical it writes cannot disagree.
+ * @param options - Which site, which address, and the languages it speaks.
+ * @returns The language named by the address, or the default one.
+ * @throws {Error} When the deployment names an origin that is not an absolute
+ * address.
+ */
+export function pageLanguage(options: PageMetaOptions): Language {
+  return readLanguagePath(ownPath(options), languagesOf(options)).language;
 }
 
 // A server behind a mount is handed the address the browser asked for, and the
 // route table is written from the site's own root, so the mount the origin
 // carries is taken off it before the table is read.
 function routeMetaOf(options: PageMetaOptions): RouteMeta {
-  return pageMetaFor(options.routes, options.url, mountPathOf(options));
+  const { path } = readLanguagePath(ownPath(options), languagesOf(options));
+  return pageMetaFor(options.routes, path);
+}
+
+// The address from the site's own root, the mount taken off, with the query
+// string and the fragment gone: what the language prefix is read off. An app
+// handing over `location.href` is answered too, so the one reading serves a
+// server, a build and a click alike.
+function ownPath(options: PageMetaOptions): string {
+  const url = options.url;
+  const path =
+    ABSOLUTE_URL.test(url) && URL.canParse(url)
+      ? new URL(url).pathname
+      : withoutQueryOrFragment(url);
+  return stripBasePath(mountPathOf(options), path);
+}
+
+function languagesOf(options: PageMetaOptions): readonly Language[] {
+  return options.languages ?? [DEFAULT_LANGUAGE];
 }
 
 function absolute(target: string, origin: string): string {

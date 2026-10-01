@@ -50,10 +50,11 @@ export interface SiteFilesOptions {
  */
 export function sitemapXml(options: SiteFilesOptions): string {
   const origin = originOf(options);
-  if (options.routes.length === 0) {
+  if (options.routes.every((route) => route.indexed === false)) {
     throw new Error('a sitemap lists at least one address');
   }
   const entries = options.routes
+    .filter((route) => route.indexed !== false)
     .map(
       (route) =>
         `  <url><loc>${escapeText(`${origin}${route.path}`)}</loc></url>`,

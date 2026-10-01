@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest';
 
+import { pageHeadTags } from '../pageMeta.ts';
 import type { RouteMeta } from '../routes.ts';
 import { pageMetaFor } from '../routes.ts';
+import { sitemapXml } from '../siteFiles.ts';
 
 const ROUTES: RouteMeta[] = [
   { path: '/', title: 'Home', description: 'The home page.' },
@@ -137,4 +139,39 @@ test('an absolute address is read for the path it carries', () => {
   expect(pageMetaFor(ROUTES, 'https://3d.cheminfo.org/')).toStrictEqual(
     ROUTES[0],
   );
+});
+
+test('a maintenance screen answers noindex and the pages around it do not', () => {
+  const routes: RouteMeta[] = [
+    { path: '/', title: 'Home', description: 'The home page of the site.' },
+    {
+      path: '/names',
+      title: 'Resolve compound names',
+      description: 'The curation queue.',
+      indexed: false,
+    },
+  ];
+
+  expect(pageHeadTags({ site: 'derepflow', routes, url: '/names' })).toContain(
+    '<meta name="robots" content="noindex, nofollow" />',
+  );
+  expect(pageHeadTags({ site: 'derepflow', routes, url: '/' })).not.toContain(
+    'noindex',
+  );
+});
+
+test('a sitemap leaves out the addresses no search engine is meant to list', () => {
+  const routes: RouteMeta[] = [
+    { path: '/', title: 'Home', description: 'The home page of the site.' },
+    {
+      path: '/names',
+      title: 'Resolve compound names',
+      description: 'The curation queue.',
+      indexed: false,
+    },
+  ];
+  const xml = sitemapXml({ site: 'derepflow', routes });
+
+  expect(xml).toContain('<loc>https://derepflow.cheminfo.org/</loc>');
+  expect(xml).not.toContain('/names');
 });

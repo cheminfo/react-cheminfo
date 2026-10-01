@@ -43,6 +43,20 @@ export interface RouteMeta {
    */
   note?: string;
   /**
+   * Whether a search engine is meant to list the page.
+   *
+   * A maintenance screen — a curation queue, an import run, an admin table — is
+   * a real address a signed-in person opens, so it belongs in the table the
+   * router and the tab title read. It is not a result anybody wants: it says
+   * nothing a visitor searched for, and a chemist who lands on it has been sent
+   * to the wrong place. Such a route is left out of the sitemap and the page
+   * answers `noindex`, which is how a page is kept out of the index — never a
+   * `Disallow`, which only stops the crawl and still lets the address be listed
+   * from a link somewhere else.
+   * @default true
+   */
+  indexed?: boolean;
+  /**
    * Whether the route also answers every address beneath it, so a section
    * carrying more pages than a table can hold — an entry per structure, per
    * ligand, per identifier — is indexed under the section rather than under the
