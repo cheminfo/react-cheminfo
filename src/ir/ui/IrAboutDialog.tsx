@@ -82,19 +82,6 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
             reader with a colour vision deficiency.
           </li>
         </ul>
-
-        <h4 style={headingStyle}>Licence</h4>
-        <p style={paragraphStyle}>
-          MIT, in the{' '}
-          <a
-            href="https://github.com/cheminfo/glycans"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            cheminfo/glycans
-          </a>{' '}
-          monorepo.
-        </p>
       </DialogBody>
     </Dialog>
   );

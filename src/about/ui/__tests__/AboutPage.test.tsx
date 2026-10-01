@@ -16,9 +16,6 @@ const SMILES: AboutContent = {
   ],
   credits: ['openchemlib', 'react'],
   cite: [PLATFORM_WORK],
-  // Stated rather than inherited: the real repository is private, and these
-  // tests are about the page a site with open sources draws.
-  publicRepository: true,
   build: {
     version: '2.4.0',
     builtAt: '2026-09-16T09:41:07Z',
@@ -38,16 +35,15 @@ function positions(html: string): number[] {
     html.indexOf('about-context'),
     html.indexOf('Built on'),
     html.indexOf('How to cite'),
-    html.indexOf('Licence and source'),
-    html.indexOf('Found a problem?'),
+    html.indexOf('about-build'),
   ];
 }
 
-test('the seven sections are all there, in the one order every site reads in', () => {
+test('the six sections are all there, in the one order every site reads in', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
   const found = positions(html);
 
-  expect(found).toHaveLength(7);
+  expect(found).toHaveLength(6);
 
   for (let index = 0; index < found.length; index++) {
     // Every section is drawn, and each starts after the one before it: a
@@ -90,25 +86,19 @@ test('the borrowed works are the registry entries, licence included', () => {
   expect(html).toContain('the component model the pages are written in.');
 });
 
-test('the licence, the sources and the version come from the ecosystem record', () => {
+test('the build is the last thing the page says, and it links nowhere', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
-  expect(html).toContain('MIT, © cheminfo.');
-  expect(html).toContain(
-    'href="https://github.com/cheminfo/smiles.cheminfo.org"',
-  );
-  expect(html).toContain('>github.com/cheminfo/smiles.cheminfo.org</a>');
-  expect(html).toContain(
-    'href="https://github.com/cheminfo/smiles.cheminfo.org/issues"',
-  );
-  expect(html).toContain(
-    'href="https://github.com/cheminfo/smiles.cheminfo.org/releases/tag/v2.4.0"',
-  );
   expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
-  expect(html).toContain(
-    'href="https://github.com/cheminfo/smiles.cheminfo.org/commit/a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"',
-  );
   expect(html).toContain('>a1b2c3d</code>');
+  // The site is not described by where its sources are kept, nor advertised
+  // by a licence, so neither the page nor its build badge names either.
+  expect(html).not.toContain('smiles.cheminfo.org/releases');
+  expect(html).not.toContain('smiles.cheminfo.org/commit');
+  expect(html).not.toContain('smiles.cheminfo.org/issues');
+  expect(html).not.toContain('MIT, © cheminfo.');
+  expect(html).not.toContain('Licence and source');
+  expect(html).not.toContain('Found a problem?');
 });
 
 test('a build that does not know its commit says only what it knows', () => {
@@ -125,26 +115,11 @@ test('a build that does not know its commit says only what it knows', () => {
   expect(html).not.toContain('from commit');
 });
 
-test('a site published off GitHub shows the build without inventing links', () => {
-  const html = renderToStaticMarkup(
-    <AboutPage
-      content={{
-        ...SMILES,
-        repository: 'https://gitlab.com/cheminfo/elsewhere',
-      }}
-    />,
-  );
-
-  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
-  expect(html).not.toContain('gitlab.com/cheminfo/elsewhere/releases');
-  expect(html).not.toContain('gitlab.com/cheminfo/elsewhere/commit');
-});
-
 test('the version is read in the hero, above everything the page says', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
   expect(html).toContain('class="about-version"');
-  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</a>');
+  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
   expect(html.indexOf('about-version')).toBeLessThan(
     html.indexOf('What you can do here'),
   );
@@ -169,10 +144,7 @@ test('a site that has never been released is named by its commit instead', () =>
   // `0.0.0` names no release anybody can look up; the commit names one build.
   expect(html).not.toContain('0.0.0');
   expect(html).toContain('class="about-version"');
-  expect(html).toContain('>a1b2c3d · 2026-09-16 09:41 UTC</a>');
-  expect(html).toContain(
-    'href="https://github.com/cheminfo/smiles.cheminfo.org/commit/a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"',
-  );
+  expect(html).toContain('>a1b2c3d · 2026-09-16 09:41 UTC</span>');
   // What the build knows is still worth saying.
   expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
 });
@@ -191,89 +163,14 @@ test('a build with neither a release nor a commit shows no badge', () => {
   expect(html).not.toContain('0.0.0');
 });
 
-test('a private site that has never been released still names its build', () => {
-  const html = renderToStaticMarkup(
-    <AboutPage
-      content={{
-        ...SMILES,
-        publicRepository: false,
-        build: {
-          version: '0.0.0',
-          builtAt: '2026-09-16T09:41:07Z',
-          commit: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
-        },
-      }}
-    />,
-  );
-
-  // The hero badge is the whole of what the page says about the build, so it
-  // carries the instant a reader would otherwise read under the licence.
-  expect(html).toContain('title="Built 2026-09-16 09:41:07 UTC from commit');
-  expect(html).toContain('>a1b2c3d · 2026-09-16 09:41 UTC</span>');
-  expect(html).not.toContain('smiles.cheminfo.org/commit');
-  expect(html).not.toContain('Licence and source');
-});
-
-test('a site with no build record shows no version', () => {
+test('a site with no build record shows no version and no build line', () => {
   const { build, ...noBuild } = SMILES;
   const html = renderToStaticMarkup(<AboutPage content={noBuild} />);
 
   expect(html).not.toContain('about-version');
-  expect(html).toContain('Licence and source');
-});
-
-test('a private repository is named nowhere, and the version stops linking', () => {
-  const html = renderToStaticMarkup(
-    <AboutPage content={{ ...SMILES, publicRepository: false }} />,
-  );
-
-  expect(html).not.toContain('Licence and source');
-  expect(html).not.toContain('MIT, © cheminfo.');
-  expect(html).not.toContain('smiles.cheminfo.org/releases');
-  expect(html).not.toContain('smiles.cheminfo.org/commit');
-
-  // The build a reader is asked to quote is still on the page, as plain text,
-  // and the badge it is read from carries the instant the licence used to.
-  expect(html).toContain('class="about-version"');
-  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
-  expect(html).toContain(
-    'title="Built 2026-09-16 09:41:07 UTC from commit a1b2c3d"',
-  );
-
-  // A tracker nobody outside can open is not offered either.
-  expect(html).not.toContain('Found a problem?');
-  expect(html).not.toContain('smiles.cheminfo.org/issues');
-
-  // Everything else the page says is untouched.
+  expect(html).not.toContain('about-build');
   expect(html).toContain('What you can do here');
   expect(html).toContain('Built on');
-});
-
-test('a private site naming a report address of its own keeps that section', () => {
-  const html = renderToStaticMarkup(
-    <AboutPage
-      content={{
-        ...SMILES,
-        publicRepository: false,
-        issues: 'https://github.com/cheminfo/feedback/issues',
-      }}
-    />,
-  );
-
-  expect(html).toContain('Found a problem?');
-  expect(html).toContain('href="https://github.com/cheminfo/feedback/issues"');
-  expect(html).not.toContain('Licence and source');
-});
-
-test('a site inherits the visibility of its own repository from the family record', () => {
-  const { publicRepository, ...inherited } = SMILES;
-  const open = renderToStaticMarkup(
-    <AboutPage content={{ ...inherited, siteId: 'regexp' }} />,
-  );
-  const closed = renderToStaticMarkup(<AboutPage content={inherited} />);
-
-  expect(open).toContain('Licence and source');
-  expect(closed).not.toContain('Licence and source');
 });
 
 test('each work is cited through the shared Cite button, and nothing else', () => {
@@ -297,8 +194,6 @@ test('a site asking for no citation loses that section and nothing else', () => 
   expect(html).not.toContain('10.2533/chimia.2025.66');
   expect(html).toContain('What you can do here');
   expect(html).toContain('Built on');
-  expect(html).toContain('Licence and source');
-  expect(html).toContain('Found a problem?');
 });
 
 test('a site writing no context loses that block, and the page still reads', () => {
@@ -433,7 +328,6 @@ test('a site outside the family draws its own mark and name from its record', ()
           id: 'images',
           name: { lead: 'images', alt: 'cheminfo', dot: true },
           host: 'images.cheminfo.org',
-          repository: 'https://github.com/cheminfo/images.cheminfo.org',
           tagline: 'Crop, rotate, adjust, resize and compress images.',
           brand: '#a21caf',
           brandAlt: '#b45309',

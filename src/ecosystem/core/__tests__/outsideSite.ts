@@ -6,7 +6,6 @@ export const OUTSIDE_SITE: SiteRecord = {
   id: 'spectra',
   name: { lead: 'spectra', alt: 'cheminfo', dot: true },
   host: 'spectra.cheminfo.org',
-  repository: 'https://github.com/cheminfo/spectra.cheminfo.org',
   tagline: 'Predict a spectrum in the browser.',
   brand: '#0f5132',
   brandAlt: '#a16207',

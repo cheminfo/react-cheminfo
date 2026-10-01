@@ -25,7 +25,6 @@ const SMILES: AboutContent = {
 const CITED: AboutContent = {
   ...SMILES,
   cite: [PLATFORM_WORK],
-  publicRepository: true,
   build: {
     version: '1.4.0',
     builtAt: '2026-09-16T09:41:07Z',
@@ -62,14 +61,6 @@ export const Default: Story = {};
 
 /** A site with a paper of its own, and a version it knows. */
 export const WithCitation: Story = { args: { content: CITED } };
-
-/**
- * A site whose sources are not open: no licence-and-source section, no tracker
- * a visitor cannot open, and a version that is read rather than followed.
- */
-export const PrivateSources: Story = {
-  args: { content: { ...CITED, publicRepository: false } },
-};
 
 /** A site with no release yet is named by the commit it was built from. */
 export const NeverReleased: Story = {

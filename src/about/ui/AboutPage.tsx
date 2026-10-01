@@ -47,8 +47,8 @@ export interface AboutPageProps {
 
 /**
  * The About page of a site of the family: what the tool is, who provides it,
- * what a visitor can do with it, what it is built on, how to cite it, and where
- * to report a problem — always in that order.
+ * what a visitor can do with it, what it is built on, and how to cite it —
+ * always in that order.
  *
  * The order is the point. A reader who has read one of our About pages knows
  * where the credits are on the other thirteen, and a site that writes its own
@@ -83,11 +83,7 @@ export function AboutPage(props: AboutPageProps): ReactElement {
           </p>
           <p style={WHAT_STYLE}>{about.what}</p>
         </div>
-        <AboutVersion
-          build={about.build}
-          repository={about.repository}
-          publicRepository={about.publicRepository}
-        />
+        <AboutVersion build={about.build} />
       </header>
 
       {about.people.length === 0 && about.providedBy.length === 0 ? null : (
@@ -133,65 +129,15 @@ export function AboutPage(props: AboutPageProps): ReactElement {
       )}
 
       {/*
-        A repository nobody outside can open is named nowhere: a licence a
-        reader cannot act on and a link that answers 404 say less than silence.
-        The version stays in the hero, unlinked, so a report still names a build.
+        The build the reader has open, last and under no heading: it is what a
+        report has to name, not something anybody came to the page to read.
       */}
-      {!about.publicRepository ? null : (
-        <AboutSection
-          title={t('about.licenceAndSource')}
-          className="about-licence"
-        >
-          <p style={FIRST_PARAGRAPH_STYLE}>
-            {around(
-              t('about.licence', { license: about.license }),
-              'sources',
-              <ExternalLink key="sources" href={about.repository} />,
-            )}
-          </p>
-          {about.build === undefined ? null : (
-            <AboutBuild build={about.build} repository={about.repository} />
-          )}
-        </AboutSection>
-      )}
-
-      {/*
-        Asking for a report is worth nothing without somewhere to send it, and
-        the tracker of a private repository answers 404 to every visitor.
-      */}
-      {about.issues === undefined ? null : (
-        <AboutSection title={t('about.foundAProblem')} className="about-issues">
-          <p style={FIRST_PARAGRAPH_STYLE}>
-            {around(
-              t('about.reportIt'),
-              'tracker',
-              <ExternalLink key="tracker" href={about.issues} />,
-            )}
-          </p>
+      {about.build === undefined ? null : (
+        <AboutSection className="about-build">
+          <AboutBuild build={about.build} />
         </AboutSection>
       )}
     </div>
-  );
-}
-
-// A link sits inside a sentence whose word order is the translator's, so the
-// message names where it goes with a placeholder and is split there.
-function around(
-  message: string,
-  placeholder: string,
-  link: ReactNode,
-): ReactNode[] {
-  const [before = '', after = ''] = message.split(`{${placeholder}}`);
-  return [before, link, after];
-}
-
-function ExternalLink(props: { href: string }): ReactElement {
-  const { href } = props;
-
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" style={LINK_STYLE}>
-      {href.replace(/^https?:\/\//, '')}
-    </a>
   );
 }
 
@@ -250,5 +196,3 @@ const FIRST_PARAGRAPH_STYLE = {
 const PARAGRAPH_STYLE = {
   margin: '8px 0 0',
 } as const satisfies CSSProperties;
-
-const LINK_STYLE = { color: 'var(--accent)' } as const satisfies CSSProperties;

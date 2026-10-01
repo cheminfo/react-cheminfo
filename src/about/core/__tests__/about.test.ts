@@ -20,8 +20,6 @@ const OUTSIDE: EcosystemSite = {
   id: 'images' as SiteId,
   name: { lead: 'images', alt: 'cheminfo', dot: true },
   host: 'images.cheminfo.org',
-  repository: 'https://github.com/cheminfo/images.cheminfo.org',
-  publicRepository: true,
   group: 'computing',
   tagline: 'Crop, rotate, adjust, resize and compress images, in your browser.',
   brand: '#a21caf',
@@ -33,67 +31,28 @@ test('a site that is not in the Tools menu may pass its own record', () => {
   const about = resolveAbout({ ...SMILES, siteId: OUTSIDE });
 
   expect(about.site.host).toBe('images.cheminfo.org');
-  expect(about.repository).toBe(
-    'https://github.com/cheminfo/images.cheminfo.org',
-  );
-  expect(about.issues).toBe(
-    'https://github.com/cheminfo/images.cheminfo.org/issues',
-  );
+  expect(about.site.tagline).toBe(OUTSIDE.tagline);
 });
 
 test('what the site left to the family comes from its ecosystem record', () => {
-  const about = resolveAbout({ ...SMILES, publicRepository: true });
+  const about = resolveAbout(SMILES);
 
   expect(about.site.host).toBe('smiles.cheminfo.org');
-  expect(about.repository).toBe(
-    'https://github.com/cheminfo/smiles.cheminfo.org',
-  );
-  expect(about.issues).toBe(
-    'https://github.com/cheminfo/smiles.cheminfo.org/issues',
-  );
-  expect(about.license).toBe('MIT');
   expect(about.build).toBeUndefined();
   expect(about.paragraphs).toStrictEqual([]);
   expect(about.cite).toStrictEqual([]);
 });
 
-test('a site that publishes elsewhere is reported there, issues included', () => {
+test('the build a site publishes is carried through untouched', () => {
   const about = resolveAbout({
     ...SMILES,
-    license: 'BSD-3-Clause',
-    repository: 'https://gitlab.com/cheminfo/elsewhere/',
-    publicRepository: true,
     build: { version: '2.4.0', builtAt: '2026-09-16T09:41:07Z' },
   });
 
-  expect(about.license).toBe('BSD-3-Clause');
-  expect(about.repository).toBe('https://gitlab.com/cheminfo/elsewhere/');
-  expect(about.issues).toBe('https://gitlab.com/cheminfo/elsewhere/issues');
   expect(about.build).toStrictEqual({
     version: '2.4.0',
     builtAt: '2026-09-16T09:41:07Z',
   });
-});
-
-test('the issues link a site writes itself is the one that is used', () => {
-  const about = resolveAbout({
-    ...SMILES,
-    issues: 'https://github.com/cheminfo/smiles.cheminfo.org/discussions',
-  });
-
-  // It stands even behind private sources: the site vouches for the address.
-  expect(about.publicRepository).toBe(false);
-  expect(about.issues).toBe(
-    'https://github.com/cheminfo/smiles.cheminfo.org/discussions',
-  );
-});
-
-test('a site with private sources asks for a report nowhere', () => {
-  const about = resolveAbout(SMILES);
-
-  // A tracker behind a private repository answers 404 to every visitor.
-  expect(about.publicRepository).toBe(false);
-  expect(about.issues).toBeUndefined();
 });
 
 test('credit ids become the entries of the shared registry, in order', () => {
@@ -186,26 +145,4 @@ test('context is two short paragraphs, never a chapter', () => {
     '`paragraphs` holds 3: at most 2 short paragraphs of context, and the rest belongs in the README.',
     'paragraph 2 is 420 characters: at most 400, or it is documentation rather than context.',
   ]);
-});
-
-test('a repository is private until a record says otherwise', () => {
-  // regexp is one of ours with open sources; 3d is one of ours that is not.
-  expect(resolveAbout({ ...SMILES, siteId: 'regexp' }).publicRepository).toBe(
-    true,
-  );
-  expect(resolveAbout({ ...SMILES, siteId: '3d' }).publicRepository).toBe(
-    false,
-  );
-});
-
-test('a site naming a repository of its own says whether it can be opened', () => {
-  const resolved = resolveAbout({
-    ...SMILES,
-    siteId: '3d',
-    repository: 'https://github.com/cheminfo/elsewhere',
-    publicRepository: true,
-  });
-
-  expect(resolved.publicRepository).toBe(true);
-  expect(resolved.issues).toBe('https://github.com/cheminfo/elsewhere/issues');
 });

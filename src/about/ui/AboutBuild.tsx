@@ -1,15 +1,12 @@
-import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 
 import type { BuildInfo } from '../../build/core/buildInfo.ts';
 import { formatBuiltAt, shortCommit } from '../../build/core/buildInfo.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import { githubSources } from '../core/repository.ts';
 
 export interface AboutBuildProps {
   /** What the build published about itself. */
   build: BuildInfo;
-  /** Where the sources live, which is what the version and commit link into. */
-  repository: string;
 }
 
 /**
@@ -17,23 +14,21 @@ export interface AboutBuildProps {
  *
  * A report of something going wrong is worth answering only when we know what
  * was running. The version itself is in the hero, where a reader is asked to
- * quote it from; this line carries the rest, and the commit links into the
- * repository, so the change that caused a problem is one click from the page
- * that shows it.
+ * quote it from; this line carries the rest, so a report can name the exact
+ * build the problem was seen on.
  * @param props - See {@link AboutBuildProps}.
  * @returns The line.
  */
 export function AboutBuild(props: AboutBuildProps): ReactElement {
-  const { build, repository } = props;
+  const { build } = props;
   const t = useChromeT();
-  const sources = githubSources(repository);
   const builtAt = formatBuiltAt(build.builtAt);
   if (build.commit === undefined) {
     return <p style={PARAGRAPH_STYLE}>{t('about.built', { builtAt })}</p>;
   }
 
-  // The commit is a link inside a sentence whose word order is the
-  // translator's, so the message is split where it names it.
+  // The commit sits inside a sentence whose word order is the translator's,
+  // so the message names where it goes and is split there.
   const [before = '', after = ''] = t('about.builtFromCommit', {
     builtAt,
   }).split('{commit}');
@@ -41,36 +36,14 @@ export function AboutBuild(props: AboutBuildProps): ReactElement {
   return (
     <p style={PARAGRAPH_STYLE}>
       {before}
-      <Reference
-        href={
-          sources === undefined
-            ? undefined
-            : `${sources}/commit/${build.commit}`
-        }
-      >
-        {shortCommit(build.commit)}
-      </Reference>
+      <code style={CODE_STYLE}>{shortCommit(build.commit)}</code>
       {after}
     </p>
   );
 }
 
-function Reference(props: {
-  href: string | undefined;
-  children: ReactNode;
-}): ReactElement {
-  const { href, children } = props;
-  if (href === undefined) return <code style={CODE_STYLE}>{children}</code>;
-
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" style={LINK_STYLE}>
-      <code style={CODE_STYLE}>{children}</code>
-    </a>
-  );
-}
-
 const PARAGRAPH_STYLE = {
-  margin: '8px 0 0',
+  margin: 0,
   color: 'var(--text-muted)',
   fontSize: 13,
 } as const satisfies CSSProperties;
@@ -79,5 +52,3 @@ const CODE_STYLE = {
   fontFamily: 'var(--font-mono, ui-monospace, monospace)',
   fontSize: 13,
 } as const satisfies CSSProperties;
-
-const LINK_STYLE = { color: 'var(--accent)' } as const satisfies CSSProperties;
