@@ -124,10 +124,10 @@ test('a long value is written smaller rather than cut short', () => {
   );
 
   expect(short).toContain(
-    'font-size:max(0.25rem, min(1.75cqw, calc((4.85cqw - 4px) / 2.40)))',
+    'font-size:max(0.25rem, min(1.6cqw, calc((4.85cqw - 4px) / 2.40)))',
   );
   expect(long).toContain(
-    'font-size:max(0.25rem, min(1.75cqw, calc((4.85cqw - 4px) / 4.80)))',
+    'font-size:max(0.25rem, min(1.6cqw, calc((4.85cqw - 4px) / 4.80)))',
   );
   expect(short).not.toContain('text-overflow');
   expect(long).not.toContain('text-overflow');
@@ -146,16 +146,16 @@ test('a wide symbol is written smaller so it stays inside its cell', () => {
   );
 });
 
-test('a table writing nothing under the symbol gives it the room', () => {
+test('every cell has the same three bands, whether or not a value is written', () => {
   const bare = renderToStaticMarkup(<PeriodicTable />);
   const withValue = renderToStaticMarkup(
     <PeriodicTable detailOf={() => '1'} />,
   );
 
-  expect(bare).toContain('min(2.8cqw,');
-  expect(bare).toContain('repeat(7, 4.9cqw)');
-  expect(withValue).toContain('min(2.4cqw,');
-  expect(withValue).toContain('repeat(7, 6.1cqw)');
+  for (const html of [bare, withValue]) {
+    expect(html).toContain('grid-template-rows:1.8cqw 1fr 1.8cqw');
+    expect(html).toContain('repeat(7, 6.8cqw)');
+  }
 });
 
 test('the type of a cell is a share of the table, so it grows with it', () => {

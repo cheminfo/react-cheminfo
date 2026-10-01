@@ -147,7 +147,6 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   } = props;
 
   const t = useChromeT();
-  const writesDetail = detailOf !== undefined;
   const gridRef = useRef<HTMLDivElement>(null);
   const cameFromKeyRef = useRef(false);
   const offset = headers ? 1 : 0;
@@ -178,7 +177,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
         role="grid"
         aria-label={t('periodic.table')}
         data-testid="periodic-table"
-        style={gridStyle(headers, writesDetail)}
+        style={gridStyle(headers)}
         onKeyDown={handleKeyDown}
       >
         {headers ? <HeaderStrips onSelectRange={onSelectRange} /> : null}
@@ -193,7 +192,6 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
             symbol={element.symbol}
             name={nameOf(element)}
             detail={detailOf?.(element)}
-            writesDetail={writesDetail}
             swatch={swatchOf(element)}
             isSelected={element.symbol === selected}
             isIncluded={isIncluded?.(element)}
@@ -218,8 +216,9 @@ function insetStyle(offset: number): CSSProperties {
   return {
     alignItems: 'center',
     display: 'flex',
-    // Narrower than the block so the writing never touches the cells beside it.
-    padding: '0 1cqw',
+    // A column of air on each side, so the writing reads as sitting in the
+    // block rather than as running into the cells beside it.
+    padding: '0 2.4cqw',
     gridColumn: `${String(EMPTY_BLOCK.column + offset)} / span ${String(EMPTY_BLOCK.columnSpan)}`,
     gridRow: `${String(EMPTY_BLOCK.row + offset)} / span ${String(EMPTY_BLOCK.rowSpan)}`,
     // A share of the table, with a floor, exactly as a cell sizes its symbol:
@@ -251,14 +250,13 @@ const MIN_WIDTH = 280;
 /**
  * How tall one row of elements is, as a share of the table's width.
  *
- * A column is about 5.4% of that width, so a cell is a seventh taller than it
- * is wide — the proportion of a wall chart, and the room the three lines of a
- * cell need to be written at a size a class can read.
+ * A column is about 5.2% of that width, so a cell is a third taller than it is
+ * wide — the proportion of a wall chart, and the room the three bands of a
+ * cell need to be read from the back of a room. It is the same height in every
+ * table: a cell keeps the band it writes a value in whether or not that table
+ * writes one.
  */
-const ROW_HEIGHT = '6.1cqw';
-
-/** The same, in a table that writes nothing under the symbol. */
-const ROW_HEIGHT_ALONE = '4.9cqw';
+const ROW_HEIGHT = '6.8cqw';
 
 /** The band the two inner-transition series were lifted out across. */
 const SERIES_GAP = 'max(6px, 1.1cqw)';
@@ -285,14 +283,11 @@ const baseGridStyle = {
  * The grid the cells are placed on.
  * @param headers - Whether a leading column and row hold the period and group
  * numbers.
- * @param writesDetail - Whether a cell writes a third line, which is what a
- * row is tall enough for.
  * @returns The style of the grid.
  */
-function gridStyle(headers: boolean, writesDetail: boolean): CSSProperties {
-  const row = writesDetail ? ROW_HEIGHT : ROW_HEIGHT_ALONE;
+function gridStyle(headers: boolean): CSSProperties {
   // The eighth row is the gap the inner-transition series are lifted out into.
-  const rows = `repeat(7, ${row}) ${SERIES_GAP} repeat(2, ${row})`;
+  const rows = `repeat(7, ${ROW_HEIGHT}) ${SERIES_GAP} repeat(2, ${ROW_HEIGHT})`;
   if (!headers) {
     return {
       ...baseGridStyle,

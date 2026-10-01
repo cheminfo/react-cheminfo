@@ -38,12 +38,6 @@ export interface ElementCellProps {
    */
   detail?: string;
   /**
-   * Whether the table this cell belongs to writes a third line at all. A table
-   * that writes none gives the room to the symbol, and its rows are shorter.
-   * @default whether this cell has one
-   */
-  writesDetail?: boolean;
-  /**
    * Whether the cell is the one the tools are pointed at.
    * @default false
    */
@@ -82,7 +76,6 @@ export function ElementCell(props: ElementCellProps): ReactElement {
     row,
     onSelect,
     detail = '',
-    writesDetail = detail !== '',
     isSelected = false,
     isIncluded = true,
     onHover,
@@ -137,7 +130,7 @@ export function ElementCell(props: ElementCellProps): ReactElement {
       <span
         style={{
           ...symbolStyle,
-          fontSize: symbolFontSize(symbol, writesDetail),
+          fontSize: symbolFontSize(symbol),
         }}
       >
         {symbol}
@@ -158,12 +151,10 @@ export function ElementCell(props: ElementCellProps): ReactElement {
  * ones whose second letter is an `m` — which are written a tenth smaller
  * rather than run into the edges of their cell.
  * @param symbol - The chemical symbol.
- * @param writesDetail - Whether the table writes a third line under it.
  * @returns A CSS length.
  */
-function symbolFontSize(symbol: string, writesDetail: boolean): string {
-  const cap = writesDetail ? SYMBOL_CQW : SYMBOL_ALONE_CQW;
-  return fitted(symbolWidthInEm(symbol), cap, '0.5rem');
+function symbolFontSize(symbol: string): string {
+  return fitted(symbolWidthInEm(symbol), SYMBOL_CQW, '0.5rem');
 }
 
 /**
@@ -233,17 +224,24 @@ const TABULAR_EM = 0.6;
 /** The size the symbol is written at wherever it fits, as a share of the table. */
 const SYMBOL_CQW = '2.4cqw';
 
-/** The same, in a table that writes nothing under the symbol. */
-const SYMBOL_ALONE_CQW = '2.8cqw';
-
 /**
  * The tallest the third line is ever written, as a share of the table.
  *
- * Close to three quarters of the symbol: the symbol is how a cell is found,
- * but the value is what the table is being read for, and a value half the size
- * of the symbol is the one thing on the cell a class cannot make out.
+ * Close to two thirds of the symbol: the symbol is how a cell is found, but
+ * the value is what the table is being read for, and a value half the size of
+ * the symbol is the one thing on the cell a class cannot make out.
  */
-const DETAIL_CQW = '1.75cqw';
+const DETAIL_CQW = '1.6cqw';
+
+/**
+ * The band at each end of a cell: the atomic number at the top, whatever the
+ * tool writes at the bottom.
+ *
+ * They are one length, not two, and that is what makes the symbol between them
+ * sit at the centre of the cell rather than near it — a bottom band wider than
+ * the top one by a third lifted every symbol in the table two pixels.
+ */
+const EDGE_BAND = '1.8cqw';
 
 /** How wide one column is, as a share of the table's width. */
 const CELL_CQW = '4.85cqw';
@@ -251,49 +249,48 @@ const CELL_CQW = '4.85cqw';
 /** What the border and the padding of a cell take off that width. */
 const CELL_CHROME = '4px';
 
+/**
+ * A cell is three bands of its own, and every cell has all three.
+ *
+ * The atomic number is in the top band, against its left edge; the symbol is
+ * centred in the middle one; whatever the tool writes is centred in the
+ * bottom one. The bands keep their height whether or not anything is written
+ * in the last of them, so a number sits at one height across the whole table
+ * and a symbol at one other — before this, both rode on a stack the cell
+ * centred and moved whenever a neighbour's value was written smaller.
+ */
 const cellStyle = {
-  alignItems: 'center',
   border: '1px solid rgb(255 255 255 / 0.55)',
   borderRadius: 3,
   cursor: 'pointer',
-  display: 'flex',
-  flexDirection: 'column',
+  display: 'grid',
   font: 'inherit',
-  justifyContent: 'center',
+  gridTemplateRows: `${EDGE_BAND} 1fr ${EDGE_BAND}`,
+  justifyItems: 'center',
   minWidth: 0,
   overflow: 'hidden',
   padding: '1px',
-  // The corner the atomic number is pinned into.
-  position: 'relative',
   transition: 'opacity 120ms ease, filter 120ms ease',
 } as const satisfies CSSProperties;
 
-/**
- * The atomic number sits out of the flow, in the corner.
- *
- * In the flow it rode on top of a stack the cell centres, so it moved down
- * whenever what is written under the symbol was written smaller — the numbers
- * of a row then sat at as many heights as the row had word lengths. Out of it,
- * the number is in the same corner of every cell, and the symbol is centred in
- * the cell rather than in what is left of it.
- */
 const numberStyle = {
+  alignSelf: 'start',
   fontSize: 'max(0.33rem, 1.1cqw)',
   fontVariantNumeric: 'tabular-nums',
-  left: 'max(1px, 0.14cqw)',
+  justifySelf: 'start',
   lineHeight: 1,
   opacity: 0.8,
-  position: 'absolute',
-  top: 'max(1px, 0.14cqw)',
 } as const satisfies CSSProperties;
 
 const symbolStyle = {
+  alignSelf: 'center',
   fontWeight: 700,
   letterSpacing: '-0.02em',
   lineHeight: 1.02,
 } as const satisfies CSSProperties;
 
 const detailStyle = {
+  alignSelf: 'center',
   fontVariantNumeric: 'tabular-nums',
   lineHeight: 1,
   maxWidth: '100%',
