@@ -150,7 +150,7 @@ const headerStyle = {
   alignItems: 'center',
   color: TOKEN.textMuted,
   display: 'flex',
-  fontSize: 'clamp(0.4rem, 1.9cqw, 0.62rem)',
+  fontSize: 'max(0.45rem, 1.35cqw)',
   justifyContent: 'center',
   padding: 0,
 } as const satisfies CSSProperties;
@@ -168,6 +168,6 @@ const markerStyle = {
   borderRadius: 3,
   color: TOKEN.textMuted,
   display: 'flex',
-  fontSize: 'clamp(0.36rem, 1.7cqw, 0.55rem)',
+  fontSize: 'max(0.4rem, 1.15cqw)',
   justifyContent: 'center',
 } as const satisfies CSSProperties;

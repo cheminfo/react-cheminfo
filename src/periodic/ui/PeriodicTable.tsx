@@ -129,6 +129,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   } = props;
 
   const t = useChromeT();
+  const writesDetail = detailOf !== undefined;
   const gridRef = useRef<HTMLDivElement>(null);
   const cameFromKeyRef = useRef(false);
   const offset = headers ? 1 : 0;
@@ -159,7 +160,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
         role="grid"
         aria-label={t('periodic.table')}
         data-testid="periodic-table"
-        style={headers ? gridWithHeadersStyle : gridStyle}
+        style={gridStyle(headers, writesDetail)}
         onKeyDown={handleKeyDown}
       >
         {headers ? <HeaderStrips onSelectRange={onSelectRange} /> : null}
@@ -171,6 +172,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
             symbol={element.symbol}
             name={nameOf(element)}
             detail={detailOf?.(element)}
+            writesDetail={writesDetail}
             swatch={swatchOf(element)}
             isSelected={element.symbol === selected}
             isIncluded={isIncluded?.(element)}
@@ -199,37 +201,64 @@ function noop(): void {
   // keyboard and a screen reader still reach every element.
 }
 
+/** Narrowest the table is ever drawn; under it the type stops being readable. */
+const MIN_WIDTH = 280;
+
+/**
+ * How tall one row of elements is, as a share of the table's width.
+ *
+ * A column is about 5.4% of that width, so a cell is a seventh taller than it
+ * is wide — the proportion of a wall chart, and the room the three lines of a
+ * cell need to be written at a size a class can read.
+ */
+const ROW_HEIGHT = '6.1cqw';
+
+/** The same, in a table that writes nothing under the symbol. */
+const ROW_HEIGHT_ALONE = '4.9cqw';
+
+/** The band the two inner-transition series were lifted out across. */
+const SERIES_GAP = 'max(6px, 1.1cqw)';
+
 const rootStyle = {
   display: 'flex',
   flexDirection: 'column',
   gap: 8,
+  minWidth: MIN_WIDTH,
+  // Everything inside — the height of a row as much as the type in a cell — is
+  // a share of this box rather than of the page, so the same table reads at
+  // 280px beside a chart and fills a lecture-hall screen at twice that.
+  containerType: 'inline-size',
 } as const satisfies CSSProperties;
 
 const baseGridStyle = {
   display: 'grid',
   gap: 2,
+  minWidth: MIN_WIDTH,
   width: '100%',
-  // The cells size their type against this box rather than against the page,
-  // so the same table reads at 320px beside a chart and at 900px on its own.
-  containerType: 'inline-size',
 } as const satisfies CSSProperties;
 
-const gridStyle = {
-  ...baseGridStyle,
+/**
+ * The grid the cells are placed on.
+ * @param headers - Whether a leading column and row hold the period and group
+ * numbers.
+ * @param writesDetail - Whether a cell writes a third line, which is what a
+ * row is tall enough for.
+ * @returns The style of the grid.
+ */
+function gridStyle(headers: boolean, writesDetail: boolean): CSSProperties {
+  const row = writesDetail ? ROW_HEIGHT : ROW_HEIGHT_ALONE;
   // The eighth row is the gap the inner-transition series are lifted out into.
-  gridTemplateColumns: `repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
-  gridTemplateRows:
-    'repeat(7, minmax(0, 1fr)) 0.5rem repeat(2, minmax(0, 1fr))',
-  aspectRatio: `${String(COLUMN_COUNT)} / 9.7`,
-  minWidth: 280,
-} as const satisfies CSSProperties;
-
-const gridWithHeadersStyle = {
-  ...baseGridStyle,
-  // A leading column and a leading row hold the period and group numbers.
-  gridTemplateColumns: `1.4rem repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
-  gridTemplateRows:
-    '1rem repeat(7, minmax(0, 1fr)) 0.5rem repeat(2, minmax(0, 1fr))',
-  aspectRatio: `${String(COLUMN_COUNT + 1.2)} / 10.6`,
-  minWidth: 280,
-} as const satisfies CSSProperties;
+  const rows = `repeat(7, ${row}) ${SERIES_GAP} repeat(2, ${row})`;
+  if (!headers) {
+    return {
+      ...baseGridStyle,
+      gridTemplateColumns: `repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
+      gridTemplateRows: rows,
+    };
+  }
+  return {
+    ...baseGridStyle,
+    gridTemplateColumns: `max(14px, 2.4cqw) repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
+    gridTemplateRows: `max(12px, 2cqw) ${rows}`,
+  };
+}

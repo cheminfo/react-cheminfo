@@ -25,7 +25,7 @@ test('the selected cell is outlined, so a property colour survives selection', (
   const cell = html.split('data-testid="element-Fe"', 2)[1] ?? '';
 
   expect(cell).toContain('aria-pressed="true"');
-  expect(cell.slice(0, 600)).toContain('outline:2px solid');
+  expect(cell.slice(0, 800)).toContain('outline-style:solid');
   expect(html).toContain(
     `background:${categorySwatch('transition-metal').background}`,
   );
@@ -115,4 +115,53 @@ test('a class given to the table lands on its outermost element', () => {
   const html = renderToStaticMarkup(<PeriodicTable className="picker" />);
 
   expect(html.startsWith('<div class="picker"')).toBe(true);
+});
+
+test('a long value is written smaller rather than cut short', () => {
+  const short = renderToStaticMarkup(<PeriodicTable detailOf={() => '2.55'} />);
+  const long = renderToStaticMarkup(
+    <PeriodicTable detailOf={() => '8.988e-5'} />,
+  );
+
+  expect(short).toContain(
+    'font-size:max(0.25rem, min(1.75cqw, calc((4.85cqw - 4px) / 2.40)))',
+  );
+  expect(long).toContain(
+    'font-size:max(0.25rem, min(1.75cqw, calc((4.85cqw - 4px) / 4.80)))',
+  );
+  expect(short).not.toContain('text-overflow');
+  expect(long).not.toContain('text-overflow');
+});
+
+test('a wide symbol is written smaller so it stays inside its cell', () => {
+  const html = renderToStaticMarkup(<PeriodicTable detailOf={() => '1'} />);
+  const iron = html.split('data-testid="element-Fe"', 2)[1] ?? '';
+  const curium = html.split('data-testid="element-Cm"', 2)[1] ?? '';
+
+  expect(iron.slice(0, 900)).toContain(
+    'font-size:max(0.5rem, min(2.4cqw, calc((4.85cqw - 4px) / 1.48)))',
+  );
+  expect(curium.slice(0, 900)).toContain(
+    'font-size:max(0.5rem, min(2.4cqw, calc((4.85cqw - 4px) / 1.80)))',
+  );
+});
+
+test('a table writing nothing under the symbol gives it the room', () => {
+  const bare = renderToStaticMarkup(<PeriodicTable />);
+  const withValue = renderToStaticMarkup(
+    <PeriodicTable detailOf={() => '1'} />,
+  );
+
+  expect(bare).toContain('min(2.8cqw,');
+  expect(bare).toContain('repeat(7, 4.9cqw)');
+  expect(withValue).toContain('min(2.4cqw,');
+  expect(withValue).toContain('repeat(7, 6.1cqw)');
+});
+
+test('the type of a cell is a share of the table, so it grows with it', () => {
+  const html = renderToStaticMarkup(<PeriodicTable />);
+
+  expect(html).toContain('container-type:inline-size');
+  expect(html).toContain('cqw');
+  expect(html).not.toContain('aspect-ratio');
 });
