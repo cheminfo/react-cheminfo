@@ -1,13 +1,13 @@
 /**
  * The languages the family speaks.
  *
- * Four, decided together rather than site by site: a visitor who switches to
- * German on one tool and follows a link to the next must land in German there
- * too, and a list that differs between two sites makes that impossible.
+ * Decided together rather than site by site: a visitor who switches to German
+ * on one tool and follows a link to the next must land in German there too, and
+ * a list that differs between two sites makes that impossible.
  */
 
 /** Every language a site of the family is written in. */
-export const LANGUAGES = ['en', 'fr', 'de', 'es'] as const;
+export const LANGUAGES = ['en', 'fr', 'de', 'es', 'it'] as const;
 
 /** One of {@link LANGUAGES}. */
 export type Language = (typeof LANGUAGES)[number];
@@ -31,6 +31,7 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   fr: 'Français',
   de: 'Deutsch',
   es: 'Español',
+  it: 'Italiano',
 };
 
 /**

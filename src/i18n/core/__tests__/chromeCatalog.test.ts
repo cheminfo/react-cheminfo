@@ -21,6 +21,7 @@ test('every language the family speaks arrives complete', async () => {
   expect(CHROME_CATALOG.translate('share.button', 'fr')).toBe('Partager');
   expect(CHROME_CATALOG.translate('share.button', 'de')).toBe('Teilen');
   expect(CHROME_CATALOG.translate('share.button', 'es')).toBe('Compartir');
+  expect(CHROME_CATALOG.translate('share.button', 'it')).toBe('Condividi');
 });
 
 test('a placeholder survives every translation', () => {
@@ -41,7 +42,7 @@ test('the catalogs a translator is handed name their repository', async () => {
 });
 
 test('a locale the family does not speak is offered nothing published', async () => {
-  const loaded = await loadCatalogs([CHROME_CATALOG], 'it');
+  const loaded = await loadCatalogs([CHROME_CATALOG], 'pt');
 
   expect(loaded.translations).toStrictEqual({});
 });

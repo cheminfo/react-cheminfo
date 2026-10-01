@@ -67,6 +67,14 @@ test('a Spanish page writes the chrome in Spanish', () => {
   expect(html).toContain('Nuestras otras herramientas');
 });
 
+test('an Italian page writes the chrome in Italian', () => {
+  const html = renderToStaticMarkup(chrome('it'));
+
+  expect(html).toContain('Condividi');
+  expect(html).toContain('Cita');
+  expect(html).toContain('I nostri altri strumenti');
+});
+
 test('a language the family does not speak reads as English', () => {
-  expect(renderToStaticMarkup(chrome('it'))).toContain('Share');
+  expect(renderToStaticMarkup(chrome('pt'))).toContain('Share');
 });

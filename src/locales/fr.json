@@ -233,6 +233,7 @@
   "overlay.hoverAName": "Survolez un nom pour savoir ce qu'il fait.",
   "overlay.dismiss": "Fermer",
   "delimited.copyTable": "Copier le tableau",
+  "delimited.copyOrDownload": "Copier ou télécharger les données",
   "delimited.close": "Fermer",
   "delimited.separator": "Séparateur",
   "delimited.save": "Enregistrer",
