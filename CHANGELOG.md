@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.35.0](https://github.com/cheminfo/react-cheminfo/compare/v0.34.0...v0.35.0) (2026-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **periodic:** size every symbol the same, whatever the cell writes under it
+* **about:** drop the licence and source section from the About record
+* **download:** the old export dialog is gone: `ExportImageDialog`, `ExportDialogFrame`, `ExportNameField`, `ExportPictureSection`, `useDrawingBox`, `IMAGE_RESOLUTIONS` and the picture helpers. Use `FigureDownload` or `useFigureDownload`.
+
+### Features
+
+* **about:** drop the licence and source section from the About record ([cc13766](https://github.com/cheminfo/react-cheminfo/commit/cc13766ead6cd0f0d37774c059d2f4c151d483d5))
+* **download:** copy a figure to the clipboard, and give the IR toolbar the save panel ([9032888](https://github.com/cheminfo/react-cheminfo/commit/9032888ac4b6861817f838106ce5b269014b9799))
+* **periodic:** size every symbol the same, whatever the cell writes under it ([22c8ac5](https://github.com/cheminfo/react-cheminfo/commit/22c8ac5a81893f1e526115589fd79608a2d877d5))
+
 ## [0.34.0](https://github.com/cheminfo/react-cheminfo/compare/v0.33.0...v0.34.0) (2026-10-01)
 
 
