@@ -159,3 +159,35 @@ test('a blank label and a blank note are written as none', () => {
     '<li><a href="/about">About the tool</a></li>',
   );
 });
+
+test("the page's own text opens the block, above the menu", () => {
+  expect(
+    noscriptIndex({
+      ...OPTIONS,
+      content: {
+        heading: 'Carbon (C) — its atomic orbitals',
+        paragraphs: ['Carbon is element 6.'],
+      },
+    }),
+  ).toBe(
+    `<noscript>
+  <h1>Carbon (C) — its atomic orbitals</h1>
+  <p>Carbon is element 6.</p>
+  <p>Conformers in 3D from a structure you draw. This tool needs JavaScript; these are the pages it offers:</p>
+  <ul>
+    <li><a href="/">Conformers in 3D</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</noscript>`,
+  );
+});
+
+test("the page's own name wins over the heading the site writes for all of them", () => {
+  expect(
+    noscriptIndex({
+      ...OPTIONS,
+      heading: 'lcao.cheminfo.org',
+      content: { heading: 'Iron (Fe) — its atomic orbitals' },
+    }),
+  ).toContain('<h1>Iron (Fe) — its atomic orbitals</h1>');
+});

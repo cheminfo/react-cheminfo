@@ -12,6 +12,8 @@ import { ECOSYSTEM_SITES, siteUrl } from '../../ecosystem/core/sites.ts';
 import { joinBasePath } from '../../router/core/basePath.ts';
 import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
 
+import type { PageContent } from './pageProse.ts';
+import { pageProseHtml } from './pageProse.ts';
 import type { RouteMeta } from './routes.ts';
 import type { SiteFilesOptions } from './siteFiles.ts';
 import { mountPathOf, resolveSite } from './siteFiles.ts';
@@ -93,6 +95,14 @@ export interface NoscriptOptions
   extends Omit<SiteFilesOptions, 'routes'>, Omit<NoscriptText, 'routes'> {
   /** The addresses it links, each with the label it is linked under. */
   routes: readonly NoscriptRoute[];
+  /**
+   * What the page being written says, above the crawl path. The block is the
+   * only text a crawler is handed before anything runs, so a page with nothing
+   * of its own here is indexed on its title and on this site's menu — which
+   * every other page of the site carries too.
+   * @default undefined — the block is the menu alone
+   */
+  content?: PageContent;
 }
 
 /**
@@ -111,14 +121,20 @@ export function noscriptIndex(options: NoscriptOptions): string {
   const site = resolveSite(options.site);
   const hrefs = options.hrefs ?? 'absolute';
   const mount = hrefs === 'absolute' ? mountPathOf(options) : '';
-  const heading = escapeText(options.heading ?? siteDisplayName(site));
+  const content = options.content;
+  // The page's own name answers the title it is indexed under, so it wins over
+  // a heading the site writes for every one of its pages at once.
+  const heading = escapeText(
+    content?.heading ?? options.heading ?? siteDisplayName(site),
+  );
   const intro = escapeText(
     options.intro ??
       `${site.tagline} This tool needs JavaScript; these are the pages it offers:`,
   );
+  const prose = content === undefined ? '' : pageProseHtml(content, '  ');
 
   return `<noscript>
-  <h1>${heading}</h1>
+  <h1>${heading}</h1>${prose}
   <p>${intro}</p>${pageList(options.routes, mount, hrefs, '  ')}${familyList(site.id, options.ecosystem)}
 </noscript>`;
 }

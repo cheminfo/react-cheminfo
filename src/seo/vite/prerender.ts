@@ -27,6 +27,7 @@ import { trimTrailingSlash } from '../../router/core/address.ts';
 import type { NoscriptText } from '../core/noscript.ts';
 import { noscriptIndex } from '../core/noscript.ts';
 import { pageHeadTags } from '../core/pageMeta.ts';
+import type { PageContent } from '../core/pageProse.ts';
 import type { RobotsDisallow } from '../core/robots.ts';
 import { robotsTxt } from '../core/robots.ts';
 import type { RouteMeta } from '../core/routes.ts';
@@ -91,6 +92,18 @@ export interface PrerenderOptions {
    * @default true
    */
   noscript?: boolean | NoscriptText;
+  /**
+   * What each page says for itself, above the crawl path: its own heading, its
+   * prose and the facts it would show anyway, read from the same data the app
+   * renders from.
+   *
+   * Without it every address ships the same body — the site's menu — and a
+   * search engine handed a hundred identical bodies keeps one of them. It is a
+   * function of the route rather than a field of it, so the prose stays out of
+   * the bundle the browser downloads: only the build ever calls it.
+   * @default undefined — every page carries the menu alone
+   */
+  content?: (route: RouteMeta) => PageContent | undefined;
 }
 
 /**
@@ -104,18 +117,18 @@ export function cheminfoPrerender(options: PrerenderOptions): Plugin {
   const { site, routes, origin, robots = [] } = options;
   assertRoutes(routes);
   const structuredData = structuredDataOf(options);
-  const crawlPath = crawlPathOf(options);
 
   let out = 'dist';
   let serve = false;
   let logger: Logger | null = null;
 
-  const page = (template: string, url: string) => {
+  const page = (template: string, route: RouteMeta) => {
     const head = fill(
       template,
       PAGE_HEAD_MARKER,
-      `${pageHeadTags({ site, routes, origin, url })}${structuredData}`,
+      `${pageHeadTags({ site, routes, origin, url: route.path })}${structuredData}`,
     );
+    const crawlPath = crawlPathOf(options, route);
     return crawlPath === '' ? head : fill(head, PAGE_BODY_MARKER, crawlPath);
   };
 
@@ -132,17 +145,16 @@ export function cheminfoPrerender(options: PrerenderOptions): Plugin {
     // from the home route rather than shipped with its markers showing.
     transformIndexHtml: {
       order: 'post',
-      handler: (html: string) =>
-        serve ? page(html, homeRoute(routes).path) : html,
+      handler: (html: string) => (serve ? page(html, homeRoute(routes)) : html),
     },
 
     closeBundle() {
       if (serve) return;
       const template = readFileSync(join(out, 'index.html'), 'utf8');
 
-      const write = (url: string, file: string) => {
+      const write = (route: RouteMeta, file: string) => {
         mkdirSync(dirname(file), { recursive: true });
-        writeFileSync(file, page(template, url));
+        writeFileSync(file, page(template, route));
       };
 
       let root = false;
@@ -150,7 +162,7 @@ export function cheminfoPrerender(options: PrerenderOptions): Plugin {
         const address = trimTrailingSlash(route.path);
         if (address === '/') root = true;
         write(
-          route.path,
+          route,
           address === '/'
             ? join(out, 'index.html')
             : join(out, address.slice(1), 'index.html'),
@@ -159,7 +171,7 @@ export function cheminfoPrerender(options: PrerenderOptions): Plugin {
       // The file a static server hands out for the mount itself. A table naming
       // no root would otherwise leave the template vite built, and ship a site
       // whose front page carries its markers instead of a head.
-      if (!root) write(homeRoute(routes).path, join(out, 'index.html'));
+      if (!root) write(homeRoute(routes), join(out, 'index.html'));
 
       writeFileSync(
         join(out, 'sitemap.xml'),
@@ -196,9 +208,16 @@ function structuredDataOf(options: PrerenderOptions): string {
   })}`;
 }
 
-function crawlPathOf(options: PrerenderOptions): string {
+function crawlPathOf(options: PrerenderOptions, route: RouteMeta): string {
   const { site, routes, origin, noscript = true } = options;
   if (noscript === false) return '';
+  const content = options.content?.(route);
   const { routes: listed, ...prose } = noscript === true ? {} : noscript;
-  return noscriptIndex({ site, origin, ...prose, routes: listed ?? routes });
+  return noscriptIndex({
+    site,
+    origin,
+    ...prose,
+    routes: listed ?? routes,
+    content,
+  });
 }

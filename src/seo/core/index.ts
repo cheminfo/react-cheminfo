@@ -10,6 +10,8 @@ export type {
 export { noscriptIndex } from './noscript.ts';
 export type { PageMetaOptions } from './pageMeta.ts';
 export { injectPageMeta, pageDocumentMeta, pageHeadTags } from './pageMeta.ts';
+export type { PageContent, PageSection, PageTable } from './pageProse.ts';
+export { pageProseHtml } from './pageProse.ts';
 export type { PlainDescriptionOptions } from './plainDescription.ts';
 export { plainDescription, plainProse } from './plainDescription.ts';
 export type { RobotsDisallow } from './robots.ts';
