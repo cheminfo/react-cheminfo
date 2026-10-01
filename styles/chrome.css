@@ -570,6 +570,77 @@ select,
   }
 }
 
+/* ── Help ────────────────────────────────────────────────────────────────── */
+
+/*
+  Every piece of help in the family opens as the same card, so a reader who has
+  met one on one site has met them all: the page's own surface, its border, its
+  radius and its shadow. Blueprint's navy slab is a hole in a light page, and
+  its 14px body turns an explanation into a wall — the same words at 12.5px
+  over 1.55 read as prose.
+*/
+.help-tooltip .bp6-popover-content {
+  /*
+    One measure for every card, so two opened in a row are the same shape.
+    Left to itself the popover is shrink-wrapped around its own longest line.
+  */
+  width: 300px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: none;
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/*
+  Blueprint opens a tooltip by transitioning it from `scale(0.8)`, and under
+  React 19 that transition is created but never ticks: it sits at time zero for
+  as long as the card is open, so the card and its type stay at four fifths of
+  the size they were drawn at. Help opens without an animation instead.
+*/
+.help-tooltip.bp6-tooltip {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transform: scale(1);
+  transition: none;
+}
+
+/* The arrow is a corner of the same card, so it carries the same two colours. */
+.help-tooltip .bp6-popover-arrow-fill {
+  fill: var(--surface);
+}
+
+.help-tooltip .bp6-popover-arrow-border {
+  fill: var(--border);
+  fill-opacity: 1;
+}
+
+.help-tooltip .bp6-popover-arrow::before {
+  box-shadow: none;
+}
+
+.help-tooltip .help-body a {
+  color: var(--accent);
+}
+
+/*
+  The glyph that opens it. How it sits in its row is the site's business — it
+  follows a label on one and a heading on another — so only its ink is set
+  here.
+*/
+.help-icon {
+  color: var(--text-faint);
+  cursor: help;
+}
+
+.help-icon:hover {
+  color: var(--accent);
+}
+
 /* ── Printing ────────────────────────────────────────────────────────────── */
 
 /* Students print the cheatsheet. Let them, without the chrome. */
