@@ -53,7 +53,7 @@ test('the previous set is left untouched and its options win over new ones', () 
     ...DEFAULT_CONFORMER_OPTIONS,
     minimisation: 'none',
     maxConformers: 2,
-    timeoutSeconds: 30,
+    timeoutSeconds: Number.POSITIVE_INFINITY,
   });
   expect(extended.conformers).toHaveLength(4);
   expect(extended.potentialConformerCount).toBe(first.potentialConformerCount);
@@ -100,11 +100,20 @@ function hexane(): Molecule {
 }
 
 function options(overrides: Partial<ConformerOptions>): ConformerOptions {
-  return { ...DEFAULT_CONFORMER_OPTIONS, ...overrides };
+  // A budget nothing can spend. These runs are about what the generator and the
+  // force field produce, never about the clock, and the ten seconds the
+  // defaults carry is a race the machine wins or loses: a loaded runner returns
+  // an empty set with `stoppedBy: 'timeout'` and no error, which reads as a
+  // chemistry failure. The tests that are about the budget set their own.
+  return {
+    ...DEFAULT_CONFORMER_OPTIONS,
+    timeoutSeconds: Number.POSITIVE_INFINITY,
+    ...overrides,
+  };
 }
 
 function limits(maxConformers: number) {
-  return { maxConformers, timeoutSeconds: 30 };
+  return { maxConformers, timeoutSeconds: Number.POSITIVE_INFINITY };
 }
 
 // A clock that stands still except when it is read, `step` at a time.

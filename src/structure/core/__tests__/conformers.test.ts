@@ -248,7 +248,16 @@ function butane(): Molecule {
 }
 
 function options(overrides: Partial<ConformerOptions>): ConformerOptions {
-  return { ...DEFAULT_CONFORMER_OPTIONS, ...overrides };
+  // A budget nothing can spend. These runs are about what the generator and the
+  // force field produce, never about the clock, and the ten seconds the
+  // defaults carry is a race the machine wins or loses: a loaded runner returns
+  // an empty set with `stoppedBy: 'timeout'` and no error, which reads as a
+  // chemistry failure. The tests that are about the budget set their own.
+  return {
+    ...DEFAULT_CONFORMER_OPTIONS,
+    timeoutSeconds: Number.POSITIVE_INFINITY,
+    ...overrides,
+  };
 }
 
 // Relative energies in kcal/mol, to three decimals, in list order.

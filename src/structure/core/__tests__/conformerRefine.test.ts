@@ -294,7 +294,7 @@ test('a refined set cannot be continued, because its energies and geometries no 
   expect(() =>
     continueConformers(molecule, refined, {
       maxConformers: 2,
-      timeoutSeconds: 10,
+      timeoutSeconds: Number.POSITIVE_INFINITY,
     }),
   ).toThrow(
     'This set was refined with GFN2-xTB, so it cannot be extended. Generate a larger set, then refine it again.',
@@ -365,5 +365,14 @@ function butane(): Molecule {
 }
 
 function options(overrides: Partial<ConformerOptions>): ConformerOptions {
-  return { ...DEFAULT_CONFORMER_OPTIONS, ...overrides };
+  // A budget nothing can spend. These runs are about what the generator and the
+  // force field produce, never about the clock, and the ten seconds the
+  // defaults carry is a race the machine wins or loses: a loaded runner returns
+  // an empty set with `stoppedBy: 'timeout'` and no error, which reads as a
+  // chemistry failure. The tests that are about the budget set their own.
+  return {
+    ...DEFAULT_CONFORMER_OPTIONS,
+    timeoutSeconds: Number.POSITIVE_INFINITY,
+    ...overrides,
+  };
 }

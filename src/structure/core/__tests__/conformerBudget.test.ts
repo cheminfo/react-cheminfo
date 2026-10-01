@@ -4,7 +4,7 @@
  */
 
 import { Molecule } from 'openchemlib';
-import { beforeAll, expect, test } from 'vitest';
+import { beforeAll, expect, test, vi } from 'vitest';
 
 import type { ConformerOptions } from '../conformerOptions.ts';
 import { DEFAULT_CONFORMER_OPTIONS } from '../conformerOptions.ts';
@@ -13,6 +13,25 @@ import { registerResources } from '../oclResources.ts';
 
 beforeAll(async () => {
   await registerResources();
+});
+
+/** What the run did, in order, as the test below watches it happen. */
+const events = vi.hoisted(() => [] as string[]);
+
+// Opening the session is where OpenChemLib sets up the torsion sets, and the
+// only seam at which "before the initialisation" can be observed without timing
+// anything.
+vi.mock(import('../conformerSession.ts'), async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    openConformerSession: (
+      ...parameters: Parameters<typeof actual.openConformerSession>
+    ) => {
+      events.push('open the session');
+      return actual.openConformerSession(...parameters);
+    },
+  };
 });
 
 test('a spent time budget returns what was produced, never an error', () => {
@@ -52,40 +71,34 @@ test('a budget of zero seconds stops before the first conformer', () => {
   expect(set.potentialConformerCount).toBe(3);
 });
 
-test('the reported duration covers the initialisation, not only the loop', () => {
-  const stamps: number[] = [];
-  const now = () => {
-    const stamp = performance.now();
-    stamps.push(stamp);
-    return stamp;
-  };
+test('the budget is read before the session is opened, not only around the loop', () => {
+  // Setting up the torsion sets is the slow half of a run, so a clock started
+  // after it would hand a flexible molecule a budget it has already spent. The
+  // order of the two says that in milliseconds; measuring a real initialisation
+  // takes a molecule slow enough to measure, which is the race this file exists
+  // to keep out of the suite.
+  events.length = 0;
+
   const set = generateConformers(
-    Molecule.fromSmiles(DIPEPTIDE),
-    // A budget nothing can spend: this test is about what the duration covers,
-    // and the default ten seconds is a race against the very initialisation it
-    // measures — a second when the machine is idle, more than ten when the rest
-    // of the suite is running beside it, and then there is no conformer at all.
-    options({ maxConformers: 1, minimisation: 'none', timeoutSeconds: 600 }),
-    now,
+    butane(),
+    options({ maxConformers: 1, minimisation: 'none' }),
+    () => {
+      events.push('clock');
+      return 0;
+    },
   );
 
   expect(set.conformers).toHaveLength(1);
-  // Read to open the run, to test the budget before the first conformer and
-  // again once it is in hand, and to close the run.
-  expect(stamps).toHaveLength(4);
-
-  const initialisation = (stamps[1] ?? 0) - (stamps[0] ?? 0);
-
-  expect(initialisation).toBeGreaterThan(100);
-  expect(set.elapsedMilliseconds).toBeGreaterThanOrEqual(initialisation);
-}, 30_000);
-
-/**
- * Alanyl-alanine: its torsion sets take about a second to set up on an idle
- * machine, and four under load — which is the point, and also why the run above
- * is given a budget it cannot spend.
- */
-const DIPEPTIDE = 'CC(N)C(=O)NC(C)C(=O)O';
+  // The clock opens the run, tests the budget before the first conformer and
+  // again once it is in hand, and closes the run.
+  expect(events).toStrictEqual([
+    'clock',
+    'open the session',
+    'clock',
+    'clock',
+    'clock',
+  ]);
+});
 
 function butane(): Molecule {
   return Molecule.fromSmiles('CCCC');
