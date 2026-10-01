@@ -11,6 +11,9 @@
 
 import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
+import type { Language } from '../../i18n/core/languages.ts';
+import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
+import { withLanguagePath } from '../../language/core/languagePath.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 import { basePathOf } from '../../router/core/basePath.ts';
 import { escapeText } from '../../share/core/escape.ts';
@@ -22,8 +25,27 @@ import type { RouteMeta } from './routes.ts';
 // parses, with `localhost:` as its scheme and `3000` as its path.
 const HTTP_ORIGIN = /^https?:\/\//i;
 
+/**
+ * Which site is being served, and where.
+ *
+ * The half of the options that says nothing about the pages, so the helpers
+ * that only resolve an address take this rather than the whole record — a
+ * caller whose `routes` is a function of the language is then still one of
+ * these.
+ */
+export interface SiteOrigin {
+  /** The site, named or passed. */
+  site: SiteRecord | SiteId;
+  /**
+   * Where the site is served, mount path included, e.g.
+   * `https://learn.cheminfo.org/surge`.
+   * @default `https://<the site's host>`
+   */
+  origin?: string;
+}
+
 /** What a crawler is told about the site as a whole. */
-export interface SiteFilesOptions {
+export interface SiteFilesOptions extends SiteOrigin {
   /** The site, named or passed. */
   site: SiteRecord | SiteId;
   /** Every address it answers. */
@@ -35,6 +57,16 @@ export interface SiteFilesOptions {
    * @default `https://<the site's host>`
    */
   origin?: string;
+  /**
+   * Every language the site is written in, the default one included.
+   *
+   * A translated page is a page per language, so the sitemap lists every one of
+   * them: a variant it leaves out is a variant nothing points a crawler at, and
+   * the translation may as well not have been written. The `hreflang` set in
+   * each page's head is what then ties them back together.
+   * @default [the default language]
+   */
+  languages?: readonly Language[];
 }
 
 /**
@@ -53,13 +85,16 @@ export function sitemapXml(options: SiteFilesOptions): string {
   if (options.routes.every((route) => route.indexed === false)) {
     throw new Error('a sitemap lists at least one address');
   }
-  const entries = options.routes
-    .filter((route) => route.indexed !== false)
-    .map(
-      (route) =>
-        `  <url><loc>${escapeText(`${origin}${route.path}`)}</loc></url>`,
-    )
-    .join('\n');
+  const languages = options.languages ?? [DEFAULT_LANGUAGE];
+  const lines: string[] = [];
+  for (const route of options.routes) {
+    if (route.indexed === false) continue;
+    for (const language of languages) {
+      const address = `${origin}${withLanguagePath(language, route.path)}`;
+      lines.push(`  <url><loc>${escapeText(address)}</loc></url>`);
+    }
+  }
+  const entries = lines.join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${entries}
@@ -91,7 +126,7 @@ export function resolveSite(site: SiteRecord | SiteId): SiteRecord {
  * @throws {Error} When the deployment named something that is not an absolute
  * `http` or `https` address.
  */
-export function originOf(options: SiteFilesOptions): string {
+export function originOf(options: SiteOrigin): string {
   const origin = options.origin ?? `https://${resolveSite(options.site).host}`;
   if (!HTTP_ORIGIN.test(origin) || !URL.canParse(origin)) {
     throw new Error(
@@ -108,6 +143,6 @@ export function originOf(options: SiteFilesOptions): string {
  * @throws {Error} When the deployment named something that is not an absolute
  * address, so there is no path to read off it.
  */
-export function mountPathOf(options: SiteFilesOptions): string {
+export function mountPathOf(options: SiteOrigin): string {
   return basePathOf(originOf(options));
 }

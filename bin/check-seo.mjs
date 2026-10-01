@@ -69,6 +69,7 @@ if (pages.length === 0) {
 const problems = [];
 const deferred = [];
 const excluded = [];
+const written = new Set(pages.map((page) => page.address));
 const titles = new Map();
 const descriptions = new Map();
 
@@ -209,6 +210,48 @@ function checkHead(at, html) {
     problems.push(`${at}: no twitter:card, so a shared link unfurls bare.`);
   }
 
+  // A translated page points at its own language too, so a set that is there
+  // at all must name every address the build wrote for this page. One that
+  // points at a file nothing wrote is a soft 404 on every language at once,
+  // and a set missing its own address is ignored whole.
+  const alternates = [
+    ...html.matchAll(
+      /<link\s+rel="alternate"\s+hreflang="([^"]*)"\s+href="([^"]*)"/gi,
+    ),
+  ];
+  if (alternates.length > 0) {
+    let self = false;
+    for (const [, hreflang, href] of alternates) {
+      const own = ownPath(href ?? '');
+      if (own === undefined) continue;
+      if (own === at) self = true;
+      if (!written.has(own)) {
+        problems.push(
+          `${at}: hreflang="${hreflang}" points at ${own}, which the build never wrote.`,
+        );
+      }
+    }
+    if (!self) {
+      problems.push(
+        `${at}: the hreflang set does not name this address — a set that leaves out the page it is on is ignored whole.`,
+      );
+    }
+    const prefix = /^\/(?<language>[a-z]{2}(?:-[A-Za-z]{2,8})?)(?:\/|$)/.exec(
+      at,
+    );
+    const named = prefix?.groups?.language;
+    const declared = tag(html, /<html[^>]*\slang="([^"]*)"/i);
+    if (
+      named !== undefined &&
+      alternates.some(([, hreflang]) => hreflang === named) &&
+      declared !== named
+    ) {
+      problems.push(
+        `${at}: the address says ${named} and <html lang> says ${declared ?? 'nothing'} — a page whose lang lies is offered to the wrong reader.`,
+      );
+    }
+  }
+
   const image = tag(html, /<meta\s+property="og:image"\s+content="([^"]*)"/i);
   if (image === undefined) {
     problems.push(`${at}: no og:image.`);
@@ -245,7 +288,6 @@ function checkSiteFiles() {
     return;
   }
   const xml = readFileSync(sitemap, 'utf8');
-  const written = new Set(pages.map((page) => page.address));
   const claimed = new Set();
   let listed = 0;
   for (const match of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {

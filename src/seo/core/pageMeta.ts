@@ -38,8 +38,16 @@ const ABSOLUTE_URL = /^[a-z][\d+.a-z-]*:\/\//i;
 export interface PageMetaOptions {
   /** The site, named or passed. */
   site: SiteRecord | SiteId;
-  /** Every address it answers, each with its title and description. */
-  routes: readonly RouteMeta[];
+  /**
+   * Every address it answers, each with its title and description.
+   *
+   * A translated site passes a function instead, exactly as `cheminfoPrerender`
+   * takes it: the language is read off the address first, and that language's
+   * table is what the page is titled from. Passed as a value by a site whose
+   * prose is per-language, a language switch would leave the title and the
+   * description in whichever language the table was built in.
+   */
+  routes: readonly RouteMeta[] | ((language: Language) => readonly RouteMeta[]);
   /**
    * The address being written, query string included: a path, or the absolute
    * address an app reads off the page it is on.
@@ -148,10 +156,12 @@ export function pageDocumentMeta(
 ): Required<DocumentMeta> {
   const site = resolveSite(options.site);
   const meta = routeMetaOf(options);
+  const language = pageLanguage(options);
   return {
     title: `${meta.title} — ${siteDisplayName(site)}`,
     description: meta.description,
-    canonical: `${originOf(options)}${withLanguagePath(pageLanguage(options), meta.path)}`,
+    canonical: `${originOf(options)}${withLanguagePath(language, meta.path)}`,
+    language,
   };
 }
 
@@ -173,8 +183,22 @@ export function pageLanguage(options: PageMetaOptions): Language {
 // route table is written from the site's own root, so the mount the origin
 // carries is taken off it before the table is read.
 function routeMetaOf(options: PageMetaOptions): RouteMeta {
-  const { path } = readLanguagePath(ownPath(options), languagesOf(options));
-  return pageMetaFor(options.routes, path);
+  const { language, path } = readLanguagePath(
+    ownPath(options),
+    languagesOf(options),
+  );
+  return pageMetaFor(tableOf(options, language), path);
+}
+
+// The table the page is titled from: the one the site passed, or the one its
+// function returns for the language the address names.
+function tableOf(
+  options: PageMetaOptions,
+  language: Language,
+): readonly RouteMeta[] {
+  return typeof options.routes === 'function'
+    ? options.routes(language)
+    : options.routes;
 }
 
 // The address from the site's own root, the mount taken off, with the query

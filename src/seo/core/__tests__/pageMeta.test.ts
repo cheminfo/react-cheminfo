@@ -155,5 +155,6 @@ test('a section titles every page beneath it', () => {
     title: 'The ligands — 3d.cheminfo.org',
     description: 'Every chemical component of the bank.',
     canonical: 'https://3d.cheminfo.org/molecules',
+    language: 'en',
   });
 });

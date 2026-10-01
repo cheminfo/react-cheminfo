@@ -1,3 +1,5 @@
+export type { AlternateOptions } from './alternates.ts';
+export { alternateLinkTags } from './alternates.ts';
 export type { DocumentMeta } from './documentMeta.ts';
 export { writeDocumentMeta } from './documentMeta.ts';
 export type {
@@ -9,7 +11,12 @@ export type {
 } from './noscript.ts';
 export { noscriptIndex } from './noscript.ts';
 export type { PageMetaOptions } from './pageMeta.ts';
-export { injectPageMeta, pageDocumentMeta, pageHeadTags } from './pageMeta.ts';
+export {
+  injectPageMeta,
+  pageDocumentMeta,
+  pageHeadTags,
+  pageLanguage,
+} from './pageMeta.ts';
 export type { PageContent, PageSection, PageTable } from './pageProse.ts';
 export { pageProseHtml } from './pageProse.ts';
 export type { PlainDescriptionOptions } from './plainDescription.ts';

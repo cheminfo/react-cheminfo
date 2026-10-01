@@ -4,8 +4,8 @@ import type { RouteMeta } from '../../core/routes.ts';
 
 import { PAGE, ROUTES, prerendered, served } from './prerenderHarness.ts';
 
-test('the built page carries the structured data a site describes itself with', () => {
-  const page = prerendered({
+test('the built page carries the structured data a site describes itself with', async () => {
+  const page = await prerendered({
     site: '3d',
     routes: ROUTES,
     category: 'ScienceApplication',
@@ -25,8 +25,8 @@ test('the built page carries the structured data a site describes itself with', 
   expect(page).not.toContain('<noscript>');
 });
 
-test('the noscript index says what the site asked it to say', () => {
-  const page = prerendered({
+test('the noscript index says what the site asked it to say', async () => {
+  const page = await prerendered({
     site: '3d',
     routes: ROUTES,
     category: false,
@@ -46,8 +46,8 @@ test('the noscript index says what the site asked it to say', () => {
   expect(page).not.toContain('application/ld+json');
 });
 
-test('the noscript index lists the pages the site curated for it', () => {
-  const page = prerendered({
+test('the noscript index lists the pages the site curated for it', async () => {
+  const page = await prerendered({
     site: '3d',
     routes: [
       ...ROUTES,
@@ -64,8 +64,8 @@ test('the noscript index lists the pages the site curated for it', () => {
   expect(page).not.toContain('href="/about"');
 });
 
-test('a noscript index written relative survives a mount chosen at startup', () => {
-  const page = prerendered({
+test('a noscript index written relative survives a mount chosen at startup', async () => {
+  const page = await prerendered({
     site: '3d',
     routes: ROUTES,
     category: false,
@@ -79,8 +79,8 @@ test('a noscript index written relative survives a mount chosen at startup', () 
   expect(page).toContain('<li><a href="./about">About</a></li>');
 });
 
-test('the noscript index lists the family the site curated for it', () => {
-  const page = prerendered({
+test('the noscript index lists the family the site curated for it', async () => {
+  const page = await prerendered({
     site: '3d',
     routes: ROUTES,
     category: false,
@@ -93,8 +93,8 @@ test('the noscript index lists the family the site curated for it', () => {
   expect(page).not.toContain('surge.cheminfo.org');
 });
 
-test('the head and the crawl path go exactly where the template kept room', () => {
-  const page = prerendered({ site: '3d', routes: ROUTES });
+test('the head and the crawl path go exactly where the template kept room', async () => {
+  const page = await prerendered({ site: '3d', routes: ROUTES });
 
   expect(page.indexOf('<title>')).toBeLessThan(page.indexOf('</head>'));
   expect(page.indexOf('application/ld+json')).toBeLessThan(
@@ -105,16 +105,16 @@ test('the head and the crawl path go exactly where the template kept room', () =
   expect(page.endsWith('</body></html>')).toBe(true);
 });
 
-test('a template carrying no head marker is refused, never shipped headless', () => {
-  expect(() =>
+test('a template carrying no head marker is refused, never shipped headless', async () => {
+  await expect(
     prerendered(
       { site: '3d', routes: ROUTES },
       '<html><head><title>x</title></head><body></body></html>',
     ),
-  ).toThrow('the page carries no <!--cheminfo:head-->');
+  ).rejects.toThrow('the page carries no <!--cheminfo:head-->');
 });
 
-test('a dev run fills the markers from the home route', () => {
+test('a dev run fills the markers from the home route', async () => {
   const page = served({ site: '3d', routes: ROUTES });
 
   expect(page).toContain('<title>Conformers in 3D — 3d.cheminfo.org</title>');

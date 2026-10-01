@@ -199,3 +199,60 @@ function createFakeDocument(): FakeDocument {
     find: (selector: string) => bySelector.get(selector) ?? null,
   } as FakeDocument;
 }
+
+test('a translated address keeps its language on the way to the head', () => {
+  const routes: RouteMeta[] = [
+    { path: '/', title: 'Accueil', description: 'La page d’accueil.' },
+    { path: '/titration', title: 'Titrage', description: 'La courbe.' },
+  ];
+
+  const page = withDocument(() => {
+    startDocumentMeta({
+      site: 'equilibrium',
+      routes,
+      languages: ['en', 'fr'],
+      url: () => '/fr/titration',
+    });
+  });
+
+  expect(page.title).toBe('Titrage — EquiLibrium');
+  expect(page.find('link[rel="canonical"]')?.href).toBe(
+    'https://equilibrium.cheminfo.org/fr/titration',
+  );
+});
+
+test('a table given as a function follows a switch of language', () => {
+  const english: RouteMeta[] = [
+    { path: '/', title: 'Titration', description: 'The curve.' },
+  ];
+  const french: RouteMeta[] = [
+    { path: '/', title: 'Titrage', description: 'La courbe.' },
+  ];
+
+  let address = '/';
+  const page = withDocument(() => {
+    startDocumentMeta({
+      site: 'equilibrium',
+      routes: (language) => (language === 'fr' ? french : english),
+      languages: ['en', 'fr'],
+      url: () => address,
+      // Written once per call, which is what a site's own effect does when the
+      // address it reads changes.
+      follow: (write) => {
+        write();
+        address = '/fr/';
+        write();
+        return stopNothing;
+      },
+    });
+  });
+
+  expect(page.title).toBe('Titrage — EquiLibrium');
+  expect(page.find('link[rel="canonical"]')?.href).toBe(
+    'https://equilibrium.cheminfo.org/fr',
+  );
+});
+
+function stopNothing(): void {
+  // Nothing was followed, so there is nothing to stop.
+}

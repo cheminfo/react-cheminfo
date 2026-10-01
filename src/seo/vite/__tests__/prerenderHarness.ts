@@ -39,10 +39,15 @@ export const PAGE = [
  * @param options - What the build was configured with.
  * @param out - The build output directory.
  */
-export function build(options: PrerenderOptions, out: string): void {
+export async function build(
+  options: PrerenderOptions,
+  out: string,
+): Promise<void> {
   const plugin = cheminfoPrerender(options);
   configure(plugin, 'build', out);
-  hookOf(plugin, 'closeBundle')();
+  // The hook fetches the chrome's catalogs before it writes, so it is awaited
+  // here exactly as vite awaits it.
+  await hookOf(plugin, 'closeBundle')();
 }
 
 /**
@@ -51,13 +56,13 @@ export function build(options: PrerenderOptions, out: string): void {
  * @param template - The page vite built.
  * @returns The prerendered `index.html`.
  */
-export function prerendered(
+export async function prerendered(
   options: PrerenderOptions,
   template = PAGE,
-): string {
+): Promise<string> {
   const out = mkdtempSync(join(tmpdir(), 'cheminfo-prerender-'));
   writeFileSync(join(out, 'index.html'), template);
-  build(options, out);
+  await build(options, out);
   return readFileSync(join(out, 'index.html'), 'utf8');
 }
 
@@ -95,10 +100,10 @@ function configure(plugin: Plugin, command: string, root: string): void {
 function hookOf(
   plugin: Plugin,
   name: 'configResolved' | 'closeBundle',
-): (value?: unknown) => void {
+): (value?: unknown) => unknown {
   const hook = plugin[name];
   if (typeof hook !== 'function') {
     throw new TypeError(`the plugin declares ${name} as a function`);
   }
-  return hook as (value?: unknown) => void;
+  return hook as (value?: unknown) => unknown;
 }

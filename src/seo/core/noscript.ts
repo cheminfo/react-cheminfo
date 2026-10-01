@@ -9,6 +9,9 @@
 import { siteById, siteDisplayName } from '../../ecosystem/core/lookup.ts';
 import type { EcosystemSite, SiteId } from '../../ecosystem/core/sites.ts';
 import { ECOSYSTEM_SITES, siteUrl } from '../../ecosystem/core/sites.ts';
+import { CHROME_CATALOG } from '../../i18n/core/chromeCatalog.ts';
+import type { Language } from '../../i18n/core/languages.ts';
+import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
 import { joinBasePath } from '../../router/core/basePath.ts';
 import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
 
@@ -71,6 +74,13 @@ export interface NoscriptText {
    */
   ecosystem?: boolean | NoscriptEcosystem;
   /**
+   * The language the block is written in, which is what the family list's own
+   * heading is translated into. The site's own prose is passed already written;
+   * this is only for the words that belong to the chrome.
+   * @default the default language
+   */
+  language?: Language;
+  /**
    * How the site's own addresses are written. `'absolute'` writes them from the
    * root of the host, under the mount the origin names. `'relative'` writes
    * `./exercises` and `./`, which the page resolves against its own `<base>` —
@@ -119,6 +129,7 @@ export interface NoscriptOptions
  */
 export function noscriptIndex(options: NoscriptOptions): string {
   const site = resolveSite(options.site);
+  const language = options.language ?? DEFAULT_LANGUAGE;
   const hrefs = options.hrefs ?? 'absolute';
   const mount = hrefs === 'absolute' ? mountPathOf(options) : '';
   const content = options.content;
@@ -135,7 +146,7 @@ export function noscriptIndex(options: NoscriptOptions): string {
 
   return `<noscript>
   <h1>${heading}</h1>${prose}
-  <p>${intro}</p>${pageList(options.routes, mount, hrefs, '  ')}${familyList(site.id, options.ecosystem)}
+  <p>${intro}</p>${pageList(options.routes, mount, hrefs, '  ')}${familyList(site.id, options.ecosystem, language)}
 </noscript>`;
 }
 
@@ -185,6 +196,7 @@ function labelOf(route: NoscriptRoute): string {
 function familyList(
   current: string,
   ecosystem: boolean | NoscriptEcosystem | undefined,
+  language: Language,
 ): string {
   if (ecosystem === undefined || ecosystem === false) return '';
   const listed = ecosystem === true ? {} : ecosystem;
@@ -198,8 +210,14 @@ function familyList(
     );
   }
   if (items.length === 0) return '';
+  // The chrome's own words, so one translation in this package writes the crawl
+  // path of every site of the family rather than eighteen catalogs carrying the
+  // same two words.
+  const heading = escapeText(
+    CHROME_CATALOG.translate('ecosystem.otherTools', language),
+  );
   return `
-  <h2>Our other tools</h2>
+  <h2>${heading}</h2>
   <ul>
 ${items.join('\n')}
   </ul>`;

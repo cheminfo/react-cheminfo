@@ -9,11 +9,11 @@ import { cheminfoPrerender } from '../prerender.ts';
 
 import { PAGE, ROUTES, build } from './prerenderHarness.ts';
 
-test('robots and the sitemap are written under the mount the site answers on', () => {
+test('robots and the sitemap are written under the mount the site answers on', async () => {
   const out = mkdtempSync(join(tmpdir(), 'cheminfo-prerender-'));
   writeFileSync(join(out, 'index.html'), PAGE);
 
-  build(
+  await build(
     {
       site: '3d',
       routes: [ROUTES[0] as RouteMeta],
@@ -42,11 +42,11 @@ Sitemap: https://learn.cheminfo.org/surge/sitemap.xml
   );
 });
 
-test('a page of a mounted site is canonical under the mount, once', () => {
+test('a page of a mounted site is canonical under the mount, once', async () => {
   const out = mkdtempSync(join(tmpdir(), 'cheminfo-prerender-'));
   writeFileSync(join(out, 'index.html'), PAGE);
 
-  build(
+  await build(
     { site: '3d', routes: ROUTES, origin: 'https://learn.cheminfo.org/surge' },
     out,
   );
@@ -59,11 +59,11 @@ test('a page of a mounted site is canonical under the mount, once', () => {
   expect(about).toContain('<title>About — 3d.cheminfo.org</title>');
 });
 
-test('a site naming no root still gets the index a server hands out', () => {
+test('a site naming no root still gets the index a server hands out', async () => {
   const out = mkdtempSync(join(tmpdir(), 'cheminfo-prerender-'));
   writeFileSync(join(out, 'index.html'), PAGE);
 
-  build(
+  await build(
     {
       site: '3d',
       routes: [
@@ -82,7 +82,7 @@ test('a site naming no root still gets the index a server hands out', () => {
   expect(index).not.toContain('<!--cheminfo:head-->');
 });
 
-test('an address written twice is refused before anything is built', () => {
+test('an address written twice is refused before anything is built', async () => {
   expect(() =>
     cheminfoPrerender({
       site: '3d',
@@ -95,7 +95,7 @@ test('an address written twice is refused before anything is built', () => {
   ).toThrow('a route path is written once: "/about"');
 });
 
-test('an address that would write outside the build output is refused', () => {
+test('an address that would write outside the build output is refused', async () => {
   expect(() =>
     cheminfoPrerender({
       site: '3d',
@@ -104,7 +104,7 @@ test('an address that would write outside the build output is refused', () => {
   ).toThrow('a route path stays inside the site: "/../escaped"');
 });
 
-test('a page displaying the markup a site is about keeps its prose', () => {
+test('a page displaying the markup a site is about keeps its prose', async () => {
   const out = mkdtempSync(join(tmpdir(), 'cheminfo-prerender-'));
   writeFileSync(
     join(out, 'index.html'),
@@ -118,7 +118,7 @@ test('a page displaying the markup a site is about keeps its prose', () => {
     ].join('\n'),
   );
 
-  build({ site: '3d', routes: ROUTES }, out);
+  await build({ site: '3d', routes: ROUTES }, out);
 
   const about = readFileSync(join(out, 'about', 'index.html'), 'utf8');
 

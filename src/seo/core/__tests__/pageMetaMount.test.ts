@@ -39,6 +39,7 @@ test('a mounted deployment writes the mount into its addresses once', () => {
     title: 'About the browser conformer generator — 3d.cheminfo.org',
     description: 'What this tool computes, and how to cite it.',
     canonical: 'https://learn.cheminfo.org/surge/about',
+    language: 'en',
   });
 
   const html = injectPageMeta(PAGE, options);
@@ -67,11 +68,13 @@ test('a mounted server titles the page it answers, not the home page', () => {
     title: 'About the browser conformer generator — 3d.cheminfo.org',
     description: 'What this tool computes, and how to cite it.',
     canonical: 'https://learn.cheminfo.org/surge/about',
+    language: 'en',
   });
   expect(pageDocumentMeta({ ...options, url: '/surge/' })).toStrictEqual({
     title: '2D to 3D — conformers from a drawn structure — 3d.cheminfo.org',
     description: 'Draw a structure and turn it into 3D conformers.',
     canonical: 'https://learn.cheminfo.org/surge/',
+    language: 'en',
   });
 });
 
@@ -106,6 +109,7 @@ test('a home page answering everything beneath it still lets the mount come off'
     title: 'About the browser conformer generator — 3d.cheminfo.org',
     description: 'What this tool computes, and how to cite it.',
     canonical: 'https://learn.cheminfo.org/surge/about',
+    language: 'en',
   });
   expect(injectPageMeta(PAGE, options)).toContain(
     '<title>About the browser conformer generator — 3d.cheminfo.org</title>',
@@ -127,11 +131,13 @@ test('the mount root is the home page, even when a route carries the mount name'
     title: '2D to 3D — conformers from a drawn structure — 3d.cheminfo.org',
     description: 'Draw a structure and turn it into 3D conformers.',
     canonical: 'https://learn.cheminfo.org/surge/',
+    language: 'en',
   });
   expect(pageDocumentMeta({ ...options, url: '/surge/surge' })).toStrictEqual({
     title: 'Surge — 3d.cheminfo.org',
     description: 'Isomer generation.',
     canonical: 'https://learn.cheminfo.org/surge/surge',
+    language: 'en',
   });
 });
 
@@ -151,6 +157,7 @@ test('an app handing over the address it is on is answered, not sent home', () =
     title: 'About the browser conformer generator — 3d.cheminfo.org',
     description: 'What this tool computes, and how to cite it.',
     canonical: 'https://learn.cheminfo.org/surge/about',
+    language: 'en',
   });
   expect(
     pageDocumentMeta({
@@ -162,5 +169,6 @@ test('an app handing over the address it is on is answered, not sent home', () =
     title: 'About the browser conformer generator — 3d.cheminfo.org',
     description: 'What this tool computes, and how to cite it.',
     canonical: 'https://3d.cheminfo.org/about',
+    language: 'en',
   });
 });

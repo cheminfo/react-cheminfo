@@ -15,6 +15,22 @@ export function writeDocumentMeta(meta: DocumentMeta): void {
   if (meta.title) documentTitle(meta.title);
   if (meta.description) metaDescription(meta.description);
   if (meta.canonical) canonicalLink(meta.canonical);
+  if (meta.language) documentLanguage(meta.language);
+}
+
+/**
+ * Say which language the page on screen is in.
+ *
+ * The file the build wrote already says it, and a click that switches language
+ * has to move it with the rest of the head: a page whose `lang` lies is read
+ * aloud wrong by a screen reader and offered to the wrong reader by a search
+ * engine, and nothing on screen shows it.
+ * @param language - The language tag, e.g. `fr`.
+ */
+export function documentLanguage(language: string): void {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  if (root) root.lang = language;
 }
 
 /**
@@ -71,6 +87,12 @@ export interface DocumentMeta {
    * @default undefined
    */
   canonical?: string;
+  /**
+   * The language the page is written in, for `<html lang>`. Left out, the one
+   * the page was served with stays as it is.
+   * @default undefined
+   */
+  language?: string;
 }
 
 function metaDescription(content: string): void {
