@@ -52,18 +52,18 @@ export function startDocumentMeta(
 ): () => void {
   if (typeof document === 'undefined') return stopNothing;
 
+  // Everything the caller passed goes through, rather than the four fields this
+  // once named one by one: an option added to `PageMetaOptions` and forgotten
+  // here is dropped in silence. `languages` was, and every translated page took
+  // the English home page's title and canonical — type-checked, linted and unit
+  // tested all the way.
+  const { url, follow, ...page } = options;
+
   const write = (): void => {
-    writeDocumentMeta(
-      pageDocumentMeta({
-        site: options.site,
-        routes: options.routes,
-        url: options.url(),
-        origin: options.origin,
-      }),
-    );
+    writeDocumentMeta(pageDocumentMeta({ ...page, url: url() }));
   };
 
-  return (options.follow ?? writeOnce)(write);
+  return (follow ?? writeOnce)(write);
 }
 
 function writeOnce(write: () => void): () => void {
