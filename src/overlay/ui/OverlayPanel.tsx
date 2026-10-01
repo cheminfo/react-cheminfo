@@ -79,6 +79,12 @@ export interface OverlayPanelProps {
    */
   nameWidth?: number;
   /**
+   * Fixed width of the panel, for one whose hint changes with its choices:
+   * left to its content, it would resize under the pointer at every pick.
+   * @default undefined — as wide as its content
+   */
+  width?: number | string;
+  /**
    * Value of the `data-testid` attribute of the panel.
    * @default undefined
    */
@@ -104,7 +110,7 @@ export interface OverlayPanelProps {
 export function OverlayPanel(props: OverlayPanelProps): ReactElement {
   const { title, children, onReset, resetLabel, help } = props;
   const t = useChromeT();
-  const { actions, hint, nameWidth, testId } = props;
+  const { actions, hint, nameWidth, width: panelWidth, testId } = props;
   const { metrics } = useOverlaySurface();
   const titleId = useId();
   const reset = useOverlayInteraction();
@@ -120,7 +126,7 @@ export function OverlayPanel(props: OverlayPanelProps): ReactElement {
       role="group"
       aria-labelledby={titleId}
       data-testid={testId}
-      style={overlayPanelSurfaceStyle(metrics)}
+      style={overlayPanelSurfaceStyle(metrics, panelWidth)}
     >
       <div style={overlayPanelHeaderStyle(metrics)}>
         <span style={overlayPanelTitleStyle(metrics)}>

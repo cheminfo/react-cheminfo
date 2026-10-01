@@ -120,10 +120,10 @@ export const irCommands = {
       'Writes what each labelled band might be under its wavenumber. Worth turning off once the chart is crowded.',
   },
   exportImage: {
-    title: 'Export as an image…',
+    title: 'Save figure…',
     shortcut: { keys: ['x'] },
     description:
-      'The chart as it stands, at a chosen resolution — PNG, or SVG, which is drawn again at whatever size it is printed rather than enlarged.',
+      'The chart as it stands, saved as a PNG or an SVG at a chosen resolution, or copied as a PNG.',
   },
   clear: {
     title: 'Close every spectrum',

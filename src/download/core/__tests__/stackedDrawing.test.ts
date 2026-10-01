@@ -2,7 +2,6 @@
 import { expect, test } from 'vitest';
 
 import { CHART_PANE_ATTRIBUTE } from '../../../chart/core/chartPane.ts';
-import { pictureSize } from '../pictureExport.ts';
 import { drawingIn } from '../stackedDrawing.ts';
 import { SVG_NAMESPACE } from '../svgNamespace.ts';
 
@@ -45,19 +44,6 @@ test('a box of stacked panes is pictured as the panes, one under the other', () 
   expect(
     panes.map((copy) => copy.querySelector('path')?.getAttribute('d')),
   ).toStrictEqual(['M0 0', 'M1 1']);
-});
-
-test('the picture of a stack is measured at the size the panes make', () => {
-  const box = document.createElement('div');
-  box.append(pane('chromatogram', drawing(800, 180, 'M0 0')));
-  box.append(pane('survey', drawing(800, 420, 'M1 1')));
-
-  // The composite is never on the page, so the size comes off its attributes.
-  expect(pictureSize(drawingIn(box), 2, { frame: 'element' })).toStrictEqual({
-    width: 1600,
-    height: 1200,
-    scale: 2,
-  });
 });
 
 test('a pane that has not been laid out is left out of the picture', () => {

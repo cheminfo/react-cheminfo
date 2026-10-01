@@ -26,14 +26,17 @@ import { overlayFocusRing } from './overlayValueStyles.ts';
  * The panel itself: a header, a body, and whatever the figure can be told to
  * do at the foot.
  * @param metrics - The measurements the card is drawn from.
+ * @param width - A fixed width, or `undefined` for as wide as its content.
  * @returns The panel's rules.
  */
 export function overlayPanelSurfaceStyle(
   metrics: OverlayMetrics,
+  width?: number | string,
 ): CSSProperties {
   return {
     display: 'flex',
     flexDirection: 'column',
+    width,
     minWidth: OVERLAY_PANEL_MIN_WIDTH,
     color: 'var(--text)',
     fontSize: metrics.fontSize,

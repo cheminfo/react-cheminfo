@@ -51,31 +51,6 @@ export {
 } from './figureTarget.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';
 
-export {
-  exportButtonsStyle,
-  exportNoteStyle,
-  exportSectionStyle,
-} from './exportStyles.ts';
-export type {
-  ImageResolution,
-  ImageResolutionId,
-  ImageSize,
-} from './imageResolution.ts';
-export {
-  DEFAULT_IMAGE_RESOLUTION,
-  IMAGE_RESOLUTIONS,
-  formatImageSize,
-  imageResolution,
-  imageSize,
-} from './imageResolution.ts';
-export type { PictureFrame, PictureOptions } from './pictureExport.ts';
-export {
-  PICTURE_PADDING,
-  copyPicture,
-  pictureSize,
-  savePngPicture,
-  saveSvgPicture,
-} from './pictureExport.ts';
 export { drawingIn, stackDrawings } from './stackedDrawing.ts';
 export type { SvgBox } from './svgBounds.ts';
 export { CONTENT_ATTRIBUTE, contentBox, elementBox } from './svgBounds.ts';

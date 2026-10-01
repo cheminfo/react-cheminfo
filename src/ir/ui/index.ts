@@ -34,6 +34,7 @@ export { IrSidePanel } from './IrSidePanel.tsx';
 export type { IrStateProviderProps } from './IrStateProvider.tsx';
 export { IrStateProvider } from './IrStateProvider.tsx';
 export { IrStatusBar } from './IrStatusBar.tsx';
+export type { IrToolbarProps } from './IrToolbar.tsx';
 export { IrToolbar } from './IrToolbar.tsx';
 export type { IrTracesProps } from './IrTraces.tsx';
 export { IrTraces } from './IrTraces.tsx';

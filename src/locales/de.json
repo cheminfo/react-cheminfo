@@ -189,6 +189,8 @@
   "download.hintRasterSvg": "Ein SVG, das ein Bild von {pixels} enthält: eine 3D-Szene hat keine Vektorform.",
   "download.hintSvg": "Öffnet sich mit {pixels} und bleibt in jeder Größe scharf.",
   "download.hintPng": "Gespeichert {pixels}.",
+  "download.hintCopied": "In die Zwischenablage kopiert: PNG mit {pixels}.",
+  "download.copyUnsupported": "Dieser Browser kann kein Bild in die Zwischenablage legen. Speichern Sie es stattdessen.",
   "download.size": "Größe",
   "download.sizeHelp": "Die Form, in der die Abbildung für die Datei gezeichnet wird. Sie wird neu gesetzt, sodass Achsen und Beschriftungen in diese Form passen, statt hineingedehnt zu werden. Eine Zeitschriftenspalte ist 8,5 cm breit, und ihr Text wird in der Größe gedruckt, in der er auf dem Bildschirm steht.",
   "download.sizeScreen": "Wie angezeigt",

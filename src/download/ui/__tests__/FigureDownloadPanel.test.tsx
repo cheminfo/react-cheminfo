@@ -5,6 +5,7 @@ import type { FigureFormat } from '../../core/downloadFigure.ts';
 import type { FigureLayout } from '../../core/figureLayout.ts';
 import type { FigurePixels } from '../../core/figureScale.ts';
 import { FigureDownloadPanel } from '../FigureDownloadPanel.tsx';
+import type { FigureNotice } from '../useFigureActions.ts';
 
 const SCREEN = { width: 720, height: 380 };
 
@@ -71,6 +72,27 @@ test('the custom sides are not offered for any other size', () => {
   expect(html).toContain('Opens at 720 × 540 pixels');
 });
 
+test('copy is offered beside save only when the panel is given one', () => {
+  expect(panel({ format: 'png', copy: true })).toContain('>Copy<');
+  expect(panel({ format: 'png' })).not.toContain('>Copy<');
+});
+
+test('a copy says what it put on the clipboard, whatever is saved', () => {
+  const html = panel({ format: 'svg', scale: 2, notice: 'copied' });
+
+  expect(html).toContain(
+    'Copied 1440 × 760 pixels to the clipboard, as a PNG.',
+  );
+});
+
+test('a browser that cannot copy a picture is told to save it', () => {
+  const html = panel({ format: 'png', notice: 'copyUnsupported' });
+
+  expect(html).toContain(
+    'This browser cannot put a picture on the clipboard. Save it instead.',
+  );
+});
+
 interface PanelOptions {
   /** The file asked for. */
   format: FigureFormat;
@@ -82,6 +104,10 @@ interface PanelOptions {
   scale?: number;
   /** The figure on screen. */
   size?: FigurePixels;
+  /** Whether copy is offered. */
+  copy?: boolean;
+  /** What the last copy came to. */
+  notice?: FigureNotice | null;
 }
 
 /**
@@ -91,6 +117,7 @@ interface PanelOptions {
  */
 function panel(options: PanelOptions): string {
   const { format, layout, custom = null, scale = 2, size = SCREEN } = options;
+  const { copy = false, notice = null } = options;
   return renderToStaticMarkup(
     <FigureDownloadPanel
       title="Save figure"
@@ -99,10 +126,12 @@ function panel(options: PanelOptions): string {
       scales={[1, 2, 3, 4]}
       size={size}
       failure={null}
+      notice={notice}
       saving={false}
       onFormatChange={() => null}
       onScaleChange={() => null}
       onSave={() => null}
+      onCopy={copy ? () => null : undefined}
       sizing={
         layout === undefined
           ? undefined

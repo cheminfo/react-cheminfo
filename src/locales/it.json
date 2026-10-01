@@ -189,6 +189,8 @@
   "download.hintRasterSvg": "Un SVG che contiene un'immagine di {pixels}: una scena 3D non ha forma vettoriale.",
   "download.hintSvg": "Si apre a {pixels}, e resta nitido a qualsiasi dimensione.",
   "download.hintPng": "Salvato {pixels}.",
+  "download.hintCopied": "Copiato negli appunti: PNG di {pixels}.",
+  "download.copyUnsupported": "Questo browser non può mettere un'immagine negli appunti. Salvala invece.",
   "download.size": "Dimensione",
   "download.sizeHelp": "La forma con cui la figura viene disegnata per il file. Viene ricomposta, così gli assi e le etichette si adattano a quella forma invece di essere stirati. Una colonna di rivista è larga 8,5 cm, e il suo testo si stampa alla dimensione con cui si legge sullo schermo.",
   "download.sizeScreen": "Come mostrata",

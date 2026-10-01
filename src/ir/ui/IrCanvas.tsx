@@ -26,6 +26,12 @@ export interface IrCanvasProps {
    * @default undefined
    */
   attachChart?: (element: HTMLDivElement | null) => void;
+  /**
+   * The `id` put on the box the chart is drawn in, which the "Save figure"
+   * panel is pointed at.
+   * @default undefined
+   */
+  chartId?: string;
 }
 
 /**
@@ -44,7 +50,7 @@ export interface IrCanvasProps {
  * @returns The canvas.
  */
 export function IrCanvas(props: IrCanvasProps) {
-  const { highlight = null, onHighlight, attachChart } = props;
+  const { highlight = null, onHighlight, attachChart, chartId } = props;
   const { state, visibleSpectra, assigned } = useIrEditorState();
   const actions = useIrActions();
   const { domain, tool, selectedId } = state.view;
@@ -59,7 +65,7 @@ export function IrCanvas(props: IrCanvasProps) {
 
   return (
     <div style={rootStyle}>
-      <div ref={attachChart} style={chartStyle}>
+      <div ref={attachChart} id={chartId} style={chartStyle}>
         <IrChart
           spectra={visibleSpectra}
           mode={mode}

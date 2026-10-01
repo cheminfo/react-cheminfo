@@ -1,10 +1,15 @@
 import type { Ref } from 'react';
-import { useCallback, useImperativeHandle, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react';
 import { SplitPane, useFullscreen } from 'react-science/ui';
 
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
-import { ExportImageDialog } from '../../download/ui/ExportImageDialog.tsx';
-import { useDrawingBox } from '../../download/ui/useDrawingBox.ts';
+import { useFigureDownload } from '../../download/ui/useFigureDownload.tsx';
 import { PanelRail } from '../../panel/ui/PanelRail.tsx';
 import type { IrBand } from '../core/irBand.ts';
 import type { IrCommandHandlers } from '../core/irCommands.ts';
@@ -58,12 +63,16 @@ export function IrShell(props: IrShellProps) {
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isDocumentationOpen, setIsDocumentationOpen] = useState(false);
-  const [isExportImageOpen, setIsExportImageOpen] = useState(false);
 
-  // The chart is the picture, so the box it is drawn in is what the export
-  // dialog is pointed at: the viewer around it is full of SVG — every icon in
-  // every toolbar is one — and the first found there would be a magnifier.
-  const chart = useDrawingBox();
+  // The chart is the picture, so the box it is drawn in is what the figure
+  // panel is pointed at: the viewer around it is full of SVG — every icon in
+  // every toolbar is one.
+  const chartId = useId();
+  const figure = useFigureDownload({
+    targetId: chartId,
+    fileName: pictureName(visibleSpectra, selectedSpectrum),
+  });
+  const { isOpen: isFigureOpen, setOpen: setFigureOpen } = figure;
   // The highlight is held here rather than in the reducer: what the pointer is
   // resting on is not part of the document and changes on every move across the
   // chart, so putting it through the reducer would run every panel's memo sixty
@@ -106,7 +115,7 @@ export function IrShell(props: IrShellProps) {
       togglePicking: () => actions.setSettings({ pickBands: !pickBands }),
       toggleAssignments: () =>
         actions.setSettings({ showAssignments: !showAssignments }),
-      exportImage: () => setIsExportImageOpen(true),
+      exportImage: () => setFigureOpen(!isFigureOpen),
       clear: () => actions.clear(),
     }),
     [
@@ -117,6 +126,8 @@ export function IrShell(props: IrShellProps) {
       showAssignments,
       scaleValueAxis,
       toggleFullScreen,
+      isFigureOpen,
+      setFigureOpen,
     ],
   );
 
@@ -176,7 +187,7 @@ export function IrShell(props: IrShellProps) {
               default: in a narrow viewer the row would take the width it is
               short of out of them, and half an icon is what that looks like. */}
           <div style={railStyle}>
-            <IrToolbar />
+            <IrToolbar figure={figure} />
           </div>
 
           <SplitPane
@@ -189,7 +200,7 @@ export function IrShell(props: IrShellProps) {
             <IrCanvas
               highlight={highlight}
               onHighlight={setHighlight}
-              attachChart={chart.attach}
+              chartId={chartId}
             />
 
             <IrSidePanel highlight={highlight} onHighlight={setHighlight} />
@@ -215,19 +226,6 @@ export function IrShell(props: IrShellProps) {
         isOpen={isDocumentationOpen}
         onClose={() => setIsDocumentationOpen(false)}
       />
-
-      {/* `element`, not `content`: the chart is drawn to the box it was given,
-          so the box is the picture — measuring the marks inside it would crop
-          the frame to wherever the trace happens to reach and leave the axes
-          hanging. */}
-      <ExportImageDialog
-        isOpen={isExportImageOpen}
-        getDrawing={chart.getDrawing}
-        frame="element"
-        filename={pictureName(visibleSpectra, selectedSpectrum)}
-        label="Infrared spectrum"
-        onClose={() => setIsExportImageOpen(false)}
-      />
     </IrCommandProvider>
   );
 }
@@ -245,7 +243,7 @@ const ZOOM_STEP = 1.2;
 const DEFAULT_FRAME_WIDTH = 200;
 
 /**
- * What a picture of the chart is called before anything is typed in the box.
+ * What a picture of the chart is called.
  *
  * The spectrum being looked at, since a figure of the chart is a figure of that
  * spectrum, and a chemist who has one run open should not have to work out

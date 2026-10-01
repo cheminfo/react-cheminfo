@@ -1,9 +1,19 @@
 import { Toolbar } from 'react-science/ui';
 
+import type { FigureDownloadState } from '../../download/ui/useFigureDownload.tsx';
 import { boxZoomOnly } from '../core/irMode.ts';
 
 import { useIrCommandProps } from './irCommandContext.tsx';
 import { useIrEditorState } from './irStateContext.ts';
+
+/** What {@link IrToolbar} needs. */
+export interface IrToolbarProps {
+  /**
+   * The "Save figure" panel the picture button opens.
+   * @default undefined — the button only runs the `exportImage` command
+   */
+  figure?: FigureDownloadState;
+}
 
 /**
  * The tools, down the left of the chart.
@@ -19,9 +29,11 @@ import { useIrEditorState } from './irStateContext.ts';
  * drag on that axis is a rectangle, so both buttons go dead with the square zoom
  * lit. Showing `read` as available there would offer a gesture the chart does not
  * make, and showing it as *active* would name the wrong one.
+ * @param props - Component props.
  * @returns The toolbar.
  */
-export function IrToolbar() {
+export function IrToolbar(props: IrToolbarProps) {
+  const { figure } = props;
   const { state, selectedSpectrum } = useIrEditorState();
   const command = useIrCommandProps();
   const { spectra } = state.data;
@@ -29,6 +41,8 @@ export function IrToolbar() {
   const { mode, pickBands, showAssignments } = state.settings;
 
   const isEmpty = spectra.length === 0;
+  // The popover opens the panel itself, so the command's own click is left out.
+  const exportCommand = command('exportImage');
   const settled = boxZoomOnly(mode);
 
   return (
@@ -92,11 +106,27 @@ export function IrToolbar() {
           window it was dragged to, the way up it is being read, the
           assignments written under the bands — so the picture is taken here
           rather than rebuilt from the spectra in a panel. */}
-      <Toolbar.Item
-        icon="media"
-        {...command('exportImage')}
-        disabled={isEmpty}
-      />
+      {figure === undefined ? (
+        <Toolbar.Item
+          icon="media"
+          {...command('exportImage')}
+          disabled={isEmpty}
+        />
+      ) : (
+        <Toolbar.PopoverItem
+          isOpen={figure.isOpen}
+          onInteraction={figure.setOpen}
+          content={figure.panel}
+          disabled={isEmpty}
+          itemProps={{
+            icon: 'media',
+            tooltip: exportCommand.tooltip,
+            'aria-label': exportCommand['aria-label'],
+            active: figure.isOpen,
+            disabled: isEmpty,
+          }}
+        />
+      )}
     </Toolbar>
   );
 }

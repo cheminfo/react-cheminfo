@@ -14,13 +14,9 @@ export { FigureDownloadPanel } from './FigureDownloadPanel.tsx';
 export type { FigureSizing } from './FigureSizeRows.tsx';
 export type { FigureRenderer } from './useFigureRedraw.tsx';
 
-export type { ExportDialogFrameProps } from './ExportDialogFrame.tsx';
-export { ExportDialogFrame } from './ExportDialogFrame.tsx';
-export type { ExportImageDialogProps } from './ExportImageDialog.tsx';
-export { ExportImageDialog } from './ExportImageDialog.tsx';
-export type { ExportNameFieldProps } from './ExportNameField.tsx';
-export { ExportNameField } from './ExportNameField.tsx';
-export type { ExportPictureSectionProps } from './ExportPictureSection.tsx';
-export { ExportPictureSection } from './ExportPictureSection.tsx';
-export type { DrawingBox } from './useDrawingBox.ts';
-export { useDrawingBox } from './useDrawingBox.ts';
+export type {
+  FigureDownloadOptions,
+  FigureDownloadState,
+} from './useFigureDownload.tsx';
+export { useFigureDownload } from './useFigureDownload.tsx';
+export type { FigureNotice } from './useFigureActions.ts';

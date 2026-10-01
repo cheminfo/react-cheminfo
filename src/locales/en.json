@@ -189,6 +189,8 @@
   "download.hintRasterSvg": "An SVG holding a picture of {pixels}: a 3D scene has no vector form.",
   "download.hintSvg": "Opens at {pixels}, and stays sharp at any size.",
   "download.hintPng": "Saved {pixels}.",
+  "download.hintCopied": "Copied {pixels} to the clipboard, as a PNG.",
+  "download.copyUnsupported": "This browser cannot put a picture on the clipboard. Save it instead.",
   "download.size": "Size",
   "download.sizeHelp": "The shape the figure is drawn at for the file. It is laid out again, so the axes and labels fit that shape instead of being stretched into it. A journal column is 8.5 cm wide, and its text prints at the size it reads on screen.",
   "download.sizeScreen": "As shown",

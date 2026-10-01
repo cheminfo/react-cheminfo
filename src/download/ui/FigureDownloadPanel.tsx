@@ -1,7 +1,5 @@
 import type { ReactElement } from 'react';
 
-import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
-import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
@@ -19,6 +17,8 @@ import {
 
 import type { FigureSizing } from './FigureSizeRows.tsx';
 import { FigureSizeRows } from './FigureSizeRows.tsx';
+import { hintOf } from './figureDownloadHint.ts';
+import type { FigureNotice } from './useFigureActions.ts';
 
 /** What {@link FigureDownloadPanel} is drawn from. */
 export interface FigureDownloadPanelProps {
@@ -34,7 +34,13 @@ export interface FigureDownloadPanelProps {
   size: FigurePixels | null;
   /** What went wrong the last time save was pressed, if anything. */
   failure: string | null;
-  /** Whether a file is being written right now. */
+  /**
+   * What the last copy came to, while the choices it was made with still
+   * stand.
+   * @default null
+   */
+  notice?: FigureNotice | null;
+  /** Whether a file or a copy is being written right now. */
   saving: boolean;
   /** Called with the format the reader picked. */
   onFormatChange: (format: FigureFormat) => void;
@@ -42,6 +48,12 @@ export interface FigureDownloadPanelProps {
   onScaleChange: (scale: number) => void;
   /** Called when they press save. */
   onSave: () => void;
+  /**
+   * Called when they press copy, which puts a PNG at the resolution picked on
+   * the clipboard.
+   * @default undefined — no copy is offered
+   */
+  onCopy?: () => void;
   /**
    * Whether the SVG holds a rendered picture rather than vector drawings, as
    * for a WebGL scene: its resolution is then the pixels of that picture, it
@@ -59,7 +71,8 @@ export interface FigureDownloadPanelProps {
 }
 
 /**
- * The choices behind the save glyph, and the button that writes the file.
+ * The choices behind the save glyph, and the buttons that write the file and
+ * copy the picture.
  *
  * The resolution applies to both formats, and means what the reader needs it
  * to: a PNG is painted with that many more pixels, and an SVG, drawn the same,
@@ -81,7 +94,7 @@ export function FigureDownloadPanel(
 ): ReactElement {
   const { title, format, scale, scales, size, failure, saving } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
-  const { sizing } = props;
+  const { sizing, onCopy, notice = null } = props;
   const t = useChromeT();
 
   // What the file is drawn at: the figure on screen, or the shape picked.
@@ -95,15 +108,29 @@ export function FigureDownloadPanel(
   return (
     <OverlayPanel
       title={title}
-      hint={hintOf(format, drawn, scale, failure, rasterSvg, t)}
+      width={PANEL_WIDTH}
+      hint={hintOf(
+        { format, size: drawn, scale, failure, notice, rasterSvg },
+        t,
+      )}
       actions={
-        <OverlayAction
-          text={t('download.save')}
-          icon="download"
-          intent="primary"
-          disabled={saving || size === null}
-          onClick={onSave}
-        />
+        <>
+          <OverlayAction
+            text={t('download.save')}
+            icon="download"
+            intent="primary"
+            disabled={saving || size === null}
+            onClick={onSave}
+          />
+          {onCopy === undefined ? null : (
+            <OverlayAction
+              text={t('clipboard.copy')}
+              icon="clipboard"
+              disabled={saving || size === null}
+              onClick={onCopy}
+            />
+          )}
+        </>
       }
     >
       <OverlaySegmented<FigureFormat>
@@ -136,6 +163,12 @@ export function FigureDownloadPanel(
     </OverlayPanel>
   );
 }
+
+/**
+ * Wide enough for the longest hint on one line in English, so switching
+ * between PNG and SVG — whose hints differ in length — never resizes the panel.
+ */
+const PANEL_WIDTH = '27em';
 
 /** The two files a figure can leave the page as. */
 const FORMAT_CHOICES: ReadonlyArray<OverlayOption<FigureFormat>> = [
@@ -170,36 +203,4 @@ function scaleChoices(
     });
   }
   return choices;
-}
-
-/**
- * The line at the foot of the panel: what pressing save is about to do.
- * @param format - Which file the reader is about to write.
- * @param size - How big the figure is drawn for the file.
- * @param scale - The multiple it is saved at.
- * @param failure - What went wrong last time, if anything.
- * @param rasterSvg - Whether the SVG embeds a rendered picture.
- * @param t - The chrome's formatter, so the sentence is in the language of
- * the page.
- * @returns The sentence.
- */
-function hintOf(
-  format: FigureFormat,
-  size: FigurePixels | null,
-  scale: number,
-  failure: string | null,
-  rasterSvg: boolean,
-  t: Translate<ChromeKey>,
-): string {
-  if (failure !== null) return failure;
-  if (size === null) return t('download.noFigure');
-  if (format === 'svg' && rasterSvg) {
-    return t('download.hintRasterSvg', {
-      pixels: formatFigurePixels(figurePixels(size, scale)),
-    });
-  }
-  const pixels = formatFigurePixels(figurePixels(size, scale));
-  return format === 'svg'
-    ? t('download.hintSvg', { pixels })
-    : t('download.hintPng', { pixels });
 }

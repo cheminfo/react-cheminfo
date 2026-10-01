@@ -189,6 +189,8 @@
   "download.hintRasterSvg": "Un SVG contenant une image de {pixels} : une scène 3D n'a pas de forme vectorielle.",
   "download.hintSvg": "S'ouvre à {pixels}, et reste net à toute taille.",
   "download.hintPng": "Enregistré {pixels}.",
+  "download.hintCopied": "Copié dans le presse-papiers : PNG de {pixels}.",
+  "download.copyUnsupported": "Ce navigateur ne peut pas copier une image dans le presse-papiers. Enregistrez-la plutôt.",
   "download.size": "Taille",
   "download.sizeHelp": "La forme à laquelle la figure est dessinée pour le fichier. Elle est remise en page, si bien que les axes et les étiquettes s'ajustent à cette forme au lieu d'y être étirés. Une colonne de revue mesure 8,5 cm, et son texte s'imprime à la taille où il se lit à l'écran.",
   "download.sizeScreen": "Comme affichée",

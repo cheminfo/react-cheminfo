@@ -189,6 +189,8 @@
   "download.hintRasterSvg": "Un SVG que contiene una imagen de {pixels}: una escena 3D no tiene forma vectorial.",
   "download.hintSvg": "Se abre a {pixels}, y se mantiene nítido a cualquier tamaño.",
   "download.hintPng": "Guardado {pixels}.",
+  "download.hintCopied": "Copiado al portapapeles: PNG de {pixels}.",
+  "download.copyUnsupported": "Este navegador no puede poner una imagen en el portapapeles. Guárdala en su lugar.",
   "download.size": "Tamaño",
   "download.sizeHelp": "La forma con la que se dibuja la figura para el archivo. Se vuelve a maquetar, de modo que los ejes y las etiquetas se ajustan a esa forma en lugar de estirarse. Una columna de revista mide 8,5 cm, y su texto se imprime al tamaño con que se lee en pantalla.",
   "download.sizeScreen": "Como se muestra",
