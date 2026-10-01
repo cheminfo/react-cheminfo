@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.33.0](https://github.com/cheminfo/react-cheminfo/compare/v0.32.0...v0.33.0) (2026-10-01)
+
+
+### Features
+
+* **i18n:** draw a translated paragraph with Prose ([fbbe278](https://github.com/cheminfo/react-cheminfo/commit/fbbe278bc98fddc35dd1fbbe80aaf512db096817))
+* **i18n:** speak Italian, and load a locale chunk the browser accepts ([c373ac0](https://github.com/cheminfo/react-cheminfo/commit/c373ac05019f17d8b112672e58df9db3ef82f7f1))
+* spin the orbital from the canvas toolbar ([6220e03](https://github.com/cheminfo/react-cheminfo/commit/6220e037f8a30a14ef9600d85b607df549d95cf8))
+
 ## [0.32.0](https://github.com/cheminfo/react-cheminfo/compare/v0.31.0...v0.32.0) (2026-10-01)
 
 
