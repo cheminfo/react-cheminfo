@@ -106,7 +106,7 @@ export function logAxisBounds(
       Math.floor(Math.log10(Math.abs(min) || 1)),
       top - maxDecades,
     );
-    return withTicks(10 ** bottom, 10 ** top, constant, mostTicks);
+    return withTicks(decade(bottom), decade(top), constant, mostTicks);
   }
 
   // A lone value, or a column of identical ones, spans nothing: reach to the
@@ -119,7 +119,13 @@ export function logAxisBounds(
   return withTicks(min, max, constant, mostTicks);
 }
 
-/** The ends, with the graduations when they are worth writing. */
+/**
+ * The ends, with the graduations when they are worth writing.
+ * @param min
+ * @param max
+ * @param constant
+ * @param mostTicks
+ */
 function withTicks(
   min: number,
   max: number,
@@ -160,11 +166,24 @@ function decadesBetween(
   const step = Math.ceil((top - bottom + 1) / mostTicks);
   const ticks = min <= 0 && max >= 0 ? [0] : [];
   for (let power = bottom; power <= top; power += step) {
-    const decade = 10 ** power;
-    if (decade >= min && decade <= max) ticks.push(decade);
+    const tick = decade(power);
+    if (tick >= min && tick <= max) ticks.push(tick);
   }
   if (constant === 0) return ticks;
   return ticks.length < RULE_PAST_DECADES ? undefined : ticks;
+}
+
+/**
+ * A whole power of ten.
+ * @param power - The exponent, a whole number.
+ * @returns Ten to that power, the same bits on every engine.
+ */
+function decade(power: number): number {
+  // Read as a decimal rather than computed: `10 ** power` goes through pow,
+  // which is not bit-exact across V8 versions — node 22 answers
+  // 0.00009999999999999999 for -4 and 1.0000000000000001e-20 for -20 — while a
+  // decimal literal is the correctly-rounded double everywhere.
+  return Number(`1e${power}`);
 }
 
 /**
