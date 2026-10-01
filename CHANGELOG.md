@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.32.0](https://github.com/cheminfo/react-cheminfo/compare/v0.31.0...v0.32.0) (2026-10-01)
+
+
+### Features
+
+* **number:** a number box that keeps what was typed ([af7b795](https://github.com/cheminfo/react-cheminfo/commit/af7b795e6bc60f5e73f54de89216f979c4d08d17))
+* **periodic:** size a cell in container-query units, and name it on hover ([1b796c4](https://github.com/cheminfo/react-cheminfo/commit/1b796c48f5a0b663b0caa5f6aee207c9e55effb5))
+
 ## [0.31.0](https://github.com/cheminfo/react-cheminfo/compare/v0.30.0...v0.31.0) (2026-09-30)
 
 
