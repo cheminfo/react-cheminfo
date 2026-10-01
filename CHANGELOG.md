@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.34.0](https://github.com/cheminfo/react-cheminfo/compare/v0.33.0...v0.34.0) (2026-10-01)
+
+
+### Features
+
+* **axis:** a linear or logarithmic axis, and the control that picks it ([d7cac0d](https://github.com/cheminfo/react-cheminfo/commit/d7cac0d904430030ebdff9da52b32d1bd37c44f7))
+* **delimited:** a button that copies or downloads a table ([4454708](https://github.com/cheminfo/react-cheminfo/commit/445470850787560cbf6facb74799edea7a9d9407))
+* **periodic:** write into the block the table leaves empty ([317251f](https://github.com/cheminfo/react-cheminfo/commit/317251f0e2d27c922c69be4d7980317db852db15))
+
+
+### Bug Fixes
+
+* **axis:** read a decade as a decimal, not as a power ([ec843d3](https://github.com/cheminfo/react-cheminfo/commit/ec843d322cf405788c16453e3ef18423f02d384e))
+
 ## [0.33.0](https://github.com/cheminfo/react-cheminfo/compare/v0.32.0...v0.33.0) (2026-10-01)
 
 
