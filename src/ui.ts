@@ -1,4 +1,5 @@
 export * from './about/ui/index.ts';
+export * from './axis/ui/index.ts';
 export * from './capsule/ui/index.ts';
 export * from './chart/ui/index.ts';
 export * from './chrome/ui/index.ts';
