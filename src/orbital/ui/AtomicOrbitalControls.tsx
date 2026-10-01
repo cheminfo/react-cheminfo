@@ -1,7 +1,8 @@
 /**
- * The two controls an orbital canvas owns: the cartesian frame, and the way
- * back to the framing the orbital opened on — a change of orbital keeps
- * whatever angle and zoom the student is on.
+ * The three controls an orbital canvas owns: the cartesian frame, the slow
+ * spin that makes a 3D shape readable on a flat screen, and the way back to the
+ * framing the orbital opened on — a change of orbital keeps whatever angle and
+ * zoom the student is on.
  */
 
 import { Button } from '@blueprintjs/core';
@@ -17,24 +18,32 @@ interface AtomicOrbitalControlsProps {
   axes: boolean;
   /** Called when the frame button is pressed. */
   onToggleAxes: () => void;
+  /** Whether the scene is turning. */
+  spinning: boolean;
+  /** Called when the spin button is pressed. */
+  onToggleSpin: () => void;
   /** Called when the reset button is pressed. */
   onResetView: () => void;
 }
 
 /**
- * The frame and reset buttons, in the canvas's top-right corner.
+ * The frame, spin and reset buttons, in the canvas's top-right corner.
  * @param props - See {@link AtomicOrbitalControlsProps}.
- * @returns The two buttons.
+ * @returns The three buttons.
  */
 export function AtomicOrbitalControls(
   props: AtomicOrbitalControlsProps,
 ): ReactElement {
-  const { axes, onToggleAxes, onResetView } = props;
+  const { axes, onToggleAxes, spinning, onToggleSpin, onResetView } = props;
   const t = useChromeT();
   const axesHelp: HelpContent = {
     title: t('orbital.axesTitle'),
     body: t('orbital.axesBody'),
     example: { code: '3d_yz', note: t('orbital.axesExample') },
+  };
+  const spinHelp: HelpContent = {
+    title: t('orbital.spinTitle'),
+    body: t('orbital.spinBody'),
   };
   const resetHelp: HelpContent = {
     title: t('orbital.resetTitle'),
@@ -51,6 +60,17 @@ export function AtomicOrbitalControls(
           aria-label={t('orbital.showAxes')}
           aria-pressed={axes}
           onClick={onToggleAxes}
+        />
+      </HelpTooltip>
+      <HelpTooltip content={spinHelp} placement="bottom">
+        <Button
+          variant="minimal"
+          size="small"
+          icon="refresh"
+          active={spinning}
+          aria-label={t('orbital.spin')}
+          aria-pressed={spinning}
+          onClick={onToggleSpin}
         />
       </HelpTooltip>
       <HelpTooltip content={resetHelp} placement="bottom">

@@ -66,7 +66,7 @@ export const WithoutAxes: Story = {
   args: { axes: false },
 };
 
-/** Turning makes a still screenshot of a 3D shape readable. */
+/** Opening already turning; the button in the corner stops it. */
 export const Spinning: Story = {
   args: { spinning: true },
 };

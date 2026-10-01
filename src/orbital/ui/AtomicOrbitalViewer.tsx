@@ -68,10 +68,17 @@ export interface AtomicOrbitalViewerProps {
    */
   onAxesChange?: (axes: boolean) => void;
   /**
-   * Whether the scene turns on its own.
+   * Whether the scene turns on its own when the canvas opens. The button in the
+   * canvas's corner flips it from there.
    * @default false
    */
   spinning?: boolean;
+  /**
+   * Called when the student flips the spin, with its new state — so a site can
+   * persist the choice and pass it back as `spinning`.
+   * @default undefined
+   */
+  onSpinningChange?: (spinning: boolean) => void;
   /**
    * How fast it turns, in molstar's own spin unit. Lower is slower.
    * @default 0.3

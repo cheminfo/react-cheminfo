@@ -64,11 +64,21 @@ interface AtomicOrbitalCanvasProps {
    */
   onAxesChange?: (axes: boolean) => void;
   /**
-   * Whether the scene turns on its own, which is what makes a still screenshot
-   * of a 3D shape readable.
+   * Whether the scene turns on its own when the canvas opens, which is what
+   * makes a still screenshot of a 3D shape readable.
+   *
+   * The canvas owns the state from then on: the button in its corner flips it,
+   * and {@link AtomicOrbitalCanvasProps.onSpinningChange} reports the new value
+   * to a site that wants to remember it for the next mount.
    * @default false
    */
   spinning?: boolean;
+  /**
+   * Called when the student flips the spin, with its new state — so a site can
+   * persist the choice and pass it back as `spinning`.
+   * @default undefined
+   */
+  onSpinningChange?: (spinning: boolean) => void;
   /**
    * How fast it turns, in molstar's own spin unit. Lower is slower.
    * @default 0.3
@@ -108,10 +118,11 @@ export function AtomicOrbitalCanvas(
     palette = PHASE_PALETTES.textbook,
     resolution = DEFAULT_RESOLUTION,
     axes: initialAxes = true,
-    spinning = false,
+    spinning: initialSpinning = false,
     spinSpeed = DEFAULT_SPIN_SPEED,
     sample = sampleInProcess,
     onAxesChange,
+    onSpinningChange,
     onNodeRadii,
     onFailureChange,
   } = props;
@@ -129,6 +140,7 @@ export function AtomicOrbitalCanvas(
   const axesRef = useRef(initialAxes);
 
   const [axes, setAxes] = useState(initialAxes);
+  const [spinning, setSpinning] = useState(initialSpinning);
 
   // What the canvas is being asked to show. Comparing it with what it *is*
   // showing gives the progress note without a state write on every prop change.
@@ -137,9 +149,19 @@ export function AtomicOrbitalCanvas(
 
   // Callbacks are read through refs so a caller passing an inline arrow does
   // not re-sample the orbital on every render of its parent.
-  const callbacks = useRef({ onAxesChange, onNodeRadii, onFailureChange });
+  const callbacks = useRef({
+    onAxesChange,
+    onSpinningChange,
+    onNodeRadii,
+    onFailureChange,
+  });
   useEffect(() => {
-    callbacks.current = { onAxesChange, onNodeRadii, onFailureChange };
+    callbacks.current = {
+      onAxesChange,
+      onSpinningChange,
+      onNodeRadii,
+      onFailureChange,
+    };
   });
 
   // Created and disposed once per mount. React 19 runs this twice in
@@ -209,6 +231,11 @@ export function AtomicOrbitalCanvas(
         onToggleAxes={() => {
           setAxes(!axes);
           callbacks.current.onAxesChange?.(!axes);
+        }}
+        spinning={spinning}
+        onToggleSpin={() => {
+          setSpinning(!spinning);
+          callbacks.current.onSpinningChange?.(!spinning);
         }}
         onResetView={() => {
           void viewerRef.current?.resetView();
