@@ -33,6 +33,7 @@
   "bin": {
     "cheminfo-check-deploy": "bin/check-deploy.mjs",
     "cheminfo-check-messages": "bin/check-messages.mjs",
+    "cheminfo-check-seo": "bin/check-seo.mjs",
     "cheminfo-check-tokens": "bin/check-tokens.mjs"
   },
   "files": [
