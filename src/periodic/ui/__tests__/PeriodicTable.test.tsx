@@ -165,3 +165,24 @@ test('the type of a cell is a share of the table, so it grows with it', () => {
   expect(html).toContain('cqw');
   expect(html).not.toContain('aspect-ratio');
 });
+
+test('the empty block holds what the tool writes there, and nothing by default', () => {
+  const bare = renderToStaticMarkup(<PeriodicTable />);
+  const html = renderToStaticMarkup(
+    <PeriodicTable inset={<span>Rubidium, [Kr] 5s1</span>} />,
+  );
+
+  expect(bare).not.toContain('grid-column:3 / span 10');
+  expect(html).toContain('grid-column:3 / span 10');
+  expect(html).toContain('grid-row:1 / span 3');
+  expect(html).toContain('<span>Rubidium, [Kr] 5s1</span>');
+});
+
+test('the header strips shift the empty block with the cells', () => {
+  const html = renderToStaticMarkup(
+    <PeriodicTable headers inset={<span>here</span>} />,
+  );
+
+  expect(html).toContain('grid-column:4 / span 10');
+  expect(html).toContain('grid-row:2 / span 3');
+});

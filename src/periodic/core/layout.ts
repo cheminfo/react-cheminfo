@@ -85,6 +85,25 @@ let placedCache: ReadonlyArray<{
 }> | null = null;
 
 /**
+ * The block of cells the table leaves empty, where no element belongs: logical
+ * columns 3 to 12 of the first three periods.
+ *
+ * It is a tenth of the drawing, in the middle of the top edge, and the one
+ * place a tool can write without covering an element — which is why a table
+ * printed on a wall puts its title or its key there.
+ */
+export const EMPTY_BLOCK: {
+  /** Leftmost column of the block, one-based. */
+  column: number;
+  /** Topmost row of the block, one-based. */
+  row: number;
+  /** How many columns it spans. */
+  columnSpan: number;
+  /** How many rows it spans. */
+  rowSpan: number;
+} = { column: 3, row: 1, columnSpan: 10, rowSpan: 3 };
+
+/**
  * The two cells the lanthanoids and the actinoids were lifted out of.
  *
  * Without them the main block has a hole in it and the two rows underneath

@@ -263,16 +263,28 @@ const cellStyle = {
   minWidth: 0,
   overflow: 'hidden',
   padding: '1px',
+  // The corner the atomic number is pinned into.
+  position: 'relative',
   transition: 'opacity 120ms ease, filter 120ms ease',
 } as const satisfies CSSProperties;
 
+/**
+ * The atomic number sits out of the flow, in the corner.
+ *
+ * In the flow it rode on top of a stack the cell centres, so it moved down
+ * whenever what is written under the symbol was written smaller — the numbers
+ * of a row then sat at as many heights as the row had word lengths. Out of it,
+ * the number is in the same corner of every cell, and the symbol is centred in
+ * the cell rather than in what is left of it.
+ */
 const numberStyle = {
-  alignSelf: 'flex-start',
-  fontSize: 'max(0.33rem, 1.2cqw)',
+  fontSize: 'max(0.33rem, 1.1cqw)',
   fontVariantNumeric: 'tabular-nums',
+  left: 'max(1px, 0.14cqw)',
   lineHeight: 1,
   opacity: 0.8,
-  paddingLeft: '0.15cqw',
+  position: 'absolute',
+  top: 'max(1px, 0.14cqw)',
 } as const satisfies CSSProperties;
 
 const symbolStyle = {

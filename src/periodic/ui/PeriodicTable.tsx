@@ -10,7 +10,12 @@
  * a site's own richer element record never has to cross into this component.
  */
 
-import type { CSSProperties, KeyboardEvent, ReactElement } from 'react';
+import type {
+  CSSProperties,
+  KeyboardEvent,
+  ReactElement,
+  ReactNode,
+} from 'react';
 import { useEffect, useRef } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
@@ -20,6 +25,7 @@ import type { PeriodicElement } from '../core/elements.ts';
 import type { ElementRange } from '../core/layout.ts';
 import {
   COLUMN_COUNT,
+  EMPTY_BLOCK,
   elementByArrowKey,
   placedElements,
 } from '../core/layout.ts';
@@ -66,6 +72,17 @@ export interface PeriodicTableProps {
    * @default every element is
    */
   isIncluded?: (element: PeriodicElement) => boolean;
+  /**
+   * What is written in the block the table leaves empty — columns 3 to 12 of
+   * the first three periods, in the middle of the top edge. A tool that reads
+   * one element off the table puts what it says about it there, where the eye
+   * already is, rather than under the grid.
+   *
+   * It is sized against the table, like everything else in the grid, so give
+   * it type in `em` and it scales with the drawing.
+   * @default undefined — the block stays empty
+   */
+  inset?: ReactNode;
   /**
    * Whether to draw the group and period strips.
    * @default false
@@ -119,6 +136,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     detailOf,
     nameOf = defaultNameOf,
     isIncluded,
+    inset,
     headers = false,
     onSelectRange,
     legend = false,
@@ -164,6 +182,9 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
         onKeyDown={handleKeyDown}
       >
         {headers ? <HeaderStrips onSelectRange={onSelectRange} /> : null}
+        {inset === undefined ? null : (
+          <div style={insetStyle(offset)}>{inset}</div>
+        )}
         {markers ? <InnerTransitionMarkers offset={offset} /> : null}
         {placedElements().map(({ element, cell }) => (
           <ElementCell
@@ -186,6 +207,29 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
       {legend ? <CategoryLegend /> : null}
     </div>
   );
+}
+
+/**
+ * Where what the caller writes in the empty block is placed.
+ * @param offset - 1 when the table draws its header strips, 0 otherwise.
+ * @returns The style of the slot.
+ */
+function insetStyle(offset: number): CSSProperties {
+  return {
+    alignItems: 'center',
+    display: 'flex',
+    // Narrower than the block so the writing never touches the cells beside it.
+    padding: '0 1cqw',
+    gridColumn: `${String(EMPTY_BLOCK.column + offset)} / span ${String(EMPTY_BLOCK.columnSpan)}`,
+    gridRow: `${String(EMPTY_BLOCK.row + offset)} / span ${String(EMPTY_BLOCK.rowSpan)}`,
+    // A share of the table, with a floor, exactly as a cell sizes its symbol:
+    // the block holds the same three rows at every width, so what is written
+    // in it has to shrink with them.
+    fontSize: 'max(0.6rem, 1.8cqw)',
+    lineHeight: 1.35,
+    minWidth: 0,
+    overflow: 'hidden',
+  };
 }
 
 function defaultSwatchOf(element: PeriodicElement): Swatch {

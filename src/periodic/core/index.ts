@@ -18,6 +18,7 @@ export {
 export type { Cell, ElementRange } from './layout.ts';
 export {
   COLUMN_COUNT,
+  EMPTY_BLOCK,
   INNER_TRANSITION_MARKERS,
   INNER_TRANSITION_ROWS,
   ROW_COUNT,
