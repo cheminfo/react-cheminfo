@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.36.0](https://github.com/cheminfo/react-cheminfo/compare/v0.35.0...v0.36.0) (2026-10-01)
+
+
+### Features
+
+* **seo:** give every prerendered address its own text ([964173b](https://github.com/cheminfo/react-cheminfo/commit/964173b232438114bf18bddc7440b760ae58887a))
+* **seo:** report the pages a search engine cannot tell apart ([69d39ae](https://github.com/cheminfo/react-cheminfo/commit/69d39aebae20b33059ee5c72b2bfd438861a46f6))
+* **seo:** write the hreflang set of a translated site ([391760b](https://github.com/cheminfo/react-cheminfo/commit/391760ba34084e5090c55c5bbfd53063b579262f))
+
 ## [0.35.0](https://github.com/cheminfo/react-cheminfo/compare/v0.34.0...v0.35.0) (2026-10-01)
 
 
