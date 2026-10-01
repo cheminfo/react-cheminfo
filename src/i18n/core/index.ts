@@ -15,6 +15,8 @@ export type {
 } from './messageCatalog.ts';
 export { MessageCatalog } from './messageCatalog.ts';
 export type { MessageValues } from './messageValues.ts';
+export type { ProsePiece } from './prose.ts';
+export { splitProse } from './prose.ts';
 export type { MessageSession } from './session.ts';
 export {
   messageSession,
