@@ -337,6 +337,50 @@ The colours a name is set in are the site's own and are not retuned to reach the
 4.5:1 of body text: ChemCalc's teal and NMRium's orange both land just under it,
 which is why a name is set bold, where 3:1 is the threshold.
 
+### `StructureEditor`
+
+The canvas a structure is drawn on, sized so none of its toolbar is cut off, and
+loaded from whatever notation the caller has.
+
+```tsx
+import { StructureEditor } from 'react-cheminfo/structure';
+
+<StructureEditor
+  value={smiles}
+  inputFormat="smiles"
+  revision={revision}
+  minHeight={280}
+  onChange={(change) => setSmiles(change.smiles)}
+/>;
+```
+
+- **The canvas takes a pasted structure itself, so a site needs no box beside it
+  to paste into.** Click the canvas and ⌘/Ctrl-V reads a molfile, a SMILES or an
+  idCode out of the clipboard and adds it to the drawing — openchemlib listens
+  for the paste on the editor and parses the text with `Molecule.fromText`.
+  Focus is what decides it, not the pointer: a paste while the caret is
+  elsewhere goes to that element and the canvas never sees it. ⌘/Ctrl-C copies
+  the structure back out. A box is still worth having where a structure arrives
+  as _text the visitor keeps_ — a share link, a value they read back — and not
+  merely to get a SMILES onto the canvas.
+- **The editor is uncontrolled**: `value` is read at mount and again on every
+  change of `revision`, never on every render. Feeding the drawing back into
+  `value` would replace every coordinate under the pen, so bump `revision` when
+  an example, a share link or a Clear button loads a structure the editor did
+  not produce.
+- `onChange` fires once the drawing has been still for `debounce` milliseconds
+  (300 by default) with every notation read out at once — idCode, SMILES,
+  molfile, formula.
+- `minHeight` is a floor, not a height: the container grows to whatever the
+  toolbar needs, measured when the lazy canvas arrives rather than on a
+  deadline, so a slow chunk never leaves half the palette cut off.
+- `help` (on by default) explains each toolbar button in a tooltip and puts a
+  guide to the mouse and the keyboard in the corner, which F1 opens too — the
+  paste and copy keys are listed there under **Anywhere**.
+- The canvas sits behind `React.lazy`, so a page that never opens an editor
+  never downloads openchemlib, and `react-cheminfo/structure` stays importable
+  when those optional peers are absent.
+
 ### `ColorScaleSelect`
 
 The colours a quantity is read with, chosen by looking at them rather than by
