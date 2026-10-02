@@ -24,6 +24,7 @@ export * from './parallel/ui/index.ts';
 export * from './pedagogy/ui/index.ts';
 export * from './periodic/ui/index.ts';
 export * from './projection/ui/index.ts';
+export * from './range/ui/index.ts';
 export * from './router/ui/index.ts';
 export * from './scatter/ui/index.ts';
 export * from './scatter3d/ui/index.ts';

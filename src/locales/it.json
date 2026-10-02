@@ -459,5 +459,13 @@
   "conformers.strategyDetail.likely-systematic": "Percorre le combinazioni di torsioni per probabilità decrescente, così i primi conformeri sono i più probabili e l'insieme è riproducibile.",
   "conformers.minimisation.none": "Nessuna (senza energie)",
   "number.increment": "Aumenta",
-  "number.decrement": "Diminuisci"
+  "number.decrement": "Diminuisci",
+  "range.lowest": "{label}, minimo",
+  "range.highest": "{label}, massimo",
+  "range.lowestIs": "{label}, minimo: {value}",
+  "range.highestIs": "{label}, massimo: {value}",
+  "range.noLowerBound": "{label}: nessun limite inferiore",
+  "range.noUpperBound": "{label}: nessun limite superiore",
+  "range.typeValue": "Fai clic per inserire un valore",
+  "range.clear": "Cancella {label}"
 }

@@ -459,5 +459,13 @@
   "conformers.strategyDetail.likely-systematic": "Walks the torsion combinations in decreasing likelihood, so the first conformers are the most probable ones and the set is reproducible.",
   "conformers.minimisation.none": "None (no energies)",
   "number.increment": "Increase",
-  "number.decrement": "Decrease"
+  "number.decrement": "Decrease",
+  "range.lowest": "{label}, lowest",
+  "range.highest": "{label}, highest",
+  "range.lowestIs": "{label}, lowest: {value}",
+  "range.highestIs": "{label}, highest: {value}",
+  "range.noLowerBound": "{label}: no lower bound",
+  "range.noUpperBound": "{label}: no upper bound",
+  "range.typeValue": "Click to type a value",
+  "range.clear": "Clear {label}"
 }

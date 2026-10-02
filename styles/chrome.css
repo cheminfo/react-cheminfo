@@ -570,6 +570,141 @@ select,
   }
 }
 
+/* ── Range slider ────────────────────────────────────────────────────────── */
+
+.range-slider {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* As tall as the clear button, so the row does not jump when it appears. */
+.range-slider__head {
+  display: flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.range-slider__label {
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.range-slider__unit {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* A range's two handles stand half a handle past the track at either end, so
+   the track is inset by that much to keep them inside the box. */
+.range-slider__track {
+  padding: 0 8px;
+}
+
+.range-slider__histogram {
+  display: block;
+  width: 100%;
+  height: 1.75rem;
+}
+
+.range-slider__bars {
+  fill: var(--border-strong);
+}
+
+.range-slider__bars--kept {
+  fill: color-mix(in oklab, var(--accent) 60%, var(--surface));
+}
+
+/* Blueprint paints the track in its own grey and the kept part in its own
+   blue, which are the two colours the family never uses. */
+.range-slider .bp6-slider {
+  min-width: 0;
+}
+
+.range-slider .bp6-slider-progress {
+  background: var(--border);
+}
+
+.range-slider .bp6-slider-progress.bp6-intent-primary {
+  background: var(--accent);
+}
+
+.range-slider .bp6-slider-handle {
+  background: var(--surface);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    var(--shadow-sm);
+}
+
+.range-slider .bp6-slider-handle:hover {
+  background: color-mix(in oklab, var(--accent) 12%, var(--surface));
+}
+
+.range-slider .bp6-slider-handle.bp6-active {
+  background: color-mix(in oklab, var(--accent) 28%, var(--surface));
+}
+
+.range-slider .bp6-slider-handle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.range-slider .bp6-disabled .bp6-slider-handle {
+  background: var(--surface-sunken);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+
+.range-slider__values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* A value reads as text and types like a box: the cursor says which. */
+.range-slider__value {
+  padding: 0.1rem 0.35rem;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text);
+  cursor: text;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.range-slider__value:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.range-slider__value:disabled {
+  cursor: default;
+}
+
+/* An open side shows the end of the track, faint: the scale without a bound. */
+.range-slider__value--open {
+  color: var(--text-faint);
+}
+
+@media (hover: hover) {
+  .range-slider__value:not(:disabled):hover {
+    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+  }
+}
+
+.range-slider__editor {
+  width: 6.5rem;
+}
+
+.range-slider__editor--max .bp6-input {
+  text-align: right;
+}
+
 /* ── Help ────────────────────────────────────────────────────────────────── */
 
 /*

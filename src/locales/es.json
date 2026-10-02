@@ -459,5 +459,13 @@
   "molecule3d.input.clickBackground": "Hacer clic en el fondo",
   "molecule3d.helpNote": "Las teclas actúan mientras el puntero está sobre la molécula. En un Mac, Ctrl es la tecla Control, no ⌘. Con una herramienta de medida activa, un clic elige un átomo.",
   "number.increment": "Aumentar",
-  "number.decrement": "Disminuir"
+  "number.decrement": "Disminuir",
+  "range.lowest": "{label}, mínimo",
+  "range.highest": "{label}, máximo",
+  "range.lowestIs": "{label}, mínimo: {value}",
+  "range.highestIs": "{label}, máximo: {value}",
+  "range.noLowerBound": "{label}: sin límite inferior",
+  "range.noUpperBound": "{label}: sin límite superior",
+  "range.typeValue": "Haga clic para escribir un valor",
+  "range.clear": "Borrar {label}"
 }

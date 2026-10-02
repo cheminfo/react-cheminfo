@@ -79,6 +79,26 @@ export function stepNumber(value: number, delta: number): number {
 }
 
 /**
+ * A number moved onto the grid of steps laid from an origin.
+ *
+ * Rounded to the decimals the step and the origin carry, for the reason
+ * {@link stepNumber} is: a slider dragged in steps of `0.1` must report `0.3`,
+ * because that is what ends up written in the link.
+ * @param value - Where the number is now.
+ * @param step - The spacing of the grid. A step that is not above zero leaves
+ * the number where it is.
+ * @param origin - A point the grid passes through. Defaults to `0`.
+ * @returns The grid point nearest the number.
+ */
+export function snapToStep(value: number, step: number, origin = 0): number {
+  if (!(step > 0) || !Number.isFinite(value)) return value;
+  const snapped = origin + Math.round((value - origin) / step) * step;
+  const decimals = Math.max(decimalsOf(step), decimalsOf(origin));
+  const factor = 10 ** decimals;
+  return Math.round(snapped * factor) / factor;
+}
+
+/**
  * How many decimals a number is written with.
  * @param value - The number.
  * @returns Its count of decimals, `0` for anything written in exponent form.

@@ -97,7 +97,8 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Pedagogy**               | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                                                                                 | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList`                                                                                                                                                    |
 | **Clipboard & files**      | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`, `downloadFigure`, `figureSvg`, `figurePng`, `figureSize`                                                                                                           | `ClickToCopy`, `CopyButton`, `CopyableValue`, `CodeBlock`, `DelimitedTextDialog`, `FigureDownload`                                                                                                                                                                                                  |
 | **Formatting & colour**    | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv`                                              | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                                                                                                                                                                         |
-| **Number entry**           | `readNumber`, `numberText`, `isPartialNumber`, `stepNumber`                                                                                                                                                                                                                | `NumberInput`                                                                                                                                                                                                                                                                                       |
+| **Number entry**           | `readNumber`, `numberText`, `isPartialNumber`, `stepNumber`, `snapToStep`                                                                                                                                                                                                  | `NumberInput`                                                                                                                                                                                                                                                                                       |
+| **Range filter**           | `isRangeBounded`, `isRangeDomain`, `rangeHandles`, `movedRange`, `settleHandles`, `sameRange`, `rangeHistogramPath`, `OPEN_RANGE`                                                                                                                                          | `RangeSlider`                                                                                                                                                                                                                                                                                       |
 | **Widgets**                | `CREDITS`, `credits`                                                                                                                                                                                                                                                       | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                                                                                                                                |
 | **Hooks & state**          | `createWorkerChannel`, `persistBucket`, `persistSignalBucket`                                                                                                                                                                                                              | `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                                                                                                                                               |
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                               | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                                                                                                                                   |
@@ -638,6 +639,37 @@ in a box of exactly that size.
 
 `downloadFigure(target, options)`, `figureSvg` and `figurePng` are the same thing
 without the button, for a site saving a figure from its own menu.
+
+### `RangeSlider`
+
+A range picked with two handles, its two values written under the track, where
+a click turns either into a box to type an exact number.
+
+```tsx
+import { RangeSlider } from 'react-cheminfo/ui';
+
+<RangeSlider
+  label="Molecular weight"
+  unit="g/mol"
+  domain={[0, 1000]}
+  step={10}
+  value={range}
+  histogram={counts}
+  onPreview={setCountRange}
+  onChange={setRange}
+/>;
+```
+
+- **A handle at the end of the track is an open side.** The range is
+  `{ min, max }`, either side `null`; the track only covers the values the page
+  knows about, so a value past it is never cut by a filter nobody touched.
+- **`onChange` fires when the range settles** — a handle released, a value
+  typed, the range cleared — so a page that fetches on it fetches once per
+  gesture. `onPreview` follows every step of a drag, for what is cheap to redraw.
+- **The handles are Blueprint's**, so the keyboard, touch screens and screen
+  readers are handled there; the stylesheet dresses them in the brand colour.
+- **`histogram`** takes one count per equal-width bin, drawn over the track with
+  the part the handles keep in the brand colour.
 
 ### `ParallelCoordinates`
 

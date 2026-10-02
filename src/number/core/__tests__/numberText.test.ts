@@ -4,6 +4,7 @@ import {
   isPartialNumber,
   numberText,
   readNumber,
+  snapToStep,
   stepNumber,
 } from '../numberText.ts';
 
@@ -55,4 +56,19 @@ test('stepping keeps the decimals the operands carry', () => {
   expect(stepNumber(1, 0.001)).toBe(1.001);
   expect(stepNumber(25, 1)).toBe(26);
   expect(stepNumber(1e-9, 1e-9)).toBe(2e-9);
+});
+
+test('snapping lands on the grid laid from the origin, in its decimals', () => {
+  expect(snapToStep(0.30000000000000004, 0.1)).toBe(0.3);
+  expect(snapToStep(7.26, 0.5)).toBe(7.5);
+  expect(snapToStep(7.24, 0.5)).toBe(7);
+  expect(snapToStep(1987.4, 1, 1970)).toBe(1987);
+  expect(snapToStep(1.3, 0.5, 0.25)).toBe(1.25);
+  expect(snapToStep(-0.74, 0.25, -1)).toBe(-0.75);
+});
+
+test('a step that is not above zero leaves the number alone', () => {
+  expect(snapToStep(3.14159, 0)).toBe(3.14159);
+  expect(snapToStep(3.14159, -1)).toBe(3.14159);
+  expect(snapToStep(Number.NaN, 1)).toBeNaN();
 });
