@@ -62,3 +62,31 @@ test('a marker inside a code span stays notation', () => {
     { kind: 'text', start: 7, text: ' is code' },
   ]);
 });
+
+test('a molecular formula is its own mark', () => {
+  expect(parseInlineMarks('Caffeine {{C8H10N4O2}} reads 6')).toStrictEqual([
+    { kind: 'text', start: 0, text: 'Caffeine ' },
+    { kind: 'mf', start: 9, mf: 'C8H10N4O2' },
+    { kind: 'text', start: 22, text: ' reads 6' },
+  ]);
+});
+
+test('a formula is read inside a strong run, and left alone inside a code span', () => {
+  expect(parseInlineMarks('**{{H2O}}**')).toStrictEqual([
+    {
+      kind: 'strong',
+      start: 0,
+      children: [{ kind: 'mf', start: 2, mf: 'H2O' }],
+    },
+  ]);
+  expect(parseInlineMarks('`{{H2O}}` is notation')).toStrictEqual([
+    { kind: 'code', start: 0, text: '{{H2O}}' },
+    { kind: 'text', start: 9, text: ' is notation' },
+  ]);
+});
+
+test('braces that do not close are prose', () => {
+  expect(parseInlineMarks('A {{C6H6 with no end')).toStrictEqual([
+    { kind: 'text', start: 0, text: 'A {{C6H6 with no end' },
+  ]);
+});

@@ -1,10 +1,8 @@
 /**
  * What the pedagogy components share about how they look: how long a pointer
  * rests before a definition opens, the monospace stack, and the ink prose is
- * set in on each of the two grounds it is shown on.
+ * set in.
  */
-
-import { Colors } from '@blueprintjs/core';
 
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
@@ -15,10 +13,7 @@ export const HOVER_OPEN_DELAY = 150;
 export const MONOSPACE =
   'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 
-/** Where prose is drawn: on the dark plate of a tooltip, or on the page. */
-export type ProseTone = 'tooltip' | 'page';
-
-/** The colours prose is set in on one ground. */
+/** The colours prose is set in. */
 export interface ProseInk {
   /** The body of a paragraph. */
   text: string;
@@ -31,23 +26,16 @@ export interface ProseInk {
 }
 
 /**
- * The ink of each ground.
+ * The one ink, because there is one ground.
  *
- * A Blueprint tooltip is the same dark plate on every site, so its ink is white
- * at decreasing strength, read off the plate rather than off the family tokens,
- * which are written for a light page. The page ink is the tokens.
+ * A definition, a documented construct and a help card are the same job, and
+ * the family answers it with one card: `help-tooltip` in `chrome.css`, light,
+ * on a border and a shadow. So the prose here is the family's tokens wherever
+ * it is read — on a page, or on that card.
  */
-export const PROSE_INK: Readonly<Record<ProseTone, ProseInk>> = {
-  tooltip: {
-    text: 'rgb(255 255 255 / 82%)',
-    muted: 'rgb(255 255 255 / 62%)',
-    code: Colors.BLUE5,
-    rule: 'rgb(255 255 255 / 15%)',
-  },
-  page: {
-    text: TOKEN.text,
-    muted: TOKEN.textMuted,
-    code: TOKEN.text,
-    rule: TOKEN.border,
-  },
+export const PROSE_INK: ProseInk = {
+  text: TOKEN.text,
+  muted: TOKEN.textMuted,
+  code: TOKEN.text,
+  rule: TOKEN.border,
 };

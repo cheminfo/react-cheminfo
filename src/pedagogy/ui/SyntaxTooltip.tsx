@@ -3,6 +3,7 @@ import { Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { GlossaryExample } from '../core/glossary.ts';
 
 import { HOVER_OPEN_DELAY, MONOSPACE, PROSE_INK } from './pedagogyStyle.ts';
@@ -98,6 +99,7 @@ export function SyntaxTooltip(props: SyntaxTooltipProps): ReactElement {
       hoverOpenDelay={HOVER_OPEN_DELAY}
       placement={placement}
       isOpen={isOpen}
+      popoverClassName="help-tooltip"
     >
       {children}
     </Tooltip>
@@ -164,7 +166,6 @@ const BODY_STYLE: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 6,
-  maxWidth: 360,
 };
 
 const HEADER_STYLE: CSSProperties = {
@@ -175,9 +176,10 @@ const HEADER_STYLE: CSSProperties = {
 };
 
 const SYNTAX_STYLE: CSSProperties = {
-  background: PROSE_INK.tooltip.rule,
+  background: TOKEN.surfaceSunken,
+  border: `1px solid ${PROSE_INK.rule}`,
   borderRadius: 3,
-  color: '#ffffff',
+  color: PROSE_INK.code,
   fontFamily: MONOSPACE,
   fontSize: 14,
   fontWeight: 600,
@@ -187,20 +189,20 @@ const SYNTAX_STYLE: CSSProperties = {
 const NAME_STYLE: CSSProperties = { fontWeight: 600, fontSize: 13 };
 
 const TAG_STYLE: CSSProperties = {
-  color: PROSE_INK.tooltip.muted,
+  color: PROSE_INK.muted,
   fontSize: 11,
 };
 
 const SUMMARY_STYLE: CSSProperties = { fontSize: 12, lineHeight: 1.4 };
 
 const DETAIL_STYLE: CSSProperties = {
-  color: PROSE_INK.tooltip.text,
+  color: PROSE_INK.text,
   fontSize: 12,
   lineHeight: 1.45,
 };
 
 const EXAMPLE_STYLE: CSSProperties = {
-  borderTop: `1px solid ${PROSE_INK.tooltip.rule}`,
+  borderTop: `1px solid ${PROSE_INK.rule}`,
   display: 'flex',
   flexDirection: 'column',
   gap: 2,
@@ -210,18 +212,18 @@ const EXAMPLE_STYLE: CSSProperties = {
 const ROW_STYLE: CSSProperties = { display: 'flex', gap: 6, fontSize: 12 };
 
 const LABEL_STYLE: CSSProperties = {
-  color: PROSE_INK.tooltip.muted,
+  color: PROSE_INK.muted,
   flex: '0 0 68px',
 };
 
 const VALUE_STYLE: CSSProperties = {
-  color: PROSE_INK.tooltip.text,
+  color: PROSE_INK.text,
   fontFamily: MONOSPACE,
   overflowWrap: 'anywhere',
 };
 
 const NOTE_STYLE: CSSProperties = {
-  color: PROSE_INK.tooltip.muted,
+  color: PROSE_INK.muted,
   fontSize: 12,
   fontStyle: 'italic',
   marginTop: 2,

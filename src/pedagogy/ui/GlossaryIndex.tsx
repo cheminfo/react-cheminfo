@@ -122,7 +122,6 @@ export function GlossaryIndex<TExample = GlossaryExample>(
             >
               <GlossaryDefinition
                 entry={entry}
-                tone="page"
                 renderExample={renderExample}
                 renderCode={renderCode}
               />

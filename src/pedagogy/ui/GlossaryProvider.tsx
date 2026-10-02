@@ -23,6 +23,13 @@ export interface GlossaryProviderProps<TExample = GlossaryExample> {
    * @default undefined — a plain `<code>`
    */
   renderCode?: (code: string) => ReactNode;
+  /**
+   * Draws the `{{C6H6O}}` formulas of the prose below. A chemistry site passes
+   * `(mf) => <MF mf={mf} />` from `react-mf` here and every formula under the
+   * provider — a step, a question, a hint, a definition — is then drawn by it.
+   * @default undefined — the formula as typed
+   */
+  renderMf?: (mf: string) => ReactNode;
   /** The part of the page whose prose resolves its markers against it. */
   children: ReactNode;
 }
@@ -41,14 +48,15 @@ export interface GlossaryProviderProps<TExample = GlossaryExample> {
 export function GlossaryProvider<TExample = GlossaryExample>(
   props: GlossaryProviderProps<TExample>,
 ): ReactElement {
-  const { glossary, renderExample, renderCode, children } = props;
+  const { glossary, renderExample, renderCode, renderMf, children } = props;
   const value = useMemo<GlossaryContextValue>(
     () => ({
       glossary,
       renderExample: renderExample as GlossaryContextValue['renderExample'],
       renderCode,
+      renderMf,
     }),
-    [glossary, renderExample, renderCode],
+    [glossary, renderExample, renderCode, renderMf],
   );
 
   return (

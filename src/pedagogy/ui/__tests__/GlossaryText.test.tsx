@@ -96,3 +96,30 @@ test('an entry with no example renders no list at all', () => {
 
   expect(html).not.toContain('<ul');
 });
+
+test('the provider draws every formula below it, a definition included', () => {
+  const html = renderToStaticMarkup(
+    <GlossaryProvider
+      glossary={{
+        sulfoxide: {
+          title: 'Sulfoxide',
+          summary: 'A {{C2H6OS}} the table reads one low.',
+          examples: [],
+        },
+      }}
+      renderMf={(mf) => <span className="mf">{mf}</span>}
+    >
+      <GlossaryText text="Phenol {{C6H6O}} reads 4." />
+      <GlossaryDefinition
+        entry={{
+          title: 'Sulfoxide',
+          summary: 'A {{C2H6OS}} the table reads one low.',
+          examples: [],
+        }}
+      />
+    </GlossaryProvider>,
+  );
+
+  expect(html).toContain('Phenol <span class="mf">C6H6O</span> reads 4.');
+  expect(html).toContain('A <span class="mf">C2H6OS</span> the table reads');
+});

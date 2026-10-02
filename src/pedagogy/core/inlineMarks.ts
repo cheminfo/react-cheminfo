@@ -1,7 +1,7 @@
 /**
  * The light inline markup authored prose is written in: `` `code` ``,
- * `**strong**` and `*emphasis*`, plus — for prose that links its jargon — the
- * `[[term]]` markers of the glossary.
+ * `**strong**`, `*emphasis*` and `{{C6H6O}}` for a molecular formula, plus —
+ * for prose that links its jargon — the `[[term]]` markers of the glossary.
  *
  * One left-to-right pass, without a DOM. Whatever opens first is read whole
  * before anything inside it is looked at, so `` `[*+]` `` and `` `*!@*` `` stay
@@ -22,10 +22,11 @@ import { GLOSSARY_MARKER_SOURCE, readMarker } from './glossary.ts';
 export type InlineSegment =
   | { kind: 'text'; start: number; text: string }
   | { kind: 'code'; start: number; text: string }
+  | { kind: 'mf'; start: number; mf: string }
   | { kind: 'term'; start: number; term: string; text: string }
   | { kind: 'strong' | 'emphasis'; start: number; children: InlineSegment[] };
 
-/** What {@link parseInlineMarks} reads besides the three marks. */
+/** What {@link parseInlineMarks} reads besides the four marks. */
 export interface ParseInlineMarksOptions {
   /**
    * Whether `[[term]]` and `[[term|displayed text]]` markers are read too, as
@@ -36,8 +37,8 @@ export interface ParseInlineMarksOptions {
 }
 
 /**
- * Split authored prose into runs of text, code spans, strong and emphasised
- * runs, and — when asked — glossary markers.
+ * Split authored prose into runs of text, code spans, molecular formulas,
+ * strong and emphasised runs, and — when asked — glossary markers.
  *
  * Anything that does not close is not markup and comes back verbatim inside a
  * `text` segment: a lone backtick, `**bold` with no closing pair, `[[term`.
@@ -52,10 +53,16 @@ export function parseInlineMarks(
   return parseFrom(text, 0, options.glossaryMarkers === true);
 }
 
+const MF_SOURCE = String.raw`\{\{(?<mf>[^{}]+)\}\}`;
 const CODE_SOURCE = '`(?<code>[^`]+)`';
 const STRONG_SOURCE = String.raw`\*\*(?<strong>[^*]+)\*\*`;
 const EMPHASIS_SOURCE = String.raw`\*(?<emphasis>[^\s*](?:[^*]*[^\s*])?)\*`;
-const MARKS_SOURCE = [CODE_SOURCE, STRONG_SOURCE, EMPHASIS_SOURCE].join('|');
+const MARKS_SOURCE = [
+  MF_SOURCE,
+  CODE_SOURCE,
+  STRONG_SOURCE,
+  EMPHASIS_SOURCE,
+].join('|');
 const MARKS_AND_MARKERS_SOURCE = `${GLOSSARY_MARKER_SOURCE}|${MARKS_SOURCE}`;
 
 function parseFrom(
@@ -99,8 +106,9 @@ function toSegment(
   markers: boolean,
 ): InlineSegment {
   const start = offset + match.index;
-  const { term, code, strong, emphasis } = match.groups ?? {};
+  const { term, mf, code, strong, emphasis } = match.groups ?? {};
   if (term !== undefined) return readMarker(term, start);
+  if (mf !== undefined) return { kind: 'mf', start, mf: mf.trim() };
   if (code !== undefined) return { kind: 'code', start, text: code };
   if (strong !== undefined) {
     return {

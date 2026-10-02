@@ -41,7 +41,7 @@ export type {
   SyntaxTooltipProps,
 } from './SyntaxTooltip.tsx';
 export { SyntaxTooltip } from './SyntaxTooltip.tsx';
-export type { ProseTone } from './pedagogyStyle.ts';
+export type { ProseInk } from './pedagogyStyle.ts';
 export type { TestCaseListProps } from './TestCaseList.tsx';
 export { TestCaseList } from './TestCaseList.tsx';
 export type {

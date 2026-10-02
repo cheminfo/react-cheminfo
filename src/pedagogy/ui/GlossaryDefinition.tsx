@@ -5,19 +5,13 @@ import type { GlossaryEntry, GlossaryExample } from '../core/glossary.ts';
 import { InlineText } from './InlineText.tsx';
 import { exampleText } from './exampleText.ts';
 import { useGlossary } from './glossaryContext.ts';
-import type { ProseInk, ProseTone } from './pedagogyStyle.ts';
+import type { ProseInk } from './pedagogyStyle.ts';
 import { MONOSPACE, PROSE_INK } from './pedagogyStyle.ts';
 
 /** Props of {@link GlossaryDefinition}. */
 export interface GlossaryDefinitionProps<TExample = GlossaryExample> {
   /** The term to explain, already resolved from a marker. */
   entry: GlossaryEntry<TExample>;
-  /**
-   * The ground it is drawn on: the dark plate of a tooltip, or the page, where
-   * a glossary lists every term.
-   * @default 'tooltip'
-   */
-  tone?: ProseTone;
   /**
    * Draws the illustration of one example; its note is still written under it.
    * @default the surrounding provider's, and otherwise the code and the input
@@ -38,17 +32,18 @@ export interface GlossaryDefinitionProps<TExample = GlossaryExample> {
 /**
  * One definition: the term, one paragraph, then the worked examples.
  *
- * The tooltip a marker opens and the entry a glossary page lists are this one
- * body on two grounds, so a term reads the same wherever it is looked up.
- * @param props - The entry, and the ground it is drawn on.
+ * The tooltip a marker opens and the entry a glossary page lists are the same
+ * body on the same ground — the family's light card — so a term reads the same
+ * wherever it is looked up.
+ * @param props - The entry, and how its examples and code spans are drawn.
  * @returns The definition.
  */
 export function GlossaryDefinition<TExample = GlossaryExample>(
   props: GlossaryDefinitionProps<TExample>,
 ): ReactElement {
-  const { className, entry, tone = 'tooltip' } = props;
+  const { className, entry } = props;
   const context = useGlossary();
-  const ink = PROSE_INK[tone];
+  const ink = PROSE_INK;
   const renderCode =
     props.renderCode ??
     context.renderCode ??
@@ -77,10 +72,7 @@ export function GlossaryDefinition<TExample = GlossaryExample>(
   }
 
   return (
-    <div
-      className={className}
-      style={tone === 'tooltip' ? TOOLTIP_BODY_STYLE : BODY_STYLE}
-    >
+    <div className={className} style={BODY_STYLE}>
       <div style={TITLE_STYLE}>{entry.title}</div>
       <div style={{ ...SUMMARY_STYLE, color: ink.text }}>
         <InlineText text={entry.summary} renderCode={renderCode} />
@@ -116,8 +108,6 @@ const BODY_STYLE: CSSProperties = {
   flexDirection: 'column',
   gap: 6,
 };
-
-const TOOLTIP_BODY_STYLE: CSSProperties = { ...BODY_STYLE, maxWidth: 340 };
 
 const TITLE_STYLE: CSSProperties = { fontWeight: 600, fontSize: 13 };
 

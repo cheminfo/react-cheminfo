@@ -732,12 +732,24 @@ select,
 }
 
 /*
+  A card holding a picture — a structure, a grid of them — at the one measure
+  below would show it at a third of its size. It keeps every other property of
+  the card and takes a wider measure, so the two still read as one thing.
+*/
+.help-tooltip--wide .bp6-popover-content {
+  width: 460px;
+}
+
+/*
+  The selector is `.bp6-popover`, which a tooltip carries too, so a card opened
+  by a popover — a row of a cheatsheet, a preview — is the same card.
+
   Blueprint opens a tooltip by transitioning it from `scale(0.8)`, and under
   React 19 that transition is created but never ticks: it sits at time zero for
   as long as the card is open, so the card and its type stay at four fifths of
   the size they were drawn at. Help opens without an animation instead.
 */
-.help-tooltip.bp6-tooltip {
+.help-tooltip.bp6-popover {
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
   transform: scale(1);
@@ -758,7 +770,38 @@ select,
   box-shadow: none;
 }
 
-.help-tooltip .help-body a {
+/*
+  Blueprint styles a tooltip's contents as if the plate under them were dark:
+  `.bp6-tooltip .bp6-key` is a near-black cap, muted and disabled text are set
+  in light greys, a link is pale blue, and inline code is white on a wash. None
+  of that is readable on this card, and a component that writes a key cap or a
+  muted line has no way of knowing it is in a tooltip. So the card puts them
+  back on the light ground here, once, for everything it ever holds.
+*/
+.help-tooltip .bp6-text-muted {
+  color: var(--text-muted);
+}
+
+.help-tooltip .bp6-text-disabled {
+  color: var(--text-faint);
+}
+
+.help-tooltip .bp6-key,
+.help-tooltip .bp6-running-text kbd {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+.help-tooltip .bp6-code,
+.help-tooltip .bp6-running-text code {
+  background: var(--surface-sunken);
+  box-shadow: none;
+  color: var(--text);
+}
+
+.help-tooltip a {
   color: var(--accent);
 }
 

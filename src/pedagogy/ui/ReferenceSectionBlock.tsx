@@ -4,6 +4,7 @@ import { ClickToCopy } from '../../clipboard/ui/ClickToCopy.tsx';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
+import { InlineText } from './InlineText.tsx';
 import type { SyntaxTooltipContent } from './SyntaxTooltip.tsx';
 import { SyntaxTooltip } from './SyntaxTooltip.tsx';
 import { MONOSPACE } from './pedagogyStyle.ts';
@@ -12,7 +13,10 @@ import { MONOSPACE } from './pedagogyStyle.ts';
 export interface ReferenceRow {
   /** The construct itself, set in monospace. */
   syntax: string;
-  /** What it does, in one line — short enough to read on paper. */
+  /**
+   * What it does, in one line — short enough to read on paper. Authored prose,
+   * so a `{{C6H6O}}` in it is drawn as a formula and a `` `code` `` as code.
+   */
   description: string;
   /**
    * The longer story, opened by hovering the row. A sparse section is meant to
@@ -118,7 +122,9 @@ function ReferenceRowLine(props: {
           {row.syntax}
         </ClickToCopy>
       </span>
-      <span style={DESCRIPTION_STYLE}>{row.description}</span>
+      <span style={DESCRIPTION_STYLE}>
+        <InlineText text={row.description} />
+      </span>
     </span>
   );
   if (row.tooltip === undefined) return line;

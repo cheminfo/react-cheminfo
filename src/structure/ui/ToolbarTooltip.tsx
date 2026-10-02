@@ -43,6 +43,7 @@ export function ToolbarTooltip(
       isOpen={hover.open}
       placement="right"
       content={<ButtonTip button={button} mode={mode} />}
+      popoverClassName="help-tooltip"
       renderTarget={({ ref }) => (
         <span ref={ref} aria-hidden style={{ ...TARGET_STYLE, ...hover.box }} />
       )}
@@ -87,7 +88,6 @@ const TIP_STYLE: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
-  maxWidth: 260,
   lineHeight: 1.4,
 };
 

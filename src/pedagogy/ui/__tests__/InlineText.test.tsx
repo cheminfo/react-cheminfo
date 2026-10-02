@@ -25,3 +25,18 @@ test('a code span is drawn by renderCode when one is given', () => {
     String.raw`Write <span class="latex">\frac{a}{b}</span> here`,
   );
 });
+
+test('a formula is drawn by renderMf, and otherwise reads as typed', () => {
+  expect(
+    renderToStaticMarkup(
+      <InlineText
+        text="Phenol {{C6H6O}} reads 4"
+        renderMf={(mf) => <span className="mf">{mf}</span>}
+      />,
+    ),
+  ).toBe('Phenol <span class="mf">C6H6O</span> reads 4');
+
+  expect(renderToStaticMarkup(<InlineText text="Phenol {{C6H6O}}" />)).toBe(
+    'Phenol C6H6O',
+  );
+});

@@ -44,8 +44,8 @@ export function plainDescription(
 }
 
 /**
- * Authored prose as plain text: glossary markers, code spans, strong and
- * emphasis resolved to the words they show, and the whitespace collapsed.
+ * Authored prose as plain text: glossary markers, code spans, formulas, strong
+ * and emphasis resolved to the words they show, and the whitespace collapsed.
  * @param prose - The prose, markup and all.
  * @returns The same words, unmarked.
  */
@@ -66,6 +66,8 @@ function textOf(segments: readonly InlineSegment[]): string {
   for (const segment of segments) {
     if ('children' in segment) {
       text += textOf(segment.children);
+    } else if (segment.kind === 'mf') {
+      text += segment.mf;
     } else {
       text += segment.text;
     }

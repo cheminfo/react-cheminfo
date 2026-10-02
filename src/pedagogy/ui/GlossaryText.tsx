@@ -16,8 +16,8 @@ import { HOVER_OPEN_DELAY } from './pedagogyStyle.ts';
 export interface GlossaryTextProps<TExample = GlossaryExample> {
   /**
    * Authored prose. Every `[[term]]` — or `[[term|displayed text]]` — the
-   * glossary knows becomes a hoverable chip, and `` `code` ``, `**strong**`
-   * and `*emphasis*` are drawn as such.
+   * glossary knows becomes a hoverable chip, and `` `code` ``, `{{C6H6O}}`,
+   * `**strong**` and `*emphasis*` are drawn as such.
    */
   text: string;
   /**
@@ -47,6 +47,11 @@ export interface GlossaryTextProps<TExample = GlossaryExample> {
    * @default the surrounding provider's, and otherwise a plain `<code>`
    */
   renderCode?: (code: string) => ReactNode;
+  /**
+   * Draws a `{{C6H6O}}` of the prose.
+   * @default the surrounding provider's, and otherwise the formula as typed
+   */
+  renderMf?: (mf: string) => ReactNode;
 }
 
 /**
@@ -69,6 +74,7 @@ export function GlossaryText<TExample = GlossaryExample>(
     className = 'glossary-term',
     renderExample,
     renderCode,
+    renderMf,
   } = props;
   const context = useGlossary();
   const terms: Glossary<unknown> = glossary ?? context.glossary;
@@ -78,6 +84,7 @@ export function GlossaryText<TExample = GlossaryExample>(
     <>
       {renderInlineSegments(segments, {
         code: renderCode ?? context.renderCode ?? plainCode,
+        mf: renderMf ?? context.renderMf,
         term: (term, shown) => {
           const entry = lookupGlossaryTerm(terms, term);
           if (entry === undefined) return shown;
@@ -94,6 +101,7 @@ export function GlossaryText<TExample = GlossaryExample>(
               }
               hoverOpenDelay={HOVER_OPEN_DELAY}
               placement={placement}
+              popoverClassName="help-tooltip"
             >
               <span className={className} style={TERM_STYLE}>
                 {shown}

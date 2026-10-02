@@ -26,6 +26,13 @@ export interface GlossaryContextValue {
    * @default undefined — a plain `<code>`
    */
   renderCode?: (code: string) => ReactNode;
+  /**
+   * Draws a `{{C6H6O}}` of the prose. A chemistry site passes
+   * `(mf) => <MF mf={mf} />` from `react-mf` here, once, so that every formula
+   * below reads as a formula rather than as a line of digits.
+   * @default undefined — the formula as typed
+   */
+  renderMf?: (mf: string) => ReactNode;
 }
 
 /**

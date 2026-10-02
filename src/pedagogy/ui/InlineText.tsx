@@ -2,13 +2,14 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { parseInlineMarks } from '../core/inlineMarks.ts';
 
+import { useGlossary } from './glossaryContext.ts';
 import { plainCode, renderInlineSegments } from './inlineSegments.tsx';
 
 /** Props of {@link InlineText}. */
 export interface InlineTextProps {
   /**
-   * Authored prose: `` `code` ``, `**strong**` and `*emphasis*`. Anything else,
-   * `[[markers]]` included, is shown as typed.
+   * Authored prose: `` `code` ``, `{{C6H6O}}`, `**strong**` and `*emphasis*`.
+   * Anything else, `[[markers]]` included, is shown as typed.
    */
   text: string;
   /**
@@ -17,6 +18,12 @@ export interface InlineTextProps {
    * @default a plain `<code>`
    */
   renderCode?: (code: string) => ReactNode;
+  /**
+   * Draws a `{{C6H6O}}`: as a formula, with `react-mf`.
+   * @default the surrounding `GlossaryProvider`'s, and otherwise the formula
+   * as typed
+   */
+  renderMf?: (mf: string) => ReactNode;
 }
 
 /**
@@ -31,9 +38,19 @@ export interface InlineTextProps {
  * @returns The prose, with its marks drawn.
  */
 export function InlineText(props: InlineTextProps): ReactElement {
-  const { text, renderCode = plainCode } = props;
+  const context = useGlossary();
+  const {
+    text,
+    renderCode = context.renderCode ?? plainCode,
+    renderMf = context.renderMf,
+  } = props;
 
   return (
-    <>{renderInlineSegments(parseInlineMarks(text), { code: renderCode })}</>
+    <>
+      {renderInlineSegments(parseInlineMarks(text), {
+        code: renderCode,
+        mf: renderMf,
+      })}
+    </>
   );
 }

@@ -8,6 +8,11 @@ interface InlineRenderers {
   /** Draws a code span, from the text between its backticks. */
   code: (code: string) => ReactNode;
   /**
+   * Draws a molecular formula, from the text between its braces.
+   * @default undefined — the formula as typed, which no chemistry site wants
+   */
+  mf?: (mf: string) => ReactNode;
+  /**
    * Draws a glossary marker, from its lowercased term and the text to show.
    * @default undefined — the text, as plain prose
    */
@@ -53,6 +58,8 @@ function renderSegment(
       return segment.text;
     case 'code':
       return renderers.code(segment.text);
+    case 'mf':
+      return renderers.mf === undefined ? segment.mf : renderers.mf(segment.mf);
     case 'term':
       return renderers.term === undefined
         ? segment.text
