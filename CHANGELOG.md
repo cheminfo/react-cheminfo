@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.37.0](https://github.com/cheminfo/react-cheminfo/compare/v0.36.0...v0.37.0) (2026-10-02)
+
+
+### Features
+
+* **ecosystem:** add iupac-name.cheminfo.org ([f11a562](https://github.com/cheminfo/react-cheminfo/commit/f11a5624de0df023604523950de38b5667098ea9))
+
 ## [0.36.0](https://github.com/cheminfo/react-cheminfo/compare/v0.35.0...v0.36.0) (2026-10-01)
 
 
