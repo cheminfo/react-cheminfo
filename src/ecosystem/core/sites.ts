@@ -57,6 +57,23 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#1c6e42', accent: '#ea580c' },
   },
   {
+    id: 'iupac-name',
+    // The name splits on its own hyphen, so it carries no domain and no dot,
+    // and the hyphen stays with the first half so the address reads as typed.
+    name: { lead: 'iupac-', alt: 'name' },
+    host: 'iupac-name.cheminfo.org',
+    tagline: 'The IUPAC name of a structure, and the structure a name denotes.',
+    group: 'structures',
+    // The blue of the IUPAC Blue Book, whose 2013 recommendations are what the
+    // site names by. A violet would repeat the lead inchi already owns.
+    brand: '#1e40af',
+    // The amber the mark's locant 1 is drawn in sits at 3.2:1 on white, short
+    // of the 4.5:1 of body text, so the second half of the wordmark takes this
+    // darkened form instead, at 7.1:1.
+    brandAlt: '#92400e',
+    mark: { plate: '#1e40af', accent: '#d97706' },
+  },
+  {
     id: 'openbabel',
     name: { lead: 'openbabel', alt: 'cheminfo', dot: true },
     host: 'openbabel.cheminfo.org',

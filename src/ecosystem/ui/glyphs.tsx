@@ -106,6 +106,22 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // A parent chain numbered from the end nearest its group: the atom that
+  // takes locant 1 carries the colour, because the numbering is what a name
+  // is built on.
+  'iupac-name': (alt) => (
+    <>
+      <path
+        d="M8 20.5 14 10l6 10.5L26 10"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="8" cy="20.5" r="3.4" fill={alt} />
+    </>
+  ),
   // Two arrows crossing in opposite directions: one notation turned into
   // another and back, which is the whole of what this one does.
   openbabel: (alt) => (
