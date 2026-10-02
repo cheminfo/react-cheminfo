@@ -6,6 +6,7 @@ export type SiteId =
   | 'inchi'
   | 'vcl'
   | 'smiles'
+  | 'iupac-name'
   | 'openbabel'
   | 'chemcalc'
   | 'dbe'
