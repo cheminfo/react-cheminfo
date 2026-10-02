@@ -119,3 +119,27 @@ test('a chart in a narrow column asks for its numbers closer together', () => {
   expect(dense).toContain('>90</text>');
   expect(dense.match(/<line /g)).toHaveLength(22);
 });
+
+test('an axis given its own values is ruled at them, and writes them its way', () => {
+  const markup = drawAxes({
+    yTickValues: [1, 10],
+    formatYTick: (value) => `10^${Math.log10(value)}`,
+  });
+
+  expect(markup).toContain('>10^0</text>');
+  expect(markup).toContain('>10^1</text>');
+  // The room-based ticks are gone. `30` and `50` are labels only the value
+  // axis would have written, so their absence is that axis and not the other.
+  expect(markup).not.toContain('>30</text>');
+  expect(markup).not.toContain('>50</text>');
+  // The horizontal axis keeps its own ticks and its own notation.
+  expect(markup).toContain('>60</text>');
+});
+
+test('a value the window has left behind is not ruled onto the margin', () => {
+  const markup = drawAxes({ yTickValues: [10, 50, 500] });
+
+  expect(markup).toContain('>10</text>');
+  expect(markup).toContain('>50</text>');
+  expect(markup).not.toContain('>500</text>');
+});

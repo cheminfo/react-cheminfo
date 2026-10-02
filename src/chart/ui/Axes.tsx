@@ -78,6 +78,25 @@ export interface AxesProps {
    * @default 44
    */
   yTickSpacing?: number;
+  /**
+   * The values to rule the vertical axis at, instead of the ones the room
+   * allows.
+   *
+   * An axis whose ticks are decided by what is being measured rather than by
+   * how much space there is: a concentration read over fifteen decades is ruled
+   * at the decades, and a tick at 0.0037 between two of them says nothing. The
+   * values outside the window are dropped, so one list serves every zoom.
+   * @default the ticks worked out from the window and the room
+   */
+  yTickValues?: readonly number[];
+  /**
+   * How a value up the side is written, instead of as a plain number.
+   *
+   * What goes with `yTickValues`: an axis ruled at the decades writes `10⁻³`,
+   * and the exponent is the only part of it a reader is reading.
+   * @default the notation the window's step calls for
+   */
+  formatYTick?: (value: number) => string;
 }
 
 /**
@@ -123,6 +142,8 @@ export function Axes(props: AxesProps): ReactElement {
     yTitle,
     xTickSpacing = X_TICK_SPACING,
     yTickSpacing = Y_TICK_SPACING,
+    yTickValues,
+    formatYTick,
   } = props;
 
   const xTicks = useMemo(
@@ -134,7 +155,15 @@ export function Axes(props: AxesProps): ReactElement {
     [yDomain, plot.height, yTickSpacing],
   );
   const writeXTick = useMemo(() => axisLabeller(xTicks), [xTicks]);
-  const writeYTick = useMemo(() => axisLabeller(yTicks), [yTicks]);
+  const labelYTick = useMemo(() => axisLabeller(yTicks), [yTicks]);
+  const writeYTick = formatYTick ?? labelYTick;
+
+  // Ruled where the quantity asks rather than where there is room; a value the
+  // zoom has left behind is dropped rather than drawn onto the margin.
+  const yRules = useMemo(
+    () => (yTickValues ? insideWindow(yTickValues, yDomain) : yTicks.values),
+    [yTickValues, yDomain, yTicks],
+  );
 
   const middleX = plot.left + plot.width / 2;
   const middleY = plot.top + plot.height / 2;
@@ -144,8 +173,8 @@ export function Axes(props: AxesProps): ReactElement {
   // clear of the narrower — far enough to read as naming the chart rather than
   // the axis.
   const titleColumn = useMemo(
-    () => valueTitleColumn(yTicks.values, writeYTick, absYTicks, plot.left),
-    [yTicks, writeYTick, absYTicks, plot.left],
+    () => valueTitleColumn(yRules, writeYTick, absYTicks, plot.left),
+    [yRules, writeYTick, absYTicks, plot.left],
   );
   // The rule a mirrored pair is reflected in only exists while both halves are
   // on screen; on an ordinary chart zero is the baseline and already drawn.
@@ -164,7 +193,7 @@ export function Axes(props: AxesProps): ReactElement {
           style={gridStyle}
         />
       ))}
-      {yTicks.values.map((tick) => (
+      {yRules.map((tick) => (
         <line
           key={tick}
           x1={plot.left}
@@ -201,7 +230,7 @@ export function Axes(props: AxesProps): ReactElement {
             {writeXTick(tick)}
           </text>
         ))}
-      {yTicks.values.map((tick) => (
+      {yRules.map((tick) => (
         <text
           key={tick}
           x={plot.left - TICK_LABEL_GAP}
@@ -236,6 +265,25 @@ export function Axes(props: AxesProps): ReactElement {
       </text>
     </g>
   );
+}
+
+/**
+ * The values of a given list that the window still shows.
+ * @param values - Every value the axis would be ruled at.
+ * @param domain - The window on screen, `[from, to]`.
+ * @returns Those inside it, in the order they were given.
+ */
+function insideWindow(
+  values: readonly number[],
+  domain: readonly [number, number],
+): number[] {
+  const low = Math.min(domain[0], domain[1]);
+  const high = Math.max(domain[0], domain[1]);
+  const inside: number[] = [];
+  for (const value of values) {
+    if (value >= low && value <= high) inside.push(value);
+  }
+  return inside;
 }
 
 /**
