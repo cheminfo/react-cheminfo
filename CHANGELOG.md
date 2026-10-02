@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.38.0](https://github.com/cheminfo/react-cheminfo/compare/v0.37.0...v0.38.0) (2026-10-02)
+
+
+### Features
+
+* **range:** add RangeSlider, whose two values are typed by a click ([f6b6d94](https://github.com/cheminfo/react-cheminfo/commit/f6b6d948082d065b90e3526a93b6bd9fbda6cd59))
+* **seo:** write every address of a translated site in its own language ([1e2fb08](https://github.com/cheminfo/react-cheminfo/commit/1e2fb08f8ef6f24a9caf6f9a7577c661222e9d22))
+
+
+### Bug Fixes
+
+* **seo:** keep every option on the way to the document head ([fd947ab](https://github.com/cheminfo/react-cheminfo/commit/fd947abe9511ffdc969e966d03ec24c205a0c05c))
+
 ## [0.37.0](https://github.com/cheminfo/react-cheminfo/compare/v0.36.0...v0.37.0) (2026-10-02)
 
 
