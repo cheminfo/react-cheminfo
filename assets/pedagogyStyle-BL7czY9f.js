@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t,r as n}from"./familyTokens-DsQXXJV4.js";var r,i;function a(){return(a=e((()=>{n(),r=`ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`,i={text:t.text,muted:t.textMuted,code:t.text,rule:t.border}})))()}export{i as n,a as r,r as t};
