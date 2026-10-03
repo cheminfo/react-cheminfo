@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{t}from"./downloadBlob-BXFxYCsP.js";function n(e,n,i=r){t(new Blob([e],{type:i}),n)}var r;function i(){return(i=e((()=>{r=`text/plain;charset=utf-8`})))()}export{i as n,n as t};

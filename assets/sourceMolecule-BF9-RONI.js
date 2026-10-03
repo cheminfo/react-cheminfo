@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{i as t,n}from"./openchemlib-5aAvE16G.js";function r(e){let{kind:t,value:r,coordinates:i}=e;return t===`idcode`?n.fromIDCode(r,i):t===`molfile`?n.fromMolfile(r):t===`smiles`?n.fromSmiles(r):new n(0,0)}function i(){return(i=e((()=>{t()})))()}export{r as n,i as t};

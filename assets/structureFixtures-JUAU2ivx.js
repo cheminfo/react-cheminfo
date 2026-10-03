@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t,n,r,i,a,o,s;function c(){return(c=e((()=>{t=`CN1C=NC2=C1C(=O)N(C)C(=O)N2C`,n=`CC(=O)Oc1ccccc1C(=O)O`,r=`c1ccccc1`,i=[{name:`caffeine`,smiles:t},{name:`aspirin`,smiles:n},{name:`benzene`,smiles:r}],a=`C[C@@H](N)C(=O)O`,o=`CC(O)=C`,s=[0,1,2,3]})))()}export{r as a,c,s as i,a as n,t as o,n as r,i as s,o as t};
