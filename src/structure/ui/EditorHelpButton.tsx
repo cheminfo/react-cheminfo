@@ -1,8 +1,9 @@
-import { Button, PopoverNext, Tooltip } from '@blueprintjs/core';
-import type { CSSProperties, ReactElement, RefObject } from 'react';
+import { Button, PopoverNext } from '@blueprintjs/core';
+import type { ReactElement, RefObject } from 'react';
 import { useEffect, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { ActionTooltip } from '../../shared/ui/ActionTooltip.tsx';
 
 import { StructureEditorHelp } from './StructureEditorHelp.tsx';
 import type { StructureEditorMode } from './editorChange.ts';
@@ -18,8 +19,11 @@ export interface EditorHelpButtonProps {
 }
 
 /**
- * The editor's help button, in the corner of the drawing, opening the guide to
- * the mouse and the keyboard.
+ * The editor's help button, opening the guide to the mouse and the keyboard.
+ *
+ * It is placed by whoever renders it — the editor puts it in the corner of the
+ * drawing, next to the export button — so the two read as one group rather
+ * than as two controls that happen to overlap.
  *
  * F1 opens it too: openchemlib binds that key to a help dialog it does not
  * implement on the web.
@@ -44,32 +48,24 @@ export function EditorHelpButton(props: EditorHelpButtonProps): ReactElement {
   }, [containerRef]);
 
   return (
-    <div style={CORNER_STYLE}>
-      <PopoverNext
-        isOpen={isOpen}
-        onInteraction={setIsOpen}
-        placement="left-start"
-        content={<StructureEditorHelp mode={mode} fragment={fragment} />}
+    <PopoverNext
+      isOpen={isOpen}
+      onInteraction={setIsOpen}
+      placement="left-start"
+      content={<StructureEditorHelp mode={mode} fragment={fragment} />}
+    >
+      <ActionTooltip
+        content={t('structure.mouseAndKeyboard')}
+        placement="left"
+        opened={isOpen}
       >
-        <Tooltip
-          content={t('structure.mouseAndKeyboard')}
-          placement="left"
-          disabled={isOpen}
-        >
-          <Button
-            variant="minimal"
-            size="small"
-            icon="help"
-            aria-label={t('structure.mouseAndKeyboard')}
-          />
-        </Tooltip>
-      </PopoverNext>
-    </div>
+        <Button
+          variant="minimal"
+          size="small"
+          icon="help"
+          aria-label={t('structure.mouseAndKeyboard')}
+        />
+      </ActionTooltip>
+    </PopoverNext>
   );
 }
-
-const CORNER_STYLE: CSSProperties = {
-  position: 'absolute',
-  top: 4,
-  right: 4,
-};

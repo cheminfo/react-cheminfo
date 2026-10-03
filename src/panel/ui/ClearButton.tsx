@@ -32,6 +32,7 @@ export function ClearButton(props: ClearButtonProps) {
 
   return (
     <Button
+      className="no-print"
       variant="minimal"
       icon="cross"
       aria-label={label}

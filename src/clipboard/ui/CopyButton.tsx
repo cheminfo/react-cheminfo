@@ -3,6 +3,7 @@ import { Button } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
 import {
   DEFAULT_COPY_RESET_AFTER,
@@ -60,7 +61,8 @@ export interface CopyButtonProps {
    */
   resetAfter?: number;
   /**
-   * What the pointer and a screen reader are told.
+   * What the pointer and a screen reader are told. An empty string drops the
+   * hover title, for a button that already sits in a tooltip of its own.
    * @default the chrome's own line, in the language of the page
    */
   title?: string;
@@ -105,7 +107,7 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
 
   return (
     <Button
-      className={className}
+      className={joinClassNames('no-print', className)}
       variant={minimal ? 'minimal' : 'solid'}
       size={small ? 'small' : 'medium'}
       icon={look.icon}

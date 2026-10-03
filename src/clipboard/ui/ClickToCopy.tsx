@@ -1,3 +1,4 @@
+import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
 import type {
   CSSProperties,
@@ -19,6 +20,9 @@ import { useCopyToClipboard } from './useCopyToClipboard.ts';
 
 /** The elements a {@link ClickToCopy} can be, so a table cell is its own target. */
 export type ClickToCopyElement = 'span' | 'code' | 'div' | 'td' | 'th';
+
+/** Where the glyph sits: past the value, or inside its right edge. */
+export type ClickToCopyLayout = 'inline' | 'block';
 
 /** What {@link ClickToCopy} copies, and how it reads. */
 export interface ClickToCopyProps {
@@ -48,6 +52,15 @@ export interface ClickToCopyProps {
    * @default 'span'
    */
   as?: ClickToCopyElement;
+  /**
+   * Where the glyph goes. A value in a line of text shows it just past itself,
+   * so the line keeps its spacing; one laid out as a block keeps room for it
+   * inside its right edge, because a glyph past the edge of a full-width block
+   * is a glyph past the edge of whatever holds it — which scrolls the page
+   * sideways by the width of the glyph.
+   * @default read from `as`: a `span` or a `code` is inline, the rest a block
+   */
+  layout?: ClickToCopyLayout;
   /**
    * Whether the value is a tab stop and a button of its own, with the glyph a
    * keyboard is shown instead of the cursor. Off when a copy button beside it
@@ -108,6 +121,7 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
     label,
     title,
     as: Element = 'span',
+    layout,
     focusable = true,
     disabled = false,
     className,
@@ -116,6 +130,7 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
   } = props;
   const t = useChromeT();
   const { copied, failed, copy } = useCopyToClipboard();
+  const placing = layout ?? (INLINE.has(Element) ? 'inline' : 'block');
 
   if (disabled) {
     return (
@@ -141,7 +156,7 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
     <Element
       className={joinClassNames(
         'click-to-copy',
-        INLINE.has(Element) ? 'click-to-copy--inline' : 'click-to-copy--block',
+        `click-to-copy--${placing}`,
         className,
       )}
       style={style}
@@ -157,25 +172,44 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
       {focusable ? (
         <Icon
           className="click-to-copy__icon"
-          icon={
-            outcome === 'copied'
-              ? 'tick'
-              : outcome === 'failed'
-                ? 'cross'
-                : 'clipboard'
-          }
+          icon={outcomeIcon(outcome)}
           size={16}
         />
       ) : null}
       <span className="click-to-copy__status" role="status">
-        {outcome === 'copied'
-          ? t('clipboard.copied')
-          : outcome === 'failed'
-            ? t('clipboard.failed')
-            : null}
+        {outcomeStatus(outcome, t)}
       </span>
     </Element>
   );
+}
+
+/** How the last copy went, while it is still being confirmed. */
+type CopyOutcome = 'copied' | 'failed' | undefined;
+
+/**
+ * The glyph the value carries: the clipboard at rest, then the answer.
+ * @param outcome - How the last copy went.
+ * @returns The icon.
+ */
+function outcomeIcon(outcome: CopyOutcome): IconName {
+  if (outcome === 'copied') return 'tick';
+  if (outcome === 'failed') return 'cross';
+  return 'clipboard';
+}
+
+/**
+ * What a screen reader is told once a copy has been attempted.
+ * @param outcome - How it went.
+ * @param t - The chrome's formatter.
+ * @returns The line, or nothing before anything was copied.
+ */
+function outcomeStatus(
+  outcome: CopyOutcome,
+  t: Translate<ChromeKey>,
+): string | null {
+  if (outcome === 'copied') return t('clipboard.copied');
+  if (outcome === 'failed') return t('clipboard.failed');
+  return null;
 }
 
 function isOnNestedControl(

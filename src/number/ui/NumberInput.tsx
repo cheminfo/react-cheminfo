@@ -250,7 +250,7 @@ export function NumberInput(props: NumberInputProps): ReactElement {
       className={[Classes.NUMERIC_INPUT, className].filter(Boolean).join(' ')}
     >
       {box}
-      <ButtonGroup className={Classes.FIXED} vertical>
+      <ButtonGroup className={`${Classes.FIXED} no-print`} vertical>
         <Button
           icon="chevron-up"
           size={size}

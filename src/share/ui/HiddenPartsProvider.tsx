@@ -2,6 +2,8 @@ import type { ReactElement, ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { HiddenPartsContext } from './hiddenParts.ts';
+import { ShareMarkingContext } from './shareMarking.ts';
+import { useShareRegionReports } from './useShareRegionReports.ts';
 
 export interface HiddenPartsProviderProps {
   /**
@@ -25,10 +27,13 @@ export function HiddenPartsProvider(
 ): ReactElement {
   const { hidden, children } = props;
   const parts = useMemo(() => new Set(hidden), [hidden]);
+  const marking = useShareRegionReports(parts);
 
   return (
     <HiddenPartsContext.Provider value={parts}>
-      {children}
+      <ShareMarkingContext.Provider value={marking}>
+        {children}
+      </ShareMarkingContext.Provider>
     </HiddenPartsContext.Provider>
   );
 }

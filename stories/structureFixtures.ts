@@ -22,6 +22,12 @@ export const DEMO_MOLECULES: readonly DemoMolecule[] = [
   { name: 'benzene', smiles: BENZENE },
 ];
 
+/** (S)-alanine, whose enantiomer shares its idCode once stereo is dropped. */
+export const ALANINE = 'C[C@@H](N)C(=O)O';
+
+/** Acetone's enol, which keys with the ketone on the tautomer idCode. */
+export const ACETONE_ENOL = 'CC(O)=C';
+
 /**
  * The atoms of aspirin's acetyl group, as a substructure match hands them
  * over: the methyl, the carbonyl carbon, its oxygen and the ester oxygen.

@@ -4,6 +4,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
 import type { DelimitedTextDialogProps } from './DelimitedTextDialog.tsx';
 import { DelimitedTextDialog } from './DelimitedTextDialog.tsx';
@@ -139,7 +140,7 @@ export function TableDataButton(props: TableDataButtonProps): ReactElement {
         trigger(show)
       ) : (
         <Button
-          className={buttonClassName}
+          className={joinClassNames('no-print', buttonClassName)}
           icon={icon}
           text={text}
           variant={minimal ? 'minimal' : 'solid'}

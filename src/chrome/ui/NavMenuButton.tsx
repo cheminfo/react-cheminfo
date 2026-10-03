@@ -58,7 +58,7 @@ export function NavMenuButton(props: NavMenuButtonProps): ReactElement {
     children,
   } = props;
 
-  const holdsActive = items.some((item) => item.id === activeId);
+  const holdsActive = holdsId(items, activeId);
   const classes = [
     'nav-link',
     icon === undefined ? null : 'nav-link--icon',
@@ -73,23 +73,7 @@ export function NavMenuButton(props: NavMenuButtonProps): ReactElement {
       content={
         <Menu className="nav-menu">
           {items.map((item) => (
-            <MenuItem
-              key={item.id}
-              icon={item.icon}
-              text={item.label}
-              // A real address, so a crawler reaching the menu can follow it
-              // and a middle click opens a tab of its own.
-              href={item.href}
-              target={item.external ? '_blank' : undefined}
-              active={item.id === activeId}
-              onClick={(event) => {
-                if (item.onSelect === undefined || isModifiedClick(event)) {
-                  return;
-                }
-                event.preventDefault();
-                item.onSelect();
-              }}
-            />
+            <NavMenuEntry key={item.id} item={item} activeId={activeId} />
           ))}
           {children}
         </Menu>
@@ -113,4 +97,63 @@ export function NavMenuButton(props: NavMenuButtonProps): ReactElement {
       </button>
     </PopoverNext>
   );
+}
+
+/**
+ * One line of a header menu, holding a submenu of its own when the entry folds
+ * pages — which is how a bar entry that is already a menu reads once the whole
+ * bar has folded into one.
+ * @param props - The entry and the page on show.
+ * @param props.item - The entry.
+ * @param props.activeId - The page on show.
+ * @returns The line.
+ */
+function NavMenuEntry(props: {
+  item: NavItem;
+  activeId: string | undefined;
+}): ReactElement {
+  const { item, activeId } = props;
+
+  return (
+    <MenuItem
+      icon={item.icon}
+      text={item.label}
+      // A real address, so a crawler reaching the menu can follow it and a
+      // middle click opens a tab of its own.
+      href={item.href}
+      target={item.external ? '_blank' : undefined}
+      active={
+        item.items === undefined
+          ? item.id === activeId
+          : holdsId(item.items, activeId)
+      }
+      onClick={(event) => {
+        if (item.onSelect === undefined || isModifiedClick(event)) return;
+        event.preventDefault();
+        item.onSelect();
+      }}
+    >
+      {item.items?.map((child) => (
+        <NavMenuEntry key={child.id} item={child} activeId={activeId} />
+      ))}
+    </MenuItem>
+  );
+}
+
+/**
+ * Whether a run of entries holds the page on show, looking through the ones
+ * that are menus of their own.
+ * @param items - The entries.
+ * @param activeId - The page on show.
+ * @returns Whether one of them is it.
+ */
+function holdsId(
+  items: readonly NavItem[],
+  activeId: string | undefined,
+): boolean {
+  for (const item of items) {
+    if (item.id === activeId) return true;
+    if (item.items !== undefined && holdsId(item.items, activeId)) return true;
+  }
+  return false;
 }

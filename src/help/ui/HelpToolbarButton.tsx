@@ -3,6 +3,7 @@ import { Button } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
 import type { HelpContent } from './HelpBody.tsx';
 import { HelpTooltip } from './HelpTooltip.tsx';
@@ -68,7 +69,7 @@ export function HelpToolbarButton(props: HelpToolbarButtonProps): ReactElement {
         icon={icon}
         text={label}
         aria-label={label ?? helpName(content, t)}
-        className={className}
+        className={joinClassNames('no-print', className)}
         onClick={onClick}
       />
     </HelpTooltip>

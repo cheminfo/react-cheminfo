@@ -28,7 +28,13 @@ import type {
   StructureEditorChange,
   StructureEditorMode,
 } from './editorChange.ts';
+import { useEditorStructure } from './useEditorStructure.ts';
 import { useToolbarFloor } from './useToolbarFloor.ts';
+
+const EditorExportButton = lazy(async () => {
+  const module = await import('./EditorExportButton.tsx');
+  return { default: module.EditorExportButton };
+});
 
 const EditorCanvas = lazy(async () => {
   const module = await import('./EditorCanvas.tsx');
@@ -94,6 +100,14 @@ export interface StructureEditorProps {
    */
   help?: boolean;
   /**
+   * Put a button in the corner that opens every notation of the drawing — its
+   * SMILES, its molfiles, its canonical identifiers — and the picture of it,
+   * ready to copy or to save. A reaction has none of those, so it is never
+   * offered one.
+   * @default true
+   */
+  exportable?: boolean;
+  /**
    * Class the container carries, so a site can reach it from its stylesheet.
    * @default undefined
    */
@@ -123,6 +137,7 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
     minHeight = 320,
     mode = 'molecule',
     help = true,
+    exportable = true,
     className,
     style,
   } = props;
@@ -130,6 +145,16 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
   const t = useChromeT();
   const containerRef = useToolbarFloor({ minHeight, revision });
   const handleChange = useDebounced(onChange, debounce, revision);
+  const drawing = useEditorStructure({ value, inputFormat, revision });
+  const handleEdit = useCallback(
+    (change: StructureEditorChange) => {
+      // Tapped undebounced, so a button beside the canvas reads the structure
+      // as it stands rather than as it stood before the last burst.
+      drawing.track(change);
+      handleChange(change);
+    },
+    [drawing, handleChange],
+  );
 
   return (
     <div
@@ -144,22 +169,31 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
       >
         <EditorCanvas
           key={revision}
-          onChange={handleChange}
+          onChange={handleEdit}
           fragment={fragment}
           inputFormat={inputFormat}
           value={value}
           mode={mode}
         />
         {help ? (
-          <>
-            <ToolbarTooltip containerRef={containerRef} mode={mode} />
+          <ToolbarTooltip containerRef={containerRef} mode={mode} />
+        ) : null}
+        <div style={CORNER_STYLE}>
+          {exportable && mode === 'molecule' ? (
+            <EditorExportButton
+              source={drawing.source}
+              fragment={fragment}
+              empty={drawing.empty}
+            />
+          ) : null}
+          {help ? (
             <EditorHelpButton
               containerRef={containerRef}
               mode={mode}
               fragment={fragment}
             />
-          </>
-        ) : null}
+          ) : null}
+        </div>
       </Suspense>
     </div>
   );
@@ -215,6 +249,18 @@ const ROOT_STYLE: CSSProperties = {
   border: `1px solid ${TOKEN.border}`,
   borderRadius: 6,
   background: '#fff',
+};
+
+/**
+ * The corner the editor's own buttons sit in: export first, then help, so the
+ * one that does something to the drawing is the nearer of the two to it.
+ */
+const CORNER_STYLE: CSSProperties = {
+  position: 'absolute',
+  top: 4,
+  right: 4,
+  display: 'flex',
+  gap: 2,
 };
 
 /** The box the canvas will fill, so its arrival moves nothing. */

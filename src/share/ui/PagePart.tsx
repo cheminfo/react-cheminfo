@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { useIsHidden } from './hiddenParts.ts';
+import { useShareMarking } from './shareMarking.ts';
 
 export interface PagePartProps {
   /** The name this region takes in `?hide=`. */
@@ -21,6 +22,16 @@ export interface PagePartProps {
 export function PagePart(props: PagePartProps): ReactNode {
   const { part, children } = props;
   const isHidden = useIsHidden();
+  const marking = useShareMarking();
 
-  return isHidden(part) ? null : children;
+  if (isHidden(part)) return null;
+  if (!marking) return children;
+
+  // `display: contents` so the marker is only a name the dialog can find, and
+  // never a box between the page and the part it holds.
+  return (
+    <div data-share-part={part} style={{ display: 'contents' }}>
+      {children}
+    </div>
+  );
 }

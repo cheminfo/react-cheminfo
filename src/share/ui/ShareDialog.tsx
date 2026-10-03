@@ -11,10 +11,11 @@ import type {
 } from '../core/index.ts';
 
 import { ShareDialogContent } from './ShareDialogContent.tsx';
+import type { SharePartDescriptions } from './SharePartRow.tsx';
 
 const DIALOG_STYLE: CSSProperties = {
-  width: 'min(820px, 94vw)',
-  height: 'min(760px, 90dvh)',
+  width: 'min(1180px, 96vw)',
+  height: 'min(820px, 92dvh)',
 };
 
 /**
@@ -86,6 +87,19 @@ export interface ShareDialogProps<
    */
   frameHeight?: number;
   /**
+   * Whether the page the link hands out is shown live beside the options.
+   * A tool whose page is too heavy to load a second time switches it off.
+   * @default true
+   */
+  preview?: boolean;
+  /**
+   * Where each row says what switching it off does: `inline` writes it under
+   * the label, which is where it is read; `help` puts it behind a glyph beside
+   * the label, for a dialog short on room.
+   * @default 'inline'
+   */
+  partDescriptions?: SharePartDescriptions;
+  /**
    * Whether the dialog is rendered through a portal on `document.body`.
    * @default true
    */
@@ -120,7 +134,7 @@ export function ShareDialog<
       isOpen={isOpen}
       onClose={onClose}
       usePortal={usePortal}
-      title={t('share.dialogTitle')}
+      title={t('share.dialogTitleFor', { title: rest.title })}
       icon="share"
       className="share-dialog"
       style={DIALOG_STYLE}

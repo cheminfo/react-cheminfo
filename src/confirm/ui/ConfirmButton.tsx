@@ -4,6 +4,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
 /** Props of {@link ConfirmButton}: a Blueprint button, and what it asks. */
 export interface ConfirmButtonProps extends Omit<ButtonProps, 'onClick'> {
@@ -46,6 +47,7 @@ export function ConfirmButton(props: ConfirmButtonProps): ReactElement {
     <>
       <Button
         {...buttonProps}
+        className={joinClassNames('no-print', buttonProps.className)}
         onClick={() => {
           setAsking(true);
         }}

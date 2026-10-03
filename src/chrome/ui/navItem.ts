@@ -50,6 +50,13 @@ export interface NavItem {
    */
   after?: ReactNode;
   /**
+   * The pages this entry folds, which make it a menu rather than a link: the
+   * run of pages that do not each need a place of their own in the bar. The
+   * entry takes the brand tint while one of them is the page on show.
+   * @default undefined
+   */
+  items?: readonly NavItem[];
+  /**
    * Whether the page cannot be opened yet — a view that needs data the site
    * has not been given.
    *

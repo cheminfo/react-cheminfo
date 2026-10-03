@@ -9,7 +9,21 @@ export {
   suggestedShareConfig,
   visibleShareParts,
 } from './config.ts';
+export type { SharePreviewDeviceKey, SharePreviewSize } from './devices.ts';
+export {
+  SHARE_PREVIEW_DEVICES,
+  sharePreviewAddress,
+  sharePreviewScale,
+  sharePreviewSize,
+} from './devices.ts';
 export { escapeAttribute, escapeText } from './escape.ts';
+export type { ShareRegion } from './regions.ts';
+export {
+  SHARE_REGIONS_MESSAGE,
+  SHARE_REGIONS_REQUEST,
+  isShareRegionsRequest,
+  readShareRegions,
+} from './regions.ts';
 export type {
   BooleanParamOptions,
   IntegerParamOptions,

@@ -333,16 +333,359 @@ button {
   font-size: 0.75rem;
 }
 
-/* The share dialog's preset tabs sit on a rule, and wrap onto a second row
-   rather than overflow a phone-width dialog. */
+/* The share dialog: the link and its buttons above, never scrolled away, then
+   the options and the page they write, side by side. */
+.share-dialog__body {
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: 12px 16px 0;
+  gap: 12px;
+}
+
+/* The ready-made links and the three things one does with the link they write,
+   on one row: the tabs say which link, the buttons act on it. A dialog too
+   narrow for both wraps the buttons under the tabs rather than cutting them. */
+.share-dialog__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  gap: 8px 16px;
+}
+
+.share-dialog__top > .share-presets {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The buttons end on the rule, as the tabs do, so the two read as one row
+   rather than as a row with something floating over it. */
+.share-linkbar {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.share-dialog__panes {
+  display: grid;
+  overflow: hidden;
+  min-height: 0;
+  flex: 1 1 auto;
+  gap: 16px;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  padding-bottom: 12px;
+}
+
+.share-dialog__panes--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.share-dialog__options {
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+/* The tabs the two panes fold into on a narrow dialog. */
+.share-dialog__tabs {
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.share-dialog__tabs > .bp6-tab-panel {
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  margin-top: 8px;
+}
+
+/* One row per part: what it is on the left, whether the link keeps it on the
+   right. The switch says `On` or `Off` in so many words, because a tick means
+   nothing without the heading above the column, and the heading is the first
+   thing a reader scrolls past. */
+.share-part {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 3px 0;
+  gap: 0 6px;
+}
+
+.share-part__label {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Pointing at a row marks it, so it is clear which of the nine is the one
+   drawn on the page beside it. */
+.share-part:hover {
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  box-shadow: 0 0 0 6px var(--surface-sunken);
+}
+
+/* The pill keeps the right edge, so the state of the whole page is one
+   vertical scan rather than a tick hunted for at the end of each label. */
+.share-part__switch.bp6-control {
+  margin: 0 0 0 auto;
+  padding: 0;
+}
+
+.share-part__switch .bp6-control-indicator {
+  /* One width for both words, or the column shifts as rows are switched. */
+  min-width: 3.1em;
+  margin: 0;
+}
+
+/* On is the site's own colour, like every other thing that is current. */
+.bp6-control.share-part__switch input:checked ~ .bp6-control-indicator {
+  background: var(--accent);
+}
+
+/* What switching the row off does, under the label it belongs to: a sentence
+   nobody has to hover for is a sentence that is read. */
+.share-part__description {
+  flex: 1 0 100%;
+  margin: 0 0 2px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* The live page, laid out at the screen picked and scaled into the pane. */
+.share-preview {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  padding-bottom: 12px;
+  gap: 8px;
+}
+
+/* The preview names itself: a page scaled into a pane otherwise reads as the
+   site, and a reader who takes it for the tool ticks a box in it and believes
+   the link now carries it. */
+.share-preview__header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.share-preview__label.bp6-heading {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  gap: 5px;
+}
+
+.share-preview__devices.bp6-button-group {
+  flex: 0 0 auto;
+}
+
+/* The desk the window sits on: a shade deeper than the page behind it, so the
+   frame reads as a screen rather than as the dialog's own background. */
+.share-preview__stage {
+  display: flex;
+  overflow: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--text) 14%, var(--surface-sunken));
+}
+
+/* The window the page is shown in: its own bar, then the page under it. It
+   keeps the room its scaled frame takes, so a phone reads as a phone on the
+   stage rather than as a column of empty grey beside it. */
+.share-preview__device {
+  overflow: hidden;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.share-preview__chrome {
+  display: flex;
+  height: 25px;
+  align-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: 11px;
+  gap: 6px;
+}
+
+.share-preview__address {
+  overflow: hidden;
+  flex: 1 1 auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.share-preview__size {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.share-preview__page {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* What the row under the pointer names, drawn on the page itself: a list of
+   nine nouns is a list the reader has to map onto a page they can already
+   see. It is a mark, never a target — the preview stays the live page. */
+.share-preview__region {
+  position: absolute;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  box-shadow: 0 0 0 9999px rgb(16 32 48 / 28%);
+  pointer-events: none;
+}
+
+.share-preview__region-name {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  padding: 1px 6px;
+  border-radius: 4px 0;
+  background: var(--accent);
+  color: var(--surface);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The dialog is dragged larger when a page needs the room: a tool a teacher
+   frames at 1920 is one they check at 1920. */
+.share-dialog.bp6-dialog {
+  overflow: hidden;
+  min-width: 480px;
+  min-height: 420px;
+  max-width: 98vw;
+  max-height: 96dvh;
+  resize: both;
+}
+
+/* The ready-made links run the width of the dialog, above both panes: the
+   choice governs the preview as much as the switches, and in a third of the
+   width four tabs wrap onto a second row. A dialog narrow enough that they
+   still do not fit wraps rather than hiding the last of them. */
 .share-presets > .bp6-tab-list {
   flex-wrap: wrap;
   row-gap: 4px;
-  box-shadow: inset 0 -1px 0 var(--border);
 }
 
-.share-presets > .bp6-tab-panel {
+/* The sentence saying what the open preset hands out, where the switches are
+   when none is. */
+.share-dialog__preset {
+  margin-top: 0;
+  color: var(--text-muted);
+}
+
+/* The structure export dialog: the picture of the structure on the left, with
+   the resolution it leaves at, and every notation of it stacked on the right. */
+.structure-export__body {
+  padding: 12px 16px 16px;
+}
+
+.structure-export__panes {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+}
+
+/* The picture holds its place while the notations scroll past it: what is
+   being exported has to stay on screen while the molfile beside it is read. */
+.structure-export__picture {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* The preview is the file: the very SVG the save button writes, laid out
+   smaller. A box of a fixed height rather than one that follows the drawing,
+   so a tall molecule does not push the resolution and the buttons under it off
+   the dialog — the structure is centred in it at whatever shape it has. */
+.structure-export__stage {
+  display: block;
+  width: 100%;
+  height: 10rem;
+  box-sizing: border-box;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  object-fit: contain;
+}
+
+.structure-export__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Two columns, so the three buttons are one size: a row of buttons whose
+   widths are set by the length of their labels reads as three unrelated
+   controls. */
+.structure-export__actions {
+  display: grid;
+  margin-top: 2px;
+  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* One notation per row, with enough air between them that a molfile's block
+   does not read as part of the row under it. */
+.structure-export__notations {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.structure-export__identifiers {
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+/* The folded identifiers are rows like the ones above them, so they keep the
+   same rhythm once the section is open. */
+.structure-export__identifiers
+  .structure-export__notation
+  + .structure-export__notation {
   margin-top: 12px;
+}
+
+/* Below this the two panes stop fitting side by side, and the picture — the
+   thing being exported — stays first. */
+@media (max-width: 44rem) {
+  .structure-export__panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ── A narrow bar ────────────────────────────────────────────────────────── */
@@ -562,12 +905,6 @@ select,
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-@media print {
-  .click-to-copy__icon {
-    display: none;
-  }
 }
 
 /* ── Range slider ────────────────────────────────────────────────────────── */
@@ -821,9 +1158,29 @@ select,
 
 /* ── Printing ────────────────────────────────────────────────────────────── */
 
-/* Students print the cheatsheet. Let them, without the chrome. */
+/*
+  A printed page carries no control. A question mark nobody can hover, a button
+  that copies, saves or shares, a stepper's two arrows: each says nothing on
+  paper, and each costs a line of the thing that was printed. So every control
+  the family ships keeps itself off a print — by one of the classes named here,
+  or by carrying `no-print` — and a site marks its own with that same class. No
+  site writes a print rule of its own.
+
+  What does print is whatever carries a value: a field and the number in it, a
+  toggle saying which option is on, a legend, a caption, a table. Hiding one of
+  those takes information off the page, which is the opposite of the rule.
+
+  Each class is written three times on purpose. How the glyph sits in its row
+  is the site's business, so a site may legitimately lay it out with a compound
+  selector of its own — `.help-icon.bp6-popover-target`, which is how Blueprint
+  has to be out-specified — and `!important` on one class would then lose the
+  tie to a stylesheet that is imported after this one. Three classes outrank
+  any such rule, so the print behaviour does not depend on import order.
+*/
 @media print {
-  .no-print {
+  .no-print.no-print.no-print,
+  .help-icon.help-icon.help-icon,
+  .click-to-copy__icon.click-to-copy__icon.click-to-copy__icon {
     display: none !important;
   }
 }

@@ -166,3 +166,57 @@ test('a bar with neither the site nor its identifier says so', () => {
     'SiteHeader needs one of its `site` and `siteId` props',
   );
 });
+
+test('a page that folds pages of its own is drawn as a menu among the pages', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader
+      siteId="equilibrium"
+      nav={[
+        ...PAGES,
+        {
+          id: 'more',
+          label: 'More',
+          icon: 'more',
+          items: [
+            { id: 'how', label: 'How it works', href: '/how-it-works' },
+            { id: 'data', label: 'Data', href: '/data' },
+          ],
+        },
+      ]}
+      activeId="tutorial"
+    />,
+  );
+
+  const nav = html.slice(
+    html.indexOf('<nav class="app-header-nav">'),
+    html.indexOf('</nav>'),
+  );
+
+  expect(nav).toContain('aria-label="More"');
+  expect(nav.indexOf('/tutorial')).toBeLessThan(
+    nav.indexOf('aria-label="More"'),
+  );
+  expect(html).not.toContain('app-header-actions');
+});
+
+test('a folded menu takes the brand tint while it holds the page on show', () => {
+  const nav: readonly NavItem[] = [
+    ...PAGES,
+    {
+      id: 'more',
+      label: 'More',
+      items: [{ id: 'data', label: 'Data', href: '/data' }],
+    },
+  ];
+
+  expect(
+    renderToStaticMarkup(
+      <SiteHeader siteId="equilibrium" nav={nav} activeId="data" />,
+    ),
+  ).toContain('class="nav-link nav-link--active" aria-label="More"');
+  expect(
+    renderToStaticMarkup(
+      <SiteHeader siteId="equilibrium" nav={nav} activeId="tutorial" />,
+    ),
+  ).toContain('class="nav-link" aria-label="More"');
+});

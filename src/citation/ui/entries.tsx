@@ -3,6 +3,7 @@ import { MenuItem, Tooltip } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { useActionTooltip } from '../../shared/ui/useActionTooltip.ts';
 import { downloadCitations } from '../core/download.ts';
 import type { CitationDownload, CitationFormat } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
@@ -131,11 +132,16 @@ function PreviewTooltip(props: {
   children: (targetProps: Record<string, unknown>) => ReactElement;
 }): ReactElement {
   const { references, format, style, children } = props;
+  // Held rather than left to Blueprint: pressing an entry downloads or copies
+  // and closes the menu, and a preview opened by the hover that led to the
+  // press would outlive both — see `useActionTooltip`.
+  const { isOpen, target } = useActionTooltip(false, PREVIEW_OPEN_DELAY);
+
   return (
     <Tooltip
       placement="left"
       popoverClassName="citation-tooltip"
-      hoverOpenDelay={PREVIEW_OPEN_DELAY}
+      isOpen={isOpen}
       content={
         <CitationPreview
           reference={references}
@@ -143,7 +149,9 @@ function PreviewTooltip(props: {
           style={style?.id}
         />
       }
-      renderTarget={({ isOpen, ...targetProps }) => children(targetProps)}
+      renderTarget={({ isOpen: drawn, ...targetProps }) =>
+        children({ ...targetProps, ...target })
+      }
     />
   );
 }

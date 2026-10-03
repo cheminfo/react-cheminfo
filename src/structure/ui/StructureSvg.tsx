@@ -8,13 +8,14 @@
  * every bundle, including the ones that only ever wanted the Tools menu.
  */
 
-import { Molecule } from 'openchemlib';
+import type { Molecule } from 'openchemlib';
 import type { ReactElement, ReactNode } from 'react';
 import { useMemo } from 'react';
 import { SvgRenderer } from 'react-ocl';
 
 import type { AtomLabelPlacement } from '../core/atomLabels.ts';
 import { applyAtomLabels } from '../core/atomLabels.ts';
+import { sourceMolecule } from '../core/sourceMolecule.ts';
 import type { StructureSource } from '../core/structureSource.ts';
 
 import { StructurePlaceholder } from './StructurePlaceholder.tsx';
@@ -163,7 +164,7 @@ function readDrawing(
 ): Drawing | null {
   let molecule: Molecule;
   try {
-    molecule = parseMolecule(kind, value, coordinates);
+    molecule = sourceMolecule({ kind, value, coordinates });
   } catch {
     return null;
   }
@@ -173,14 +174,4 @@ function readDrawing(
   const labels = new Map(JSON.parse(labelsKey) as Array<[number, string]>);
   const written = applyAtomLabels(molecule, labels, placement);
   return { molecule, labelled: written > 0 };
-}
-
-function parseMolecule(
-  kind: StructureSource['kind'],
-  value: string,
-  coordinates: string | undefined,
-): Molecule {
-  if (kind === 'idcode') return Molecule.fromIDCode(value, coordinates);
-  if (kind === 'molfile') return Molecule.fromMolfile(value);
-  return Molecule.fromSmiles(value);
 }

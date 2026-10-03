@@ -1,11 +1,17 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import { MISSING_VALUE } from '../../format/core/missing.ts';
+import type { HelpText } from '../../help/ui/HelpBody.tsx';
+import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
+import { OVERLAY_HELP_NAME_STYLE } from '../../overlay/ui/overlayRowStyles.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
 import { ClickToCopy } from './ClickToCopy.tsx';
 
 const DEFAULT_BLOCK_HEIGHT = 160;
+
+/** What says there is more of the value than is on screen. */
+const FADE = 'linear-gradient(to bottom, #000 72%, transparent 100%)';
 
 /** What {@link CopyableValue} names, shows and copies. */
 export interface CopyableValueProps {
@@ -14,10 +20,13 @@ export interface CopyableValueProps {
   /** The value itself, which is what a click on it copies. */
   value: string;
   /**
-   * A longer explanation of the label, shown on hover.
-   * @default undefined — the label carries no hover text
+   * What the value is, read by hovering the label — which is underlined with
+   * dots to say so. It opens as the family's help card rather than as the
+   * browser's own tooltip, which takes a second to appear and is drawn by the
+   * operating system rather than by us.
+   * @default undefined — the label explains nothing beyond itself
    */
-  hint?: string;
+  hint?: HelpText;
   /**
    * Whether the value keeps its line breaks and scrolls past `maxHeight`, for
    * a molfile or any other multi-line notation.
@@ -25,16 +34,32 @@ export interface CopyableValueProps {
    */
   block?: boolean;
   /**
-   * Height past which a block value scrolls on its own.
+   * Height past which a block value scrolls on its own, or is cut off when it
+   * is clipped.
    * @default 160
    */
   maxHeight?: number | string;
+  /**
+   * Whether a block value is cut off at `maxHeight` and faded, rather than
+   * given scrollbars. A notation is copied rather than read, and a molfile is
+   * both long and wide, so a scrollbar on each axis of each of two of them is
+   * four bars of chrome buying nothing.
+   * @default false
+   */
+  clip?: boolean;
   /**
    * What the pointer and a screen reader are told, replacing the title built
    * from the label and the value.
    * @default undefined — `Copy the ${label} (${value})`
    */
   copyTitle?: string;
+  /**
+   * A control on the label's own line, pushed to the right — a save button for
+   * a notation that is also a file, a menu of the forms it comes in. It sits
+   * outside the value, so pressing it never copies.
+   * @default undefined
+   */
+  action?: ReactNode;
   /**
    * What goes under the value: the links an identifier leads to, a note on it.
    * @default undefined
@@ -66,11 +91,30 @@ export function CopyableValue(props: CopyableValueProps): ReactElement {
     hint,
     block = false,
     maxHeight = DEFAULT_BLOCK_HEIGHT,
+    clip = false,
     copyTitle,
+    action,
     children,
     className,
   } = props;
   const isEmpty = value === '';
+
+  const written = (
+    <span
+      className="copyable-value__label"
+      style={hint === undefined ? LABEL_STYLE : HINTED_LABEL_STYLE}
+    >
+      {label}
+    </span>
+  );
+  const name =
+    hint === undefined ? (
+      written
+    ) : (
+      <HelpTooltip content={{ body: hint }} placement="top-start">
+        {written}
+      </HelpTooltip>
+    );
 
   return (
     <div
@@ -80,21 +124,29 @@ export function CopyableValue(props: CopyableValueProps): ReactElement {
           : `copyable-value ${className}`
       }
     >
-      <span
-        className="copyable-value__label"
-        style={hint === undefined ? LABEL_STYLE : HINTED_LABEL_STYLE}
-        title={hint}
-      >
-        {label}
-      </span>
+      {action === undefined ? (
+        name
+      ) : (
+        <span className="copyable-value__header" style={HEADER_STYLE}>
+          {name}
+          {action}
+        </span>
+      )}
       <ClickToCopy
         as="code"
+        // The value fills the row, so the glyph goes inside its right edge: a
+        // `code` is an inline element but this one is laid out as a block.
+        layout="block"
         value={value}
         label={label}
         title={copyTitle}
         disabled={isEmpty}
         className="copyable-value__value"
-        style={block ? { ...BLOCK_VALUE_STYLE, maxHeight } : VALUE_STYLE}
+        style={
+          block
+            ? { ...(clip ? CLIPPED_VALUE_STYLE : BLOCK_VALUE_STYLE), maxHeight }
+            : VALUE_STYLE
+        }
       >
         {isEmpty ? MISSING_VALUE : value}
       </ClickToCopy>
@@ -110,9 +162,24 @@ const LABEL_STYLE = {
   fontWeight: 600,
 } as const satisfies CSSProperties;
 
+/**
+ * A label that explains itself is underlined with dots, which is the one
+ * convention that lets a `?` glyph leave the row — see `OverlayRow`, where the
+ * rest of the package already reads this way.
+ */
 const HINTED_LABEL_STYLE = {
   ...LABEL_STYLE,
-  cursor: 'help',
+  ...OVERLAY_HELP_NAME_STYLE,
+  display: 'inline',
+} as const satisfies CSSProperties;
+
+/** The label and its control, on one line with the control at the right. */
+const HEADER_STYLE = {
+  display: 'flex',
+  minHeight: 20,
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 8,
 } as const satisfies CSSProperties;
 
 const VALUE_STYLE = {
@@ -127,4 +194,12 @@ const BLOCK_VALUE_STYLE = {
   whiteSpace: 'pre',
   overflowWrap: 'normal',
   overflow: 'auto',
+} as const satisfies CSSProperties;
+
+/** The same block, cut off at its height and faded out rather than scrolled. */
+const CLIPPED_VALUE_STYLE = {
+  ...BLOCK_VALUE_STYLE,
+  overflow: 'hidden',
+  maskImage: FADE,
+  WebkitMaskImage: FADE,
 } as const satisfies CSSProperties;

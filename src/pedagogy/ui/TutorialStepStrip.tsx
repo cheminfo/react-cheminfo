@@ -1,8 +1,9 @@
-import { Button, Tag, Tooltip } from '@blueprintjs/core';
+import { Button, Tag } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import { clamp } from '../../format/core/clamp.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { ActionTooltip } from '../../shared/ui/ActionTooltip.tsx';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ExerciseLevel } from '../core/types.ts';
 
@@ -150,24 +151,14 @@ function LevelStrip(props: LevelStripProps): ReactElement {
     const step = steps[position] as TutorialStripStep;
     const active = position === activeIndex;
     buttons.push(
-      <Tooltip
+      <StepButton
         key={step.id ?? position}
-        content={step.title}
-        hoverOpenDelay={HOVER_OPEN_DELAY}
-        placement="bottom"
-      >
-        <button
-          type="button"
-          aria-label={`Step ${position + 1}: ${step.title}`}
-          aria-current={active ? 'step' : undefined}
-          style={numberStyle(colours, active)}
-          onClick={() => {
-            onSelect(position);
-          }}
-        >
-          {position + 1}
-        </button>
-      </Tooltip>,
+        step={step}
+        position={position}
+        colours={colours}
+        active={active}
+        onSelect={onSelect}
+      />,
     );
   }
 
@@ -176,6 +167,47 @@ function LevelStrip(props: LevelStripProps): ReactElement {
       <span style={LABEL_STYLE}>{label}</span>
       {buttons}
     </div>
+  );
+}
+
+interface StepButtonProps {
+  step: TutorialStripStep;
+  position: number;
+  colours: TutorialLevelColours;
+  active: boolean;
+  onSelect: (index: number) => void;
+}
+
+/**
+ * One numbered step, naming itself on hover.
+ *
+ * The name is held by {@link ActionTooltip} rather than by Blueprint: pressing
+ * a number within the hover delay would otherwise open the card afterwards,
+ * over the step it has just walked away from.
+ * @param props - The step, where it sits, and what picking it does.
+ * @returns The button.
+ */
+function StepButton(props: StepButtonProps): ReactElement {
+  const { step, position, colours, active, onSelect } = props;
+
+  return (
+    <ActionTooltip
+      content={step.title}
+      delay={HOVER_OPEN_DELAY}
+      placement="bottom"
+    >
+      <button
+        type="button"
+        aria-label={`Step ${position + 1}: ${step.title}`}
+        aria-current={active ? 'step' : undefined}
+        style={numberStyle(colours, active)}
+        onClick={() => {
+          onSelect(position);
+        }}
+      >
+        {position + 1}
+      </button>
+    </ActionTooltip>
   );
 }
 

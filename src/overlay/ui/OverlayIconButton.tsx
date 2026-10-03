@@ -90,6 +90,7 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
   return (
     <button
       type="button"
+      className="no-print"
       title={told}
       aria-label={name}
       aria-haspopup={opensMenu ? 'menu' : undefined}

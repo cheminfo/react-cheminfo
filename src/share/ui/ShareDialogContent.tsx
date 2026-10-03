@@ -1,16 +1,11 @@
-import {
-  AnchorButton,
-  Button,
-  Classes,
-  DialogFooter,
-  H6,
-} from '@blueprintjs/core';
-import type { CSSProperties, ReactElement, ReactNode } from 'react';
-import { useState } from 'react';
+import { Button, DialogFooter } from '@blueprintjs/core';
+import type { CSSProperties, ReactElement } from 'react';
+import { useRef, useState } from 'react';
 
-import { CodeBlock, CopyButton } from '../../clipboard/ui/index.ts';
+import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type {
+  HideablePart,
   ShareConfig,
   ShareParamCodecs,
   ShareParamValues,
@@ -30,27 +25,18 @@ import {
 
 import { ShareConfigOptions } from './ShareConfigOptions.tsx';
 import type { ShareDialogProps, ShareDraft } from './ShareDialog.tsx';
+import { ShareLinkBar } from './ShareLinkBar.tsx';
+import { SharePanes } from './SharePanes.tsx';
 import { SharePresetTabs } from './SharePresetTabs.tsx';
+import { SharePreview } from './SharePreview.tsx';
 import { withPart } from './draft.ts';
-
-const LEAD_STYLE: CSSProperties = {
-  marginTop: 0,
-  color: 'var(--text-muted, #5b6875)',
-};
-const SECTION_STYLE: CSSProperties = { marginBottom: 18 };
-const ACTIONS_STYLE: CSSProperties = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 8,
-  marginTop: 8,
-};
 
 const NO_PRESETS: readonly never[] = [];
 
-// The dialog has a fixed height so switching preset does not resize it: the
-// body takes what the header and footer leave, and scrolls.
-const BODY_CLASS = `${Classes.DIALOG_BODY} ${Classes.DIALOG_BODY_SCROLL_CONTAINER}`;
-const BODY_STYLE: CSSProperties = { maxHeight: 'none', minHeight: 0 };
+/** Width below which the two panes stop fitting side by side and become tabs. */
+const TWO_PANE_WIDTH = 720;
+
+const SECTION_STYLE: CSSProperties = { marginBottom: 14 };
 
 /** Everything the dialog holds, minus what only its shell is concerned with. */
 export type ShareDialogContentProps<
@@ -58,8 +44,8 @@ export type ShareDialogContentProps<
 > = Omit<ShareDialogProps<Codecs>, 'isOpen' | 'usePortal'>;
 
 /**
- * The sections of the share dialog: what the link says, what it hands out, and
- * the markup that frames it.
+ * The share dialog's body: what one does with the link above, never scrolled
+ * away, then the options on the left and the page they write on the right.
  * @param props - What the site's links can say, how the page is named, and the extra section.
  * @returns The body and the footer of the dialog.
  */
@@ -76,6 +62,8 @@ export function ShareDialogContent<
     search,
     frameTitle,
     frameHeight,
+    preview = true,
+    partDescriptions = 'inline',
     children,
   } = props;
   const t = useChromeT();
@@ -86,9 +74,16 @@ export function ShareDialogContent<
   const [config, setConfig] = useState<ShareConfig<Codecs>>(() =>
     initialDraft(query, vocabulary, findPreset(presets, defaultPreset ?? null)),
   );
+  const [pointed, setPointed] = useState<string | null>(null);
   const [presetKey, setPresetKey] = useState<string | null>(
     () => findSharePreset(config, presets, vocabulary)?.key ?? null,
   );
+  const body = useRef<HTMLDivElement>(null);
+  const { width } = useContainerSize(body);
+  // Zero until the body is first measured, and the wide layout is the one that
+  // renders both panes, so nothing is missing from a first paint or a render
+  // with no layout at all.
+  const narrow = width > 0 && width < TWO_PANE_WIDTH;
 
   function setEmbed(embed: boolean): void {
     setConfig((previous) => ({ ...previous, embed }));
@@ -135,55 +130,57 @@ export function ShareDialogContent<
       embed={config.embed}
       parts={visibleShareParts(vocabulary.parts, config.embed)}
       hidden={config.hidden}
+      descriptions={partDescriptions}
       onEmbedChange={setEmbed}
       onPartChange={setPartHidden}
+      onPartPointed={setPointed}
     />
   );
 
+  const openPreset = findPreset(presets, presetKey);
+  const optionsPane = (
+    <div className="share-dialog__options">
+      {openPreset === undefined ? (
+        options
+      ) : (
+        <p className="share-dialog__preset">{openPreset.description}</p>
+      )}
+
+      {children === undefined ? null : (
+        <section className="share-section" style={SECTION_STYLE}>
+          {typeof children === 'function' ? children(draft) : children}
+        </section>
+      )}
+    </div>
+  );
+
+  const previewPane = preview ? (
+    <SharePreview
+      url={url}
+      title={frameTitle ?? title}
+      highlight={highlightOf(vocabulary.parts, pointed)}
+    />
+  ) : null;
+
   return (
     <>
-      <div className={BODY_CLASS} style={BODY_STYLE}>
-        <p style={LEAD_STYLE}>{lead(t('share.lead'), title)}</p>
-
-        {presets.length === 0 ? (
-          options
-        ) : (
-          <SharePresetTabs
-            presets={presets}
-            selected={presetKey}
-            onSelect={selectPreset}
-            custom={options}
-          />
-        )}
-
-        {children === undefined ? null : (
-          <section className="share-section" style={SECTION_STYLE}>
-            {typeof children === 'function' ? children(draft) : children}
-          </section>
-        )}
-
-        <section className="share-section" style={SECTION_STYLE}>
-          <H6>{t('share.link')}</H6>
-          <CodeBlock code={url} tone="muted" />
-          <div style={ACTIONS_STYLE}>
-            <CopyButton content={url} label={t('share.copyLink')} />
-            <AnchorButton
-              icon="share"
-              text={t('share.openInNewTab')}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
+      <div className="share-dialog__body" ref={body}>
+        <div className="share-dialog__top">
+          {presets.length === 0 ? null : (
+            <SharePresetTabs
+              presets={presets}
+              selected={presetKey}
+              onSelect={selectPreset}
             />
-          </div>
-        </section>
+          )}
+          <ShareLinkBar url={url} frame={frame} />
+        </div>
 
-        <section className="share-section" style={SECTION_STYLE}>
-          <H6>{t('share.iframe')}</H6>
-          <CodeBlock code={frame} tone="muted" />
-          <div style={ACTIONS_STYLE}>
-            <CopyButton content={frame} label={t('share.copyIframe')} />
-          </div>
-        </section>
+        <SharePanes
+          options={optionsPane}
+          preview={previewPane}
+          narrow={narrow}
+        />
       </div>
       <DialogFooter
         actions={
@@ -192,14 +189,6 @@ export function ShareDialogContent<
       />
     </>
   );
-}
-
-// The name of the page is set in bold inside a sentence whose word order is
-// the translator's, so the message is split at its placeholder rather than
-// written as a prefix and a suffix.
-function lead(message: string, title: string): ReactNode[] {
-  const [before = '', after = ''] = message.split('{title}');
-  return [before, <b key="title">{title}</b>, after];
 }
 
 function initialDraft<Codecs extends ShareParamCodecs>(
@@ -213,6 +202,20 @@ function initialDraft<Codecs extends ShareParamCodecs>(
   return preset === undefined
     ? suggested
     : applySharePreset(suggested, preset, vocabulary);
+}
+
+// The name in the list and the box on the page are the same thing, so the
+// preview is told what the reader is pointing at rather than a key it would
+// have to look a name up for.
+function highlightOf(
+  parts: readonly HideablePart[],
+  pointed: string | null,
+): { part: string; label: string } | null {
+  if (pointed === null) return null;
+  for (const part of parts) {
+    if (part.key === pointed) return { part: part.key, label: part.label };
+  }
+  return null;
 }
 
 function findPreset<Codecs extends ShareParamCodecs>(

@@ -16,13 +16,15 @@ test('the label names the value, and the value is the only control', () => {
   expect(html.match(/<button/g)).toBeNull();
   expect(html.match(/tabindex/g)).toHaveLength(1);
   expect(html).toContain(`title="Copy the InChIKey (${INCHI_KEY})"`);
+  // The value fills the row, so the glyph keeps its room inside the right
+  // edge: past it, it would scroll whatever holds the value sideways.
   expect(html).toContain(
-    'class="click-to-copy click-to-copy--inline copyable-value__value"',
+    'class="click-to-copy click-to-copy--block copyable-value__value"',
   );
   expect(html).not.toContain('disabled=""');
 });
 
-test('a hint is read on hover over the label', () => {
+test('a hint opens as the family help card, not as the browser tooltip', () => {
   const html = renderToStaticMarkup(
     <CopyableValue
       label="SMILES"
@@ -31,10 +33,16 @@ test('a hint is read on hover over the label', () => {
     />,
   );
 
-  expect(html).toContain(
+  // The browser's own tooltip is drawn by the operating system and takes a
+  // second to appear, so the label carries no `title` at all.
+  expect(html).not.toContain(
     'title="Simplified molecular-input line-entry system"',
   );
+  expect(html).toContain('bp6-popover-target');
+  // Dotted and taking the help cursor, which is what says the name explains
+  // itself — see `OverlayRow`, where the rest of the package reads this way.
   expect(html).toContain('cursor:help');
+  expect(html).toContain('underline dotted');
 });
 
 test('a block value keeps its line breaks and scrolls past its height', () => {
@@ -50,6 +58,23 @@ test('a block value keeps its line breaks and scrolls past its height', () => {
   expect(html).toContain('white-space:pre');
   expect(html).toContain('max-height:90px');
   expect(html).toContain('overflow:auto');
+});
+
+test('a clipped block is cut off and faded rather than given scrollbars', () => {
+  const html = renderToStaticMarkup(
+    <CopyableValue
+      label="Molfile"
+      value={'\n  RDKit\n\n'}
+      block
+      clip
+      maxHeight={92}
+    />,
+  );
+
+  expect(html).toContain('overflow:hidden');
+  expect(html).toContain('max-height:92px');
+  expect(html).toContain('mask-image:linear-gradient(to bottom, #000 72%');
+  expect(html).not.toContain('overflow:auto');
 });
 
 test('an empty value reads as the missing marker and offers nothing to copy', () => {

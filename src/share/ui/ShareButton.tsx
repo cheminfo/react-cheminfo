@@ -2,6 +2,7 @@ import { Button, Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
 /** How the button is dressed for the bar it sits in. */
 export type ShareButtonVariant = 'nav-link' | 'blueprint';
@@ -61,7 +62,7 @@ export function ShareButton(props: ShareButtonProps): ReactElement {
   if (variant === 'blueprint') {
     return (
       <Button
-        className={className}
+        className={joinClassNames('no-print', className)}
         variant="minimal"
         icon="share"
         text={text}
@@ -75,11 +76,7 @@ export function ShareButton(props: ShareButtonProps): ReactElement {
   return (
     <button
       type="button"
-      className={
-        className === undefined
-          ? 'nav-link nav-link--icon'
-          : `nav-link nav-link--icon ${className}`
-      }
+      className={joinClassNames('nav-link nav-link--icon no-print', className)}
       title={title}
       aria-label={label}
       onClick={onClick}

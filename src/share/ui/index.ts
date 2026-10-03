@@ -6,4 +6,5 @@ export { PagePart } from './PagePart.tsx';
 export type { ShareButtonProps, ShareButtonVariant } from './ShareButton.tsx';
 export { ShareButton } from './ShareButton.tsx';
 export type { ShareDialogProps } from './ShareDialog.tsx';
+export type { SharePartDescriptions } from './SharePartRow.tsx';
 export { ShareDialog } from './ShareDialog.tsx';

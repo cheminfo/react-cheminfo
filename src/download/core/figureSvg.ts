@@ -48,6 +48,13 @@ export interface FigureSvg {
 /** What a saved SVG figure is, for the file and for the renderer reading it. */
 export const FIGURE_SVG_TYPE = 'image/svg+xml;charset=utf-8';
 
+/** A run of words inside a card, with where it sits and how it is set. */
+interface TextRun {
+  text: string;
+  box: DOMRect;
+  type: CSSStyleDeclaration;
+}
+
 /** The token a figure's own ground is named by. */
 const SURFACE_TOKEN = '--surface';
 
@@ -138,19 +145,15 @@ function legendMarkup(legend: Element, box: DOMRect): string {
   }
 
   const texts: FigureLegendText[] = [];
-  for (const run of legend.querySelectorAll('*')) {
-    if (run.firstElementChild !== null) continue;
-    const words = run.textContent?.trim() ?? '';
-    if (words === '') continue;
-    const at = run.getBoundingClientRect();
-    const type = window.getComputedStyle(run);
+  for (const run of textRuns(legend)) {
+    const at = run.box;
     texts.push({
-      text: words,
+      text: run.text,
       x: at.left - box.left,
       y: at.top - box.top + at.height / 2,
-      color: type.color,
-      fontSize: Number.parseFloat(type.fontSize),
-      fontWeight: type.fontWeight,
+      color: run.type.color,
+      fontSize: Number.parseFloat(run.type.fontSize),
+      fontWeight: run.type.fontWeight,
     });
   }
 
@@ -170,6 +173,35 @@ function legendMarkup(legend: Element, box: DOMRect): string {
     marks,
     texts,
   });
+}
+
+/**
+ * Every run of words inside a card, with the box the browser gave it.
+ *
+ * Collected as text nodes rather than as elements, because an element is only
+ * the smallest box around a run when it holds nothing else: a formula drawn as
+ * `HCO<sub>3</sub><sup>-</sup>` keeps `HCO` on the element itself, and a card
+ * read element by element loses exactly the letters that name the species. The
+ * box is measured over the characters with a `Range`, which is also tighter
+ * than the element's own box wherever that element is padded.
+ * @param legend - The card, as it sits on the page.
+ * @returns The runs, in the order they are written.
+ */
+function textRuns(legend: Element): TextRun[] {
+  const runs: TextRun[] = [];
+  const walker = document.createTreeWalker(legend, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
+    const words = node.textContent?.trim() ?? '';
+    if (words === '') continue;
+    const parent = node.parentElement;
+    if (parent === null) continue;
+    range.selectNodeContents(node);
+    const box = range.getBoundingClientRect();
+    if (box.width <= 0 || box.height <= 0) continue;
+    runs.push({ text: words, box, type: window.getComputedStyle(parent) });
+  }
+  return runs;
 }
 
 /**
