@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.39.0](https://github.com/cheminfo/react-cheminfo/compare/v0.38.0...v0.39.0) (2026-10-03)
+
+
+### Features
+
+* **chart:** let an axis be ruled where its quantity asks ([5e0d576](https://github.com/cheminfo/react-cheminfo/commit/5e0d5760a2289e365f78ce0333a0e85854902a5e))
+* **pedagogy:** read {{C6H12O6}} as a molecular formula in authored prose ([4bedd32](https://github.com/cheminfo/react-cheminfo/commit/4bedd320a285e8f185d4bc6ea8329dfd021274ba))
+* **structure:** hand a drawn structure over from the editor ([92c1527](https://github.com/cheminfo/react-cheminfo/commit/92c15278b0f10ae2950f668b7963b10c953042f7))
+
 ## [0.38.0](https://github.com/cheminfo/react-cheminfo/compare/v0.37.0...v0.38.0) (2026-10-02)
 
 
