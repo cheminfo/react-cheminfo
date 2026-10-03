@@ -289,6 +289,10 @@ const STORY_IDS = [
   'projection-projectionviewer--named-samples',
   'projection-projectionviewer--seized-pills',
   'projection-projectionviewer--umap',
+  'range-rangeslider--decimals',
+  'range-rangeslider--default',
+  'range-rangeslider--no-track',
+  'range-rangeslider--with-histogram',
   'scatter-scattercloud--default',
   'scatter-scattercloud--lasso',
   'scatter-scattercloud--named-groups',
@@ -355,11 +359,17 @@ const STORY_IDS = [
   'structure-structureeditor--default',
   'structure-structureeditor--empty',
   'structure-structureeditor--fragment',
+  'structure-structureeditor--no-corner-buttons',
   'structure-structureeditor--no-debounce',
   'structure-structureeditor--no-help',
   'structure-structureeditor--reaction',
   'structure-structureeditor--reloadable',
   'structure-structureeditor--small-box',
+  'structure-structureexportdialog--default',
+  'structure-structureexportdialog--nothing',
+  'structure-structureexportdialog--stereocentre',
+  'structure-structureexportdialog--tautomer',
+  'structure-structureexportdialog--unreadable',
 ];
 
 // React reports every caught error-boundary hit through `console.error`, so the
