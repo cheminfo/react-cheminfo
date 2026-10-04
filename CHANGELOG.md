@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.40.0](https://github.com/cheminfo/react-cheminfo/compare/v0.39.1...v0.40.0) (2026-10-04)
+
+
+### Features
+
+* **conformers:** draw provisional energies muted in ConformerTable ([14a4d7d](https://github.com/cheminfo/react-cheminfo/commit/14a4d7df471390b70a328c1245c82db0aa5470e9))
+* **deploy:** refuse a repository whose image nothing can pull ([78d4b85](https://github.com/cheminfo/react-cheminfo/commit/78d4b857bb0dbe8efd6722b1029fced74949dd9e))
+* **molstar:** a shared headless molstar layer ([71e534c](https://github.com/cheminfo/react-cheminfo/commit/71e534ca6f8212b65f31aac70985e5ccd0fa3fec))
+
 ## [0.39.1](https://github.com/cheminfo/react-cheminfo/compare/v0.39.0...v0.39.1) (2026-10-04)
 
 
