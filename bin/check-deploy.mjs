@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /*
  * Report every way a repository would break, or silently mis-deploy, under the
- * server's global deploy script: a compose file it would not find, an image with
- * no selectable tag, a page the browser keeps across a deploy and then cannot
+ * server's global deploy script: a compose file it would not find, an image
+ * nothing publishes or that carries no selectable tag, a page the browser keeps across a deploy and then cannot
  * run, an `IMAGE_NAME` naming a package this repository never publishes, an
  * `env_file` that fails on a checkout with no `.env` yet, a service with no
  * health probe to read, an `.env.example` that hides a mode.
@@ -26,6 +26,7 @@ import process from 'node:process';
 
 import {
   DEPLOY_COMPOSE_FILES,
+  DOCKER_IMAGE_WORKFLOW,
   NGINX_CONFIG,
   PAGE_CACHE_CONFIG,
   findDeployProblems,
@@ -77,6 +78,7 @@ for (const path of [
   'Dockerfile',
   PAGE_CACHE_CONFIG,
   NGINX_CONFIG,
+  DOCKER_IMAGE_WORKFLOW,
 ]) {
   const text = read(path);
   if (text !== undefined) files.push({ path, text });

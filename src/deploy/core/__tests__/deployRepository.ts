@@ -1,5 +1,19 @@
 export const IMAGE = 'ghcr.io/cheminfo/example.cheminfo.org';
 
+export const DOCKER_IMAGE = `name: Docker image
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  docker-image:
+    uses: zakodium/workflows/.github/workflows/docker-image.yml@docker-image-v1
+    with:
+      tag-version: \${{ github.event_name == 'push' && github.ref_name || '' }}
+`;
+
 export const ENV_EXAMPLE = `
 IMAGE_NAME=${IMAGE}
 # Rewritten by the server's deploy script; never edit it by hand.
@@ -36,6 +50,7 @@ export function repository(overrides: Record<string, string> = {}) {
     'compose.cloudflared.yaml': service(),
     '.env.example': ENV_EXAMPLE,
     '.gitignore': 'node_modules\n.env\n.deploy\n',
+    '.github/workflows/docker-image.yml': DOCKER_IMAGE,
     ...overrides,
   };
   return Object.entries(files).map(([path, text]) => ({ path, text }));

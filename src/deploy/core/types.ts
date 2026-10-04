@@ -10,7 +10,9 @@ export type DeployProblemKind =
   | 'missing-healthcheck'
   | 'missing-env-example'
   | 'missing-deploy-ignore'
-  | 'cacheable-page';
+  | 'cacheable-page'
+  | 'unpublishable-image'
+  | 'brittle-install';
 
 /** One way a repository would fail, or silently mis-deploy, on the server. */
 export interface DeployProblem {

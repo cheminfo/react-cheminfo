@@ -61,7 +61,11 @@ IMAGE_TAG=latest
 });
 
 test('with no compose files named, all three modes are required', () => {
-  const files = repository().filter((file) => file.path === '.env.example');
+  const files = repository().filter(
+    (file) =>
+      file.path === '.env.example' ||
+      file.path === '.github/workflows/docker-image.yml',
+  );
 
   const problems = findDeployProblems(
     [...files, { path: '.gitignore', text: '.deploy\n' }],
