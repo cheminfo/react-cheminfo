@@ -7,5 +7,17 @@
  * erased and so are safe.
  */
 
+export { Molecule3DExport } from './Molecule3DExport.tsx';
+export type { Molecule3DExportProps } from './Molecule3DExport.tsx';
+export { Molecule3DHelp } from './Molecule3DHelp.tsx';
+export { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
+export type { Molecule3DToolbarProps } from './Molecule3DToolbar.tsx';
+export type {
+  MoleculeImageRequest,
+  SceneCapture,
+} from './exportMoleculeImage.ts';
+export { exportMoleculeImage } from './exportMoleculeImage.ts';
+export type { ImageExport } from './useImageExport.ts';
+export { useImageExport } from './useImageExport.ts';
 export { MoleculeViewer3D } from './MoleculeViewer3D.tsx';
 export type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';

@@ -10,10 +10,13 @@
  * measurement.
  */
 
-import { OrderedSet } from 'molstar/lib/mol-data/int.js';
+import { OrderedSet, SortedArray } from 'molstar/lib/mol-data/int.js';
 import type { Loci } from 'molstar/lib/mol-model/loci.js';
 import type { UnitIndex } from 'molstar/lib/mol-model/structure/structure/element/util.js';
-import type { Structure } from 'molstar/lib/mol-model/structure.js';
+import type {
+  ElementIndex,
+  Structure,
+} from 'molstar/lib/mol-model/structure.js';
 import { StructureElement } from 'molstar/lib/mol-model/structure.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import { MeasurementGroupTag } from 'molstar/lib/mol-plugin-state/manager/structure/measurement.js';
@@ -32,18 +35,31 @@ import { moleculeStructure } from './renderMolecule.ts';
 const elementLoci = StructureElement.Loci;
 
 /**
+ * Where the atoms a measurement addresses are found in the plugin's state.
+ *
+ * A site that mounts a molstar plugin of its own builds its scene under refs of
+ * its own, so it says here which structure the clicks are read against; the
+ * default is the one `<MoleculeViewer3D>` draws.
+ */
+export type MoleculeStructureSource = (
+  plugin: PluginContext,
+) => Structure | undefined;
+
+/**
  * Draw exactly `measurements` over the current molecule. An atom the structure
  * does not have skips its measurement rather than failing the scene.
  * @param plugin - The molstar context.
  * @param measurements - Everything to show, replacing what is shown.
+ * @param structureOf - See {@link MoleculeStructureSource}.
  * @returns Nothing; resolves once every label is on screen.
  */
 export async function renderMeasurements(
   plugin: PluginContext,
   measurements: readonly Measurement[],
+  structureOf: MoleculeStructureSource = moleculeStructure,
 ): Promise<void> {
   await clearMeasurements(plugin);
-  const structure = moleculeStructure(plugin);
+  const structure = structureOf(plugin);
   if (structure === undefined) return;
   const manager = plugin.managers.structure.measurement;
   for (const measurement of measurements) {
@@ -141,6 +157,29 @@ export class MeasurementPicker {
     this.#plugin.managers.interactivity.lociSelects.deselectAll();
     this.#onMeasure({ kind, atoms: atoms.toReversed() });
   }
+}
+
+/**
+ * Address one atom of a structure the way a {@link Measurement} does.
+ *
+ * A site that builds its own scene numbers atoms by their position in the file
+ * it drew; this is how that number becomes a reference a measurement keeps.
+ * @param structure - The structure on screen.
+ * @param element - The atom's index in the model, i.e. its position in the file.
+ * @returns The reference, or `undefined` when the structure has no such atom.
+ */
+export function atomReferenceOf(
+  structure: Structure,
+  element: ElementIndex,
+): AtomReference | undefined {
+  const units = structure.units;
+  for (let unit = 0; unit < units.length; unit++) {
+    const elements = units[unit]?.elements;
+    if (elements === undefined) continue;
+    const index = SortedArray.indexOf(elements, element);
+    if (index !== -1) return { unit, element: index };
+  }
+  return undefined;
 }
 
 function atomReference(

@@ -8,6 +8,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { DEFAULT_SPIN_SPEED } from '../../molstar/core/index.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 import {
   normalizeMolecule3DSettings,
@@ -17,7 +18,6 @@ import {
 import { Molecule3DExport } from './Molecule3DExport.tsx';
 import { Molecule3DOptions } from './Molecule3DOptions.tsx';
 import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
-import { DEFAULT_SPIN_SPEED } from './camera.ts';
 import { createMolecule3DViewer } from './createViewer.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
 import { useControlledState } from './useControlledState.ts';

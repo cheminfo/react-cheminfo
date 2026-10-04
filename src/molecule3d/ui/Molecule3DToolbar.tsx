@@ -17,6 +17,7 @@ import {
   MEASUREMENT_LABELS,
 } from '../core/measurement.ts';
 import type { Molecule3DTools } from '../core/settings.ts';
+import { resolveMolecule3DTools } from '../core/settings.ts';
 
 import { Molecule3DHelp } from './Molecule3DHelp.tsx';
 import {
@@ -27,20 +28,22 @@ import {
 
 /** Props of {@link Molecule3DToolbar}. */
 export interface Molecule3DToolbarProps {
-  tools: Molecule3DTools;
+  /** Which tools to show; every one it does not name is on. */
+  tools?: Partial<Molecule3DTools>;
   measureKind: MeasurementKind | null;
   onMeasureKindChange: (kind: MeasurementKind | null) => void;
   measurementCount: number;
   onClearMeasurements: () => void;
   spinning: boolean;
   onSpinningChange: (spinning: boolean) => void;
-  showSurface: boolean;
-  onShowSurfaceChange: (showSurface: boolean) => void;
+  /** Whether the molecular surface is drawn; its tool is left out without a handler. */
+  showSurface?: boolean;
+  onShowSurfaceChange?: (showSurface: boolean) => void;
   onResetView: () => void;
-  /** Content of the options popover. */
-  options: ReactElement;
-  /** Content of the export popover. */
-  exportPanel: ReactElement;
+  /** Content of the options popover; its tool is left out without one. */
+  options?: ReactElement;
+  /** Content of the export popover; its tool is left out without one. */
+  exportPanel?: ReactElement;
 }
 
 /**
@@ -50,7 +53,7 @@ export interface Molecule3DToolbarProps {
  */
 export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
   const {
-    tools,
+    tools: toolsProp,
     measureKind,
     onMeasureKindChange,
     measurementCount,
@@ -64,16 +67,20 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
     exportPanel,
   } = props;
   const t = useChromeT();
+  const tools = resolveMolecule3DTools(toolsProp);
+  const showOptions = tools.options && options !== undefined;
+  const showSurfaceTool = tools.surface && onShowSurfaceChange !== undefined;
+  const showExport = tools.export && exportPanel !== undefined;
   const hasView =
     tools.spin ||
     tools.surface ||
     tools.reset ||
-    tools.options ||
-    tools.export ||
+    showOptions ||
+    showExport ||
     tools.help;
 
   return (
-    <div style={COLUMN_STYLE}>
+    <div className="no-print" style={COLUMN_STYLE}>
       {hasView && (
         <Card elevation={1} style={CARD_STYLE}>
           <Toolbar vertical aria-label={t('molecule3d.view')}>
@@ -98,19 +105,19 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
                 }}
               />
             )}
-            {tools.surface && (
+            {showSurfaceTool && (
               <Toolbar.Item
                 icon={<SurfaceIcon />}
-                active={showSurface}
+                active={showSurface ?? false}
                 aria-label={t('molecule3d.surface')}
                 tooltip={t('molecule3d.molecularSurface')}
                 tooltipProps={TOOLTIP_PROPS}
                 onClick={() => {
-                  onShowSurfaceChange(!showSurface);
+                  onShowSurfaceChange(showSurface !== true);
                 }}
               />
             )}
-            {tools.options && (
+            {showOptions && (
               <Toolbar.PopoverItem
                 placement="right-start"
                 content={options}
@@ -122,7 +129,7 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
                 }}
               />
             )}
-            {tools.export && (
+            {showExport && (
               <Toolbar.PopoverItem
                 placement="right-start"
                 content={exportPanel}

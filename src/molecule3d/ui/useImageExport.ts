@@ -4,8 +4,8 @@ import { useCallback } from 'react';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import type { FigurePixels } from '../../download/core/figureScale.ts';
 
+import type { SceneCapture } from './exportMoleculeImage.ts';
 import { exportMoleculeImage } from './exportMoleculeImage.ts';
-import type { Molecule3DViewer } from './viewer.ts';
 
 /** What {@link useImageExport} hands the export panel. */
 export interface ImageExport {
@@ -24,7 +24,7 @@ export interface ImageExport {
  */
 export function useImageExport(
   container: HTMLDivElement | null,
-  viewerRef: RefObject<Molecule3DViewer | null>,
+  viewerRef: RefObject<SceneCapture | null>,
   fileName: string,
 ): ImageExport {
   const canvasSize = useCallback((): FigurePixels | null => {

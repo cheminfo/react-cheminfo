@@ -20,6 +20,7 @@
     "./core": "./lib/core.js",
     "./ir": "./lib/ir.js",
     "./molecule3d": "./lib/molecule3d.js",
+    "./molstar": "./lib/molstar.js",
     "./orbital": "./lib/orbital.js",
     "./slides": "./lib/slides.js",
     "./spectra": "./lib/spectra.js",

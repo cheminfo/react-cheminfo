@@ -8,22 +8,20 @@
  * is the component's.
  */
 
-import type { PluginViewModel } from 'molstar/lib/extensions/plugin/view-model.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 
+import {
+  DEFAULT_CAMERA_DURATION,
+  DEFAULT_SPIN_SPEED,
+  MolstarPlugin,
+  setSpin,
+} from '../../molstar/core/index.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
 import type { ImageSize } from '../core/exportImage.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 import type { Molecule3DFile } from '../core/settings.ts';
 
-import {
-  DEFAULT_CAMERA_DURATION,
-  DEFAULT_SPIN_SPEED,
-  applyCamera,
-  resetCamera,
-  setSpin,
-  watchCamera,
-} from './camera.ts';
+import { applyCamera, resetCamera, watchCamera } from './camera.ts';
 import { captureScene } from './captureScene.ts';
 import {
   MeasurementPicker,
@@ -32,7 +30,6 @@ import {
 } from './measurements.ts';
 import { clearMolecule, renderMolecule } from './renderMolecule.ts';
 import { clearSurface, renderSurface } from './renderSurface.ts';
-import { mountMolecule3DPlugin } from './viewerSpec.ts';
 import type {
   Molecule3DViewerOptions,
   MoleculeStyle,
@@ -44,9 +41,8 @@ import type {
  * method resolves to nothing once `dispose` has been called.
  */
 export class Molecule3DViewer {
-  readonly #model: PluginViewModel;
+  readonly #plugin: MolstarPlugin;
   #picker: MeasurementPicker | undefined;
-  #disposed = false;
 
   /** Resolves once the canvas exists; every method awaits it internally. */
   readonly ready: Promise<void>;
@@ -57,17 +53,15 @@ export class Molecule3DViewer {
    * @param options - See {@link Molecule3DViewerOptions}.
    */
   constructor(container: HTMLElement, options: Molecule3DViewerOptions = {}) {
-    const {
-      background = '#ffffff', // tokens-ok: a WebGL clear colour
-      onMeasure = ignore,
-    } = options;
-    this.#model = mountMolecule3DPlugin(container, background);
-    this.ready = this.#model.initialized;
+    const { background, onMeasure = ignore } = options;
+    this.#plugin = new MolstarPlugin(container, { background });
+    this.ready = this.#plugin.ready;
     // Registered before any `#run`, so the picker exists by the time one runs.
-    this.ready.then(() => {
-      if (this.#disposed) return;
-      this.#picker = new MeasurementPicker(this.#model.plugin, onMeasure);
-    }, ignore);
+    void this.#plugin
+      .run((plugin) => {
+        this.#picker = new MeasurementPicker(plugin, onMeasure);
+      })
+      .catch(ignore);
   }
 
   /**
@@ -177,16 +171,7 @@ export class Molecule3DViewer {
    * the canvas exists.
    */
   watchCamera(listener: (camera: Molecule3DCamera | null) => void): () => void {
-    let stop: (() => void) | null = null;
-    let cancelled = false;
-    void this.#run((plugin) => {
-      if (!cancelled) stop = watchCamera(plugin, listener);
-    });
-    return () => {
-      cancelled = true;
-      stop?.();
-      stop = null;
-    };
+    return this.#plugin.subscribe((plugin) => watchCamera(plugin, listener));
   }
 
   /**
@@ -203,34 +188,19 @@ export class Molecule3DViewer {
 
   /** Re-read the container's size. Call from a `ResizeObserver`. */
   handleResize(): void {
-    if (this.#disposed) return;
-    this.#model.plugin.handleResize();
+    this.#plugin.handleResize();
   }
 
   /** Tear the viewer down and release its WebGL context. Idempotent. */
   dispose(): void {
-    if (this.#disposed) return;
-    this.#disposed = true;
     this.#picker?.dispose();
-    void this.ready
-      .catch(() => undefined)
-      .then(() => {
-        this.#model.plugin.dispose();
-      });
+    this.#plugin.dispose();
   }
 
-  async #run<Result>(
+  #run<Result>(
     action: (plugin: PluginContext) => Result | Promise<Result>,
   ): Promise<Result | undefined> {
-    if (this.#disposed) return undefined;
-    await this.ready;
-    if (this.#disposed) return undefined;
-    try {
-      return await action(this.#model.plugin);
-    } catch (error) {
-      if (this.#disposed) return undefined;
-      throw error;
-    }
+    return this.#plugin.run(action);
   }
 }
 

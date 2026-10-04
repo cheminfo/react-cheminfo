@@ -7,7 +7,11 @@ import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import type { ImageSize } from '../core/exportImage.ts';
 import { dataUriBytes, rasterSvgMarkup } from '../core/exportImage.ts';
 
-import type { Molecule3DViewer } from './viewer.ts';
+/** The one thing an export asks of a viewer: a picture of its scene. */
+export interface SceneCapture {
+  /** Render the scene at that pixel size, as a `data:` URI. */
+  captureImage: (size: ImageSize) => Promise<string | undefined>;
+}
 
 /** What {@link exportMoleculeImage} writes. */
 export interface MoleculeImageRequest {
@@ -27,7 +31,7 @@ export interface MoleculeImageRequest {
  * @returns Nothing; resolves once the download has been started.
  */
 export async function exportMoleculeImage(
-  viewer: Molecule3DViewer,
+  viewer: SceneCapture,
   request: MoleculeImageRequest,
 ): Promise<void> {
   const { format, scale, size, fileName } = request;
