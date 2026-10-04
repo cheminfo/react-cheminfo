@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.40.1](https://github.com/cheminfo/react-cheminfo/compare/v0.40.0...v0.40.1) (2026-10-04)
+
+
+### Bug Fixes
+
+* **molstar:** reach the layer through a pattern subpath ([f69921b](https://github.com/cheminfo/react-cheminfo/commit/f69921b9800a62209be51b76d5c930b33911fa0e))
+
 ## [0.40.0](https://github.com/cheminfo/react-cheminfo/compare/v0.39.1...v0.40.0) (2026-10-04)
 
 
