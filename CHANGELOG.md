@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.39.1](https://github.com/cheminfo/react-cheminfo/compare/v0.39.0...v0.39.1) (2026-10-04)
+
+
+### Bug Fixes
+
+* **share:** mark a part the framed page draws after it loads ([d445561](https://github.com/cheminfo/react-cheminfo/commit/d445561f037d14c4f14d467044625d843c245edf))
+
 ## [0.39.0](https://github.com/cheminfo/react-cheminfo/compare/v0.38.0...v0.39.0) (2026-10-03)
 
 
