@@ -86,7 +86,10 @@ export class MolstarPlugin {
     this.ready = this.#model.initialized;
   }
 
-  /** Whether {@link dispose} has been called. */
+  /**
+   * Whether {@link dispose} has been called.
+   * @returns True once the canvas has been torn down.
+   */
   get disposed(): boolean {
     return this.#disposed;
   }

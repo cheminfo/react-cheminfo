@@ -4,7 +4,7 @@
 
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 
-import type { ImageSize } from '../core/exportImage.ts';
+import type { ImageSize } from '../../molecule3d/core/exportImage.ts';
 
 /**
  * Render the scene without its selection highlights or its axes.

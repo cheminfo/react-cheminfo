@@ -97,7 +97,8 @@ export function atomName(element: string, index: number): string {
 
 /**
  * Molstar's label providers return HTML, and a readout is plain text.
- * @param label
+ * @param label - The provider's label.
+ * @returns The same label with its tags and entities resolved.
  */
 function stripMarkup(label: string): string {
   return label

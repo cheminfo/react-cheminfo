@@ -13,7 +13,11 @@ import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import {
   DEFAULT_CAMERA_DURATION,
   DEFAULT_SPIN_SPEED,
+  MeasurementPicker,
   MolstarPlugin,
+  captureScene,
+  clearMeasurements,
+  renderMeasurements,
   setSpin,
 } from '../../molstar/core/index.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
@@ -22,13 +26,11 @@ import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 import type { Molecule3DFile } from '../core/settings.ts';
 
 import { applyCamera, resetCamera, watchCamera } from './camera.ts';
-import { captureScene } from './captureScene.ts';
 import {
-  MeasurementPicker,
-  clearMeasurements,
-  renderMeasurements,
-} from './measurements.ts';
-import { clearMolecule, renderMolecule } from './renderMolecule.ts';
+  clearMolecule,
+  moleculeStructure,
+  renderMolecule,
+} from './renderMolecule.ts';
 import { clearSurface, renderSurface } from './renderSurface.ts';
 import type {
   Molecule3DViewerOptions,
@@ -59,7 +61,11 @@ export class Molecule3DViewer {
     // Registered before any `#run`, so the picker exists by the time one runs.
     void this.#plugin
       .run((plugin) => {
-        this.#picker = new MeasurementPicker(plugin, onMeasure);
+        this.#picker = new MeasurementPicker(
+          plugin,
+          onMeasure,
+          moleculeStructure,
+        );
       })
       .catch(ignore);
   }
@@ -112,7 +118,9 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the labels are on screen.
    */
   showMeasurements(measurements: readonly Measurement[]): Promise<void> {
-    return this.#run((plugin) => renderMeasurements(plugin, measurements));
+    return this.#run((plugin) =>
+      renderMeasurements(plugin, measurements, moleculeStructure),
+    );
   }
 
   /**

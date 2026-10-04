@@ -26,10 +26,8 @@ import type {
   AtomReference,
   Measurement,
   MeasurementKind,
-} from '../core/measurement.ts';
-import { MEASUREMENT_ATOM_COUNTS } from '../core/measurement.ts';
-
-import { moleculeStructure } from './renderMolecule.ts';
+} from '../../molecule3d/core/measurement.ts';
+import { MEASUREMENT_ATOM_COUNTS } from '../../molecule3d/core/measurement.ts';
 
 // Lowercased: it is a factory, not a constructor.
 const elementLoci = StructureElement.Loci;
@@ -37,9 +35,8 @@ const elementLoci = StructureElement.Loci;
 /**
  * Where the atoms a measurement addresses are found in the plugin's state.
  *
- * A site that mounts a molstar plugin of its own builds its scene under refs of
- * its own, so it says here which structure the clicks are read against; the
- * default is the one `<MoleculeViewer3D>` draws.
+ * Every site builds its scene under refs of its own, so it says here which
+ * structure the clicks and the labels are read against.
  */
 export type MoleculeStructureSource = (
   plugin: PluginContext,
@@ -56,7 +53,7 @@ export type MoleculeStructureSource = (
 export async function renderMeasurements(
   plugin: PluginContext,
   measurements: readonly Measurement[],
-  structureOf: MoleculeStructureSource = moleculeStructure,
+  structureOf: MoleculeStructureSource,
 ): Promise<void> {
   await clearMeasurements(plugin);
   const structure = structureOf(plugin);
@@ -96,19 +93,23 @@ export class MeasurementPicker {
   readonly #plugin: PluginContext;
   readonly #onMeasure: (measurement: Measurement) => void;
   readonly #unsubscribe: () => void;
+  readonly #structureOf: MoleculeStructureSource;
   #kind: MeasurementKind | null = null;
 
   /**
    * Start listening to the selection history of `plugin`.
    * @param plugin - The molstar context.
    * @param onMeasure - Called with each measurement once its atoms are picked.
+   * @param structureOf - See {@link MoleculeStructureSource}.
    */
   constructor(
     plugin: PluginContext,
     onMeasure: (measurement: Measurement) => void,
+    structureOf: MoleculeStructureSource,
   ) {
     this.#plugin = plugin;
     this.#onMeasure = onMeasure;
+    this.#structureOf = structureOf;
     // A molfile is one residue: at molstar's default granularity a click
     // would pick the whole molecule.
     plugin.managers.interactivity.setProps({ granularity: 'element' });
@@ -142,7 +143,7 @@ export class MeasurementPicker {
 
   #collect(): void {
     const kind = this.#kind;
-    const structure = moleculeStructure(this.#plugin);
+    const structure = this.#structureOf(this.#plugin);
     if (kind === null || structure === undefined) return;
     const needed = MEASUREMENT_ATOM_COUNTS[kind];
     // The history is newest first.
