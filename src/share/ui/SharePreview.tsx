@@ -22,6 +22,12 @@ import { SharePreviewDevices } from './SharePreviewDevices.tsx';
 /** Room the window's own bar takes, which the page is not scaled into. */
 const CHROME_HEIGHT = 26;
 
+/** How often the framed page is asked again while it has answered nothing. */
+const ASK_INTERVAL = 300;
+
+/** How many times, so a page with nothing to report is left alone. */
+const ASK_LIMIT = 10;
+
 export interface SharePreviewProps {
   /** The address the frame loads — the link as it stands. */
   url: string;
@@ -96,6 +102,31 @@ export function SharePreview(props: SharePreviewProps): ReactElement {
   useEffect(() => {
     mark.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }, [highlight?.part]);
+
+  // The frame's own load says the document is there, never that the page it
+  // builds is listening: a React tree mounts in a task of its own, after it.
+  // So the question is repeated until it is answered — there is no event on
+  // this side to wait for, and a page that answers nothing is a page with no
+  // parts to point at, which costs ten messages and stops.
+  useEffect(() => {
+    if (regions.length > 0) return undefined;
+    let asked = 0;
+    const timer = setInterval(() => {
+      asked += 1;
+      if (asked > ASK_LIMIT) {
+        clearInterval(timer);
+        return;
+      }
+      frame.current?.contentWindow?.postMessage(
+        { type: SHARE_REGIONS_REQUEST },
+        '*',
+      );
+    }, ASK_INTERVAL);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [regions, src]);
 
   return (
     <section className="share-preview" aria-label={t('share.preview')}>
