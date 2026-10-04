@@ -78,6 +78,14 @@ export interface ConformerTableProps {
    * @default undefined — every column keeps its own
    */
   columnLabels?: Partial<Record<ConformerColumn, string>>;
+  /**
+   * Whether the energies on screen are expected to be replaced — a force
+   * field's numbers while a better method is still working on the set. They
+   * are then drawn muted, so a reader can tell at a glance which of the two
+   * rankings they are looking at.
+   * @default false
+   */
+  provisional?: boolean;
 }
 
 /**
@@ -102,6 +110,7 @@ export function ConformerTable(
     label = 'Conformers, most stable first',
     rowName = String,
     columnLabels,
+    provisional = false,
   } = props;
 
   const bodyRef = useRef<HTMLTableSectionElement>(null);
@@ -208,7 +217,7 @@ export function ConformerTable(
                   <ClickToCopy
                     key={column}
                     as="td"
-                    style={cellStyle(column)}
+                    style={cellStyle(column, provisional)}
                     value={content}
                     label={COPY_LABELS[column]}
                     testId={CELL_TEST_IDS[column]}
@@ -218,7 +227,7 @@ export function ConformerTable(
                 ) : (
                   <td
                     key={column}
-                    style={cellStyle(column)}
+                    style={cellStyle(column, provisional)}
                     data-testid={CELL_TEST_IDS[column]}
                   >
                     {content}
@@ -360,8 +369,24 @@ function headerStyle(column: ConformerColumn): CSSProperties | undefined {
   return NUMERIC_CONFORMER_COLUMNS.has(column) ? numericStyle : undefined;
 }
 
-function cellStyle(column: ConformerColumn): CSSProperties | undefined {
-  return NUMERIC_CONFORMER_COLUMNS.has(column) ? numericStyle : undefined;
+/**
+ * A cell's own style: numbers are right-aligned and tabular, and every cell a
+ * better method will restate is muted while it works. The rank is not one of
+ * them — it names the row rather than measuring it, and it is what a reader
+ * follows as the order changes under them.
+ * @param column - The column the cell is in.
+ * @param provisional - Whether the energies are still expected to change.
+ * @returns The cell's inline style, or `undefined` when it needs none.
+ */
+function cellStyle(
+  column: ConformerColumn,
+  provisional: boolean,
+): CSSProperties | undefined {
+  const numeric = NUMERIC_CONFORMER_COLUMNS.has(column);
+  if (!provisional || column === 'id') {
+    return numeric ? numericStyle : undefined;
+  }
+  return numeric ? provisionalNumericStyle : provisionalStyle;
 }
 
 const tableStyle = { width: '100%' } as const satisfies CSSProperties;
@@ -369,6 +394,15 @@ const tableStyle = { width: '100%' } as const satisfies CSSProperties;
 const numericStyle = {
   textAlign: 'right',
   fontVariantNumeric: 'tabular-nums',
+} as const satisfies CSSProperties;
+
+const provisionalStyle = {
+  color: 'var(--text-muted)',
+} as const satisfies CSSProperties;
+
+const provisionalNumericStyle = {
+  ...numericStyle,
+  ...provisionalStyle,
 } as const satisfies CSSProperties;
 
 /**

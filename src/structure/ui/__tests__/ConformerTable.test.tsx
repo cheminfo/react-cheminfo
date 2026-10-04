@@ -217,3 +217,31 @@ test('a picker can name its rows and rename a heading', () => {
   expect(html).toContain('Conformer 3');
   expect(html).not.toContain('>#<');
 });
+
+test('a provisional set mutes the numbers a better method will restate', () => {
+  const html = renderToStaticMarkup(
+    <ConformerTable conformers={butane()} provisional />,
+  );
+
+  expect(cellOf(html, 'conformer-relative-energy')).toContain(
+    'var(--text-muted)',
+  );
+  expect(cellOf(html, 'conformer-population')).toContain('var(--text-muted)');
+  // The rank names the row rather than measuring it, so it keeps its own ink.
+  expect(cellOf(html, 'conformer-id')).not.toContain('var(--text-muted)');
+});
+
+test('a settled set draws every cell in the page ink', () => {
+  const html = renderToStaticMarkup(<ConformerTable conformers={butane()} />);
+
+  expect(html).not.toContain('var(--text-muted)');
+});
+
+/**
+ * The opening tag of the first cell of a column, where its style is written.
+ * @param html
+ * @param testId
+ */
+function cellOf(html: string, testId: string): string {
+  return new RegExp(`<td[^>]*${testId}[^>]*>`).exec(html)?.[0] ?? '';
+}
