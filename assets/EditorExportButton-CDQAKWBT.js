@@ -1,8 +1,0 @@
-import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t,n}from"./iframe-DS2CryJ6.js";import{n as r,t as i}from"./useT-DBVeIM0y.js";import{n as a,r as o}from"./buttons-B8YFhXAZ.js";import{n as s,t as c}from"./ActionTooltip-7d8V1onF.js";import{n as l,t as u}from"./StructureExportDialog-HOec86tT.js";function d(e){let{source:t,fragment:n,empty:i}=e,o=r(),[s,l]=(0,f.useState)(null);return(0,p.jsxs)(p.Fragment,{children:[(0,p.jsx)(c,{content:o(`structure.export.open`),placement:`left`,opened:s!==null,children:(0,p.jsx)(a,{variant:`minimal`,size:`small`,icon:`export`,disabled:i,"aria-label":o(`structure.export.open`),onClick:()=>l(t())})}),(0,p.jsx)(u,{...s,isOpen:s!==null,fragment:n,onClose:()=>l(null)})]})}var f,p;function m(){return(m=e((()=>{o(),f=t(),i(),s(),l(),p=n(),d.__docgenInfo={description:`The editor's export button, beside the help one, opening every notation of
-the drawing and the picture of it.
-
-The structure is read when the button is pressed rather than kept beside the
-canvas, so the dialog opens on what is drawn now and the editor is not
-re-rendered on every stroke to keep a copy in step.
-@param props - See {@link EditorExportButtonProps}.
-@returns The button and its dialog.`,methods:[],displayName:`EditorExportButton`,props:{source:{required:!0,tsType:{name:`signature`,type:`function`,raw:`() => StructureSourceInput`,signature:{arguments:[],return:{name:`StructureSourceInput`}}},description:`Reads what is drawn, called the moment the dialog is opened.`},fragment:{required:!0,tsType:{name:`boolean`},description:`Whether the editor draws a query fragment.`},empty:{required:!0,tsType:{name:`boolean`},description:`Whether the canvas holds nothing to export.`}}}})))()}m();export{d as EditorExportButton};
