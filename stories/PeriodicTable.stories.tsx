@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { swatchAt } from '../src/color/core/interpolate.ts';
 import { positionInRange } from '../src/color/core/scale.ts';
 import { resolveColorScale } from '../src/color/core/scaleText.ts';
+import { configurationOf } from '../src/orbital/core/electronConfiguration.ts';
 import { UNKNOWN_SWATCH } from '../src/periodic/core/categories.ts';
 import type { PeriodicElement } from '../src/periodic/core/elements.ts';
 import type { PeriodicTableProps } from '../src/periodic/ui/PeriodicTable.tsx';
@@ -108,6 +109,21 @@ export const DimmedSelection: Story = {
   ),
 };
 
+/** The table a wall chart draws: the name, and the electrons of each shell. */
+export const Shells: Story = {
+  args: { headers: true, legend: false },
+  render: (args) => (
+    <div style={{ maxWidth: 900 }}>
+      <PeriodicTable
+        {...args}
+        selected="Ni"
+        detailOf={(element) => element.name}
+        shellsOf={(element) => shellsFor(element.atomicNumber)}
+      />
+    </div>
+  ),
+};
+
 function PickerDemo(props: PeriodicTableProps): ReactElement {
   const [selected, setSelected] = useState('C');
   return (
@@ -153,6 +169,14 @@ function swatchFor(element: PeriodicElement) {
 }
 
 const VIRIDIS = resolveColorScale('viridis').scale;
+
+function shellsFor(atomicNumber: number): number[] {
+  const shells: number[] = [];
+  for (const subshell of configurationOf(atomicNumber)) {
+    shells[subshell.n - 1] = (shells[subshell.n - 1] ?? 0) + subshell.electrons;
+  }
+  return shells;
+}
 
 function detailFor(element: PeriodicElement): string {
   const value = ELECTRONEGATIVITY[element.symbol];

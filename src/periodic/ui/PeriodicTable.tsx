@@ -37,6 +37,13 @@ import {
   HeaderStrips,
   InnerTransitionMarkers,
 } from './PeriodicTableChrome.tsx';
+import {
+  ROW_SHARE,
+  SHELLS_RESERVED,
+  detailType,
+  shellFontSize,
+  textWidthInEm,
+} from './cellType.ts';
 import { UNIT_PROPERTY, ofWidth, unitValue } from './unit.ts';
 
 /** What {@link PeriodicTable} needs. */
@@ -68,6 +75,13 @@ export interface PeriodicTableProps {
    * @default the English name
    */
   nameOf?: (element: PeriodicElement) => string;
+  /**
+   * Electrons in each shell of an element, innermost first, written down the
+   * right-hand edge of its cell. The energy levels, which a table is also read
+   * for: none of ours knows them, so the tool that does says so here.
+   * @default undefined — no cell writes any
+   */
+  shellsOf?: (element: PeriodicElement) => readonly number[] | undefined;
   /**
    * Whether an element is inside the set the tool is showing. Everything
    * outside it is dimmed rather than removed, so the table keeps its shape.
@@ -137,6 +151,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     swatchOf = defaultSwatchOf,
     detailOf,
     nameOf = defaultNameOf,
+    shellsOf,
     isIncluded,
     inset,
     headers = false,
@@ -184,6 +199,23 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     onSelect(next.symbol);
   }
 
+  // One size for the whole table rather than one per cell: a column of values
+  // written at eleven sizes is read as eleven things, and a name shrunk to a
+  // third of its neighbour's is the one a class cannot make out. The size is
+  // what the widest of them fits at, and anything wider than that is condensed
+  // by the cell rather than written smaller still.
+  const placed = placedElements();
+  const widths: number[] = [];
+  let deepest = 0;
+  for (const { element } of placed) {
+    widths.push(textWidthInEm(detailOf?.(element) ?? ''));
+    const stack = shellsOf?.(element);
+    if (stack !== undefined && stack.length > deepest) deepest = stack.length;
+  }
+  const reserved = deepest === 0 ? 0 : SHELLS_RESERVED;
+  const type = detailType(widths, reserved);
+  const shellSize = shellFontSize(deepest);
+
   return (
     <div ref={rootRef} className={className} style={rootStyle}>
       <div
@@ -199,13 +231,16 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
           <div style={insetStyle(offset)}>{inset}</div>
         )}
         {markers ? <InnerTransitionMarkers offset={offset} /> : null}
-        {placedElements().map(({ element, cell }) => (
+        {placed.map(({ element, cell }) => (
           <ElementCell
             key={element.symbol}
             atomicNumber={element.atomicNumber}
             symbol={element.symbol}
             name={nameOf(element)}
             detail={detailOf?.(element)}
+            detailType={type}
+            shells={shellsOf?.(element)}
+            shellSize={shellSize}
             swatch={swatchOf(element)}
             isSelected={element.symbol === selected}
             isIncluded={isIncluded?.(element)}
@@ -270,7 +305,7 @@ const MIN_WIDTH = 280;
  * table: a cell keeps the band it writes a value in whether or not that table
  * writes one.
  */
-const ROW_HEIGHT = ofWidth(6.8);
+const ROW_HEIGHT = ofWidth(ROW_SHARE);
 
 /** The band the two inner-transition series were lifted out across. */
 const SERIES_GAP = `max(6px, ${ofWidth(1.1)})`;

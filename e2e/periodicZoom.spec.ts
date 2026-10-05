@@ -57,9 +57,21 @@ test('the drawing keeps its proportions under a host page zoom', async ({
   const plain = await shapeOf(page, 1);
   const zoomed = await shapeOf(page, ZOOM);
 
-  // A third of a cell is what the defect cost, so a couple of per cent of
-  // tolerance leaves room for one engine's text metrics and catches it.
-  expect(zoomed.symbolPerCell).toBeCloseTo(plain.symbolPerCell, 2);
-  expect(zoomed.cellPerTable).toBeCloseTo(plain.cellPerTable, 2);
-  expect(zoomed.heightPerWidth).toBeCloseTo(plain.heightPerWidth, 2);
+  // The claim is about proportion, so the tolerance is relative. A third of a
+  // cell is what the defect cost; four per cent leaves room for the size an
+  // engine actually rasterises a share of a width at — WebKit quantises a
+  // font size, and the smaller the type the larger that rounding reads as a
+  // share of it.
+  expectSameShape(zoomed.symbolPerCell, plain.symbolPerCell);
+  expectSameShape(zoomed.cellPerTable, plain.cellPerTable);
+  expectSameShape(zoomed.heightPerWidth, plain.heightPerWidth);
 });
+
+/**
+ * Two shares of the same drawing, taken at two zooms.
+ * @param zoomed - The share the zoomed host measured.
+ * @param plain - The share the unzoomed one measured.
+ */
+function expectSameShape(zoomed: number, plain: number): void {
+  expect(Math.abs(zoomed / plain - 1)).toBeLessThan(0.04);
+}

@@ -124,24 +124,81 @@ test('a long value is written smaller rather than cut short', () => {
     <PeriodicTable detailOf={() => '8.988e-5'} />,
   );
 
-  expect(short).toContain(`font-size:${fitted('0.25rem', 1.6, '2.40')}`);
-  expect(long).toContain(`font-size:${fitted('0.25rem', 1.6, '4.80')}`);
+  // Four glyphs have room to spare, so they are written at the cap; eight do
+  // not, and the whole table steps down with them rather than cutting any.
+  expect(short).toContain(`font-size:max(0.4rem, ${ofWidth(1.5)})`);
+  expect(long).toContain(`font-size:max(0.4rem, ${ofWidth(0.95)})`);
   expect(short).not.toContain('text-overflow');
   expect(long).not.toContain('text-overflow');
 });
 
-test('a wide symbol is written smaller so it stays inside its cell', () => {
-  const html = renderToStaticMarkup(<PeriodicTable detailOf={() => '1'} />);
-  const iron = html.split('data-testid="element-Fe"', 2)[1] ?? '';
-  const curium = html.split('data-testid="element-Cm"', 2)[1] ?? '';
-
-  expect(iron.slice(0, 2000)).toContain(
-    `font-size:${fitted('0.5rem', 2.4, '1.48')}`,
+test('one size writes the third line of every cell of a table', () => {
+  const html = renderToStaticMarkup(
+    <PeriodicTable detailOf={(element) => element.name} />,
   );
-  expect(curium.slice(0, 2000)).toContain(
-    `font-size:${fitted('0.5rem', 2.4, '1.80')}`,
+  const size = `font-size:max(0.4rem, ${ofWidth(0.95)})`;
+
+  // Tin and praseodymium are written alike; the longer of the two is condensed
+  // to fit rather than written smaller than its neighbours.
+  expect(cellOf(html, 'Sn')).toContain(size);
+  expect(cellOf(html, 'Pr')).toContain(size);
+  expect(cellOf(html, 'Sn')).not.toContain('transform:scaleX');
+  expect(cellOf(html, 'Pr')).toContain('transform:scaleX(0.7');
+});
+
+test('a wide symbol is written smaller so it stays clear of the shells', () => {
+  const html = renderToStaticMarkup(
+    <PeriodicTable shellsOf={() => [2, 8, 1]} />,
+  );
+
+  // Iron has room beside the column of electrons; curium, an em wider, does
+  // not, and steps down rather than running into it.
+  expect(cellOf(html, 'Fe')).toContain(
+    `font-size:max(0.5rem, ${ofWidth(2.1)})`,
+  );
+  expect(cellOf(html, 'Cm')).toContain(
+    `font-size:max(0.5rem, ${ofWidth(1.707)})`,
   );
 });
+
+test('the electrons of each shell stand down the right edge, at one size', () => {
+  const bare = renderToStaticMarkup(<PeriodicTable />);
+  const html = renderToStaticMarkup(
+    <PeriodicTable
+      detailOf={(element) => element.name}
+      shellsOf={(element) => (element.symbol === 'Fr' ? SEVEN : [2, 8, 1])}
+    />,
+  );
+
+  // The deepest stack of the table is what the size fits, so francium's seven
+  // and sodium's three are written alike.
+  expect(cellOf(html, 'Fr')).toContain('2\n8\n18\n32\n18\n8\n1');
+  expect(cellOf(html, 'Na')).toContain(
+    `font-size:max(0.3rem, ${ofWidth(0.81)})`,
+  );
+  expect(cellOf(html, 'Fr')).toContain(
+    `font-size:max(0.3rem, ${ofWidth(0.81)})`,
+  );
+  // The column is reserved in the cell rather than laid over the symbol.
+  expect(cellOf(html, 'Na')).toContain(
+    `grid-template-columns:1fr ${ofWidth(1.2)};column-gap:${ofWidth(0.5)}`,
+  );
+  expect(bare).toContain('grid-template-columns:1fr;');
+  expect(bare).not.toContain('grid-row:1 / span 3');
+});
+
+/** Francium's shells, the deepest stack of the table. */
+const SEVEN = [2, 8, 18, 32, 18, 8, 1];
+
+/**
+ * The markup of one cell.
+ * @param html - The whole table.
+ * @param symbol - The element to read.
+ * @returns What that cell carries.
+ */
+function cellOf(html: string, symbol: string): string {
+  return (html.split(`data-symbol="${symbol}"`, 2)[1] ?? '').slice(0, 2000);
+}
 
 test('every cell has the same three bands, whether or not a value is written', () => {
   const bare = renderToStaticMarkup(<PeriodicTable />);
@@ -174,17 +231,6 @@ test('a render that never measures falls back to the container unit', () => {
   expect(html).not.toContain('--periodic-unit:');
   expect(html).not.toContain('getBoundingClientRect');
 });
-
-/**
- * The size a string of the given width is written at.
- * @param floor - The size it is never written under.
- * @param cap - The share of the width it is written at where it fits.
- * @param widthInEm - How wide the string is, as the component rounds it.
- * @returns The CSS the cell carries.
- */
-function fitted(floor: string, cap: number, widthInEm: string): string {
-  return `max(${floor}, min(${ofWidth(cap)}, calc((${UNIT} * 4.85 - 4px) / ${widthInEm})))`;
-}
 
 test('the empty block holds what the tool writes there, and nothing by default', () => {
   const bare = renderToStaticMarkup(<PeriodicTable />);

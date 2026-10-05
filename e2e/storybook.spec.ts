@@ -279,6 +279,7 @@ const STORY_IDS = [
   'periodic-periodictable--dimmed-selection',
   'periodic-periodictable--picker',
   'periodic-periodictable--property-map',
+  'periodic-periodictable--shells',
   'projection-pcaviewer--every-pair',
   'projection-pcaviewer--how-much-each-explains',
   'projection-pcaviewer--iris',
