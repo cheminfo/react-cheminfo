@@ -374,8 +374,12 @@ button {
    nothing to push them there. */
 .share-linkbar {
   display: flex;
+  /* They keep the right edge while there is room, and wrap under each other
+     rather than off the dialog once there is not. */
+  flex: 0 1 auto;
+  flex-wrap: wrap;
   align-items: center;
-  flex: 0 0 auto;
+  justify-content: flex-end;
   margin-left: auto;
   gap: 8px;
 }
@@ -588,7 +592,11 @@ button {
    frames at 1920 is one they check at 1920. */
 .share-dialog.bp6-dialog {
   overflow: hidden;
-  min-width: 480px;
+  /* The floor is what a drag may shrink the dialog to, so it must not also
+     apply to a screen narrower than it: at 480px the dialog stopped shrinking
+     and was clipped on both sides, with no horizontal scroll to reach what was
+     cut — the iframe snippet and the part checkboxes, on every phone. */
+  min-width: min(480px, 96vw);
   min-height: 420px;
   max-width: 98vw;
   max-height: 96dvh;
