@@ -23,6 +23,18 @@ IMAGE_TAG=latest
 # COMPOSE_FILE=compose.cloudflared.yaml
 `;
 
+/** A root `package.json` whose build cannot write a bundle before the tests pass. */
+export const PACKAGE_JSON = `{
+  "scripts": {
+    "build": "npm run test && npm run test-e2e && npm run build-only",
+    "build-only": "vite build",
+    "test": "npm run test-only && npm run eslint",
+    "test-e2e": "playwright test",
+    "test-only": "vitest run --coverage"
+  }
+}
+`;
+
 /**
  * One service that keeps the contract, with lines appended under it.
  * @param extra - Lines added at the end of the service.
@@ -50,6 +62,7 @@ export function repository(overrides: Record<string, string> = {}) {
     'compose.cloudflared.yaml': service(),
     '.env.example': ENV_EXAMPLE,
     '.gitignore': 'node_modules\n.env\n.deploy\n',
+    'package.json': PACKAGE_JSON,
     '.github/workflows/docker-image.yml': DOCKER_IMAGE,
     ...overrides,
   };

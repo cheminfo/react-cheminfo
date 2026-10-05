@@ -12,7 +12,11 @@ export type DeployProblemKind =
   | 'missing-deploy-ignore'
   | 'cacheable-page'
   | 'unpublishable-image'
-  | 'brittle-install';
+  | 'brittle-install'
+  | 'ungated-build'
+  | 'missing-build-only'
+  | 'test-runs-e2e'
+  | 'gated-image-build';
 
 /** One way a repository would fail, or silently mis-deploy, on the server. */
 export interface DeployProblem {

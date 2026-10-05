@@ -1,3 +1,4 @@
+import { readBuildGate } from './buildGate.ts';
 import { readComposeFile } from './composeFile.ts';
 import { readEnvExample } from './envExample.ts';
 import { readPageCache } from './pageCache.ts';
@@ -18,7 +19,8 @@ import { DEPLOY_COMPOSE_FILES } from './types.ts';
  * reports it healthy. So a repository has to hand it a selectable tag on every
  * image we build, an `IMAGE_NAME` that names the package our own workflow
  * publishes, a compose file that parses on a checkout with no `.env` yet, and a
- * health probe to read. It also has to publish that image in the first place:
+ * health probe to read, and a `build` that cannot write a bundle until the
+ * tests have passed. It also has to publish that image in the first place:
  * with no `latest` to pull the script builds from source on the deploy host,
  * and the install that follows must survive a blip in the registry. It also has to hand the browser a page the browser will
  * not keep, or the next deploy leaves returning visitors on a blank one. Each
@@ -83,6 +85,8 @@ export function findDeployProblems(
     readPageCache(dockerfile, byPath, problems);
     readInstallRetries(dockerfile, problems);
   }
+
+  readBuildGate(byPath.get('package.json'), dockerfile, problems);
 
   readPublishedImage(byPath.get(DOCKER_IMAGE_WORKFLOW), problems);
 

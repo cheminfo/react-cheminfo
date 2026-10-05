@@ -5,7 +5,7 @@ import { findDeployProblems } from '../checkDeploy.ts';
 import { IMAGE, repository } from './deployRepository.ts';
 
 const SWS_DOCKERFILE = `FROM node:24-alpine AS builder
-RUN npm run build
+RUN npm run build-only
 
 FROM joseluisq/static-web-server:2-alpine
 COPY --from=builder /app/dist /public
@@ -29,7 +29,7 @@ Cache-Control = "public, max-age=31536000, immutable"
 `;
 
 const NGINX_DOCKERFILE = `FROM node:24-alpine AS builder
-RUN npm run build
+RUN npm run build-only
 
 FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf

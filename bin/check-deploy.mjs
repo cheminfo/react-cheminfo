@@ -5,7 +5,8 @@
  * nothing publishes or that carries no selectable tag, a page the browser keeps across a deploy and then cannot
  * run, an `IMAGE_NAME` naming a package this repository never publishes, an
  * `env_file` that fails on a checkout with no `.env` yet, a service with no
- * health probe to read, an `.env.example` that hides a mode.
+ * health probe to read, an `.env.example` that hides a mode, a `build` that
+ * bundles before the tests have run.
  *
  * Wire it as an npm script, next to check-tokens:
  *   "check-deploy": "cheminfo-check-deploy"
@@ -75,6 +76,7 @@ for (const path of [
   ...expected,
   '.env.example',
   '.gitignore',
+  'package.json',
   'Dockerfile',
   PAGE_CACHE_CONFIG,
   NGINX_CONFIG,

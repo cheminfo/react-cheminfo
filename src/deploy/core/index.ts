@@ -1,3 +1,4 @@
+export { readBuildGate } from './buildGate.ts';
 export { findDeployProblems } from './checkDeploy.ts';
 export type {
   CheckDeployOptions,
