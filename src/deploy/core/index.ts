@@ -7,6 +7,7 @@ export type {
   DeployProblemKind,
 } from './types.ts';
 export { NGINX_CONFIG, PAGE_CACHE_CONFIG } from './pageCache.ts';
+export { REACT_MAJOR, readReactCopies } from './reactCopies.ts';
 export {
   DOCKER_IMAGE_WORKFLOW,
   readInstallRetries,

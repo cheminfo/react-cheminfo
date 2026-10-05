@@ -6,7 +6,8 @@
  * run, an `IMAGE_NAME` naming a package this repository never publishes, an
  * `env_file` that fails on a checkout with no `.env` yet, a service with no
  * health probe to read, an `.env.example` that hides a mode, a `build` that
- * bundles before the tests have run.
+ * bundles before the tests have run, a React that resolves twice or resolves to
+ * a major the family does not run.
  *
  * Wire it as an npm script, next to check-tokens:
  *   "check-deploy": "cheminfo-check-deploy"
@@ -77,6 +78,7 @@ for (const path of [
   '.env.example',
   '.gitignore',
   'package.json',
+  'package-lock.json',
   'Dockerfile',
   PAGE_CACHE_CONFIG,
   NGINX_CONFIG,

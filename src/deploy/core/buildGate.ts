@@ -1,7 +1,5 @@
+import { lineOf, parseJsonObject, stringEntries } from './json.ts';
 import type { DeployProblem } from './types.ts';
-
-/** The scripts a repository's own `package.json` declares, as npm would run them. */
-type Scripts = Record<string, string>;
 
 /**
  * Report a repository that can bundle, and so publish, code nothing tested.
@@ -24,8 +22,9 @@ export function readBuildGate(
   problems: DeployProblem[],
 ): void {
   if (packageJson === undefined) return;
-  const scripts = parseScripts(packageJson);
-  if (scripts === undefined) return;
+  const parsed = parseJsonObject(packageJson);
+  if (parsed === undefined) return;
+  const scripts = stringEntries(parsed.scripts);
 
   const build = scripts.build;
   if (build !== undefined && !/\bnpm run test\b/.test(build)) {
@@ -89,34 +88,4 @@ function gatedBuildLine(dockerfile: string): number | undefined {
     return index + 1;
   }
   return undefined;
-}
-
-/**
- * The scripts block of a `package.json`.
- * @param text - The file, unparsed.
- * @returns Its scripts, or undefined when the file is not readable as one.
- */
-function parseScripts(text: string): Scripts | undefined {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    return undefined;
-  }
-  if (typeof parsed !== 'object' || parsed === null) return undefined;
-  const scripts = (parsed as { scripts?: unknown }).scripts;
-  if (typeof scripts !== 'object' || scripts === null) return {};
-  return scripts as Scripts;
-}
-
-/**
- * Where a report should point, so the reader lands on the script itself.
- * @param text - The file to search.
- * @param needle - The key to find.
- * @returns Its line, counting from 1, or 0 when it is not there.
- */
-function lineOf(text: string, needle: string): number {
-  const at = text.indexOf(needle);
-  if (at === -1) return 0;
-  return text.slice(0, at).split('\n').length;
 }

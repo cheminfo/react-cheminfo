@@ -7,6 +7,7 @@ import {
   readInstallRetries,
   readPublishedImage,
 } from './publishedImage.ts';
+import { readReactCopies } from './reactCopies.ts';
 import type { CheckDeployOptions, DeployFile, DeployProblem } from './types.ts';
 import { DEPLOY_COMPOSE_FILES } from './types.ts';
 
@@ -87,6 +88,12 @@ export function findDeployProblems(
   }
 
   readBuildGate(byPath.get('package.json'), dockerfile, problems);
+
+  readReactCopies(
+    byPath.get('package.json'),
+    byPath.get('package-lock.json'),
+    problems,
+  );
 
   readPublishedImage(byPath.get(DOCKER_IMAGE_WORKFLOW), problems);
 

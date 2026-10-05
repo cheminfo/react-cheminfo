@@ -16,7 +16,11 @@ export type DeployProblemKind =
   | 'ungated-build'
   | 'missing-build-only'
   | 'test-runs-e2e'
-  | 'gated-image-build';
+  | 'gated-image-build'
+  | 'duplicate-react'
+  | 'stray-react-major'
+  | 'unpinned-react'
+  | 'conflicting-react-pin';
 
 /** One way a repository would fail, or silently mis-deploy, on the server. */
 export interface DeployProblem {
