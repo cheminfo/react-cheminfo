@@ -106,6 +106,23 @@ test('every part is offered, worded positively, as a switch saying its state', (
   expect(html.match(/bp6-switch-inner-text">Off</g)).toHaveLength(4);
 });
 
+test('a switch is named after the part, not after its own On and Off', () => {
+  const html = render();
+
+  // Blueprint wraps the input in a label of its own carrying the On/Off text,
+  // and a wrapping label beats an `htmlFor` one: without the explicit link the
+  // switch is named "OnOff" and a screen reader never says what is on.
+  const named = html.match(/aria-labelledby="[^"]+-label"/g) ?? [];
+
+  expect(named).toHaveLength(4);
+
+  const [, labelId] =
+    /id="([^"]+-label)"[^>]*>The other sets</.exec(html) ?? [];
+
+  expect(labelId).toBeDefined();
+  expect(html).toContain(`aria-labelledby="${labelId}"`);
+});
+
 test('a part says what switching it off does, under its own label', () => {
   const html = render();
 

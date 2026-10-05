@@ -45,6 +45,7 @@ export function SharePartRow(props: SharePartRowProps): ReactElement {
   const { label, description, on, descriptions, onChange, onPointed } = props;
   const t = useChromeT();
   const id = useId();
+  const labelId = `${id}-label`;
 
   return (
     <div
@@ -54,7 +55,7 @@ export function SharePartRow(props: SharePartRowProps): ReactElement {
       onFocus={() => onPointed?.(true)}
       onBlur={() => onPointed?.(false)}
     >
-      <label className="share-part__label" htmlFor={id}>
+      <label className="share-part__label" htmlFor={id} id={labelId}>
         {label}
       </label>
       {descriptions === 'help' ? (
@@ -63,6 +64,10 @@ export function SharePartRow(props: SharePartRowProps): ReactElement {
       <Switch
         id={id}
         className="share-part__switch"
+        // Blueprint wraps the input in a label of its own carrying the On/Off
+        // text, and a wrapping label beats an `htmlFor` one: without this the
+        // switch is named "OnOff" and a screen reader never says what is on.
+        aria-labelledby={labelId}
         checked={on}
         innerLabel={t('share.off')}
         innerLabelChecked={t('share.on')}
