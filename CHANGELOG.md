@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.42.0](https://github.com/cheminfo/react-cheminfo/compare/v0.41.0...v0.42.0) (2026-10-05)
+
+
+### Features
+
+* **chrome:** ship the About entry, so no site picks its glyph ([d7268e2](https://github.com/cheminfo/react-cheminfo/commit/d7268e247543b49554b91b86c34c8d58d516b195))
+
 ## [0.41.0](https://github.com/cheminfo/react-cheminfo/compare/v0.40.1...v0.41.0) (2026-10-05)
 
 
