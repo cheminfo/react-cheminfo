@@ -5,7 +5,7 @@
  * A cell is a real `<button>`, so Tab reaches it, Enter and Space activate it,
  * and a screen reader reads the element's name rather than its symbol.
  *
- * Everything written in it is sized in container-query units, so a cell shows
+ * Everything written in it is a share of the table's width, so a cell shows
  * the same proportions at 280px beside a chart and across a lecture-hall
  * screen — the table a class reads is the same drawing, larger.
  */
@@ -15,6 +15,8 @@ import { useState } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+
+import { UNIT, ofWidth } from './unit.ts';
 
 /** What {@link ElementCell} needs to draw one element. */
 export interface ElementCellProps {
@@ -120,8 +122,8 @@ export function ElementCell(props: ElementCellProps): ReactElement {
         outlineColor: swatch.foreground,
         // Thick enough to be seen from the back of a room, and drawn inside
         // the cell so a neighbour never covers it.
-        outlineWidth: 'max(2px, 0.3cqw)',
-        outlineOffset: 'max(-3px, -0.4cqw)',
+        outlineWidth: `max(2px, ${ofWidth(0.3)})`,
+        outlineOffset: `max(-3px, ${ofWidth(-0.4)})`,
         // The cell the pointer is on, for a class following a demonstration.
         filter: isHovered ? 'brightness(1.08)' : undefined,
       }}
@@ -154,7 +156,7 @@ export function ElementCell(props: ElementCellProps): ReactElement {
  * @returns A CSS length.
  */
 function symbolFontSize(symbol: string): string {
-  return fitted(symbolWidthInEm(symbol), SYMBOL_CQW, '0.5rem');
+  return fitted(symbolWidthInEm(symbol), SYMBOL_CAP, '0.5rem');
 }
 
 /**
@@ -167,7 +169,7 @@ function symbolFontSize(symbol: string): string {
  * @returns A CSS length.
  */
 function detailFontSize(detail: string): string {
-  return fitted(detailWidthInEm(detail), DETAIL_CQW, '0.25rem');
+  return fitted(detailWidthInEm(detail), DETAIL_CAP, '0.25rem');
 }
 
 /**
@@ -182,7 +184,7 @@ function detailFontSize(detail: string): string {
  * @returns A CSS length.
  */
 function fitted(widthInEm: number, cap: string, floor: string): string {
-  const room = `calc((${CELL_CQW} - ${CELL_CHROME}) / ${widthInEm.toFixed(2)})`;
+  const room = `calc((${UNIT} * ${String(CELL_SHARE)} - ${CELL_CHROME}) / ${widthInEm.toFixed(2)})`;
   return `max(${floor}, min(${cap}, ${room}))`;
 }
 
@@ -222,7 +224,7 @@ function detailWidthInEm(detail: string): number {
 const TABULAR_EM = 0.6;
 
 /** The size the symbol is written at wherever it fits, as a share of the table. */
-const SYMBOL_CQW = '2.4cqw';
+const SYMBOL_CAP = ofWidth(2.4);
 
 /**
  * The tallest the third line is ever written, as a share of the table.
@@ -231,7 +233,7 @@ const SYMBOL_CQW = '2.4cqw';
  * the value is what the table is being read for, and a value half the size of
  * the symbol is the one thing on the cell a class cannot make out.
  */
-const DETAIL_CQW = '1.6cqw';
+const DETAIL_CAP = ofWidth(1.6);
 
 /**
  * The band at each end of a cell: the atomic number at the top, whatever the
@@ -241,10 +243,10 @@ const DETAIL_CQW = '1.6cqw';
  * sit at the centre of the cell rather than near it — a bottom band wider than
  * the top one by a third lifted every symbol in the table two pixels.
  */
-const EDGE_BAND = '1.8cqw';
+const EDGE_BAND = ofWidth(1.8);
 
-/** How wide one column is, as a share of the table's width. */
-const CELL_CQW = '4.85cqw';
+/** How wide one column is, in per cent of the table's width. */
+const CELL_SHARE = 4.85;
 
 /** What the border and the padding of a cell take off that width. */
 const CELL_CHROME = '4px';
@@ -275,7 +277,7 @@ const cellStyle = {
 
 const numberStyle = {
   alignSelf: 'start',
-  fontSize: 'max(0.33rem, 1.1cqw)',
+  fontSize: `max(0.33rem, ${ofWidth(1.1)})`,
   fontVariantNumeric: 'tabular-nums',
   justifySelf: 'start',
   lineHeight: 1,

@@ -19,6 +19,7 @@ import type {
 import { useEffect, useRef } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
+import { useResizeObserver } from '../../hooks/ui/useResizeObserver.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { categorySwatch } from '../core/categories.ts';
 import type { PeriodicElement } from '../core/elements.ts';
@@ -36,6 +37,7 @@ import {
   HeaderStrips,
   InnerTransitionMarkers,
 } from './PeriodicTableChrome.tsx';
+import { UNIT_PROPERTY, ofWidth, unitValue } from './unit.ts';
 
 /** What {@link PeriodicTable} needs. */
 export interface PeriodicTableProps {
@@ -147,9 +149,21 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   } = props;
 
   const t = useChromeT();
+  const rootRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const cameFromKeyRef = useRef(false);
   const offset = headers ? 1 : 0;
+
+  // The drawing is read off this one number, so it is written straight onto
+  // the element rather than held as state: a window being dragged would
+  // otherwise re-render all 118 cells per frame, and the engine recomputes
+  // every length from the custom property on its own. A width of zero is a
+  // table in a tab nobody has opened; the last measurement stands until it is
+  // shown, and the observer fires again then.
+  useResizeObserver(rootRef, ({ width }) => {
+    if (width === 0) return;
+    rootRef.current?.style.setProperty(UNIT_PROPERTY, unitValue(width));
+  });
 
   useEffect(() => {
     if (!cameFromKeyRef.current) return;
@@ -171,7 +185,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   }
 
   return (
-    <div className={className} style={rootStyle}>
+    <div ref={rootRef} className={className} style={rootStyle}>
       <div
         ref={gridRef}
         role="grid"
@@ -218,13 +232,13 @@ function insetStyle(offset: number): CSSProperties {
     display: 'flex',
     // A column of air on each side, so the writing reads as sitting in the
     // block rather than as running into the cells beside it.
-    padding: '0 2.4cqw',
+    padding: `0 ${ofWidth(2.4)}`,
     gridColumn: `${String(EMPTY_BLOCK.column + offset)} / span ${String(EMPTY_BLOCK.columnSpan)}`,
     gridRow: `${String(EMPTY_BLOCK.row + offset)} / span ${String(EMPTY_BLOCK.rowSpan)}`,
     // A share of the table, with a floor, exactly as a cell sizes its symbol:
     // the block holds the same three rows at every width, so what is written
     // in it has to shrink with them.
-    fontSize: 'max(0.6rem, 1.8cqw)',
+    fontSize: `max(0.6rem, ${ofWidth(1.8)})`,
     lineHeight: 1.35,
     minWidth: 0,
     overflow: 'hidden',
@@ -256,10 +270,10 @@ const MIN_WIDTH = 280;
  * table: a cell keeps the band it writes a value in whether or not that table
  * writes one.
  */
-const ROW_HEIGHT = '6.8cqw';
+const ROW_HEIGHT = ofWidth(6.8);
 
 /** The band the two inner-transition series were lifted out across. */
-const SERIES_GAP = 'max(6px, 1.1cqw)';
+const SERIES_GAP = `max(6px, ${ofWidth(1.1)})`;
 
 const rootStyle = {
   display: 'flex',
@@ -268,7 +282,10 @@ const rootStyle = {
   minWidth: MIN_WIDTH,
   // Everything inside — the height of a row as much as the type in a cell — is
   // a share of this box rather than of the page, so the same table reads at
-  // 280px beside a chart and fills a lecture-hall screen at twice that.
+  // 280px beside a chart and fills a lecture-hall screen at twice that. The
+  // share is measured (see `unit.ts`); the container is what the `1cqw`
+  // fallback and a site's own `@container` rules are answered by, and it keeps
+  // this box's width independent of what is written inside it.
   containerType: 'inline-size',
 } as const satisfies CSSProperties;
 
@@ -297,7 +314,7 @@ function gridStyle(headers: boolean): CSSProperties {
   }
   return {
     ...baseGridStyle,
-    gridTemplateColumns: `max(14px, 2.4cqw) repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
-    gridTemplateRows: `max(12px, 2cqw) ${rows}`,
+    gridTemplateColumns: `max(14px, ${ofWidth(2.4)}) repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
+    gridTemplateRows: `max(12px, ${ofWidth(2)}) ${rows}`,
   };
 }

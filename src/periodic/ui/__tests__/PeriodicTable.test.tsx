@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 
 import { categorySwatch } from '../../core/categories.ts';
 import { PeriodicTable } from '../PeriodicTable.tsx';
+import { UNIT, ofWidth } from '../unit.ts';
 
 test('every element is drawn, announced by name rather than by symbol', () => {
   const html = renderToStaticMarkup(<PeriodicTable />);
@@ -25,7 +26,7 @@ test('the selected cell is outlined, so a property colour survives selection', (
   const cell = html.split('data-testid="element-Fe"', 2)[1] ?? '';
 
   expect(cell).toContain('aria-pressed="true"');
-  expect(cell.slice(0, 800)).toContain('outline-style:solid');
+  expect(cell.slice(0, 2000)).toContain('outline-style:solid');
   expect(html).toContain(
     `background:${categorySwatch('transition-metal').background}`,
   );
@@ -123,12 +124,8 @@ test('a long value is written smaller rather than cut short', () => {
     <PeriodicTable detailOf={() => '8.988e-5'} />,
   );
 
-  expect(short).toContain(
-    'font-size:max(0.25rem, min(1.6cqw, calc((4.85cqw - 4px) / 2.40)))',
-  );
-  expect(long).toContain(
-    'font-size:max(0.25rem, min(1.6cqw, calc((4.85cqw - 4px) / 4.80)))',
-  );
+  expect(short).toContain(`font-size:${fitted('0.25rem', 1.6, '2.40')}`);
+  expect(long).toContain(`font-size:${fitted('0.25rem', 1.6, '4.80')}`);
   expect(short).not.toContain('text-overflow');
   expect(long).not.toContain('text-overflow');
 });
@@ -138,11 +135,11 @@ test('a wide symbol is written smaller so it stays inside its cell', () => {
   const iron = html.split('data-testid="element-Fe"', 2)[1] ?? '';
   const curium = html.split('data-testid="element-Cm"', 2)[1] ?? '';
 
-  expect(iron.slice(0, 900)).toContain(
-    'font-size:max(0.5rem, min(2.4cqw, calc((4.85cqw - 4px) / 1.48)))',
+  expect(iron.slice(0, 2000)).toContain(
+    `font-size:${fitted('0.5rem', 2.4, '1.48')}`,
   );
-  expect(curium.slice(0, 900)).toContain(
-    'font-size:max(0.5rem, min(2.4cqw, calc((4.85cqw - 4px) / 1.80)))',
+  expect(curium.slice(0, 2000)).toContain(
+    `font-size:${fitted('0.5rem', 2.4, '1.80')}`,
   );
 });
 
@@ -153,8 +150,10 @@ test('every cell has the same three bands, whether or not a value is written', (
   );
 
   for (const html of [bare, withValue]) {
-    expect(html).toContain('grid-template-rows:1.8cqw 1fr 1.8cqw');
-    expect(html).toContain('repeat(7, 6.8cqw)');
+    expect(html).toContain(
+      `grid-template-rows:${ofWidth(1.8)} 1fr ${ofWidth(1.8)}`,
+    );
+    expect(html).toContain(`repeat(7, ${ofWidth(6.8)})`);
   }
 });
 
@@ -162,9 +161,30 @@ test('the type of a cell is a share of the table, so it grows with it', () => {
   const html = renderToStaticMarkup(<PeriodicTable />);
 
   expect(html).toContain('container-type:inline-size');
-  expect(html).toContain('cqw');
+  expect(html).toContain(UNIT);
   expect(html).not.toContain('aspect-ratio');
 });
+
+test('a render that never measures falls back to the container unit', () => {
+  // A server render, and a prerendered page before its script runs: nothing
+  // has set the property, so the drawing is the one it has always been.
+  const html = renderToStaticMarkup(<PeriodicTable headers />);
+
+  expect(html).toContain('var(--periodic-unit, 1cqw)');
+  expect(html).not.toContain('--periodic-unit:');
+  expect(html).not.toContain('getBoundingClientRect');
+});
+
+/**
+ * The size a string of the given width is written at.
+ * @param floor - The size it is never written under.
+ * @param cap - The share of the width it is written at where it fits.
+ * @param widthInEm - How wide the string is, as the component rounds it.
+ * @returns The CSS the cell carries.
+ */
+function fitted(floor: string, cap: number, widthInEm: string): string {
+  return `max(${floor}, min(${ofWidth(cap)}, calc((${UNIT} * 4.85 - 4px) / ${widthInEm})))`;
+}
 
 test('the empty block holds what the tool writes there, and nothing by default', () => {
   const bare = renderToStaticMarkup(<PeriodicTable />);

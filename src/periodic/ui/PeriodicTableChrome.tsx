@@ -14,6 +14,8 @@ import {
   INNER_TRANSITION_ROWS,
 } from '../core/layout.ts';
 
+import { ofWidth } from './unit.ts';
+
 /** What {@link HeaderStrips} needs. */
 interface HeaderStripsProps {
   /**
@@ -150,7 +152,7 @@ const headerStyle = {
   alignItems: 'center',
   color: TOKEN.textMuted,
   display: 'flex',
-  fontSize: 'max(0.45rem, 1.35cqw)',
+  fontSize: `max(0.45rem, ${ofWidth(1.35)})`,
   justifyContent: 'center',
   padding: 0,
 } as const satisfies CSSProperties;
@@ -168,6 +170,6 @@ const markerStyle = {
   borderRadius: 3,
   color: TOKEN.textMuted,
   display: 'flex',
-  fontSize: 'max(0.4rem, 1.15cqw)',
+  fontSize: `max(0.4rem, ${ofWidth(1.15)})`,
   justifyContent: 'center',
 } as const satisfies CSSProperties;

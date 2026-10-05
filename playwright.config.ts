@@ -22,6 +22,17 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    // One spec runs in WebKit too: the periodic table's proportions broke
+    // there and nowhere else, because WebKit applies a host page's zoom to a
+    // container-query length twice. A defect no other engine shows is a defect
+    // only that engine can guard.
+    {
+      name: 'webkit',
+      testMatch: /periodicZoom\.spec\.ts/,
+      // WebKit knows no clipboard permission, and refuses to open a context
+      // asking for the one the citation specs need.
+      use: { ...devices['Desktop Safari'], permissions: [] },
+    },
   ],
   webServer: {
     // `--ci` keeps Storybook from opening a browser and from phoning home.
