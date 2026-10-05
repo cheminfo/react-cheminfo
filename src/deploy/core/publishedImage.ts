@@ -53,7 +53,11 @@ export function readPublishedImage(
   }
 
   const value = match.groups.value ?? '';
-  if (value.includes('github.ref_name') && !value.includes('event_name')) {
+  // Either guard keeps a branch name out: `event_name == 'push'` fires only for
+  // the tag push, and `ref_type == 'tag'` only when the ref is one. What is
+  // refused is the bare ref, which a manual run hands over as a branch.
+  const guarded = value.includes('event_name') || value.includes('ref_type');
+  if (value.includes('github.ref_name') && !guarded) {
     problems.push({
       file: DOCKER_IMAGE_WORKFLOW,
       line: lineOf(workflow, TAG_VERSION),

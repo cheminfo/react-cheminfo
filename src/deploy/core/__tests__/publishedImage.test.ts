@@ -12,6 +12,9 @@ import { DOCKER_IMAGE, IMAGE, repository } from './deployRepository.ts';
 const PATIENT = 'ENV NPM_CONFIG_FETCH_RETRIES=5';
 // Escaped braces, so none of these is read as an interpolation here.
 const GUARDED = `\${{ github.event_name == 'push' && github.ref_name || '' }}`;
+
+/** The other spelling of the guard, which eight of our sites use. */
+const GUARDED_BY_REF_TYPE = `\${{ github.ref_type == 'tag' && github.ref_name || '' }}`;
 const BARE = `\${{ github.ref_name }}`;
 
 test('a repository nothing publishes an image for is reported', () => {
@@ -61,6 +64,19 @@ test('a guarded tag-version reports nothing', () => {
   expect(findDeployProblems(repository(), { imageName: IMAGE })).toStrictEqual(
     [],
   );
+});
+
+test('a ref_type guard is accepted too: it cannot pass a branch name either', () => {
+  // Eight sites spell the guard this way, and it is as sound: a manual run
+  // dispatched from a branch has `ref_type` of `branch`, so nothing reaches
+  // tag-version. Refusing it would be refusing a correct workflow.
+  const workflow = DOCKER_IMAGE.replace(GUARDED, GUARDED_BY_REF_TYPE);
+
+  expect(
+    findDeployProblems(repository({ [DOCKER_IMAGE_WORKFLOW]: workflow }), {
+      imageName: IMAGE,
+    }),
+  ).toStrictEqual([]);
 });
 
 test('npm ci left on npm own patience is reported, with its line', () => {
