@@ -1,3 +1,5 @@
+export type { AboutButtonProps } from './AboutButton.tsx';
+export { AboutButton } from './AboutButton.tsx';
 export type { AccountButtonProps, AccountIdentity } from './AccountButton.tsx';
 export { AccountButton } from './AccountButton.tsx';
 export type { HeaderToggleOption, HeaderToggleProps } from './HeaderToggle.tsx';

@@ -1,6 +1,8 @@
 {
   "language.label": "Language",
   "chrome.pages": "Pages",
+  "chrome.about": "About",
+  "chrome.aboutTitle": "What this site is, what it is built on, and how to cite it",
   "account.signIn": "Sign in",
   "account.signOut": "Sign out",
   "account.signedInAs": "Signed in as {name}",

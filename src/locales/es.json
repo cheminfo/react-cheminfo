@@ -1,6 +1,8 @@
 {
   "language.label": "Idioma",
   "chrome.pages": "Páginas",
+  "chrome.about": "Acerca de",
+  "chrome.aboutTitle": "Qué es este sitio, en qué se basa y cómo citarlo",
   "account.signIn": "Iniciar sesión",
   "account.signOut": "Cerrar sesión",
   "account.signedInAs": "Sesión iniciada como {name}",
