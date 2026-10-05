@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.41.0](https://github.com/cheminfo/react-cheminfo/compare/v0.40.1...v0.41.0) (2026-10-05)
+
+
+### Features
+
+* **deploy:** refuse a build that bundles before the tests have run ([706cc49](https://github.com/cheminfo/react-cheminfo/commit/706cc4929bf3184e68cb20e5e69e4581158d6dba))
+
+
+### Bug Fixes
+
+* **deploy:** accept a tag-version guarded by ref_type ([729b547](https://github.com/cheminfo/react-cheminfo/commit/729b547e74cacb9b30f2c309457e637f09c5c5cf))
+* **share:** keep the dialog's buttons at the right edge without tabs ([1b8080e](https://github.com/cheminfo/react-cheminfo/commit/1b8080e5f345316fa99d1ed894ab482b6879af8d))
+* **share:** name a part's switch after the part ([4c73349](https://github.com/cheminfo/react-cheminfo/commit/4c733491f6450eda421632f5505948465c4e6bba))
+* size the periodic table off a measured width ([4099682](https://github.com/cheminfo/react-cheminfo/commit/4099682b0f3298c66bc8d34890377ae6b8545cf2))
+
 ## [0.40.1](https://github.com/cheminfo/react-cheminfo/compare/v0.40.0...v0.40.1) (2026-10-04)
 
 
