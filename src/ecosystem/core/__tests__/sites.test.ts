@@ -34,6 +34,7 @@ test('the family is the twenty-seven sites, listed once each', () => {
     'atoms',
     'moles',
     'inorganic',
+    'powerpoint',
   ] satisfies SiteId[]);
 });
 

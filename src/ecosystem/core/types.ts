@@ -28,7 +28,8 @@ export type SiteId =
   | 'osiris'
   | 'atoms'
   | 'moles'
-  | 'inorganic';
+  | 'inorganic'
+  | 'powerpoint';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

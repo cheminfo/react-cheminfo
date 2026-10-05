@@ -311,6 +311,19 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brandAlt: '#0e7490',
     mark: { plate: '#a3620a', accent: '#22d3ee' },
   },
+  {
+    id: 'powerpoint',
+    name: { lead: 'powerpoint', alt: 'cheminfo', dot: true },
+    host: 'powerpoint.cheminfo.org',
+    tagline:
+      'Put a live tool on a slide, from the link its Share button gives.',
+    group: 'computing',
+    brand: '#c8460d',
+    // The blue sits on the white slide of the mark, where it reads at 6.7:1,
+    // and is dark enough to set the second half of the wordmark in as well.
+    brandAlt: '#1d4ed8',
+    mark: { plate: '#c8460d', accent: '#1d4ed8' },
+  },
 ];
 
 /** How a link to a site is written, beyond the site itself. */

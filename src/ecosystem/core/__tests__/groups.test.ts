@@ -65,6 +65,7 @@ test('the tools a course opens with are the ones under the basics', () => {
     'learn',
     'tex',
     'regexp',
+    'powerpoint',
   ]);
 });
 
