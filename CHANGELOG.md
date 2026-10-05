@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.43.0](https://github.com/cheminfo/react-cheminfo/compare/v0.42.0...v0.43.0) (2026-10-05)
+
+
+### Features
+
+* **ecosystem:** add powerpoint.cheminfo.org, with its two colours and mark ([fffaa1a](https://github.com/cheminfo/react-cheminfo/commit/fffaa1ac00028d10ea0f63c6e680177b95e93299))
+* **periodic:** write the electron shells in a cell, at one size for the table ([9c06f6a](https://github.com/cheminfo/react-cheminfo/commit/9c06f6a4b46146ac4a7b529619d66553cbc1ad2c))
+* report a React that resolves twice or is not the family major ([0da0d8c](https://github.com/cheminfo/react-cheminfo/commit/0da0d8c6bddb3412512e2a4fd0022aea91250ad6))
+
+
+### Bug Fixes
+
+* let the share dialog fit a phone ([8e8c3ce](https://github.com/cheminfo/react-cheminfo/commit/8e8c3cef44a2145627b6fa08c78942aec967bf75))
+
 ## [0.42.0](https://github.com/cheminfo/react-cheminfo/compare/v0.41.0...v0.42.0) (2026-10-05)
 
 
