@@ -341,33 +341,42 @@ button {
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  padding: 12px 16px 0;
+  padding: 0 16px;
   gap: 12px;
 }
 
 /* The ready-made links and the three things one does with the link they write,
    on one row: the tabs say which link, the buttons act on it. A dialog too
-   narrow for both wraps the buttons under the tabs rather than cutting them. */
+   narrow for both wraps the buttons under the tabs rather than cutting them.
+
+   The band owns the space between the dialog's header and its rule — the body
+   does not pad above it — so the buttons centre in that whole band whether or
+   not the site has tabs to put beside them. */
 .share-dialog__top {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
   border-bottom: 1px solid var(--border);
   gap: 8px 16px;
 }
 
+/* The tabs end on the rule, where a tab strip's underline has to be, so they
+   are pulled through the band's lower half. */
 .share-dialog__top > .share-presets {
   flex: 1 1 auto;
   min-width: 0;
+  align-self: flex-end;
+  margin-bottom: -12px;
 }
 
-/* The buttons end on the rule, as the tabs do, so the two read as one row
-   rather than as a row with something floating over it. */
+/* The buttons keep the right edge on every site: a dialog with no tabs has
+   nothing to push them there. */
 .share-linkbar {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
+  margin-left: auto;
   gap: 8px;
 }
 
