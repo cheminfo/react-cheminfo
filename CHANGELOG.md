@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.47.0](https://github.com/cheminfo/react-cheminfo/compare/v0.46.0...v0.47.0) (2026-10-06)
+
+
+### Features
+
+* divide a column by a share too, not only a row ([c890cb3](https://github.com/cheminfo/react-cheminfo/commit/c890cb3cf55ba2228b8061d4c7ccd35bf17c6a78))
+* let the periodic table pick elements and the whole of it ([a35c21b](https://github.com/cheminfo/react-cheminfo/commit/a35c21b1e5fa5ca8e7e0174991ebcf42caa70665))
+
+
+### Bug Fixes
+
+* **chart:** draw the preview at the window the release will take ([eafbf38](https://github.com/cheminfo/react-cheminfo/commit/eafbf386541b5b41658d23ddccad04eb067e7d58))
+
 ## [0.46.0](https://github.com/cheminfo/react-cheminfo/compare/v0.45.0...v0.46.0) (2026-10-06)
 
 
