@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { SplitColumn } from '../SplitColumn.tsx';
 import { SplitRow } from '../SplitRow.tsx';
 
 function render(node: Parameters<typeof renderToStaticMarkup>[0]): string {
@@ -73,4 +74,53 @@ test('a share no splitter could reach is brought back inside the range', () => {
   // 80% of the row, written as the flex share react-science lays the other
   // side out with: (100 - 80) / 80 * 100 = 25.
   expect(markup).toContain('flex:25 0 0%');
+});
+
+test('a column divided by a share needs a height, and stacks where there is none', () => {
+  // Rendered to a string there is no box to measure, so the fallback is the
+  // viewport — and a page rendered to a string has none of that either, which
+  // is the case a column must not collapse in.
+  const markup = render(
+    <SplitColumn
+      ratio={40}
+      defaultRatio={50}
+      onRatio={ignore}
+      start={<p>the viewer</p>}
+      end={<p>the table</p>}
+    />,
+  );
+
+  expect(markup).toContain('the viewer');
+  expect(markup).toContain('the table');
+  expect(markup).toContain('data-testid="split-start"');
+});
+
+test('a column that has a height to divide takes its share of it', () => {
+  const previous = globalThis.innerHeight;
+  Object.defineProperty(globalThis, 'innerHeight', {
+    value: 900,
+    configurable: true,
+  });
+  try {
+    const markup = render(
+      <SplitColumn
+        ratio={40}
+        defaultRatio={50}
+        onRatio={ignore}
+        start={<p>the viewer</p>}
+        end={<p>the table</p>}
+      />,
+    );
+
+    expect(markup).toContain('split-row');
+    // 40% of the column, written as the flex share react-science lays the
+    // other pane out with: (100 - 40) / 40 * 100 = 150.
+    expect(markup).toContain('flex:150 0 0%');
+    expect(markup).toContain('padding-bottom:6px');
+  } finally {
+    Object.defineProperty(globalThis, 'innerHeight', {
+      value: previous,
+      configurable: true,
+    });
+  }
 });
