@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.44.0](https://github.com/cheminfo/react-cheminfo/compare/v0.43.0...v0.44.0) (2026-10-06)
+
+
+### Features
+
+* report whether a period or group header click was additive ([1c39854](https://github.com/cheminfo/react-cheminfo/commit/1c3985407ad15442fd3475d351ad71fe95906fb0))
+
 ## [0.43.0](https://github.com/cheminfo/react-cheminfo/compare/v0.42.0...v0.43.0) (2026-10-05)
 
 
