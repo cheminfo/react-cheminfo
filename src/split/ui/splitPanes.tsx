@@ -13,6 +13,18 @@
  * everything one pane holds leaves the other the whole of it rather than a
  * share.
  *
+ * **Several bars on one page make a grid, and a grid has to read as one.** Three
+ * panes are one of these nested inside the other, and the shares are numbered in
+ * reading order — `split` for the first bar a reader meets going left to right
+ * and then down, `split2` for the next. Two rules keep that from coming apart:
+ * **at most two bars on a page**, because a third is a window manager rather
+ * than a tool and every bar is one more thing to understand before the page can
+ * be used; and **never a bar across two columns of the same row**, because two
+ * of them at independent heights do not read as a grid, they read as a page that
+ * has come apart. Divide the column that holds the figures and leave its
+ * neighbours whole — or, where both genuinely want the same line, give them one
+ * share and one parameter so it runs straight across.
+ *
  * The bar itself is react-science's `SplitPane`, and it keeps react-science's
  * look — barely visible on purpose, found by the pointer that changes over it
  * rather than by the eye. All `chrome.css` says about it is that eleven pixels
