@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.45.0](https://github.com/cheminfo/react-cheminfo/compare/v0.44.0...v0.45.0) (2026-10-06)
+
+
+### Features
+
+* share the splitter that puts a row's division in the address ([d7b58e9](https://github.com/cheminfo/react-cheminfo/commit/d7b58e932dfb954be792b97f42d3f1d684f06dc6))
+
 ## [0.44.0](https://github.com/cheminfo/react-cheminfo/compare/v0.43.0...v0.44.0) (2026-10-06)
 
 
