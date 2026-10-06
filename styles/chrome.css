@@ -1173,6 +1173,24 @@ select,
   color: var(--accent);
 }
 
+/* ── The splitter ───────────────────────────────────────────────────────── */
+
+/*
+  The bar between the two figures of a `<SplitRow>` is react-science's, and it
+  keeps react-science's look — the pale track with the grip written on it that
+  NMRium and every other tool of ours is divided by. It is barely visible on
+  purpose: what is read is the two figures, and the bar is found by the pointer
+  that changes over it rather than by the eye.
+
+  All this says is that eleven pixels is more gutter than two figures need.
+  `:nth-child(2)` is the bar: a split is only mounted with a pane on each side
+  of it, so the three children are always side, bar, side.
+*/
+.split-row > div > div:nth-child(2) {
+  width: 7px;
+  min-width: 7px;
+}
+
 /* ── Printing ────────────────────────────────────────────────────────────── */
 
 /*

@@ -30,6 +30,7 @@ export * from './scatter/ui/index.ts';
 export * from './scatter3d/ui/index.ts';
 export * from './share/ui/index.ts';
 export * from './shared/ui/index.ts';
+export * from './split/ui/index.ts';
 // The conformer table, from the structure module's file rather than its
 // barrel: `structure/ui/index.ts` is the door that must never reach react-ocl,
 // and this component does not, but `react-cheminfo/conformers` is imported by
