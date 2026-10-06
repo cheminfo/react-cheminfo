@@ -48,6 +48,8 @@ export interface ProbeProps {
   drag?: DragMode;
   /** Whether the wheel scales the value axis. */
   wheel?: boolean;
+  /** Whether the chart answers `f` with a fitted window. */
+  keys?: boolean;
   /**
    * Told the range a select drag swept out.
    * @default undefined
@@ -89,6 +91,7 @@ export function ProbeChart(props: ProbeProps) {
     yAxis,
     drag,
     wheel,
+    keys,
     onSelectRange,
     onClick,
     shouldStartDrag,
@@ -107,6 +110,7 @@ export function ProbeChart(props: ProbeProps) {
     gestures: {
       ...(drag === undefined ? {} : { drag }),
       ...(wheel === undefined ? {} : { wheel }),
+      ...(keys === undefined ? {} : { keys }),
     },
     ...(onSelectRange === undefined ? {} : { onSelectRange }),
     ...(onClick === undefined ? {} : { onClick }),

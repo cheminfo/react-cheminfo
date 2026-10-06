@@ -47,7 +47,7 @@ export { SelectionRect } from './SelectionRect.tsx';
 export type { LegendEntry, TraceLegendProps } from './TraceLegend.tsx';
 export { TraceLegend } from './TraceLegend.tsx';
 export type { ChartClickModifiers } from './chartGestures.ts';
-export { NO_MODIFIERS } from './chartGestures.ts';
+export { FIT_KEY, NO_MODIFIERS, asksToFit } from './chartGestures.ts';
 export { chartSurfaceStyle } from './chartSurface.ts';
 export type { ChartPointer, ChartPointerOptions } from './useChartPointer.ts';
 export {

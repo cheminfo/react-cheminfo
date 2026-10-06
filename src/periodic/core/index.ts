@@ -15,7 +15,7 @@ export {
   UNKNOWN_SWATCH,
   categorySwatch,
 } from './categories.ts';
-export type { Cell, ElementRange } from './layout.ts';
+export type { Cell, ElementPick, ElementRange } from './layout.ts';
 export {
   COLUMN_COUNT,
   EMPTY_BLOCK,

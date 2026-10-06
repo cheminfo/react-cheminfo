@@ -16,6 +16,7 @@ import { useState } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import type { ElementPick } from '../core/layout.ts';
 
 import {
   SHELLS_AIR,
@@ -53,8 +54,11 @@ export interface ElementCellProps {
   column: number;
   /** Row of the grid, one-based. */
   row: number;
-  /** Called with the symbol when the cell is chosen. */
-  onSelect: (symbol: string) => void;
+  /**
+   * Called with the symbol when the cell is chosen, and with what the click
+   * asked for: a plain one, or an additive one — Cmd or Ctrl held.
+   */
+  onSelect: (symbol: string, pick: ElementPick) => void;
   /**
    * Third line, under the symbol: the value the tool is showing.
    * @default '' — nothing is written
@@ -143,8 +147,8 @@ export function ElementCell(props: ElementCellProps): ReactElement {
         atomicNumber,
       })}
       aria-pressed={isSelected}
-      onClick={() => {
-        onSelect(symbol);
+      onClick={(event) => {
+        onSelect(symbol, { additive: event.metaKey || event.ctrlKey });
       }}
       onPointerEnter={() => {
         setIsHovered(true);

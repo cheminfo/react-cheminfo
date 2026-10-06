@@ -163,12 +163,27 @@ export interface ZoomGestures {
    * @default true
    */
   wheel?: boolean;
+  /**
+   * Whether the chart answers `f` with a window fitted to everything drawn.
+   *
+   * The same thing the double click does, reachable without a pointer — and the
+   * one gesture a reader cannot discover by trying, which is why the key is the
+   * same `f` on every chart of the family rather than each one choosing.
+   *
+   * Turned off by a viewer that already owns its keys: the infrared shell runs
+   * `f` through its own command table, where the key is listed in a toolbar
+   * tooltip and in the documentation panel, and fits every pane of a stack
+   * rather than the one chart the pointer is on.
+   * @default true
+   */
+  keys?: boolean;
 }
 
 /** What the gestures come to when a viewer states none of them. */
 export const DEFAULT_ZOOM_GESTURES: Required<ZoomGestures> = {
   drag: 'xAxis',
   wheel: true,
+  keys: true,
 };
 
 /**

@@ -266,6 +266,7 @@
   "periodic.table": "Tabla periódica",
   "periodic.group": "Grupo {group}",
   "periodic.period": "Periodo {period}",
+  "periodic.allElements": "Todos los elementos",
   "periodic.cellLabel": "{name} ({symbol}, Z = {atomicNumber})",
   "periodic.category.alkali-metal": "Metal alcalino",
   "periodic.category.alkaline-earth-metal": "Alcalinotérreo",

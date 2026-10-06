@@ -80,6 +80,33 @@ test('the header strips are drawn only when asked, as labels or as buttons', () 
   expect(clickable).toContain('<button type="button" aria-label="Period 7"');
 });
 
+test('the corner is a button only when the table takes the whole of it', () => {
+  const plain = renderToStaticMarkup(<PeriodicTable headers />);
+  const withCorner = renderToStaticMarkup(
+    <PeriodicTable headers onSelectAll={() => null} />,
+  );
+
+  // Left alone the corner stays empty, as it always was.
+  expect(plain).not.toContain('aria-label="All elements"');
+  expect(withCorner).toContain(
+    '<button type="button" aria-label="All elements"',
+  );
+
+  // It stands where the two strips meet, and points into the grid it takes.
+  const corner = withCorner.split('aria-label="All elements"', 2)[1] ?? '';
+
+  expect(corner.slice(0, 600)).toContain('grid-column:1;grid-row:1');
+  expect(corner.slice(0, 600)).toContain('>◢</button>');
+});
+
+test('a clickable header says what it is on hover, not only to a reader', () => {
+  const clickable = renderToStaticMarkup(
+    <PeriodicTable headers onSelectRange={() => null} />,
+  );
+
+  expect(clickable).toContain('aria-label="Group 18" title="Group 18"');
+});
+
 test('the markers stand where the two series were lifted out, unless waived', () => {
   const withMarkers = renderToStaticMarkup(<PeriodicTable />);
   const without = renderToStaticMarkup(<PeriodicTable markers={false} />);

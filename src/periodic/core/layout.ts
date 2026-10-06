@@ -28,6 +28,18 @@ export interface ElementRange {
   additive: boolean;
 }
 
+/** One element, and what the click that picked it asked for. */
+export interface ElementPick {
+  /**
+   * Whether the click asked for this element on top of what was already
+   * chosen — Cmd on a Mac, Ctrl elsewhere — rather than in place of it. A tool
+   * whose plain click already means something of its own — reading one element
+   * into a card — tells the two apart by it, so one table both reads an
+   * element and builds a set of them.
+   */
+  additive: boolean;
+}
+
 /** A cell of the grid, one-based as CSS grid lines are. */
 export interface Cell {
   /** Grid column, one-based. */

@@ -301,3 +301,64 @@ test('the dual preview says which window the release will take', () => {
 
   expect(zoom?.selection?.zoomsYAxis).toBe(true);
 });
+
+test('f fits the window to everything drawn', () => {
+  const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
+  const { drag, pressKey } = mount({ fitted });
+
+  drag({ x: plot.left + 100, y: 100 }, { x: plot.left + 300, y: 120 });
+
+  expect((zoom?.domain as ChartDomain).x).not.toStrictEqual(fitted.x);
+
+  const taken = pressKey('f');
+
+  expect(zoom?.domain).toStrictEqual(fitted);
+  // Taken rather than passed on, so the page does not also act on it.
+  expect(taken).toBe(true);
+});
+
+test('a held shift still fits, and a modifier leaves the key to the browser', () => {
+  const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
+  const { drag, pressKey } = mount({ fitted });
+
+  drag({ x: plot.left + 100, y: 100 }, { x: plot.left + 300, y: 120 });
+  const zoomed = zoom?.domain as ChartDomain;
+
+  // Ctrl+F is the browser's search; a chart that swallowed it to fit itself
+  // would be a chart people stop typing near.
+  expect(pressKey('f', { ctrlKey: true })).toBe(false);
+  expect(zoom?.domain).toStrictEqual(zoomed);
+
+  expect(pressKey('F')).toBe(true);
+  expect(zoom?.domain).toStrictEqual(fitted);
+});
+
+test('a chart that answers no key is out of the tab order and ignores f', () => {
+  const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
+  const { drag, pressKey } = mount({ fitted, keys: false });
+
+  drag({ x: plot.left + 100, y: 100 }, { x: plot.left + 300, y: 120 });
+  const zoomed = zoom?.domain as ChartDomain;
+
+  expect(pressKey('f')).toBe(false);
+  expect(zoom?.domain).toStrictEqual(zoomed);
+  expect(zoom?.handlers.tabIndex).toBe(-1);
+});
+
+test('a chart that answers the key is reachable by keyboard', () => {
+  const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
+  mount({ fitted });
+
+  expect(zoom?.handlers.tabIndex).toBe(0);
+});
+
+test('another key over the chart is left to the page', () => {
+  const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
+  const { drag, pressKey } = mount({ fitted });
+
+  drag({ x: plot.left + 100, y: 100 }, { x: plot.left + 300, y: 120 });
+  const zoomed = zoom?.domain as ChartDomain;
+
+  expect(pressKey('g')).toBe(false);
+  expect(zoom?.domain).toStrictEqual(zoomed);
+});

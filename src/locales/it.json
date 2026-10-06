@@ -412,6 +412,7 @@
   "periodic.table": "Tavola periodica",
   "periodic.group": "Gruppo {group}",
   "periodic.period": "Periodo {period}",
+  "periodic.allElements": "Tutti gli elementi",
   "periodic.cellLabel": "{name} ({symbol}, Z = {atomicNumber})",
   "periodic.category.alkali-metal": "Metallo alcalino",
   "periodic.category.alkaline-earth-metal": "Alcalino terroso",

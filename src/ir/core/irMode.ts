@@ -168,7 +168,12 @@ export function zoomGestures(
   tool: ZoomDragMode = 'xAxis',
 ): Required<ZoomGestures> {
   const { boxZoomOnly, wheelZoom } = IR_MODE_RULES[mode];
-  return { drag: boxZoomOnly ? 'box' : tool, wheel: wheelZoom };
+  // The shell owns `f`: its own command table runs `resetDomain`, which fits
+  // every pane of a stack rather than the one chart the caret is in, and the key
+  // is written down in a toolbar tooltip and in the documentation panel. A chart
+  // answering it as well would fit one pane and swallow the key before the
+  // shell heard it.
+  return { drag: boxZoomOnly ? 'box' : tool, wheel: wheelZoom, keys: false };
 }
 
 /**

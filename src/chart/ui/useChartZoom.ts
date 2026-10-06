@@ -28,7 +28,11 @@
  * answer each viewer hands over.
  */
 
-import type { PointerEvent as ReactPointerEvent, RefObject } from 'react';
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+  RefObject,
+} from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import type {
@@ -50,6 +54,7 @@ import type {
 } from './chartGestures.ts';
 import {
   answeredRelease,
+  asksToFit,
   draggedTo,
   releaseDrag,
   startedDrag,
@@ -147,6 +152,7 @@ export function useChartZoom(options: ChartZoomOptions): ChartZoom {
   const pointsDown = yAxis?.pointsDown;
   const dragMode = gestures?.drag ?? DEFAULT_ZOOM_GESTURES.drag;
   const wheel = gestures?.wheel ?? DEFAULT_ZOOM_GESTURES.wheel;
+  const keys = gestures?.keys ?? DEFAULT_ZOOM_GESTURES.keys;
   const rules = useMemo<ZoomRules>(
     () => ({ baseline, keepBaseline, pointsDown, drag: dragMode }),
     [baseline, keepBaseline, pointsDown, dragMode],
@@ -236,6 +242,19 @@ export function useChartZoom(options: ChartZoomOptions): ChartZoom {
     [drag, yScale, rules],
   );
 
+  const onKeyDown = useCallback(
+    (event: ReactKeyboardEvent<SVGSVGElement>) => {
+      if (!keys || !asksToFit(event)) return;
+      // Taken rather than passed on, so the page under a chart does not scroll
+      // to its own next heading as well — and so a second chart mounted beside
+      // this one is not fitted by a key aimed at this one.
+      event.preventDefault();
+      event.stopPropagation();
+      reset();
+    },
+    [keys, reset],
+  );
+
   return {
     domain,
     xScale,
@@ -248,6 +267,11 @@ export function useChartZoom(options: ChartZoomOptions): ChartZoom {
       onPointerUp,
       onPointerCancel,
       onDoubleClick: reset,
+      onKeyDown,
+      // Out of the tab order again on a chart that answers no key: a stop on the
+      // way through a page that does nothing when it is reached is worse than no
+      // stop at all.
+      tabIndex: keys ? 0 : -1,
     },
   };
 }

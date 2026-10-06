@@ -155,6 +155,32 @@ export function mount(props: MountProps) {
       });
     },
     /**
+     * Press a key on the chart, which first takes the caret as a click on it
+     * would.
+     * @param key - The `event.key` to send.
+     * @param modifiers - Any modifier held with it.
+     * @param modifiers.ctrlKey - Whether control was held.
+     * @param modifiers.altKey - Whether alt was held.
+     * @returns Whether the chart took the key, which is how a chart that answers
+     * it is told apart from one that leaves it to the page.
+     */
+    pressKey: (
+      key: string,
+      modifiers: { ctrlKey?: boolean; altKey?: boolean } = {},
+    ): boolean => {
+      const svg = container.querySelector('svg') as SVGSVGElement;
+      const event = new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...modifiers,
+      });
+      act(() => {
+        svg.dispatchEvent(event);
+      });
+      return event.defaultPrevented;
+    },
+    /**
      * Turn the wheel over the chart.
      * @param deltaY - How far it travelled, positive away from the reader.
      * @returns Whether the chart refused the page its scroll, which is how a

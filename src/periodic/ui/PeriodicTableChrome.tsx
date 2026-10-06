@@ -24,18 +24,28 @@ interface HeaderStripsProps {
    * @default undefined
    */
   onSelectRange?: (range: ElementRange) => void;
+  /**
+   * Called when the corner where the two strips meet is clicked. The corner of
+   * a spreadsheet takes everything, and a table whose rows and columns are one
+   * click each owes the same for the whole of it. Without it the corner stays
+   * empty.
+   * @default undefined
+   */
+  onSelectAll?: () => void;
 }
 
 /**
- * The 1–18 strip along the top and the 1–7 strip down the left.
+ * The 1–18 strip along the top, the 1–7 strip down the left, and the corner
+ * where they meet.
  *
  * They are buttons when the table takes a range: "plot period 3" is one click
- * there and eight on the cells.
+ * there and eight on the cells. The corner takes the whole table, which is the
+ * gesture a spreadsheet has taught everybody.
  * @param props - See {@link HeaderStripsProps}.
- * @returns The two strips, placed on the grid.
+ * @returns The two strips, the corner, and the inner-transition period numbers.
  */
 export function HeaderStrips(props: HeaderStripsProps): ReactElement {
-  const { onSelectRange } = props;
+  const { onSelectRange, onSelectAll } = props;
   const t = useChromeT();
   const groups: ReactElement[] = [];
   for (let group = 1; group <= COLUMN_COUNT; group++) {
@@ -84,6 +94,19 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
 
   return (
     <>
+      {onSelectAll === undefined ? null : (
+        <HeaderCell
+          // The glyph points into the grid it takes, as a spreadsheet's does.
+          // It is a mark rather than a word because the corner is a
+          // seventeenth of the table's width, and the word differs in every
+          // language the chrome speaks.
+          label="◢"
+          title={t('periodic.allElements')}
+          column={1}
+          row={1}
+          onClick={onSelectAll}
+        />
+      )}
       {groups}
       {periods}
       {INNER_TRANSITION_ROWS.map(({ row, period }) => (
@@ -159,6 +182,7 @@ function HeaderCell(props: HeaderCellProps): ReactElement {
     <button
       type="button"
       aria-label={title}
+      title={title}
       onClick={onClick}
       style={{ ...style, ...headerButtonStyle }}
     >

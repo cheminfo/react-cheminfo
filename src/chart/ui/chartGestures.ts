@@ -14,8 +14,12 @@
  * gesture reporting a range and a click for the same drag.
  */
 
-import type { PointerEvent as ReactPointerEvent } from 'react';
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+} from 'react';
 
+import { isEditingField } from '../../panel/core/isEditingField.ts';
 import type { ChartDomain, ZoomRules } from '../core/chartDomain.ts';
 import type { PlotRect } from '../core/chartGeometry.ts';
 import type { ChartScale } from '../core/chartScale.ts';
@@ -29,6 +33,7 @@ import { isInsidePlot } from './useChartPointer.ts';
 
 /** One gesture on the SVG, as React hands it over. */
 type PointerHandler = (event: ReactPointerEvent<SVGSVGElement>) => void;
+type KeyboardHandler = (event: ReactKeyboardEvent<SVGSVGElement>) => void;
 
 /**
  * Which keys were held as a click was let go.
@@ -56,6 +61,41 @@ export interface ChartZoomHandlers {
   onPointerUp: PointerHandler;
   onPointerCancel: PointerHandler;
   onDoubleClick: () => void;
+  onKeyDown: KeyboardHandler;
+  /**
+   * So the chart can hold the caret, which is what lets a key reach it.
+   *
+   * In the tab order rather than merely focusable by a click, because the chart
+   * is* the widget here: a reader who navigates by keyboard has no other way to
+   * reach it, and a chart nobody can focus answers no key at all. A viewer that
+   * answers none takes itself back out of the order.
+   */
+  tabIndex: number;
+}
+
+/** The key that fits the window to everything drawn, on every chart. */
+export const FIT_KEY = 'f';
+
+/**
+ * Whether a key press asks for the window to be fitted.
+ *
+ * A key pressed with a modifier belongs to the browser or to the page — Ctrl+F
+ * is a search, and a chart that swallowed it to fit itself would be a chart
+ * people stop typing near — and a key delivered to a field is part of what is
+ * being written. Compared case-insensitively, so a capital arriving from a held
+ * shift still fits.
+ * @param event - The key press, as React delivers it or as the DOM does.
+ * @returns Whether the chart should fit its window.
+ */
+export function asksToFit(
+  event: Pick<
+    KeyboardEvent,
+    'key' | 'ctrlKey' | 'metaKey' | 'altKey' | 'target'
+  >,
+): boolean {
+  if (event.ctrlKey || event.metaKey || event.altKey) return false;
+  if (isEditingField(event.target)) return false;
+  return event.key.toLowerCase() === FIT_KEY;
 }
 
 /** What a host asks to be told, beyond the window it is shown anyway. */

@@ -23,7 +23,7 @@ import { useResizeObserver } from '../../hooks/ui/useResizeObserver.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { categorySwatch } from '../core/categories.ts';
 import type { PeriodicElement } from '../core/elements.ts';
-import type { ElementRange } from '../core/layout.ts';
+import type { ElementPick, ElementRange } from '../core/layout.ts';
 import {
   COLUMN_COUNT,
   EMPTY_BLOCK,
@@ -55,10 +55,12 @@ export interface PeriodicTableProps {
   selected?: string;
   /**
    * Called with the symbol of the element that was clicked, and by the arrow
-   * keys.
+   * keys. The pick says whether the click was additive — Cmd or Ctrl held — so
+   * a tool whose plain click already reads one element into a card can let the
+   * same table build a set of them.
    * @default undefined — the table is a figure rather than a control
    */
-  onSelect?: (symbol: string) => void;
+  onSelect?: (symbol: string, pick: ElementPick) => void;
   /**
    * The colour each cell takes.
    * @default the family colour
@@ -113,6 +115,13 @@ export interface PeriodicTableProps {
    */
   onSelectRange?: (range: ElementRange) => void;
   /**
+   * Called when the corner where the two header strips meet is clicked, which
+   * is how a reader takes the whole table back. Without it the corner stays
+   * empty.
+   * @default undefined
+   */
+  onSelectAll?: () => void;
+  /**
    * Whether to draw the family legend under the grid.
    * @default false
    */
@@ -158,6 +167,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     inset,
     headers = false,
     onSelectRange,
+    onSelectAll,
     legend = false,
     markers = true,
     keyboard = true,
@@ -198,7 +208,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     if (next === null) return;
     event.preventDefault();
     cameFromKeyRef.current = true;
-    onSelect(next.symbol);
+    onSelect(next.symbol, PLAIN_PICK);
   }
 
   // One size for the whole table rather than one per cell: a column of values
@@ -228,7 +238,12 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
         style={gridStyle(headers)}
         onKeyDown={handleKeyDown}
       >
-        {headers ? <HeaderStrips onSelectRange={onSelectRange} /> : null}
+        {headers ? (
+          <HeaderStrips
+            onSelectRange={onSelectRange}
+            onSelectAll={onSelectAll}
+          />
+        ) : null}
         {inset === undefined ? null : (
           <div style={insetStyle(offset)}>{inset}</div>
         )}
@@ -289,6 +304,9 @@ function defaultSwatchOf(element: PeriodicElement): Swatch {
 function defaultNameOf(element: PeriodicElement): string {
   return element.name;
 }
+
+/** The arrow keys walk the table to read it; they never add to a set. */
+const PLAIN_PICK: ElementPick = { additive: false };
 
 function noop(): void {
   // A table with no `onSelect` is a figure; its cells stay buttons so the

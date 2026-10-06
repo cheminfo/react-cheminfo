@@ -412,6 +412,7 @@
   "periodic.table": "Periodic table",
   "periodic.group": "Group {group}",
   "periodic.period": "Period {period}",
+  "periodic.allElements": "All elements",
   "periodic.cellLabel": "{name} ({symbol}, Z = {atomicNumber})",
   "periodic.category.alkali-metal": "Alkali metal",
   "periodic.category.alkaline-earth-metal": "Alkaline earth",

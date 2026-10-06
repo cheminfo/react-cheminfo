@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, expect, test } from 'vitest';
 
 import type { ChartDomain } from '../../core/chartDomain.ts';
+import { FIT_KEY, asksToFit } from '../chartGestures.ts';
 
 import {
   installProbeStubs,
@@ -170,4 +171,26 @@ test('a select drag let go past the baseline still answers with an x range', () 
   expect(ranges).toStrictEqual([[150, 450]]);
   // Identity: the height was never taken, so nothing about the window moved.
   expect(zoom?.domain).toBe(fitted);
+});
+
+/**
+ * A bare `f` delivered to something.
+ * @param target - What it was delivered to.
+ * @returns The press, as `asksToFit` reads one.
+ */
+function pressedOn(target: EventTarget | null) {
+  return {
+    key: FIT_KEY,
+    ctrlKey: false,
+    metaKey: false,
+    altKey: false,
+    target,
+  };
+}
+
+test('f typed into a field is part of what is being written', () => {
+  expect(asksToFit(pressedOn(document.createElement('svg')))).toBe(true);
+  expect(asksToFit(pressedOn(document.createElement('input')))).toBe(false);
+  expect(asksToFit(pressedOn(document.createElement('textarea')))).toBe(false);
+  expect(asksToFit(pressedOn(document.createElement('select')))).toBe(false);
 });

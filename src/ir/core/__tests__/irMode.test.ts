@@ -51,6 +51,7 @@ test('percent transmittance is zoomed by rectangle alone, and not by the wheel',
   expect(zoomGestures('transmittance')).toStrictEqual({
     drag: 'box',
     wheel: false,
+    keys: false,
   });
   // The mode has the last word, not the tool: a reading drag chosen in
   // absorbance must not follow the chemist across the switch and answer with a
@@ -58,6 +59,7 @@ test('percent transmittance is zoomed by rectangle alone, and not by the wheel',
   expect(zoomGestures('transmittance', 'xAxis')).toStrictEqual({
     drag: 'box',
     wheel: false,
+    keys: false,
   });
 });
 
@@ -65,10 +67,12 @@ test('absorbance answers both drags and the wheel', () => {
   expect(zoomGestures('absorbance')).toStrictEqual({
     drag: 'xAxis',
     wheel: true,
+    keys: false,
   });
   expect(zoomGestures('absorbance', 'box')).toStrictEqual({
     drag: 'box',
     wheel: true,
+    keys: false,
   });
 });
 
@@ -108,18 +112,22 @@ test('both modes still answer exactly the gestures they always did', () => {
   expect(zoomGestures('transmittance')).toStrictEqual({
     drag: 'box',
     wheel: false,
+    keys: false,
   });
   expect(zoomGestures('transmittance', 'box')).toStrictEqual({
     drag: 'box',
     wheel: false,
+    keys: false,
   });
   expect(zoomGestures('absorbance')).toStrictEqual({
     drag: 'xAxis',
     wheel: true,
+    keys: false,
   });
   expect(zoomGestures('absorbance', 'box')).toStrictEqual({
     drag: 'box',
     wheel: true,
+    keys: false,
   });
 });
 
