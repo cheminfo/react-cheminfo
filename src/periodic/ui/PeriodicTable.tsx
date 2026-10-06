@@ -105,8 +105,10 @@ export interface PeriodicTableProps {
    */
   headers?: boolean;
   /**
-   * Called when a whole group or period header is clicked. Without it the
-   * strips are labels rather than buttons.
+   * Called when a whole group or period header is clicked. The run says
+   * whether the click was additive — Cmd or Ctrl held — so a tool can let a
+   * reader put two periods on one chart. Without it the strips are labels
+   * rather than buttons.
    * @default undefined
    */
   onSelectRange?: (range: ElementRange) => void;

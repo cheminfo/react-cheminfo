@@ -20,6 +20,12 @@ export interface ElementRange {
   kind: 'group' | 'period';
   /** Its number: a group from 1 to 18, a period from 1 to 7. */
   value: number;
+  /**
+   * Whether the click asked for this run on top of what was already chosen —
+   * Cmd on a Mac, Ctrl elsewhere — rather than in place of it. A reader
+   * comparing two periods holds it down for the second one.
+   */
+  additive: boolean;
 }
 
 /** A cell of the grid, one-based as CSS grid lines are. */

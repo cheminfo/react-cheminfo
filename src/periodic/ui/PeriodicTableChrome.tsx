@@ -3,7 +3,7 @@
  * markers the inner-transition series were lifted out of.
  */
 
-import type { CSSProperties, ReactElement } from 'react';
+import type { CSSProperties, MouseEvent, ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
@@ -19,8 +19,8 @@ import { ofWidth } from './unit.ts';
 /** What {@link HeaderStrips} needs. */
 interface HeaderStripsProps {
   /**
-   * Called with the run whose header was clicked. Without it the strips are
-   * labels rather than buttons.
+   * Called with the run whose header was clicked, and whether the click was
+   * additive. Without it the strips are labels rather than buttons.
    * @default undefined
    */
   onSelectRange?: (range: ElementRange) => void;
@@ -48,8 +48,12 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
         row={1}
         onClick={
           onSelectRange &&
-          (() => {
-            onSelectRange({ kind: 'group', value: group });
+          ((event) => {
+            onSelectRange({
+              kind: 'group',
+              value: group,
+              additive: isAdditive(event),
+            });
           })
         }
       />,
@@ -66,8 +70,12 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
         row={period + 1}
         onClick={
           onSelectRange &&
-          (() => {
-            onSelectRange({ kind: 'period', value: period });
+          ((event) => {
+            onSelectRange({
+              kind: 'period',
+              value: period,
+              additive: isAdditive(event),
+            });
           })
         }
       />,
@@ -129,7 +137,18 @@ interface HeaderCellProps {
   title: string;
   column: number;
   row: number;
-  onClick?: (() => void) | undefined;
+  onClick?: ((event: MouseEvent<HTMLButtonElement>) => void) | undefined;
+}
+
+/**
+ * Whether a click asks for the run on top of the selection rather than in
+ * place of it: Cmd on a Mac, Ctrl everywhere else, so one gesture reads the
+ * same on both.
+ * @param event - The click, for its modifier keys.
+ * @returns True when the run is to be added to what is already chosen.
+ */
+function isAdditive(event: MouseEvent): boolean {
+  return event.metaKey || event.ctrlKey;
 }
 
 function HeaderCell(props: HeaderCellProps): ReactElement {
