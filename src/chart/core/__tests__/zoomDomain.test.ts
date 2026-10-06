@@ -331,3 +331,48 @@ test('a dual drag ignores the baseline the reading gesture reads', () => {
     zoomedDomain(shown, drag, plot, xScale, yScale, { drag: 'dual' }),
   ).toStrictEqual({ x: [200, 400], y: shown.y });
 });
+
+test('a mirrored preview is stretched to the baseline the release holds', () => {
+  // Zero runs across the middle of this plot, at pixel 100, so a drag made
+  // wholly inside the reflected half crosses the baseline without reaching it.
+  const drag = { fromX: 100, fromY: 150, toX: 300, toY: 180 };
+
+  const selection = zoomSelection(drag, mirroredY);
+
+  // Drawn from the baseline's own pixel, not from where the hand went down.
+  expect(selection?.zoomsYAxis).toBe(true);
+  expect(selection?.fromY).toBe(100);
+  expect(selection?.toY).toBe(180);
+  // Which is the window letting go gives: pixel 100 is 0, pixel 180 is -80.
+  expect(
+    zoomedDomain(mirrored, drag, plot, xScale, mirroredY)?.y,
+  ).toStrictEqual([-80, 0]);
+});
+
+test('an upright preview is untouched, the gesture having reached the baseline', () => {
+  // Released below the foot of the plot, which is how the y axis is asked for
+  // here, so the drag already spans the baseline at pixel 200.
+  const drag = { fromX: 100, fromY: 50, toX: 300, toY: 240 };
+
+  const selection = zoomSelection(drag, yScale);
+
+  expect(selection?.fromY).toBe(50);
+  expect(selection?.toY).toBe(240);
+});
+
+test('a preview holds no baseline the release does not hold', () => {
+  const drag = { fromX: 100, fromY: 150, toX: 300, toY: 180 };
+
+  // A continuous trace keeps no baseline, so the rectangle is the hand's own
+  // height — and the box tool and a `dual` drag are promises about themselves.
+  for (const rules of [
+    { keepBaseline: false },
+    { drag: 'box' as const },
+    { drag: 'dual' as const },
+  ]) {
+    const selection = zoomSelection(drag, mirroredY, rules);
+
+    expect(selection?.fromY).toBe(150);
+    expect(selection?.toY).toBe(180);
+  }
+});

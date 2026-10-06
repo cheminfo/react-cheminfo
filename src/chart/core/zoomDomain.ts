@@ -55,7 +55,17 @@ export interface DragBox {
   toY: number;
 }
 
-/** The drag as it is being made, for the preview rectangle to be drawn from. */
+/**
+ * The drag as it is being made, for the preview rectangle to be drawn from.
+ *
+ * Its **vertical corners are the window the release will take**, not the two
+ * places the hand passed through. The two differ by the baseline a viewer's
+ * rules hold: on a mirrored chart zero runs across the middle of the plot, so a
+ * drag made wholly inside the reflected half crosses the baseline without ever
+ * reaching it, and the release stretches the window back to zero. A rectangle
+ * drawn at the height of the hand would promise a band between two intensities
+ * that letting go does not give.
+ */
 export interface ZoomSelection extends DragBox {
   /**
    * Whether letting go here would take the y axis with it, which is what the
@@ -88,15 +98,22 @@ export function zoomSelection(
   if (drag === null) return null;
   const {
     baseline = DEFAULT_Y_AXIS_RULES.baseline,
+    keepBaseline = DEFAULT_Y_AXIS_RULES.keepBaseline,
     pointsDown = DEFAULT_Y_AXIS_RULES.pointsDown,
     drag: mode = 'xAxis',
   } = rules;
+  const zoomsYAxis = takesYAxis(drag, mode, yScale, baseline, pointsDown);
+  // Stretched in pixels rather than in values because the rectangle is drawn in
+  // pixels and the mapping is monotonic, so including the baseline's own pixel
+  // in the span is including the baseline in the window.
+  const held = zoomsYAxis && holdsBaseline(mode, keepBaseline);
+  const atBaseline = chartPixel(yScale, baseline);
   return {
     fromX: drag.fromX,
-    fromY: drag.fromY,
+    fromY: held ? Math.min(drag.fromY, drag.toY, atBaseline) : drag.fromY,
     toX: drag.toX,
-    toY: drag.toY,
-    zoomsYAxis: takesYAxis(drag, mode, yScale, baseline, pointsDown),
+    toY: held ? Math.max(drag.fromY, drag.toY, atBaseline) : drag.toY,
+    zoomsYAxis,
   };
 }
 
@@ -213,7 +230,7 @@ export function zoomedDomain(
   // tool or by a `dual` drag that left its level, is a promise about exactly
   // that rectangle, and a viewer whose axis rules keep its baseline would
   // otherwise see a taller window than the one drawn.
-  const holdBaseline = keepBaseline && mode === 'xAxis';
+  const holdBaseline = holdsBaseline(mode, keepBaseline);
   const bottom = holdBaseline
     ? Math.min(baseline, fromY, toY)
     : Math.min(fromY, toY);
@@ -272,6 +289,21 @@ export function scaledYAxis(
  * @param pointsDown - Whether the data hangs below that baseline.
  * @returns Whether the height comes along.
  */
+/**
+ * Whether the window keeps the baseline whatever the drag asked for, which the
+ * preview and the release must agree on as surely as they agree on the height.
+ *
+ * Only the reading gesture holds it. A rectangle dragged out deliberately — by
+ * the box tool, or by a `dual` drag that left its level — is a promise about
+ * exactly that rectangle.
+ * @param mode - What a drag on this chart asks for.
+ * @param keepBaseline - Whether the viewer's rules keep it.
+ * @returns Whether the baseline stays in the window.
+ */
+function holdsBaseline(mode: DragMode, keepBaseline: boolean): boolean {
+  return keepBaseline && mode === 'xAxis';
+}
+
 function takesYAxis(
   drag: DragBox,
   mode: DragMode,
