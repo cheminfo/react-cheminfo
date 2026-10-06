@@ -131,6 +131,30 @@ export function mount(props: MountProps) {
       });
     },
     /**
+     * Press on the plot and keep the button down, so the drag being made can be
+     * read off `selection` while the hand is still moving — which is the only
+     * way to test what the preview rectangle promises.
+     * @param from - Where the press lands, in user units.
+     */
+    press: (from: ChartPoint) => {
+      const svg = container.querySelector('svg') as SVGSVGElement;
+      act(() => {
+        svg.dispatchEvent(
+          pointerEvent('pointerdown', from.x, from.y, { button: 0 }),
+        );
+      });
+    },
+    /**
+     * Move the pointer with the button still down.
+     * @param to - Where it has got to, in user units.
+     */
+    move: (to: ChartPoint) => {
+      const svg = container.querySelector('svg') as SVGSVGElement;
+      act(() => {
+        svg.dispatchEvent(pointerEvent('pointermove', to.x, to.y));
+      });
+    },
+    /**
      * Turn the wheel over the chart.
      * @param deltaY - How far it travelled, positive away from the reader.
      * @returns Whether the chart refused the page its scroll, which is how a

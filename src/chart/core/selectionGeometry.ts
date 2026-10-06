@@ -34,9 +34,10 @@ export interface SelectionRectangle {
  * A drag that takes the y axis with it is drawn at the height of the drag
  * itself, and one that asks for the x axis alone spans the whole plot.
  * That is the gesture announcing itself before the button is let go: the
- * rectangle changing shape as the pointer crosses the baseline is the only
- * warning a user gets that the release is about to move both axes, and it is one
- * they can still act on.
+ * rectangle changing shape — as the pointer crosses the baseline, or as a
+ * `dual` drag leaves the level it started on — is the only warning a user gets
+ * that the release is about to move both axes, and it is one they can still act
+ * on.
  *
  * A drag too short to zoom draws nothing at all. Below `MINIMUM_DRAG` the
  * release does nothing — most clicks made on a trackpad wobble by a pixel or two

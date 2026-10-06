@@ -80,18 +80,29 @@ export const DEFAULT_Y_AXIS_RULES: Required<YAxisRules> = {
  * between forty and sixty percent", so a drag narrows the horizontal axis and
  * leaves the height alone unless it is released past the baseline.
  *
+ * `dual` is the same reading gesture with a gate a reader can predict: a drag
+ * kept level narrows the horizontal axis alone, and one taken far enough up or
+ * down brings the height with it. It is what `xAxis` cannot be on a chart whose
+ * vertical axis has no baseline to cross — a titration curve climbing from pH 2
+ * to pH 12, a speciation diagram drawn over decades — where "has the pointer
+ * passed zero" is a question about the margin rather than about the data, and
+ * the answer to it is no for every drag made inside the plot. Here both windows
+ * are asked for where the curve is, and the preview changes shape as the
+ * threshold is crossed, so the rectangle is found by the hand that was already
+ * drawing one.
+ *
  * `box` is the tool: while it is chosen, the rectangle dragged out is the window,
  * both axes at once. It is a mode rather than a modifier because it is used in
  * runs — a baseline being examined is examined several times over — and a
  * modifier held down through each of them is a worse gesture than a tool pressed
  * once.
  *
- * The two are named apart from the whole of `DragMode` so that a chart offering
- * nothing but zoom tools can say so in its own signature — which is what stops
- * `select`, the one drag that moves no axis, from reaching a chart with no
- * handler for it.
+ * The three are named apart from the whole of `DragMode` so that a chart
+ * offering nothing but zoom tools can say so in its own signature — which is
+ * what stops `select`, the one drag that moves no axis, from reaching a chart
+ * with no handler for it.
  */
-export type ZoomDragMode = 'xAxis' | 'box';
+export type ZoomDragMode = 'xAxis' | 'dual' | 'box';
 
 /**
  * What a drag across the plot asks for.

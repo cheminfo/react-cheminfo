@@ -256,3 +256,48 @@ test('new data with no window imposed refits both axes', () => {
   // a host asks for by giving its window up.
   expect(zoom?.domain).toStrictEqual(withBoth);
 });
+
+test('a dual drag kept level zooms the x axis, and taken down takes both', () => {
+  // A titration curve: pH climbs from 2 to 12 and the baseline at 0 is nowhere
+  // the reader can drag to, which is why this chart is not read by `xAxis`.
+  const fitted: ChartDomain = { x: [0, 50], y: [2, 12] };
+  const { drag } = mount({
+    fitted,
+    drag: 'dual',
+    yAxis: { keepBaseline: false },
+  });
+
+  drag({ x: plot.left + 100, y: 150 }, { x: plot.left + 300, y: 158 });
+
+  const level = zoom?.domain as ChartDomain;
+
+  expect(level.x[1] - level.x[0]).toBeLessThan(fitted.x[1] - fitted.x[0]);
+  expect(level.y).toStrictEqual(fitted.y);
+
+  drag({ x: plot.left + 100, y: 150 }, { x: plot.left + 300, y: 230 });
+
+  const rectangle = zoom?.domain as ChartDomain;
+
+  expect(rectangle.y[1] - rectangle.y[0]).toBeLessThan(
+    fitted.y[1] - fitted.y[0],
+  );
+  expect(rectangle.y[0]).toBeGreaterThan(fitted.y[0]);
+});
+
+test('the dual preview says which window the release will take', () => {
+  const fitted: ChartDomain = { x: [0, 50], y: [2, 12] };
+  const { press, move } = mount({
+    fitted,
+    drag: 'dual',
+    yAxis: { keepBaseline: false },
+  });
+
+  press({ x: plot.left + 100, y: 150 });
+  move({ x: plot.left + 300, y: 158 });
+
+  expect(zoom?.selection?.zoomsYAxis).toBe(false);
+
+  move({ x: plot.left + 300, y: 230 });
+
+  expect(zoom?.selection?.zoomsYAxis).toBe(true);
+});

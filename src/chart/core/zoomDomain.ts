@@ -10,7 +10,7 @@
 
 import { clamp } from '../../format/core/clamp.ts';
 
-import type { ChartDomain, ZoomRules } from './chartDomain.ts';
+import type { ChartDomain, DragMode, ZoomRules } from './chartDomain.ts';
 import { DEFAULT_Y_AXIS_RULES } from './chartDomain.ts';
 import type { PlotRect } from './chartGeometry.ts';
 import type { ChartScale } from './chartScale.ts';
@@ -29,6 +29,19 @@ import { chartPixel, chartValue } from './chartScale.ts';
  * hundred down went somewhere.
  */
 export const MINIMUM_DRAG = 4;
+
+/**
+ * How far a `dual` drag has to travel vertically before it brings the y axis
+ * with it, in user units of the SVG.
+ *
+ * Far enough above `MINIMUM_DRAG` that no drag meant to stay level reaches it by
+ * the tremor of a hand or the slope of a trackpad swipe, and near enough that
+ * the rectangle a reader wants costs one gesture rather than a reach for the
+ * margin. The preview changes shape on the pixel it is crossed, so the number
+ * itself never has to be learnt: the first drag that crosses it teaches the
+ * gesture, and the first that recrosses it back shows the way out.
+ */
+export const DUAL_ZOOM_TRAVEL = 24;
 
 /** The two corners of a drag, in the user units of the SVG. */
 export interface DragBox {
@@ -58,9 +71,9 @@ export interface ZoomSelection extends DragBox {
  * than by the rectangle itself — so what the preview promises and what letting
  * go actually does are the same test rather than two that have to agree.
  *
- * A `select` drag is therefore always a band, however far past the baseline it
- * strays: its answer is two numbers on one axis, so a preview that grew into a
- * rectangle would promise a height nobody is ever told about.
+ * Which answer a mode gives is `takesYAxis`'s business, so a `select` drag is
+ * always a band however far past the baseline it strays, and a `dual` drag
+ * becomes a rectangle the moment it has travelled `DUAL_ZOOM_TRAVEL`.
  * @param drag - The drag being made, `null` when none is.
  * @param yScale - The y axis as it is currently zoomed.
  * @param rules - How the y axis behaves and what a drag means, defaulting to a
@@ -83,14 +96,24 @@ export function zoomSelection(
     fromY: drag.fromY,
     toX: drag.toX,
     toY: drag.toY,
-    // The box tool takes the height always, so the preview is a rectangle from
-    // the first pixel of the gesture rather than a full-height band that
-    // suddenly becomes one; a select drag never takes it at all.
-    zoomsYAxis:
-      mode === 'box' ||
-      (mode !== 'select' &&
-        releasedBeyondBaseline(drag.toY, yScale, baseline, pointsDown)),
+    zoomsYAxis: takesYAxis(drag, mode, yScale, baseline, pointsDown),
   };
+}
+
+/**
+ * Whether a drag has left the level it started on by enough to ask for the y
+ * axis as well.
+ *
+ * Measured as the hand made it, before any clamping to the plot: a drag that ran
+ * out over the tick labels travelled however far it travelled. Nothing is
+ * latched — the answer is read off the two corners and nothing else — so a
+ * reader who drifted down and came back up is promised a band again, and the
+ * preview says so while the button is still down.
+ * @param drag - The drag being made or released, in user units of the SVG.
+ * @returns Whether the height comes along.
+ */
+export function draggedBeyondLevel(drag: DragBox): boolean {
+  return Math.abs(drag.toY - drag.fromY) >= DUAL_ZOOM_TRAVEL;
 }
 
 /**
@@ -178,24 +201,19 @@ export function zoomedDomain(
     Math.min(firstX, secondX),
     Math.max(firstX, secondX),
   ];
-  // The box tool is asked for the rectangle it was given, wherever it was let
-  // go; the reading gesture takes the height only when it crossed the baseline.
-  if (
-    mode !== 'box' &&
-    !releasedBeyondBaseline(drag.toY, yScale, baseline, pointsDown)
-  ) {
+  if (!takesYAxis(drag, mode, yScale, baseline, pointsDown)) {
     return { x, y: current.y };
   }
 
   const fromY = chartValue(yScale, clamp(drag.fromY, plot.top, plot.bottom));
   const toY = chartValue(yScale, clamp(drag.toY, plot.top, plot.bottom));
   // Both ends, so a baseline the data runs *down* from — 100 percent
-  // transmittance — is kept as surely as one it stands on. The box tool holds no
-  // baseline at all: a rectangle dragged round a feature is a promise about
-  // exactly that rectangle, and a viewer whose axis rules keep its baseline
-  // would otherwise see the tool quietly return a taller window than the one
-  // drawn.
-  const holdBaseline = keepBaseline && mode !== 'box';
+  // transmittance — is kept as surely as one it stands on. Only the reading
+  // gesture holds a baseline: a rectangle dragged out deliberately, by the box
+  // tool or by a `dual` drag that left its level, is a promise about exactly
+  // that rectangle, and a viewer whose axis rules keep its baseline would
+  // otherwise see a taller window than the one drawn.
+  const holdBaseline = keepBaseline && mode === 'xAxis';
   const bottom = holdBaseline
     ? Math.min(baseline, fromY, toY)
     : Math.min(fromY, toY);
@@ -232,4 +250,37 @@ export function scaledYAxis(
     baseline + (current.y[1] - baseline) * factor,
   ];
   return y[1] > y[0] ? { x: current.x, y } : current;
+}
+
+/**
+ * Whether a drag brings the y axis with it, which is the one question the
+ * preview and the release must never answer differently.
+ *
+ * Asked once, here, rather than by each of them: a rectangle that promises a
+ * height the release then refuses teaches a reader that the chart is
+ * unreliable, and two copies of this test are how that comes about.
+ *
+ * The box tool takes the height always, so its preview is a rectangle from the
+ * first pixel of the gesture rather than a full-height band that suddenly
+ * becomes one. A `select` drag never takes it at all: its answer is two numbers
+ * on one axis, and a preview that grew into a rectangle would promise a height
+ * nobody is ever told about.
+ * @param drag - The drag being made or released, in user units of the SVG.
+ * @param mode - What a drag on this chart asks for.
+ * @param yScale - The y axis as it is currently zoomed.
+ * @param baseline - The value the reading gesture is judged against.
+ * @param pointsDown - Whether the data hangs below that baseline.
+ * @returns Whether the height comes along.
+ */
+function takesYAxis(
+  drag: DragBox,
+  mode: DragMode,
+  yScale: ChartScale,
+  baseline: number,
+  pointsDown: boolean,
+): boolean {
+  if (mode === 'box') return true;
+  if (mode === 'select') return false;
+  if (mode === 'dual') return draggedBeyondLevel(drag);
+  return releasedBeyondBaseline(drag.toY, yScale, baseline, pointsDown);
 }

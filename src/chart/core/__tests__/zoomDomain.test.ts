@@ -5,7 +5,9 @@ import { sameChartDomain } from '../chartDomain.ts';
 import type { PlotRect } from '../chartGeometry.ts';
 import { chartScale } from '../chartScale.ts';
 import {
+  DUAL_ZOOM_TRAVEL,
   MINIMUM_DRAG,
+  draggedBeyondLevel,
   releasedBeyondBaseline,
   scaledYAxis,
   zoomSelection,
@@ -257,4 +259,75 @@ test('a select preview is a band however far past the baseline it strays', () =>
   expect(zoomSelection(drag, yScale, { drag: 'select' })?.zoomsYAxis).toBe(
     false,
   );
+});
+
+test('a dual drag kept level narrows the horizontal axis alone', () => {
+  // Ten pixels down, well inside the plot: the reading gesture would ignore it
+  // and so does this, but the x window is asked for all the same.
+  const drag = { fromX: 100, fromY: 50, toX: 300, toY: 60 };
+
+  expect(
+    zoomedDomain(shown, drag, plot, xScale, yScale, { drag: 'dual' }),
+  ).toStrictEqual({ x: [200, 400], y: shown.y });
+});
+
+test('a dual drag that left its level takes the rectangle it drew', () => {
+  // Eighty pixels down, nowhere near the baseline at the foot of the plot.
+  const drag = { fromX: 100, fromY: 60, toX: 300, toY: 140 };
+
+  expect(
+    zoomedDomain(shown, drag, plot, xScale, yScale, { drag: 'dual' }),
+  ).toStrictEqual({ x: [200, 400], y: [30, 70] });
+});
+
+test('a dual drag switches at DUAL_ZOOM_TRAVEL, upwards as readily as down', () => {
+  const short = { fromX: 100, fromY: 100, toX: 300, toY: 100 + 23 };
+  const long = { fromX: 100, fromY: 100, toX: 300, toY: 100 + 24 };
+  const up = { fromX: 100, fromY: 100, toX: 300, toY: 100 - 24 };
+
+  expect(DUAL_ZOOM_TRAVEL).toBe(24);
+  expect(draggedBeyondLevel(short)).toBe(false);
+  expect(draggedBeyondLevel(long)).toBe(true);
+  expect(draggedBeyondLevel(up)).toBe(true);
+  // And the threshold is clear of the wobble that makes a press a click.
+  expect(DUAL_ZOOM_TRAVEL).toBeGreaterThan(MINIMUM_DRAG);
+});
+
+test('a dual drag holds no baseline, whatever the axis rules say', () => {
+  const drag = { fromX: 100, fromY: 60, toX: 300, toY: 140 };
+
+  // `keepBaseline` is a stick spectrum's rule; a rectangle drawn on purpose is
+  // a promise about itself, exactly as the box tool's is.
+  expect(
+    zoomedDomain(shown, drag, plot, xScale, yScale, {
+      drag: 'dual',
+      keepBaseline: true,
+    }),
+  ).toStrictEqual({ x: [200, 400], y: [30, 70] });
+});
+
+test('the dual preview is a band until the drag leaves its level', () => {
+  const level = { fromX: 100, fromY: 100, toX: 300, toY: 110 };
+  const left = { fromX: 100, fromY: 100, toX: 300, toY: 140 };
+
+  expect(zoomSelection(level, yScale, { drag: 'dual' })?.zoomsYAxis).toBe(
+    false,
+  );
+  expect(zoomSelection(left, yScale, { drag: 'dual' })?.zoomsYAxis).toBe(true);
+  // Coming back up promises a band again: the answer is the two corners and
+  // nothing a previous frame remembered.
+  expect(zoomSelection(level, yScale, { drag: 'dual' })?.zoomsYAxis).toBe(
+    false,
+  );
+});
+
+test('a dual drag ignores the baseline the reading gesture reads', () => {
+  // Released below the foot of the plot, which is how `xAxis` is asked for the
+  // height — but level with where it began, so this asks for none.
+  const drag = { fromX: 100, fromY: 250, toX: 300, toY: 250 };
+
+  expect(releasedBeyondBaseline(drag.toY, yScale)).toBe(true);
+  expect(
+    zoomedDomain(shown, drag, plot, xScale, yScale, { drag: 'dual' }),
+  ).toStrictEqual({ x: [200, 400], y: shown.y });
 });

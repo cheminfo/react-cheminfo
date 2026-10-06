@@ -36,6 +36,10 @@ export function SelectionRect(props: SelectionRectProps): ReactElement | null {
 
   return (
     <rect
+      // Named, because the shape of this rectangle is the whole promise a drag
+      // makes — a band for the x axis alone, the drawn height for both — and
+      // the only way to check the promise is to measure it mid-drag.
+      data-testid="chart-selection"
       x={rectangle.x}
       y={rectangle.y}
       width={rectangle.width}

@@ -169,7 +169,9 @@ export {
 } from './viewTransform.ts';
 export type { DragBox, ZoomSelection } from './zoomDomain.ts';
 export {
+  DUAL_ZOOM_TRAVEL,
   MINIMUM_DRAG,
+  draggedBeyondLevel,
   releasedBeyondBaseline,
   scaledYAxis,
   zoomSelection,
