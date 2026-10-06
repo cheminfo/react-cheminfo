@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.46.0](https://github.com/cheminfo/react-cheminfo/compare/v0.45.0...v0.46.0) (2026-10-06)
+
+
+### Features
+
+* **chart:** add a dual drag mode gated on vertical travel ([5a8f873](https://github.com/cheminfo/react-cheminfo/commit/5a8f873fef906afaff23cd5926ea45cfbcc84176))
+
 ## [0.45.0](https://github.com/cheminfo/react-cheminfo/compare/v0.44.0...v0.45.0) (2026-10-06)
 
 
