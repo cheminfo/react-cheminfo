@@ -55,6 +55,9 @@ test('a row the address divides is laid out at that share', () => {
   );
 
   expect(markup).toContain('split-row');
+  // A row is divided across, so the bar keeps the width rule and says nothing
+  // about a direction.
+  expect(markup).not.toContain('split-row--down');
   expect(markup).toContain('data-testid="split-start"');
   expect(markup).toContain('data-testid="split-end"');
   expect(markup).toContain('flex:100 0 0%');
@@ -113,6 +116,11 @@ test('a column that has a height to divide takes its share of it', () => {
     );
 
     expect(markup).toContain('split-row');
+    // And says which way it divides, because the seven pixels `chrome.css`
+    // narrows the bar to are its height here and its width on a row. Reached
+    // through the one class, a column's bar renders as a nub at the pane's
+    // left edge rather than as a line across it.
+    expect(markup).toContain('split-row split-row--down');
     // 40% of the column, written as the flex share react-science lays the
     // other pane out with: (100 - 40) / 40 * 100 = 150.
     expect(markup).toContain('flex:150 0 0%');

@@ -26,7 +26,6 @@ export type SplitColumnProps = SplitPanesProps;
  * no height to divide, it measures nothing, says nothing about it, and simply
  * stacks the two panes with no splitter, which is what an ordinary page wanted
  * anyway.
- *
  * @param props - See {@link SplitColumnProps}.
  * @returns The two panes with the splitter between them, the two stacked where
  * there is no height to divide, or whichever one a link left, alone.

@@ -24,7 +24,6 @@ export type SplitRowProps = SplitPanesProps;
  * of forms dragged past about half the row does not grow: the labels stay put
  * and the fields stretch to a width nobody types into, so the room becomes
  * empty card. The figure beside it is what the drag exists to enlarge.
- *
  * @param props - See {@link SplitRowProps}.
  * @returns The two panes with the splitter between them, the two stacked on a
  * narrow screen, or whichever one a link left on the page, alone.

@@ -349,6 +349,8 @@ const STORY_IDS = [
   'spectra-spectrasettingseditor--with-principal-components',
   'spectra-spectrasettingseditor--with-problems',
   'spectra-spectrasettingseditor--with-the-spectra-loaded',
+  'split-splitpanes--across',
+  'split-splitpanes--down',
   'structure-structure--atom-labels',
   'structure-structure--clickable-atoms',
   'structure-structure--default',

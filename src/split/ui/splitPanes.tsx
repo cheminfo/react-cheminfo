@@ -85,7 +85,6 @@ interface InternalProps extends SplitPanesProps {
 
 /**
  * The two panes, divided where the address says.
- *
  * @param props - See {@link SplitPanesProps}.
  * @returns The panes with the splitter between them, the two stacked where
  * there is no room for both, or whichever one a link left, alone.
@@ -154,8 +153,15 @@ export function SplitPanes(props: InternalProps): ReactElement | null {
 
   return (
     // `split-row` is what `chrome.css` reaches the bar through: it is
-    // react-science's own element and carries no class of ours.
-    <div ref={box} className="split-row" style={across ? undefined : FILL}>
+    // react-science's own element and carries no class of ours. A column says
+    // which way it divides as well, because its bar is that same line turned a
+    // quarter: there it is the height that is narrowed, and the width that is
+    // left to run the pane.
+    <div
+      ref={box}
+      className={across ? 'split-row' : 'split-row split-row--down'}
+      style={across ? undefined : FILL}
+    >
       <SplitPane
         direction={direction}
         controlledSide="start"
@@ -187,7 +193,6 @@ export function SplitPanes(props: InternalProps): ReactElement | null {
 
 /**
  * The share a splitter asked for.
- *
  * @param asked - What it reported, a percentage because that is what it was
  * given.
  * @param current - The share in force, kept when the report is not a number.
@@ -208,7 +213,6 @@ function shareOf(
  * measured. Reading it rather than starting at zero is what keeps a wide page
  * from laying itself out stacked and splitting a frame later, which would build
  * both figures twice on every load.
- *
  * @param across - Whether the box is divided across or down.
  * @param fallback - What to answer where there is no window to read — a test,
  * or a page rendered to a string.
