@@ -16,6 +16,9 @@ const CHROME = '[data-figure="chrome"]';
 /** A key floating over a figure, which is. */
 const LEGEND = '[data-figure="legend"]';
 
+/** A part of the figure the page draws in HTML rather than in SVG. */
+const HTML = '[data-figure="html"]';
+
 /** A figure's box on the page, in the coordinates a bounding box reports. */
 export interface FigureBounds {
   /** Its left edge. */
@@ -54,7 +57,8 @@ export function figureElement(target: string | Element): Element {
  * over a figure are `<svg>` too, so anything inside an element marked as
  * chrome is left behind — a cog saved into the middle of a scatter plot is the
  * bug this exists to prevent. A drawing with no area is left behind as well,
- * because a tab that is not showing is still in the document.
+ * because a tab that is not showing is still in the document, and so is one
+ * inside a part drawn in HTML, which paints its own.
  * @param element - The box the figure is mounted in.
  * @returns The drawings.
  */
@@ -65,12 +69,33 @@ export function figureDrawings(element: Element): readonly SVGSVGElement[] {
   const drawings: SVGSVGElement[] = [];
   for (const drawing of element.querySelectorAll('svg')) {
     if (drawing.closest(CHROME) !== null) continue;
+    if (drawing.closest(HTML) !== null) continue;
     if (isNested(drawings, drawing)) continue;
     const box = drawing.getBoundingClientRect();
     if (box.width <= 0 || box.height <= 0) continue;
     drawings.push(drawing);
   }
   return drawings;
+}
+
+/**
+ * The parts of it drawn in HTML: a table of buttons, a grid of cards — anything
+ * that is a picture on the page without being an `<svg>`. A component opts in
+ * by marking its box `data-figure="html"`, and the part is then painted into
+ * the file from where the browser put each box and each line of words.
+ * @param element - The box the figure is mounted in.
+ * @returns The parts, outermost only, in the order they are painted.
+ */
+export function figurePaintings(element: Element): readonly Element[] {
+  if (element.matches(HTML)) return hasArea(element) ? [element] : [];
+  const parts: Element[] = [];
+  for (const part of element.querySelectorAll(HTML)) {
+    if (part.closest(CHROME) !== null) continue;
+    if (isNested(parts, part)) continue;
+    if (!hasArea(part)) continue;
+    parts.push(part);
+  }
+  return parts;
 }
 
 /**
@@ -86,6 +111,7 @@ export function figureDrawings(element: Element): readonly SVGSVGElement[] {
 export function figureLegends(element: Element): readonly Element[] {
   const legends: Element[] = [];
   for (const legend of element.querySelectorAll(LEGEND)) {
+    if (legend.closest(HTML) !== null) continue;
     legends.push(legend);
   }
   return legends;
@@ -93,10 +119,11 @@ export function figureLegends(element: Element): readonly Element[] {
 
 /**
  * The box every drawing of a figure fits in.
- * @param drawings - The drawings, as they sit on the page.
+ * @param drawings - The drawings, and the parts drawn in HTML, as they sit on
+ *   the page.
  * @returns The box, or one with no area where there are no drawings.
  */
-export function figureBounds(drawings: readonly SVGSVGElement[]): FigureBounds {
+export function figureBounds(drawings: readonly Element[]): FigureBounds {
   let left = Number.POSITIVE_INFINITY;
   let top = Number.POSITIVE_INFINITY;
   let right = Number.NEGATIVE_INFINITY;
@@ -123,7 +150,11 @@ export function figureBounds(drawings: readonly SVGSVGElement[]): FigureBounds {
 export function figureSize(target: string | Element): FigurePixels | null {
   let bounds: FigureBounds;
   try {
-    bounds = figureBounds(figureDrawings(figureElement(target)));
+    const element = figureElement(target);
+    bounds = figureBounds([
+      ...figureDrawings(element),
+      ...figurePaintings(element),
+    ]);
   } catch {
     return null;
   }
@@ -140,12 +171,14 @@ export function figureSize(target: string | Element): FigurePixels | null {
  * @param drawing - The one being considered.
  * @returns Whether it is already part of the figure.
  */
-function isNested(
-  taken: readonly SVGSVGElement[],
-  drawing: SVGSVGElement,
-): boolean {
+function isNested(taken: readonly Element[], drawing: Element): boolean {
   for (const other of taken) {
     if (other.contains(drawing)) return true;
   }
   return false;
+}
+
+function hasArea(element: Element): boolean {
+  const box = element.getBoundingClientRect();
+  return box.width > 0 && box.height > 0;
 }

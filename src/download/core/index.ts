@@ -47,6 +47,7 @@ export {
   figureDrawings,
   figureElement,
   figureLegends,
+  figurePaintings,
   figureSize,
 } from './figureTarget.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';

@@ -22,11 +22,11 @@ export interface FigurePiece {
   y: number;
   /**
    * What it is. Written into the file, so a reader — a test, or somebody
-   * editing the figure afterwards — can tell the drawings from the key that
-   * was painted over them.
+   * editing the figure afterwards — can tell the drawings from a part the page
+   * drew in HTML and from the key that was painted over them.
    * @default 'drawing'
    */
-  kind?: 'drawing' | 'legend';
+  kind?: 'drawing' | 'html' | 'legend';
 }
 
 /** How the file around the drawings is written. */
