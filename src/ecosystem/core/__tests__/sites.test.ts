@@ -2,6 +2,10 @@ import { expect, test } from 'vitest';
 
 import type { SiteId } from '../sites.ts';
 import { ECOSYSTEM_SITES, siteUrl } from '../sites.ts';
+import { UNLISTED_SITES } from '../unlistedSites.ts';
+
+// A site no menu shows yet owes the family the same colours as a listed one.
+const FAMILY = [...ECOSYSTEM_SITES, ...UNLISTED_SITES];
 
 test('the family is the twenty-seven sites, listed once each', () => {
   const ids = ECOSYSTEM_SITES.map((site) => site.id);
@@ -38,6 +42,13 @@ test('the family is the twenty-seven sites, listed once each', () => {
   ] satisfies SiteId[]);
 });
 
+test('the sites not linked from the others yet are named apart', () => {
+  expect(UNLISTED_SITES.map((site) => site.id)).toStrictEqual([
+    'molecules',
+    'naturals',
+  ] satisfies SiteId[]);
+});
+
 test('this site is one of them', () => {
   const vcl = ECOSYSTEM_SITES.find((site) => site.id === 'vcl');
 
@@ -46,17 +57,17 @@ test('this site is one of them', () => {
 });
 
 test('every site is a distinct https address', () => {
-  const hosts = ECOSYSTEM_SITES.map((site) => site.host);
+  const hosts = FAMILY.map((site) => site.host);
 
-  expect(new Set(hosts).size).toBe(ECOSYSTEM_SITES.length);
+  expect(new Set(hosts).size).toBe(FAMILY.length);
 
-  for (const site of ECOSYSTEM_SITES) {
+  for (const site of FAMILY) {
     expect(siteUrl(site)).toBe(`https://${site.host}/`);
   }
 });
 
 test('every site owns two colours for its name and two for its mark', () => {
-  for (const site of ECOSYSTEM_SITES) {
+  for (const site of FAMILY) {
     for (const color of [
       site.brand,
       site.brandAlt,
@@ -72,7 +83,7 @@ test('every site owns two colours for its name and two for its mark', () => {
 });
 
 test('both halves of a name are readable on white', () => {
-  for (const site of ECOSYSTEM_SITES) {
+  for (const site of FAMILY) {
     // 3:1, which is what a name set at 15px bold asks for. Two sites keep an
     // official colour that lands just under the 4.5:1 of body text.
     expect(contrastOnWhite(site.brand)).toBeGreaterThan(3);
@@ -83,10 +94,10 @@ test('both halves of a name are readable on white', () => {
 test('no site leads with a colour another one has already claimed', () => {
   // The tightest pair the family currently keeps is vcl and lcao, two blues at
   // 4.7. Anything closer than 4 reads as the same colour in a row of tiles.
-  for (let i = 0; i < ECOSYSTEM_SITES.length; i++) {
-    for (let j = i + 1; j < ECOSYSTEM_SITES.length; j++) {
-      const one = ECOSYSTEM_SITES[i];
-      const other = ECOSYSTEM_SITES[j];
+  for (let i = 0; i < FAMILY.length; i++) {
+    for (let j = i + 1; j < FAMILY.length; j++) {
+      const one = FAMILY[i];
+      const other = FAMILY[j];
       if (one === undefined || other === undefined) continue;
 
       expect({
@@ -102,7 +113,7 @@ test("a mark's answering element separates from the plate and from white", () =>
   // collapsing at 16px is that its colour differs from both — a difference of
   // hue as much as of lightness, which is why this is not a contrast ratio.
   // The family's own floor is 30.6 from the plate and 19.1 from white.
-  for (const site of ECOSYSTEM_SITES) {
+  for (const site of FAMILY) {
     expect(difference(site.mark.accent, site.mark.plate)).toBeGreaterThan(25);
     expect(difference(site.mark.accent, '#ffffff')).toBeGreaterThan(15);
   }

@@ -2,6 +2,13 @@ import type { SiteGroup, SiteGroupId } from './groups.ts';
 import { SITE_GROUPS } from './groups.ts';
 import type { EcosystemSite, SiteId, SiteRecord } from './sites.ts';
 import { ECOSYSTEM_SITES } from './sites.ts';
+import { UNLISTED_SITES } from './unlistedSites.ts';
+
+// What a site is looked up in: the listed ones, then those no menu shows yet.
+const KNOWN_SITES: readonly EcosystemSite[] = [
+  ...ECOSYSTEM_SITES,
+  ...UNLISTED_SITES,
+];
 
 /** One topic and the sites written under it. */
 export interface GroupedSites {
@@ -40,13 +47,14 @@ export function sitesInGroup(id: SiteGroupId): EcosystemSite[] {
 }
 
 /**
- * One site of the family, by the identifier its entry carries.
+ * One site of the family, by the identifier its entry carries — listed in the
+ * menu or not yet.
  * @param id - The site being asked for.
  * @returns The site.
  * @throws {Error} When no site of the family carries that identifier.
  */
 export function siteById(id: SiteId): EcosystemSite {
-  for (const site of ECOSYSTEM_SITES) {
+  for (const site of KNOWN_SITES) {
     if (site.id === id) return site;
   }
   throw new Error(`unknown ecosystem site: ${id}`);
@@ -83,7 +91,7 @@ export function findSiteByHost(host: string): EcosystemSite | undefined {
   const wanted = normalizeHost(host);
   if (wanted === '') return undefined;
 
-  for (const site of ECOSYSTEM_SITES) {
+  for (const site of KNOWN_SITES) {
     if (normalizeHost(site.host) === wanted) return site;
   }
   return undefined;

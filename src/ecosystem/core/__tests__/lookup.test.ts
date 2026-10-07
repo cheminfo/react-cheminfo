@@ -1,8 +1,9 @@
 import { expect, test } from 'vitest';
 
-import { findSiteByHost, siteById } from '../lookup.ts';
+import { findSiteByHost, groupedSites, siteById } from '../lookup.ts';
 import type { SiteId } from '../sites.ts';
 import { ECOSYSTEM_SITES } from '../sites.ts';
+import { UNLISTED_SITES } from '../unlistedSites.ts';
 
 test('a site is found by the identifier its entry carries', () => {
   const site = siteById('equilibrium');
@@ -22,6 +23,26 @@ test('an identifier belonging to nobody names itself in the error', () => {
 test('every site of the family is found by its own host', () => {
   for (const site of ECOSYSTEM_SITES) {
     expect(findSiteByHost(site.host)).toStrictEqual(site);
+  }
+});
+
+test('a site no menu lists yet is still found by its identifier and its host', () => {
+  expect(siteById('naturals').host).toBe('naturals.cheminfo.org');
+  expect(siteById('molecules').host).toBe('molecules.cheminfo.org');
+  expect(findSiteByHost('naturals.cheminfo.org')?.id).toBe('naturals');
+  expect(findSiteByHost('www.molecules.cheminfo.org')?.id).toBe('molecules');
+});
+
+test('a site no menu lists yet is under no topic', () => {
+  const listed = new Set<SiteId>();
+  for (const { sites } of groupedSites()) {
+    for (const site of sites) listed.add(site.id);
+  }
+
+  expect(listed.size).toBe(ECOSYSTEM_SITES.length);
+
+  for (const site of UNLISTED_SITES) {
+    expect(listed.has(site.id)).toBe(false);
   }
 });
 

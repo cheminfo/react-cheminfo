@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ECOSYSTEM_SITES } from '../src/ecosystem/core/sites.ts';
+import { UNLISTED_SITES } from '../src/ecosystem/core/unlistedSites.ts';
 import { SiteMark } from '../src/ecosystem/ui/marks.tsx';
 
 // The sizes a mark has to survive: a favicon, a menu tile, and a header.
@@ -41,7 +42,7 @@ export const EverySite: Story = {
   parameters: { layout: 'padded' },
   render: (args) => (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-      {ECOSYSTEM_SITES.map((site) => (
+      {[...ECOSYSTEM_SITES, ...UNLISTED_SITES].map((site) => (
         <SiteMark key={site.id} site={site} size={args.size} />
       ))}
     </div>

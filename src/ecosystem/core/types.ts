@@ -1,6 +1,6 @@
 import type { SiteGroupId } from './groups.ts';
 
-/** The sites the menu links to. */
+/** The sites of the family, whether the menu links to them yet or not. */
 export type SiteId =
   | 'learn'
   | 'inchi'
@@ -24,12 +24,14 @@ export type SiteId =
   | '3d'
   | 'periodic-table'
   | 'database'
+  | 'molecules'
   | 'symmetry'
   | 'osiris'
   | 'atoms'
   | 'moles'
   | 'inorganic'
-  | 'powerpoint';
+  | 'powerpoint'
+  | 'naturals';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

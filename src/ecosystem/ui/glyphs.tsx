@@ -385,6 +385,26 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <ellipse cx="16" cy="9.4" rx="10.2" ry="3.9" fill={alt} />
     </>
   ),
+  // A ring with one bond leading out to a dot: a molecule, and the link to the
+  // source that holds it. The dot carries the answering colour.
+  molecules: (alt) => (
+    <>
+      <path
+        d="M13.4 11.6 19.12 14.9 19.12 21.5 13.4 24.8 7.68 21.5 7.68 14.9Z"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M19.12 14.9 22.4 13"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      <circle cx="24.6" cy="11.6" r="3.6" fill={alt} />
+    </>
+  ),
   // A tetrahedron seen from slightly above, four balls at its corners: the
   // first shape a chemist meets symmetry in. The apex carries the answering
   // colour, which is also the C3 axis every base triangle turns about.
@@ -484,6 +504,30 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
         strokeLinecap="round"
       />
       <path d="M16 8.45 20.59 11.1V16.4L16 19.05 11.41 16.4V11.1Z" fill={alt} />
+    </>
+  ),
+  // A ring, the compound, with a stem leading out of it to a leaf: a natural
+  // product, and the organism it came from. The leaf carries the answering
+  // colour.
+  naturals: (alt) => (
+    <>
+      <path
+        d="M11.5 14 16.7 17 16.7 23 11.5 26 6.3 23 6.3 17Z"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16.7 17 19.6 14.2"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M19 14.8C18.2 9.6 21.6 5.9 27.2 5.2 27.7 10.9 24.5 14.6 19 14.8Z"
+        fill={alt}
+      />
     </>
   ),
 };
