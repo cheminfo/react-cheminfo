@@ -373,6 +373,10 @@ const STORY_IDS = [
   'structure-structureexportdialog--stereocentre',
   'structure-structureexportdialog--tautomer',
   'structure-structureexportdialog--unreadable',
+  'taxonomy-taxonlineage--default',
+  'taxonomy-taxonlineage--every-rank',
+  'taxonomy-taxonlineage--organism-names',
+  'taxonomy-taxonlineage--plain-with-ncbi',
 ];
 
 // React reports every caught error-boundary hit through `console.error`, so the

@@ -114,6 +114,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Projections**            | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `resolveProjectionShapes`, `PROJECTION_COPY`                                                  | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                                                                                                                                     |
 | **Parallel coordinates**   | `parallelAxisOf`, `parallelAxisLayouts`, `parallelIncludedMask`, `parallelKeptCount`, `parallelNearestRow`, `parallelSegmentAt`, `parallelBandAt`, `parallelRangeOf`, `parallelPalette`, `parallelColorSteps`, `paintParallelLines`                                        | `ParallelCoordinates`                                                                                                                                                                                                                                                                               |
 | **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `EMPTY_BLOCK`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                       | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                                                                                                                                    |
+| **Taxonomy**               | `TAXON_RANKS`, `PRINCIPAL_RANKS`, `rankOrder`, `isPrincipalRank`, `isGenusOrBelow`, `isAboveGenus`, `principalLineage`, `lineageFromNodes`, `lineageFromRanks`, `genusOrBelow`, `ncbiTaxonomyUrl`, `splitOrganismName`                                                     | `TaxonLineage`, `OrganismName`, `useRankLabel`                                                                                                                                                                                                                                                      |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -670,6 +671,49 @@ import { RangeSlider } from 'react-cheminfo/ui';
   readers are handled there; the stylesheet dresses them in the brand colour.
 - **`histogram`** takes one count per equal-width bin, drawn over the track with
   the part the handles keep in the brand colour.
+
+### `TaxonLineage` and `OrganismName`
+
+Where an organism sits in the tree of life, as a breadcrumb, and its name set
+the way nomenclature sets it.
+
+```tsx
+import { lineageFromNodes } from 'react-cheminfo/core';
+import { OrganismName, TaxonLineage } from 'react-cheminfo/ui';
+
+<OrganismName name="Catharanthus roseus (L.) G. Don" />;
+
+<TaxonLineage
+  lineage={lineageFromNodes(taxa, taxId)}
+  taxonHref={(taxon) => `/taxonomy/${taxon.taxId}`}
+  onTaxonSelect={(taxon) => navigate(`/taxonomy/${taxon.taxId}`)}
+  ncbiLink
+/>;
+```
+
+- **A lineage is `{ rank, name, taxId? }[]`, from the top down.** It is read
+  from a map of NCBI nodes pointing at their parents (`lineageFromNodes`), from
+  a record of names by rank as octochemdb stores it (`lineageFromRanks`), or
+  written as it is.
+- **The principal ranks are shown by default** — domain, kingdom, phylum,
+  class, order, family, genus, species — with the last taxon kept whatever its
+  rank. `principal={false}` shows every clade, for a page walking the tree.
+- **Each rank is a tooltip, or a small label over the name** with `showRanks`.
+  The labels are the chrome's words, translated with it; `useRankLabel()` names
+  a rank the same way anywhere else on the page.
+- **A taxon is a link only when `taxonHref` gives it an address**, and
+  `onTaxonSelect` takes over its plain click so the site moves without a
+  reload. `current` marks the last taxon as the page being read; `ncbiLink`
+  adds the way out to the NCBI Taxonomy Browser.
+- **Italics follow the rank, then the name.** The names from the genus down go
+  through `splitOrganismName`, which sets the genus and the epithets in italics
+  and the authority, the strain, `sp.`, a cultivar and the words announcing a
+  rank (`subsp.`, `var.`, `f.`) upright. It reads a name by its shape, as the
+  source wrote it, and leaves upright what it cannot place.
+
+The type is `TaxonLineage` in `react-cheminfo/core` and the component
+`TaxonLineage` in `react-cheminfo/ui`; a file needing both imports one of them
+under another name.
 
 ### `ParallelCoordinates`
 

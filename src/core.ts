@@ -35,5 +35,6 @@ export * from './state/core/index.ts';
 // Framework-free molfile and editor-value helpers, so a worker can read a
 // molfile without loading the editor that `react-cheminfo/structure` exports.
 export * from './structure/core/index.ts';
+export * from './taxonomy/core/index.ts';
 export * from './tokens/core/index.ts';
 export * from './worker/core/index.ts';
