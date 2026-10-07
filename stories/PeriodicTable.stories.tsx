@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { swatchAt } from '../src/color/core/interpolate.ts';
 import { positionInRange } from '../src/color/core/scale.ts';
 import { resolveColorScale } from '../src/color/core/scaleText.ts';
+import { FigureDownload } from '../src/download/ui/FigureDownload.tsx';
 import { configurationOf } from '../src/orbital/core/electronConfiguration.ts';
 import { UNKNOWN_SWATCH } from '../src/periodic/core/categories.ts';
 import type { PeriodicElement } from '../src/periodic/core/elements.ts';
@@ -109,6 +110,17 @@ export const DimmedSelection: Story = {
   ),
 };
 
+/**
+ * A table a reader can take away. The save glyph is the site's, in the bar
+ * above, pointed at the box the table and its key sit in; the table only has
+ * to be inside it. The corner that takes the whole table shows itself when it
+ * is pointed at, and stays off a print and out of the saved file.
+ */
+export const Download: Story = {
+  args: { headers: true, legend: true },
+  render: (args) => <DownloadDemo {...args} />,
+};
+
 /** The table a wall chart draws: the name, and the electrons of each shell. */
 export const Shells: Story = {
   args: { headers: true, legend: false },
@@ -160,7 +172,51 @@ function PropertyMapDemo(props: PeriodicTableProps): ReactElement {
   );
 }
 
+function DownloadDemo(props: PeriodicTableProps): ReactElement {
+  const [selected, setSelected] = useState('O');
+  const [range, setRange] = useState('none');
+  return (
+    <div style={{ maxWidth: 900 }}>
+      <div className="no-print" style={BAR_STYLE}>
+        <span style={CAPTION_STYLE}>Colour by electronegativity</span>
+        <FigureDownload
+          targetId="periodic-figure"
+          fileName="electronegativity"
+          testId="save-table"
+        />
+      </div>
+      <div id="periodic-figure">
+        <PeriodicTable
+          {...props}
+          selected={selected}
+          onSelect={setSelected}
+          onSelectRange={(picked) => {
+            setRange(`${picked.kind} ${String(picked.value)}`);
+          }}
+          onSelectAll={() => {
+            setRange('all');
+          }}
+          swatchOf={swatchFor}
+          detailOf={detailFor}
+        />
+      </div>
+      <p style={CAPTION_STYLE}>
+        Selected: <strong>{selected}</strong>. Last header clicked:{' '}
+        <strong>{range}</strong>.
+      </p>
+    </div>
+  );
+}
+
 const CAPTION_STYLE = { color: TOKEN.textMuted, fontSize: 13 };
+
+const BAR_STYLE = {
+  alignItems: 'center',
+  display: 'flex',
+  gap: 8,
+  justifyContent: 'flex-end',
+  marginBottom: 8,
+} as const;
 
 function swatchFor(element: PeriodicElement) {
   const value = ELECTRONEGATIVITY[element.symbol];

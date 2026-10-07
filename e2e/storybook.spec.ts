@@ -277,6 +277,7 @@ const STORY_IDS = [
   'pedagogy-tutorialstepstrip--plain-level-names',
   'pedagogy-tutorialstepstrip--with-a-pager-hint',
   'periodic-periodictable--dimmed-selection',
+  'periodic-periodictable--download',
   'periodic-periodictable--picker',
   'periodic-periodictable--property-map',
   'periodic-periodictable--shells',

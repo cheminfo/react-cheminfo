@@ -14,6 +14,8 @@ import {
   INNER_TRANSITION_ROWS,
 } from '../core/layout.ts';
 
+import { SelectAllCorner } from './SelectAllCorner.tsx';
+import { headerButtonStyle, headerStyle } from './headerStyles.ts';
 import { ofWidth } from './unit.ts';
 
 /** What {@link HeaderStrips} needs. */
@@ -95,15 +97,8 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
   return (
     <>
       {onSelectAll === undefined ? null : (
-        <HeaderCell
-          // The glyph points into the grid it takes, as a spreadsheet's does.
-          // It is a mark rather than a word because the corner is a
-          // seventeenth of the table's width, and the word differs in every
-          // language the chrome speaks.
-          label="◢"
+        <SelectAllCorner
           title={t('periodic.allElements')}
-          column={1}
-          row={1}
           onClick={onSelectAll}
         />
       )}
@@ -190,22 +185,6 @@ function HeaderCell(props: HeaderCellProps): ReactElement {
     </button>
   );
 }
-
-const headerStyle = {
-  alignItems: 'center',
-  color: TOKEN.textMuted,
-  display: 'flex',
-  fontSize: `max(0.45rem, ${ofWidth(1.35)})`,
-  justifyContent: 'center',
-  padding: 0,
-} as const satisfies CSSProperties;
-
-const headerButtonStyle = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  font: 'inherit',
-} as const satisfies CSSProperties;
 
 const markerStyle = {
   alignItems: 'center',

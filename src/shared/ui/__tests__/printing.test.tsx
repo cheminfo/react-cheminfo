@@ -15,6 +15,7 @@ import { HelpToolbarButton } from '../../../help/ui/HelpToolbarButton.tsx';
 import { NumberInput } from '../../../number/ui/NumberInput.tsx';
 import { OverlayIconButton } from '../../../overlay/ui/OverlayIconButton.tsx';
 import { ClearButton } from '../../../panel/ui/ClearButton.tsx';
+import { PeriodicTable } from '../../../periodic/ui/PeriodicTable.tsx';
 import { ShareButton } from '../../../share/ui/ShareButton.tsx';
 
 const CHROME_CSS = readFileSync(
@@ -40,6 +41,10 @@ const CONTROLS: ReadonlyArray<readonly [string, ReactElement]> = [
   [
     'a bare glyph over a figure',
     <OverlayIconButton key="glyph" icon="cog" label="Cog" />,
+  ],
+  [
+    'the corner that takes a whole periodic table',
+    <PeriodicTable key="table" headers onSelectAll={noop} />,
   ],
   [
     'the cross that empties a box',

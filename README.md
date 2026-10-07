@@ -638,6 +638,31 @@ stopped moving. Draw exactly what is on screen; only the box changes.
 A chart that measures its own container can ignore `size`: the copy is mounted
 in a box of exactly that size.
 
+A figure drawn in HTML rather than SVG is saved too. Mark its box
+`data-figure="html"`, and each ground, border, outline and line of words in it
+is painted into the file from where the browser put it, so the copy matches the
+screen. Anything marked `data-figure="chrome"` inside it stays behind. Images,
+gradients, shadows and `::before` / `::after` content are not painted.
+
+`PeriodicTable` is one, so the save glyph can sit wherever the site keeps its
+controls. Point it at a box around the table and anything that belongs in the
+picture, such as the site's own colour key:
+
+```tsx
+<div className="no-print">
+  <PropertySelect … />
+  <FigureDownload targetId="table-figure" fileName="electronegativity" />
+</div>
+<div id="table-figure" data-figure="html">
+  <PeriodicTable headers swatchOf={swatchFor} />
+  <Legend … />
+</div>
+```
+
+Marking the box itself `data-figure="html"` paints everything in it, the key's
+labels included. The corner that selects the whole table shows itself only when
+pointed at or reached from the keyboard, and is neither printed nor saved.
+
 `downloadFigure(target, options)`, `figureSvg` and `figurePng` are the same thing
 without the button, for a site saving a figure from its own menu.
 
