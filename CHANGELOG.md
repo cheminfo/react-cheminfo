@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.48.0](https://github.com/cheminfo/react-cheminfo/compare/v0.47.0...v0.48.0) (2026-10-07)
+
+
+### Features
+
+* **download:** save a figure the page draws in HTML ([7653cee](https://github.com/cheminfo/react-cheminfo/commit/7653ceec053397b8d1532afb0c1d8cd6ed8ab3e3))
+* **ecosystem:** carry the marks of molecules and naturals, not yet listed ([496463d](https://github.com/cheminfo/react-cheminfo/commit/496463d2190a125d12f2b8728fe616cfa47ced3a))
+* **periodic:** let a site save the table, and show the corner only when pointed at ([c6f6677](https://github.com/cheminfo/react-cheminfo/commit/c6f667738a6cd03c6ee465798a2acc5428aaea7d))
+* **taxonomy:** add TaxonLineage and OrganismName ([7a06080](https://github.com/cheminfo/react-cheminfo/commit/7a0608091e13b1a8dc5c09eccbb3ddc6e6063255))
+
+
+### Bug Fixes
+
+* draw a column splitter as a line across the pane, not a nub ([acb7313](https://github.com/cheminfo/react-cheminfo/commit/acb7313458048065bab26135f5ae057925c097c6))
+
 ## [0.47.0](https://github.com/cheminfo/react-cheminfo/compare/v0.46.0...v0.47.0) (2026-10-06)
 
 
