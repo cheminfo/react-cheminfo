@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-C0FnF6B9.js";async function t(e){return typeof ClipboardItem>`u`||!navigator.clipboard?.write?!1:(await navigator.clipboard.write([new ClipboardItem({"image/png":e})]),!0)}function n(){return(n=e((()=>{})))()}export{t as n,n as t};

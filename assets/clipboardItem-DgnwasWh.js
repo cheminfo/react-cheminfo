@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";async function t(e){let t=globalThis.navigator?.clipboard;if(typeof t?.write!=`function`||typeof ClipboardItem>`u`)return!1;try{return await t.write([new ClipboardItem(e)]),!0}catch{return!1}}function n(){return(n=e((()=>{})))()}export{t as n,n as t};
