@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.50.0](https://github.com/cheminfo/react-cheminfo/compare/v0.49.0...v0.50.0) (2026-10-08)
+
+
+### Features
+
+* add a Cloudflare Pages middleware for the analytics snippet ([aa16aa6](https://github.com/cheminfo/react-cheminfo/commit/aa16aa665632255e2a7adc5fce72cd23c35db43f))
+* serve the Pages middleware from react-cheminfo/pages ([eced9d5](https://github.com/cheminfo/react-cheminfo/commit/eced9d59a312069ccce729f6e06f9677d1f0f13a))
+
+
+### Bug Fixes
+
+* **check-seo:** count a flat .html file as a page only when the sitemap names it ([87d2afe](https://github.com/cheminfo/react-cheminfo/commit/87d2afea4dff8b05e8342ba27e4d6d3318d0fab8))
+
 ## [0.49.0](https://github.com/cheminfo/react-cheminfo/compare/v0.48.0...v0.49.0) (2026-10-08)
 
 
