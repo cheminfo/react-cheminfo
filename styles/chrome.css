@@ -192,6 +192,27 @@ button {
   padding: 0.3rem 0.5rem;
 }
 
+/* Every utility of the bar takes the same box, whatever it is built on — a link,
+   or a Blueprint button opening a menu — so the marks stand evenly spaced: the
+   same padding, no minimum width, no room kept beside the glyph for the hidden
+   label, and one glyph size. */
+.app-header-actions .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down)) {
+  min-width: 0;
+  padding: 0.3rem 0.5rem;
+}
+
+.app-header-actions
+  .bp6-button:has(> .bp6-icon:not(.bp6-icon-caret-down))
+  > .bp6-icon {
+  margin: 0;
+}
+
+.app-header-actions .nav-link--icon > .bp6-icon > svg,
+.app-header-actions .bp6-button > .bp6-icon > svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* A setting the bar shows as its own values — the language, the scale a
    temperature is read on — the one in force pressed. The values carry no
    glyph, which is what keeps them written where a utility is only its mark. */

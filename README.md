@@ -92,6 +92,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Chrome**                 | —                                                                                                                                                                                                                                                                          | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `AccountButton`, `useCompactHeader`                                                                                                                                                                                           |
 | **Languages**              | `LANGUAGES`, `DEFAULT_LANGUAGE`, `LANGUAGE_LABELS`, `isLanguage`, `MessageCatalog`, `CHROME_CATALOG`, `setMessageSession`, `loadCatalogs`, `LANGUAGE_PARAM`, `withLanguageParam`                                                                                           | `useT`, `useChromeT`, `useLanguage`, `LanguageSelect`, `SiteLanguage`                                                                                                                                                                                                                               |
 | **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                                                                   | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                     |
+| **Contact**                | `CONTACT_FORM_URLS`, `contactFormUrl`, `contactUrl`                                                                                                                                                                                                                        | `ContactButton`                                                                                                                                                                                                                                                                                     |
 | **Share & embed**          | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, `visibleShareParts`, `applySharePreset`, `findSharePreset`, the param codecs, `syncPreferencesWithUrl`, `applyPreferencesFromSearch`, `writePreferencesToSearch`                    | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`                                                                                                                                                                                                                      |
 | **Routing & head**         | `createTabRouter`, `readRoute`, `writeRoute`, `subscribeToRoute`, `adoptLegacyHashAddress`, `writeDocumentMeta`                                                                                                                                                            | `useTabRoute`                                                                                                                                                                                                                                                                                       |
 | **Indexing**               | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute`                                                          | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                                                                                                                                                                            |
@@ -223,6 +224,19 @@ import { PLATFORM_WORK, TEACHING_WORK } from 'react-cheminfo/core';
 
 <CiteButton works={[OWN_WORK, TEACHING_WORK, PLATFORM_WORK]} />;
 ```
+
+### `ContactButton`
+
+The Contact entry of a site header. `SiteHeader` draws it after the site's
+utilities and just before Share, which a site passes in its own `share` prop so
+that it always comes last; a site gets the entry by updating the package: it opens the
+family's contact form in a new tab, in the language of the page (English when the
+form is not written in it), with the site and the page already filled in. The form
+is opened, never embedded, so nothing is loaded from it before the click.
+
+The forms are set once, in `CONTACT_FORM_URLS`, as addresses holding `{site}` and
+`{page}`; while it is empty no entry is drawn. A site passes `contact={false}` to
+`SiteHeader` to leave the entry out, or its own address to open another form.
 
 ### `EcosystemButton`
 

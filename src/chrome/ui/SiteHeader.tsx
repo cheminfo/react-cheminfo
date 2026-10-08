@@ -1,10 +1,13 @@
 import type { ReactElement, ReactNode } from 'react';
 import { Fragment } from 'react';
 
+import { contactFormUrl } from '../../contact/core/contactUrl.ts';
+import { ContactButton } from '../../contact/ui/ContactButton.tsx';
 import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { Wordmark } from '../../ecosystem/ui/Wordmark.tsx';
 import { SiteMark } from '../../ecosystem/ui/marks.tsx';
+import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 
 import { NavLink } from './NavLink.tsx';
@@ -39,12 +42,28 @@ export interface SiteHeaderProps {
    */
   activeId?: string;
   /**
-   * The utilities pushed to the right edge — Cite, Tools, Share, sign in. They
+   * The utilities pushed to the right edge — About, Cite, Tools, the language,
+   * sign in; Share has a prop of its own, so it always comes last. They
    * arrive dressed as bar items, so a plain `nav-link` and a `CiteButton` read
    * alike beside each other.
    * @default undefined
    */
   actions?: ReactNode;
+  /**
+   * The Share entry, which closes the utilities on every site, after the
+   * Contact entry. A site passes its own when it wraps the shared `ShareButton`
+   * in a dialog of its own.
+   * @default undefined
+   */
+  share?: ReactNode;
+  /**
+   * The contact form the Contact entry opens, drawn after the site's utilities
+   * and just before Share, with
+   * `{site}` and `{page}` where the site and the page are written; `false`
+   * leaves the entry out. No entry is drawn while there is no form.
+   * @default the family's form in the language of the page (`CONTACT_FORM_URLS`)
+   */
+  contact?: string | false;
   /**
    * Draws one page the site's own way, for a bar whose entries need a tooltip
    * or a wrapper of their own.
@@ -113,6 +132,8 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
     nav,
     activeId,
     actions,
+    share,
+    contact,
     renderNavItem,
     embedded = false,
     homeHref = '/',
@@ -122,6 +143,7 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
     pagesLabel,
   } = props;
   const t = useChromeT();
+  const language = useLanguage();
 
   if (embedded) return null;
 
@@ -129,6 +151,8 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
   if (site === undefined) {
     throw new Error('SiteHeader needs one of its `site` and `siteId` props');
   }
+  const contactForm =
+    contact === false ? '' : (contact ?? contactFormUrl(language));
 
   return (
     <header className="app-header no-print">
@@ -169,8 +193,16 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
           </div>
         ) : null}
         <span className="spacer" />
-        {actions === undefined ? null : (
-          <div className="app-header-actions">{actions}</div>
+        {actions === undefined &&
+        share === undefined &&
+        contactForm === '' ? null : (
+          <div className="app-header-actions">
+            {actions}
+            {contactForm === '' ? null : (
+              <ContactButton siteId={site.id} formUrl={contactForm} />
+            )}
+            {share}
+          </div>
         )}
       </div>
     </header>

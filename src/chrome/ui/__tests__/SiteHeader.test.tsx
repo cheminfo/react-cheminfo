@@ -70,7 +70,9 @@ test('the utilities sit in their own group after the spacer', () => {
 });
 
 test('a bar with no utilities holds no group for them', () => {
-  const html = renderToStaticMarkup(<SiteHeader siteId="surge" nav={PAGES} />);
+  const html = renderToStaticMarkup(
+    <SiteHeader siteId="surge" nav={PAGES} contact={false} />,
+  );
 
   expect(html).not.toContain('app-header-actions');
 });
@@ -171,6 +173,7 @@ test('a page that folds pages of its own is drawn as a menu among the pages', ()
   const html = renderToStaticMarkup(
     <SiteHeader
       siteId="equilibrium"
+      contact={false}
       nav={[
         ...PAGES,
         {
@@ -219,4 +222,48 @@ test('a folded menu takes the brand tint while it holds the page on show', () =>
       <SiteHeader siteId="equilibrium" nav={nav} activeId="tutorial" />,
     ),
   ).toContain('class="nav-link" aria-label="More"');
+});
+
+test('the Contact entry follows the utilities and opens the form for this site', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader
+      siteId="inchi"
+      nav={PAGES}
+      actions={<span className="probe">Cite</span>}
+      contact="https://forms.example.org/contact?site={site}&page={page}"
+    />,
+  );
+
+  expect(html).toContain(
+    '<div class="app-header-actions"><span class="probe">Cite</span><a',
+  );
+  expect(html).toContain(
+    'href="https://forms.example.org/contact?site=inchi&amp;page="',
+  );
+  expect(html).toContain('target="_blank"');
+});
+
+test('a site may leave the Contact entry out', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader siteId="inchi" nav={PAGES} contact={false} />,
+  );
+
+  expect(html).not.toContain('app-header-actions');
+  expect(html).not.toContain('forms.example.org');
+});
+
+test('Share closes the utilities, with the Contact entry just before it', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader
+      siteId="inchi"
+      nav={PAGES}
+      actions={<span className="probe">Cite</span>}
+      share={<span className="share-probe">Share</span>}
+      contact="https://forms.example.org/contact?site={site}&page={page}"
+    />,
+  );
+
+  expect(html).toMatch(
+    /<div class="app-header-actions"><span class="probe">Cite<\/span><a[^>]*forms\.example\.org[^>]*>.*<\/a><span class="share-probe">Share<\/span><\/div>/,
+  );
 });
