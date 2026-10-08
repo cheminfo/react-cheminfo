@@ -1096,6 +1096,27 @@ disk. A server writing more into the same place composes it itself, with
 `pageHeadTags` and `fill(page, PAGE_BODY_MARKER, noscriptIndex(…))`. All of that
 is `react-cheminfo/core`, so a backend loads no React and no Vite.
 
+### On Cloudflare Pages
+
+Pages serves the build as it is, so there is no server and no entrypoint to put
+the analytics snippet in a page. `trackingScriptMiddleware` adds it per request
+instead, from the project's `TRACKING_SCRIPT` variable, and returns everything
+that is not a page untouched:
+
+```ts
+// functions/_middleware.ts
+import { trackingScriptMiddleware } from 'react-cheminfo/core';
+
+export const onRequest = trackingScriptMiddleware;
+```
+
+Keep the bundles out of the function with a `public/_routes.json`, so a page
+view costs one invocation rather than one per asset:
+
+```json
+{ "version": 1, "include": ["/*"], "exclude": ["/assets/*"] }
+```
+
 ## Saying which build is running
 
 A report of something going wrong is worth answering only when we know what was
