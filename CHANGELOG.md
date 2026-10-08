@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.49.0](https://github.com/cheminfo/react-cheminfo/compare/v0.48.0...v0.49.0) (2026-10-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* prerender each address as <address>.html
+
+### Features
+
+* prerender each address as &lt;address&gt;.html ([f3688da](https://github.com/cheminfo/react-cheminfo/commit/f3688da929a0f3bf2c2831855408501cacf17d8a))
+
 ## [0.48.0](https://github.com/cheminfo/react-cheminfo/compare/v0.47.0...v0.48.0) (2026-10-07)
 
 
