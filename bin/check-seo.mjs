@@ -63,7 +63,7 @@ if (stats === undefined || !stats.isDirectory()) {
 const pages = [];
 collect(root, pages);
 if (pages.length === 0) {
-  process.exit(usageError(TOOL, `no index.html under ${root}`));
+  process.exit(usageError(TOOL, `no HTML page under ${root}`));
 }
 
 const problems = [];
@@ -367,8 +367,9 @@ function collect(path, pages) {
     const next = join(path, entry.name);
     if (entry.isDirectory()) {
       collect(next, pages);
-    } else if (entry.name === 'index.html') {
-      const address = `/${relative(root, next).replace(/index\.html$/, '')}`;
+    } else if (entry.name.endsWith('.html')) {
+      const page = relative(root, next).replace(/\.html$/, '');
+      const address = `/${page.replace(/(?:^|\/)index$/, '')}`;
       pages.push({ file: next, address: trimSlash(address) });
     }
   }

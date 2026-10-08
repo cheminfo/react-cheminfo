@@ -156,7 +156,7 @@ export function homeRoute(routes: readonly RouteMeta[]): RouteMeta {
  * only the first entry describes, and one carrying a `..` segment writes its
  * file outside the build output. Two addresses that differ only in an empty
  * segment or in case are the same defect wearing a disguise: `//x` and `/x`
- * both write `dist/x/index.html`, and so do `/About` and `/about` on the
+ * both write `dist/x.html`, and so do `/About` and `/about` on the
  * case-insensitive filesystem macOS and Windows ship by default — one file, two
  * sitemap entries, and only one of the two descriptions survives. All of it is
  * author configuration read at build time, so it is refused where it is written

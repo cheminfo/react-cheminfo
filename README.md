@@ -1043,7 +1043,7 @@ keep in step.
 ```ts
 cheminfoPrerender({ site: 'surge', routes: PAGE_ROUTES });
 // origin defaults to https://surge.cheminfo.org — the site owns its host,
-// the mount is '', and /exercises is written at dist/exercises/index.html.
+// the mount is '', and /exercises is written at dist/exercises.html.
 
 cheminfoPrerender({
   site: 'surge',
@@ -1055,7 +1055,7 @@ cheminfoPrerender({
 ```
 
 The **files on disk are laid out from the build's own root either way** —
-`dist/exercises/index.html`, never `dist/surge/exercises/index.html`. It is the
+`dist/exercises.html`, never `dist/surge/exercises.html`. It is the
 server that puts them under the mount. An origin must be an absolute `http` or
 `https` address or it is refused: one written `localhost:3000` parses with
 `localhost:` as its scheme, which would read the mount back as `/3000`.

@@ -51,7 +51,7 @@ test('a page of a mounted site is canonical under the mount, once', async () => 
     out,
   );
 
-  const about = readFileSync(join(out, 'about', 'index.html'), 'utf8');
+  const about = readFileSync(join(out, 'about.html'), 'utf8');
 
   expect(about).toContain(
     '<link rel="canonical" href="https://learn.cheminfo.org/surge/about" />',
@@ -120,7 +120,7 @@ test('a page displaying the markup a site is about keeps its prose', async () =>
 
   await build({ site: '3d', routes: ROUTES }, out);
 
-  const about = readFileSync(join(out, 'about', 'index.html'), 'utf8');
+  const about = readFileSync(join(out, 'about.html'), 'utf8');
 
   expect(about).toContain('<title>About — 3d.cheminfo.org</title>');
   expect(about).toContain(

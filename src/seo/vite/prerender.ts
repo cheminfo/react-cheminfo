@@ -15,6 +15,12 @@
  * Every address the tool answers is on disk, so an address that is *not* on
  * disk is genuinely not a page and must 404 rather than serving the tool under
  * a name it does not have.
+ *
+ * `/about` is written to `about.html`, never `about/index.html`: a static host
+ * serves a folder's index at `/about/` and redirects the address every link and
+ * canonical uses to it (Cloudflare Pages does, with no way to turn it off),
+ * while `about.html` is served at `/about` itself by Pages, static-web-server
+ * and `vite preview` alike.
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -229,7 +235,7 @@ export function cheminfoPrerender(options: PrerenderOptions): Plugin {
             language,
             address === '/'
               ? join(out, 'index.html')
-              : join(out, address.slice(1), 'index.html'),
+              : join(out, `${address.slice(1)}.html`),
           );
           written++;
         }

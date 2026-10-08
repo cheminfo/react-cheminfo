@@ -45,9 +45,9 @@ async function files(
   const read = (name: string) => readFileSync(join(out, name), 'utf8');
   return {
     '/': read('index.html'),
-    '/about': read(join('about', 'index.html')),
-    '/fr': read(join('fr', 'index.html')),
-    '/fr/about': read(join('fr', 'about', 'index.html')),
+    '/about': read('about.html'),
+    '/fr': read('fr.html'),
+    '/fr/about': read(join('fr', 'about.html')),
     sitemap: read('sitemap.xml'),
   };
 }
@@ -138,6 +138,7 @@ test('a site given one language writes exactly what it wrote before', async () =
   ).toHaveLength(2);
   // Nothing was written under a language it does not speak.
   expect(existsSync(join(out, 'fr'))).toBe(false);
+  expect(existsSync(join(out, 'fr.html'))).toBe(false);
 });
 
 test('a translated table answering other addresses is refused at build time', async () => {

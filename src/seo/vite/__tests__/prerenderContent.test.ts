@@ -45,7 +45,7 @@ async function pages(
   await build(options, out);
   return {
     '/': readFileSync(join(out, 'index.html'), 'utf8'),
-    '/about': readFileSync(join(out, 'about', 'index.html'), 'utf8'),
+    '/about': readFileSync(join(out, 'about.html'), 'utf8'),
   };
 }
 
