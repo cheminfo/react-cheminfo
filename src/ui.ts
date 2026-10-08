@@ -4,6 +4,7 @@ export * from './capsule/ui/index.ts';
 export * from './chart/ui/index.ts';
 export * from './chrome/ui/index.ts';
 export * from './citation/ui/index.ts';
+export * from './contact/ui/index.ts';
 export * from './clipboard/ui/index.ts';
 export * from './color/ui/index.ts';
 export * from './confirm/ui/index.ts';

@@ -3,6 +3,8 @@
   "chrome.pages": "Seiten",
   "chrome.about": "Über",
   "chrome.aboutTitle": "Was diese Seite ist, worauf sie aufbaut und wie man sie zitiert",
+  "chrome.contact": "Kontakt",
+  "chrome.contactTitle": "Eine Frage, ein Problem, eine Idee? Schreiben Sie uns",
   "account.signIn": "Anmelden",
   "account.signOut": "Abmelden",
   "account.signedInAs": "Angemeldet als {name}",

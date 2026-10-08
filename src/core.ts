@@ -5,6 +5,7 @@ export * from './chart/core/index.ts';
 export * from './citation/core/index.ts';
 export * from './clipboard/core/index.ts';
 export * from './color/core/index.ts';
+export * from './contact/core/index.ts';
 export * from './credits/core/index.ts';
 export * from './delimited/core/index.ts';
 export * from './download/core/index.ts';
