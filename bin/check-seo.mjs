@@ -60,6 +60,7 @@ if (stats === undefined || !stats.isDirectory()) {
   process.exit(usageError(TOOL, `no such build directory: ${root}`));
 }
 
+const named = sitemapAddresses();
 const pages = [];
 collect(root, pages);
 if (pages.length === 0) {
@@ -358,6 +359,11 @@ function exists(path) {
 
 /**
  * Add every built page under a path to the list, with the address it answers.
+ *
+ * A folder's `index.html` is always a page. Any other `.html` file is one only
+ * when the sitemap names its address, as every prerendered `<route>.html` is:
+ * a demo the build emits or a document copied from `public` is not a page of
+ * the site, and holding it to a page's head would report a correct build.
  * @param {string} path - A directory of the build.
  * @param {Array<{ file: string, address: string }>} pages - Collected so far.
  */
@@ -369,8 +375,27 @@ function collect(path, pages) {
       collect(next, pages);
     } else if (entry.name.endsWith('.html')) {
       const page = relative(root, next).replace(/\.html$/, '');
-      const address = `/${page.replace(/(?:^|\/)index$/, '')}`;
-      pages.push({ file: next, address: trimSlash(address) });
+      const address = trimSlash(`/${page.replace(/(?:^|\/)index$/, '')}`);
+      if (entry.name === 'index.html' || named.has(address)) {
+        pages.push({ file: next, address });
+      }
     }
   }
+}
+
+/**
+ * Read which addresses of this build the sitemap names.
+ * @returns {Set<string>} Every address of this build the sitemap names.
+ */
+function sitemapAddresses() {
+  const sitemap = join(root, 'sitemap.xml');
+  const addresses = new Set();
+  if (!exists(sitemap)) return addresses;
+  for (const match of readFileSync(sitemap, 'utf8').matchAll(
+    /<loc>(?<loc>[^<]+)<\/loc>/g,
+  )) {
+    const own = ownPath(match.groups?.loc ?? '');
+    if (own !== undefined) addresses.add(own === '' ? '/' : own);
+  }
+  return addresses;
 }
