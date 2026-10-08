@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.51.0](https://github.com/cheminfo/react-cheminfo/compare/v0.50.0...v0.51.0) (2026-10-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* writeImageToClipboard is removed (use copyFigure or writeBlobToClipboard), FigureNotice moves to download/core, and FigureDownloadPanel requires onCopy.
+
+### Features
+
+* copy every figure through copyFigure, and reset the 3D display options ([883b639](https://github.com/cheminfo/react-cheminfo/commit/883b639d3ba2f3ff7bb022f113b30dc009de8ba6))
+
 ## [0.50.0](https://github.com/cheminfo/react-cheminfo/compare/v0.49.0...v0.50.0) (2026-10-08)
 
 
