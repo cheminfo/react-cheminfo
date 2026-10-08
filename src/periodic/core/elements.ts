@@ -9,9 +9,12 @@
  * they still agree with it.
  *
  * `block` follows the element's *position* in the table, which is what a
- * student reads off it. The configuration is the authority on which subshell is
- * actually filling, and the two disagree for a handful of elements — lanthanum
- * fills 5d, not 4f. See `ELEMENT_ANOMALIES` in the orbital module.
+ * student reads off it, with two exceptions where the table's shape and the
+ * chemistry part ways: helium is s, and lutetium and lawrencium close the d
+ * block in group 3 (IUPAC), so the f block is fourteen wide. The configuration
+ * is the authority on which subshell is actually filling, and the two disagree
+ * for a handful of elements — lanthanum fills 5d, not 4f. See
+ * `ELEMENT_ANOMALIES` in the orbital module.
  */
 
 /** Region of the table an element sits in. */
@@ -210,6 +213,8 @@ export function elementByAtomicNumber(
 }
 
 function blockOf(atomicNumber: number, group: number | null): ElementBlock {
+  // Lutetium and lawrencium are drawn in the f rows but belong to group 3.
+  if (atomicNumber === 71 || atomicNumber === 103) return 'd';
   if (group === null) return 'f';
   // Helium sits above the p block but its only electrons are 1s.
   if (atomicNumber === 2) return 's';

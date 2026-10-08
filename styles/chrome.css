@@ -333,54 +333,36 @@ button {
   font-size: 0.75rem;
 }
 
-/* The share dialog: the link and its buttons above, never scrolled away, then
-   the options and the page they write, side by side. */
+/* The share dialog: the ready-made links above, the options and the page they
+   write side by side, and the three things one does with the link in the
+   footer, never scrolled away. */
 .share-dialog__body {
   display: flex;
   overflow: hidden;
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  padding: 0 16px;
+  padding: 12px 16px 0;
   gap: 12px;
 }
 
-/* The ready-made links and the three things one does with the link they write,
-   on one row: the tabs say which link, the buttons act on it. A dialog too
-   narrow for both wraps the buttons under the tabs rather than cutting them.
-
-   The band owns the space between the dialog's header and its rule — the body
-   does not pad above it — so the buttons centre in that whole band whether or
-   not the site has tabs to put beside them. */
+/* The tabs end on the rule, where a tab strip's underline has to be. */
 .share-dialog__top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  padding: 12px 0;
   border-bottom: 1px solid var(--border);
-  gap: 8px 16px;
 }
 
-/* The tabs end on the rule, where a tab strip's underline has to be, so they
-   are pulled through the band's lower half. */
 .share-dialog__top > .share-presets {
-  flex: 1 1 auto;
   min-width: 0;
-  align-self: flex-end;
-  margin-bottom: -12px;
+  margin-bottom: -1px;
 }
 
-/* The buttons keep the right edge on every site: a dialog with no tabs has
-   nothing to push them there. */
+/* A dialog too narrow for the three buttons wraps them under each other rather
+   than cutting them. */
 .share-linkbar {
   display: flex;
-  /* They keep the right edge while there is room, and wrap under each other
-     rather than off the dialog once there is not. */
-  flex: 0 1 auto;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  margin-left: auto;
   gap: 8px;
 }
 
@@ -528,26 +510,55 @@ button {
   overflow: hidden;
   flex: 0 0 auto;
   border: 1px solid var(--border-strong);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--surface);
   box-shadow: var(--shadow-md);
 }
 
+/* Dressed as a browser's title bar — grey, three window buttons, the address in
+   a field of its own — so it reads as a window and not as the site's header. */
 .share-preview__chrome {
   display: flex;
-  height: 25px;
+  height: 30px;
   align-items: center;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-sunken);
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border-strong);
+  background: color-mix(in oklab, var(--text) 9%, var(--surface-sunken));
   color: var(--text-muted);
   font-size: 11px;
-  gap: 6px;
+  gap: 10px;
+}
+
+.share-preview__lights {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 5px;
+}
+
+.share-preview__lights > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 15%);
+}
+
+.share-preview__lights > span:nth-child(2) {
+  background: #febc2e;
+}
+
+.share-preview__lights > span:nth-child(3) {
+  background: #28c840;
 }
 
 .share-preview__address {
   overflow: hidden;
+  min-width: 0;
   flex: 1 1 auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

@@ -91,3 +91,21 @@ test('a faded element fades everything inside it at once', () => {
       '<g transform="translate(2 3)"><svg/></g></g>',
   );
 });
+
+test('a drawing sized by CSS is written at the size the browser drew it', () => {
+  const markup = figureHtmlMarkup([
+    {
+      kind: 'drawing',
+      markup: '<svg viewBox="0 0 100 10" preserveAspectRatio="none"/>',
+      x: 120.4,
+      y: 8,
+      size: { width: 230.25, height: 12 },
+    },
+  ]);
+
+  expect(markup).toBe(
+    '<g transform="translate(120.4 8)">' +
+      '<svg width="230.25" height="12" overflow="visible">' +
+      '<svg viewBox="0 0 100 10" preserveAspectRatio="none"/></svg></g>',
+  );
+});

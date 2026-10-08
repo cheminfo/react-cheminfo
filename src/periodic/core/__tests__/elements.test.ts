@@ -59,6 +59,22 @@ test('the block follows the position in the table', () => {
   expect(elementBySymbol('U')?.block).toBe('f');
 });
 
+test('the f block is fourteen wide: lutetium and lawrencium are d', () => {
+  const fBlock: string[] = [];
+  for (const element of PERIODIC_ELEMENTS) {
+    if (element.block === 'f') fBlock.push(element.symbol);
+  }
+
+  expect(fBlock).toHaveLength(28);
+  expect(fBlock.at(0)).toBe('La');
+  expect(fBlock.at(13)).toBe('Yb');
+  expect(fBlock.at(14)).toBe('Ac');
+  expect(fBlock.at(-1)).toBe('No');
+  expect(elementBySymbol('Lu')?.block).toBe('d');
+  expect(elementBySymbol('Lr')?.block).toBe('d');
+  expect(elementBySymbol('Lu')?.group).toBeNull();
+});
+
 test('an element is found by symbol and by atomic number', () => {
   expect(elementBySymbol('Cl')).toStrictEqual({
     atomicNumber: 17,

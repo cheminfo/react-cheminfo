@@ -5,7 +5,9 @@ import {
   isRepresentationId,
   isSurfaceColoringId,
   normalizeMolecule3DSettings,
+  resetMolecule3DSettings,
   resolveMolecule3DTools,
+  sameMolecule3DSettings,
 } from '../settings.ts';
 
 test('nothing given is the default settings', () => {
@@ -65,4 +67,40 @@ test('tools not named stay on', () => {
       help: true,
     },
   );
+});
+
+test('a reset returns to the defaults but leaves the surface toggle alone', () => {
+  const changed = {
+    representation: 'spacefill',
+    sizeFactor: 1.6,
+    showSurface: true,
+    surfaceAlpha: 0.8,
+    probeRadius: 2.2,
+    surfaceColoring: 'polarity',
+    surfaceColor: '#332288',
+  } as const;
+
+  expect(resetMolecule3DSettings(changed)).toStrictEqual({
+    ...DEFAULT_MOLECULE_3D_SETTINGS,
+    showSurface: true,
+  });
+
+  const siteDefaults = normalizeMolecule3DSettings({ sizeFactor: 0.6 });
+
+  expect(resetMolecule3DSettings(changed, siteDefaults)).toStrictEqual({
+    ...siteDefaults,
+    showSurface: true,
+  });
+});
+
+test('settings compare equal only when every field does', () => {
+  const settings = DEFAULT_MOLECULE_3D_SETTINGS;
+
+  expect(sameMolecule3DSettings(settings, { ...settings })).toBe(true);
+  expect(
+    sameMolecule3DSettings(settings, { ...settings, probeRadius: 1.5 }),
+  ).toBe(false);
+  expect(
+    sameMolecule3DSettings(settings, { ...settings, surfaceColor: '#000000' }),
+  ).toBe(false);
 });

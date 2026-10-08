@@ -310,13 +310,14 @@ test('a configured page keeps its own configuration over the default preset', ()
   expect(html).toContain(`${BASE}?hide=hints`);
 });
 
-test('the three things one does with the link come before the options', () => {
+test('the three things one does with the link sit in the footer, after the options', () => {
   const html = render({ search: 'set=alkanes' });
   const bar = html.indexOf('share-linkbar');
   const panes = html.indexOf('share-dialog__panes');
 
-  expect(bar).toBeGreaterThan(-1);
-  expect(panes).toBeGreaterThan(bar);
+  expect(panes).toBeGreaterThan(-1);
+  expect(bar).toBeGreaterThan(panes);
+  expect(html.lastIndexOf('bp6-dialog-footer', bar)).toBeGreaterThan(panes);
   expect(html).toContain('Copy the link');
   expect(html).toContain('Open in a new tab');
   expect(html).toContain('Copy the iframe');

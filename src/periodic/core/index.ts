@@ -15,8 +15,15 @@ export {
   UNKNOWN_SWATCH,
   categorySwatch,
 } from './categories.ts';
-export type { Cell, ElementPick, ElementRange } from './layout.ts';
+export type {
+  BlockRange,
+  Cell,
+  ElementPick,
+  ElementRange,
+  NumberedRange,
+} from './layout.ts';
 export {
+  BLOCK_LABELS,
   COLUMN_COUNT,
   EMPTY_BLOCK,
   INNER_TRANSITION_MARKERS,

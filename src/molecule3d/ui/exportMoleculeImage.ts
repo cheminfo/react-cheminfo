@@ -25,6 +25,26 @@ export interface MoleculeImageRequest {
 }
 
 /**
+ * Render the scene as a PNG, for the clipboard.
+ * @param viewer - The viewer holding the scene.
+ * @param scale - Multiple of the canvas on screen it is rendered at.
+ * @param size - Size of the canvas on screen, CSS pixels.
+ * @returns The PNG.
+ * @throws {Error} When the viewer has nothing to render.
+ */
+export async function captureMoleculePng(
+  viewer: SceneCapture,
+  scale: number,
+  size: ImageSize,
+): Promise<Blob> {
+  const dataUri = await viewer.captureImage(figurePixels(size, scale));
+  if (dataUri === undefined) {
+    throw new Error('There is no picture to copy yet.');
+  }
+  return new Blob([dataUriBytes(dataUri)], { type: FIGURE_PNG_TYPE });
+}
+
+/**
  * Render the scene and hand it to the browser as a file.
  * @param viewer - The viewer holding the scene.
  * @param request - See {@link MoleculeImageRequest}.

@@ -44,3 +44,41 @@ test('the button is reachable by the test id and named for a screen reader', () 
   expect(html).toContain('data-testid="color-scale"');
   expect(html).toContain('aria-label="Colour scale"');
 });
+
+test('one colour is named on the button when the picker offers it', () => {
+  const html = renderToStaticMarkup(
+    <ColorScaleSelect value="uniform" onChange={noop} allowUniform />,
+  );
+
+  expect(html).toContain('One colour');
+  expect(html).not.toContain('Viridis');
+});
+
+test('a picker that does not offer one colour reads it as the default', () => {
+  const html = renderToStaticMarkup(
+    <ColorScaleSelect value="uniform" onChange={noop} />,
+  );
+
+  expect(html).toContain('Viridis');
+  expect(html).not.toContain('One colour');
+});
+
+test('on a bar the picker is one line: its name, the scale, and its dots', () => {
+  const html = renderToStaticMarkup(
+    <ColorScaleSelect
+      value="plasma"
+      onChange={noop}
+      label="Colour scale"
+      appearance="bar"
+      testId="scale"
+    />,
+  );
+
+  expect(html).not.toContain('<label');
+  expect(html).toContain('aria-label="Colour scale — Plasma"');
+  expect(html).toContain('aria-haspopup="menu"');
+  expect(html).toContain('data-testid="scale"');
+  expect(html).toContain('#0d0887');
+  expect(html).toContain('#f0f921');
+  expect(html).not.toContain('0.00%');
+});

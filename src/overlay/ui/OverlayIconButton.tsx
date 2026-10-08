@@ -7,7 +7,7 @@ import { useOverlaySurface } from './overlaySurface.ts';
 import { useOverlayInteraction } from './useOverlayInteraction.ts';
 
 /** What {@link OverlayIconButton} needs. */
-interface OverlayIconButtonProps {
+export interface OverlayIconButtonProps {
   /**
    * The glyph: a Blueprint icon name, or an element of the caller's own — an
    * inline `<svg>` drawing the very mark the figure draws, which is the one
@@ -60,6 +60,13 @@ interface OverlayIconButtonProps {
    */
   onClick?: () => void;
   /**
+   * Whether the pointer is left without the browser's own tooltip, for a
+   * button that already opens a card of its own on hover: the two would
+   * otherwise stack. The screen reader is still told the name.
+   * @default false
+   */
+  untitled?: boolean;
+  /**
    * Value of the `data-testid` attribute.
    * @default undefined
    */
@@ -81,6 +88,7 @@ interface OverlayIconButtonProps {
 export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
   const { icon, label, value, active = false, disabled = false } = props;
   const { disabledReason, opensMenu = false, onClick, testId } = props;
+  const { untitled = false } = props;
   const { metrics } = useOverlaySurface();
   const { hovered, focused, handlers } = useOverlayInteraction();
 
@@ -91,7 +99,7 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
     <button
       type="button"
       className="no-print"
-      title={told}
+      title={untitled ? undefined : told}
       aria-label={name}
       aria-haspopup={opensMenu ? 'menu' : undefined}
       aria-expanded={opensMenu ? active : undefined}

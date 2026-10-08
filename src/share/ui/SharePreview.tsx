@@ -20,7 +20,7 @@ import {
 import { SharePreviewDevices } from './SharePreviewDevices.tsx';
 
 /** Room the window's own bar takes, which the page is not scaled into. */
-const CHROME_HEIGHT = 26;
+const CHROME_HEIGHT = 31;
 
 /** How often the framed page is asked again while it has answered nothing. */
 const ASK_INTERVAL = 300;
@@ -148,7 +148,11 @@ export function SharePreview(props: SharePreviewProps): ReactElement {
           style={{ width: page.width * scale }}
         >
           <div className="share-preview__chrome">
-            <Icon icon="eye-open" size={11} />
+            <span className="share-preview__lights" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
             <span className="share-preview__address">
               {sharePreviewAddress(url)}
             </span>

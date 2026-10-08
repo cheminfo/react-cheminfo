@@ -3,7 +3,7 @@ import type { Molecule } from 'openchemlib';
 import type { CSSProperties, ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 
-import { writeImageToClipboard } from '../../clipboard/core/copyPng.ts';
+import { copyFigure } from '../../download/core/copyFigure.ts';
 import { downloadBlob } from '../../download/core/downloadBlob.ts';
 import { downloadText } from '../../download/core/downloadText.ts';
 import { figurePng } from '../../download/core/figurePng.ts';
@@ -143,9 +143,9 @@ export function StructurePicturePane(
           onClick={() =>
             // Safari only allows a clipboard write the click itself started,
             // so the image is handed over as a promise rather than awaited
-            // first — see `writeImageToClipboard`.
+            // first — see `copyFigure`.
             void run(async () =>
-              (await writeImageToClipboard(png()))
+              (await copyFigure(png())) === 'copied'
                 ? t('download.hintCopied', {
                     pixels: formatFigurePixels(picture),
                   })

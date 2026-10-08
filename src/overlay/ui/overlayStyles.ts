@@ -204,6 +204,67 @@ export function overlayBarContentStyle(metrics: OverlayMetrics): CSSProperties {
   };
 }
 
+/** How strong a quiet bar's controls are drawn while it rests. */
+export const OVERLAY_QUIET_OPACITY = 0.45;
+
+/**
+ * How much of a resting bar's ground is left: almost none, so the strip reads
+ * as the page behind it until the figure is pointed at.
+ */
+export const OVERLAY_RESTING_GROUND_OPACITY = 0.08;
+
+/**
+ * The opacity of a stretched bar's controls.
+ * @param rest - How the bar rests.
+ * @param awake - Whether the figure is pointed at or a control holds the focus.
+ * @returns The rules fading the controls, never the ground under them.
+ */
+export function overlayBarRestStyle(
+  rest: 'visible' | 'quiet' | 'hidden',
+  awake: boolean,
+): CSSProperties {
+  if (rest === 'visible') return {};
+  const opacity = awake ? 1 : rest === 'quiet' ? OVERLAY_QUIET_OPACITY : 0;
+  return { opacity, transition: 'opacity 150ms ease-out' };
+}
+
+/**
+ * The ground of a stretched bar — its surface and the hairline under it —
+ * faded with its controls, so a resting bar is the page's own grey.
+ * @param rest - How the bar rests.
+ * @param awake - Whether the figure is pointed at or a control holds the focus.
+ * @returns The ground's rules.
+ */
+export function overlayBarGroundStyle(
+  rest: 'visible' | 'quiet' | 'hidden',
+  awake: boolean,
+): CSSProperties {
+  if (rest === 'visible') return OVERLAY_BAR_GROUND_STYLE;
+  return {
+    ...OVERLAY_BAR_GROUND_STYLE,
+    opacity: awake ? 1 : OVERLAY_RESTING_GROUND_OPACITY,
+    transition: 'opacity 150ms ease-out',
+  };
+}
+
+/**
+ * Everything on a stretched bar after its start: the settings, then the glyphs
+ * pushed to the right edge, so settings always read from the left and the `?`
+ * and the save glyph are always found in the same corner.
+ * @param metrics - The measurements the bar is drawn from.
+ * @returns The group's rules.
+ */
+export function overlayBarGroupStyle(metrics: OverlayMetrics): CSSProperties {
+  return {
+    display: 'flex',
+    flex: '1 1 auto',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: metrics.gap,
+    minWidth: 0,
+  };
+}
+
 /**
  * One end of a stretched bar.
  *

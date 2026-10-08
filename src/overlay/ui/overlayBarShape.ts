@@ -12,6 +12,19 @@ import type { ReactNode } from 'react';
 
 import type { OverlayPlacement } from '../core/overlayPlacement.ts';
 
+/**
+ * How a stretched bar's controls are drawn while nothing points at the figure
+ * it belongs to. The bar keeps its height in every case, so nothing under it
+ * moves when it wakes.
+ *
+ * - `visible` — at full strength, always.
+ * - `quiet` — faded, so the bar still says how the figure is drawn without
+ *   drawing the eye; full strength on pointing or focus.
+ * - `hidden` — an empty strip until the figure is pointed at or a control
+ *   holds the focus.
+ */
+export type OverlayBarRest = 'visible' | 'quiet' | 'hidden';
+
 /** What both shapes of a bar are drawn from, with every default resolved. */
 export interface OverlayBarShapeProps {
   /** The controls at the start of the row. */
@@ -46,6 +59,12 @@ export interface OverlayBarShapeProps {
   morePadded: boolean;
   /** Whether the bar has folded its controls away behind that button. */
   folded: boolean;
+  /**
+   * How a stretched bar's controls are drawn while nothing points at the
+   * figure.
+   * @default 'visible'
+   */
+  rest?: OverlayBarRest;
   /**
    * Value of the `data-testid` attribute of the bar.
    * @default undefined

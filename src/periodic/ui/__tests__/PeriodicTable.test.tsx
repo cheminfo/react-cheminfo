@@ -21,12 +21,13 @@ test('a cell takes its family colour, and its ink, by default', () => {
   expect(html).toContain(`color:${halogen.foreground}`);
 });
 
-test('the selected cell is outlined, so a property colour survives selection', () => {
+test('the selected cell is ringed, so a property colour survives selection', () => {
   const html = renderToStaticMarkup(<PeriodicTable selected="Fe" />);
   const cell = html.split('data-testid="element-Fe"', 2)[1] ?? '';
 
   expect(cell).toContain('aria-pressed="true"');
-  expect(cell.slice(0, 2000)).toContain('outline-style:solid');
+  expect(cell.slice(0, 2000)).toContain('box-shadow:inset 0 0 0 max(2px');
+  expect(cell.slice(0, 2000)).not.toContain('outline');
   expect(html).toContain(
     `background:${categorySwatch('transition-metal').background}`,
   );

@@ -11,11 +11,23 @@
  * by one; nothing in this module needs to know that.
  */
 
-import type { ElementCategory, PeriodicElement } from './elements.ts';
+import type {
+  ElementBlock,
+  ElementCategory,
+  PeriodicElement,
+} from './elements.ts';
 import { PERIODIC_ELEMENTS, elementBySymbol } from './elements.ts';
 
-/** A whole run of the table: one group, or one period. */
-export interface ElementRange {
+/**
+ * A whole run of the table: one group, one period, or one block.
+ *
+ * Narrow on `kind` before reading `value`: a group or a period is numbered, a
+ * block is lettered.
+ */
+export type ElementRange = NumberedRange | BlockRange;
+
+/** One group or one period. */
+export interface NumberedRange {
   /** Whether the run is a group or a period. */
   kind: 'group' | 'period';
   /** Its number: a group from 1 to 18, a period from 1 to 7. */
@@ -25,6 +37,16 @@ export interface ElementRange {
    * Cmd on a Mac, Ctrl elsewhere — rather than in place of it. A reader
    * comparing two periods holds it down for the second one.
    */
+  additive: boolean;
+}
+
+/** One block: the elements whose last electron enters the same subshell. */
+export interface BlockRange {
+  /** A block. */
+  kind: 'block';
+  /** Its letter. */
+  value: ElementBlock;
+  /** As for {@link NumberedRange.additive}. */
   additive: boolean;
 }
 
@@ -135,6 +157,26 @@ export const INNER_TRANSITION_MARKERS: ReadonlyArray<{
 }> = [
   { cell: { column: 3, row: 6 }, label: '57–71', category: 'lanthanoid' },
   { cell: { column: 3, row: 7 }, label: '89–103', category: 'actinoid' },
+];
+
+/**
+ * Where each block is named, in the cells no element occupies: s, d and p
+ * along the spacer under period 7, each under the columns it holds, and f in
+ * the two cells left of the inner-transition rows.
+ *
+ * Helium is an s element standing over the p block; a label follows the
+ * columns, and the element its electrons.
+ */
+export const BLOCK_LABELS: ReadonlyArray<{
+  block: ElementBlock;
+  cell: Cell;
+  columnSpan: number;
+  rowSpan: number;
+}> = [
+  { block: 's', cell: { column: 1, row: 8 }, columnSpan: 2, rowSpan: 1 },
+  { block: 'd', cell: { column: 3, row: 8 }, columnSpan: 10, rowSpan: 1 },
+  { block: 'p', cell: { column: 13, row: 8 }, columnSpan: 6, rowSpan: 1 },
+  { block: 'f', cell: { column: 1, row: 9 }, columnSpan: 2, rowSpan: 2 },
 ];
 
 /** The period each inner-transition row belongs to, for its row label. */

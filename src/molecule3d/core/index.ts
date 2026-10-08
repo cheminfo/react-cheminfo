@@ -45,5 +45,7 @@ export {
   isRepresentationId,
   isSurfaceColoringId,
   normalizeMolecule3DSettings,
+  resetMolecule3DSettings,
   resolveMolecule3DTools,
+  sameMolecule3DSettings,
 } from './settings.ts';

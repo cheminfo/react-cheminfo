@@ -1,9 +1,8 @@
-import { Button, DialogFooter } from '@blueprintjs/core';
+import { DialogFooter } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { useRef, useState } from 'react';
 
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
-import { useChromeT } from '../../i18n/ui/useT.ts';
 import type {
   HideablePart,
   ShareConfig,
@@ -44,8 +43,9 @@ export type ShareDialogContentProps<
 > = Omit<ShareDialogProps<Codecs>, 'isOpen' | 'usePortal'>;
 
 /**
- * The share dialog's body: what one does with the link above, never scrolled
- * away, then the options on the left and the page they write on the right.
+ * The share dialog's body: the options on the left and the page they write on
+ * the right, and what one does with the link in the footer, never scrolled
+ * away. A copy closes the dialog, since it was what the dialog was opened for.
  * @param props - What the site's links can say, how the page is named, and the extra section.
  * @returns The body and the footer of the dialog.
  */
@@ -66,7 +66,6 @@ export function ShareDialogContent<
     partDescriptions = 'inline',
     children,
   } = props;
-  const t = useChromeT();
 
   const address = globalThis.location;
   const base = baseUrl ?? address?.href ?? '';
@@ -165,16 +164,15 @@ export function ShareDialogContent<
   return (
     <>
       <div className="share-dialog__body" ref={body}>
-        <div className="share-dialog__top">
-          {presets.length === 0 ? null : (
+        {presets.length === 0 ? null : (
+          <div className="share-dialog__top">
             <SharePresetTabs
               presets={presets}
               selected={presetKey}
               onSelect={selectPreset}
             />
-          )}
-          <ShareLinkBar url={url} frame={frame} />
-        </div>
+          </div>
+        )}
 
         <SharePanes
           options={optionsPane}
@@ -183,9 +181,7 @@ export function ShareDialogContent<
         />
       </div>
       <DialogFooter
-        actions={
-          <Button intent="primary" text={t('share.done')} onClick={onClose} />
-        }
+        actions={<ShareLinkBar url={url} frame={frame} onCopied={onClose} />}
       />
     </>
   );

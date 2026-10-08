@@ -10,12 +10,18 @@ export interface ShareLinkBarProps {
   url: string;
   /** The markup that frames the page in someone else's site. */
   frame: string;
+  /**
+   * Called once either copy has landed on the clipboard.
+   * @default undefined
+   */
+  onCopied?: () => void;
 }
 
 /**
- * The three things one does with a share link, kept above the options and
+ * The three things one does with a share link, in the dialog's footer and
  * never scrolled away: a dialog whose Copy button is below the fold is a dialog
- * one scrolls through every single time.
+ * one scrolls through every single time. A copy is what the dialog was opened
+ * for, so the dialog is told when one lands and closes on it.
  *
  * Neither the address nor the frame markup is printed. A teacher reads neither
  * before pasting it, and a hundred characters of query string set in monospace
@@ -25,7 +31,7 @@ export interface ShareLinkBarProps {
  * @returns The bar.
  */
 export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
-  const { url, frame } = props;
+  const { url, frame, onCopied } = props;
   const t = useChromeT();
 
   return (
@@ -36,7 +42,12 @@ export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
           body: t('share.copyLinkHelp'),
         }}
       >
-        <CopyButton content={url} label={t('share.copyLink')} title="" />
+        <CopyButton
+          content={url}
+          label={t('share.copyLink')}
+          title=""
+          onCopied={onCopied}
+        />
       </HelpTooltip>
       <HelpTooltip
         content={{
@@ -63,6 +74,7 @@ export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
           icon="code"
           label={t('share.copyIframe')}
           title=""
+          onCopied={onCopied}
         />
       </HelpTooltip>
     </div>

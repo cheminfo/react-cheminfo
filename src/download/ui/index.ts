@@ -19,4 +19,3 @@ export type {
   FigureDownloadState,
 } from './useFigureDownload.tsx';
 export { useFigureDownload } from './useFigureDownload.tsx';
-export type { FigureNotice } from './useFigureActions.ts';

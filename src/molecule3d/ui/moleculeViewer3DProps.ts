@@ -38,7 +38,8 @@ export interface MoleculeViewer3DProps {
    */
   settings?: Molecule3DSettings;
   /**
-   * Starting settings when the component owns them.
+   * Starting settings when the component owns them, and what the options'
+   * reset button returns to either way.
    * @default DEFAULT_MOLECULE_3D_SETTINGS
    */
   defaultSettings?: Partial<Molecule3DSettings>;

@@ -9,6 +9,8 @@
  * belong to the same tool.
  */
 
+export type { FigureBarProps } from './FigureBar.tsx';
+export { FigureBar } from './FigureBar.tsx';
 export type { OverlayActionProps } from './OverlayAction.tsx';
 export { OverlayAction } from './OverlayAction.tsx';
 export type { OverlayBarProps } from './OverlayBar.tsx';
@@ -20,6 +22,8 @@ export { OverlayChip } from './OverlayChip.tsx';
 export { OverlayDivider } from './OverlayDivider.tsx';
 export type { OverlayGroupProps } from './OverlayGroup.tsx';
 export { OverlayGroup } from './OverlayGroup.tsx';
+export type { OverlayIconButtonProps } from './OverlayIconButton.tsx';
+export { OverlayIconButton } from './OverlayIconButton.tsx';
 export type { OverlayInfoProps } from './OverlayInfo.tsx';
 export { OverlayInfo } from './OverlayInfo.tsx';
 export type { OverlayLayerProps } from './OverlayLayer.tsx';

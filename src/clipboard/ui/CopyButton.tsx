@@ -71,6 +71,12 @@ export interface CopyButtonProps {
    * @default undefined
    */
   className?: string;
+  /**
+   * Called once the clipboard has taken the content — never when it refused —
+   * for a dialog whose whole purpose was that copy and that closes on it.
+   * @default undefined
+   */
+  onCopied?: () => void;
 }
 
 /**
@@ -92,6 +98,7 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
     resetAfter = DEFAULT_COPY_RESET_AFTER,
     title,
     className,
+    onCopied,
   } = props;
   const t = useChromeT();
   const { copied, failed, copy } = useCopyToClipboard(resetAfter);
@@ -117,7 +124,11 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
       title={hoverTitle}
       aria-label={label ?? hoverTitle}
       onClick={() => {
-        void copy(typeof content === 'function' ? content() : content);
+        void copy(typeof content === 'function' ? content() : content).then(
+          (written) => {
+            if (written) onCopied?.();
+          },
+        );
       }}
     />
   );

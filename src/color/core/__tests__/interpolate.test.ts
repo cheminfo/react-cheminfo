@@ -70,6 +70,53 @@ test('the long way from blue to red is the whole rainbow', () => {
   ]);
 });
 
+test('an anchor added on the long way round changes nothing', () => {
+  const rainbow = {
+    interpolation: 'hsv-long' as const,
+    stops: [
+      { position: 0, color: '#0000ff' },
+      { position: 1, color: '#ff0000' },
+    ],
+  };
+  const split = {
+    interpolation: 'hsv-long' as const,
+    stops: [
+      { position: 0, color: '#0000ff' },
+      { position: 0.5, color: colorAt(rainbow, 0.5) },
+      { position: 1, color: '#ff0000' },
+    ],
+  };
+
+  expect(colorAt(split, 0.5)).toBe('#00ff00');
+  expect(sampleScale(split, 5)).toStrictEqual(sampleScale(rainbow, 5));
+});
+
+test('the long way round turns one way for the whole scale, not per anchor', () => {
+  const scale = {
+    interpolation: 'hsv-long' as const,
+    stops: [
+      { position: 0, color: '#0000ff' },
+      { position: 0.5, color: '#00ffff' },
+      { position: 1, color: '#ff0000' },
+    ],
+  };
+
+  expect(colorAt(scale, 0.25)).toBe('#0080ff');
+  expect(colorAt(scale, 0.75)).toBe('#80ff00');
+});
+
+test('a grey anchor takes the hue of the other end instead of passing red', () => {
+  const scale = {
+    interpolation: 'hsv' as const,
+    stops: [
+      { position: 0, color: '#ffffff' },
+      { position: 1, color: '#0000ff' },
+    ],
+  };
+
+  expect(colorAt(scale, 0.5)).toBe('#8080ff');
+});
+
 test('mixing the channels fades through the grey the wheel turns around', () => {
   const straight = evenScale(['#ff0000', '#0000ff']);
 

@@ -1,10 +1,10 @@
 /**
  * The display options of the molecule viewer, shown in the toolbar's popover:
  * the representation, the size, and the surface's opacity, solvent probe and
- * colours.
+ * colours, with a button returning them all to the defaults.
  */
 
-import { SegmentedControl, Slider } from '@blueprintjs/core';
+import { Button, SegmentedControl, Slider } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
 import { formatDecimal } from '../../format/core/numbers.ts';
@@ -15,6 +15,8 @@ import {
   REPRESENTATIONS,
   REPRESENTATION_LABELS,
   isRepresentationId,
+  resetMolecule3DSettings,
+  sameMolecule3DSettings,
 } from '../core/settings.ts';
 
 import { Molecule3DSurfaceColors } from './Molecule3DSurfaceColors.tsx';
@@ -25,6 +27,8 @@ export interface Molecule3DOptionsProps {
   onChange: (settings: Molecule3DSettings) => void;
   /** Topological polar surface area in Å², or `null` when unknown. */
   polarSurfaceArea: number | null;
+  /** What the reset button returns to; `showSurface` is left as it is. */
+  defaults: Molecule3DSettings;
 }
 
 /**
@@ -33,8 +37,10 @@ export interface Molecule3DOptionsProps {
  * @returns The panel.
  */
 export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
-  const { settings, onChange, polarSurfaceArea } = props;
+  const { settings, onChange, polarSurfaceArea, defaults } = props;
   const t = useChromeT();
+  const reset = resetMolecule3DSettings(settings, defaults);
+  const atDefaults = sameMolecule3DSettings(settings, reset);
 
   return (
     <div style={PANEL_STYLE}>
@@ -67,6 +73,20 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
             onChange({ ...settings, sizeFactor });
           }}
         />
+        {settings.showSurface ? null : (
+          <span style={SURFACE_OFF_STYLE} data-testid="molecule3d-surface-off">
+            {t('molecule3d.surfaceOff')}
+            <Button
+              variant="minimal"
+              size="small"
+              intent="primary"
+              text={t('molecule3d.showSurface')}
+              onClick={() => {
+                onChange({ ...settings, showSurface: true });
+              }}
+            />
+          </span>
+        )}
         <SliderRow
           label={t('molecule3d.surfaceOpacity')}
           range={MOLECULE_3D_RANGES.surfaceAlpha}
@@ -96,6 +116,22 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
         onChange={onChange}
         polarSurfaceArea={polarSurfaceArea}
       />
+      <span style={FOOTER_STYLE}>
+        {/* A disabled button fires no hover, so the wrapper carries the why. */}
+        <span title={atDefaults ? t('molecule3d.atDefaults') : undefined}>
+          <Button
+            variant="minimal"
+            size="small"
+            icon="reset"
+            text={t('molecule3d.resetSettings')}
+            disabled={atDefaults}
+            data-testid="molecule3d-reset-settings"
+            onClick={() => {
+              onChange(reset);
+            }}
+          />
+        </span>
+      </span>
     </div>
   );
 }
@@ -157,6 +193,18 @@ const GRID_STYLE: CSSProperties = {
 };
 
 const LABEL_STYLE: CSSProperties = { fontSize: 12 };
+
+/** Spans the grid, between the size and the surface rows it explains. */
+const SURFACE_OFF_STYLE: CSSProperties = {
+  display: 'flex',
+  gridColumn: '1 / -1',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  color: 'var(--text-muted)',
+  fontSize: 12,
+};
+
+const FOOTER_STYLE: CSSProperties = { display: 'flex', justifyContent: 'end' };
 
 /** Room on both sides, so the handle is never clipped at either end. */
 const SLIDER_STYLE: CSSProperties = { display: 'block', paddingInline: 8 };

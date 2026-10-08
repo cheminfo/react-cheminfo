@@ -70,6 +70,7 @@ function paintElement(
       markup: drawingMarkup(element),
       x: box.left - context.origin.left,
       y: box.top - context.origin.top,
+      size: { width: box.width, height: box.height },
     });
     return;
   }

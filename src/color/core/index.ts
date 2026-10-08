@@ -21,6 +21,15 @@ export {
   DEFAULT_COLOR_SCALE_ID,
   colorScaleById,
 } from './scales.ts';
+export {
+  UNIFORM_COLOR_SCALE_ID,
+  UNIFORM_SWATCH,
+  formatUniformColorScale,
+  isUniformColorScale,
+  uniformSwatch,
+} from './uniform.ts';
+export type { ScaleTone } from './tone.ts';
+export { scaleTone, setScaleTone } from './tone.ts';
 export type { ResolvedColorScale } from './scaleText.ts';
 export {
   MAXIMUM_CUSTOM_STOPS,

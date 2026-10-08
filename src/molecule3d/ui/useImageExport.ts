@@ -1,11 +1,16 @@
 import type { RefObject } from 'react';
 import { useCallback } from 'react';
 
+import type { FigureNotice } from '../../download/core/copyFigure.ts';
+import { copyFigure } from '../../download/core/copyFigure.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import type { FigurePixels } from '../../download/core/figureScale.ts';
 
 import type { SceneCapture } from './exportMoleculeImage.ts';
-import { exportMoleculeImage } from './exportMoleculeImage.ts';
+import {
+  captureMoleculePng,
+  exportMoleculeImage,
+} from './exportMoleculeImage.ts';
 
 /** What {@link useImageExport} hands the export panel. */
 export interface ImageExport {
@@ -13,10 +18,15 @@ export interface ImageExport {
   canvasSize: () => FigurePixels | null;
   /** Render the scene at `scale` and download it as `format`. */
   exportImage: (format: FigureFormat, scale: number) => Promise<void>;
+  /**
+   * Render the scene at `scale` and put it on the clipboard as a PNG. Call it
+   * from the click itself: Safari only allows a write the click started.
+   */
+  copyImage: (scale: number) => Promise<FigureNotice>;
 }
 
 /**
- * The two callbacks the export panel needs, bound to the canvas and its viewer.
+ * The callbacks the export panel needs, bound to the canvas and its viewer.
  * @param container - The element molstar draws into.
  * @param viewerRef - The viewer, once created.
  * @param fileName - File name without its extension.
@@ -46,5 +56,17 @@ export function useImageExport(
     [canvasSize, viewerRef, fileName],
   );
 
-  return { canvasSize, exportImage };
+  const copyImage = useCallback(
+    (scale: number) => {
+      const viewer = viewerRef.current;
+      const size = canvasSize();
+      if (viewer === null || size === null) {
+        return Promise.reject(new Error('There is no picture to copy yet.'));
+      }
+      return copyFigure(captureMoleculePng(viewer, scale, size));
+    },
+    [canvasSize, viewerRef],
+  );
+
+  return { canvasSize, exportImage, copyImage };
 }

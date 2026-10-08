@@ -17,16 +17,36 @@ function noop(): void {
   // The editor is read here, never edited.
 }
 
-test('every anchor gets a colour, a position and a way out', () => {
+test('every anchor stands on the strip where it sits', () => {
   const html = renderToStaticMarkup(
     <ColorScaleEditor value={SCALE} onChange={noop} />,
   );
 
-  expect(html.match(/type="color"/g)).toHaveLength(3);
+  expect(html.match(/role="slider"[^>]*Position of anchor/g)).toHaveLength(3);
+  expect(html).toContain('aria-valuenow="0.4"');
+  expect(html).toContain('left:40%');
+  expect(html).toContain('aria-label="Position of anchor 3"');
+});
+
+test('the saturation and the brightness are set for every anchor at once', () => {
+  const html = renderToStaticMarkup(
+    <ColorScaleEditor value={SCALE} onChange={noop} />,
+  );
+
+  expect(html).toContain('Saturation');
+  expect(html).toContain('Brightness');
+  expect(html.match(/100 %/g)).toHaveLength(2);
+});
+
+test('the first anchor is the one shown to set exactly, with one colour box', () => {
+  const html = renderToStaticMarkup(
+    <ColorScaleEditor value={SCALE} onChange={noop} />,
+  );
+
+  expect(html.match(/type="color"/g)).toHaveLength(1);
+  expect(html).toContain('aria-label="Colour of anchor 1"');
   expect(html).toContain('value="#0000ff"');
-  expect(html).toContain('value="0.4"');
-  expect(html).toContain('aria-label="Remove anchor 2"');
-  expect(html).toContain('0.40');
+  expect(html).toContain('aria-label="Remove anchor 1"');
 });
 
 test('the path between two anchors is picked, and the one in force is selected', () => {
@@ -53,7 +73,9 @@ test('the last two anchors cannot be removed, because a scale needs both', () =>
     />,
   );
 
-  expect(html.match(/disabled=""/g)).toHaveLength(2);
+  expect(
+    html.match(/aria-label="Remove anchor 1"[^>]*disabled=""/g),
+  ).toHaveLength(1);
 });
 
 test('a short hex is expanded, because a colour input reads nothing else', () => {
@@ -71,5 +93,4 @@ test('a short hex is expanded, because a colour input reads nothing else', () =>
   );
 
   expect(html).toContain('value="#ff0000"');
-  expect(html).toContain('value="#0000ff"');
 });

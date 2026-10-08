@@ -89,6 +89,13 @@ export interface HtmlPaintDrawing {
   x: number;
   /** Its top edge, in pixels from the top of the part. */
   y: number;
+  /**
+   * Its width and height as the browser drew it. A drawing sized by CSS
+   * carries no size of its own, and an `<svg>` without one fills the whole
+   * file.
+   * @default undefined — the markup is placed as it is
+   */
+  size?: { width: number; height: number };
 }
 
 /** Everything inside an element the page drew faded. */
@@ -123,12 +130,18 @@ function paintMarkup(paint: HtmlPaint): string {
     case 'text':
       return textMarkup(paint);
     case 'drawing':
-      return `<g transform="translate(${round(paint.x)} ${round(paint.y)})">${paint.markup}</g>`;
+      return `<g transform="translate(${round(paint.x)} ${round(paint.y)})">${sizedDrawing(paint)}</g>`;
     case 'group':
       return `<g opacity="${round(paint.opacity)}">${figureHtmlMarkup(paint.children)}</g>`;
     default:
       return '';
   }
+}
+
+function sizedDrawing(drawing: HtmlPaintDrawing): string {
+  const { markup, size } = drawing;
+  if (size === undefined) return markup;
+  return `<svg width="${round(size.width)}" height="${round(size.height)}" overflow="visible">${markup}</svg>`;
 }
 
 function boxMarkup(box: HtmlPaintBox): string {

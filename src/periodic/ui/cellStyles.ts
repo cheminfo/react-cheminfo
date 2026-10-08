@@ -84,10 +84,11 @@ export const detailStyle = {
 /**
  * The electrons of each shell, innermost at the top, down the right-hand edge
  * of the whole cell: the stack is as tall as the three bands together, which
- * is what lets seven of them be read.
+ * is what lets seven of them be read. It hangs from the top, so the innermost
+ * shell sits at the same height in every cell whatever the period.
  */
 export const shellsStyle = {
-  alignSelf: 'center',
+  alignSelf: 'start',
   gridColumn: 2,
   gridRow: '1 / span 3',
   fontVariantNumeric: 'tabular-nums',

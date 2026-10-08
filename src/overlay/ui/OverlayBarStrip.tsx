@@ -3,15 +3,18 @@ import type { ReactElement } from 'react';
 import { OverlayBarButton } from './OverlayBarButton.tsx';
 import type { OverlayBarShapeProps } from './overlayBarShape.ts';
 import {
-  OVERLAY_BAR_GROUND_STYLE,
   overlayBarContentStyle,
+  overlayBarGroundStyle,
+  overlayBarGroupStyle,
+  overlayBarRestStyle,
   overlayBarSideStyle,
   overlayCardStyle,
 } from './overlayStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
 
 /**
- * The bar that spans the width of the figure, its two ends pushed apart.
+ * The bar that spans the width of the figure: the settings from the left edge,
+ * the glyphs — help, saving, the button the rest folds into — at the right.
  *
  * It is in the flow above the picture rather than on it, and its ground is
  * solid rather than translucent, because a strip reaching from one edge of the
@@ -26,35 +29,44 @@ import { useOverlaySurface } from './overlaySurface.ts';
  */
 export function OverlayBarStrip(props: OverlayBarShapeProps): ReactElement {
   const { children, end, tools, info, more, placement, label } = props;
-  const { moreIcon, morePadded, folded, testId } = props;
-  const { metrics } = useOverlaySurface();
+  const { moreIcon, morePadded, folded, testId, rest = 'visible' } = props;
+  const { metrics, awake } = useOverlaySurface();
 
   const opens = more !== undefined || (folded && end !== undefined);
 
   return (
     <div style={overlayCardStyle(placement, metrics)} data-testid={testId}>
-      <div style={OVERLAY_BAR_GROUND_STYLE} />
-      <div style={overlayBarContentStyle(metrics)}>
-        <div style={overlayBarSideStyle(metrics)}>{children}</div>
+      <div style={overlayBarGroundStyle(rest, awake)} />
+      <div
+        style={{
+          ...overlayBarContentStyle(metrics),
+          ...overlayBarRestStyle(rest, awake),
+        }}
+      >
+        {children === null || children === undefined ? null : (
+          <div style={overlayBarSideStyle(metrics)}>{children}</div>
+        )}
         <div
           role="group"
           aria-label={label}
-          style={overlayBarSideStyle(metrics)}
+          style={overlayBarGroupStyle(metrics)}
         >
-          {folded ? null : end}
-          {tools}
-          {info}
-          {opens ? (
-            <OverlayBarButton
-              placement={placement}
-              label={label}
-              icon={moreIcon}
-              padded={morePadded}
-            >
-              {folded ? end : null}
-              {more}
-            </OverlayBarButton>
-          ) : null}
+          <div style={overlayBarSideStyle(metrics)}>{folded ? null : end}</div>
+          <div style={overlayBarSideStyle(metrics)}>
+            {tools}
+            {info}
+            {opens ? (
+              <OverlayBarButton
+                placement={placement}
+                label={label}
+                icon={moreIcon}
+                padded={morePadded}
+              >
+                {folded ? end : null}
+                {more}
+              </OverlayBarButton>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

@@ -21,6 +21,7 @@ import type { PeriodicElement } from '../core/elements.ts';
 import type { ElementPick } from '../core/layout.ts';
 import { elementByArrowKey, placedElements } from '../core/layout.ts';
 
+import { BlockStrip } from './BlockStrip.tsx';
 import { CategoryLegend } from './CategoryLegend.tsx';
 import { ElementCell } from './ElementCell.tsx';
 import {
@@ -69,6 +70,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   const gridRef = useRef<HTMLDivElement>(null);
   const cameFromKeyRef = useRef(false);
   const offset = headers ? 1 : 0;
+  const blocks = headers && onSelectRange !== undefined;
 
   // The drawing is read off this one number, so it is written straight onto
   // the element rather than held as state: a window being dragged would
@@ -132,7 +134,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
         role="grid"
         aria-label={t('periodic.table')}
         data-testid="periodic-table"
-        style={gridStyle(headers)}
+        style={gridStyle(headers, blocks)}
         onKeyDown={handleKeyDown}
       >
         {headers ? (
@@ -141,6 +143,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
             onSelectAll={onSelectAll}
           />
         ) : null}
+        {blocks ? <BlockStrip onSelectRange={onSelectRange} /> : null}
         {inset === undefined ? null : (
           <div style={insetStyle(offset)}>{inset}</div>
         )}

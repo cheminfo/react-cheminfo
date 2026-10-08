@@ -1,10 +1,9 @@
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
+import type { FigureNotice } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 import { figurePixels, formatFigurePixels } from '../core/figureScale.ts';
-
-import type { FigureNotice } from './useFigureActions.ts';
 
 /** What the line at the foot of the panel is written from. */
 export interface HintState {

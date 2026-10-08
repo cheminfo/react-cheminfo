@@ -186,6 +186,41 @@ export function normalizeMolecule3DSettings(
 }
 
 /**
+ * What the options' reset button returns to: the defaults, with the surface
+ * left on or off as it is — that is the toolbar's toggle, not an option.
+ * @param settings - The settings in force.
+ * @param defaults - The settings the viewer opened on.
+ * @returns The defaults, keeping `showSurface`.
+ */
+export function resetMolecule3DSettings(
+  settings: Molecule3DSettings,
+  defaults: Molecule3DSettings = DEFAULT_MOLECULE_3D_SETTINGS,
+): Molecule3DSettings {
+  return { ...defaults, showSurface: settings.showSurface };
+}
+
+/**
+ * Whether two settings draw the same picture.
+ * @param first - One settings record.
+ * @param second - The other.
+ * @returns True when every field is equal.
+ */
+export function sameMolecule3DSettings(
+  first: Molecule3DSettings,
+  second: Molecule3DSettings,
+): boolean {
+  return (
+    first.representation === second.representation &&
+    first.sizeFactor === second.sizeFactor &&
+    first.showSurface === second.showSurface &&
+    first.surfaceAlpha === second.surfaceAlpha &&
+    first.probeRadius === second.probeRadius &&
+    first.surfaceColoring === second.surfaceColoring &&
+    first.surfaceColor === second.surfaceColor
+  );
+}
+
+/**
  * Complete a partial tool selection.
  * @param tools - The tools a site switched on or off.
  * @returns Every tool, those not named left on.

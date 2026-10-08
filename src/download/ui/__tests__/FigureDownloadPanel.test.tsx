@@ -1,11 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import type { FigureNotice } from '../../core/copyFigure.ts';
 import type { FigureFormat } from '../../core/downloadFigure.ts';
 import type { FigureLayout } from '../../core/figureLayout.ts';
 import type { FigurePixels } from '../../core/figureScale.ts';
 import { FigureDownloadPanel } from '../FigureDownloadPanel.tsx';
-import type { FigureNotice } from '../useFigureActions.ts';
 
 const SCREEN = { width: 720, height: 380 };
 
@@ -72,9 +72,9 @@ test('the custom sides are not offered for any other size', () => {
   expect(html).toContain('Opens at 720 × 540 pixels');
 });
 
-test('copy is offered beside save only when the panel is given one', () => {
-  expect(panel({ format: 'png', copy: true })).toContain('>Copy<');
-  expect(panel({ format: 'png' })).not.toContain('>Copy<');
+test('copy is always offered beside save, whatever the format', () => {
+  expect(panel({ format: 'png' })).toContain('>Copy<');
+  expect(panel({ format: 'svg' })).toContain('>Copy<');
 });
 
 test('a copy says what it put on the clipboard, whatever is saved', () => {
@@ -104,8 +104,6 @@ interface PanelOptions {
   scale?: number;
   /** The figure on screen. */
   size?: FigurePixels;
-  /** Whether copy is offered. */
-  copy?: boolean;
   /** What the last copy came to. */
   notice?: FigureNotice | null;
 }
@@ -117,7 +115,7 @@ interface PanelOptions {
  */
 function panel(options: PanelOptions): string {
   const { format, layout, custom = null, scale = 2, size = SCREEN } = options;
-  const { copy = false, notice = null } = options;
+  const { notice = null } = options;
   return renderToStaticMarkup(
     <FigureDownloadPanel
       title="Save figure"
@@ -131,7 +129,7 @@ function panel(options: PanelOptions): string {
       onFormatChange={() => null}
       onScaleChange={() => null}
       onSave={() => null}
-      onCopy={copy ? () => null : undefined}
+      onCopy={() => null}
       sizing={
         layout === undefined
           ? undefined

@@ -1,6 +1,4 @@
-import { useCallback, useState } from 'react';
-
-import { writeImageToClipboard } from '../../clipboard/core/copyPng.ts';
+import { copyFigure } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import { downloadFigure } from '../core/downloadFigure.ts';
 import { figurePng } from '../core/figurePng.ts';
@@ -8,9 +6,8 @@ import type { FigurePixels } from '../core/figureScale.ts';
 import { figureSvg } from '../core/figureSvg.ts';
 
 import type { FigureRedraw } from './useFigureRedraw.tsx';
-
-/** What the last copy came to, when it is worth a line of its own. */
-export type FigureNotice = 'copied' | 'copyUnsupported';
+import type { FigureTask } from './useFigureTask.ts';
+import { useFigureTask } from './useFigureTask.ts';
 
 /** What {@link useFigureActions} works from. */
 export interface FigureActionsOptions {
@@ -34,19 +31,11 @@ export interface FigureActionsOptions {
 }
 
 /** What {@link useFigureActions} hands back. */
-export interface FigureActions {
+export interface FigureActions extends Omit<FigureTask, 'run'> {
   /** Write the figure to a file, in the format picked. */
   save: () => void;
   /** Put the figure on the clipboard, as a PNG at the resolution picked. */
   copy: () => void;
-  /** Whether a file or a copy is being written right now. */
-  busy: boolean;
-  /** What went wrong the last time, if anything. */
-  failure: string | null;
-  /** What the last copy came to, if it is still what the panel describes. */
-  notice: FigureNotice | null;
-  /** Forget the last outcome, once the choices it answered have changed. */
-  clear: () => void;
 }
 
 /**
@@ -60,25 +49,12 @@ export interface FigureActions {
 export function useFigureActions(options: FigureActionsOptions): FigureActions {
   const { targetId, format, scale, fileName, background } = options;
   const { redrawAt, redraw } = options;
-  const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<string | null>(null);
-  const [notice, setNotice] = useState<FigureNotice | null>(null);
+  const { run, busy, failure, notice, clear } = useFigureTask();
 
   function withFigure(write: (box: string | Element) => Promise<void>) {
     return redrawAt === null
       ? write(targetId)
       : redraw(targetId, redrawAt, write);
-  }
-
-  function run(task: Promise<FigureNotice | null>): void {
-    setBusy(true);
-    setFailure(null);
-    setNotice(null);
-    void task
-      .then(setNotice, (error: unknown) => {
-        setFailure(error instanceof Error ? error.message : String(error));
-      })
-      .finally(() => setBusy(false));
   }
 
   function save(): void {
@@ -94,20 +70,8 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
         resolve(await figurePng(figureSvg(box, { background }), scale));
       }).catch(reject);
     });
-    // A browser whose clipboard takes text only never reads the picture, so
-    // its failure would otherwise go unhandled.
-    png.catch(() => undefined);
-    run(
-      writeImageToClipboard(png).then((copied) =>
-        copied ? 'copied' : 'copyUnsupported',
-      ),
-    );
+    run(copyFigure(png));
   }
-
-  const clear = useCallback(() => {
-    setFailure(null);
-    setNotice(null);
-  }, []);
 
   return { save, copy, busy, failure, notice, clear };
 }

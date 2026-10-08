@@ -60,9 +60,12 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     onFailureChange,
   } = props;
   const tools = resolveMolecule3DTools(toolsProp);
+  const [initialSettings] = useState(() =>
+    normalizeMolecule3DSettings(defaultSettings),
+  );
   const [settings, setSettings] = useControlledState(
     settingsProp,
-    () => normalizeMolecule3DSettings(defaultSettings),
+    initialSettings,
     onSettingsChange,
   );
   const [spinning, setSpinning] = useControlledState(
@@ -140,7 +143,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     camera: props,
   });
 
-  const { canvasSize, exportImage } = useImageExport(
+  const { canvasSize, exportImage, copyImage } = useImageExport(
     container,
     viewerRef,
     fileName,
@@ -171,10 +174,15 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
                 settings={settings}
                 onChange={setSettings}
                 polarSurfaceArea={polarSurfaceArea}
+                defaults={initialSettings}
               />
             }
             exportPanel={
-              <Molecule3DExport getSize={canvasSize} onExport={exportImage} />
+              <Molecule3DExport
+                getSize={canvasSize}
+                onExport={exportImage}
+                onCopy={copyImage}
+              />
             }
           />
         </div>

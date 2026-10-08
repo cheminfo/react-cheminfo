@@ -11,6 +11,9 @@ test.use({
   launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader'] },
 });
 
+/** An open panel, never the tooltip of the button that opened it. */
+const PANEL = '.bp6-popover:not(.bp6-tooltip)';
+
 test('the surface is coloured by polarity and states its TPSA', async ({
   page,
 }) => {
@@ -38,7 +41,7 @@ test('the surface is coloured by polarity and states its TPSA', async ({
   await expect(help).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Display options' }).click();
-  const options = page.locator('.bp6-popover');
+  const options = page.locator(PANEL);
 
   await expect(options.getByTestId('molecule3d-tpsa-value')).toHaveText(
     'TPSA: 20.2 Å²',
@@ -68,6 +71,58 @@ test('the surface is coloured by polarity and states its TPSA', async ({
   await expect(page.getByText('Surface colour', { exact: true })).toBeVisible();
 
   expect(problems).toStrictEqual([]);
+});
+
+test('the options return to the defaults, the surface left on', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await openStory(page, 'molecule3d-moleculeviewer3d--surface-and-spin');
+
+  await page.getByRole('button', { name: 'Display options' }).click();
+  const options = page.locator(PANEL);
+  const reset = options.getByTestId('molecule3d-reset-settings');
+  await expect(reset).toBeDisabled();
+
+  await options.getByText('Spacefill', { exact: true }).click();
+  await options.getByText('Polarity', { exact: true }).click();
+  await expect(reset).toBeEnabled();
+  await options.screenshot({ path: 'test-results/molecule3d-reset.png' });
+
+  await reset.click();
+  await expect(reset).toBeDisabled();
+  await expect(
+    options.getByRole('radio', { name: 'Ball and stick' }),
+  ).toHaveAttribute('aria-checked', 'true');
+  // The surface is still drawn, so its controls stay live.
+  await expect(options.getByRole('radio', { name: 'Uniform' })).toBeEnabled();
+});
+
+test('a hidden surface says why its options are greyed, and a copy is offered', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await openStory(page, 'molecule3d-moleculeviewer3d--default');
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 });
+
+  await page.getByRole('button', { name: 'Display options' }).click();
+  const options = page.locator(PANEL);
+  const note = options.getByTestId('molecule3d-surface-off');
+  await expect(note).toContainText('The surface is hidden.');
+  await expect(options.getByRole('radio', { name: 'Polarity' })).toBeDisabled();
+  await options.screenshot({ path: 'test-results/molecule3d-surface-off.png' });
+
+  await note.getByRole('button', { name: 'Show it' }).click();
+  await expect(note).toHaveCount(0);
+  await expect(options.getByRole('radio', { name: 'Polarity' })).toBeEnabled();
+
+  await page.getByRole('button', { name: 'Export image' }).click();
+  const panel = page.locator(PANEL).filter({ hasText: 'Export image' });
+  await panel.getByRole('button', { name: 'Copy' }).click();
+  await expect(panel).toContainText('to the clipboard, as a PNG.', {
+    timeout: 30_000,
+  });
+  await panel.screenshot({ path: 'test-results/molecule3d-copy.png' });
 });
 
 /** The camera the SharedCamera story opens on: a quarter turn about y. */

@@ -5,6 +5,7 @@ import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
+import type { FigureNotice } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import { figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
@@ -18,7 +19,6 @@ import {
 import type { FigureSizing } from './FigureSizeRows.tsx';
 import { FigureSizeRows } from './FigureSizeRows.tsx';
 import { hintOf } from './figureDownloadHint.ts';
-import type { FigureNotice } from './useFigureActions.ts';
 
 /** What {@link FigureDownloadPanel} is drawn from. */
 export interface FigureDownloadPanelProps {
@@ -51,9 +51,8 @@ export interface FigureDownloadPanelProps {
   /**
    * Called when they press copy, which puts a PNG at the resolution picked on
    * the clipboard.
-   * @default undefined — no copy is offered
    */
-  onCopy?: () => void;
+  onCopy: () => void;
   /**
    * Whether the SVG holds a rendered picture rather than vector drawings, as
    * for a WebGL scene: its resolution is then the pixels of that picture, it
@@ -122,14 +121,12 @@ export function FigureDownloadPanel(
             disabled={saving || size === null}
             onClick={onSave}
           />
-          {onCopy === undefined ? null : (
-            <OverlayAction
-              text={t('clipboard.copy')}
-              icon="clipboard"
-              disabled={saving || size === null}
-              onClick={onCopy}
-            />
-          )}
+          <OverlayAction
+            text={t('clipboard.copy')}
+            icon="clipboard"
+            disabled={saving || size === null}
+            onClick={onCopy}
+          />
         </>
       }
     >

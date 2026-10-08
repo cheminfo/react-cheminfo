@@ -9,6 +9,7 @@ import type { OverlayPlacement } from '../core/overlayPlacement.ts';
 import { OverlayBarCard } from './OverlayBarCard.tsx';
 import { OverlayBarStrip } from './OverlayBarStrip.tsx';
 import type { OverlayPanel } from './OverlayPanel.tsx';
+import type { OverlayBarRest } from './overlayBarShape.ts';
 import { OVERLAY_RESTING_OPACITY } from './overlayStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
 
@@ -21,10 +22,11 @@ export interface OverlayBarProps {
    */
   children: ReactNode;
   /**
-   * What sits at the far end of the row: the controls belonging to whatever
-   * the figure is currently showing. They are the first thing to go when the
-   * figure is too narrow for both ends, folding in behind the button.
-   * @default undefined — the bar's end holds only its glyphs
+   * The controls belonging to whatever the figure is currently showing. On a
+   * card they close the row; on a stretched bar they follow the start, left
+   * aligned, and only the glyphs keep the right edge. They are the first
+   * thing to go when the figure is too narrow, folding in behind the button.
+   * @default undefined — the bar holds only its start and its glyphs
    */
   end?: ReactNode;
   /**
@@ -73,6 +75,13 @@ export interface OverlayBarProps {
    * @default 0.74
    */
   restingOpacity?: number;
+  /**
+   * How a stretched bar's controls are drawn while nothing points at the
+   * figure: at full strength, faded, or not at all. The bar keeps its height
+   * whichever it is. A card ignores it: its rest is `restingOpacity`.
+   * @default 'visible'
+   */
+  rest?: OverlayBarRest;
   /**
    * Whether the bar is reduced to a button opening the same controls in a
    * popover. Left out, it folds on its own once the figure is narrower than
@@ -135,7 +144,7 @@ export function OverlayBar(props: OverlayBarProps): ReactElement {
   const name = label ?? t('overlay.options');
   const { collapsed, defaultCollapsed = false } = props;
   const { collapseBelow = 420, moreIcon = 'cog', testId } = props;
-  const { morePadded = true } = props;
+  const { morePadded = true, rest } = props;
   const { width } = useOverlaySurface();
   const [startedFolded] = useState(defaultCollapsed);
 
@@ -158,6 +167,7 @@ export function OverlayBar(props: OverlayBarProps): ReactElement {
         moreIcon={moreIcon}
         morePadded={morePadded}
         folded={folded}
+        rest={rest}
         testId={testId}
       >
         {children}

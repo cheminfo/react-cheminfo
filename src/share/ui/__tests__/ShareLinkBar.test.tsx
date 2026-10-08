@@ -27,6 +27,7 @@ const BASE = 'https://smiles.cheminfo.org/exercises';
 let host: HTMLDivElement;
 let root: Root;
 const written: string[] = [];
+const dialog = { closed: 0, refuse: false };
 
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
@@ -34,12 +35,15 @@ beforeEach(() => {
   vi.stubGlobal('navigator', {
     clipboard: {
       writeText: (text: string) => {
+        if (dialog.refuse) return Promise.reject(new Error('denied'));
         written.push(text);
         return Promise.resolve();
       },
     },
   });
   written.length = 0;
+  dialog.closed = 0;
+  dialog.refuse = false;
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);
@@ -57,7 +61,9 @@ async function clickButton(label: string): Promise<void> {
       <ShareDialog
         isOpen
         usePortal={false}
-        onClose={() => undefined}
+        onClose={() => {
+          dialog.closed += 1;
+        }}
         vocabulary={VOCABULARY}
         title="Exercises"
         frameTitle="SMILES — Exercises"
@@ -81,6 +87,15 @@ test('the first button copies the address the options are writing', async () => 
   await clickButton('Copy the link');
 
   expect(written).toStrictEqual([`${BASE}?set=alkanes&embed=1`]);
+  expect(dialog.closed).toBe(1);
+});
+
+test('a refused copy leaves the dialog open, so the failure is seen', async () => {
+  dialog.refuse = true;
+  await clickButton('Copy the link');
+
+  expect(written).toStrictEqual([]);
+  expect(dialog.closed).toBe(0);
 });
 
 test('the third copies a frame carrying the name and the height it was given', async () => {
@@ -89,6 +104,7 @@ test('the third copies a frame carrying the name and the height it was given', a
   expect(written).toStrictEqual([
     `<iframe src="${BASE}?set=alkanes&amp;embed=1" title="SMILES — Exercises" width="100%" height="800" style="border: 1px solid #ddd; border-radius: 8px" loading="lazy"></iframe>`,
   ]);
+  expect(dialog.closed).toBe(1);
 });
 
 /** A `ResizeObserver` that observes nothing, for a DOM where nothing resizes. */

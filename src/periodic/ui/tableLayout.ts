@@ -51,6 +51,9 @@ const ROW_HEIGHT = ofWidth(ROW_SHARE);
 /** The band the two inner-transition series were lifted out across. */
 const SERIES_GAP = `max(6px, ${ofWidth(1.1)})`;
 
+/** The height of a header strip, and of the gap once it carries block labels. */
+const STRIP_HEIGHT = `max(12px, ${ofWidth(2)})`;
+
 export const rootStyle = {
   display: 'flex',
   flexDirection: 'column',
@@ -76,11 +79,14 @@ const baseGridStyle = {
  * The grid the cells are placed on.
  * @param headers - Whether a leading column and row hold the period and group
  * numbers.
+ * @param blocks - Whether the gap under period 7 names the blocks, which needs
+ * it as tall as a header strip.
  * @returns The style of the grid.
  */
-export function gridStyle(headers: boolean): CSSProperties {
+export function gridStyle(headers: boolean, blocks = false): CSSProperties {
   // The eighth row is the gap the inner-transition series are lifted out into.
-  const rows = `repeat(7, ${ROW_HEIGHT}) ${SERIES_GAP} repeat(2, ${ROW_HEIGHT})`;
+  const gap = blocks ? STRIP_HEIGHT : SERIES_GAP;
+  const rows = `repeat(7, ${ROW_HEIGHT}) ${gap} repeat(2, ${ROW_HEIGHT})`;
   if (!headers) {
     return {
       ...baseGridStyle,
@@ -91,6 +97,6 @@ export function gridStyle(headers: boolean): CSSProperties {
   return {
     ...baseGridStyle,
     gridTemplateColumns: `max(14px, ${ofWidth(2.4)}) repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
-    gridTemplateRows: `max(12px, ${ofWidth(2)}) ${rows}`,
+    gridTemplateRows: `${STRIP_HEIGHT} ${rows}`,
   };
 }

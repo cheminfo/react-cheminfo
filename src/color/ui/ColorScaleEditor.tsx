@@ -1,24 +1,26 @@
 import { Button, HTMLSelect } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { formatDecimal } from '../../format/core/numbers.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { NumberInput } from '../../number/ui/NumberInput.tsx';
 import { normalizeHexColor } from '../core/hex.ts';
 import type {
   ColorInterpolation,
   ColorScale,
   ColorStop,
 } from '../core/interpolate.ts';
-import { colorAt } from '../core/interpolate.ts';
-import { MAXIMUM_CUSTOM_STOPS } from '../core/scaleText.ts';
+import {
+  MINIMUM_CUSTOM_STOPS,
+  moveColorStop,
+  recolorColorStop,
+  removeColorStop,
+} from '../core/stops.ts';
 
-import { ColorScaleBar } from './ColorScaleBar.tsx';
+import { ColorScaleTone } from './ColorScaleTone.tsx';
+import { ColorScaleTrack } from './ColorScaleTrack.tsx';
 
-const MINIMUM_STOPS = 2;
 const POSITION_STEP = 0.01;
-const PREVIEW_HEIGHT = 16;
-const PREVIEW_SAMPLES = 48;
-const POSITION_DECIMALS = 2;
 // A `type="color"` input only takes six hex digits; an anchor that is not a
 // hex colour is shown as black until it is picked again.
 const UNREADABLE_COLOR = '#000000';
@@ -44,88 +46,108 @@ export interface ColorScaleEditorProps {
 }
 
 /**
- * A colour scale of the reader's own: the colours it passes through, where
- * each one sits, and the path it takes between them.
+ * A colour scale of the reader's own, edited on the strip it draws.
  *
- * A colour is anchored rather than typed into a list, so two anchors and the
- * HSV path already describe a whole rainbow, and an anchor never crosses its
- * neighbours — the scale it draws is always the one the strip above shows.
+ * A click on the strip adds an anchor in the colour already there, an anchor
+ * is dragged along it, and an anchor pointed at goes with Backspace. The
+ * anchor last touched shows its colour and position below, to set exactly.
  * @param props - See {@link ColorScaleEditorProps}.
- * @returns The preview, the anchors, and the picker of the path between them.
+ * @returns The strip, the selected anchor, and the picker of the path between anchors.
  */
 export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
   const { className, value, onChange } = props;
   const t = useChromeT();
   const stops = value.stops;
+  const [picked, setPicked] = useState(0);
+  const [hovered, setHovered] = useState<number | null>(null);
+  const colorInput = useRef<HTMLInputElement>(null);
+  const selected = Math.min(picked, stops.length - 1);
+  const stop = stops[selected];
+  const removable = stops.length > MINIMUM_CUSTOM_STOPS;
 
-  function write(next: readonly ColorStop[]): void {
+  function write(next: ColorStop[]): void {
     onChange({ stops: next, interpolation: value.interpolation });
   }
 
+  function remove(index: number): void {
+    if (!removable) return;
+    write(removeColorStop(stops, index));
+    setHovered(null);
+    setPicked(Math.max(0, index - 1));
+  }
+
+  useEffect(() => {
+    if (hovered === null || !removable) return;
+    const index = hovered;
+    function onKeyDown(event: globalThis.KeyboardEvent): void {
+      if (event.key !== 'Backspace' && event.key !== 'Delete') return;
+      if (isEditable(event.target)) return;
+      event.preventDefault();
+      onChange({
+        stops: removeColorStop(stops, index),
+        interpolation: value.interpolation,
+      });
+      setHovered(null);
+      setPicked(Math.max(0, index - 1));
+    }
+    globalThis.addEventListener('keydown', onKeyDown);
+    return () => {
+      globalThis.removeEventListener('keydown', onKeyDown);
+    };
+  }, [hovered, removable, stops, value.interpolation, onChange]);
+
   return (
     <div className={className} style={PANEL_STYLE}>
-      <ColorScaleBar
+      <ColorScaleTrack
         scale={value}
-        height={PREVIEW_HEIGHT}
-        samples={PREVIEW_SAMPLES}
-        label={t('color.scaleBeingEdited')}
+        selected={selected}
+        hovered={hovered}
+        onSelect={setPicked}
+        onHover={setHovered}
+        onChange={write}
+        onRemove={remove}
+        onPick={() => {
+          colorInput.current?.showPicker();
+        }}
       />
 
-      <div style={ROWS_STYLE}>
-        {stops.map((stop, index) => (
-          <div key={`${String(index)}-${stop.color}`} style={ROW_STYLE}>
-            <input
-              type="color"
-              aria-label={t('color.anchorColour', { index: index + 1 })}
-              value={normalizeHexColor(stop.color) ?? UNREADABLE_COLOR}
-              style={SWATCH_STYLE}
-              onChange={(event) => {
-                write(replace(stops, index, { color: event.target.value }));
-              }}
-            />
-            <input
-              type="range"
-              aria-label={t('color.anchorPosition', { index: index + 1 })}
-              min={0}
-              max={1}
-              step={POSITION_STEP}
-              value={stop.position}
-              style={SLIDER_STYLE}
-              onChange={(event) => {
-                write(
-                  replace(stops, index, {
-                    position: hold(stops, index, event.target.valueAsNumber),
-                  }),
-                );
-              }}
-            />
-            <span style={POSITION_STYLE}>
-              {formatDecimal(stop.position, POSITION_DECIMALS)}
-            </span>
-            <Button
-              icon="cross"
-              variant="minimal"
-              size="small"
-              aria-label={t('color.removeAnchor', { index: index + 1 })}
-              disabled={stops.length <= MINIMUM_STOPS}
-              onClick={() => {
-                write(stops.filter((_, at) => at !== index));
-              }}
-            />
-          </div>
-        ))}
-      </div>
-
-      <div style={FOOTER_STYLE}>
-        <Button
-          icon="plus"
-          size="small"
-          text={t('color.addColour')}
-          disabled={stops.length >= MAXIMUM_CUSTOM_STOPS}
-          onClick={() => {
-            write(withAddedStop(value));
+      <div style={ROW_STYLE}>
+        <input
+          ref={colorInput}
+          type="color"
+          aria-label={t('color.anchorColour', { index: selected + 1 })}
+          value={normalizeHexColor(stop?.color ?? '') ?? UNREADABLE_COLOR}
+          style={SWATCH_STYLE}
+          onChange={(event) => {
+            write(recolorColorStop(stops, selected, event.target.value));
           }}
         />
+        <NumberInput
+          ariaLabel={t('color.anchorPosition', { index: selected + 1 })}
+          value={stop?.position ?? 0}
+          min={0}
+          max={1}
+          step={POSITION_STEP}
+          size="small"
+          buttons={false}
+          style={POSITION_STYLE}
+          onChange={(position) => {
+            const moved = moveColorStop(stops, selected, position);
+            write(moved.stops);
+            setPicked(moved.index);
+          }}
+        />
+        <Button
+          icon="trash"
+          variant="minimal"
+          size="small"
+          aria-label={t('color.removeAnchor', { index: selected + 1 })}
+          disabled={!removable}
+          onClick={() => {
+            remove(selected);
+          }}
+        />
+        <span style={SPACER_STYLE} />
         <HTMLSelect
           aria-label={t('color.path')}
           value={value.interpolation}
@@ -141,59 +163,22 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
           }}
         />
       </div>
+
+      <ColorScaleTone stops={stops} onChange={write} />
+
+      <p style={HINT_STYLE}>{t('color.editorHint')}</p>
     </div>
   );
 }
 
-function replace(
-  stops: readonly ColorStop[],
-  index: number,
-  patch: Partial<ColorStop>,
-): ColorStop[] {
-  return stops.map((stop, at) => (at === index ? { ...stop, ...patch } : stop));
-}
-
-/**
- * A position an anchor may take: never past either of its neighbours, so the
- * rows never reorder under a dragging finger.
- * @param stops - The anchors as they stand.
- * @param index - Which of them is being moved.
- * @param position - Where it is being moved to.
- * @returns The position it is allowed to take.
- */
-function hold(
-  stops: readonly ColorStop[],
-  index: number,
-  position: number,
-): number {
-  if (!Number.isFinite(position)) return stops[index]?.position ?? 0;
-  const low = stops[index - 1]?.position ?? 0;
-  const high = stops[index + 1]?.position ?? 1;
-  return Math.min(high, Math.max(low, position));
-}
-
-/**
- * The anchors with one more, dropped in the widest gap and taking the colour
- * the scale already has there — so adding one changes nothing until it is moved.
- * @param scale - The scale being edited.
- * @returns Its anchors, with the new one among them.
- */
-function withAddedStop(scale: ColorScale): ColorStop[] {
-  const stops = [...scale.stops];
-  let widest = 0;
-  let at = 1;
-  for (let index = 1; index < stops.length; index++) {
-    const span =
-      (stops[index]?.position ?? 0) - (stops[index - 1]?.position ?? 0);
-    if (span > widest) {
-      widest = span;
-      at = index;
-    }
-  }
-  const position =
-    ((stops[at]?.position ?? 1) + (stops[at - 1]?.position ?? 0)) / 2;
-  stops.splice(at, 0, { position, color: colorAt(scale, position) });
-  return stops;
+function isEditable(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.isContentEditable ||
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
+  );
 }
 
 const PANEL_STYLE = {
@@ -201,18 +186,13 @@ const PANEL_STYLE = {
   flexDirection: 'column',
   gap: 10,
   padding: 12,
-  minWidth: 280,
-} as const satisfies CSSProperties;
-
-const ROWS_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 4,
+  minWidth: 320,
 } as const satisfies CSSProperties;
 
 const ROW_STYLE = {
   display: 'flex',
   alignItems: 'center',
+  flexWrap: 'wrap',
   gap: 8,
 } as const satisfies CSSProperties;
 
@@ -225,23 +205,17 @@ const SWATCH_STYLE = {
   cursor: 'pointer',
 } as const satisfies CSSProperties;
 
-const SLIDER_STYLE = {
-  flex: '1 1 auto',
-  minWidth: 90,
-  accentColor: 'var(--accent, currentColor)',
-} as const satisfies CSSProperties;
-
 const POSITION_STYLE = {
-  fontSize: 12,
-  fontVariantNumeric: 'tabular-nums',
-  width: 30,
-  textAlign: 'right',
+  width: 64,
 } as const satisfies CSSProperties;
 
-const FOOTER_STYLE = {
-  display: 'flex',
-  alignItems: 'center',
-  flexWrap: 'wrap',
-  gap: 8,
-  justifyContent: 'space-between',
+const SPACER_STYLE = {
+  flex: '1 1 auto',
+} as const satisfies CSSProperties;
+
+const HINT_STYLE = {
+  margin: 0,
+  color: 'var(--text-muted)',
+  fontSize: 12,
+  lineHeight: 1.4,
 } as const satisfies CSSProperties;

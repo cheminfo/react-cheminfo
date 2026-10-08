@@ -170,14 +170,15 @@ export function ElementCell(props: ElementCellProps): ReactElement {
         background: swatch.background,
         color: swatch.foreground,
         opacity: isIncluded ? 1 : 0.28,
-        // An outline rather than a fill: a table coloured by a property must
-        // keep saying what the value is while a cell is selected.
-        outlineStyle: isSelected ? 'solid' : 'none',
-        outlineColor: swatch.foreground,
-        // Thick enough to be seen from the back of a room, and drawn inside
-        // the cell so a neighbour never covers it.
-        outlineWidth: `max(2px, ${ofWidth(0.3)})`,
-        outlineOffset: `max(-3px, ${ofWidth(-0.4)})`,
+        // A ring rather than a fill: a table coloured by a property must keep
+        // saying what the value is while a cell is selected. Drawn as an inset
+        // shadow, never an outline: a click focuses the cell, and a site's
+        // focus-ring reset (`outline: none !important`) would erase it.
+        // Thick enough to be seen from the back of a room, and inside the cell
+        // so a neighbour never covers it.
+        boxShadow: isSelected
+          ? `inset 0 0 0 max(2px, ${ofWidth(0.3)}) ${swatch.foreground}`
+          : undefined,
         // The cell the pointer is on, for a class following a demonstration.
         filter: isHovered ? 'brightness(1.08)' : undefined,
       }}

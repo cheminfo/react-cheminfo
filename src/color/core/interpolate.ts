@@ -3,6 +3,7 @@ import { clamp } from '../../format/core/clamp.ts';
 import type { ReadableInkOptions } from './contrast.ts';
 import { readableInk } from './contrast.ts';
 import { parseHexColor, toHexColor } from './hex.ts';
+import type { HsvColor } from './hsv.ts';
 import { hsvToRgb, rgbToHsv, wrapHue } from './hsv.ts';
 
 const HALF_TURN = 180;
@@ -33,8 +34,10 @@ export interface ColorStop {
  * - `hsv` turns along the colour wheel the short way round, so two anchors
  *   already describe a ramp that keeps its saturation instead of fading
  *   through the grey in the middle of the straight line between them.
- * - `hsv-long` turns the other way round, which is how two anchors of the same
- *   hue draw a full rainbow.
+ * - `hsv-long` turns the whole scale one way round the wheel: the long way
+ *   between its two ends, which is how two anchors draw a rainbow. Each anchor
+ *   in between is reached by turning that same way, never by a turn of its own,
+ *   so adding one where the scale already has its colour changes nothing.
  */
 export type ColorInterpolation = 'rgb' | 'hsv' | 'hsv-long';
 
@@ -94,7 +97,11 @@ export function colorAt(scale: ColorScale, position: number): string {
     if (at > end.position) continue;
     const span = end.position - start.position;
     const ratio = span <= 0 ? 0 : (at - start.position) / span;
-    return mix(start.color, end.color, ratio, interpolation);
+    return mix(start.color, end.color, ratio, {
+      interpolation,
+      turn: longTurn(first.color, last.color),
+      whole: stops.length === MINIMUM_SAMPLES,
+    });
   }
   return toHexColor(parseHexColor(last.color));
 }
@@ -134,15 +141,18 @@ export function sampleScale(scale: ColorScale, count: number): string[] {
   return colors;
 }
 
-function mix(
-  start: string,
-  end: string,
-  ratio: number,
-  interpolation: ColorInterpolation,
-): string {
+interface HuePath {
+  interpolation: ColorInterpolation;
+  /** The way the long path turns: 1 up the wheel, -1 down it. */
+  turn: number;
+  /** Whether the two anchors are the whole scale, so one hue on both is a full turn. */
+  whole: boolean;
+}
+
+function mix(start: string, end: string, ratio: number, path: HuePath): string {
   const from = parseHexColor(start);
   const to = parseHexColor(end);
-  if (interpolation === 'rgb') {
+  if (path.interpolation === 'rgb') {
     return toHexColor({
       red: from.red + (to.red - from.red) * ratio,
       green: from.green + (to.green - from.green) * ratio,
@@ -152,7 +162,8 @@ function mix(
 
   const one = rgbToHsv(from);
   const other = rgbToHsv(to);
-  const hue = one.hue + hueStep(one.hue, other.hue, interpolation) * ratio;
+  const [fromHue, toHue] = pairHues(one, other);
+  const hue = fromHue + hueStep(fromHue, toHue, path) * ratio;
   return toHexColor(
     hsvToRgb({
       hue: wrapHue(hue),
@@ -162,15 +173,33 @@ function mix(
   );
 }
 
-function hueStep(
-  from: number,
-  to: number,
-  interpolation: ColorInterpolation,
-): number {
-  const short = (((to - from) % TURN) + TURN + HALF_TURN) % TURN;
-  const shortest = short - HALF_TURN;
-  if (interpolation !== 'hsv-long') return shortest;
-  // Two anchors of the same hue are a full turn apart the long way round,
-  // which is what draws a rainbow from one colour back to itself.
-  return shortest > 0 ? shortest - TURN : shortest + TURN;
+// A grey, black or white has no hue of its own, so it takes the other one's:
+// the path then fades to it instead of sweeping through red on the way.
+function pairHues(one: HsvColor, other: HsvColor): [number, number] {
+  if (one.saturation === 0) return [other.hue, other.hue];
+  if (other.saturation === 0) return [one.hue, one.hue];
+  return [one.hue, other.hue];
+}
+
+function hueStep(from: number, to: number, path: HuePath): number {
+  if (path.interpolation !== 'hsv-long') return shortestStep(from, to);
+  const step = path.turn > 0 ? upStep(from, to) : -upStep(to, from);
+  return step === 0 && path.whole ? path.turn * TURN : step;
+}
+
+function longTurn(first: string, last: string): number {
+  const [from, to] = pairHues(
+    rgbToHsv(parseHexColor(first)),
+    rgbToHsv(parseHexColor(last)),
+  );
+  // Two ends of one hue are a full turn apart, taken up the wheel.
+  return shortestStep(from, to) > 0 ? -1 : 1;
+}
+
+function shortestStep(from: number, to: number): number {
+  return ((((to - from) % TURN) + TURN + HALF_TURN) % TURN) - HALF_TURN;
+}
+
+function upStep(from: number, to: number): number {
+  return (((to - from) % TURN) + TURN) % TURN;
 }
