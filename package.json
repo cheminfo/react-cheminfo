@@ -22,6 +22,7 @@
     "./molecule3d": "./lib/molecule3d.js",
     "./molstar/*": "./lib/molstar/*/index.js",
     "./orbital": "./lib/orbital.js",
+    "./pages": "./lib/pages.js",
     "./slides": "./lib/slides.js",
     "./spectra": "./lib/spectra.js",
     "./structure": "./lib/structure.js",

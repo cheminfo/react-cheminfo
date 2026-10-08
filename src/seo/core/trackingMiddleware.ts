@@ -20,8 +20,7 @@ export interface TrackingMiddlewareContext {
  * build gives is returned untouched. A site wires it in
  * `functions/_middleware.ts`:
  *
- *   import { trackingScriptMiddleware } from 'react-cheminfo/core';
- *   export const onRequest = trackingScriptMiddleware;
+ *   export { onRequest } from 'react-cheminfo/pages';
  * @param context - The Pages Function context.
  * @returns The response, carrying the snippet when it is an HTML page.
  */

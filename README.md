@@ -35,6 +35,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/core`              | every framework-free helper — 140 value exports   | nothing                                          |
 | `react-cheminfo/ui`                | every React component and hook — 60 value exports | React                                            |
 | `react-cheminfo/vite`              | the prerender plugin and the OG card              | nothing; React on the card                       |
+| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware         | nothing                                          |
 | `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                      | React, molstar                                   |
 | `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar            | React, molstar                                   |
 | `react-cheminfo/structure`         | the structure editor and renderer                 | React, react-ocl, OCL                            |
@@ -1099,16 +1100,17 @@ is `react-cheminfo/core`, so a backend loads no React and no Vite.
 ### On Cloudflare Pages
 
 Pages serves the build as it is, so there is no server and no entrypoint to put
-the analytics snippet in a page. `trackingScriptMiddleware` adds it per request
-instead, from the project's `TRACKING_SCRIPT` variable, and returns everything
-that is not a page untouched:
+the analytics snippet in a page. `onRequest` from `react-cheminfo/pages` adds it
+per request instead, from the project's `TRACKING_SCRIPT` variable, and returns
+everything that is not a page untouched:
 
 ```ts
 // functions/_middleware.ts
-import { trackingScriptMiddleware } from 'react-cheminfo/core';
-
-export const onRequest = trackingScriptMiddleware;
+export { onRequest } from 'react-cheminfo/pages';
 ```
+
+It is a door of its own so the Functions bundler reads two small files and
+never the rest of `core`, whose JSON imports an older esbuild cannot parse.
 
 Keep the bundles out of the function with a `public/_routes.json`, so a page
 view costs one invocation rather than one per asset:

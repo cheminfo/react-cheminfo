@@ -33,6 +33,4 @@ export { startDocumentMeta } from './startDocumentMeta.ts';
 export type { StructuredDataOptions } from './structuredData.ts';
 export { structuredDataScript } from './structuredData.ts';
 export { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from './template.ts';
-export type { TrackingMiddlewareContext } from './trackingMiddleware.ts';
-export { trackingScriptMiddleware } from './trackingMiddleware.ts';
 export { injectTrackingScript } from './trackingScript.ts';
