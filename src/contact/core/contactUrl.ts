@@ -2,11 +2,13 @@ import type { Language } from '../../i18n/core/languages.ts';
 
 /**
  * Address of the contact form every site of the family opens, one per language the form
- * is written in, with `{site}` and `{page}` where the site and the page are written.
- * Empty while no form exists, which keeps the Contact entry out of the header.
+ * is written in, with `{site}` and `{page}` where the site and the page are written. A
+ * language without a form of its own opens the English one; with no form at all, no
+ * Contact entry is drawn.
  */
-export const CONTACT_FORM_URLS: Readonly<Partial<Record<Language, string>>> =
-  {};
+export const CONTACT_FORM_URLS: Readonly<Partial<Record<Language, string>>> = {
+  en: 'https://docs.google.com/forms/d/e/1FAIpQLSd_1G3tUOEJh_qapmLn_xrybWa9Nu7B57bpYm76o4nwPKPWsg/viewform?usp=pp_url&entry.569380734={site}&entry.2103045774={page}',
+};
 
 /** What a contact address is filled with. */
 export interface ContactUrlOptions {
