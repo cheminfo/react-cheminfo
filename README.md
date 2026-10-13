@@ -30,22 +30,24 @@ would mean two Blueprint style trees in one page.
 Subpaths are **bundle boundaries, not taxonomy**: a feature gets its own door
 only when it drags a heavy dependency behind it.
 
-| Import                             | Holds                                             | Costs                                            |
-| ---------------------------------- | ------------------------------------------------- | ------------------------------------------------ |
-| `react-cheminfo/core`              | every framework-free helper — 140 value exports   | nothing                                          |
-| `react-cheminfo/ui`                | every React component and hook — 60 value exports | React                                            |
-| `react-cheminfo/vite`              | the prerender plugin and the OG card              | nothing; React on the card                       |
-| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware         | nothing                                          |
-| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                      | React, molstar                                   |
-| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar            | React, molstar                                   |
-| `react-cheminfo/structure`         | the structure editor and renderer                 | React, react-ocl, OCL                            |
-| `react-cheminfo/conformers`        | conformer generation, ranking and refinement      | OCL                                              |
-| `react-cheminfo/slides`            | the deck format and the slideshow player          | React, react-markdown                            |
-| `react-cheminfo/spectra`           | the spectra processing settings editors           | React; types only from spectra-processor, ml-pca |
-| `react-cheminfo/ir`                | the infrared chart, band table and editor         | React, ir-spectrum, convert-to-jcamp             |
-| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                    | nothing on import; xtb-wasm on the first call    |
-| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet      | nothing                                          |
-| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours | nothing                                          |
+| Import                             | Holds                                                 | Costs                                            |
+| ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
+| `react-cheminfo/core`              | every framework-free helper — 140 value exports       | nothing                                          |
+| `react-cheminfo/ui`                | every React component and hook — 60 value exports     | React                                            |
+| `react-cheminfo/vite`              | the prerender plugin and the OG card                  | nothing; React on the card                       |
+| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware             | nothing                                          |
+| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                          | React, molstar                                   |
+| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                | React, molstar                                   |
+| `react-cheminfo/structure`         | the structure editor and renderer                     | React, react-ocl, OCL                            |
+| `react-cheminfo/conformers`        | conformer generation, ranking and refinement          | OCL                                              |
+| `react-cheminfo/slides`            | the deck format and the slideshow player              | React, react-markdown                            |
+| `react-cheminfo/spectra`           | the spectra processing settings editors               | React; types only from spectra-processor, ml-pca |
+| `react-cheminfo/ir`                | the infrared chart, band table and editor             | React, ir-spectrum, convert-to-jcamp             |
+| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                        | nothing on import; xtb-wasm on the first call    |
+| `react-cheminfo/host`              | data handed over by a page that frames the tool       | nothing on import; ajv once the page is framed   |
+| `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
+| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
+| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -116,6 +118,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Parallel coordinates**   | `parallelAxisOf`, `parallelAxisLayouts`, `parallelIncludedMask`, `parallelKeptCount`, `parallelNearestRow`, `parallelSegmentAt`, `parallelBandAt`, `parallelRangeOf`, `parallelPalette`, `parallelColorSteps`, `paintParallelLines`                                        | `ParallelCoordinates`                                                                                                                                                                                                                                                                               |
 | **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `EMPTY_BLOCK`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                       | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                                                                                                                                    |
 | **Taxonomy**               | `TAXON_RANKS`, `PRINCIPAL_RANKS`, `rankOrder`, `isPrincipalRank`, `isGenusOrBelow`, `isAboveGenus`, `principalLineage`, `lineageFromNodes`, `lineageFromRanks`, `genusOrBelow`, `ncbiTaxonomyUrl`, `splitOrganismName`                                                     | `TaxonLineage`, `OrganismName`, `useRankLabel`                                                                                                                                                                                                                                                      |
+| **Framed by a host**       | `hostStructureLoader`, `readHostMolecule`, `STRUCTURE_KINDS`, `connectHost`, `selectInputs`, `checkValue`, `kindAccepts`, `parseRequest` (all `/host`); `startStandInHost`, `SCIPEAKS_ETHYLBENZENE_LOAD` (`/host-testing`)                                                 | `useHostConnection` (`/host`)                                                                                                                                                                                                                                                                       |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -835,6 +838,58 @@ const included = useMemo(
 - **The card is a render prop**, because what belongs in it is the caller's
   subject — a formula through `react-mf`, a structure, a name — and a readout of
   strings cannot hold any of that.
+
+## Framed by a notebook
+
+A page that frames a tool — an electronic lab notebook such as SciPeaks, a
+course — can hand it typed data instead of writing it into the link. The tool
+says `cheminfo:hello` to its parent, the parent answers `cheminfo:connect` with
+a private `MessageChannel` port, and the data arrives on that port as
+`{ kind, value }` items, each checked against pipeline.cheminfo.org's JSON
+Schema before the tool reads it. A tool taking a structure writes two things:
+
+```ts
+// src/tool.ts
+import type { ToolInterface } from 'react-cheminfo/host';
+import { STRUCTURE_KINDS, hostStructureLoader } from 'react-cheminfo/host';
+
+export const TOOL: ToolInterface = {
+  name: '3d',
+  inputs: [{ key: 'structure', kinds: STRUCTURE_KINDS }],
+  outputs: [],
+};
+
+export const loadFromHost = hostStructureLoader((molecule, label) => {
+  loadSmiles(molecule.toIsomericSmiles(), label);
+});
+```
+
+```tsx
+// App.tsx, right after the hook that applies the address
+useHostConnection(TOOL, { load: loadFromHost, build: BUILD_INFO });
+```
+
+- **Nothing is downloaded unless the page is framed**: the connection and ajv
+  are one lazy chunk, fetched once a parent or an opener exists.
+- **A structure that does not read is answered, not shown**: the host gets
+  `unreadable` with one sentence it can display, and the screen does not change.
+  A molfile whose atoms all sit on one point — SciPeaks stores some that way —
+  is laid out again.
+- **The same document twice is applied once**, so a host re-sending a sample
+  never overwrites what the visitor did with it.
+
+`react-cheminfo/host-testing` serves a stand-in host for Playwright on
+`127.0.0.1`, and exports `SCIPEAKS_ETHYLBENZENE_LOAD`: the message SciPeaks'
+tool tab sends for a sample, byte for byte. visualizer-helper's tests pin the
+same message, so a change on either side fails a test rather than a notebook.
+
+```ts
+const host = await startStandInHost();
+await page.goto(
+  host.pageUrl(`${origin}/?embed=1`, [SCIPEAKS_ETHYLBENZENE_LOAD]),
+);
+const { results } = await page.evaluate(readStandInHostLog);
+```
 
 ## Speaking four languages
 
