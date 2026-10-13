@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.52.0](https://github.com/cheminfo/react-cheminfo/compare/v0.51.0...v0.52.0) (2026-10-13)
+
+
+### Features
+
+* add react-cheminfo/host, so a framing page such as SciPeaks can hand a tool its data ([cfa3d9e](https://github.com/cheminfo/react-cheminfo/commit/cfa3d9e05cf49ce54f6cb96bf8689a7f13836c02))
+
 ## [0.51.0](https://github.com/cheminfo/react-cheminfo/compare/v0.50.0...v0.51.0) (2026-10-08)
 
 
