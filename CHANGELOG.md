@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.53.0](https://github.com/cheminfo/react-cheminfo/compare/v0.52.0...v0.53.0) (2026-10-14)
+
+
+### Features
+
+* seal a share link so a class can neither read nor change it ([312d3d0](https://github.com/cheminfo/react-cheminfo/commit/312d3d0256408bf3aaec215811004856d0641aa3))
+
 ## [0.52.0](https://github.com/cheminfo/react-cheminfo/compare/v0.51.0...v0.52.0) (2026-10-13)
 
 
