@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.55.1](https://github.com/cheminfo/react-cheminfo/compare/v0.55.0...v0.55.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **deploy:** ask for all four React pins, not the runtime pair ([10bb88f](https://github.com/cheminfo/react-cheminfo/commit/10bb88febda69fce76c635952af9e8c33f2634cf))
+* offer to protect a link on every preset, not only under Custom ([be99434](https://github.com/cheminfo/react-cheminfo/commit/be994348fac20b72af4993f01dd8c0643eedd437))
+
 ## [0.55.0](https://github.com/cheminfo/react-cheminfo/compare/v0.54.0...v0.55.0) (2026-10-14)
 
 
