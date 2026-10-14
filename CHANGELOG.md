@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.55.0](https://github.com/cheminfo/react-cheminfo/compare/v0.54.0...v0.55.0) (2026-10-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* add a Contact entry before Share in the site header
+
+### Features
+
+* add a Contact entry before Share in the site header ([895561c](https://github.com/cheminfo/react-cheminfo/commit/895561c8110924f6f42f4fe284ce370e04d5dd06))
+* open the English contact form from the Contact entry ([8d2021e](https://github.com/cheminfo/react-cheminfo/commit/8d2021e15a8837ce773ec99ed5dca3f6ae345c86))
+
 ## [0.54.0](https://github.com/cheminfo/react-cheminfo/compare/v0.53.0...v0.54.0) (2026-10-14)
 
 
