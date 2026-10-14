@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.54.0](https://github.com/cheminfo/react-cheminfo/compare/v0.53.0...v0.54.0) (2026-10-14)
+
+
+### Features
+
+* read a site's locales off disk for the build ([ecc80fc](https://github.com/cheminfo/react-cheminfo/commit/ecc80fcc18c37588fff7d5f43e0d0c9506ff1ecd))
+
 ## [0.53.0](https://github.com/cheminfo/react-cheminfo/compare/v0.52.0...v0.53.0) (2026-10-14)
 
 
