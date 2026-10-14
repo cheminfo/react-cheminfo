@@ -72,6 +72,13 @@ export interface CheckDeployOptions {
    */
   requireHealthcheck?: boolean;
   /**
+   * Whether a workflow must publish the image. A private repository with no
+   * CI minutes builds it on the deploy host on purpose; a workflow it does
+   * ship is still checked.
+   * @default true
+   */
+  requirePublishedImage?: boolean;
+  /**
    * A comment carrying this marker inside a service waives the healthcheck for
    * it, for a worker with no HTTP surface to probe. The reason is written next
    * to the marker, where the next reader of the compose file will find it.

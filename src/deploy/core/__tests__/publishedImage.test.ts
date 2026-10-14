@@ -33,6 +33,32 @@ test('a repository nothing publishes an image for is reported', () => {
   );
 });
 
+test('a repository that builds its image on the host may ship no workflow', () => {
+  const files = repository().filter(
+    (file) => file.path !== DOCKER_IMAGE_WORKFLOW,
+  );
+
+  const problems = findDeployProblems(files, {
+    imageName: IMAGE,
+    requirePublishedImage: false,
+  });
+
+  expect(problems).toStrictEqual([]);
+});
+
+test('a workflow it does ship is still read', () => {
+  const workflow = DOCKER_IMAGE.replace(GUARDED, BARE);
+
+  const problems = findDeployProblems(
+    repository({ [DOCKER_IMAGE_WORKFLOW]: workflow }),
+    { imageName: IMAGE, requirePublishedImage: false },
+  );
+
+  expect(problems).toHaveLength(1);
+  expect(problems[0]?.kind).toBe('unpublishable-image');
+  expect(problems[0]?.line).toBe(12);
+});
+
 test('a workflow with no tag-version publishes no latest to pull', () => {
   const workflow = DOCKER_IMAGE.split('    with:', 1)[0] ?? '';
 

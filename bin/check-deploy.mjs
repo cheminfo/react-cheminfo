@@ -13,11 +13,13 @@
  *   "check-deploy": "cheminfo-check-deploy"
  *
  * Usage: check-deploy.mjs [--image-name=ghcr.io/owner/repo] [--compose=a,b]
- *                         [--foreign=prefix,prefix] [--no-healthcheck] [--quiet]
+ *                         [--foreign=prefix,prefix] [--no-healthcheck]
+ *                         [--no-published-image] [--quiet]
  *   --image-name    the package this repo publishes; read from `git remote` when omitted
  *   --compose       the compose files it ships, when not the three every site ships
  *   --foreign       image prefixes built elsewhere, exempt from the tag rule
  *   --no-healthcheck  the services are not expected to declare a healthcheck
+ *   --no-published-image  the image is built on the deploy host on purpose
  *   --quiet         say nothing when the scan is clean
  *
  * Exits 1 when anything is reported, 2 when it was called wrongly, 0 otherwise.
@@ -42,6 +44,7 @@ let imageName;
 let composeFiles;
 let foreignImages;
 let requireHealthcheck = true;
+let requirePublishedImage = true;
 let quiet = false;
 
 for (const argument of process.argv.slice(2)) {
@@ -53,6 +56,8 @@ for (const argument of process.argv.slice(2)) {
     foreignImages = listOption(argument.slice('--foreign='.length));
   } else if (argument === '--no-healthcheck') {
     requireHealthcheck = false;
+  } else if (argument === '--no-published-image') {
+    requirePublishedImage = false;
   } else if (argument === '--quiet') {
     quiet = true;
   } else {
@@ -93,6 +98,7 @@ const problems = findDeployProblems(files, {
   composeFiles: expected,
   foreignImages: foreignImages ?? ['cloudflare/cloudflared'],
   requireHealthcheck,
+  requirePublishedImage,
 });
 
 if (problems.length > 0) {

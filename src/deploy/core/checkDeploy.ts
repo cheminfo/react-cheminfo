@@ -95,7 +95,10 @@ export function findDeployProblems(
     problems,
   );
 
-  readPublishedImage(byPath.get(DOCKER_IMAGE_WORKFLOW), problems);
+  const workflow = byPath.get(DOCKER_IMAGE_WORKFLOW);
+  if (workflow !== undefined || (options.requirePublishedImage ?? true)) {
+    readPublishedImage(workflow, problems);
+  }
 
   const gitignore = byPath.get('.gitignore');
   if (gitignore === undefined || !/^\s*\/?\.deploy\/?\s*$/m.test(gitignore)) {
