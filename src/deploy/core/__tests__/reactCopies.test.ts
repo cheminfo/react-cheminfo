@@ -141,7 +141,7 @@ test('a React that is not the family major is reported even as the only copy', (
   );
 });
 
-test('a stale peer with nothing pinning React is reported for both packages', () => {
+test('a stale peer with nothing pinning React is reported for all four packages', () => {
   const problems = problemsOf({
     'package.json': `${JSON.stringify(
       { dependencies: { react: '^19.3.0', 'react-dom': '^19.3.0' } },
@@ -155,11 +155,59 @@ test('a stale peer with nothing pinning React is reported for both packages', ()
     (problem) => problem.kind === 'unpinned-react',
   );
 
-  expect(unpinned).toHaveLength(2);
-  expect(unpinned[0]?.message).toBe(
+  expect(unpinned.map((problem) => problem.message)).toStrictEqual([
     'react-popper asks for react ^16.8.0 || ^17 || ^18, which excludes React 19, and nothing pins react',
-  );
+    'react-popper asks for react ^16.8.0 || ^17 || ^18, which excludes React 19, and nothing pins react-dom',
+    'react-popper asks for react ^16.8.0 || ^17 || ^18, which excludes React 19, and nothing pins @types/react',
+    'react-popper asks for react ^16.8.0 || ^17 || ^18, which excludes React 19, and nothing pins @types/react-dom',
+  ]);
   expect(unpinned[0]?.file).toBe('package.json');
+});
+
+test('the runtime pair alone does not satisfy the pin: the type trees are asked for too', () => {
+  const problems = problemsOf({
+    'package.json': `${JSON.stringify(
+      {
+        dependencies: { react: '^19.3.0', 'react-dom': '^19.3.0' },
+        overrides: { react: '^19.3.0', 'react-dom': '^19.3.0' },
+      },
+      null,
+      2,
+    )}\n`,
+    'package-lock.json': lock({ ...ONE_COPY, ...STALE_PEER }),
+  });
+
+  expect(
+    problems
+      .filter((problem) => problem.kind === 'unpinned-react')
+      .map((problem) => problem.message),
+  ).toStrictEqual([
+    'react-popper asks for react ^16.8.0 || ^17 || ^18, which excludes React 19, and nothing pins @types/react',
+    'react-popper asks for react ^16.8.0 || ^17 || ^18, which excludes React 19, and nothing pins @types/react-dom',
+  ]);
+});
+
+test('all four pinned leaves nothing to report', () => {
+  const problems = problemsOf({
+    'package.json': `${JSON.stringify(
+      {
+        dependencies: { react: '^19.3.0', 'react-dom': '^19.3.0' },
+        overrides: {
+          react: '^19.3.0',
+          'react-dom': '^19.3.0',
+          '@types/react': '^19.3.0',
+          '@types/react-dom': '^19.3.0',
+        },
+      },
+      null,
+      2,
+    )}\n`,
+    'package-lock.json': lock({ ...ONE_COPY, ...STALE_PEER }),
+  });
+
+  expect(
+    problems.filter((problem) => problem.kind === 'unpinned-react'),
+  ).toStrictEqual([]);
 });
 
 test('a peer that merely starts before the major is not a stale peer', () => {

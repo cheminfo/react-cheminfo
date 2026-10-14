@@ -108,14 +108,19 @@ export function readReactCopies(
 
   const stale = stalePeer(entries);
   if (stale !== undefined) {
-    for (const name of ['react', 'react-dom'] as const) {
+    // All four, not the runtime pair: a lock that pins only `react` and
+    // `react-dom` keeps a nested `@types/react` of the wrong major, and `tsc`
+    // then rejects a component crossing between the two type trees, in a file
+    // nobody touched. Twenty-one sites were in that state while this check
+    // asked for two.
+    for (const name of SINGLE_COPY) {
       if (declared.get(name)?.override !== undefined) continue;
       problems.push({
         file: 'package.json',
         line: lineOf(packageJson, '"dependencies"'),
         kind: 'unpinned-react',
         message: `${stale.name} asks for ${stale.key} ${stale.range}, which excludes React ${REACT_MAJOR}, and nothing pins ${name}`,
-        hint: `add "overrides": { "react": "^${REACT_MAJOR}…", "react-dom": "^${REACT_MAJOR}…" } to the root package.json`,
+        hint: `pin all four in the root "overrides": react, react-dom, @types/react and @types/react-dom, each with the range it is depended on`,
       });
     }
   }
