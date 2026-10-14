@@ -65,6 +65,7 @@ const meta = {
     embedded: { control: 'boolean' },
     nav: { control: false },
     actions: { control: false },
+    share: { control: false },
     renderNavItem: { control: false },
     onHome: { control: false },
   },
@@ -79,7 +80,11 @@ const meta = {
   },
   render: (args) => (
     <SiteTokens siteId={familySite(args)}>
-      <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} />
+      <SiteHeader
+        {...args}
+        actions={<Utilities siteId={familySite(args)} />}
+        share={<Share />}
+      />
     </SiteTokens>
   ),
 } satisfies Meta<typeof SiteHeader>;
@@ -104,6 +109,7 @@ export const EverySite: Story = {
             nav={bar.nav}
             activeId={bar.activeId}
             actions={<Utilities siteId={bar.siteId} />}
+            share={<Share />}
           />
         </SiteTokens>
       ))}
@@ -122,6 +128,7 @@ export const ActiveAndHovered: Story = {
       <SiteHeader
         {...args}
         actions={<Utilities siteId={familySite(args)} />}
+        share={<Share />}
         renderNavItem={(item, isActive) => (
           <NavLink
             item={item}
@@ -154,6 +161,7 @@ export const WholePage: Story = {
         <SiteHeader
           {...args}
           actions={<Utilities siteId={familySite(args)} />}
+          share={<Share />}
         />
         <main style={MAIN_STYLE}>
           <div style={CARD_STYLE}>
@@ -175,7 +183,11 @@ export const WholePage: Story = {
 export const Embedded: Story = {
   render: (args) => (
     <SiteTokens siteId={familySite(args)}>
-      <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} />
+      <SiteHeader
+        {...args}
+        actions={<Utilities siteId={familySite(args)} />}
+        share={<Share />}
+      />
       <p style={CAPTION_STYLE}>
         Above, the bar. Below, the same bar with <code>embedded</code>, which
         draws nothing.
@@ -258,6 +270,7 @@ function NarrowBar(props: SiteHeaderProps): ReactElement {
             {...props}
             nav={compact ? [PAGES_ITEM] : nav}
             actions={<Utilities siteId={siteId} compact={compact} />}
+            share={<Share compact={compact} />}
             renderNavItem={
               compact
                 ? () => (
@@ -282,14 +295,15 @@ function NarrowBar(props: SiteHeaderProps): ReactElement {
 }
 
 /**
- * The utilities of a site bar: the work it asks to be cited, the family, and
- * the link that frames the page elsewhere.
+ * The utilities of a site bar: the work it asks to be cited and the family.
+ * The Contact entry the bar adds on its own, and Share goes through the bar's
+ * `share` prop so it always comes last.
  * @param props - The site they sit on, and whether the bar has run out of room.
  * @param props.siteId - The site the bar belongs to, so the ecosystem menu
  * knows which entry of the family is the current one.
  * @param props.compact - Whether the bar is too narrow for labels, in which
  * case the buttons keep only their icons.
- * @returns The three buttons, dressed as bar items.
+ * @returns The two buttons, dressed as bar items.
  */
 function Utilities(props: { siteId: SiteId; compact?: boolean }): ReactElement {
   const { siteId, compact = false } = props;
@@ -298,9 +312,20 @@ function Utilities(props: { siteId: SiteId; compact?: boolean }): ReactElement {
     <>
       <CiteButton reference={PAPER} compact={compact} />
       <EcosystemButton currentSiteId={siteId} compact={compact} />
-      <ShareButton onClick={noop} compact={compact} />
     </>
   );
+}
+
+/**
+ * The link that frames the page elsewhere, which the bar draws last.
+ * @param props - Whether the bar has run out of room.
+ * @param props.compact - Whether the bar is too narrow for a label.
+ * @returns The Share entry, dressed as a bar item.
+ */
+function Share(props: { compact?: boolean }): ReactElement {
+  const { compact = false } = props;
+
+  return <ShareButton onClick={noop} compact={compact} />;
 }
 
 /**
