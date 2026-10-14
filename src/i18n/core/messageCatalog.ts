@@ -142,6 +142,19 @@ export class MessageCatalog<TKey extends string = string> {
   }
 
   /**
+   * Whether the catalog declares a key at all.
+   *
+   * English is the list of keys, so this is what a loop walking a numbered
+   * family of messages — `how.limits.p1`, `p2`, … — stops on, and what tells a
+   * page a section was never written from one left untranslated.
+   * @param key - Key to look for.
+   * @returns True when English carries it.
+   */
+  public declares(key: string): boolean {
+    return ownMessage(this.source.messages, key) !== undefined;
+  }
+
+  /**
    * The messages of a language, once they are in memory.
    * @param language - Language asked for.
    * @returns The messages, or an empty catalog while they are still coming.

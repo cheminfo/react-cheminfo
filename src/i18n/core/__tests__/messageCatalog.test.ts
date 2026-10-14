@@ -120,3 +120,14 @@ test('a session formats every message the catalog declares', () => {
 test('an inherited property is never a message', () => {
   expect(catalog().translate('constructor', 'en')).toBe('constructor');
 });
+
+test('English is the list of keys a catalog declares', () => {
+  const read = catalog();
+
+  expect(read.declares('greeting.hello')).toBe(true);
+  expect(read.declares('greeting.named')).toBe(true);
+  expect(read.declares('greeting.absent')).toBe(false);
+  // A key only a translation carries is still not declared: the family of
+  // messages a loop walks is the English one.
+  expect(read.declares('toString')).toBe(false);
+});

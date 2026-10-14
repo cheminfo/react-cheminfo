@@ -3,27 +3,17 @@ import { CHROME_CATALOG } from '../core/chromeCatalog.ts';
 import type {
   Language,
   LooseKey,
-  MessageValues,
+  Translate,
   TranslateOptions,
 } from '../core/index.ts';
+import { catalogTranslate } from '../core/index.ts';
 import type { MessageCatalog } from '../core/messageCatalog.ts';
 
 import { useLanguage, useMessagesVersion } from './useLanguage.ts';
 
-/**
- * What a component reads its text with.
- *
- * `t(key)` is a key the catalog declares, checked at compile time.
- * `t.or(key, fallback)` is a key built from the data — a site's id, an
- * element's symbol — which the catalog may not have caught up with yet; it
- * reads as the fallback rather than as a raw key.
- */
-export type Translate<TKey extends string> = ((
-  key: LooseKey<TKey>,
-  values?: MessageValues,
-) => string) & {
-  or: (key: string, fallback: string, values?: MessageValues) => string;
-};
+// The formatter's own shape belongs to the catalog, not to the hook, and a site
+// reads it from either entry point.
+export type { Translate } from '../core/index.ts';
 
 /**
  * The formatter of a catalog's text, in the language the page is written in.
@@ -40,20 +30,7 @@ export function useT<TKey extends string>(
   const language = useLanguage();
   useMessagesVersion();
   catalog.prefetch(language);
-  return translator(catalog, language);
-}
-
-// Built outside the hook, because the `or` form is a property of the function
-// itself and a render may not write to a value it has just read.
-function translator<TKey extends string>(
-  catalog: MessageCatalog<TKey>,
-  language: Language,
-): Translate<TKey> {
-  const translate = (key: LooseKey<TKey>, values?: MessageValues) =>
-    catalog.translate(key, language, { values });
-  translate.or = (key: string, fallback: string, values?: MessageValues) =>
-    catalog.translate(key, language, { fallback, values });
-  return translate;
+  return catalogTranslate(catalog, language);
 }
 
 /**
