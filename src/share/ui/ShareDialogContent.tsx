@@ -27,8 +27,10 @@ import { ShareConfigOptions } from './ShareConfigOptions.tsx';
 import type { ShareDialogProps, ShareDraft } from './ShareDialog.tsx';
 import { ShareLinkBar } from './ShareLinkBar.tsx';
 import { SharePanes } from './SharePanes.tsx';
+import type { SharePartDescriptions } from './SharePartRow.tsx';
 import { SharePresetTabs } from './SharePresetTabs.tsx';
 import { SharePreview } from './SharePreview.tsx';
+import { ShareSealOption } from './ShareSealOption.tsx';
 import { withPart } from './draft.ts';
 import { useSealedUrl } from './useSealedUrl.ts';
 
@@ -131,6 +133,7 @@ export function ShareDialogContent<
     title: frameTitle ?? title,
     height: frameHeight,
   });
+  const onSealedChange = offeredWhenOpened(setSealed);
   const options = (
     <ShareConfigOptions
       embed={shown.embed}
@@ -139,7 +142,7 @@ export function ShareDialogContent<
       descriptions={partDescriptions}
       onEmbedChange={setEmbed}
       sealed={sealed}
-      onSealedChange={offeredWhenOpened(setSealed)}
+      onSealedChange={onSealedChange}
       onPartChange={setPartHidden}
       onPartPointed={setPointed}
     />
@@ -151,7 +154,12 @@ export function ShareDialogContent<
       {openPreset === undefined ? (
         options
       ) : (
-        <p className="share-dialog__preset">{openPreset.description}</p>
+        <PresetSummary
+          description={openPreset.description}
+          sealed={sealed}
+          descriptions={partDescriptions}
+          onSealedChange={onSealedChange}
+        />
       )}
 
       {children === undefined ? null : (
@@ -199,6 +207,29 @@ export function ShareDialogContent<
           />
         }
       />
+    </>
+  );
+}
+
+// A preset says what it hands out; protecting the link is the one switch it
+// leaves to the teacher, so it stays within reach on every tab.
+function PresetSummary(props: {
+  description: string;
+  sealed: boolean;
+  descriptions: SharePartDescriptions;
+  onSealedChange: ((sealed: boolean) => void) | undefined;
+}): ReactElement {
+  const { description, sealed, descriptions, onSealedChange } = props;
+  return (
+    <>
+      <p className="share-dialog__preset">{description}</p>
+      {onSealedChange === undefined ? null : (
+        <ShareSealOption
+          sealed={sealed}
+          descriptions={descriptions}
+          onChange={onSealedChange}
+        />
+      )}
     </>
   );
 }

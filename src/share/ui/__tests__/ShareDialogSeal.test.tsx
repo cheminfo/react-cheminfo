@@ -44,6 +44,32 @@ test('a site that opens sealed links offers to protect the link', async () => {
   );
 });
 
+test('a dialog opened on a preset keeps the switch within reach', () => {
+  const html = renderToStaticMarkup(
+    <ShareDialog
+      isOpen
+      usePortal={false}
+      onClose={() => undefined}
+      vocabulary={VOCABULARY}
+      presets={[
+        {
+          key: 'figure',
+          label: 'The figure',
+          description: 'The figure alone, nothing to answer.',
+          hidden: ['answers'],
+        },
+      ]}
+      defaultPreset="figure"
+      title="Exercises"
+      baseUrl="https://surge.cheminfo.org/exercises"
+      search="formulas=C4H10O"
+    />,
+  );
+
+  expect(html).toContain('The figure alone, nothing to answer.');
+  expect(html).toContain('Protect this link');
+});
+
 test('a refused link says so, and opens the tool without it', () => {
   const html = renderToStaticMarkup(<SealedLinkRefused href="/exercises" />);
 

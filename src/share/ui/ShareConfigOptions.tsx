@@ -7,6 +7,7 @@ import type { HideablePart } from '../core/index.ts';
 import { SharePartOptions } from './SharePartOptions.tsx';
 import type { SharePartDescriptions } from './SharePartRow.tsx';
 import { SharePartRow } from './SharePartRow.tsx';
+import { ShareSealOption } from './ShareSealOption.tsx';
 
 const SECTION_STYLE: CSSProperties = { marginBottom: 14 };
 
@@ -71,10 +72,8 @@ export function ShareConfigOptions(
           onChange={onEmbedChange}
         />
         {onSealedChange === undefined ? null : (
-          <SharePartRow
-            label={t('share.protect')}
-            description={t('share.protectHint')}
-            on={sealed}
+          <ShareSealOption
+            sealed={sealed}
             descriptions={descriptions}
             onChange={onSealedChange}
           />
