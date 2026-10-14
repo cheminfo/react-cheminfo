@@ -15,6 +15,11 @@ export interface ShareLinkBarProps {
    * @default undefined
    */
   onCopied?: () => void;
+  /**
+   * Whether the link is not ready to hand out yet, as while it is being sealed.
+   * @default false
+   */
+  disabled?: boolean;
 }
 
 /**
@@ -31,7 +36,7 @@ export interface ShareLinkBarProps {
  * @returns The bar.
  */
 export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
-  const { url, frame, onCopied } = props;
+  const { url, frame, onCopied, disabled = false } = props;
   const t = useChromeT();
 
   return (
@@ -46,6 +51,7 @@ export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
           content={url}
           label={t('share.copyLink')}
           title=""
+          disabled={disabled}
           onCopied={onCopied}
         />
       </HelpTooltip>
@@ -59,6 +65,7 @@ export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
           icon="share"
           text={t('share.openInNewTab')}
           href={url}
+          disabled={disabled}
           target="_blank"
           rel="noopener noreferrer"
         />
@@ -74,6 +81,7 @@ export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
           icon="code"
           label={t('share.copyIframe')}
           title=""
+          disabled={disabled}
           onCopied={onCopied}
         />
       </HelpTooltip>

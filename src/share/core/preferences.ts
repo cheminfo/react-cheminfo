@@ -1,3 +1,5 @@
+import { pageHistory, pageLocation } from '../../router/core/pageAddress.ts';
+
 import { EMBED_PARAM, HIDE_PARAM } from './config.ts';
 import type { ShareParamCodec } from './params.ts';
 import type { QueryEntry } from './query.ts';
@@ -56,12 +58,12 @@ export interface SyncPreferencesOptions {
   subscribe: (listener: () => void) => () => void;
   /**
    * The address to read and keep up to date.
-   * @default globalThis.location
+   * @default pageLocation()
    */
   location?: PreferenceLocation;
   /**
    * The history to rewrite.
-   * @default globalThis.history
+   * @default pageHistory()
    */
   history?: PreferenceHistory;
 }
@@ -157,16 +159,14 @@ export function writePreferencesToSearch(
 export function syncPreferencesWithUrl(
   options: SyncPreferencesOptions,
 ): () => void {
-  const {
-    preferences,
-    subscribe,
-    location = globalThis.location,
-    history = globalThis.history,
-  } = options;
+  const { preferences, subscribe } = options;
+  const location = options.location ?? pageLocation();
+  const history = options.history ?? pageHistory();
   assertPreferenceNames(preferences);
+  if (location === undefined || history === undefined) return () => undefined;
   applyPreferencesFromSearch(location.search, preferences);
   let active = true;
-  function write(): void {
+  const write = (): void => {
     if (!active) return;
     const current = location.search;
     const next = writePreferencesToSearch(current, preferences);
@@ -177,7 +177,7 @@ export function syncPreferencesWithUrl(
       '',
       `${location.pathname}${query}${location.hash}`,
     );
-  }
+  };
   const unsubscribe = subscribe(write);
   write();
   return () => {

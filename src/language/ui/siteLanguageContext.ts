@@ -1,5 +1,6 @@
 import { createContext, use } from 'react';
 
+import { pageLocation } from '../../router/core/pageAddress.ts';
 import { readLanguageParam } from '../core/languageParam.ts';
 
 /** What a site declares the page is being read in. */
@@ -16,5 +17,5 @@ export const SiteLanguageContext = createContext<string | undefined>(undefined);
 export function useSiteLanguage(): string | undefined {
   const declared = use(SiteLanguageContext);
   if (declared !== undefined) return declared;
-  return readLanguageParam(globalThis.location?.search ?? '');
+  return readLanguageParam(pageLocation()?.search ?? '');
 }

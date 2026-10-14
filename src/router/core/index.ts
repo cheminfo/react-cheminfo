@@ -18,6 +18,14 @@ export type {
   LegacyHashOptions,
 } from './legacyHash.ts';
 export { adoptLegacyHashAddress, pathFromLegacyHash } from './legacyHash.ts';
+export type { PageHistory, PageLocation } from './pageAddress.ts';
+export {
+  holdPageAddress,
+  isPageAddressHeld,
+  pageHistory,
+  pageLocation,
+  releasePageAddress,
+} from './pageAddress.ts';
 export type { QueryEntry, QueryStringOptions } from './query.ts';
 export {
   firstQueryValues,

@@ -2,13 +2,15 @@
  * The tab router bound to the browser: read the address on screen, write a new
  * one through the History API, and hear every move.
  *
- * The router itself stays pure. Everything here reads `globalThis.location` and
- * writes `globalThis.history`, and does nothing where neither exists, so a
- * prerender script can import a module that uses it.
+ * The router itself stays pure. Everything here reads and writes the address
+ * through `pageLocation` and `pageHistory` — the browser's, or the one a sealed
+ * link holds in memory — and does nothing where neither exists, so a prerender
+ * script can import a module that uses it.
  */
 
 import { EMBED_PARAM, HIDE_PARAM } from '../../share/core/config.ts';
 
+import { pageHistory, pageLocation } from './pageAddress.ts';
 import type { QueryEntry } from './query.ts';
 import { formatQueryEntries } from './query.ts';
 import type { TabRoute, TabRouteInput, TabRouter } from './tabRouter.ts';
@@ -34,7 +36,7 @@ export function readRoute<Tab extends string>(
   const address = currentAddress();
   const adopted = router.legacyAddress(address);
   if (adopted === null) return router.parse(address);
-  const history = browserHistory();
+  const history = pageHistory();
   history?.replaceState(history.state, '', adopted);
   globalThis.dispatchEvent?.(new Event(ROUTE_CHANGE_EVENT));
   return router.parse(adopted);
@@ -78,8 +80,8 @@ export function writeRoute<Tab extends string>(
 ): string {
   const current = currentAddress();
   const address = withKeptParams(router, route, current, options.keep ?? []);
-  const location = browserLocation();
-  const history = browserHistory();
+  const location = pageLocation();
+  const history = pageHistory();
   if (location === undefined || history === undefined) return address;
 
   const shown =
@@ -126,7 +128,7 @@ export function subscribeToRoute<Tab extends string>(
  * @returns It, or `/` where there is no browser.
  */
 export function currentAddress(): string {
-  const location = browserLocation();
+  const location = pageLocation();
   if (location === undefined) return '/';
   return `${location.pathname}${location.search}${location.hash}`;
 }
@@ -149,12 +151,4 @@ function withKeptParams<Tab extends string>(
   if (kept.length === 0) return target;
   const separator = target.includes('?') ? '&' : '?';
   return `${target}${separator}${formatQueryEntries(kept)}`;
-}
-
-function browserLocation(): Location | undefined {
-  return globalThis.location;
-}
-
-function browserHistory(): History | undefined {
-  return globalThis.history;
 }

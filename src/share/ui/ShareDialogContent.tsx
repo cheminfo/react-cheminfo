@@ -15,6 +15,7 @@ import {
   applySharePreset,
   buildEmbedCode,
   buildShareUrl,
+  canOpenSealedAddresses,
   findSharePreset,
   isShareConfigured,
   parseShareConfig,
@@ -29,6 +30,7 @@ import { SharePanes } from './SharePanes.tsx';
 import { SharePresetTabs } from './SharePresetTabs.tsx';
 import { SharePreview } from './SharePreview.tsx';
 import { withPart } from './draft.ts';
+import { useSealedUrl } from './useSealedUrl.ts';
 
 const NO_PRESETS: readonly never[] = [];
 
@@ -73,6 +75,7 @@ export function ShareDialogContent<
   const [config, setConfig] = useState<ShareConfig<Codecs>>(() =>
     initialDraft(query, vocabulary, findPreset(presets, defaultPreset ?? null)),
   );
+  const [sealed, setSealed] = useState(false);
   const [pointed, setPointed] = useState<string | null>(null);
   const [presetKey, setPresetKey] = useState<string | null>(
     () => findSharePreset(config, presets, vocabulary)?.key ?? null,
@@ -86,6 +89,8 @@ export function ShareDialogContent<
 
   function setEmbed(embed: boolean): void {
     setConfig((previous) => ({ ...previous, embed }));
+    // A sealed page is always embedded, so leaving the frame drops the seal.
+    setSealed((previous) => previous && embed);
   }
 
   function setPartHidden(part: string, hidden: boolean): void {
@@ -118,19 +123,23 @@ export function ShareDialogContent<
     setPartHidden,
     setParam,
   };
-  const url = buildShareUrl({ base, search: query, config, vocabulary });
+  const shown = embeddedWhenSealed(config, sealed);
+  const url = buildShareUrl({ base, search: query, config: shown, vocabulary });
+  const { link, ready } = useSealedUrl(url, sealed);
   const frame = buildEmbedCode({
-    url,
+    url: link,
     title: frameTitle ?? title,
     height: frameHeight,
   });
   const options = (
     <ShareConfigOptions
-      embed={config.embed}
-      parts={visibleShareParts(vocabulary.parts, config.embed)}
+      embed={shown.embed}
+      parts={visibleShareParts(vocabulary.parts, shown.embed)}
       hidden={config.hidden}
       descriptions={partDescriptions}
       onEmbedChange={setEmbed}
+      sealed={sealed}
+      onSealedChange={offeredWhenOpened(setSealed)}
       onPartChange={setPartHidden}
       onPartPointed={setPointed}
     />
@@ -155,7 +164,7 @@ export function ShareDialogContent<
 
   const previewPane = preview ? (
     <SharePreview
-      url={url}
+      url={link}
       title={frameTitle ?? title}
       highlight={highlightOf(vocabulary.parts, pointed)}
     />
@@ -181,10 +190,32 @@ export function ShareDialogContent<
         />
       </div>
       <DialogFooter
-        actions={<ShareLinkBar url={url} frame={frame} onCopied={onClose} />}
+        actions={
+          <ShareLinkBar
+            url={link}
+            frame={frame}
+            disabled={!ready}
+            onCopied={onClose}
+          />
+        }
       />
     </>
   );
+}
+
+// A sealed page is always embedded, whatever a preset said.
+function embeddedWhenSealed<Codecs extends ShareParamCodecs>(
+  config: ShareConfig<Codecs>,
+  sealed: boolean,
+): ShareConfig<Codecs> {
+  return sealed ? { ...config, embed: true } : config;
+}
+
+// A site that never opens a sealed address must not hand one out.
+function offeredWhenOpened(
+  setSealed: (sealed: boolean) => void,
+): ((sealed: boolean) => void) | undefined {
+  return canOpenSealedAddresses() ? setSealed : undefined;
 }
 
 function initialDraft<Codecs extends ShareParamCodecs>(

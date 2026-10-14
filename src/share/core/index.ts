@@ -52,6 +52,16 @@ export {
 } from './preferences.ts';
 export type { SharePreset } from './presets.ts';
 export { applySharePreset, findSharePreset } from './presets.ts';
+export type { SealProblem, UnsealResult } from './seal.ts';
+export {
+  SEAL_PARAM,
+  sealQuery,
+  sealShareUrl,
+  sealedToken,
+  unsealQuery,
+} from './seal.ts';
+export type { SealedAddress } from './sealedAddress.ts';
+export { canOpenSealedAddresses, openSealedAddress } from './sealedAddress.ts';
 export type { EmbedCodeOptions, ShareUrlOptions } from './url.ts';
 export { buildEmbedCode, buildShareUrl } from './url.ts';
 export type {

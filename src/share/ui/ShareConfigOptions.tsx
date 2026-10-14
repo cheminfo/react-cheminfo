@@ -21,6 +21,16 @@ export interface ShareConfigOptionsProps {
   descriptions: SharePartDescriptions;
   /** Called when the layout is switched. */
   onEmbedChange: (embed: boolean) => void;
+  /**
+   * Whether the link is handed out sealed.
+   * @default false
+   */
+  sealed?: boolean;
+  /**
+   * Called when sealing is switched. Without it the switch is not offered.
+   * @default undefined
+   */
+  onSealedChange?: (sealed: boolean) => void;
   /** Called with the part and whether the link should switch it off. */
   onPartChange: (part: string, hidden: boolean) => void;
   /** Called with the part the pointer is on, or `null` when it leaves. */
@@ -28,7 +38,8 @@ export interface ShareConfigOptionsProps {
 }
 
 /**
- * The switches of the share dialog: the layout, then one per part of the page.
+ * The switches of the share dialog: the layout — embedded, and sealed where the
+ * site opens sealed links — then one per part of the page.
  * @param props - The draft's layout and parts, and how to change them.
  * @returns The two sections.
  */
@@ -41,6 +52,8 @@ export function ShareConfigOptions(
     hidden,
     descriptions,
     onEmbedChange,
+    sealed = false,
+    onSealedChange,
     onPartChange,
     onPartPointed,
   } = props;
@@ -57,6 +70,15 @@ export function ShareConfigOptions(
           descriptions={descriptions}
           onChange={onEmbedChange}
         />
+        {onSealedChange === undefined ? null : (
+          <SharePartRow
+            label={t('share.protect')}
+            description={t('share.protectHint')}
+            on={sealed}
+            descriptions={descriptions}
+            onChange={onSealedChange}
+          />
+        )}
       </section>
 
       {parts.length > 0 ? (

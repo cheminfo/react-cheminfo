@@ -3,6 +3,8 @@ export { HiddenPartsProvider } from './HiddenPartsProvider.tsx';
 export { useIsHidden } from './hiddenParts.ts';
 export type { PagePartProps } from './PagePart.tsx';
 export { PagePart } from './PagePart.tsx';
+export type { SealedLinkRefusedProps } from './SealedLinkRefused.tsx';
+export { SealedLinkRefused } from './SealedLinkRefused.tsx';
 export type { ShareButtonProps, ShareButtonVariant } from './ShareButton.tsx';
 export { ShareButton } from './ShareButton.tsx';
 export type { ShareDialogProps } from './ShareDialog.tsx';
