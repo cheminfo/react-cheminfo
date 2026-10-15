@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.56.0](https://github.com/cheminfo/react-cheminfo/compare/v0.55.1...v0.56.0) (2026-10-15)
+
+
+### Features
+
+* add wikidata.cheminfo.org as an unlisted site, with its credits ([744f49b](https://github.com/cheminfo/react-cheminfo/commit/744f49bbd56a3eccc03d3104080e4ca7a0dfc11e))
+* **check-deploy:** accept a repository that builds its image on the host ([2ecca83](https://github.com/cheminfo/react-cheminfo/commit/2ecca8360e8a2103168587b09a6053b4ad73a998))
+
 ## [0.55.1](https://github.com/cheminfo/react-cheminfo/compare/v0.55.0...v0.55.1) (2026-10-14)
 
 
