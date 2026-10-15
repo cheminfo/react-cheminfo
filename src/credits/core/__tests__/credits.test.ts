@@ -26,9 +26,9 @@ test('an entry carries its name, address, sentence and licence', () => {
   ]);
 });
 
-test('wikidata credits its source, its reader and its search', () => {
+test('wikidata credits its sources, its reader and its search', () => {
   expect(
-    credits(['wikipedia', 'wtf-wikipedia', 'openchemlib-sqlite']),
+    credits(['wikipedia', 'wikidata', 'wtf-wikipedia', 'openchemlib-sqlite']),
   ).toStrictEqual([
     {
       id: 'wikipedia',
@@ -37,6 +37,14 @@ test('wikidata credits its source, its reader and its search', () => {
       description:
         'the articles, and the Chembox and Drugbox infoboxes every value is read from.',
       license: 'CC-BY-SA-4.0',
+    },
+    {
+      id: 'wikidata',
+      name: 'Wikidata',
+      href: 'https://www.wikidata.org/',
+      description:
+        'the name of every compound in every language, and its article in each Wikipedia.',
+      license: 'CC0-1.0',
     },
     {
       id: 'wtf-wikipedia',
@@ -105,7 +113,7 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(38);
+  expect(CREDITS).toHaveLength(39);
 });
 
 test('every entry names a work, an address and what it does', () => {

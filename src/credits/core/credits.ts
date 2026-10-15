@@ -309,6 +309,14 @@ export const CREDITS = [
     license: 'CC-BY-SA-4.0',
   },
   {
+    id: 'wikidata',
+    name: 'Wikidata',
+    href: 'https://www.wikidata.org/',
+    description:
+      'the name of every compound in every language, and its article in each Wikipedia.',
+    license: 'CC0-1.0',
+  },
+  {
     id: 'wtf-wikipedia',
     name: 'wtf_wikipedia',
     href: 'https://github.com/spencermountain/wtf_wikipedia',
