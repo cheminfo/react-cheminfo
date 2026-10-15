@@ -317,6 +317,13 @@ export const CREDITS = [
     license: 'CC0-1.0',
   },
   {
+    id: 'country-flag-icons',
+    name: 'country-flag-icons',
+    href: 'https://gitlab.com/catamphetamine/country-flag-icons',
+    description: 'the flag each language is picked by.',
+    license: 'MIT',
+  },
+  {
     id: 'wtf-wikipedia',
     name: 'wtf_wikipedia',
     href: 'https://github.com/spencermountain/wtf_wikipedia',
