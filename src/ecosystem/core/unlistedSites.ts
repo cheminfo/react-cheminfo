@@ -34,4 +34,20 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     // apart from the white ring at 16 px.
     mark: { plate: '#c2410c', accent: '#a3e635' },
   },
+  {
+    id: 'wikidata',
+    name: { lead: 'wikidata', alt: 'cheminfo', dot: true },
+    host: 'wikidata.cheminfo.org',
+    tagline: 'The chemistry of Wikipedia’s infoboxes, searchable by structure.',
+    group: 'research',
+    // A leather-binding brown, the bound encyclopedia, 7.3 Oklab units from the
+    // nearest lead of the family (database) and 9.4:1 on white.
+    brand: '#5c4033',
+    // Wikipedia's own link blue answers it, 5.4:1 on white, so it is also the
+    // text half of the wordmark.
+    brandAlt: '#3366cc',
+    // On the brown plate that blue sits 24.5 apart, under the family's floor,
+    // so the link row of the mark takes a lighter blue of the same hue.
+    mark: { plate: '#5c4033', accent: '#6b9bf2' },
+  },
 ];

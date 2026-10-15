@@ -63,11 +63,14 @@ test('every site of the family has a mark that draws', () => {
 test('a site no menu lists yet draws its mark from its identifier', () => {
   const naturals = renderToStaticMarkup(<SiteMark siteId="naturals" />);
   const molecules = renderToStaticMarkup(<SiteMark siteId="molecules" />);
+  const wikidata = renderToStaticMarkup(<SiteMark siteId="wikidata" />);
 
   expect(naturals).toContain('fill="#c2410c"');
   expect(naturals).toContain('fill="#a3e635"');
   expect(molecules).toContain('fill="#be185d"');
   expect(molecules).toContain('fill="#5eead4"');
+  expect(wikidata).toContain('fill="#5c4033"');
+  expect(wikidata).toContain('fill="#6b9bf2"');
 });
 
 test('a site outside the family is drawn with the glyph it brings', () => {

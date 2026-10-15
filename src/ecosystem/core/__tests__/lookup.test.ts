@@ -31,6 +31,8 @@ test('a site no menu lists yet is still found by its identifier and its host', (
   expect(siteById('molecules').host).toBe('molecules.cheminfo.org');
   expect(findSiteByHost('naturals.cheminfo.org')?.id).toBe('naturals');
   expect(findSiteByHost('www.molecules.cheminfo.org')?.id).toBe('molecules');
+  expect(siteById('wikidata').host).toBe('wikidata.cheminfo.org');
+  expect(findSiteByHost('wikidata.cheminfo.org')?.id).toBe('wikidata');
 });
 
 test('a site no menu lists yet is under no topic', () => {

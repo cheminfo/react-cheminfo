@@ -78,6 +78,13 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'openchemlib-sqlite',
+    name: 'openchemlib-sqlite',
+    href: 'https://github.com/cheminfo/openchemlib-sqlite',
+    description: 'the substructure and similarity search, inside SQLite.',
+    license: 'MIT',
+  },
+  {
     id: 'osiris-property-explorer',
     name: 'OSIRIS Property Explorer',
     href: 'https://www.organic-chemistry.org/prog/peo/',
@@ -292,6 +299,22 @@ export const CREDITS = [
     name: 'ChemExper',
     href: 'https://www.chemexper.com/',
     description: 'the catalogue the compounds and their spectra come from.',
+  },
+  {
+    id: 'wikipedia',
+    name: 'Wikipedia',
+    href: 'https://en.wikipedia.org/',
+    description:
+      'the articles, and the Chembox and Drugbox infoboxes every value is read from.',
+    license: 'CC-BY-SA-4.0',
+  },
+  {
+    id: 'wtf-wikipedia',
+    name: 'wtf_wikipedia',
+    href: 'https://github.com/spencermountain/wtf_wikipedia',
+    description:
+      'reads the wikitext of an article and its templates into plain values.',
+    license: 'MIT',
   },
   {
     id: 'react',

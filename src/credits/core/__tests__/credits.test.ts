@@ -26,6 +26,36 @@ test('an entry carries its name, address, sentence and licence', () => {
   ]);
 });
 
+test('wikidata credits its source, its reader and its search', () => {
+  expect(
+    credits(['wikipedia', 'wtf-wikipedia', 'openchemlib-sqlite']),
+  ).toStrictEqual([
+    {
+      id: 'wikipedia',
+      name: 'Wikipedia',
+      href: 'https://en.wikipedia.org/',
+      description:
+        'the articles, and the Chembox and Drugbox infoboxes every value is read from.',
+      license: 'CC-BY-SA-4.0',
+    },
+    {
+      id: 'wtf-wikipedia',
+      name: 'wtf_wikipedia',
+      href: 'https://github.com/spencermountain/wtf_wikipedia',
+      description:
+        'reads the wikitext of an article and its templates into plain values.',
+      license: 'MIT',
+    },
+    {
+      id: 'openchemlib-sqlite',
+      name: 'openchemlib-sqlite',
+      href: 'https://github.com/cheminfo/openchemlib-sqlite',
+      description: 'the substructure and similarity search, inside SQLite.',
+      license: 'MIT',
+    },
+  ]);
+});
+
 test('an unknown work is reported rather than quietly dropped', () => {
   // @ts-expect-error the registry has no such work, which is the point.
   expect(() => credits(['jsmol'])).toThrow('unknown credit: jsmol');
@@ -75,7 +105,7 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(35);
+  expect(CREDITS).toHaveLength(38);
 });
 
 test('every entry names a work, an address and what it does', () => {

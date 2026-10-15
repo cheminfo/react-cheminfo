@@ -530,4 +530,20 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // An infobox: the structure at its top, a ring, and two rows of data under
+  // it. The second row carries the answering colour, the blue of a link. Both
+  // rows and the gap between them fall on whole pixels at 16 px.
+  wikidata: (alt) => (
+    <>
+      <path
+        d="M16 5.4 20.85 8.2 20.85 13.8 16 16.6 11.15 13.8 11.15 8.2Z"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      <rect x="6" y="20" width="20" height="2" rx="1" fill="#ffffff" />
+      <rect x="6" y="24" width="14" height="4" rx="2" fill={alt} />
+    </>
+  ),
 };
