@@ -1,6 +1,7 @@
 /**
  * A molecule in three dimensions, with a toolbar to measure it, turn it, wrap
- * it in its surface and restyle it — and what to say when there cannot be one.
+ * it in its surface, restyle it and fill the screen with it — and what to say
+ * when there cannot be one.
  *
  * The WebGL probe runs before molstar is touched, so a machine without WebGL
  * gets an explanation instead of a blank rectangle, and the canvas sits behind

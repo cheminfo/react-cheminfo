@@ -1,5 +1,6 @@
 /**
- * The molstar canvas of `MoleculeViewer3D`, with its toolbars over it.
+ * The molstar canvas of `MoleculeViewer3D`, with its toolbars over it, in a
+ * box that can fill the screen.
  *
  * Reached through `React.lazy`, so a page that never shows a molecule never
  * downloads molstar.
@@ -17,6 +18,7 @@ import {
 
 import { Molecule3DExport } from './Molecule3DExport.tsx';
 import { Molecule3DOptions } from './Molecule3DOptions.tsx';
+import { Molecule3DStage } from './Molecule3DStage.tsx';
 import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
 import { createMolecule3DViewer } from './createViewer.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
@@ -150,44 +152,53 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
   );
 
   return (
-    <div style={{ ...STAGE_STYLE, minHeight }}>
-      <div ref={setContainer} style={CANVAS_STYLE} data-testid="molecule3d" />
-      {molfile !== null && (
-        <div style={OVERLAY_STYLE}>
-          <Molecule3DToolbar
-            tools={tools}
-            measureKind={measureKind}
-            onMeasureKindChange={setMeasureKind}
-            measurementCount={measurements.length}
-            onClearMeasurements={() => {
-              setMeasurements(NO_MEASUREMENTS);
-            }}
-            spinning={spinning}
-            onSpinningChange={setSpinning}
-            showSurface={settings.showSurface}
-            onShowSurfaceChange={(showSurface) => {
-              setSettings({ ...settings, showSurface });
-            }}
-            onResetView={resetView}
-            options={
-              <Molecule3DOptions
-                settings={settings}
-                onChange={setSettings}
-                polarSurfaceArea={polarSurfaceArea}
-                defaults={initialSettings}
-              />
-            }
-            exportPanel={
-              <Molecule3DExport
-                getSize={canvasSize}
-                onExport={exportImage}
-                onCopy={copyImage}
-              />
-            }
+    <Molecule3DStage style={{ ...STAGE_STYLE, minHeight }}>
+      {(fullscreen) => (
+        <>
+          <div
+            ref={setContainer}
+            style={CANVAS_STYLE}
+            data-testid="molecule3d"
           />
-        </div>
+          {molfile !== null && (
+            <div style={OVERLAY_STYLE}>
+              <Molecule3DToolbar
+                tools={tools}
+                fullscreen={fullscreen}
+                measureKind={measureKind}
+                onMeasureKindChange={setMeasureKind}
+                measurementCount={measurements.length}
+                onClearMeasurements={() => {
+                  setMeasurements(NO_MEASUREMENTS);
+                }}
+                spinning={spinning}
+                onSpinningChange={setSpinning}
+                showSurface={settings.showSurface}
+                onShowSurfaceChange={(showSurface) => {
+                  setSettings({ ...settings, showSurface });
+                }}
+                onResetView={resetView}
+                options={
+                  <Molecule3DOptions
+                    settings={settings}
+                    onChange={setSettings}
+                    polarSurfaceArea={polarSurfaceArea}
+                    defaults={initialSettings}
+                  />
+                }
+                exportPanel={
+                  <Molecule3DExport
+                    getSize={canvasSize}
+                    onExport={exportImage}
+                    onCopy={copyImage}
+                  />
+                }
+              />
+            </div>
+          )}
+        </>
       )}
-    </div>
+    </Molecule3DStage>
   );
 }
 

@@ -460,6 +460,7 @@
   "molecule3d.molecularSurface": "Molecular surface",
   "molecule3d.displayOptions": "Display options",
   "molecule3d.exportImage": "Export image",
+  "molecule3d.fullScreen": "Full screen",
   "molecule3d.measure": "Measure",
   "molecule3d.clearMeasurements": "Remove all measurements",
   "molecule3d.measurement.distance": "Distance",

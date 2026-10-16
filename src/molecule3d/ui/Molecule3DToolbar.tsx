@@ -1,6 +1,6 @@
 /**
  * The toolbars floating over the molecule canvas: the view — reset, spin,
- * surface, and the options, export and help popovers — in one vertical
+ * surface, the options and export popovers, full screen and help — in one vertical
  * react-science `Toolbar`, and the measuring tools with their own clear button
  * in a second one under it.
  */
@@ -26,6 +26,14 @@ import {
   SurfaceIcon,
 } from './molecule3dIcons.tsx';
 
+/** Whether the canvas fills the screen, and how to change that. */
+export interface Molecule3DFullscreen {
+  /** Whether the canvas and its toolbars fill the screen. */
+  active: boolean;
+  /** Fill the screen, or leave it. */
+  toggle: () => void;
+}
+
 /** Props of {@link Molecule3DToolbar}. */
 export interface Molecule3DToolbarProps {
   /** Which tools to show; every one it does not name is on. */
@@ -44,6 +52,12 @@ export interface Molecule3DToolbarProps {
   options?: ReactElement;
   /** Content of the export popover; its tool is left out without one. */
   exportPanel?: ReactElement;
+  /**
+   * Whether the canvas fills the screen, and the toggle; its tool is left out
+   * without one, which is what a browser that cannot fill the screen gets.
+   * @default undefined
+   */
+  fullscreen?: Molecule3DFullscreen;
 }
 
 /**
@@ -65,18 +79,21 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
     onResetView,
     options,
     exportPanel,
+    fullscreen,
   } = props;
   const t = useChromeT();
   const tools = resolveMolecule3DTools(toolsProp);
   const showOptions = tools.options && options !== undefined;
   const showSurfaceTool = tools.surface && onShowSurfaceChange !== undefined;
   const showExport = tools.export && exportPanel !== undefined;
+  const showFullscreen = tools.fullscreen && fullscreen !== undefined;
   const hasView =
     tools.spin ||
     tools.surface ||
     tools.reset ||
     showOptions ||
     showExport ||
+    showFullscreen ||
     tools.help;
 
   return (
@@ -139,6 +156,16 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
                   tooltip: t('molecule3d.exportImage'),
                   tooltipProps: TOOLTIP_PROPS,
                 }}
+              />
+            )}
+            {showFullscreen && (
+              <Toolbar.Item
+                icon={fullscreen.active ? 'minimize' : 'fullscreen'}
+                active={fullscreen.active}
+                aria-label={t('molecule3d.fullScreen')}
+                tooltip={t('molecule3d.fullScreen')}
+                tooltipProps={TOOLTIP_PROPS}
+                onClick={fullscreen.toggle}
               />
             )}
             {tools.help && (

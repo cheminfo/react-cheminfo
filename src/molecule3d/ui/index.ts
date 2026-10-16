@@ -11,7 +11,10 @@ export { Molecule3DExport } from './Molecule3DExport.tsx';
 export type { Molecule3DExportProps } from './Molecule3DExport.tsx';
 export { Molecule3DHelp } from './Molecule3DHelp.tsx';
 export { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
-export type { Molecule3DToolbarProps } from './Molecule3DToolbar.tsx';
+export type {
+  Molecule3DFullscreen,
+  Molecule3DToolbarProps,
+} from './Molecule3DToolbar.tsx';
 export type {
   MoleculeImageRequest,
   SceneCapture,

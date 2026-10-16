@@ -484,6 +484,7 @@
   "molecule3d.molecularSurface": "Superficie molecular",
   "molecule3d.displayOptions": "Opciones de presentación",
   "molecule3d.exportImage": "Exportar la imagen",
+  "molecule3d.fullScreen": "Pantalla completa",
   "molecule3d.measure": "Medir",
   "molecule3d.clearMeasurements": "Quitar todas las medidas",
   "molecule3d.measurement.distance": "Distancia",

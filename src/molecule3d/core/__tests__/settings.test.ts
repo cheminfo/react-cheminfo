@@ -64,6 +64,7 @@ test('tools not named stay on', () => {
       surface: true,
       reset: true,
       export: true,
+      fullscreen: true,
       help: true,
     },
   );

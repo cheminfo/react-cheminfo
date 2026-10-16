@@ -125,6 +125,59 @@ test('a hidden surface says why its options are greyed, and a copy is offered', 
   await panel.screenshot({ path: 'test-results/molecule3d-copy.png' });
 });
 
+test('the canvas fills the screen with its toolbars, their menus included', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await openStory(page, 'molecule3d-moleculeviewer3d--default');
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 });
+  const fullScreen = page.getByRole('button', { name: 'Full screen' });
+  const options = page.getByRole('button', { name: 'Display options' });
+
+  await fullScreen.click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.fullscreenElement?.querySelector(
+            '[data-testid="molecule3d"]',
+          ) != null,
+      ),
+    )
+    .toBe(true);
+  await expect(fullScreen).toHaveClass(/bp6-active/);
+
+  // A menu portalled to the body would open behind the box filling the screen.
+  await options.click();
+  await expect(page.locator(PANEL)).toBeVisible();
+  expect(
+    await page.evaluate(
+      (panel) => document.fullscreenElement?.querySelector(panel) != null,
+      PANEL,
+    ),
+  ).toBe(true);
+  await page.screenshot({ path: 'test-results/molecule3d-fullscreen.png' });
+  await options.click();
+  await expect(page.locator(PANEL)).toHaveCount(0);
+
+  await fullScreen.click();
+  await expect
+    .poll(() => page.evaluate(() => document.fullscreenElement === null))
+    .toBe(true);
+  await expect(fullScreen).not.toHaveClass(/bp6-active/);
+
+  await options.click();
+  await expect(page.locator(PANEL)).toBeVisible();
+  expect(
+    await page.evaluate(
+      (panel) =>
+        document.querySelector(panel)?.closest('.bp6-portal')?.parentElement ===
+        document.body,
+      PANEL,
+    ),
+  ).toBe(true);
+});
+
 /** The camera the SharedCamera story opens on: a quarter turn about y. */
 const QUARTER_TURN = [0, Math.SQRT1_2, 0, Math.SQRT1_2] as const;
 

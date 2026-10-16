@@ -105,6 +105,12 @@ export interface Molecule3DTools {
   reset: boolean;
   /** A popover saving the picture as a PNG or an SVG. */
   export: boolean;
+  /**
+   * A toggle filling the screen with the canvas and its toolbars. It is left
+   * out where the browser cannot fill the screen, as on an iPhone or in a
+   * frame not allowed to.
+   */
+  fullscreen: boolean;
   /** A popover listing what the mouse and the keyboard do on the canvas. */
   help: boolean;
 }
@@ -117,6 +123,7 @@ export const DEFAULT_MOLECULE_3D_TOOLS: Molecule3DTools = {
   surface: true,
   reset: true,
   export: true,
+  fullscreen: true,
   help: true,
 };
 
