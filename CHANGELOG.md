@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.57.0](https://github.com/cheminfo/react-cheminfo/compare/v0.56.0...v0.57.0) (2026-10-16)
+
+
+### Features
+
+* **credits:** add country-flag-icons ([c3abb3d](https://github.com/cheminfo/react-cheminfo/commit/c3abb3d5a412537a0ed5e366d93eed7fcf31bf93))
+* **credits:** add Wikidata ([779b6c9](https://github.com/cheminfo/react-cheminfo/commit/779b6c9cdc30fd1a72ee7f2a83e5d24ae6000f40))
+* **molecule3d:** fill the screen from the 3D toolbar ([6b4484f](https://github.com/cheminfo/react-cheminfo/commit/6b4484f2a3b677365f280f635db37c3db5a0c78a))
+
 ## [0.56.0](https://github.com/cheminfo/react-cheminfo/compare/v0.55.1...v0.56.0) (2026-10-15)
 
 
