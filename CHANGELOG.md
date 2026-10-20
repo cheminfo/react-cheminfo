@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.58.0](https://github.com/cheminfo/react-cheminfo/compare/v0.57.0...v0.58.0) (2026-10-20)
+
+
+### Features
+
+* **ecosystem:** rename the naturals site to chembio ([36a1bf1](https://github.com/cheminfo/react-cheminfo/commit/36a1bf1840a6633e158ccab5aae8cc7604b48ccd))
+
 ## [0.57.0](https://github.com/cheminfo/react-cheminfo/compare/v0.56.0...v0.57.0) (2026-10-16)
 
 
