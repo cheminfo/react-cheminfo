@@ -63,6 +63,13 @@ test('the pointer target is one focusable rectangle over the whole plot', () => 
   expect(html).toContain('cursor:crosshair');
 });
 
+test('a vertical swipe on the plot is left to the page, a sideways one tracks', () => {
+  const html = render({ series: [line(0)] });
+
+  expect(html).toContain('touch-action:pan-y');
+  expect(html).not.toContain('touch-action:none');
+});
+
 test('a tracked slot draws the crosshair and a marker on each series', () => {
   const html = render({ series: [line(0), line(1)], trackedIndex: 1 });
 

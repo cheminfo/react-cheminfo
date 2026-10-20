@@ -89,6 +89,34 @@ export function nextChartSize(
   return { width: nextWidth, height: nextHeight };
 }
 
+/**
+ * The size an element is laid out at, which no CSS transform changes.
+ *
+ * `getBoundingClientRect` reports the box as painted: inside a popover that
+ * opens by scaling up from 30 %, a chart measured on its first frame is drawn
+ * at 30 % of its width, and stays so, since a transform never resizes the
+ * layout and the observer never fires again. `offsetWidth` is the laid-out
+ * size but rounded to a whole pixel, so the precise rectangle is kept unless a
+ * transform has visibly scaled it.
+ * @param element - The wrapper the chart is drawn in.
+ * @returns Its laid-out width and height.
+ */
+export function layoutSize(element: Element): {
+  width: number;
+  height: number;
+} {
+  const rect = element.getBoundingClientRect();
+  if (!hasOffsetSize(element)) {
+    return { width: rect.width, height: rect.height };
+  }
+  const { offsetWidth, offsetHeight } = element;
+  return {
+    width: Math.abs(rect.width - offsetWidth) < 1 ? rect.width : offsetWidth,
+    height:
+      Math.abs(rect.height - offsetHeight) < 1 ? rect.height : offsetHeight,
+  };
+}
+
 /** What a chart is given before its element has ever been laid out. */
 const NO_SIZE: ChartSize = { width: 0, height: 0 };
 
@@ -101,8 +129,23 @@ function read(
   element: Element,
   setSize: Dispatch<SetStateAction<ChartSize>>,
 ): void {
-  const { width, height } = element.getBoundingClientRect();
+  const { width, height } = layoutSize(element);
   setSize((current) => nextChartSize(current, width, height));
+}
+
+/**
+ * Whether an element has a laid-out size of its own, as an HTML element does
+ * and an SVG one does not. Checked by shape, so it holds outside a browser.
+ * @param element - The element.
+ * @returns True when `offsetWidth` and `offsetHeight` are numbers.
+ */
+function hasOffsetSize(
+  element: Element,
+): element is Element & { offsetWidth: number; offsetHeight: number } {
+  return (
+    typeof (element as Partial<HTMLElement>).offsetWidth === 'number' &&
+    typeof (element as Partial<HTMLElement>).offsetHeight === 'number'
+  );
 }
 
 /**

@@ -180,9 +180,11 @@ const LAYER_STYLE = {
   pointerEvents: 'none',
 } as const satisfies CSSProperties;
 
+// The slots run along x, so only a sideways finger tracks them: a vertical
+// swipe that starts on the chart still scrolls the page or the card around it.
 const SLIDER_STYLE = {
   pointerEvents: 'auto',
-  touchAction: 'none',
+  touchAction: 'pan-y',
   cursor: 'crosshair',
 } as const satisfies CSSProperties;
 
