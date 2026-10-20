@@ -737,6 +737,41 @@ button {
   }
 }
 
+/* ── Tokens for molecules.cheminfo.org ─────────────────────────────────────── */
+
+/* The heading, when the tokens were checked, and the button asking again, on
+   one line that wraps on a phone. */
+.molecules-tokens__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  gap: 0.25rem 0.75rem;
+}
+
+.molecules-tokens__title {
+  font-weight: 600;
+}
+
+.molecules-tokens__muted {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+/* A phone scrolls the table within its box, never the page sideways. */
+.molecules-tokens__scroll {
+  overflow-x: auto;
+}
+
+.molecules-tokens__table {
+  width: 100%;
+}
+
+/* A variable name breaks nowhere: it is copied into a .env as it reads. */
+.molecules-tokens__table code {
+  white-space: nowrap;
+}
+
 /* ── A narrow bar ────────────────────────────────────────────────────────── */
 
 /* The menu the pages fold into, drawn only once they no longer fit. */
