@@ -509,7 +509,7 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // A ring, the compound, with a stem leading out of it to a leaf: a natural
   // product, and the organism it came from. The leaf carries the answering
   // colour.
-  naturals: (alt) => (
+  chembio: (alt) => (
     <>
       <path
         d="M11.5 14 16.7 17 16.7 23 11.5 26 6.3 23 6.3 17Z"

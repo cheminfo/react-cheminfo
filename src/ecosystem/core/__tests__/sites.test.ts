@@ -45,7 +45,7 @@ test('the family is the twenty-seven sites, listed once each', () => {
 test('the sites not linked from the others yet are named apart', () => {
   expect(UNLISTED_SITES.map((site) => site.id)).toStrictEqual([
     'molecules',
-    'naturals',
+    'chembio',
     'wikidata',
   ] satisfies SiteId[]);
 });

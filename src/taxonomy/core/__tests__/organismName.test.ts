@@ -1,6 +1,6 @@
 /**
  * The names below are taken as their sources wrote them — LOTUS, COCONUT,
- * NPASS, CMAUP and NP Atlas, as naturals.cheminfo.org imports them — so the
+ * NPASS, CMAUP and NP Atlas, as chembio.cheminfo.org imports them — so the
  * casing, the authorities and the strains are the ones a page really meets.
  */
 

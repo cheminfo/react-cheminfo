@@ -19,9 +19,11 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#be185d', accent: '#5eead4' },
   },
   {
-    id: 'naturals',
-    name: { lead: 'naturals', alt: 'cheminfo', dot: true },
-    host: 'naturals.cheminfo.org',
+    id: 'chembio',
+    // The name splits on itself, chemistry and biology, so it carries no
+    // domain.
+    name: { lead: 'chem', alt: 'bio', dot: false },
+    host: 'chembio.cheminfo.org',
     tagline: 'Natural products, and the organisms they were found in.',
     group: 'research',
     // Moss, the green of the plants most natural products come from, 8.5

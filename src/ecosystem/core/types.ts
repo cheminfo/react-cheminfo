@@ -31,7 +31,7 @@ export type SiteId =
   | 'moles'
   | 'inorganic'
   | 'powerpoint'
-  | 'naturals'
+  | 'chembio'
   | 'wikidata';
 
 /** A site's name, split the way its own wordmark splits it. */

@@ -27,9 +27,9 @@ test('every site of the family is found by its own host', () => {
 });
 
 test('a site no menu lists yet is still found by its identifier and its host', () => {
-  expect(siteById('naturals').host).toBe('naturals.cheminfo.org');
+  expect(siteById('chembio').host).toBe('chembio.cheminfo.org');
   expect(siteById('molecules').host).toBe('molecules.cheminfo.org');
-  expect(findSiteByHost('naturals.cheminfo.org')?.id).toBe('naturals');
+  expect(findSiteByHost('chembio.cheminfo.org')?.id).toBe('chembio');
   expect(findSiteByHost('www.molecules.cheminfo.org')?.id).toBe('molecules');
   expect(siteById('wikidata').host).toBe('wikidata.cheminfo.org');
   expect(findSiteByHost('wikidata.cheminfo.org')?.id).toBe('wikidata');
