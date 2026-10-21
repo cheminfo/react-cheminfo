@@ -530,6 +530,16 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // A mass spectrum: three peaks on a baseline, the tallest, the base peak, in
+  // the answering colour. Every edge falls on a whole pixel at 16 px.
+  mz: (alt) => (
+    <>
+      <rect x="4" y="26" width="24" height="2" fill="#ffffff" />
+      <rect x="6" y="16" width="4" height="10" rx="1" fill="#ffffff" />
+      <rect x="14" y="6" width="4" height="20" rx="1" fill={alt} />
+      <rect x="22" y="12" width="4" height="14" rx="1" fill="#ffffff" />
+    </>
+  ),
   // An infobox: the structure at its top, a ring, and two rows of data under
   // it. The second row carries the answering colour, the blue of a link. Both
   // rows and the gap between them fall on whole pixels at 16 px.

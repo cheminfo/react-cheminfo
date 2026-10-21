@@ -52,4 +52,18 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     // so the link row of the mark takes a lighter blue of the same hue.
     mark: { plate: '#5c4033', accent: '#6b9bf2' },
   },
+  {
+    id: 'mz',
+    name: { lead: 'mz', alt: 'cheminfo', dot: true },
+    host: 'mz.cheminfo.org',
+    tagline: 'Mass spectra, classified by how they were measured.',
+    group: 'spectra',
+    // Ultramarine, the deep blue of a dye whose colour is its spectrum.
+    brand: '#2200c4',
+    // An orange answers it at 5.2:1 on white, for the name.
+    brandAlt: '#c2410c',
+    // The mark takes a brighter orange, so the base peak stands apart from
+    // the ultramarine plate at 16 px.
+    mark: { plate: '#2200c4', accent: '#f97316' },
+  },
 ];

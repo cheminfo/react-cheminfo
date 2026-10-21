@@ -47,6 +47,7 @@ test('the sites not linked from the others yet are named apart', () => {
     'molecules',
     'chembio',
     'wikidata',
+    'mz',
   ] satisfies SiteId[]);
 });
 
