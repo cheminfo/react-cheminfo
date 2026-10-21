@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.59.0](https://github.com/cheminfo/react-cheminfo/compare/v0.58.0...v0.59.0) (2026-10-21)
+
+
+### Features
+
+* **ecosystem:** add mz.cheminfo.org ([db1a5de](https://github.com/cheminfo/react-cheminfo/commit/db1a5dea7a7822f9ec72f34e7b7c50dbe1f3cd01))
+* **moleculesToken:** show the status of the molecules.cheminfo.org tokens ([3c8953c](https://github.com/cheminfo/react-cheminfo/commit/3c8953caefb8d643873cae06e897653aa55ecfa1))
+
+
+### Bug Fixes
+
+* **chart:** size charts by their layout box and let a vertical swipe scroll the page ([8381904](https://github.com/cheminfo/react-cheminfo/commit/8381904abe4593b893ead4961c26a0a38b88f320))
+
 ## [0.58.0](https://github.com/cheminfo/react-cheminfo/compare/v0.57.0...v0.58.0) (2026-10-20)
 
 
