@@ -1,0 +1,1 @@
+import{t as e}from"./iframe-23LsOEIP.js";e();
