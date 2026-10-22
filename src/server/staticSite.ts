@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join, relative, resolve, sep } from 'node:path';
 
-import fastifyStatic from '@fastify/static';
 import type {
   FastifyInstance,
   FastifyReply,
@@ -88,6 +87,9 @@ export async function staticSite(
   }
   const pages = await readPages(root, files, trackingScript);
 
+  // An optional peer, installed only by a site that has a server: importing
+  // react-cheminfo/server must not need it.
+  const { default: fastifyStatic } = await import('@fastify/static');
   await fastify.register(fastifyStatic, {
     root,
     serve: false,
