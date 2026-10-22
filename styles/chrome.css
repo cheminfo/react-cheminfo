@@ -354,6 +354,88 @@ button {
   font-size: 0.75rem;
 }
 
+/* ── Where a molecule comes from ─────────────────────────────────────────── */
+
+/* A source's own colour, softened: a pale tint behind the name and the hue
+   darkened for the text, so a row of badges stays calm whatever colours the
+   sources chose. The colour is set inline from what molecules publishes. */
+.source-badge {
+  --source: var(--brand);
+
+  display: inline-flex;
+  align-items: baseline;
+  padding: calc(0.1rem - 1px) calc(0.55rem - 1px);
+  border: 1px solid color-mix(in oklab, var(--source) 28%, white);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--source) 12%, white);
+  color: color-mix(in oklab, var(--source) 55%, var(--text));
+  /* Never lighter than an ink, so a pale colour a source chose stays readable. */
+  color: oklch(from var(--source) min(l, 0.45) c h);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  gap: 0.35rem;
+  line-height: 1.5;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* A source with no look of its own. */
+.source-badge--neutral {
+  --source: var(--text-muted);
+}
+
+a.source-badge:hover {
+  background: color-mix(in oklab, var(--source) 20%, white);
+  text-decoration: none;
+}
+
+/* The logo sits on a white chip of its own, so it reads on any badge colour. */
+.source-badge__logo {
+  display: inline-flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  border-radius: 50%;
+  margin-left: -0.35rem;
+  background: var(--surface);
+}
+
+.source-badge__logo img {
+  display: block;
+  max-width: 0.8rem;
+  max-height: 0.8rem;
+}
+
+.source-badge__id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.source-badge__count {
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.source-badge--compact {
+  padding: 0 calc(0.45rem - 1px);
+  font-size: 0.6875rem;
+}
+
+.source-badge--compact .source-badge__logo {
+  width: 0.95rem;
+  height: 0.95rem;
+  margin-left: -0.3rem;
+}
+
+.source-badge--compact .source-badge__logo img {
+  max-width: 0.7rem;
+  max-height: 0.7rem;
+}
+
 /* What a release's badge leaves to its hover: a header, then the commit and the
    instant as a label/value grid. The values are what a report quotes, so they
    never wrap and their digits line up. */
