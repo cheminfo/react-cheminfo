@@ -618,5 +618,12 @@
   "moleculesToken.refusedDetail": "jamais émis, ou révoqué",
   "moleculesToken.unsetDetail": "Définissez {variable} dans le fichier .env du serveur.",
   "moleculesToken.uncheckableDetail": "Ce molecules.cheminfo.org ne sait pas encore vérifier un jeton.",
-  "moleculesToken.howToChange": "Un jeton se change dans le fichier .env du serveur, et est relu au redémarrage du service. molecules.cheminfo.org en émet un nouveau avec"
+  "moleculesToken.howToChange": "Un jeton se change dans le fichier .env du serveur, et est relu au redémarrage du service. molecules.cheminfo.org en émet un nouveau avec",
+  "moleculesToken.fix.title": "Définissez un jeton valide dans {variables}",
+  "moleculesToken.fix.issueOne": "Émettez un jeton sur la page Admin de molecules.cheminfo.org :",
+  "moleculesToken.fix.issueMany": "Émettez un jeton par source sur la page Admin de molecules.cheminfo.org :",
+  "moleculesToken.fix.issueOnServer": "Ou, sur le serveur de molecules.cheminfo.org :",
+  "moleculesToken.fix.envOne": "Écrivez-le dans le fichier .env du serveur de ce site :",
+  "moleculesToken.fix.envMany": "Écrivez-les dans le fichier .env du serveur de ce site :",
+  "moleculesToken.fix.restart": "Redémarrez les services, qui ne lisent le fichier .env qu'à leur démarrage :"
 }

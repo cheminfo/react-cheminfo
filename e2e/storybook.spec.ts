@@ -171,6 +171,7 @@ const STORY_IDS = [
   'molecule3d-moleculeviewer3d--view-only',
   'molecule3d-moleculeviewer3d--with-measurement',
   'molecules-moleculestokentable--not-checked-yet',
+  'molecules-moleculestokentable--not-set',
   'molecules-moleculestokentable--operator',
   'molecules-moleculestokentable--public',
   'number-numberinput--default',

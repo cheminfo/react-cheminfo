@@ -140,3 +140,69 @@ test('before the first check, the table says when it is made', () => {
   );
   expect(html).not.toContain('<table');
 });
+
+/**
+ * The text of each code block, as it is copied.
+ * @param html - The rendered table.
+ * @returns One string per block.
+ */
+function blocks(html: string): string[] {
+  return [...html.matchAll(/<pre[^>]*>(?<code>.*?)<\/pre>/gs)].map((block) =>
+    (block.groups?.code ?? '').replaceAll('&#x27;', "'"),
+  );
+}
+
+test('a token to replace comes with the three steps that replace it', () => {
+  const html = renderToStaticMarkup(<MoleculesTokenTable checks={CHECKS} />);
+
+  expect(html).toContain(
+    'Set a valid token in MOLECULES_TOKEN_LOTUS, MOLECULES_TOKEN_NPASS, and MOLECULES_TOKEN_CMAUP',
+  );
+  expect(html).toContain(
+    'Issue one token per source on the Admin page of molecules.cheminfo.org:',
+  );
+  expect(html).toContain('href="https://molecules.cheminfo.org/admin"');
+  expect(blocks(html)).toStrictEqual([
+    "npm run tokens -- issue 'LOTUS' EMAIL\nnpm run tokens -- issue 'NPASS' EMAIL\nnpm run tokens -- issue 'CMAUP' EMAIL",
+    'MOLECULES_TOKEN_LOTUS=mct_…\nMOLECULES_TOKEN_NPASS=mct_…\nMOLECULES_TOKEN_CMAUP=mct_…',
+    'docker compose up -d',
+  ]);
+  expect(html).not.toContain('A token is changed in the server');
+});
+
+test('a token not set reads in the singular, as a warning, at the address the site names', () => {
+  const html = renderToStaticMarkup(
+    <MoleculesTokenTable
+      checks={[
+        {
+          ...unchecked,
+          variable: 'MOLECULES_TOKEN',
+          sources: ['Wikidata'],
+          verdict: 'unset',
+        },
+      ]}
+      moleculesUrl="https://molecules.fat.bb8.dev/"
+    />,
+  );
+
+  expect(html).toContain('Set a valid token in MOLECULES_TOKEN');
+  expect(html).toContain(
+    'Issue a token on the Admin page of molecules.cheminfo.org:',
+  );
+  expect(html).toContain('Write it in the .env of this site&#x27;s server:');
+  expect(html).toContain('href="https://molecules.fat.bb8.dev/admin"');
+  expect(html).toMatch(/class="[^"]*-callout [^"]*-intent-warning/);
+  expect(blocks(html).slice(0, 2)).toStrictEqual([
+    "npm run tokens -- issue 'Wikidata' EMAIL",
+    'MOLECULES_TOKEN=mct_…',
+  ]);
+});
+
+test('with every token valid, no step is shown and the table says how a token is changed', () => {
+  const html = renderToStaticMarkup(<MoleculesTokenTable checks={[VALID]} />);
+
+  expect(html).not.toContain('molecules-tokens-fix');
+  expect(html).toContain(
+    'A token is changed in the server&#x27;s .env and read again when the service restarts.',
+  );
+});

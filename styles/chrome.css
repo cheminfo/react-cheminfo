@@ -772,6 +772,27 @@ button {
   white-space: nowrap;
 }
 
+.molecules-tokens__fix {
+  margin-bottom: 0.75rem;
+}
+
+.molecules-tokens__fix ol {
+  padding-left: 1.25rem;
+  margin: 0.25rem 0 0;
+}
+
+.molecules-tokens__fix li + li {
+  margin-top: 0.6rem;
+}
+
+.molecules-tokens__fix p {
+  margin: 0 0 0.25rem;
+}
+
+.molecules-tokens__fix p + p {
+  margin-top: 0.4rem;
+}
+
 /* ── A narrow bar ────────────────────────────────────────────────────────── */
 
 /* The menu the pages fold into, drawn only once they no longer fit. */

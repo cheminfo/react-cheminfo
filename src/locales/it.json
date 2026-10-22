@@ -618,5 +618,12 @@
   "moleculesToken.refusedDetail": "mai emesso, o revocato",
   "moleculesToken.unsetDetail": "Impostare {variable} nel file .env del server.",
   "moleculesToken.uncheckableDetail": "Questo molecules.cheminfo.org non sa ancora verificare un token.",
-  "moleculesToken.howToChange": "Un token si cambia nel file .env del server e viene riletto al riavvio del servizio. molecules.cheminfo.org ne emette uno nuovo con"
+  "moleculesToken.howToChange": "Un token si cambia nel file .env del server e viene riletto al riavvio del servizio. molecules.cheminfo.org ne emette uno nuovo con",
+  "moleculesToken.fix.title": "Impostare un token valido in {variables}",
+  "moleculesToken.fix.issueOne": "Emettere un token nella pagina Admin di molecules.cheminfo.org:",
+  "moleculesToken.fix.issueMany": "Emettere un token per fonte nella pagina Admin di molecules.cheminfo.org:",
+  "moleculesToken.fix.issueOnServer": "Oppure, sul server di molecules.cheminfo.org:",
+  "moleculesToken.fix.envOne": "Scriverlo nel file .env del server di questo sito:",
+  "moleculesToken.fix.envMany": "Scriverli nel file .env del server di questo sito:",
+  "moleculesToken.fix.restart": "Riavviare i servizi, che leggono il file .env solo all'avvio:"
 }

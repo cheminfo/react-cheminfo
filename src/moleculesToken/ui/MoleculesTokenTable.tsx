@@ -1,16 +1,18 @@
 import type { Intent } from '@blueprintjs/core';
 import { Button, Callout, HTMLTable, Tag } from '@blueprintjs/core';
-import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
-import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type {
   MoleculesTokenCheck,
   MoleculesTokenVerdict,
 } from '../core/moleculesToken.ts';
+import { tokensToFix } from '../core/tokenFix.ts';
+
+import { MoleculesTokenFix } from './MoleculesTokenFix.tsx';
+import { tokenDetails } from './tokenDetails.tsx';
 
 /** What {@link MoleculesTokenTable} shows. */
 export interface MoleculesTokenTableProps {
@@ -32,6 +34,11 @@ export interface MoleculesTokenTableProps {
    * @default undefined
    */
   error?: string;
+  /**
+   * Where molecules.cheminfo.org answers, whose Admin page issues tokens.
+   * @default 'https://molecules.cheminfo.org'
+   */
+  moleculesUrl?: string;
 }
 
 const INTENT: Record<MoleculesTokenVerdict, Intent> = {
@@ -60,12 +67,12 @@ const ISSUE_COMMAND = 'npm run tokens -- issue SOURCE EMAIL';
  * The tokens a site holds for molecules.cheminfo.org, one row each, with what
  * molecules.cheminfo.org said of it when it was last checked: valid, another
  * source's, refused, not set. A token is changed in the server's `.env`, never
- * here, so the table says where.
+ * here, so the table says where, and above it how, when one has to be.
  * @param props - See {@link MoleculesTokenTableProps}.
  * @returns The table.
  */
 export function MoleculesTokenTable(props: MoleculesTokenTableProps) {
-  const { checks, pending = false, onCheckAgain, error } = props;
+  const { checks, pending = false, onCheckAgain, error, moleculesUrl } = props;
   const t = useChromeT();
   const language = useLanguage();
   const formats = useMemo(
@@ -117,6 +124,9 @@ export function MoleculesTokenTable(props: MoleculesTokenTableProps) {
           {error}
         </Callout>
       )}
+      {checks !== null && (
+        <MoleculesTokenFix checks={checks} moleculesUrl={moleculesUrl} />
+      )}
       {checks === null ? (
         <p className="molecules-tokens__muted">
           {t('moleculesToken.notChecked')}
@@ -148,102 +158,18 @@ export function MoleculesTokenTable(props: MoleculesTokenTableProps) {
                       {t(LABEL[check.verdict])}
                     </Tag>
                   </td>
-                  <td>{details(check, t, formats.instant)}</td>
+                  <td>{tokenDetails(check, t, formats.instant)}</td>
                 </tr>
               ))}
             </tbody>
           </HTMLTable>
         </div>
       )}
-      <p className="molecules-tokens__muted">
-        {t('moleculesToken.howToChange')} <code>{ISSUE_COMMAND}</code>
-      </p>
+      {(checks === null || tokensToFix(checks).length === 0) && (
+        <p className="molecules-tokens__muted">
+          {t('moleculesToken.howToChange')} <code>{ISSUE_COMMAND}</code>
+        </p>
+      )}
     </section>
   );
-}
-
-/**
- * What a row says besides its verdict.
- * @param check - The check.
- * @param t - The chrome's translator.
- * @param instant - How an instant is written.
- * @returns The cell's content.
- */
-function details(
-  check: MoleculesTokenCheck,
-  t: Translate<ChromeKey>,
-  instant: Intl.DateTimeFormat,
-): ReactNode {
-  const hint: Fact | null =
-    check.hint === null
-      ? null
-      : ['hint', <code key="hint">{check.hint}…</code>];
-  switch (check.verdict) {
-    case 'ok':
-      return facts([
-        check.sources.length === 1 || check.source === null
-          ? null
-          : ['source', t('moleculesToken.forSource', { source: check.source })],
-        check.issuedAt === null
-          ? null
-          : [
-              'issued',
-              check.email === null
-                ? t('moleculesToken.issued', {
-                    when: instant.format(check.issuedAt),
-                  })
-                : t('moleculesToken.issuedTo', {
-                    email: check.email,
-                    when: instant.format(check.issuedAt),
-                  }),
-            ],
-        [
-          'used',
-          check.lastUsedAt === null
-            ? t('moleculesToken.neverUsed')
-            : t('moleculesToken.lastUsed', {
-                when: instant.format(check.lastUsedAt),
-              }),
-        ],
-        hint,
-      ]);
-    case 'otherSource':
-      return facts([
-        [
-          'source',
-          t('moleculesToken.otherSourceDetail', {
-            source: check.source ?? '',
-          }),
-        ],
-        hint,
-      ]);
-    case 'refused':
-      return check.message ?? t('moleculesToken.refusedDetail');
-    case 'unset':
-      return t('moleculesToken.unsetDetail', { variable: check.variable });
-    case 'uncheckable':
-      return t('moleculesToken.uncheckableDetail');
-    case 'unanswered':
-      return check.message;
-    default:
-      return null;
-  }
-}
-
-/** One fact about a token, and the key it is drawn under. */
-type Fact = readonly [key: string, content: ReactNode];
-
-/**
- * Facts about a token, one after the other.
- * @param parts - The facts; null ones are left out.
- * @returns The facts, separated by a middle dot.
- */
-function facts(parts: ReadonlyArray<Fact | null>): ReactNode {
-  const shown = parts.filter((part) => part !== null);
-  return shown.map(([key, content], index) => (
-    <span key={key}>
-      {index > 0 && ' · '}
-      {content}
-    </span>
-  ));
 }

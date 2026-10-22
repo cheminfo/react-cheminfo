@@ -618,5 +618,12 @@
   "moleculesToken.refusedDetail": "nunca emitido, o revocado",
   "moleculesToken.unsetDetail": "Defina {variable} en el .env del servidor.",
   "moleculesToken.uncheckableDetail": "Este molecules.cheminfo.org aún no puede comprobar un token.",
-  "moleculesToken.howToChange": "Un token se cambia en el .env del servidor y se vuelve a leer cuando el servicio se reinicia. molecules.cheminfo.org emite uno nuevo con"
+  "moleculesToken.howToChange": "Un token se cambia en el .env del servidor y se vuelve a leer cuando el servicio se reinicia. molecules.cheminfo.org emite uno nuevo con",
+  "moleculesToken.fix.title": "Defina un token válido en {variables}",
+  "moleculesToken.fix.issueOne": "Emita un token en la página Admin de molecules.cheminfo.org:",
+  "moleculesToken.fix.issueMany": "Emita un token por fuente en la página Admin de molecules.cheminfo.org:",
+  "moleculesToken.fix.issueOnServer": "O, en el servidor de molecules.cheminfo.org:",
+  "moleculesToken.fix.envOne": "Escríbalo en el .env del servidor de este sitio:",
+  "moleculesToken.fix.envMany": "Escríbalos en el .env del servidor de este sitio:",
+  "moleculesToken.fix.restart": "Reinicie los servicios, que solo leen el .env al arrancar:"
 }

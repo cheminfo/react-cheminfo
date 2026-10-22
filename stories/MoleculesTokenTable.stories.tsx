@@ -100,3 +100,17 @@ export const Public: Story = {
 export const NotCheckedYet: Story = {
   args: { checks: null },
 };
+
+/** A site's one token, not set: the steps that set it lead the table. */
+export const NotSet: Story = {
+  args: {
+    checks: [
+      {
+        ...unchecked,
+        variable: 'MOLECULES_TOKEN',
+        sources: ['Wikidata'],
+        verdict: 'unset',
+      },
+    ],
+  },
+};
