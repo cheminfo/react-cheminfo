@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.64.0](https://github.com/cheminfo/react-cheminfo/compare/v0.63.1...v0.64.0) (2026-10-22)
+
+
+### Features
+
+* **molecule3d:** highlight atoms and the bonds between them ([5e25a87](https://github.com/cheminfo/react-cheminfo/commit/5e25a874d7a3fa8ac021fcc30ac579e432e08e46))
+
 ## [0.63.1](https://github.com/cheminfo/react-cheminfo/compare/v0.63.0...v0.63.1) (2026-10-22)
 
 
