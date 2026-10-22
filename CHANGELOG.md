@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.64.1](https://github.com/cheminfo/react-cheminfo/compare/v0.64.0...v0.64.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* **molecule3d:** redraw only the measurements when they alone change ([452884f](https://github.com/cheminfo/react-cheminfo/commit/452884f31e5a942f38163e530e21e67ff4796a4b))
+
 ## [0.64.0](https://github.com/cheminfo/react-cheminfo/compare/v0.63.1...v0.64.0) (2026-10-22)
 
 
