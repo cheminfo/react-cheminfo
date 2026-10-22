@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.63.1](https://github.com/cheminfo/react-cheminfo/compare/v0.63.0...v0.63.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* **molecule3d:** draw measurement labels in front of their atoms ([c9a2842](https://github.com/cheminfo/react-cheminfo/commit/c9a2842b4241519892b09cfe8c914b1b040c24da))
+
 ## [0.63.0](https://github.com/cheminfo/react-cheminfo/compare/v0.62.0...v0.63.0) (2026-10-22)
 
 
