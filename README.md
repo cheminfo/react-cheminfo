@@ -1229,9 +1229,11 @@ A prerendered site can also be deployed as a server, with its API and its MCP
 tools beside the pages. `staticSite` from `react-cheminfo/server` serves the
 build by the rules the static hosts follow: `/titration` is `titration.html`
 with no redirect, an unknown address is `404.html` and never the home page,
-pages are revalidated on every visit and `assets/` is kept for a year, the
-`TRACKING_SCRIPT` snippet is in every page, and `/health` answers the deploy
-script. Only a file the build wrote is ever served.
+pages are revalidated on every visit and `assets/` is kept for a year, every
+answer carries `Access-Control-Allow-Origin: *` (a page framed by a chat's
+sandboxed view fetches all its files cross-origin), the `TRACKING_SCRIPT`
+snippet is in every page, and `/health` answers the deploy script. Only a file
+the build wrote is ever served.
 
 ```ts
 import { fastify } from 'fastify';

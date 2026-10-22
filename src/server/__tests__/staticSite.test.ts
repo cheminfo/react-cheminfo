@@ -96,6 +96,39 @@ test('a hashed bundle is kept for a year, any other file is revalidated', async 
   expect(data.body).toBe('volume,pH\n0,1\n');
 });
 
+test('every answer of the site is open to any origin, as on the static hosts', async () => {
+  const app = await site();
+  const first = await app.inject({ url: '/titration' });
+  const answers = [
+    first,
+    await app.inject({
+      url: '/titration',
+      headers: { 'if-none-match': first.headers.etag },
+    }),
+    await app.inject({ url: '/assets/index-a1b2.js' }),
+    await app.inject({ url: '/demo/hcl-by-naoh.csv' }),
+    await app.inject({ url: '/nothing-here' }),
+    await app.inject({ url: '/precipitation' }),
+    await app.inject({ url: '/health' }),
+  ];
+
+  expect(answers.map((answer) => answer.statusCode)).toStrictEqual([
+    200, 304, 200, 200, 404, 301, 200,
+  ]);
+  expect(
+    answers.map((answer) => answer.headers['access-control-allow-origin']),
+  ).toStrictEqual(['*', '*', '*', '*', '*', '*', '*']);
+});
+
+test('the API decides its own origins', async () => {
+  const app = await site();
+  const tools = await app.inject({ url: '/v1/tools' });
+  const unknown = await app.inject({ url: '/v1/nothing' });
+
+  expect(tools.headers['access-control-allow-origin']).toBeUndefined();
+  expect(unknown.headers['access-control-allow-origin']).toBeUndefined();
+});
+
 test('an unknown address is the 404 page, never the home page', async () => {
   const app = await site();
   const response = await app.inject({ url: '/nothing-here' });

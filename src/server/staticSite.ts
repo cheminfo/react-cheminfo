@@ -49,6 +49,13 @@ const PAGE_CACHE = 'no-cache';
 /** A bundle is named by its content, so it never changes under its name. */
 const BUNDLE_CACHE = 'public, max-age=31536000, immutable';
 
+/**
+ * Every file of a build is public, and a page framed by a sandboxed view runs
+ * under an opaque origin, where everything it fetches from its own site is
+ * cross-origin: the static hosts open every response, and so does this server.
+ */
+const ALLOW_ORIGIN = 'access-control-allow-origin';
+
 /** Kept out of the API's documentation (`@fastify/swagger` reads `hide`). */
 const HIDDEN: FastifySchema & { hide: boolean } = { hide: true };
 
@@ -57,8 +64,9 @@ const HIDDEN: FastifySchema & { hide: boolean } = { hide: true };
  * family follows (static-web-server's `sws.toml`, Cloudflare Pages): a real
  * file per address and no fallback page, `/titration` answered without a
  * redirect, pages checked on every visit and hashed bundles kept for a year,
- * the analytics snippet in every page, `404.html` for an address the site does
- * not have, and `/health` for the deploy script.
+ * every response open to any origin, the analytics snippet in every page,
+ * `404.html` for an address the site does not have, and `/health` for the
+ * deploy script.
  *
  * Register it next to the API; a build missing (a server started before the
  * frontend was built) leaves the API alone:
@@ -77,7 +85,7 @@ export async function staticSite(
   fastify.get(
     '/health',
     { logLevel: 'silent', schema: HIDDEN },
-    (_request, reply) => reply.send({ status: 'ok' }),
+    (_request, reply) => reply.header(ALLOW_ORIGIN, '*').send({ status: 'ok' }),
   );
 
   const files = await listSiteFiles(root);
@@ -96,14 +104,10 @@ export async function staticSite(
     cacheControl: false,
     setHeaders: (reply, path) => {
       const file = relative(root, path).split(sep).join('/');
-      if (isHashedBundle(file)) {
-        reply.header('cache-control', BUNDLE_CACHE);
-        // A page framed by a sandboxed view may run under an opaque origin,
-        // and a module bundle is then fetched cross-origin.
-        reply.header('access-control-allow-origin', '*');
-      } else {
-        reply.header('cache-control', PAGE_CACHE);
-      }
+      reply.header(
+        'cache-control',
+        isHashedBundle(file) ? BUNDLE_CACHE : PAGE_CACHE,
+      );
     },
   });
 
@@ -113,6 +117,7 @@ export async function staticSite(
     if (reserved.some((prefix) => pathname.startsWith(prefix))) {
       return reply.callNotFound();
     }
+    reply.header(ALLOW_ORIGIN, '*');
     const destination =
       redirects[pathname] ?? redirects[pathname.replace(/\/$/, '')];
     if (destination !== undefined) {
