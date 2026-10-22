@@ -77,6 +77,15 @@ test('copy is always offered beside save, whatever the format', () => {
   expect(panel({ format: 'svg' })).toContain('>Copy<');
 });
 
+test('a running save or copy keeps both buttons focusable, so Escape still closes the card', () => {
+  const running = panel({ format: 'png', saving: true });
+  const idle = panel({ format: 'png' });
+
+  expect(running.match(/aria-disabled="true"/gu)).toHaveLength(2);
+  expect(running).not.toMatch(/<button[^>]*\sdisabled=""/u);
+  expect(idle).not.toContain('aria-disabled="true"');
+});
+
 test('a copy says what it put on the clipboard, whatever is saved', () => {
   const html = panel({ format: 'svg', scale: 2, notice: 'copied' });
 
@@ -106,6 +115,8 @@ interface PanelOptions {
   size?: FigurePixels;
   /** What the last copy came to. */
   notice?: FigureNotice | null;
+  /** Whether a save or a copy is running. */
+  saving?: boolean;
 }
 
 /**
@@ -115,7 +126,7 @@ interface PanelOptions {
  */
 function panel(options: PanelOptions): string {
   const { format, layout, custom = null, scale = 2, size = SCREEN } = options;
-  const { notice = null } = options;
+  const { notice = null, saving = false } = options;
   return renderToStaticMarkup(
     <FigureDownloadPanel
       title="Save figure"
@@ -125,7 +136,7 @@ function panel(options: PanelOptions): string {
       size={size}
       failure={null}
       notice={notice}
-      saving={false}
+      saving={saving}
       onFormatChange={() => null}
       onScaleChange={() => null}
       onSave={() => null}

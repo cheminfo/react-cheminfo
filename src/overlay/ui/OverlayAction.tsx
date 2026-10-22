@@ -26,6 +26,13 @@ export interface OverlayActionProps extends Omit<
    * @default 'none'
    */
   intent?: Intent;
+  /**
+   * Whether what it started is still running. A busy button ignores a press
+   * but keeps the focus, so the card around it keeps its keys: a disabled one
+   * drops the focus to the page, and Escape no longer closes the card.
+   * @default false
+   */
+  busy?: boolean;
 }
 
 /**
@@ -45,6 +52,7 @@ export function OverlayAction(props: OverlayActionProps): ReactElement {
     intent = 'none',
     help,
     disabled = false,
+    busy = false,
     testId,
   } = props;
   const { metrics } = useOverlaySurface();
@@ -58,8 +66,9 @@ export function OverlayAction(props: OverlayActionProps): ReactElement {
         icon={icon}
         text={text}
         disabled={disabled}
+        aria-disabled={busy || undefined}
         data-testid={testId}
-        onClick={onClick}
+        onClick={busy ? undefined : onClick}
       />
     </OverlayRow>
   );

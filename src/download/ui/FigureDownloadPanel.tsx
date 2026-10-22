@@ -118,13 +118,15 @@ export function FigureDownloadPanel(
             text={t('download.save')}
             icon="download"
             intent="primary"
-            disabled={saving || size === null}
+            disabled={size === null}
+            busy={saving}
             onClick={onSave}
           />
           <OverlayAction
             text={t('clipboard.copy')}
             icon="clipboard"
-            disabled={saving || size === null}
+            disabled={size === null}
+            busy={saving}
             onClick={onCopy}
           />
         </>
