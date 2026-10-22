@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.62.0](https://github.com/cheminfo/react-cheminfo/compare/v0.61.0...v0.62.0) (2026-10-22)
+
+
+### Features
+
+* **server:** open every answer of a static site to any origin ([2000f0c](https://github.com/cheminfo/react-cheminfo/commit/2000f0ce96df91f4ce27e7040e9dd48bde89ede0))
+
 ## [0.61.0](https://github.com/cheminfo/react-cheminfo/compare/v0.60.0...v0.61.0) (2026-10-22)
 
 
