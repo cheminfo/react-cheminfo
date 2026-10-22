@@ -37,9 +37,7 @@ export interface SharedCameraOptions {
 
 /**
  * What {@link useSharedCamera} answers. The same object on every render: the
- * draw effect keys on it, and a fresh one would tear the scene down and build
- * it again — which makes molstar frame the model afresh and loses the camera a
- * link had just restored.
+ * draw effect keys on it, and a fresh one would run it again for nothing.
  */
 export interface SharedCamera {
   /**

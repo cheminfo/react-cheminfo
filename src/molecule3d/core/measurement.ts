@@ -41,3 +41,50 @@ export interface Measurement {
   kind: MeasurementKind;
   atoms: readonly AtomReference[];
 }
+
+/**
+ * Whether two lists name the same measurements, of the same kinds over the
+ * same atoms, in the same order — what decides that nothing needs drawing
+ * again.
+ * @param first - One list.
+ * @param second - The other.
+ * @returns True when every measurement of one is the measurement of the other
+ * at its place.
+ */
+export function sameMeasurements(
+  first: readonly Measurement[],
+  second: readonly Measurement[],
+): boolean {
+  if (first === second) return true;
+  if (first.length !== second.length) return false;
+  for (let index = 0; index < first.length; index++) {
+    const one = first[index];
+    const other = second[index];
+    if (one === undefined || other === undefined) return false;
+    if (one.kind !== other.kind || !sameAtoms(one.atoms, other.atoms)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Whether two lists name the same atoms in the same order.
+ * @param first - One list.
+ * @param second - The other.
+ * @returns True when every atom of one is the atom of the other at its place.
+ */
+export function sameAtoms(
+  first: readonly AtomReference[],
+  second: readonly AtomReference[],
+): boolean {
+  if (first.length !== second.length) return false;
+  for (let position = 0; position < first.length; position++) {
+    const atom = first[position];
+    const match = second[position];
+    if (atom?.unit !== match?.unit || atom?.element !== match?.element) {
+      return false;
+    }
+  }
+  return true;
+}

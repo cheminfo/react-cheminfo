@@ -4,8 +4,19 @@ import { normalizeMolecule3DSettings } from '../core/settings.ts';
 
 import type { Molecule3DViewer } from './viewer.ts';
 
+/** The operations of the viewer a scene is drawn with. */
+export type SceneViewer = Pick<
+  Molecule3DViewer,
+  | 'showMolecule'
+  | 'hideMolecule'
+  | 'showSurface'
+  | 'showMeasurements'
+  | 'resetCamera'
+  | 'setCamera'
+>;
+
 /**
- * Draw the scene. `showMolecule` empties it, so the surface and the
+ * Draw the whole scene. `showMolecule` empties it, so the surface and the
  * measurements are added after the model, and the camera is framed last.
  * @param viewer - The viewer holding the canvas.
  * @param molfile - What to draw, or `null` to empty the scene.
@@ -17,7 +28,7 @@ import type { Molecule3DViewer } from './viewer.ts';
  * @returns Nothing; resolves once the scene is complete.
  */
 export async function drawScene(
-  viewer: Molecule3DViewer,
+  viewer: SceneViewer,
   molfile: Molecule3DFile | null,
   settings: Molecule3DSettings,
   measurements: readonly Measurement[],

@@ -5,18 +5,18 @@
  * The draw is coalesced into one animation frame, so dragging a slider costs
  * one rebuild rather than one per pixel, and the camera is framed only when the
  * molecule is new — a restyle that snapped the view back would undo the
- * reader's orientation.
+ * reader's orientation. What each draw rebuilds is the scene drawer's call: a
+ * change of the measurements alone redraws them and nothing else.
  */
 
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
-import type { Molecule3DCamera } from '../core/camera.ts';
 import type { Measurement } from '../core/measurement.ts';
 import type { Molecule3DFile, Molecule3DSettings } from '../core/settings.ts';
 
-import { drawScene } from './drawScene.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
+import { SceneDrawer } from './sceneDrawer.ts';
 import {
   DEFAULT_CAMERA_SETTLE_DELAY,
   useSharedCamera,
@@ -71,10 +71,7 @@ export function useMoleculeScene(options: MoleculeSceneOptions): MoleculeScene {
     onFailureChange,
     camera: cameraProps,
   } = options;
-  const framedRef = useRef<{
-    molfile: Molecule3DFile;
-    viewer: Molecule3DViewer;
-  } | null>(null);
+  const drawerRef = useRef<SceneDrawer | null>(null);
   const reportFailure = useRef(onFailureChange);
   useEffect(() => {
     reportFailure.current = onFailureChange;
@@ -92,31 +89,24 @@ export function useMoleculeScene(options: MoleculeSceneOptions): MoleculeScene {
   useEffect(() => {
     const viewer = viewerRef.current;
     if (container === null || viewer === null) return;
+    // A new viewer starts from an empty scene, so it gets a drawer of its own.
+    if (drawerRef.current?.viewer !== viewer) {
+      drawerRef.current = new SceneDrawer(viewer, camera.takeLinkedCamera);
+    }
+    const drawer = drawerRef.current;
     let cancelled = false;
     const frame = requestAnimationFrame(() => {
-      const framed = framedRef.current;
-      const isNew =
-        molfile !== null &&
-        (framed?.molfile !== molfile || framed.viewer !== viewer);
-      framedRef.current = molfile === null ? null : { molfile, viewer };
-      // The link's camera is spent on the first molecule framed; afterwards the
-      // camera is the reader's and a new molecule is framed as usual.
-      const linked: Molecule3DCamera | null = isNew
-        ? camera.takeLinkedCamera()
-        : null;
-      const frameCamera = isNew && linked === null ? frameNewMolecule : 'none';
-      void drawScene(viewer, molfile, settings, measurements, frameCamera)
-        .then(() => {
-          if (cancelled) return;
-          if (linked !== null) void viewer.setCamera(linked);
-          reportFailure.current(null);
-        })
-        .catch((error: unknown) => {
+      drawer.draw({ molfile, settings, measurements, frameNewMolecule }).then(
+        () => {
+          if (!cancelled) reportFailure.current(null);
+        },
+        (error: unknown) => {
           if (cancelled) return;
           reportFailure.current(
             error instanceof Error ? error.message : String(error),
           );
-        });
+        },
+      );
     });
     return () => {
       cancelled = true;

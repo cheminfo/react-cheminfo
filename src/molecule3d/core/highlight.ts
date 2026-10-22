@@ -9,6 +9,7 @@
  */
 
 import type { AtomReference } from './measurement.ts';
+import { sameAtoms } from './measurement.ts';
 
 /** One bonded path of atoms to emphasise on the model. */
 export interface Molecule3DHighlight {
@@ -95,14 +96,7 @@ export function sameHighlights(
     const one = first[index]?.atoms;
     const other = second[index]?.atoms;
     if (one === undefined || other === undefined) return false;
-    if (one.length !== other.length) return false;
-    for (let position = 0; position < one.length; position++) {
-      const atom = one[position];
-      const match = other[position];
-      if (atom?.unit !== match?.unit || atom?.element !== match?.element) {
-        return false;
-      }
-    }
+    if (!sameAtoms(one, other)) return false;
   }
   return true;
 }

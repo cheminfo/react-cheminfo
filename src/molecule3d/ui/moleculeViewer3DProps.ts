@@ -72,7 +72,9 @@ export interface MoleculeViewer3DProps {
   /**
    * The measurements drawn over the model, when the site owns them. They name
    * atoms by position, so they carry over to another conformer of the same
-   * molecule; a site showing an unrelated molecule should clear them.
+   * molecule; a site showing an unrelated molecule should clear them. Changing
+   * them redraws the measurements and nothing else: the model, its highlights
+   * and the camera are left as they are.
    * @default undefined
    */
   measurements?: readonly Measurement[];
