@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.63.0](https://github.com/cheminfo/react-cheminfo/compare/v0.62.0...v0.63.0) (2026-10-22)
+
+
+### Features
+
+* **molecule3d:** export Molecule3DStage, the box a 3D view fills the screen with ([0b05340](https://github.com/cheminfo/react-cheminfo/commit/0b0534084b2df4ec34f2c87d9b5c18ecc23b559c))
+
+
+### Bug Fixes
+
+* **download:** keep the focus on a figure's save and copy while they run ([f01462d](https://github.com/cheminfo/react-cheminfo/commit/f01462dfff9d8dc781b58ae07cb1fb3bfd4b8814))
+
 ## [0.62.0](https://github.com/cheminfo/react-cheminfo/compare/v0.61.0...v0.62.0) (2026-10-22)
 
 
