@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.61.0](https://github.com/cheminfo/react-cheminfo/compare/v0.60.0...v0.61.0) (2026-10-22)
+
+
+### Features
+
+* **server:** serve a prerendered site from Node with staticSite ([c1e78a6](https://github.com/cheminfo/react-cheminfo/commit/c1e78a62e0bf17ef3fbffe9c362a7c5dbce79b8a))
+
+
+### Bug Fixes
+
+* **server:** load @fastify/static on first use ([3ca30de](https://github.com/cheminfo/react-cheminfo/commit/3ca30de08a13bcf17b39949987b7f89b4f3c9ecc))
+
 ## [0.60.0](https://github.com/cheminfo/react-cheminfo/compare/v0.59.0...v0.60.0) (2026-10-22)
 
 
