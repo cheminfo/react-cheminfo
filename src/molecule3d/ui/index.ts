@@ -10,6 +10,8 @@
 export { Molecule3DExport } from './Molecule3DExport.tsx';
 export type { Molecule3DExportProps } from './Molecule3DExport.tsx';
 export { Molecule3DHelp } from './Molecule3DHelp.tsx';
+export { Molecule3DStage } from './Molecule3DStage.tsx';
+export type { Molecule3DStageProps } from './Molecule3DStage.tsx';
 export { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
 export type {
   Molecule3DFullscreen,

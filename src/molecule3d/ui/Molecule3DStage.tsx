@@ -18,8 +18,16 @@ import type { Molecule3DFullscreen } from './Molecule3DToolbar.tsx';
 
 /** Props of {@link Molecule3DStage}. */
 export interface Molecule3DStageProps {
-  /** Style of the box. */
-  style: CSSProperties;
+  /**
+   * Style of the box, or a function handed whether the box fills the screen,
+   * for a box shaped differently while it does.
+   */
+  style: CSSProperties | ((fillsScreen: boolean) => CSSProperties);
+  /**
+   * Called with the box once it is mounted, and with `null` once it is gone.
+   * @default undefined
+   */
+  onStage?: (element: HTMLDivElement | null) => void;
   /**
    * What is drawn in the box, handed whether it fills the screen and the
    * toggle, or `undefined` where the browser cannot fill the screen.
@@ -46,7 +54,7 @@ interface StageProps extends Molecule3DStageProps {
 }
 
 function Stage(props: StageProps): ReactElement {
-  const { style, children, fullscreenRef } = props;
+  const { style, onStage, children, fullscreenRef } = props;
   const { isFullScreen, toggle } = useFullscreen();
   const portal = useContext(PortalContext);
   const [canFillScreen] = useState(isFullscreenEnabled);
@@ -55,14 +63,18 @@ function Stage(props: StageProps): ReactElement {
     (element: HTMLDivElement | null) => {
       fullscreenRef.current = element;
       setStage(element);
+      onStage?.(element);
     },
-    [fullscreenRef],
+    [fullscreenRef, onStage],
   );
 
   // The provider is always there, so entering full screen changes a value
   // rather than the tree, and the canvas inside is never mounted again.
   return (
-    <div ref={stageRef} style={style}>
+    <div
+      ref={stageRef}
+      style={typeof style === 'function' ? style(isFullScreen) : style}
+    >
       <PortalProvider
         portalClassName={portal.portalClassName}
         portalContainer={
