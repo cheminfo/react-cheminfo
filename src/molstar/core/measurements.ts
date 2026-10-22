@@ -19,6 +19,7 @@ import type {
 } from 'molstar/lib/mol-model/structure.js';
 import { StructureElement } from 'molstar/lib/mol-model/structure.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
+import type { StructureMeasurementManager } from 'molstar/lib/mol-plugin-state/manager/structure/measurement.js';
 import { MeasurementGroupTag } from 'molstar/lib/mol-plugin-state/manager/structure/measurement.js';
 import { StateSelection, StateTransform } from 'molstar/lib/mol-state/index.js';
 
@@ -60,18 +61,45 @@ export async function renderMeasurements(
   if (structure === undefined) return;
   const manager = plugin.managers.structure.measurement;
   for (const measurement of measurements) {
-    const [a, b, c, d] = atomLoci(structure, measurement.atoms);
-    /* eslint-disable no-await-in-loop -- each add commits to the state tree, and commits must not interleave */
-    if (measurement.kind === 'distance' && a && b) {
-      await manager.addDistance(a, b);
-    } else if (measurement.kind === 'angle' && a && b && c) {
-      await manager.addAngle(a, b, c);
-    } else if (measurement.kind === 'dihedral' && a && b && c && d) {
-      await manager.addDihedral(a, b, c, d);
-    }
-    /* eslint-enable no-await-in-loop */
+    // eslint-disable-next-line no-await-in-loop -- each add commits to the state tree, and commits must not interleave
+    await addMeasurement(
+      manager,
+      measurement.kind,
+      atomLoci(structure, measurement.atoms),
+    );
   }
 }
+
+/**
+ * Add one measurement to the scene, its label in front of the atoms it names.
+ * @param manager - molstar's measurement manager.
+ * @param kind - What is measured.
+ * @param loci - Its atoms, in order; fewer than the kind needs adds nothing.
+ * @returns Nothing; resolves once the measurement is committed.
+ */
+export async function addMeasurement(
+  manager: Pick<
+    StructureMeasurementManager,
+    'addDistance' | 'addAngle' | 'addDihedral'
+  >,
+  kind: MeasurementKind,
+  loci: readonly StructureElement.Loci[],
+): Promise<void> {
+  const [a, b, c, d] = loci;
+  if (kind === 'distance' && a && b) {
+    await manager.addDistance(a, b, MEASUREMENT_LABEL);
+  } else if (kind === 'angle' && a && b && c) {
+    await manager.addAngle(a, b, c, MEASUREMENT_LABEL);
+  } else if (kind === 'dihedral' && a && b && c && d) {
+    await manager.addDihedral(a, b, c, d, MEASUREMENT_LABEL);
+  }
+}
+
+/**
+ * A label drawn at the depth of its atoms hides half behind them: it is drawn
+ * in front of them, as molstar's own order labels are.
+ */
+const MEASUREMENT_LABEL = { labelParams: { offsetZ: 0.75 } };
 
 /**
  * Remove every measurement from the scene.
