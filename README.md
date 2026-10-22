@@ -36,6 +36,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/ui`                | every React component and hook — 60 value exports     | React                                            |
 | `react-cheminfo/vite`              | the prerender plugin and the OG card                  | nothing; React on the card                       |
 | `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware             | nothing                                          |
+| `react-cheminfo/server`            | the prerendered build, served from Node               | fastify, @fastify/static; Node only              |
 | `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                          | React, molstar                                   |
 | `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                | React, molstar                                   |
 | `react-cheminfo/structure`         | the structure editor and renderer                     | React, react-ocl, OCL                            |
@@ -1221,6 +1222,34 @@ view costs one invocation rather than one per asset:
 ```json
 { "version": 1, "include": ["/*"], "exclude": ["/assets/*"] }
 ```
+
+### On a Node server, next to an API
+
+A prerendered site can also be deployed as a server, with its API and its MCP
+tools beside the pages. `staticSite` from `react-cheminfo/server` serves the
+build by the rules the static hosts follow: `/titration` is `titration.html`
+with no redirect, an unknown address is `404.html` and never the home page,
+pages are revalidated on every visit and `assets/` is kept for a year, the
+`TRACKING_SCRIPT` snippet is in every page, and `/health` answers the deploy
+script. Only a file the build wrote is ever served.
+
+```ts
+import { fastify } from 'fastify';
+import { staticSite } from 'react-cheminfo/server';
+
+const app = fastify();
+// …the API under /v1/…
+await app.register(staticSite, {
+  root: 'dist',
+  trackingScript: process.env.TRACKING_SCRIPT,
+  redirects: { '/precipitation': '/equilibrium' },
+});
+```
+
+Addresses under `reserved` (default `['/v1/']`) are left to the API, which
+answers its own 404. Without a build, `staticSite` logs it and serves the API
+alone. `fastify` (5) and `@fastify/static` (10) are optional peers, installed
+by a site that has a server.
 
 ## Saying which build is running
 
