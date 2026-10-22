@@ -9,10 +9,12 @@
  */
 
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
+import { Color } from 'molstar/lib/mol-util/color/color.js';
 
 import {
   DEFAULT_CAMERA_DURATION,
   DEFAULT_SPIN_SPEED,
+  HighlightPainter,
   MeasurementPicker,
   MolstarPlugin,
   captureScene,
@@ -22,11 +24,13 @@ import {
 } from '../../molstar/core/index.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
 import type { ImageSize } from '../core/exportImage.ts';
+import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 import type { Molecule3DFile } from '../core/settings.ts';
 
 import { applyCamera, resetCamera, watchCamera } from './camera.ts';
 import {
+  MODEL_REPRESENTATION_REF,
   clearMolecule,
   moleculeStructure,
   renderMolecule,
@@ -45,6 +49,7 @@ import type {
 export class Molecule3DViewer {
   readonly #plugin: MolstarPlugin;
   #picker: MeasurementPicker | undefined;
+  #painter: HighlightPainter | undefined;
 
   /** Resolves once the canvas exists; every method awaits it internally. */
   readonly ready: Promise<void>;
@@ -66,6 +71,7 @@ export class Molecule3DViewer {
           onMeasure,
           moleculeStructure,
         );
+        this.#painter = new HighlightPainter(plugin, MODEL_REPRESENTATION_REF);
       })
       .catch(ignore);
   }
@@ -121,6 +127,22 @@ export class Molecule3DViewer {
     return this.#run((plugin) =>
       renderMeasurements(plugin, measurements, moleculeStructure),
     );
+  }
+
+  /**
+   * Emphasise exactly these paths of atoms on the model — this one and every
+   * one drawn after it — without redrawing the scene or moving the camera.
+   * @param highlights - Replaces what is emphasised; empty restores the model.
+   * @param color - What they are painted in, as `#rrggbb`.
+   * @returns Nothing; resolves once the model is repainted.
+   */
+  setHighlights(
+    highlights: readonly Molecule3DHighlight[],
+    color: string,
+  ): Promise<void> {
+    return this.#run(() => {
+      this.#painter?.set(highlights, Color.fromHexStyle(color));
+    });
   }
 
   /**
@@ -202,6 +224,7 @@ export class Molecule3DViewer {
   /** Tear the viewer down and release its WebGL context. Idempotent. */
   dispose(): void {
     this.#picker?.dispose();
+    this.#painter?.dispose();
     this.#plugin.dispose();
   }
 

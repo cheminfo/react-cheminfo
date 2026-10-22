@@ -7,6 +7,9 @@ import { formatMolecule3DCamera } from '../src/molecule3d/core/camera.ts';
 import { MoleculeViewer3D } from '../src/molecule3d/ui/MoleculeViewer3D.tsx';
 import type { MoleculeViewer3DProps } from '../src/molecule3d/ui/moleculeViewer3DProps.ts';
 
+import { GeometryHighlightsDemo } from './GeometryHighlightsDemo.tsx';
+import { ACETONE } from './acetoneFixtures.ts';
+
 /** One butane conformer, as OpenChemLib's conformer generator wrote it. */
 const BUTANE = `#1
 OCL MolfileCreator  3D
@@ -90,6 +93,17 @@ export const WithMeasurement: Story = {
       },
     ],
   },
+};
+
+/**
+ * Acetone beside its geometry, as a 3D answer card lists it. The row under the
+ * pointer, or the one last clicked, is highlighted on the model: C–H ×6 to
+ * begin with, whose six bonds and eight atoms take the site's accent while the
+ * C–C and C=O bonds between them keep their colours.
+ */
+export const Highlights: Story = {
+  args: { molfile: { format: 'mol', data: ACETONE } },
+  render: (args) => <GeometryHighlightsDemo {...args} />,
 };
 
 /** The surface on, and the model turning. */

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { ViewerCapability } from '../../orbital/ui/capability.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
+import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement } from '../core/measurement.ts';
 import type {
   Molecule3DFile,
@@ -80,6 +81,18 @@ export interface MoleculeViewer3DProps {
    * @default undefined
    */
   onMeasurementsChange?: (measurements: readonly Measurement[]) => void;
+  /**
+   * The parts of the model to emphasise in the site's accent colour, each a
+   * bonded path of atoms named as measurements name them: two atoms are that
+   * bond, three the two bonds of an angle, four the three bonds of a dihedral,
+   * and one atom is that atom alone. Only the bonds between consecutive atoms
+   * of one path are emphasised, never another bond between two highlighted
+   * atoms, and an atom the structure lacks is skipped. Changing them repaints
+   * the model and nothing else: the camera, the measurements and the hover are
+   * left as they are.
+   * @default [] — nothing is emphasised
+   */
+  highlights?: readonly Molecule3DHighlight[];
   /**
    * Where the camera stands when the first molecule is framed — what a shared
    * link carries. The camera belongs to whoever is dragging it afterwards, so

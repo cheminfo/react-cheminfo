@@ -10,6 +10,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { DEFAULT_SPIN_SPEED } from '../../molstar/core/index.ts';
+import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 import {
   normalizeMolecule3DSettings,
@@ -21,6 +22,7 @@ import { Molecule3DOptions } from './Molecule3DOptions.tsx';
 import { Molecule3DStage } from './Molecule3DStage.tsx';
 import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
 import { createMolecule3DViewer } from './createViewer.ts';
+import { highlightColorOf } from './highlightColor.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
 import { useControlledState } from './useControlledState.ts';
 import { useImageExport } from './useImageExport.ts';
@@ -56,6 +58,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     spinSpeed = DEFAULT_SPIN_SPEED,
     measurements: measurementsProp,
     onMeasurementsChange,
+    highlights = NO_HIGHLIGHTS,
     fileName = 'molecule',
     background,
     minHeight = 320,
@@ -133,6 +136,14 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     void viewerRef.current?.setMeasureKind(measureKind);
   }, [container, measureKind]);
 
+  // Kept out of the scene: a new highlight repaints the model, never redraws it.
+  useEffect(() => {
+    void viewerRef.current?.setHighlights(
+      highlights,
+      highlightColorOf(container),
+    );
+  }, [container, highlights]);
+
   const { resetView } = useMoleculeScene({
     container,
     viewerRef,
@@ -203,6 +214,8 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
 }
 
 const NO_MEASUREMENTS: readonly Measurement[] = [];
+
+const NO_HIGHLIGHTS: readonly Molecule3DHighlight[] = [];
 
 const STAGE_STYLE: CSSProperties = {
   position: 'relative',

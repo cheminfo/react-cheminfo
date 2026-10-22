@@ -1,6 +1,6 @@
 /**
  * The molstar layer under the 3D views: the plugin lifecycle, the camera, the
- * hover labels, the measurements and the picture of a scene.
+ * hover labels, the measurements, the highlights and the picture of a scene.
  *
  * Three of our sites mount a headless molstar canvas — the molecule viewer
  * here, lcao's orbitals and symmetry's crystals — and each of them had its own
@@ -25,6 +25,7 @@ export {
   framedRadius,
   setSpin,
 } from './camera.ts';
+export { HighlightPainter, highlightOverpaint } from './highlights.ts';
 export { atomName, atomText, lociText, subscribeHover } from './hover.ts';
 export type { MolstarPluginOptions } from './plugin.ts';
 export { MolstarPlugin } from './plugin.ts';

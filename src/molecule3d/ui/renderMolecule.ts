@@ -26,7 +26,7 @@ export const MOLECULE_STRUCTURE_REF = 'molecule3d-structure';
 const MOLECULE_DATA_REF = 'molecule3d-data';
 
 /** The drawn model, replaced in place whenever the style changes. */
-const MODEL_REPRESENTATION_REF = 'molecule3d-model';
+export const MODEL_REPRESENTATION_REF = 'molecule3d-model';
 
 /**
  * molstar's ball-and-stick radius factor that a size factor of 1 stands for:

@@ -165,6 +165,7 @@ const STORY_IDS = [
   'hooks-uselistkeyboardnavigation--default',
   'hooks-uselistkeyboardnavigation--default-page-step',
   'molecule3d-moleculeviewer3d--default',
+  'molecule3d-moleculeviewer3d--highlights',
   'molecule3d-moleculeviewer3d--polar-surface',
   'molecule3d-moleculeviewer3d--shared-camera',
   'molecule3d-moleculeviewer3d--surface-and-spin',

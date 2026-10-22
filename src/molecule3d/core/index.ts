@@ -17,6 +17,12 @@ export { dataUriBytes, rasterSvgMarkup } from './exportImage.ts';
 export type { Molecule3DGesture, Molecule3DGestureKey } from './gestures.ts';
 export { MOLECULE_3D_GESTURES } from './gestures.ts';
 export type {
+  HighlightedBond,
+  HighlightedParts,
+  Molecule3DHighlight,
+} from './highlight.ts';
+export { highlightedParts, sameHighlights } from './highlight.ts';
+export type {
   AtomReference,
   Measurement,
   MeasurementKind,
