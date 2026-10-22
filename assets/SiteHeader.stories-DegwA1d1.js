@@ -1,0 +1,148 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{c as t,i as n,r,s as i}from"./lookup-attq9aNX.js";import{h as a,n as o}from"./iframe-BfDMxkta.js";import{i as ee,n as te,r as s,t as c}from"./useT-4S5aAz4G.js";import{n as l,t as ne}from"./Wordmark-CQk30Jg4.js";import{n as u,t as re}from"./marks-DrtREAYS.js";import{n as d,t as ie}from"./CiteButton-BjOydIOq.js";import{n as ae}from"./navItem-6b8YIPQN.js";import{a as f,c as p,i as oe,l as m,o as se,s as h,t as g}from"./chromeFixtures-B7FnFARF.js";import{n as _,t as v}from"./AccountButton-Dw9p3r7z.js";import{r as ce,t as le}from"./paper-Cd7wdwx9.js";import{n as ue,t as de}from"./EcosystemButton-CTxTJoKM.js";import{n as y,t as b}from"./NavMenuButton-BLaDgXWq.js";import{n as fe,t as pe}from"./ShareButton-CEoehLXH.js";import{n as me,t as he}from"./SiteFooter-B0qEzoxE.js";function x(e,t=S){return t[e]??t.en??``}function ge(e,t){let{site:n,page:r=``}=t;return e.replaceAll(`{site}`,encodeURIComponent(n)).replaceAll(`{page}`,encodeURIComponent(r))}var S;function C(){return(C=e((()=>{S={en:`https://docs.google.com/forms/d/e/1FAIpQLSd_1G3tUOEJh_qapmLn_xrybWa9Nu7B57bpYm76o4nwPKPWsg/viewform?usp=pp_url&entry.569380734={site}&entry.2103045774={page}`}})))()}function w(e){let{siteId:t,page:n=globalThis.location?.href??``,label:r,title:i,className:a}=e,o=te(),s=ee(),c=e.formUrl??x(s);return c===``?null:(0,_e.jsx)(p,{item:{id:`contact`,label:r??o(`chrome.contact`),icon:`chat`,href:ge(c,{site:t,page:n}),external:!0,title:i??o(`chrome.contactTitle`)},className:a})}var _e;function T(){return(T=e((()=>{m(),s(),c(),C(),_e=o(),w.__docgenInfo={description:`The Contact entry of a site header: it opens the family's contact form in a new tab,
+with the site and the page already filled in, so the reader only writes the message.
+The form is opened, never embedded, so nothing is loaded from it before the click.
+@param props - The site, and the form it opens.
+@returns The entry, or nothing while no form address is set.`,methods:[],displayName:`ContactButton`,props:{siteId:{required:!0,tsType:{name:`string`},description:`The site the reader writes about, written into the form.`},formUrl:{required:!1,tsType:{name:`string`},description:"Address of the form, with `{site}` and `{page}` where they are written.\n@default the family's form in the language of the page (`CONTACT_FORM_URLS`)"},page:{required:!1,tsType:{name:`string`},description:`The page the reader is on, written into the form.
+@default the address of the current page`},label:{required:!1,tsType:{name:`string`},description:`What the entry reads. In a compact bar it is not written, but it stays what
+the pointer and a screen reader are told.
+@default the chrome's own word for it, in the language of the page`},title:{required:!1,tsType:{name:`string`},description:`What the pointer is told.
+@default the chrome's own sentence, in the language of the page`},className:{required:!1,tsType:{name:`string`},description:`Class names added after the component's own.
+@default undefined`}}}})))()}function E(e){let{item:t,activeId:n}=e;return t.items===void 0?(0,D.jsx)(p,{item:t,active:t.id===n}):(0,D.jsx)(b,{label:ve(t),icon:typeof t.icon==`string`?t.icon:void 0,items:t.items,activeId:n,placement:`bottom-start`})}function ve(e){return typeof e.label==`string`?e.label:e.title??e.id}var D;function O(){return(O=e((()=>{m(),y(),D=o(),E.__docgenInfo={description:`One page of the bar: a link, or the menu it opens when the entry folds pages
+of its own. A menu stands where its pages would, among them and not among the
+utilities, because picking one of them changes what the page shows.
+@param props - The entry and the page on show.
+@param props.item - The entry.
+@param props.activeId - The page on show.
+@returns The entry.`,methods:[],displayName:`NavEntry`,props:{item:{required:!0,tsType:{name:`NavItem`},description:``},activeId:{required:!0,tsType:{name:`union`,raw:`string | undefined`,elements:[{name:`string`},{name:`undefined`}]},description:``}}}})))()}function k(e){let{siteId:t,site:r,mark:i,nav:a,activeId:o,actions:s,share:c,account:l,contact:u,renderNavItem:d,embedded:ie=!1,homeHref:f=`/`,onHome:p,markSize:oe=28,width:m=`page`,pagesLabel:se}=e,h=te(),g=ee();if(ie)return null;let _=r??(t===void 0?void 0:n(t));if(_===void 0)throw Error("SiteHeader needs one of its `site` and `siteId` props");let v=u===!1?``:u??x(g);return(0,j.jsx)(`header`,{className:`app-header no-print`,children:(0,j.jsxs)(`div`,{className:ye[m],children:[(0,j.jsxs)(`a`,{className:`brand`,href:f,title:_.host,onClick:e=>{p===void 0||ae(e)||(e.preventDefault(),p())},children:[i??(0,j.jsx)(re,{site:_,size:oe}),(0,j.jsx)(ne,{site:_})]}),(0,j.jsx)(`nav`,{className:`app-header-nav`,children:a.map(e=>(0,j.jsx)(A.Fragment,{children:d===void 0?(0,j.jsx)(E,{item:e,activeId:o}):d(e,e.id===o)},e.id))}),a.length>1?(0,j.jsx)(`div`,{className:`app-header-nav-menu`,children:(0,j.jsx)(b,{label:se??h(`chrome.pages`),icon:`menu`,compact:!0,items:a,activeId:o})}):null,(0,j.jsx)(`span`,{className:`spacer`}),s===void 0&&c===void 0&&l===void 0&&v===``?null:(0,j.jsxs)(`div`,{className:`app-header-actions`,children:[s,v===``?null:(0,j.jsx)(w,{siteId:_.id,formUrl:v}),c,l]})]})})}var A,j,ye;function be(){return(be=e((()=>{A=a(),C(),T(),r(),l(),u(),s(),c(),O(),y(),j=o(),ye={page:`app-header__inner`,full:`app-header__inner app-header__inner--full`},k.__docgenInfo={description:`The bar every site of the family carries: the brand linking home at the left,
+the pages next to it, and the utilities pushed to the right edge by the
+spacer.
+
+The bar folds on its own width, with no hook to wire: under 48rem the
+utilities keep only their icons, under 36rem the pages fold into one menu,
+and under 22rem the name gives way to the mark.
+@param props - The site, its pages, its utilities, and whether the page is
+framed in another site.
+@returns The bar, or nothing at all on an embedded page.
+@throws {Error} When neither \`site\` nor \`siteId\` is given.`,methods:[],displayName:`SiteHeader`,props:{siteId:{required:!1,tsType:{name:`union`,raw:`| 'learn'
+| 'inchi'
+| 'vcl'
+| 'smiles'
+| 'iupac-name'
+| 'openbabel'
+| 'chemcalc'
+| 'dbe'
+| 'nmrium'
+| 'metabo'
+| 'derepflow'
+| 'surge'
+| 'tex'
+| 'lcao'
+| 'regexp'
+| 'pdb'
+| 'elucidation'
+| 'equilibrium'
+| 'polycarp'
+| '3d'
+| 'periodic-table'
+| 'database'
+| 'molecules'
+| 'symmetry'
+| 'osiris'
+| 'atoms'
+| 'moles'
+| 'inorganic'
+| 'powerpoint'
+| 'chembio'
+| 'wikidata'
+| 'mz'`,elements:[{name:`literal`,value:`'learn'`},{name:`literal`,value:`'inchi'`},{name:`literal`,value:`'vcl'`},{name:`literal`,value:`'smiles'`},{name:`literal`,value:`'iupac-name'`},{name:`literal`,value:`'openbabel'`},{name:`literal`,value:`'chemcalc'`},{name:`literal`,value:`'dbe'`},{name:`literal`,value:`'nmrium'`},{name:`literal`,value:`'metabo'`},{name:`literal`,value:`'derepflow'`},{name:`literal`,value:`'surge'`},{name:`literal`,value:`'tex'`},{name:`literal`,value:`'lcao'`},{name:`literal`,value:`'regexp'`},{name:`literal`,value:`'pdb'`},{name:`literal`,value:`'elucidation'`},{name:`literal`,value:`'equilibrium'`},{name:`literal`,value:`'polycarp'`},{name:`literal`,value:`'3d'`},{name:`literal`,value:`'periodic-table'`},{name:`literal`,value:`'database'`},{name:`literal`,value:`'molecules'`},{name:`literal`,value:`'symmetry'`},{name:`literal`,value:`'osiris'`},{name:`literal`,value:`'atoms'`},{name:`literal`,value:`'moles'`},{name:`literal`,value:`'inorganic'`},{name:`literal`,value:`'powerpoint'`},{name:`literal`,value:`'chembio'`},{name:`literal`,value:`'wikidata'`},{name:`literal`,value:`'mz'`}]},description:"The site the bar belongs to, which draws its mark and writes its name. One\nof `site` and `siteId` is required.\n@default undefined"},site:{required:!1,tsType:{name:`SiteRecord`},description:`The same site, passed rather than named — for a site that is deliberately
+not one of \`ECOSYSTEM_SITES\`, and so is linked from no other site's menu.
+@default undefined`},mark:{required:!1,tsType:{name:`ReactNode`},description:`The site's own mark, for a site the shared glyph set does not hold. It
+stands where \`SiteMark\` would, at the size the site draws it.
+@default undefined — the family's mark for that site`},nav:{required:!0,tsType:{name:`unknown`},description:`The pages, in the order the bar lists them.`},activeId:{required:!1,tsType:{name:`string`},description:"Which of the pages is on show, named by its `id`.\n@default undefined"},actions:{required:!1,tsType:{name:`ReactNode`},description:`The utilities pushed to the right edge — About, Cite, Tools, the language;
+Share and the account have props of their own, so they always come last.
+They arrive dressed as bar items, so a plain \`nav-link\` and a \`CiteButton\`
+read alike beside each other.
+@default undefined`},account:{required:!1,tsType:{name:`ReactNode`},description:"Who is signed in, drawn at the extreme right, after Share — usually an\n`AccountButton`. A site passes it only while somebody is signed in: signing\nin starts on the About (`AboutPage`'s `signIn`), never in the bar.\n@default undefined"},share:{required:!1,tsType:{name:`ReactNode`},description:`The Share entry, which closes the utilities on every site, after the
+Contact entry. A site passes its own when it wraps the shared \`ShareButton\`
+in a dialog of its own.
+@default undefined`},contact:{required:!1,tsType:{name:`union`,raw:`string | false`,elements:[{name:`string`},{name:`literal`,value:`false`}]},description:"The contact form the Contact entry opens, drawn after the site's utilities\nand just before Share, with\n`{site}` and `{page}` where the site and the page are written; `false`\nleaves the entry out. No entry is drawn while there is no form.\n@default the family's form in the language of the page (`CONTACT_FORM_URLS`)"},renderNavItem:{required:!1,tsType:{name:`signature`,type:`function`,raw:`(item: NavItem, isActive: boolean) => ReactNode`,signature:{arguments:[{type:{name:`NavItem`},name:`item`},{type:{name:`boolean`},name:`isActive`}],return:{name:`ReactNode`}}},description:`Draws one page the site's own way, for a bar whose entries need a tooltip
+or a wrapper of their own.
+@default undefined`},embedded:{required:!1,tsType:{name:`boolean`},description:`Whether the page is framed in another site, in which case no bar is drawn
+at all — what a host page frames already carries its own navigation.
+@default false`},homeHref:{required:!1,tsType:{name:`string`},description:`Where the brand leads.
+@default '/'`},onHome:{required:!1,tsType:{name:`signature`,type:`function`,raw:`() => void`,signature:{arguments:[],return:{name:`void`}}},description:`What the site does when the brand is picked, for a page that routes in
+place. A modified click is left to the browser.
+@default undefined`},markSize:{required:!1,tsType:{name:`number`},description:`Edge of the site's mark, in pixels.
+@default 28`},width:{required:!1,tsType:{name:`union`,raw:`'page' | 'full'`,elements:[{name:`literal`,value:`'page'`},{name:`literal`,value:`'full'`}]},description:`How wide the bar's contents run.
+
+\`page\` caps them at \`--page-max\` and centres them, so the brand sits over
+the first word of a page that is capped the same way — which is what a
+site of reading matter wants. \`full\` runs them to both edges, for a tool
+that fills the window: there the cap leaves the brand floating inwards
+with the tool running past it on both sides, and reads as a fault.
+@default 'page'`},pagesLabel:{required:!1,tsType:{name:`string`},description:`What the menu the pages fold into on a phone is called, for the pointer
+and a screen reader.
+@default the chrome's own word for it, in the language of the page`}}}})))()}function xe(e,t={}){let{maxWidth:n=N}=t,r=(0,M.useCallback)(t=>Ce(e?.current??null,t),[e]),i=(0,M.useCallback)(()=>Se(e?.current??null,n),[e,n]);return(0,M.useSyncExternalStore)(r,i,we)}function Se(e,t=N){let n=e===null?0:e.clientWidth,r=n>0?n:globalThis.innerWidth;return!Number.isFinite(r)||r<=0?!1:r<=t}function Ce(e,t){if(e!==null&&typeof ResizeObserver==`function`){let n=new ResizeObserver(t);return n.observe(e),()=>n.disconnect()}return globalThis.addEventListener(`resize`,t),()=>globalThis.removeEventListener(`resize`,t)}function we(){return!1}var M,N;function P(){return(P=e((()=>{M=a(),N=1e3})))()}function F(e){return e.siteId??`smiles`}function Te(e){let t=(0,z.useRef)(null),n=xe(t,{maxWidth:640}),{nav:r,activeId:i}=e,a=F(e);return(0,B.jsx)(R,{siteId:a,children:(0,B.jsxs)(`div`,{style:{padding:`1.25rem`},children:[(0,B.jsx)(`div`,{ref:t,style:ke,children:(0,B.jsx)(k,{...e,nav:n?[Ae]:r,actions:(0,B.jsx)(I,{siteId:a,compact:n}),share:(0,B.jsx)(L,{compact:n}),renderNavItem:n?()=>(0,B.jsx)(b,{label:`Pages`,icon:`menu`,items:r,activeId:i}):void 0})}),(0,B.jsxs)(`p`,{style:{...U,padding:`0.75rem 0 0`},children:[`useCompactHeader: `,(0,B.jsx)(`code`,{children:String(n)}),` — drag the right edge of the bar past 640 px.`]})]})})}function I(e){let{siteId:t,compact:n=!1}=e;return(0,B.jsxs)(B.Fragment,{children:[(0,B.jsx)(ie,{reference:le,compact:n}),(0,B.jsx)(de,{currentSiteId:t,compact:n})]})}function L(e){let{compact:t=!1}=e;return(0,B.jsx)(pe,{onClick:h,compact:t})}function R(e){let t=n(e.siteId),r={"--brand":t.brand,"--brand-alt":t.brandAlt,"--accent":t.brand};return(0,B.jsx)(`div`,{style:r,children:e.children})}var z,B,V,H,U,W,G,K,q,J,Y,X,Z,Ee,De,Q,Oe,$,ke,Ae,je;function Me(){return(Me=e((()=>{z=a(),_(),m(),y(),me(),be(),P(),d(),r(),t(),ue(),fe(),se(),ce(),B=o(),V=i.map(e=>e.id),H=`
+.sb-hovered {
+  background: var(--surface-sunken);
+  color: var(--text);
+}`,U={padding:`0.75rem 1.25rem 0`,margin:0,color:`var(--text-muted)`,fontSize:`0.8125rem`},W={title:`Chrome/SiteHeader`,component:k,args:{siteId:`smiles`,nav:f,activeId:`draw`,markSize:28,homeHref:`/`,embedded:!1},argTypes:{siteId:{control:`select`,options:V},activeId:{control:`select`,options:f.map(e=>e.id)},markSize:{control:{type:`range`,min:16,max:48,step:2}},homeHref:{control:`text`},embedded:{control:`boolean`},nav:{control:!1},actions:{control:!1},share:{control:!1},account:{control:!1},renderNavItem:{control:!1},onHome:{control:!1}},parameters:{layout:`fullscreen`,docs:{description:{component:`The bar every site of the family carries: the brand linking home at the left, the pages next to it, and the utilities pushed to the right edge.`}}},render:e=>(0,B.jsx)(R,{siteId:F(e),children:(0,B.jsx)(k,{...e,actions:(0,B.jsx)(I,{siteId:F(e)}),share:(0,B.jsx)(L,{})})})},G={},K={render:e=>(0,B.jsx)(R,{siteId:F(e),children:(0,B.jsx)(k,{...e,actions:(0,B.jsx)(I,{siteId:F(e)}),share:(0,B.jsx)(L,{}),account:(0,B.jsx)(v,{identity:{name:`Luc Patiny`,detail:`admin`},onSignOut:h})})})},q={render:()=>(0,B.jsx)(`div`,{style:Ee,children:oe.map(e=>(0,B.jsx)(R,{siteId:e.siteId,children:(0,B.jsx)(k,{siteId:e.siteId,nav:e.nav,activeId:e.activeId,actions:(0,B.jsx)(I,{siteId:e.siteId}),share:(0,B.jsx)(L,{})})},e.siteId))})},J={render:e=>(0,B.jsxs)(R,{siteId:F(e),children:[(0,B.jsx)(`style`,{children:H}),(0,B.jsx)(k,{...e,actions:(0,B.jsx)(I,{siteId:F(e)}),share:(0,B.jsx)(L,{}),renderNavItem:(e,t)=>(0,B.jsx)(p,{item:e,active:t,className:e.id===`tutorial`?`sb-hovered`:void 0})}),(0,B.jsx)(`p`,{style:U,children:`Draw is the page on show; Tutorial is drawn as the pointer leaves it.`})]})},Y={render:e=>(0,B.jsx)(Te,{...e})},X={render:e=>(0,B.jsx)(R,{siteId:F(e),children:(0,B.jsxs)(`div`,{style:De,children:[(0,B.jsx)(k,{...e,actions:(0,B.jsx)(I,{siteId:F(e)}),share:(0,B.jsx)(L,{})}),(0,B.jsx)(`main`,{style:Q,children:(0,B.jsxs)(`div`,{style:Oe,children:[(0,B.jsx)(`h1`,{style:{margin:0,fontSize:`1.25rem`},children:g.name}),(0,B.jsxs)(`p`,{style:{margin:0,color:`var(--text-muted)`},children:[`Monoisotopic mass `,g.monoisotopicMass]}),(0,B.jsx)(`code`,{style:$,children:g.smiles}),(0,B.jsx)(`code`,{style:$,children:g.inchiKey})]})}),(0,B.jsx)(he,{siteId:F(e),layout:`row`})]})})},Z={render:e=>(0,B.jsxs)(R,{siteId:F(e),children:[(0,B.jsx)(k,{...e,actions:(0,B.jsx)(I,{siteId:F(e)}),share:(0,B.jsx)(L,{})}),(0,B.jsxs)(`p`,{style:U,children:[`Above, the bar. Below, the same bar with `,(0,B.jsx)(`code`,{children:`embedded`}),`, which draws nothing.`]}),(0,B.jsx)(k,{...e,embedded:!0})]})},Ee={display:`flex`,minHeight:`100vh`,flexDirection:`column`,padding:`1.5rem`,background:`var(--surface-sunken)`,gap:`1.5rem`},De={display:`flex`,minHeight:`100vh`,flexDirection:`column`,background:`var(--surface-sunken)`},Q={width:`100%`,maxWidth:`var(--page-max)`,flex:`1 1 auto`,padding:`1.5rem 1.25rem`,margin:`0 auto`},Oe={display:`flex`,maxWidth:`32rem`,flexDirection:`column`,padding:`1rem 1.25rem`,border:`1px solid var(--border)`,borderRadius:`var(--radius)`,background:`var(--surface)`,boxShadow:`var(--shadow-sm)`,gap:`0.5rem`},$={overflowWrap:`anywhere`,fontSize:`0.8125rem`},ke={overflow:`auto`,width:520,minWidth:320,maxWidth:`100%`,border:`1px solid var(--border)`,borderRadius:`var(--radius)`,resize:`horizontal`},Ae={id:`pages`,label:`Pages`},G.parameters={...G.parameters,docs:{...G.parameters?.docs,source:{originalSource:`{}`,...G.parameters?.docs?.source}}},K.parameters={...K.parameters,docs:{...K.parameters?.docs,source:{originalSource:`{
+  render: args => <SiteTokens siteId={familySite(args)}>
+      <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} share={<Share />} account={<AccountButton identity={{
+      name: 'Luc Patiny',
+      detail: 'admin'
+    }} onSignOut={noop} />} />
+    </SiteTokens>
+}`,...K.parameters?.docs?.source},description:{story:`Signed in: the account's mark closes the bar, after Share.`,...K.parameters?.docs?.description}}},q.parameters={...q.parameters,docs:{...q.parameters?.docs,source:{originalSource:`{
+  render: () => <div style={STACK_STYLE}>
+      {SITE_BARS.map(bar => <SiteTokens key={bar.siteId} siteId={bar.siteId}>
+          <SiteHeader siteId={bar.siteId} nav={bar.nav} activeId={bar.activeId} actions={<Utilities siteId={bar.siteId} />} share={<Share />} />
+        </SiteTokens>)}
+    </div>
+}`,...q.parameters?.docs?.source},description:{story:`The same bar on four sites, one under the other: the geometry, the type and
+the neutrals never move — only the two colours and the pages do.`,...q.parameters?.docs?.description}}},J.parameters={...J.parameters,docs:{...J.parameters?.docs,source:{originalSource:`{
+  render: args => <SiteTokens siteId={familySite(args)}>
+      <style>{HOVER_RULE}</style>
+      <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} share={<Share />} renderNavItem={(item, isActive) => <NavLink item={item} active={isActive} className={item.id === 'tutorial' ? 'sb-hovered' : undefined} />} />
+      <p style={CAPTION_STYLE}>
+        Draw is the page on show; Tutorial is drawn as the pointer leaves it.
+      </p>
+    </SiteTokens>
+}`,...J.parameters?.docs?.source},description:{story:`The page on show, in the brand tint, beside a page under the pointer: the
+hover is the neutral wash, so it never impersonates where you are.`,...J.parameters?.docs?.description}}},Y.parameters={...Y.parameters,docs:{...Y.parameters?.docs,source:{originalSource:`{
+  render: args => <NarrowBar {...args} />
+}`,...Y.parameters?.docs?.source},description:{story:`A bar with no room left: \`useCompactHeader\` measures the bar itself, so the
+utilities give up their labels and the pages fold into one menu rather than
+being pushed off the edge. Drag the right edge to widen it.`,...Y.parameters?.docs?.description}}},X.parameters={...X.parameters,docs:{...X.parameters?.docs,source:{originalSource:`{
+  render: args => <SiteTokens siteId={familySite(args)}>
+      <div style={PAGE_STYLE}>
+        <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} share={<Share />} />
+        <main style={MAIN_STYLE}>
+          <div style={CARD_STYLE}>
+            <h1 style={{
+            margin: 0,
+            fontSize: '1.25rem'
+          }}>{CAFFEINE.name}</h1>
+            <p style={{
+            margin: 0,
+            color: 'var(--text-muted)'
+          }}>
+              Monoisotopic mass {CAFFEINE.monoisotopicMass}
+            </p>
+            <code style={CODE_STYLE}>{CAFFEINE.smiles}</code>
+            <code style={CODE_STYLE}>{CAFFEINE.inchiKey}</code>
+          </div>
+        </main>
+        <SiteFooter siteId={familySite(args)} layout="row" />
+      </div>
+    </SiteTokens>
+}`,...X.parameters?.docs?.source},description:{story:`Header, page and footer together — the whole chrome a site imports.`,...X.parameters?.docs?.description}}},Z.parameters={...Z.parameters,docs:{...Z.parameters?.docs,source:{originalSource:`{
+  render: args => <SiteTokens siteId={familySite(args)}>
+      <SiteHeader {...args} actions={<Utilities siteId={familySite(args)} />} share={<Share />} />
+      <p style={CAPTION_STYLE}>
+        Above, the bar. Below, the same bar with <code>embedded</code>, which
+        draws nothing.
+      </p>
+      <SiteHeader {...args} embedded />
+    </SiteTokens>
+}`,...Z.parameters?.docs?.source},description:{story:`A framed page is given no bar at all: what frames it carries its own.`,...Z.parameters?.docs?.description}}},je=[`Default`,`SignedIn`,`EverySite`,`ActiveAndHovered`,`Narrow`,`WholePage`,`Embedded`]})))()}Me();export{J as ActiveAndHovered,G as Default,Z as Embedded,q as EverySite,Y as Narrow,K as SignedIn,X as WholePage,je as __namedExportsOrder,W as default};
