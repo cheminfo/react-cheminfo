@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.60.0](https://github.com/cheminfo/react-cheminfo/compare/v0.59.0...v0.60.0) (2026-10-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* sign in from the About, and state the build once in its hero
+
+### Features
+
+* draw a source's badge in the colour and logo molecules publishes ([8de4cd3](https://github.com/cheminfo/react-cheminfo/commit/8de4cd351e7e50029f19e001b25f178569f28f9e))
+* **moleculesToken:** show the steps that replace a missing or refused token ([3db2bd2](https://github.com/cheminfo/react-cheminfo/commit/3db2bd2a1b9e79b489bfa510005d1639fd4f6fb4))
+* sign in from the About, and state the build once in its hero ([eb5058c](https://github.com/cheminfo/react-cheminfo/commit/eb5058c8930136ba171b7417a2fe411edfea6d36))
+
 ## [0.59.0](https://github.com/cheminfo/react-cheminfo/compare/v0.58.0...v0.59.0) (2026-10-21)
 
 
