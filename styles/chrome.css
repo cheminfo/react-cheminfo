@@ -354,6 +354,62 @@ button {
   font-size: 0.75rem;
 }
 
+/* What a release's badge leaves to its hover: a header, then the commit and the
+   instant as a label/value grid. The values are what a report quotes, so they
+   never wrap and their digits line up. */
+.build-tooltip .bp6-popover-content {
+  width: auto;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.build-tooltip__header {
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.build-tooltip__rows {
+  display: grid;
+  margin: 0;
+  column-gap: 16px;
+  grid-template-columns: auto auto;
+}
+
+.build-tooltip__rows dt {
+  color: var(--text-muted);
+}
+
+.build-tooltip__rows dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Signing in starts on the About, under the build badge: quiet at rest, in the
+   type of the badge beside it, and a link only to whoever looks for one. */
+.about-sign-in {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.about-sign-in:hover,
+.about-sign-in:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 /* The share dialog: the ready-made links above, the options and the page they
    write side by side, and the three things one does with the link in the
    footer, never scrolled away. */

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useRef } from 'react';
 
+import { AccountButton } from '../src/chrome/ui/AccountButton.tsx';
 import { NavLink } from '../src/chrome/ui/NavLink.tsx';
 import { NavMenuButton } from '../src/chrome/ui/NavMenuButton.tsx';
 import { SiteFooter } from '../src/chrome/ui/SiteFooter.tsx';
@@ -66,6 +67,7 @@ const meta = {
     nav: { control: false },
     actions: { control: false },
     share: { control: false },
+    account: { control: false },
     renderNavItem: { control: false },
     onHome: { control: false },
   },
@@ -94,6 +96,25 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+/** Signed in: the account's mark closes the bar, after Share. */
+export const SignedIn: Story = {
+  render: (args) => (
+    <SiteTokens siteId={familySite(args)}>
+      <SiteHeader
+        {...args}
+        actions={<Utilities siteId={familySite(args)} />}
+        share={<Share />}
+        account={
+          <AccountButton
+            identity={{ name: 'Luc Patiny', detail: 'admin' }}
+            onSignOut={noop}
+          />
+        }
+      />
+    </SiteTokens>
+  ),
+};
 
 /**
  * The same bar on four sites, one under the other: the geometry, the type and

@@ -62,6 +62,11 @@ export const Default: Story = {};
 /** A site with a paper of its own, and a version it knows. */
 export const WithCitation: Story = { args: { content: CITED } };
 
+/** A site with accounts: signing in starts under the version, never in the bar. */
+export const WithSignIn: Story = {
+  args: { content: CITED, signIn: { href: '/admin' } },
+};
+
 /** A site with no release yet is named by the commit it was built from. */
 export const NeverReleased: Story = {
   args: {

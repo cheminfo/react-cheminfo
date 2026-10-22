@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { buildLabel } from '../../build/core/buildInfo.ts';
 import { CreditsList } from '../../credits/ui/CreditsList.tsx';
 import { Wordmark } from '../../ecosystem/ui/Wordmark.tsx';
 import { SiteMark } from '../../ecosystem/ui/marks.tsx';
@@ -7,10 +8,11 @@ import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { AboutContent } from '../core/about.ts';
 import { resolveAbout } from '../core/about.ts';
 
-import { AboutBuild } from './AboutBuild.tsx';
 import { AboutCitations } from './AboutCitations.tsx';
 import { AboutProvidedBy } from './AboutProvidedBy.tsx';
 import { AboutSection } from './AboutSection.tsx';
+import type { AboutSignInProps } from './AboutSignIn.tsx';
+import { AboutSignIn } from './AboutSignIn.tsx';
 import { AboutVersion } from './AboutVersion.tsx';
 
 export interface AboutPageProps {
@@ -43,6 +45,13 @@ export interface AboutPageProps {
    * @default undefined
    */
   logo?: ReactNode;
+  /**
+   * Where the people who run the site sign in, drawn under the build badge in
+   * the corner of the hero. A site passes it while nobody is signed in, and
+   * leaves it out once somebody is: the account is then in the bar.
+   * @default undefined — the site has no account to sign in to
+   */
+  signIn?: AboutSignInProps;
 }
 
 /**
@@ -58,10 +67,12 @@ export interface AboutPageProps {
  * @throws {Error} When the record names a site or a credit that does not exist.
  */
 export function AboutPage(props: AboutPageProps): ReactElement {
-  const { content, className, children, logo, mark } = props;
+  const { content, className, children, logo, mark, signIn } = props;
   const t = useChromeT();
   const about = resolveAbout(content);
   const site = about.site;
+  const hasCorner =
+    buildLabel(about.build) !== undefined || signIn !== undefined;
 
   return (
     <div
@@ -83,7 +94,12 @@ export function AboutPage(props: AboutPageProps): ReactElement {
           </p>
           <p style={WHAT_STYLE}>{about.what}</p>
         </div>
-        <AboutVersion build={about.build} />
+        {hasCorner ? (
+          <div className="about-corner" style={CORNER_STYLE}>
+            <AboutVersion build={about.build} />
+            {signIn === undefined ? null : <AboutSignIn {...signIn} />}
+          </div>
+        ) : null}
       </header>
 
       {about.people.length === 0 && about.providedBy.length === 0 ? null : (
@@ -127,16 +143,6 @@ export function AboutPage(props: AboutPageProps): ReactElement {
           <AboutCitations works={about.cite} />
         </AboutSection>
       )}
-
-      {/*
-        The build the reader has open, last and under no heading: it is what a
-        report has to name, not something anybody came to the page to read.
-      */}
-      {about.build === undefined ? null : (
-        <AboutSection className="about-build">
-          <AboutBuild build={about.build} />
-        </AboutSection>
-      )}
     </div>
   );
 }
@@ -164,6 +170,14 @@ const HERO_STYLE = {
   background: 'var(--surface)',
   gap: 16,
   lineHeight: 1.55,
+} as const satisfies CSSProperties;
+
+const CORNER_STYLE = {
+  display: 'flex',
+  flex: '0 0 auto',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  gap: 2,
 } as const satisfies CSSProperties;
 
 const NAME_STYLE = {

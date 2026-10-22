@@ -1,5 +1,3 @@
-export type { AboutBuildProps } from './AboutBuild.tsx';
-export { AboutBuild } from './AboutBuild.tsx';
 export type { AboutVersionProps } from './AboutVersion.tsx';
 export { AboutVersion } from './AboutVersion.tsx';
 export type { AboutCitationsProps } from './AboutCitations.tsx';
@@ -10,3 +8,5 @@ export type { AboutProvidedByProps } from './AboutProvidedBy.tsx';
 export { AboutProvidedBy } from './AboutProvidedBy.tsx';
 export type { AboutSectionProps } from './AboutSection.tsx';
 export { AboutSection } from './AboutSection.tsx';
+export type { AboutSignInProps } from './AboutSignIn.tsx';
+export { AboutSignIn } from './AboutSignIn.tsx';

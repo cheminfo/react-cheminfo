@@ -35,15 +35,14 @@ function positions(html: string): number[] {
     html.indexOf('about-context'),
     html.indexOf('Built on'),
     html.indexOf('How to cite'),
-    html.indexOf('about-build'),
   ];
 }
 
-test('the six sections are all there, in the one order every site reads in', () => {
+test('the five sections are all there, in the one order every site reads in', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
   const found = positions(html);
 
-  expect(found).toHaveLength(6);
+  expect(found).toHaveLength(5);
 
   for (let index = 0; index < found.length; index++) {
     // Every section is drawn, and each starts after the one before it: a
@@ -86,11 +85,15 @@ test('the borrowed works are the registry entries, licence included', () => {
   expect(html).toContain('the component model the pages are written in.');
 });
 
-test('the build is the last thing the page says, and it links nowhere', () => {
+test('the build is said once, in the hero, and it links nowhere', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
-  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
-  expect(html).toContain('>a1b2c3d</code>');
+  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
+  // The commit of a release is in the card the badge's hover opens, and
+  // nothing further down the page repeats the build.
+  expect(html).not.toContain('a1b2c3d');
+  expect(html).not.toContain('about-build');
+  expect(html).not.toContain('Built 2026');
   // The site is not described by where its sources are kept, nor advertised
   // by a licence, so neither the page nor its build badge names either.
   expect(html).not.toContain('smiles.cheminfo.org/releases');
@@ -111,14 +114,17 @@ test('a build that does not know its commit says only what it knows', () => {
     />,
   );
 
-  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
+  expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
   expect(html).not.toContain('from commit');
 });
 
 test('the version is read in the hero, above everything the page says', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
-  expect(html).toContain('class="about-version"');
+  // A release opens its card on hover, and on focus for a keyboard.
+  expect(html).toContain(
+    '<span class="bp6-popover-target"><span style="flex:0 0 auto;font-family:var(--font-mono, ui-monospace, monospace);font-size:13px;color:var(--text-muted);white-space:nowrap" class="about-version" tabindex="0">',
+  );
   expect(html).toContain('>2.4.0 · 2026-09-16 09:41 UTC</span>');
   expect(html.indexOf('about-version')).toBeLessThan(
     html.indexOf('What you can do here'),
@@ -145,8 +151,11 @@ test('a site that has never been released is named by its commit instead', () =>
   expect(html).not.toContain('0.0.0');
   expect(html).toContain('class="about-version"');
   expect(html).toContain('>a1b2c3d · 2026-09-16 09:41 UTC</span>');
-  // What the build knows is still worth saying.
-  expect(html).toContain('Built 2026-09-16 09:41:07 UTC');
+  // The commit is the label, so the badge has nothing left for a hover card.
+  expect(html.split('a1b2c3d')).toHaveLength(2);
+  expect(html).toContain(
+    '<span style="flex:0 0 auto;font-family:var(--font-mono, ui-monospace, monospace);font-size:13px;color:var(--text-muted);white-space:nowrap" class="about-version">a1b2c3d',
+  );
 });
 
 test('a build with neither a release nor a commit shows no badge', () => {
@@ -339,4 +348,50 @@ test('a site outside the family draws its own mark and name from its record', ()
 
   expect(html).toContain('Crop, rotate, adjust, resize and compress images.');
   expect(html).toContain('>images</span>');
+});
+
+test('a site with accounts offers to sign in under the version, in the hero', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage content={SMILES} signIn={{ href: '/admin' }} />,
+  );
+
+  expect(html).toContain(
+    '<div class="about-corner" style="display:flex;flex:0 0 auto;flex-direction:column;align-items:flex-end;gap:2px"><span',
+  );
+  expect(html).toContain(
+    '>2.4.0 · 2026-09-16 09:41 UTC</span></span><a class="about-sign-in" href="/admin">Sign in</a></div>',
+  );
+  expect(html.indexOf('about-sign-in')).toBeLessThan(
+    html.indexOf('What you can do here'),
+  );
+});
+
+test('a site with no page for signing in draws a button with its own words', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage content={SMILES} signIn={{ label: 'Teacher sign in' }} />,
+  );
+
+  expect(html).toContain(
+    '<button type="button" class="about-sign-in">Teacher sign in</button>',
+  );
+});
+
+test('the invitation stands alone in the corner when the build says nothing', () => {
+  const { build, ...noBuild } = SMILES;
+  const html = renderToStaticMarkup(
+    <AboutPage content={noBuild} signIn={{ href: '/sign-in' }} />,
+  );
+
+  expect(html).not.toContain('about-version');
+  expect(html).toContain(
+    '<a class="about-sign-in" href="/sign-in">Sign in</a></div></header>',
+  );
+});
+
+test('without accounts and without a build, the hero keeps no corner', () => {
+  const { build, ...noBuild } = SMILES;
+  const html = renderToStaticMarkup(<AboutPage content={noBuild} />);
+
+  expect(html).not.toContain('about-corner');
+  expect(html).not.toContain('about-sign-in');
 });

@@ -267,3 +267,35 @@ test('Share closes the utilities, with the Contact entry just before it', () => 
     /<div class="app-header-actions"><span class="probe">Cite<\/span><a[^>]*forms\.example\.org[^>]*>.*<\/a><span class="share-probe">Share<\/span><\/div>/,
   );
 });
+
+test('the account stands at the extreme right, after Share', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader
+      siteId="inchi"
+      nav={PAGES}
+      actions={<span className="probe">Cite</span>}
+      share={<span className="share-probe">Share</span>}
+      account={<span className="account-probe">LP</span>}
+      contact={false}
+    />,
+  );
+
+  expect(html).toContain(
+    '<div class="app-header-actions"><span class="probe">Cite</span><span class="share-probe">Share</span><span class="account-probe">LP</span></div>',
+  );
+});
+
+test('an account alone still gets the utilities group', () => {
+  const html = renderToStaticMarkup(
+    <SiteHeader
+      siteId="inchi"
+      nav={PAGES}
+      account={<span className="account-probe">LP</span>}
+      contact={false}
+    />,
+  );
+
+  expect(html).toContain(
+    '<div class="app-header-actions"><span class="account-probe">LP</span></div>',
+  );
+});

@@ -10,7 +10,7 @@ import { SiteMark } from '../../ecosystem/ui/marks.tsx';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 
-import { NavLink } from './NavLink.tsx';
+import { NavEntry } from './NavEntry.tsx';
 import { NavMenuButton } from './NavMenuButton.tsx';
 import type { NavItem } from './navItem.ts';
 import { isModifiedClick } from './navItem.ts';
@@ -42,13 +42,20 @@ export interface SiteHeaderProps {
    */
   activeId?: string;
   /**
-   * The utilities pushed to the right edge — About, Cite, Tools, the language,
-   * sign in; Share has a prop of its own, so it always comes last. They
-   * arrive dressed as bar items, so a plain `nav-link` and a `CiteButton` read
-   * alike beside each other.
+   * The utilities pushed to the right edge — About, Cite, Tools, the language;
+   * Share and the account have props of their own, so they always come last.
+   * They arrive dressed as bar items, so a plain `nav-link` and a `CiteButton`
+   * read alike beside each other.
    * @default undefined
    */
   actions?: ReactNode;
+  /**
+   * Who is signed in, drawn at the extreme right, after Share — usually an
+   * `AccountButton`. A site passes it only while somebody is signed in: signing
+   * in starts on the About (`AboutPage`'s `signIn`), never in the bar.
+   * @default undefined
+   */
+  account?: ReactNode;
   /**
    * The Share entry, which closes the utilities on every site, after the
    * Contact entry. A site passes its own when it wraps the shared `ShareButton`
@@ -133,6 +140,7 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
     activeId,
     actions,
     share,
+    account,
     contact,
     renderNavItem,
     embedded = false,
@@ -195,6 +203,7 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
         <span className="spacer" />
         {actions === undefined &&
         share === undefined &&
+        account === undefined &&
         contactForm === '' ? null : (
           <div className="app-header-actions">
             {actions}
@@ -202,47 +211,12 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
               <ContactButton siteId={site.id} formUrl={contactForm} />
             )}
             {share}
+            {account}
           </div>
         )}
       </div>
     </header>
   );
-}
-
-/**
- * One page of the bar: a link, or the menu it opens when the entry folds pages
- * of its own. A menu stands where its pages would, among them and not among the
- * utilities, because picking one of them changes what the page shows.
- * @param props - The entry and the page on show.
- * @param props.item - The entry.
- * @param props.activeId - The page on show.
- * @returns The entry.
- */
-function NavEntry(props: {
-  item: NavItem;
-  activeId: string | undefined;
-}): ReactElement {
-  const { item, activeId } = props;
-  if (item.items === undefined) {
-    return <NavLink item={item} active={item.id === activeId} />;
-  }
-
-  return (
-    <NavMenuButton
-      label={menuLabel(item)}
-      icon={typeof item.icon === 'string' ? item.icon : undefined}
-      items={item.items}
-      activeId={activeId}
-      placement="bottom-start"
-    />
-  );
-}
-
-// The trigger names itself to a screen reader, so an entry drawn as a glyph
-// alone says what it opens through its title rather than through its id.
-function menuLabel(item: NavItem): string {
-  if (typeof item.label === 'string') return item.label;
-  return item.title ?? item.id;
 }
 
 /** The two widths the bar's contents run at, as the classes that set them. */
