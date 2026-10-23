@@ -32,3 +32,16 @@ export type {
 export { startToolServer, toolSiteServer } from './server/toolSiteServer.ts';
 export { parseTrustProxy } from './server/trustProxy.ts';
 export type { FastifyTyped } from './server/types.ts';
+export type {
+  AnswerAddresses,
+  AnswerAddressesInput,
+} from './server/answerAddresses.ts';
+export {
+  answerAddresses,
+  joinAddress,
+  viewOrigins,
+} from './server/answerAddresses.ts';
+export type { CardMetaOptions, PageAnswer } from './server/cardMeta.ts';
+export { cardMeta, pageAnswer } from './server/cardMeta.ts';
+export type { SiteViewOptions } from './server/siteView.ts';
+export { siteView } from './server/siteView.ts';

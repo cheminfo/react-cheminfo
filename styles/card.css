@@ -1,0 +1,145 @@
+/*
+ * The card an answer is shown as in a chat: a site's own page under
+ * `?embed=1&card=1`, which mcp.cheminfo.org frames inline. Imported once by
+ * the site's card, after `chrome.css`, whose tokens it reads; `CardFrame` and
+ * the components of `react-cheminfo/card` carry the classes.
+ */
+
+/* The frame is exactly as tall as the card reports, so nothing around the card
+   may add a pixel, and the page behind it takes the card's colour. */
+body:has(.card) {
+  margin: 0;
+  background: var(--surface);
+}
+
+.card {
+  box-sizing: border-box;
+  padding: 0.6rem 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.card a:not(.bp6-button) {
+  color: var(--accent);
+}
+
+/* The chat floats its own full-screen control over the top right corner of
+   the frame, about 40px square: the first line of a card leaves it empty. */
+.card__header {
+  padding-right: 2.75rem;
+  margin: 0;
+}
+
+.card__title {
+  min-width: 0;
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.card__muted {
+  color: var(--text-muted);
+}
+
+/* The last row of a card: a remark, then the actions — copying its table, the
+   way to the site's page — keeping its right edge together. */
+.card__end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.35rem;
+  gap: 0.25rem 0.5rem;
+}
+
+.card__note {
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+/* A dialog a card opens is as tall as what it holds: the card grows to hold
+   it, where Blueprint would cut its body to seven tenths of a frame that is
+   only as tall as the card. */
+body:has(.card) .bp6-dialog-body-scroll-container {
+  max-height: none;
+}
+
+/* The tooltip of a card's action names it in a few words: the family's help
+   card, at the width of its text rather than at the measure of a paragraph. */
+.help-tooltip.card-tooltip .bp6-popover-content {
+  width: auto;
+  max-width: 300px;
+}
+
+/* ── A figure, and the glyphs that take it away ─────────────────────────── */
+
+/* The glyphs stand in a column beside the figure's top right corner: over the
+   drawing they would hide part of a curve or an atom. */
+.card-figure {
+  position: relative;
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+  padding-right: 30px;
+}
+
+/* A grid of structures takes the width it is given. */
+.card-figure--fill {
+  width: auto;
+}
+
+/* Faded until the figure is pointed at, as the chat's own glyphs are, and at
+   full strength while one holds the focus or has its panel open. Inset by the
+   width of a focus ring, which the layer around them would otherwise cut. */
+.card-figure__tools {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0.6;
+  pointer-events: auto;
+  transition: opacity 120ms ease;
+}
+
+.card-figure:hover .card-figure__tools,
+.card-figure__tools:focus-within,
+.card-figure__tools:has([aria-expanded='true']) {
+  opacity: 1;
+}
+
+/* A finger has nothing to point with before it taps, and gets the larger
+   glyphs: the column widens with them. */
+@media (hover: none) {
+  .card-figure__tools {
+    opacity: 1;
+  }
+}
+
+@media (pointer: coarse) {
+  .card-figure {
+    padding-right: 46px;
+  }
+}
+
+/* ── Copying a table ────────────────────────────────────────────────────── */
+
+/* A heading of a few letters has room for the glyph alone; the label stays the
+   button's accessible name. */
+.card__copy-table--glyph .bp6-button-text {
+  display: none;
+}
+
+/* On a narrow frame the last row has no room for two labelled buttons: the
+   table's copy keeps its glyph, and its tooltip says what it does. */
+@media (width <= 30rem) {
+  .card__copy-table .bp6-button-text {
+    display: none;
+  }
+}

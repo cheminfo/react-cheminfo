@@ -1,6 +1,8 @@
 export * from './about/core/index.ts';
 export * from './axis/core/index.ts';
 export * from './build/core/index.ts';
+// The addresses of an answer's card, which a tool server writes in Node.
+export * from './card/core/index.ts';
 export * from './chart/core/index.ts';
 export * from './citation/core/index.ts';
 export * from './clipboard/core/index.ts';

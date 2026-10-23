@@ -37,6 +37,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/vite`              | the prerender plugin and the OG card                  | nothing; React on the card                       |
 | `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware             | nothing                                          |
 | `react-cheminfo/server`            | the prerendered build, served from Node               | fastify, @fastify/static; Node only              |
+| `react-cheminfo/card`              | the card an answer is shown as in a chat              | React; cheminfo-mcp-server, an optional peer     |
 | `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                          | React, molstar                                   |
 | `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                | React, molstar                                   |
 | `react-cheminfo/structure`         | the structure editor and renderer                     | React, react-ocl, OCL                            |
@@ -49,6 +50,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
 | `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
 | `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
+| `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens         | nothing                                          |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -121,6 +123,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `EMPTY_BLOCK`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                                                                                   | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                                                                                                                                    |
 | **Taxonomy**               | `TAXON_RANKS`, `PRINCIPAL_RANKS`, `rankOrder`, `isPrincipalRank`, `isGenusOrBelow`, `isAboveGenus`, `principalLineage`, `lineageFromNodes`, `lineageFromRanks`, `genusOrBelow`, `ncbiTaxonomyUrl`, `splitOrganismName`                                                                                                                 | `TaxonLineage`, `OrganismName`, `useRankLabel`                                                                                                                                                                                                                                                      |
 | **Framed by a host**       | `hostStructureLoader`, `readHostMolecule`, `STRUCTURE_KINDS`, `connectHost`, `selectInputs`, `checkValue`, `kindAccepts`, `parseRequest` (all `/host`); `startStandInHost`, `SCIPEAKS_ETHYLBENZENE_LOAD` (`/host-testing`)                                                                                                             | `useHostConnection` (`/host`)                                                                                                                                                                                                                                                                       |
+| **Answer cards**           | `CARD_PARAM`, `isCardAddress`, `sitePageUrl`, `cardPageUrl`, `framedPageUrl`, `roomForPanels`; `answerAddresses`, `joinAddress`, `viewOrigins`, `cardMeta`, `pageAnswer`, `siteView` (all `/server`)                                                                                                                                   | `CardFrame`, `CardDetailsButton`, `CardFigure`, `CopyTableButton`, `fitCardToFrame`, `useFitCardToFrame`, `useOverlayRoom`, `holdRoomForPanels` (all `/card`); `StructureExportButton`, `useStructureDraft` (`/structure`)                                                                          |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -1363,6 +1366,81 @@ const molecules = createMoleculesClient({
 });
 const { importKey } = await molecules.startImport();
 ```
+
+## Answers shown in a chat
+
+A site's tool server answers mcp.cheminfo.org with a link to the page people
+share and a card: the same page on this server under `?embed=1&card=1`, which
+the chat frames inline, and the page itself over the full screen. The card and
+the page read the same parameters, so they never disagree about what was
+asked.
+
+The server writes both addresses with `react-cheminfo/server`. `siteUrl` and
+`publicUrl` may be an origin or an origin and a mount, with or without a
+trailing slash, and a page is named from the site's own root: every helper
+joins them with exactly one slash.
+
+```ts
+import {
+  answerAddresses,
+  cardMeta,
+  pageAnswer,
+  siteView,
+} from 'react-cheminfo/server';
+
+const addresses = answerAddresses({ siteUrl, publicUrl });
+// { link: 'https://equilibrium.cheminfo.org/titration?ind=thymol', meta }
+const answer = pageAnswer(addresses, '/titration', { ind: 'thymol' });
+// A query written by the site's own codec, and what only the card reads.
+const meta = cardMeta(addresses, `/?${libraryQuery}`, {
+  hide: ['editor'],
+  extra: { rows: '10' },
+});
+const view = siteView({ uri: 'ui://vcl/page', name, description, addresses });
+```
+
+A card address longer than `maxLength` (8000) is not carried: `meta` is then
+undefined and the chat draws the answer itself, while `link` still names the
+page. These helpers are built on `embedMeta` and `embedView`, so
+`cheminfo-mcp-server` (an optional peer) is installed by a site that imports
+`react-cheminfo/server`. The addresses alone — `CARD_PARAM`, `sitePageUrl`,
+`cardPageUrl`, `framedPageUrl` — are in `react-cheminfo/core`, for the page.
+
+The card itself is drawn with `react-cheminfo/card` and
+`react-cheminfo/styles/card.css`:
+
+```tsx
+import 'react-cheminfo/styles/card.css';
+import {
+  CardDetailsButton,
+  CardFigure,
+  CardFrame,
+  CopyTableButton,
+} from 'react-cheminfo/card';
+import { StructureExportButton } from 'react-cheminfo/structure';
+
+<CardFrame>
+  <p className="card__header card__title">pH 8.72 at equivalence</p>
+  <CardFigure
+    fileName="titration"
+    tools={<StructureExportButton smiles={smiles} />}
+  >
+    <TitrationChart />
+  </CardFigure>
+  <div className="card__end">
+    <CopyTableButton table={() => toDelimited(rows)} />
+    <CardDetailsButton address={{ cardParams: ['scale', 'ph'] }} />
+  </div>
+</CardFrame>;
+```
+
+`CardFrame` reports the card's height to the frame and grows the card while a
+dialog or a popover it opened is open, so the frame holds it — only when the
+page is framed. A card that keeps its own root uses `ref={fitCardToFrame}`, or
+`useFitCardToFrame(ref)`. `CardDetailsButton` opens the card's address without
+`card`, `embed`, `hide` and the parameters only the card reads, in a new tab
+when framed and in place otherwise. Their words come from the chrome's
+catalog, in the language of the page.
 
 ## Saying which build is running
 
