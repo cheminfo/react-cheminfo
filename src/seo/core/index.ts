@@ -49,3 +49,5 @@ export type { StructuredDataOptions } from './structuredData.ts';
 export { structuredDataScript } from './structuredData.ts';
 export { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from './template.ts';
 export { injectTrackingScript } from './trackingScript.ts';
+export type { PageContentRecord } from './pageContent.ts';
+export { pageContentOf } from './pageContent.ts';

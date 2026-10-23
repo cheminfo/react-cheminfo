@@ -27,12 +27,14 @@ export * from './parallel/ui/index.ts';
 export * from './pedagogy/ui/index.ts';
 export * from './periodic/ui/index.ts';
 export * from './projection/ui/index.ts';
+export * from './property/ui/index.ts';
 export * from './range/ui/index.ts';
 export * from './router/ui/index.ts';
 export * from './scatter/ui/index.ts';
 export * from './scatter3d/ui/index.ts';
 export * from './share/ui/index.ts';
 export * from './shared/ui/index.ts';
+export * from './shell/ui/index.ts';
 export * from './split/ui/index.ts';
 export * from './taxonomy/ui/index.ts';
 // The conformer table, from the structure module's file rather than its

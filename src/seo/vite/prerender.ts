@@ -36,6 +36,8 @@ import { withLanguagePath } from '../../language/core/languagePath.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 import type { NoscriptText } from '../core/noscript.ts';
 import { noscriptIndex } from '../core/noscript.ts';
+import type { PageContentRecord } from '../core/pageContent.ts';
+import { pageContentOf } from '../core/pageContent.ts';
 import { pageHeadTags } from '../core/pageMeta.ts';
 import type { PageContent } from '../core/pageProse.ts';
 import type { RobotsDisallow } from '../core/robots.ts';
@@ -124,6 +126,15 @@ export interface PrerenderOptions {
    * @default undefined — every page carries the menu alone
    */
   content?: (route: RouteMeta, language: Language) => PageContent | undefined;
+  /**
+   * The pages written for, by path — or a function giving them per language —
+   * for a site that would otherwise write `content` only to look a path up in
+   * them. Every other address then says the name and the sentence its route
+   * is indexed under, so none ships the bare menu. `content`, when given, is
+   * read instead.
+   * @default undefined — `content` alone decides
+   */
+  pages?: PageContentRecord;
   /**
    * Every language the site is written in, the default one included.
    *
@@ -306,7 +317,7 @@ function crawlPathOf(
   const noscript =
     typeof declared === 'function' ? declared(language) : declared;
   if (noscript === false) return '';
-  const content = options.content?.(route, language);
+  const content = contentOf(options, route, language);
   const { routes: listed, ...prose } = noscript === true ? {} : noscript;
   // The crawl path of a translated page links to that language's addresses: a
   // French page listing the English ones is a crawler's only route out of it,
@@ -350,4 +361,18 @@ function withHtmlLang(template: string, language: Language): string {
     /<html(?<attributes>[^>]*)\slang="[^"]*"/i,
     `<html$<attributes> lang="${language}"`,
   );
+}
+
+// What a page says for itself: the site's own function when it wrote one, and
+// otherwise the page it wrote for that path, or the route's name and sentence.
+function contentOf(
+  options: PrerenderOptions,
+  route: RouteMeta,
+  language: Language,
+): PageContent | undefined {
+  const { content, pages } = options;
+  if (content !== undefined) return content(route, language);
+  return pages === undefined
+    ? undefined
+    : pageContentOf(pages)(route, language);
 }

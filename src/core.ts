@@ -28,6 +28,7 @@ export * from './parallel/core/index.ts';
 export * from './pedagogy/core/index.ts';
 export * from './periodic/core/index.ts';
 export * from './projection/core/index.ts';
+export * from './property/core/index.ts';
 export * from './range/core/index.ts';
 export * from './router/core/index.ts';
 export * from './scatter/core/index.ts';

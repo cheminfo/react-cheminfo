@@ -51,3 +51,21 @@ export type {
 export { TutorialStepStrip } from './TutorialStepStrip.tsx';
 export type { TutorialLevelColours } from './tutorialLevels.ts';
 export { TUTORIAL_LEVEL_COLOURS } from './tutorialLevels.ts';
+export type { AnswerFieldsProps } from './AnswerFields.tsx';
+export { AnswerFields } from './AnswerFields.tsx';
+export type {
+  ExerciseListEntry,
+  ExerciseListProgress,
+  ExerciseListProps,
+} from './ExerciseList.tsx';
+export { ExerciseList } from './ExerciseList.tsx';
+export type { ExerciseSeriesProps } from './ExerciseSeries.tsx';
+export { ExerciseSeries } from './ExerciseSeries.tsx';
+export type {
+  AnswerInputProps,
+  QuestionCardProps,
+  QuestionRendering,
+} from './QuestionCard.tsx';
+export { QuestionCard } from './QuestionCard.tsx';
+export { SERIES_COUNTS } from './seriesCounts.ts';
+export { useAttemptRecords } from './useAttemptRecords.ts';

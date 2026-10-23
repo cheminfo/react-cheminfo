@@ -33,6 +33,7 @@ only when it drags a heavy dependency behind it.
 | Import                             | Holds                                                 | Costs                                            |
 | ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
 | `react-cheminfo/core`              | every framework-free helper — 140 value exports       | nothing                                          |
+| `react-cheminfo/formula`           | formulas: read, compared, drawn and copied            | mf-parser, react-mf; React on the components     |
 | `react-cheminfo/ui`                | every React component and hook — 60 value exports     | React                                            |
 | `react-cheminfo/vite`              | the prerender plugin and the OG card                  | nothing; React on the card                       |
 | `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware             | nothing                                          |
@@ -102,6 +103,10 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Routing & head**         | `createTabRouter`, `readRoute`, `writeRoute`, `subscribeToRoute`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `pageLocation`, `pageHistory`                                                                                                                                                                                         | `useTabRoute`                                                                                                                                                                                                                                                                                       |
 | **Indexing**               | `injectPageMeta`, `pageHeadTags`, `pageDocumentMeta`, `fill`, `PAGE_HEAD_MARKER`, `PAGE_BODY_MARKER`, `robotsTxt`, `sitemapXml`, `noscriptIndex`, `structuredDataScript`, `assertRoutes`, `routeFor`, `homeRoute`                                                                                                                      | `cheminfoPrerender`, `ogCardHtml`, `OG_WIDTH`, `OG_HEIGHT` (all `/vite`)                                                                                                                                                                                                                            |
 | **Pedagogy**               | `parseGlossaryMarkers`, `localStorageProgressStore`, `progressSummary`, `finishValidation`                                                                                                                                                                                                                                             | `GlossaryText`, `SyntaxTooltip`, `HintLadder`, `ExerciseActions`, `ExerciseProgressHeader`, `TutorialStepStrip`, `ReferenceGrid`, `TestCaseList`                                                                                                                                                    |
+| **Graded series**          | `pickSeeded`, `freshSeed`, `parseSeed`, `seedParam`, `createAttemptStore`, `createProgressController`, `readAnswerNumber`, `emptyCase`, `unreadableCase`                                                                                                                                                                               | `ExerciseSeries`, `QuestionCard`, `AnswerFields`, `ExerciseList`, `useAttemptRecords`                                                                                                                                                                                                               |
+| **Formulas**               | `readFormula`, `normalizeFormula`, `canonicalFormula`, `atomCounts`, `formulaHtml`, `formulaText` (all `/formula`)                                                                                                                                                                                                                     | `CopyableFormula`, `QuestionFormula`, `FormulaInput` (all `/formula`)                                                                                                                                                                                                                               |
+| **Site shell**             | `pageContentOf`; the `pages` option of `cheminfoPrerender` (`/vite`)                                                                                                                                                                                                                                                                   | `SiteShell`, `ShareControl`                                                                                                                                                                                                                                                                         |
+| **Properties**             | `copyableText`                                                                                                                                                                                                                                                                                                                         | `PropertyTable`                                                                                                                                                                                                                                                                                     |
 | **Clipboard & files**      | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`, `downloadFigure`, `figureSvg`, `figurePng`, `figureSize`                                                                                                                                                                       | `ClickToCopy`, `CopyButton`, `CopyableValue`, `CodeBlock`, `DelimitedTextDialog`, `FigureDownload`                                                                                                                                                                                                  |
 | **Formatting & colour**    | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv`                                                                                                          | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                                                                                                                                                                         |
 | **Number entry**           | `readNumber`, `numberText`, `isPartialNumber`, `stepNumber`, `snapToStep`                                                                                                                                                                                                                                                              | `NumberInput`                                                                                                                                                                                                                                                                                       |
@@ -857,6 +862,60 @@ const included = useMemo(
 - **The card is a render prop**, because what belongs in it is the caller's
   subject — a formula through `react-mf`, a structure, a name — and a readout of
   strings cannot hold any of that.
+
+## A graded series, and the shell around it
+
+A pedagogic site that asks a series of questions writes its pool and its
+grader, and nothing else. `SeriesTool` describes them; `ExerciseSeries` draws
+the list beside the open question, the progress over the series, the length
+picker and the new-series button. It reads no address: the page hands it the
+seed, the length and the share of the row, and is told when one changes.
+
+```tsx
+import { createAttemptStore, parseSeed } from 'react-cheminfo/core';
+import { ExerciseSeries } from 'react-cheminfo/ui';
+
+const ATTEMPTS = createAttemptStore({ key: 'atoms' }); // atoms:attempts:v1
+
+<ExerciseSeries
+  tool={ELECTRONS}
+  store={ATTEMPTS}
+  label={(ion) => <QuestionFormula formula={ion.formula} />}
+  prompt={(ion) => <p>How many electrons has {ion.name}?</p>}
+  seed={parseSeed(route.params.seed)}
+  onSeed={(seed, history) => writeSeed(tab, seed, history)}
+  count={questionCount}
+  onCount={setQuestionCount}
+  split={SERIES_SPLIT.parse(route.params.split ?? null)}
+  onSplit={(split) => writeSplit(tab, split)}
+/>;
+```
+
+`pickSeeded` draws the series. Its `draw` option names the generator call a
+site's links were written with — `getFloat` for atoms, inorganic and moles,
+`getUint32` with `wrap` for dbe — so every `?seed=` already handed out opens
+the same questions. `seedParam` reads a seed a link pins, and `?seed=each` for
+one series per student. `createProgressController(signal)` is the handful of
+actions an exercise page performs on progress kept in a signal.
+
+Formulas come from their own door, because they are read by `mf-parser` and
+drawn by `react-mf`: `readFormula` reads `NO3-`, `SO4--` and `CuSO4.5H2O` the
+way a student types them, which the parser alone reads as neutral or as a
+decimal; `CopyableFormula` copies a formula as text and as HTML, so a paste
+keeps its subscripts.
+
+`SiteShell` is the chrome around a page: the theme, the bar with About · Cite ·
+Tools · Contact · Share, the page, and the footer, with nothing but the page
+under `?embed`. A site fills the slots between the shared entries
+(`actionsAfterAbout`, `actionsAfterCite`, `actions`, `language`, `account`) and
+never re-orders them. Given the site's router, it marks the tab on show and
+serves the About tab as `AboutPage`. Its `share` takes what `ShareControl`
+takes — the Share entry and its dialog in one, which is also what a header's
+own `share` prop takes.
+
+A prerendered site that writes text for a few of its pages passes them as
+`pages` to `cheminfoPrerender`; every other address then says the name and the
+sentence its route is indexed under.
 
 ## Framed by a notebook
 
