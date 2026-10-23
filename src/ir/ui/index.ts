@@ -47,6 +47,7 @@ export { createIrActions } from './irActions.ts';
 export type { IrChartProps } from './irChartProps.ts';
 export type { IrCommandContextValue } from './irCommandContext.tsx';
 export { useIrCommand, useIrCommandProps } from './irCommandContext.tsx';
+export type { IrHostPanel } from './irHostPanels.ts';
 export { useIrActions, useIrEditorState } from './irStateContext.ts';
 export type { IrEditorApi, UseIrEditorOptions } from './useIrEditor.ts';
 export { useIrEditor } from './useIrEditor.ts';

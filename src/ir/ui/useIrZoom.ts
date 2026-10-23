@@ -16,6 +16,7 @@ import { useMemo } from 'react';
 
 import type { ZoomDragMode } from '../../chart/core/chartDomain.ts';
 import type { PlotRect } from '../../chart/core/chartGeometry.ts';
+import type { ChartPoint } from '../../chart/core/svgPoint.ts';
 import type { ChartZoom } from '../../chart/ui/useChartZoom.ts';
 import { useChartZoom } from '../../chart/ui/useChartZoom.ts';
 import { fittedTo, fullDomain } from '../core/irDomain.ts';
@@ -52,6 +53,13 @@ export interface IrZoomOptions {
    * @default 'xAxis'
    */
   drag?: ZoomDragMode;
+  /**
+   * Told where a click on the plot landed — a press let go over it without
+   * travelling, never the end of a drag — as a wavenumber and a value in the
+   * mode drawn.
+   * @default undefined
+   */
+  onClick?: (point: ChartPoint) => void;
 }
 
 /**
@@ -72,6 +80,7 @@ export function useIrZoom(options: IrZoomOptions): ChartZoom {
     plot,
     domain = null,
     drag = 'xAxis',
+    onClick,
   } = options;
 
   const fitted = useMemo(() => fullDomain(spectra, mode), [spectra, mode]);
@@ -91,5 +100,6 @@ export function useIrZoom(options: IrZoomOptions): ChartZoom {
     domain,
     gestures,
     reverseX: IR_TECHNIQUE_RULES[technique].reverseX,
+    onClick,
   });
 }

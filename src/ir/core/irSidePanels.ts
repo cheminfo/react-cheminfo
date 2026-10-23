@@ -16,5 +16,12 @@ export const irSidePanels = [
   icon: ActivityBarItemProps['icon'];
 }>;
 
-/** Identity of one of the panels the activity bar offers. */
+/** Identity of one of the panels the viewer offers of its own. */
 export type IrSidePanelId = (typeof irSidePanels)[number]['id'];
+
+/**
+ * Identity of any panel the side can hold: one of the viewer's own, or one a
+ * host added to them. Still a union with the viewer's own ids, so those keep
+ * autocompleting where a plain `string` would swallow them.
+ */
+export type IrPanelId = IrSidePanelId | (string & Record<never, never>);

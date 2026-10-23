@@ -9,7 +9,7 @@
 import type { Dispatch } from 'react';
 
 import type { IrAction } from '../core/irReducer.ts';
-import type { IrSidePanelId } from '../core/irSidePanels.ts';
+import type { IrPanelId } from '../core/irSidePanels.ts';
 import type { IrDomain, IrSpectrum } from '../core/irSpectrum.ts';
 import type { IrSettings, IrTool, PartialIrState } from '../core/irState.ts';
 
@@ -35,8 +35,8 @@ export interface IrEditorActions {
   resetDomain: () => void;
   /** Run this tool on the next drag. */
   setTool: (tool: IrTool) => void;
-  /** Open or close a side panel. */
-  togglePanel: (panelId: IrSidePanelId) => void;
+  /** Open or close a side panel, the viewer's own or one a host added. */
+  togglePanel: (panelId: IrPanelId) => void;
   /** Say why something was refused, or that nothing is wrong any more. */
   setError: (error: string | null) => void;
   /** Change how the spectra are drawn and read. */

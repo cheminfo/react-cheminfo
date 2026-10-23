@@ -1,10 +1,11 @@
 import type { Ref } from 'react';
 
-import type { IrEditorHandle } from '../core/irEditorApi.ts';
-import type { IrSidePanelId } from '../core/irSidePanels.ts';
+import type { IrEditorHandle, IrPlotClick } from '../core/irEditorApi.ts';
+import type { IrPanelId } from '../core/irSidePanels.ts';
 import type { IrSpectrum } from '../core/irSpectrum.ts';
 
 import { VibrationalEditor } from './VibrationalEditor.tsx';
+import type { IrHostPanel } from './irHostPanels.ts';
 
 /** The handle a host drives a Raman viewer through: the infrared one's. */
 export type RamanEditorHandle = IrEditorHandle;
@@ -25,10 +26,27 @@ export interface RamanEditorProps {
    */
   onChange?: (spectra: IrSpectrum[]) => void;
   /**
-   * The side panels open to begin with.
+   * The side panels open to begin with: the viewer's own — `'spectra'`,
+   * `'bands'`, `'metadata'` — or the id of one of `panels`. An id no panel
+   * answers to is ignored.
    * @default DEFAULT_SIDE_PANELS
    */
-  defaultPanelIds?: IrSidePanelId[];
+  defaultPanelIds?: readonly IrPanelId[];
+  /**
+   * Panels the host adds to the viewer's own. Their icons come first in the
+   * activity bar, in the order given, and each then behaves as a built-in panel
+   * does: toggled on its own, stacked in the same column with a share of its
+   * height, folded and closed from its header.
+   * @default []
+   */
+  panels?: readonly IrHostPanel[];
+  /**
+   * The plot was clicked at this Raman shift (a press that did not travel, i.e.
+   * not a zoom drag), with the spectrum selected at that moment. The shift is
+   * reported as `wavenumber`, the name both techniques share.
+   * @default undefined
+   */
+  onPlotClick?: (click: IrPlotClick) => void;
   /**
    * The handle a host drives the viewer through: take these spectra, frame this
    * Raman shift, select that one.

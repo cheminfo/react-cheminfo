@@ -95,6 +95,13 @@ export interface IrChartProps {
    */
   onDomainChange?: (domain: IrDomain) => void;
   /**
+   * Told the wavenumber a click on the plot landed at: a press let go over the
+   * plot without travelling. The end of a drag is never one, nor is a press let
+   * go over the axis labels, which inverts to a value the chart is not drawing.
+   * @default undefined
+   */
+  onPlotClick?: (wavenumber: number) => void;
+  /**
    * What a drag across the plot asks for: the wavenumber axis alone, or exactly
    * the rectangle it sweeps out. A viewer offering a square-zoom tool switches
    * this while the tool is chosen.

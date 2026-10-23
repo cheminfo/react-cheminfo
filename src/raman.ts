@@ -9,9 +9,10 @@
  */
 
 export type { LoadedIrSpectrum } from './ir/core/analysisSpectra.ts';
-export type { IrEditorHandle } from './ir/core/irEditorApi.ts';
+export type { IrEditorHandle, IrPlotClick } from './ir/core/irEditorApi.ts';
 export type { IrSpectrum } from './ir/core/irSpectrum.ts';
 export { toIrSpectra } from './ir/core/toIrSpectrum.ts';
+export type { IrHostPanel } from './ir/ui/irHostPanels.ts';
 export type {
   RamanEditorHandle,
   RamanEditorProps,

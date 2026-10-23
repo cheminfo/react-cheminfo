@@ -55,6 +55,9 @@ export function PanelRail<TId extends string>(
           id={panel.id}
           icon={panel.icon}
           tooltip={panel.title}
+          // A tooltip is not an accessible name: without this every toggle is
+          // an icon-only button with no name at all.
+          aria-label={panel.title}
           active={openIds.includes(panel.id)}
           onClick={() => onToggle(panel.id)}
         />

@@ -50,7 +50,11 @@ export {
   fittedTo,
   fullDomain,
 } from './irDomain.ts';
-export type { IrEditorHandle, ZoomToBandOptions } from './irEditorApi.ts';
+export type {
+  IrEditorHandle,
+  IrPlotClick,
+  ZoomToBandOptions,
+} from './irEditorApi.ts';
 export {
   ABSORBANCE_DECIMALS,
   INTENSITY_DIGITS,
@@ -129,5 +133,5 @@ export {
 } from './spectrumJcamp.ts';
 export type { ToIrSpectrumOptions } from './toIrSpectrum.ts';
 export { toIrSpectra, toIrSpectrum } from './toIrSpectrum.ts';
-export type { IrSidePanelId } from './irSidePanels.ts';
+export type { IrPanelId, IrSidePanelId } from './irSidePanels.ts';
 export { irSidePanels } from './irSidePanels.ts';

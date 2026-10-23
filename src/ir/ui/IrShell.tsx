@@ -7,11 +7,9 @@ import { useFigureDownload } from '../../download/ui/useFigureDownload.tsx';
 import { PanelRail } from '../../panel/ui/PanelRail.tsx';
 import type { IrBand } from '../core/irBand.ts';
 import type { IrCommandHandlers } from '../core/irCommands.ts';
-import type { IrEditorHandle } from '../core/irEditorApi.ts';
+import type { IrEditorHandle, IrPlotClick } from '../core/irEditorApi.ts';
 import { otherIrMode } from '../core/irMode.ts';
-import { irSidePanels } from '../core/irSidePanels.ts';
 import type { IrSpectrum } from '../core/irSpectrum.ts';
-import { DEFAULT_SIDE_PANEL } from '../core/irState.ts';
 import { irCommandOffered } from '../core/irTechniqueCommands.ts';
 
 import { IrAboutDialog } from './IrAboutDialog.tsx';
@@ -21,9 +19,11 @@ import { IrDocumentationDialog } from './IrDocumentationDialog.tsx';
 import { IrHeader } from './IrHeader.tsx';
 import { IrSidePanel } from './IrSidePanel.tsx';
 import { IrToolbar } from './IrToolbar.tsx';
+import type { IrHostPanel } from './irHostPanels.ts';
 import { useIrActions, useIrEditorState } from './irStateContext.ts';
 import { useIrHandle } from './useIrHandle.ts';
 import { useIrShortcuts } from './useIrShortcuts.ts';
+import { useIrSide } from './useIrSide.ts';
 import { useValueAxisZoom } from './useValueAxisZoom.ts';
 
 export interface IrShellProps {
@@ -32,6 +32,13 @@ export interface IrShellProps {
    * @default undefined
    */
   handle?: Ref<IrEditorHandle>;
+  /** The panels the host adds to the viewer's own, ahead of them. */
+  panels: readonly IrHostPanel[];
+  /**
+   * Told of a click on the plot, with the spectrum selected at that moment.
+   * @default undefined
+   */
+  onPlotClick?: (click: IrPlotClick) => void;
 }
 
 /**
@@ -49,12 +56,13 @@ export interface IrShellProps {
  * @returns The screen.
  */
 export function IrShell(props: IrShellProps) {
-  const { handle } = props;
+  const { handle, panels, onPlotClick } = props;
 
   const { state, visibleSpectra, selectedSpectrum } = useIrEditorState();
   const actions = useIrActions();
   const { toggle: toggleFullScreen } = useFullscreen();
   const { openPanelIds, tool } = state.view;
+  const side = useIrSide(panels);
   const { mode, pickBands, showAssignments, technique } = state.settings;
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -122,20 +130,6 @@ export function IrShell(props: IrShellProps) {
   useIrShortcuts(root, commands);
   useIrHandle(handle);
 
-  /**
-   * Open or close the side, as the splitter is dragged shut and back open.
-   * @param open - Whether the side is now open.
-   */
-  function setSideOpen(open: boolean): void {
-    if (!open) {
-      for (const panelId of openPanelIds) actions.togglePanel(panelId);
-      return;
-    }
-    // Dragging the splitter back open must land on something, or it opens on an
-    // empty column and reads as broken.
-    if (openPanelIds.length === 0) actions.togglePanel(DEFAULT_SIDE_PANEL);
-  }
-
   return (
     <IrCommandProvider handlers={commands} technique={technique}>
       {/* `tabIndex` so a click anywhere in the viewer makes this the target the
@@ -156,23 +150,28 @@ export function IrShell(props: IrShellProps) {
             direction="horizontal"
             controlledSide="end"
             defaultSize="360px"
-            open={openPanelIds.length > 0}
-            onOpenChange={setSideOpen}
+            open={side.isOpen}
+            onOpenChange={side.setOpen}
           >
             <IrCanvas
               highlight={highlight}
               onHighlight={setHighlight}
               chartId={chartId}
+              onPlotClick={onPlotClick}
             />
 
-            <IrSidePanel highlight={highlight} onHighlight={setHighlight} />
+            <IrSidePanel
+              panels={panels}
+              highlight={highlight}
+              onHighlight={setHighlight}
+            />
           </SplitPane>
 
           {/* Outside the split, so the icons stay put against the right edge
               while the panel beside them is resized or closed. */}
           <div style={railStyle}>
             <PanelRail
-              panels={irSidePanels}
+              panels={side.panels}
               openIds={openPanelIds}
               onToggle={actions.togglePanel}
             />

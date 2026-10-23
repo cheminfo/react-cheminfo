@@ -13,7 +13,7 @@
  * a stale band is then impossible rather than merely unlikely.
  */
 
-import type { IrSidePanelId } from './irSidePanels.ts';
+import type { IrPanelId, IrSidePanelId } from './irSidePanels.ts';
 import type { IrDomain, IrMode, IrSpectrum } from './irSpectrum.ts';
 import type { IrTechnique } from './irTechnique.ts';
 import { defaultIrMode, irModeFor, offersIrMode } from './irTechnique.ts';
@@ -42,8 +42,11 @@ export interface IrView {
   domain: IrDomain | null;
   /** Which tool a drag across the chart is running. */
   tool: IrTool;
-  /** The side panels that are open, in the order their icons are stacked. */
-  openPanelIds: IrSidePanelId[];
+  /**
+   * The side panels that are open: the viewer's own and any a host added. An id
+   * no panel on offer answers to opens nothing.
+   */
+  openPanelIds: IrPanelId[];
   /** Why the last action was refused, `null` as soon as one succeeds. */
   error: string | null;
 }
@@ -139,10 +142,10 @@ export interface CreateIrStateOptions {
    */
   settings?: Partial<IrSettings>;
   /**
-   * The panels open to begin with.
+   * The panels open to begin with, the viewer's own or a host's.
    * @default DEFAULT_SIDE_PANELS
    */
-  panelIds?: IrSidePanelId[];
+  panelIds?: readonly IrPanelId[];
 }
 
 /**

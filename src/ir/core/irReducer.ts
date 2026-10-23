@@ -13,7 +13,7 @@
  * closed.
  */
 
-import type { IrSidePanelId } from './irSidePanels.ts';
+import type { IrPanelId } from './irSidePanels.ts';
 import type { IrDomain, IrSpectrum } from './irSpectrum.ts';
 import type { IrSettings, IrState, IrTool, PartialIrState } from './irState.ts';
 import { isIrWindow, mergeIrSettings } from './irState.ts';
@@ -30,7 +30,7 @@ export type IrAction =
   | { type: 'setDomain'; domain: IrDomain }
   | { type: 'resetDomain' }
   | { type: 'setTool'; tool: IrTool }
-  | { type: 'togglePanel'; panelId: IrSidePanelId }
+  | { type: 'togglePanel'; panelId: IrPanelId }
   | { type: 'setError'; error: string | null }
   | { type: 'setSettings'; settings: Partial<IrSettings> }
   | { type: 'loadState'; state: PartialIrState }

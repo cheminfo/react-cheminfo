@@ -3,6 +3,7 @@ import { useCallback, useId, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { sameChartDomain } from '../../chart/core/chartDomain.ts';
 import { MARGIN, plotRect } from '../../chart/core/chartGeometry.ts';
+import type { ChartPoint } from '../../chart/core/svgPoint.ts';
 import { Axes } from '../../chart/ui/Axes.tsx';
 import { SelectionRect } from '../../chart/ui/SelectionRect.tsx';
 import { chartSurfaceStyle } from '../../chart/ui/chartSurface.ts';
@@ -56,6 +57,7 @@ export function IrChart(props: IrChartProps): ReactElement {
     onHighlight,
     domain = null,
     onDomainChange,
+    onPlotClick,
     drag = 'xAxis',
     emphasisedId = null,
     width,
@@ -81,6 +83,14 @@ export function IrChart(props: IrChartProps): ReactElement {
   const frameWidth = plot.right + MARGIN.right;
   const frameHeight = plot.bottom + MARGIN.bottom;
 
+  const onClick = useMemo(
+    () =>
+      onPlotClick === undefined
+        ? undefined
+        : (point: ChartPoint) => onPlotClick(point.x),
+    [onPlotClick],
+  );
+
   // The host's window goes *into* the zoom rather than over it, so a drag is
   // always measured against what is on screen.
   const zoom = useIrZoom({
@@ -91,6 +101,7 @@ export function IrChart(props: IrChartProps): ReactElement {
     plot,
     domain,
     drag,
+    onClick,
   });
 
   // The scales the zoom measured its gestures against — the x one running right

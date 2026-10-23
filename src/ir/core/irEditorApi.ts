@@ -42,3 +42,16 @@ export interface IrEditorHandle {
   /** Point the panels at one spectrum, or at none. */
   selectSpectrum: (id: string | null) => void;
 }
+
+/**
+ * A click on the plot, as the viewer tells its host about it.
+ *
+ * A click is a press let go over the plot without travelling: the end of a
+ * zoom drag is never one, and a click on the axis labels is not reported.
+ */
+export interface IrPlotClick {
+  /** Where it landed on the horizontal axis, in cm⁻¹ — a Raman shift for Raman. */
+  wavenumber: number;
+  /** Identity of the spectrum selected when it was made, `null` for none. */
+  spectrumId: string | null;
+}

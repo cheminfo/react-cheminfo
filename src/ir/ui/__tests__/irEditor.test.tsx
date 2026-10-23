@@ -37,10 +37,13 @@ test('the shell draws the chart, its rails and the panels', async () => {
   // The status bar.
   expect(markup).toContain('1 spectrum drawn of 1');
   expect(markup).toContain('Synthetic five-band film');
-  // The panels that open by default, and not the one that does not.
-  expect(markup).toContain('Bands');
-  expect(markup).toContain('Spectra');
-  expect(markup).not.toContain('Acquisition');
+  // The panels that open by default, and not the one that does not — read off
+  // their headers, since the rail names every panel whether it is open or not.
+  expect(markup).toContain('aria-label="Close the bands panel"');
+  expect(markup).toContain('aria-label="Close the spectra panel"');
+  expect(markup).not.toContain('aria-label="Close the acquisition panel"');
+  // Every toggle in the rail is named, open or not.
+  expect(markup).toContain('aria-label="Acquisition"');
 });
 
 test('every tool is offered, and each carries its key', async () => {
@@ -87,7 +90,7 @@ test('the panels asked for are the panels opened', async () => {
     <IrEditor data={await fiveBands()} defaultPanelIds={['metadata']} />,
   );
 
-  expect(markup).toContain('Acquisition');
+  expect(markup).toContain('aria-label="Close the acquisition panel"');
   // What the file said about itself, which is what that panel is for.
   expect(markup).toContain('five-bands.jdx');
   expect(markup).toContain('jcamp');

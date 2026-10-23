@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import type { IrBand } from '../core/irBand.ts';
+import type { IrPlotClick } from '../core/irEditorApi.ts';
 import type { IrDomain } from '../core/irSpectrum.ts';
 
 import { IrChart } from './IrChart.tsx';
@@ -32,6 +33,12 @@ export interface IrCanvasProps {
    * @default undefined
    */
   chartId?: string;
+  /**
+   * Told of a click on the plot — a press let go without travelling, never the
+   * end of a drag — with the spectrum selected at that moment.
+   * @default undefined
+   */
+  onPlotClick?: (click: IrPlotClick) => void;
 }
 
 /**
@@ -50,7 +57,13 @@ export interface IrCanvasProps {
  * @returns The canvas.
  */
 export function IrCanvas(props: IrCanvasProps) {
-  const { highlight = null, onHighlight, attachChart, chartId } = props;
+  const {
+    highlight = null,
+    onHighlight,
+    attachChart,
+    chartId,
+    onPlotClick,
+  } = props;
   const { state, visibleSpectra, assigned } = useIrEditorState();
   const actions = useIrActions();
   const { domain, tool, selectedId } = state.view;
@@ -61,6 +74,17 @@ export function IrCanvas(props: IrCanvasProps) {
       actions.setDomain(next);
     },
     [actions],
+  );
+
+  // Which spectrum was selected is the viewer's to say, not the chart's: the
+  // chart only knows where the press landed.
+  const onClickAt = useMemo(
+    () =>
+      onPlotClick === undefined
+        ? undefined
+        : (wavenumber: number) =>
+            onPlotClick({ wavenumber, spectrumId: selectedId }),
+    [onPlotClick, selectedId],
   );
 
   return (
@@ -79,6 +103,7 @@ export function IrCanvas(props: IrCanvasProps) {
           onDomainChange={onDomainChange}
           drag={tool === 'box' ? 'box' : 'xAxis'}
           emphasisedId={selectedId}
+          onPlotClick={onClickAt}
         />
       </div>
       <IrStatusBar />
