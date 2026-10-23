@@ -7,10 +7,15 @@
 import { act, useRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 
 import { CardFrame } from '../CardFrame.tsx';
+import { loadEmbed } from '../embed.ts';
 import { fitCardToFrame, useOverlayRoom } from '../fitCardToFrame.ts';
+
+beforeAll(async () => {
+  await loadEmbed();
+});
 
 let host: HTMLDivElement;
 let root: Root;

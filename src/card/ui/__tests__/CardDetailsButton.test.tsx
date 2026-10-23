@@ -9,13 +9,14 @@ import { act } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 
 import {
   holdPageAddress,
   releasePageAddress,
 } from '../../../router/core/pageAddress.ts';
 import { CardDetailsButton } from '../CardDetailsButton.tsx';
+import { loadEmbed } from '../embed.ts';
 
 const opened = vi.hoisted(() => [] as string[]);
 
@@ -26,6 +27,10 @@ vi.mock('cheminfo-mcp-server/embed', async (importOriginal) => ({
     return 'window';
   },
 }));
+
+beforeAll(async () => {
+  await loadEmbed();
+});
 
 let host: HTMLDivElement;
 let root: Root;

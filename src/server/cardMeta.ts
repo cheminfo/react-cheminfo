@@ -4,14 +4,13 @@
  * server — its card inline, the page itself over the full screen.
  */
 
-import { embedMeta } from 'cheminfo-mcp-server';
-
 import type { CardPageOptions } from '../card/core/cardPageUrl.ts';
 import { cardPageUrl, framedPageUrl } from '../card/core/cardPageUrl.ts';
 import { formatQueryString } from '../router/core/query.ts';
 
 import type { AnswerAddressesInput } from './answerAddresses.ts';
 import { joinAddress } from './answerAddresses.ts';
+import { mcpServer } from './mcpServer.ts';
 
 /** How {@link cardMeta} writes the card and the page. */
 export interface CardMetaOptions extends CardPageOptions {
@@ -58,7 +57,7 @@ export function cardMeta(
   const framed = joinAddress(addresses.publicUrl, page);
   const card = cardPageUrl(framed, written);
   if (card.length > maxLength) return undefined;
-  return embedMeta(card, { page: framedPageUrl(framed, written) });
+  return mcpServer().embedMeta(card, { page: framedPageUrl(framed, written) });
 }
 
 /**

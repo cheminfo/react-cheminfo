@@ -1,7 +1,8 @@
-import { isFramed, reportEmbedHeight } from 'cheminfo-mcp-server/embed';
+import type * as Embed from 'cheminfo-mcp-server/embed';
 import type { RefObject } from 'react';
 import { useEffect } from 'react';
 
+import { loadEmbed, loadedEmbed } from './embed.ts';
 import { holdRoomForPanels } from './holdRoomForPanels.ts';
 
 /**
@@ -12,19 +13,29 @@ import { holdRoomForPanels } from './holdRoomForPanels.ts';
  * and none to grow, and nothing is done.
  *
  * Its shape is a React 19 ref callback's — `ref={fitCardToFrame}` — so it
- * starts once the card is mounted and stops when it is removed.
+ * starts once the card is mounted and stops when it is removed. The first
+ * card waits for `cheminfo-mcp-server/embed` to load; a site without it gets
+ * a card that never reports.
  * @param card - The element holding the whole card; none reports nothing.
  * @returns A function that stops both, or undefined when nothing started.
  */
 export function fitCardToFrame(
   card: HTMLElement | null,
 ): (() => void) | undefined {
-  if (card === null || !isFramed()) return undefined;
-  const stopRoom = holdRoomForPanels(card);
-  const stopReport = reportEmbedHeight(card);
+  if (card === null) return undefined;
+  const embed = loadedEmbed();
+  if (embed !== undefined) return fitLoaded(embed, card);
+  let stop: (() => void) | undefined;
+  let stopped = false;
+  loadEmbed().then(
+    (module) => {
+      if (!stopped) stop = fitLoaded(module, card);
+    },
+    () => undefined,
+  );
   return () => {
-    stopReport();
-    stopRoom();
+    stopped = true;
+    stop?.();
   };
 }
 
@@ -49,4 +60,17 @@ export function useOverlayRoom(card: RefObject<HTMLElement | null>): void {
     const element = card.current;
     return element === null ? undefined : holdRoomForPanels(element);
   }, [card]);
+}
+
+function fitLoaded(
+  embed: typeof Embed,
+  card: HTMLElement,
+): (() => void) | undefined {
+  if (!embed.isFramed()) return undefined;
+  const stopRoom = holdRoomForPanels(card);
+  const stopReport = embed.reportEmbedHeight(card);
+  return () => {
+    stopReport();
+    stopRoom();
+  };
 }

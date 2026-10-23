@@ -53,6 +53,13 @@ const meta = {
       </section>
     ),
   },
+  decorators: [
+    (Story) => (
+      <div>
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     layout: 'fullscreen',
     docs: {

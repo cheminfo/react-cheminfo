@@ -1,8 +1,8 @@
 import type { AppResource } from 'cheminfo-mcp-server';
-import { embedView } from 'cheminfo-mcp-server';
 
 import type { AnswerAddressesInput } from './answerAddresses.ts';
 import { viewOrigins } from './answerAddresses.ts';
+import { mcpServer } from './mcpServer.ts';
 
 /** What {@link siteView} names, and where its pages come from. */
 export interface SiteViewOptions {
@@ -32,7 +32,7 @@ export interface SiteViewOptions {
  */
 export function siteView(options: SiteViewOptions): AppResource {
   const { uri, name, description, addresses, height } = options;
-  return embedView({
+  return mcpServer().embedView({
     uri,
     name,
     description,

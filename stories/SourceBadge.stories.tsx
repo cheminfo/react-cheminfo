@@ -19,6 +19,13 @@ const meta = {
     identifier: 'CHEBI:15377',
     href: 'https://www.ebi.ac.uk/chebi/CHEBI:15377',
   },
+  decorators: [
+    (Story) => (
+      <div>
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     docs: {
       description: {

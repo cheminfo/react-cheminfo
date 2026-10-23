@@ -1,6 +1,6 @@
 import { Button, Tooltip } from '@blueprintjs/core';
-import { openSitePage } from 'cheminfo-mcp-server/embed';
 import type { CSSProperties, ReactElement } from 'react';
+import { useEffect } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { pageLocation } from '../../router/core/pageAddress.ts';
@@ -13,6 +13,7 @@ import {
   CARD_TOOLTIP_DELAY,
   CARD_TOOLTIP_MODIFIERS,
 } from './cardTooltip.ts';
+import { loadEmbed, loadedEmbed } from './embed.ts';
 
 /** What {@link CardDetailsButton} opens. */
 export interface CardDetailsButtonProps {
@@ -53,6 +54,9 @@ export function CardDetailsButton(props: CardDetailsButtonProps): ReactElement {
   const { page, address, tooltip, testId = 'card-details' } = props;
   const t = useChromeT();
   const { isOpen, target } = useActionTooltip(false, CARD_TOOLTIP_DELAY);
+  useEffect(() => {
+    loadEmbed().catch(() => undefined);
+  }, []);
   return (
     <Tooltip
       content={tooltip ?? t('card.detailsTitle')}
@@ -70,7 +74,13 @@ export function CardDetailsButton(props: CardDetailsButtonProps): ReactElement {
           aria-label={t('card.detailsLabel')}
           data-testid={testId}
           onClick={() => {
-            openSitePage(page === undefined ? cardSitePage(address) : page());
+            const url = page === undefined ? cardSitePage(address) : page();
+            const embed = loadedEmbed();
+            if (embed === undefined) {
+              void loadEmbed().then((module) => module.openSitePage(url));
+            } else {
+              embed.openSitePage(url);
+            }
           }}
         />
       </span>
