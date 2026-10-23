@@ -77,10 +77,13 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   // otherwise re-render all 118 cells per frame, and the engine recomputes
   // every length from the custom property on its own. A width of zero is a
   // table in a tab nobody has opened; the last measurement stands until it is
-  // shown, and the observer fires again then.
+  // shown, and the observer fires again then. `data-measured` says the cells
+  // now follow a measured width rather than the `1cqw` fallback.
   useResizeObserver(rootRef, ({ width }) => {
-    if (width === 0) return;
-    rootRef.current?.style.setProperty(UNIT_PROPERTY, unitValue(width));
+    const root = rootRef.current;
+    if (width === 0 || root === null) return;
+    root.style.setProperty(UNIT_PROPERTY, unitValue(width));
+    root.dataset.measured = '';
   });
 
   useEffect(() => {

@@ -29,11 +29,22 @@ interface Shape {
 }
 
 async function shapeOf(page: Page, zoom: number): Promise<Shape> {
+  await page.unroute('**/iframe.html*');
+  if (zoom !== 1) {
+    // The add-in frames a page that is zoomed before it draws anything, so the
+    // page is served zoomed: the table's first measurement is the zoomed one.
+    await page.route('**/iframe.html*', async (route) => {
+      const response = await route.fetch();
+      const html = await response.text();
+      const zoomed = `<style>html { zoom: ${String(zoom)} }</style></head>`;
+      await route.fulfill({ response, body: html.replace('</head>', zoomed) });
+    });
+  }
   await openStory(page, 'periodic-periodictable--property-map');
   await expect(page.getByTestId('element-Fe')).toBeVisible();
-  if (zoom !== 1) {
-    await page.addStyleTag({ content: `html { zoom: ${String(zoom)} }` });
-  }
+  // Until it has measured its width the table draws in `1cqw`, the unit WebKit
+  // gets wrong under a zoom; the claim is about the measured drawing.
+  await expect(page.locator('[data-measured]')).toHaveCount(1);
 
   return page.evaluate(() => {
     const table = document.querySelector('[data-testid="periodic-table"]');
