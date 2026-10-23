@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.66.0](https://github.com/cheminfo/react-cheminfo/compare/v0.65.0...v0.66.0) (2026-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* absorbance and transmittance are optional on IrSpectrum, LoadedIrSpectrum and IrBand, and traceOf may return undefined.
+
+### Features
+
+* add RamanEditor, the Raman sibling of IrEditor on a shared core ([55bcafc](https://github.com/cheminfo/react-cheminfo/commit/55bcafcfd4be197cb4d39a61e6b7df9052c84eee))
+
 ## [0.65.0](https://github.com/cheminfo/react-cheminfo/compare/v0.64.1...v0.65.0) (2026-10-23)
 
 
