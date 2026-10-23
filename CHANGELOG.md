@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.65.0](https://github.com/cheminfo/react-cheminfo/compare/v0.64.1...v0.65.0) (2026-10-23)
+
+
+### Features
+
+* add exercise series, a formula entry, a site shell and a property table ([8700e3a](https://github.com/cheminfo/react-cheminfo/commit/8700e3acbb5f6eeb446cfcd77500527e92b1a45e))
+* add languages to the tab router and options to persistence, share, worker channel and useAsync ([13d4e7f](https://github.com/cheminfo/react-cheminfo/commit/13d4e7f70ccb60401b4fbd78d8fae854ce13c9b5))
+* add server configuration, tool-site and single-page-app servers, and a molecules client ([01a117b](https://github.com/cheminfo/react-cheminfo/commit/01a117bcf6e48b0a3deaa0f704323bd4792f57a5))
+* add the card kit for tool answers framed in the chat ([caa881f](https://github.com/cheminfo/react-cheminfo/commit/caa881f9bfdcffa0d7c064a87bf78040a661f8b1))
+
+
+### Bug Fixes
+
+* let every entry import without its optional peers ([ce186b7](https://github.com/cheminfo/react-cheminfo/commit/ce186b7218fb1d4d49c7c0e6eaed08b2d78678e4))
+
 ## [0.64.1](https://github.com/cheminfo/react-cheminfo/compare/v0.64.0...v0.64.1) (2026-10-22)
 
 
