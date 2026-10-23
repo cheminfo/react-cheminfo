@@ -77,6 +77,7 @@
     "ir-spectrum": "^4.2.0",
     "leven": "^4.1.0",
     "ml-spectra-processing": "^14.35.1",
+    "ml-xsadd": "^3.0.1",
     "openchemlib": "^9.25.0",
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
@@ -87,6 +88,7 @@
   "devDependencies": {
     "@blueprintjs/core": "^6.18.0",
     "@fastify/static": "^10.1.6",
+    "@fastify/type-provider-typebox": "^6.3.0",
     "@playwright/test": "^1.62.1",
     "@storybook/addon-docs": "^10.5.8",
     "@storybook/react-vite": "^10.5.8",
@@ -123,6 +125,7 @@
   "peerDependencies": {
     "@blueprintjs/core": "^6.18.0",
     "@fastify/static": "^10.0.0",
+    "@fastify/type-provider-typebox": "^6.0.0",
     "fastify": "^5.0.0",
     "ml-pca": "^4.1.1",
     "ml-signal-processing": "^2.2.2",
@@ -145,6 +148,9 @@
   "homepage": "https://github.com/cheminfo/react-cheminfo#readme",
   "peerDependenciesMeta": {
     "@fastify/static": {
+      "optional": true
+    },
+    "@fastify/type-provider-typebox": {
       "optional": true
     },
     "fastify": {

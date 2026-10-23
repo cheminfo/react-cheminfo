@@ -1253,6 +1253,117 @@ answers its own 404. Without a build, `staticSite` logs it and serves the API
 alone. `fastify` (5) and `@fastify/static` (10) are optional peers, installed
 by a site that has a server.
 
+`basePath` (`BASE_PATH`) serves one image at a mount chosen at startup, behind a
+proxy that takes the path off: it is written into the `<base href="/">` of every
+page when the build is read, and in front of every redirect.
+
+### A tool site's server, from its environment
+
+A site that serves its tools beside its pages has nothing of its own to write
+but the tools. `readServerConfig` reads the environment once and refuses a
+malformed value; `toolSiteServer` builds Fastify, registers the API the site
+passes, then `staticSite`; `startToolServer` listens and closes on `SIGTERM`
+and `SIGINT`, setting `process.exitCode = 1` when a close fails.
+
+```ts
+// server/main.ts
+import { join } from 'node:path';
+
+import {
+  readServerConfig,
+  startToolServer,
+  toolSiteServer,
+} from 'react-cheminfo/server';
+
+const config = readServerConfig(process.env, {
+  siteId: 'osiris',
+  port: 10_620,
+  root: join(import.meta.dirname, '../dist'),
+});
+
+await startToolServer(
+  (settings) =>
+    toolSiteServer({
+      siteId: 'osiris',
+      config: settings,
+      // name: 'osiris.cheminfo.org', version: the repository root's release
+      registerApi: (app, { name, version }) =>
+        registerTools(app, name, version),
+    }),
+  config,
+);
+```
+
+| Variable          | Read as                                                             | Default                      |
+| ----------------- | ------------------------------------------------------------------- | ---------------------------- |
+| `PORT`            | an integer from 1 to 65535                                          | the site's own port          |
+| `HOST`            | the interface listened on                                           | `0.0.0.0`                    |
+| `TRACKING_SCRIPT` | the analytics snippet, verbatim                                     | nothing loaded               |
+| `SITE_URL`        | the address answers link to, path kept, ending in `/`               | the site's own address       |
+| `PUBLIC_URL`      | this server's address, which a chat frames, ending in `/`           | `http://localhost:<PORT>/`   |
+| `TRUST_PROXY`     | an address, a CIDR, a list of either, or `true`; a hop count throws | `false`                      |
+| `SERVER_ROOT`     | the build served                                                    | the `root` option, or `dist` |
+| `BASE_PATH`       | the mount, behind a proxy that takes it off                         | none                         |
+
+The pieces are exported on their own for a backend that is not a tool site:
+`parseTrustProxy`, `readEnvNumber` (blank is unset, a malformed value throws),
+`readHttpAddress`, `readRepositoryVersion` (the root `package.json`, found as
+`cheminfoBuildInfo` finds it), `healthRoute` (`GET /health`, silent),
+`listenSite` (listen, and close on a signal, then run `onClose`), and the
+type-only `FastifyTyped` (`@fastify/type-provider-typebox` is an optional peer).
+
+### A single-page app, served by its backend
+
+A backend that serves a Vite single-page app answers every address the app
+routes with the built page, under the head of that address and a crawl path of
+its own. `spaSite` does that, and writes `sitemap.xml` and `robots.txt` from the
+route table at the address the site is served at; serves the build's files, with
+`assets/` kept for a year; leaves `/v1/` and `/docs` to the API; and answers
+`/health`.
+
+```ts
+await app.register(spaSite, {
+  root: join(import.meta.dirname, '../../frontend/dist'),
+  site: 'wikidata',
+  siteUrl: process.env.SITE_URL, // blank: the origin the request arrived on
+  trackingScript: process.env.TRACKING_SCRIPT,
+  noscript: { heading: 'wikidata.cheminfo.org', hrefs: 'relative' },
+  // A compound under its own name; undefined falls back to the table.
+  page: (url) => compoundPage(db, url),
+  sitemapPaths: () => db.pageIds().map((id) => `/compound/${id}`),
+});
+```
+
+The route table is the one the app reads, written beside the page at build time
+by `cheminfoRouteTable` from `react-cheminfo/vite`, which also runs
+`assertRoutes` when the build starts; `readRouteTable(root, fallback)` reads it
+back. `notFoundStatus: 404` with `knownRoute` answers an address the app does not
+route with a real 404, `structuredData` takes a function writing the whole block,
+and `indexed: false` keeps an admin site out of every index.
+
+```ts
+// frontend/vite.config.ts
+plugins: [react(), cheminfoRouteTable({ routes: ROUTES })],
+```
+
+### Writing to molecules.cheminfo.org
+
+`createMoleculesClient` from `react-cheminfo/core` is the client a site writes
+its source through: `startImport`, `importState`, `submit`, `lookup` and
+`purge`, each attempt with its own deadline, retried on 429, 502, 503, 504 or no
+answer with doubling, spread pauses that honour `Retry-After`, bodies gzipped.
+It reads no Node module.
+
+```ts
+const molecules = createMoleculesClient({
+  baseUrl: 'https://molecules.cheminfo.org',
+  token: process.env.MOLECULES_TOKEN_LOTUS,
+  onRetry: (details) =>
+    logger.warn(details, 'molecules.cheminfo.org: retrying'),
+});
+const { importKey } = await molecules.startImport();
+```
+
 ## Saying which build is running
 
 A report of something going wrong is worth answering only when we know what was

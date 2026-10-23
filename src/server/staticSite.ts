@@ -1,15 +1,19 @@
 import { readFile } from 'node:fs/promises';
 import { join, relative, resolve, sep } from 'node:path';
 
-import type {
-  FastifyInstance,
-  FastifyReply,
-  FastifyRequest,
-  FastifySchema,
-} from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+import { joinBasePath, normalizeBasePath } from '../router/core/basePath.ts';
 import { injectTrackingScript } from '../seo/core/trackingScript.ts';
+import { escapeAttribute } from '../share/core/escape.ts';
 
+import { healthRoute } from './healthRoute.ts';
+import {
+  ALLOW_ORIGIN,
+  BUNDLE_CACHE,
+  HIDDEN,
+  PAGE_CACHE,
+} from './routeOptions.ts';
 import { isHashedBundle, listSiteFiles, resolveAddress } from './siteFiles.ts';
 
 /** Options of {@link staticSite}. */
@@ -35,6 +39,15 @@ export interface StaticSiteOptions {
    * @default ['/v1/']
    */
   reserved?: readonly string[];
+  /**
+   * The path the deployment is mounted at, `/osiris` for
+   * `https://www.cheminfo.org/osiris/`, behind a proxy that takes it off before
+   * the request arrives. It is written into the `<base href="/">` of every page
+   * when they are read, and in front of every redirect, so one image serves a
+   * host of its own and a shared one without a rebuild or a copy of the build.
+   * @default '' - the site owns the root of its host
+   */
+  basePath?: string;
 }
 
 /** A page: the file with the snippet in its head, and the tag a browser checks. */
@@ -43,21 +56,8 @@ interface Page {
   etag: string;
 }
 
-/** A page is checked on every visit: it names the bundles of its own build. */
-const PAGE_CACHE = 'no-cache';
-
-/** A bundle is named by its content, so it never changes under its name. */
-const BUNDLE_CACHE = 'public, max-age=31536000, immutable';
-
-/**
- * Every file of a build is public, and a page framed by a sandboxed view runs
- * under an opaque origin, where everything it fetches from its own site is
- * cross-origin: the static hosts open every response, and so does this server.
- */
-const ALLOW_ORIGIN = 'access-control-allow-origin';
-
-/** Kept out of the API's documentation (`@fastify/swagger` reads `hide`). */
-const HIDDEN: FastifySchema & { hide: boolean } = { hide: true };
+/** The `<base>` a build carries, which a mounted deployment rewrites. */
+const ROOT_BASE = /<base\s+href=(?<quote>["'])\/\k<quote>\s*\/?>/i;
 
 /**
  * Serve a site's build from Node, with the rules every static host of the
@@ -81,19 +81,16 @@ export async function staticSite(
 ): Promise<void> {
   const { trackingScript, redirects = {}, reserved = ['/v1/'] } = options;
   const root = resolve(options.root);
+  const basePath = normalizeBasePath(options.basePath ?? '');
 
-  fastify.get(
-    '/health',
-    { logLevel: 'silent', schema: HIDDEN },
-    (_request, reply) => reply.header(ALLOW_ORIGIN, '*').send({ status: 'ok' }),
-  );
+  await healthRoute(fastify);
 
   const files = await listSiteFiles(root);
   if (files === undefined) {
     fastify.log.warn({ root }, 'no built site: serving the API alone');
     return;
   }
-  const pages = await readPages(root, files, trackingScript);
+  const pages = await readPages(root, files, { trackingScript, basePath });
 
   // An optional peer, installed only by a site that has a server: importing
   // react-cheminfo/server must not need it.
@@ -121,7 +118,10 @@ export async function staticSite(
     const destination =
       redirects[pathname] ?? redirects[pathname.replace(/\/$/, '')];
     if (destination !== undefined) {
-      return reply.redirect(`${destination}${search}`, 301);
+      return reply.redirect(
+        `${mountedAddress(basePath, destination)}${search}`,
+        301,
+      );
     }
 
     const file = resolveAddress(files, pathname);
@@ -138,28 +138,58 @@ export async function staticSite(
 }
 
 /**
- * Read every page of the build once, with the snippet in its head.
+ * Read every page of the build once, with the snippet in its head and the
+ * mount in its `<base>`.
  * @param root - The build.
  * @param files - Its files.
- * @param trackingScript - The snippet, if any.
+ * @param stamp - What is written into every page.
+ * @param stamp.trackingScript - The snippet, if any.
+ * @param stamp.basePath - The mount, `''` for none.
  * @returns The pages, by file.
  */
 async function readPages(
   root: string,
   files: ReadonlySet<string>,
-  trackingScript: string | undefined,
+  stamp: { trackingScript: string | undefined; basePath: string },
 ): Promise<Map<string, Page>> {
   const htmlFiles = [...files].filter((file) => file.endsWith('.html'));
   const pages = await Promise.all(
     htmlFiles.map(async (file) => {
-      const html = injectTrackingScript(
-        await readFile(join(root, file), 'utf8'),
-        trackingScript,
+      const html = stampBase(
+        injectTrackingScript(
+          await readFile(join(root, file), 'utf8'),
+          stamp.trackingScript,
+        ),
+        stamp.basePath,
       );
       return [file, { html, etag: await etagOf(html) }] as const;
     }),
   );
   return new Map(pages);
+}
+
+/**
+ * Write the mount into the first `<base href="/">` a page carries, as the
+ * container entrypoints of a mounted image do.
+ * @param html - The page.
+ * @param basePath - The mount, `''` for none.
+ * @returns The page, its relative addresses resolving under the mount.
+ */
+function stampBase(html: string, basePath: string): string {
+  if (basePath === '') return html;
+  const tag = `<base href="${escapeAttribute(`${basePath}/`)}" />`;
+  return html.replace(ROOT_BASE, () => tag);
+}
+
+/**
+ * Where a redirect sends the browser: under the mount the proxy took off.
+ * @param basePath - The mount, `''` for none.
+ * @param destination - The address, from the site's own root or absolute.
+ * @returns The address the browser is sent to.
+ */
+function mountedAddress(basePath: string, destination: string): string {
+  if (basePath === '' || !destination.startsWith('/')) return destination;
+  return joinBasePath(basePath, destination);
 }
 
 function sendPage(

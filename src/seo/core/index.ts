@@ -24,6 +24,13 @@ export { plainDescription, plainProse } from './plainDescription.ts';
 export type { RobotsDisallow } from './robots.ts';
 export { robotsTxt } from './robots.ts';
 export { routeProblems, withheldPhrase } from './routeProblems.ts';
+export type { RouteField } from './routeTable.ts';
+export {
+  ROUTE_FIELDS,
+  ROUTE_TABLE_FILE,
+  parseRouteTable,
+  serializeRouteTable,
+} from './routeTable.ts';
 export type { RouteMeta } from './routes.ts';
 export { assertRoutes, homeRoute, pageMetaFor, routeFor } from './routes.ts';
 export type { SiteFilesOptions } from './siteFiles.ts';
