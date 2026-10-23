@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.67.0](https://github.com/cheminfo/react-cheminfo/compare/v0.66.0...v0.67.0) (2026-10-23)
+
+
+### Features
+
+* let a host add panels to the IR and Raman viewers and hear plot clicks ([93198ba](https://github.com/cheminfo/react-cheminfo/commit/93198ba78d0b988c1c81a6d56cccd9a555c1c1fa))
+
 ## [0.66.0](https://github.com/cheminfo/react-cheminfo/compare/v0.65.0...v0.66.0) (2026-10-23)
 
 
