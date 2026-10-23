@@ -1,11 +1,5 @@
 import type { Ref } from 'react';
-import {
-  useCallback,
-  useId,
-  useImperativeHandle,
-  useMemo,
-  useState,
-} from 'react';
+import { useId, useMemo, useState } from 'react';
 import { SplitPane, useFullscreen } from 'react-science/ui';
 
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
@@ -13,12 +7,12 @@ import { useFigureDownload } from '../../download/ui/useFigureDownload.tsx';
 import { PanelRail } from '../../panel/ui/PanelRail.tsx';
 import type { IrBand } from '../core/irBand.ts';
 import type { IrCommandHandlers } from '../core/irCommands.ts';
-import { fullDomain } from '../core/irDomain.ts';
-import type { IrEditorHandle, ZoomToBandOptions } from '../core/irEditorApi.ts';
-import { otherIrMode, yAxisRules } from '../core/irMode.ts';
+import type { IrEditorHandle } from '../core/irEditorApi.ts';
+import { otherIrMode } from '../core/irMode.ts';
 import { irSidePanels } from '../core/irSidePanels.ts';
-import type { IrDomain, IrSpectrum } from '../core/irSpectrum.ts';
+import type { IrSpectrum } from '../core/irSpectrum.ts';
 import { DEFAULT_SIDE_PANEL } from '../core/irState.ts';
+import { irCommandOffered } from '../core/irTechniqueCommands.ts';
 
 import { IrAboutDialog } from './IrAboutDialog.tsx';
 import { IrCanvas } from './IrCanvas.tsx';
@@ -28,7 +22,9 @@ import { IrHeader } from './IrHeader.tsx';
 import { IrSidePanel } from './IrSidePanel.tsx';
 import { IrToolbar } from './IrToolbar.tsx';
 import { useIrActions, useIrEditorState } from './irStateContext.ts';
+import { useIrHandle } from './useIrHandle.ts';
 import { useIrShortcuts } from './useIrShortcuts.ts';
+import { useValueAxisZoom } from './useValueAxisZoom.ts';
 
 export interface IrShellProps {
   /**
@@ -58,8 +54,8 @@ export function IrShell(props: IrShellProps) {
   const { state, visibleSpectra, selectedSpectrum } = useIrEditorState();
   const actions = useIrActions();
   const { toggle: toggleFullScreen } = useFullscreen();
-  const { openPanelIds, tool, domain } = state.view;
-  const { mode, pickBands, showAssignments } = state.settings;
+  const { openPanelIds, tool } = state.view;
+  const { mode, pickBands, showAssignments, technique } = state.settings;
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isDocumentationOpen, setIsDocumentationOpen] = useState(false);
@@ -79,27 +75,7 @@ export function IrShell(props: IrShellProps) {
   // times a second.
   const [highlight, setHighlight] = useState<IrBand | null>(null);
 
-  /**
-   * ChartScale the value axis by a factor, about the baseline the mode hangs from.
-   * @param factor - Above one to zoom out.
-   */
-  const scaleValueAxis = useCallback(
-    (factor: number) => {
-      const shown = domain ?? fullDomain(visibleSpectra, mode);
-      // Asked of the mode rather than written out again here: the baseline a
-      // value axis is scaled about is `irMode`'s to know, and a second copy of
-      // it is a second thing to get wrong.
-      const { baseline = 0 } = yAxisRules(mode);
-      actions.setDomain({
-        x: shown.x,
-        y: [
-          baseline + (shown.y[0] - baseline) * factor,
-          baseline + (shown.y[1] - baseline) * factor,
-        ],
-      });
-    },
-    [actions, domain, visibleSpectra, mode],
-  );
+  const { zoomIn, zoomOut } = useValueAxisZoom();
 
   const commands = useMemo<IrCommandHandlers>(
     () => ({
@@ -108,13 +84,18 @@ export function IrShell(props: IrShellProps) {
       fullScreen: toggleFullScreen,
       readTool: () => actions.setTool('read'),
       boxTool: () => actions.setTool(tool === 'box' ? 'read' : 'box'),
-      zoomIn: () => scaleValueAxis(1 / ZOOM_STEP),
-      zoomOut: () => scaleValueAxis(ZOOM_STEP),
+      zoomIn,
+      zoomOut,
       resetZoom: () => actions.resetDomain(),
-      toggleMode: () => actions.setSettings({ mode: otherIrMode(mode) }),
+      // A command the technique does not offer has no handler, so its key
+      // stays with the page.
+      toggleMode: irCommandOffered(technique, 'toggleMode')
+        ? () => actions.setSettings({ mode: otherIrMode(mode, technique) })
+        : undefined,
       togglePicking: () => actions.setSettings({ pickBands: !pickBands }),
-      toggleAssignments: () =>
-        actions.setSettings({ showAssignments: !showAssignments }),
+      toggleAssignments: irCommandOffered(technique, 'toggleAssignments')
+        ? () => actions.setSettings({ showAssignments: !showAssignments })
+        : undefined,
       exportImage: () => setFigureOpen(!isFigureOpen),
       clear: () => actions.clear(),
     }),
@@ -122,9 +103,11 @@ export function IrShell(props: IrShellProps) {
       actions,
       tool,
       mode,
+      technique,
       pickBands,
       showAssignments,
-      scaleValueAxis,
+      zoomIn,
+      zoomOut,
       toggleFullScreen,
       isFigureOpen,
       setFigureOpen,
@@ -137,28 +120,7 @@ export function IrShell(props: IrShellProps) {
   // again.
   const [root, setRoot] = useState<HTMLElement | null>(null);
   useIrShortcuts(root, commands);
-
-  useImperativeHandle(
-    handle,
-    (): IrEditorHandle => ({
-      getSpectra: () => state.data.spectra,
-      setSpectra: (spectra) => actions.setSpectra(spectra),
-      addSpectra: (spectra) => actions.addSpectra(spectra),
-      clear: () => actions.clear(),
-      setDomain: (next) => actions.setDomain(next),
-      resetDomain: () => actions.resetDomain(),
-      zoomToWavenumber: (wavenumber, options: ZoomToBandOptions = {}) => {
-        const { width = DEFAULT_FRAME_WIDTH } = options;
-        const shown: IrDomain = domain ?? fullDomain(visibleSpectra, mode);
-        actions.setDomain({
-          x: [wavenumber - width / 2, wavenumber + width / 2],
-          y: shown.y,
-        });
-      },
-      selectSpectrum: (id) => actions.selectSpectrum(id),
-    }),
-    [state.data.spectra, actions, domain, visibleSpectra, mode],
-  );
+  useIrHandle(handle);
 
   /**
    * Open or close the side, as the splitter is dragged shut and back open.
@@ -175,7 +137,7 @@ export function IrShell(props: IrShellProps) {
   }
 
   return (
-    <IrCommandProvider handlers={commands}>
+    <IrCommandProvider handlers={commands} technique={technique}>
       {/* `tabIndex` so a click anywhere in the viewer makes this the target the
           shortcuts are heard on: keys are delivered to whatever holds the caret,
           and an SVG never does. */}
@@ -221,26 +183,16 @@ export function IrShell(props: IrShellProps) {
       <IrAboutDialog
         isOpen={isAboutOpen}
         onClose={() => setIsAboutOpen(false)}
+        technique={technique}
       />
       <IrDocumentationDialog
         isOpen={isDocumentationOpen}
         onClose={() => setIsDocumentationOpen(false)}
+        technique={technique}
       />
     </IrCommandProvider>
   );
 }
-
-/**
- * What one press of zoom in or out is worth.
- *
- * A fifth, which is about what one notch of a mouse wheel does — so the button
- * and the wheel feel like the same gesture at two speeds rather than two
- * different ones.
- */
-const ZOOM_STEP = 1.2;
-
-/** How wide a window a host gets when it asks to frame a band without saying. */
-const DEFAULT_FRAME_WIDTH = 200;
 
 /**
  * What a picture of the chart is called.

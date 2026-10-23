@@ -1,22 +1,21 @@
-import { Icon } from '@blueprintjs/core';
 import { useMemo } from 'react';
 import { Button, Toolbar } from 'react-science/ui';
 
 import {
   panelBodyStyle,
-  panelCellStyle,
   panelEmptyStyle,
   panelHeaderCellStyle,
-  panelNumberCellStyle,
   panelStyle,
   panelTableStyle,
   panelToolbarStyle,
 } from '../../panel/core/panelStyles.ts';
-import type { AssignedBand } from '../core/assignBands.ts';
 import type { IrBand } from '../core/irBand.ts';
 import { sameIrBand } from '../core/irBand.ts';
-import { formatIrValue, formatWavenumber } from '../core/irFormat.ts';
+import { shortModeLabel } from '../core/irFormat.ts';
+import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 
+import { BandRow } from './BandRow.tsx';
+import { bandsToTsv } from './bandsTsv.ts';
 import { useIrActions, useIrEditorState } from './irStateContext.ts';
 
 export interface BandsPanelProps {
@@ -45,6 +44,10 @@ export interface BandsPanelProps {
  * Hovering a row marks the band on the chart and hovering the chart lights the
  * row, which is the whole reason the highlight is threaded through the shell
  * rather than held here: the two views are of one thing.
+ *
+ * For a technique the correlation table does not cover — Raman — the column of
+ * candidates and the button naming them are left out, and the table is the
+ * bands themselves.
  * @param props - Component props.
  * @returns The panel.
  */
@@ -52,11 +55,16 @@ export function BandsPanel(props: BandsPanelProps) {
   const { highlight = null, onHighlight } = props;
   const { state, selectedSpectrum, assigned } = useIrEditorState();
   const actions = useIrActions();
-  const { mode, pickBands, showAssignments, picking } = state.settings;
+  const { mode, pickBands, showAssignments, picking, technique } =
+    state.settings;
+  const { assignments } = IR_TECHNIQUE_RULES[technique];
 
   const rows = useMemo(() => assigned, [assigned]);
 
-  const tsv = useMemo(() => bandsToTsv(rows, mode), [rows, mode]);
+  const tsv = useMemo(
+    () => bandsToTsv(rows, mode, assignments),
+    [rows, mode, assignments],
+  );
 
   return (
     <div style={panelStyle}>
@@ -69,16 +77,18 @@ export function BandsPanel(props: BandsPanelProps) {
             aria-label="Pick the bands"
             onClick={() => actions.setSettings({ pickBands: !pickBands })}
           />
-          <Toolbar.Item
-            icon="label"
-            active={showAssignments}
-            tooltip="Name the assignments on the chart"
-            aria-label="Name the assignments on the chart"
-            disabled={!pickBands}
-            onClick={() =>
-              actions.setSettings({ showAssignments: !showAssignments })
-            }
-          />
+          {assignments ? (
+            <Toolbar.Item
+              icon="label"
+              active={showAssignments}
+              tooltip="Name the assignments on the chart"
+              aria-label="Name the assignments on the chart"
+              disabled={!pickBands}
+              onClick={() =>
+                actions.setSettings({ showAssignments: !showAssignments })
+              }
+            />
+          ) : null}
         </Toolbar>
 
         {/* The threshold is the one picking setting worth reaching for while
@@ -134,9 +144,11 @@ export function BandsPanel(props: BandsPanelProps) {
                 <th style={panelHeaderCellStyle}>cm⁻¹</th>
                 <th style={panelHeaderCellStyle} />
                 <th style={{ ...panelHeaderCellStyle, textAlign: 'right' }}>
-                  {mode === 'absorbance' ? 'A' : '%T'}
+                  {shortModeLabel(mode)}
                 </th>
-                <th style={panelHeaderCellStyle}>could be</th>
+                {assignments ? (
+                  <th style={panelHeaderCellStyle}>could be</th>
+                ) : null}
               </tr>
             </thead>
             <tbody>
@@ -145,6 +157,7 @@ export function BandsPanel(props: BandsPanelProps) {
                   key={`${entry.band.spectrumId} ${entry.band.wavenumber}`}
                   entry={entry}
                   mode={mode}
+                  assignments={assignments}
                   lit={sameIrBand(entry.band, highlight)}
                   onHighlight={onHighlight}
                 />
@@ -156,112 +169,6 @@ export function BandsPanel(props: BandsPanelProps) {
     </div>
   );
 }
-
-interface BandRowProps {
-  /** The band and everything it might be. */
-  entry: AssignedBand;
-  /** Which value axis is being read. */
-  mode: 'absorbance' | 'transmittance';
-  /** Whether the pointer is on this band, here or on the chart. */
-  lit: boolean;
-  /** Told when the pointer arrives on this row, and when it leaves. */
-  onHighlight?: (band: IrBand | null) => void;
-}
-
-/**
- * One band: where it is, how strong, and every vibration it could be.
- *
- * The candidates are written as one line rather than a list, so a strong band
- * with four of them stays one row of the table and the wavenumbers keep reading
- * down the column. The `title` carries them again with each one's note, which is
- * where the reason to prefer one lives.
- * @param props - Component props.
- * @returns The row.
- */
-function BandRow(props: BandRowProps) {
-  const { entry, mode, lit, onHighlight } = props;
-  const { band, candidates } = entry;
-
-  const value = mode === 'absorbance' ? band.absorbance : band.transmittance;
-  const detail = candidates
-    .map((candidate) =>
-      candidate.note === undefined
-        ? `${candidate.group} ${candidate.vibration}`
-        : `${candidate.group} ${candidate.vibration} — ${candidate.note}`,
-    )
-    .join('\n');
-
-  return (
-    <tr
-      style={lit ? litRowStyle : undefined}
-      onPointerEnter={() => onHighlight?.(band)}
-      onPointerLeave={() => onHighlight?.(null)}
-    >
-      <td style={panelNumberCellStyle}>{formatWavenumber(band.wavenumber)}</td>
-      <td style={panelCellStyle} title={STRENGTH_TITLES[band.strength]}>
-        {band.strength}
-      </td>
-      <td style={panelNumberCellStyle}>{formatIrValue(value, mode)}</td>
-      <td style={panelCellStyle} title={detail}>
-        {candidates.length === 0 ? (
-          <span style={{ opacity: 0.5 }}>—</span>
-        ) : (
-          <span style={{ whiteSpace: 'normal' }}>
-            {candidates[0]?.group} {candidates[0]?.vibration}
-            {candidates.length > 1 ? (
-              <span style={{ opacity: 0.6 }}>
-                {' '}
-                <Icon icon="more" size={10} /> {candidates.length - 1} more
-              </span>
-            ) : null}
-          </span>
-        )}
-      </td>
-    </tr>
-  );
-}
-
-/** What each strength letter means, for the column that shows only the letter. */
-const STRENGTH_TITLES = {
-  w: 'weak, relative to this spectrum',
-  m: 'medium, relative to this spectrum',
-  S: 'strong, relative to this spectrum',
-} as const;
-
-/**
- * The table as text, for pasting into a notebook.
- *
- * Tab separated with every candidate on the row, because the reason to copy a
- * band table is to put it beside a structure and argue about it — and the
- * argument is over the candidates rather than over the wavenumbers.
- * @param rows - The bands, as they are shown.
- * @param mode - Which value axis is being read.
- * @returns The table, one line per band, with a heading.
- */
-function bandsToTsv(
-  rows: readonly AssignedBand[],
-  mode: 'absorbance' | 'transmittance',
-): string {
-  const heading = ['wavenumber', 'strength', mode, 'could be'].join('\t');
-  const lines = rows.map((entry) =>
-    [
-      formatWavenumber(entry.band.wavenumber),
-      entry.band.strength,
-      formatIrValue(
-        mode === 'absorbance'
-          ? entry.band.absorbance
-          : entry.band.transmittance,
-        mode,
-      ),
-      entry.candidates
-        .map((candidate) => `${candidate.group} ${candidate.vibration}`)
-        .join('; '),
-    ].join('\t'),
-  );
-  return [heading, ...lines].join('\n');
-}
-
-const litRowStyle = { background: '#fff3e0' } as const;
 
 const thresholdStyle = {
   display: 'inline-flex',

@@ -2,6 +2,8 @@ import { Header, Toolbar, useFullscreen } from 'react-science/ui';
 
 import { IrLogo } from './IrLogo.tsx';
 import { useIrCommandProps } from './irCommandContext.tsx';
+import { useIrEditorState } from './irStateContext.ts';
+import { useIrText } from './useIrText.ts';
 
 /**
  * The bar across the top: the mark on the left, the viewer on the right.
@@ -17,13 +19,18 @@ import { useIrCommandProps } from './irCommandContext.tsx';
 export function IrHeader() {
   const command = useIrCommandProps();
   const { isFullScreen } = useFullscreen();
+  const { technique } = useIrEditorState().state.settings;
+  const text = useIrText(technique);
 
   return (
     <Header>
-      <Toolbar aria-label="Infrared spectrum viewer">
-        <Toolbar.Item icon={<IrLogo size={16} />} {...command('about')} />
+      <Toolbar aria-label={text.viewer}>
+        <Toolbar.Item
+          icon={<IrLogo size={16} technique={technique} />}
+          {...command('about')}
+        />
       </Toolbar>
-      <Toolbar aria-label="Infrared spectrum viewer help">
+      <Toolbar aria-label={text.viewerHelp}>
         <Toolbar.Item icon="help" {...command('documentation')} />
         {/* Always the last thing in the bar, hard against the right edge: the
             corner a window is made bigger from is the corner it is looked for

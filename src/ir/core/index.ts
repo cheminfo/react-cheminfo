@@ -10,7 +10,8 @@
  * transmittance and a band points the other way in each, and that a wavenumber
  * maps to a range of vibrations rather than to one. Nothing here knows what a
  * glycan is, and nothing should: an infrared spectrum answers for whatever was
- * put in the beam.
+ * put in the beam. A Raman spectrum is the one other technique held, and what
+ * differs for it is in `IR_TECHNIQUE_RULES`.
  */
 
 export type { LoadedIrSpectrum } from './analysisSpectra.ts';
@@ -26,16 +27,22 @@ export { downloadIrSpectra, downloadIrSpectrum } from './downloadSpectra.ts';
 export type { IrJcampReadOptions } from './fromJcamp.ts';
 export type { IrSpcReadOptions } from './fromSpc.ts';
 export type { IrBand, IrBandStrength } from './irBand.ts';
-export { sameIrBand } from './irBand.ts';
+export { bandHeight, bandValue, sameIrBand } from './irBand.ts';
 export type {
   IrCommand,
   IrCommandHandlers,
   IrCommandId,
+  IrCommandTable,
   IrGesture,
   IrShortcut,
   RunIrCommand,
 } from './irCommands.ts';
-export { irCommandLabel, irCommands } from './irCommands.ts';
+export {
+  irCommandEntryLabel,
+  irCommandLabel,
+  irCommands,
+} from './irCommands.ts';
+export { irCommandOffered, irCommandsFor } from './irTechniqueCommands.ts';
 export {
   LABEL_HEADROOM,
   X_DOMAIN_PADDING,
@@ -46,9 +53,11 @@ export {
 export type { IrEditorHandle, ZoomToBandOptions } from './irEditorApi.ts';
 export {
   ABSORBANCE_DECIMALS,
+  INTENSITY_DIGITS,
   TRANSMITTANCE_DECIMALS,
   formatIrValue,
   formatWavenumber,
+  formatWavenumberRange,
   shortModeLabel,
 } from './irFormat.ts';
 export {
@@ -61,8 +70,8 @@ export {
   yAxisTitle,
   zoomGestures,
 } from './irMode.ts';
-export type { CreateIrStateOptions, IrAction } from './irReducer.ts';
-export { createIrState, irReducer } from './irReducer.ts';
+export type { IrAction } from './irReducer.ts';
+export { irReducer } from './irReducer.ts';
 export type {
   IrDomain,
   IrFormat,
@@ -75,6 +84,7 @@ export type {
 } from './irSpectrum.ts';
 export { traceOf } from './irSpectrum.ts';
 export type {
+  CreateIrStateOptions,
   IrData,
   IrSettings,
   IrState,
@@ -89,9 +99,19 @@ export {
   DEFAULT_SIDE_PANEL,
   DEFAULT_SIDE_PANELS,
   MAXIMUM_LABEL_LIMIT,
+  createIrState,
   isIrWindow,
   mergeIrSettings,
 } from './irState.ts';
+export type { IrTechnique, IrTechniqueRules } from './irTechnique.ts';
+export {
+  IR_TECHNIQUES,
+  IR_TECHNIQUE_RULES,
+  defaultIrMode,
+  irModeFor,
+  irModeTechnique,
+  offersIrMode,
+} from './irTechnique.ts';
 export type {
   LoadIrSpectraOptions,
   LoadIrSpectraResult,

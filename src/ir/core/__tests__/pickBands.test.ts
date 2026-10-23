@@ -37,7 +37,7 @@ test('every band that was put in the spectrum is found', async () => {
 test('the bands come back ascending, and the deepest is the carbonyl', async () => {
   const bands = pickBands(await fiveBands());
   const strongest = bands.toSorted(
-    (first, second) => second.absorbance - first.absorbance,
+    (first, second) => (second.absorbance ?? 0) - (first.absorbance ?? 0),
   )[0];
 
   expect(Math.round(strongest?.wavenumber ?? 0)).toBe(1708);

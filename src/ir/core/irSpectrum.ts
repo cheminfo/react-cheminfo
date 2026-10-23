@@ -1,17 +1,22 @@
 /**
- * What an infrared spectrum is once it has been read, whatever it was read from.
+ * What a vibrational spectrum is once it has been read, whatever it was read
+ * from.
  *
- * One acquisition becomes one `IrSpectrum` carrying **both** value axes —
- * absorbance and percent transmittance — over one shared array of wavenumbers.
- * Both are held rather than one being derived on demand because `ir-spectrum`
- * already produces both when it reads a file: it adds an `a` and a `t` variable
- * to every spectrum whichever of the two the instrument wrote, so the conversion
- * happens once, in the one place that knows what the file's y axis meant. Holding
- * the answer means switching what is drawn costs nothing, and means the two
- * axes can never drift apart through a round trip.
+ * One infrared acquisition becomes one `IrSpectrum` carrying **both** value
+ * axes — absorbance and percent transmittance — over one shared array of
+ * wavenumbers. Both are held rather than one being derived on demand because
+ * `ir-spectrum` already produces both when it reads a file: it adds an `a` and
+ * a `t` variable to every spectrum whichever of the two the instrument wrote, so
+ * the conversion happens once, in the one place that knows what the file's y
+ * axis meant. Holding the answer means switching what is drawn costs nothing,
+ * and means the two axes can never drift apart through a round trip.
+ *
+ * A Raman acquisition carries its intensity instead, over its Raman shifts —
+ * also wavenumbers in cm⁻¹ — and neither infrared axis: there is no
+ * transmittance of scattered light to convert it to.
  *
  * The arrays are `Float64Array` and are replaced on a change, never written
- * into, since every consumer holds the same object by reference. An infrared
+ * into, since every consumer holds the same object by reference. A vibrational
  * spectrum is a few thousand points rather than a mass spectrum's few hundred
  * thousand, so holding two value axes costs nothing worth counting.
  */
@@ -30,8 +35,11 @@ import type { ChartDomain } from '../../chart/core/chartDomain.ts';
  */
 export type IrTrace = DataXY<Float64Array>;
 
-/** The formats a spectrum can have been read from. */
-export type IrFormat = 'jcamp' | 'spc' | 'text' | 'calculated';
+/**
+ * The formats a spectrum can have been read from. `wdf` is Renishaw's Raman
+ * format, which a host reads with its own parser and hands over.
+ */
+export type IrFormat = 'jcamp' | 'spc' | 'text' | 'wdf' | 'calculated';
 
 /**
  * Where a spectrum came from, and what the file said about the acquisition.
@@ -87,8 +95,11 @@ export interface IrMeta {
   fields: IrMetaField[];
 }
 
-/** Which value axis is being drawn and read. */
-export type IrMode = 'absorbance' | 'transmittance';
+/**
+ * Which value axis is being drawn and read: absorbance or percent
+ * transmittance for an infrared spectrum, intensity for a Raman one.
+ */
+export type IrMode = 'absorbance' | 'transmittance' | 'intensity';
 
 /** One spectrum as the viewer holds it. */
 export interface IrSpectrum {
@@ -99,19 +110,33 @@ export interface IrSpectrum {
   /** The colour it is drawn in. */
   color: string;
   /**
-   * The wavenumbers in cm⁻¹, **ascending**.
+   * The wavenumbers in cm⁻¹, **ascending** — of the light absorbed for an
+   * infrared spectrum, the Raman shift for a Raman one.
    *
-   * Ascending even though the axis is read from 4000 down to 400: which way the
-   * numbers run on screen is the chart's business, and every binary search and
-   * every extent taken off index zero downstream wants them in order. Reversing
-   * the data instead would make the drawing simpler once and everything else
-   * wrong.
+   * Ascending even though the infrared axis is read from 4000 down to 400:
+   * which way the numbers run on screen is the chart's business, and every
+   * binary search and every extent taken off index zero downstream wants them in
+   * order. Reversing the data instead would make the drawing simpler once and
+   * everything else wrong.
    */
   wavenumber: Float64Array;
-  /** Absorbance at each wavenumber, as `ir-spectrum` supplied it. */
-  absorbance: Float64Array;
-  /** Percent transmittance at each wavenumber, likewise. */
-  transmittance: Float64Array;
+  /**
+   * Absorbance at each wavenumber, as `ir-spectrum` supplied it. An infrared
+   * spectrum carries it beside `transmittance`.
+   * @default undefined
+   */
+  absorbance?: Float64Array;
+  /**
+   * Percent transmittance at each wavenumber, likewise.
+   * @default undefined
+   */
+  transmittance?: Float64Array;
+  /**
+   * Intensity at each Raman shift, which a Raman spectrum carries instead of
+   * the two infrared axes.
+   * @default undefined
+   */
+  intensity?: Float64Array;
   /** What the file said about the acquisition, `null` when it said nothing. */
   meta: IrMeta | null;
   /** Where it came from. */
@@ -145,11 +170,15 @@ export type IrDomain = ChartDomain;
  * render of every spectrum is a copy per frame for no gain.
  * @param spectrum - The spectrum.
  * @param mode - Which value axis is being drawn.
- * @returns The trace, sharing the spectrum's own arrays.
+ * @returns The trace, sharing the spectrum's own arrays, or `undefined` when the
+ * spectrum carries no such axis — a Raman spectrum has no absorbance.
  */
-export function traceOf(spectrum: IrSpectrum, mode: IrMode): IrTrace {
-  return {
-    x: spectrum.wavenumber,
-    y: mode === 'absorbance' ? spectrum.absorbance : spectrum.transmittance,
-  };
+export function traceOf(
+  spectrum: IrSpectrum,
+  mode: IrMode,
+): IrTrace | undefined {
+  const values = spectrum[mode];
+  return values === undefined
+    ? undefined
+    : { x: spectrum.wavenumber, y: values };
 }

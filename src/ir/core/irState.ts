@@ -15,6 +15,8 @@
 
 import type { IrSidePanelId } from './irSidePanels.ts';
 import type { IrDomain, IrMode, IrSpectrum } from './irSpectrum.ts';
+import type { IrTechnique } from './irTechnique.ts';
+import { defaultIrMode, irModeFor, offersIrMode } from './irTechnique.ts';
 import type { PickBandsOptions } from './pickBands.ts';
 
 /** The document: what a file holds. */
@@ -48,7 +50,12 @@ export interface IrView {
 
 /** The workspace: how every spectrum is drawn, whichever ones are open. */
 export interface IrSettings {
-  /** Which value axis the spectra are read in. */
+  /**
+   * What the spectra were measured with. Chosen when the viewer opens and fixed
+   * from then on: a change asking for another is ignored.
+   */
+  technique: IrTechnique;
+  /** Which value axis the spectra are read in, always one the technique offers. */
   mode: IrMode;
   /** Whether the bands are picked at all. */
   pickBands: boolean;
@@ -108,6 +115,7 @@ export const DEFAULT_PICKING: PickBandsOptions = {
 
 /** The workspace a fresh viewer starts from. */
 export const DEFAULT_SETTINGS: IrSettings = {
+  technique: 'infrared',
   mode: 'transmittance',
   pickBands: true,
   picking: DEFAULT_PICKING,
@@ -116,6 +124,57 @@ export const DEFAULT_SETTINGS: IrSettings = {
   assignmentTolerance: 5,
 };
 
+/** What a viewer opens on. */
+export interface CreateIrStateOptions {
+  /**
+   * The spectra to open on.
+   * @default []
+   */
+  spectra?: IrSpectrum[];
+  /**
+   * The workspace to open in. Its `technique` is fixed for the life of the
+   * viewer, and its `mode` falls back to the technique's first when the
+   * technique does not offer it.
+   * @default DEFAULT_SETTINGS
+   */
+  settings?: Partial<IrSettings>;
+  /**
+   * The panels open to begin with.
+   * @default DEFAULT_SIDE_PANELS
+   */
+  panelIds?: IrSidePanelId[];
+}
+
+/**
+ * The state a viewer opens with.
+ *
+ * The panel list is spread rather than stored by reference: a caller's array is
+ * the caller's to mutate, and a viewer holding it would find its open panels
+ * changing under it.
+ * @param options - What it opens on.
+ * @returns The state.
+ */
+export function createIrState(options: CreateIrStateOptions = {}): IrState {
+  const { spectra = [], settings, panelIds } = options;
+  const technique = settings?.technique ?? DEFAULT_SETTINGS.technique;
+  const opened: IrSettings = {
+    ...DEFAULT_SETTINGS,
+    technique,
+    mode: defaultIrMode(technique),
+  };
+  return {
+    data: { spectra: [...spectra] },
+    view: {
+      selectedId: spectra[0]?.id ?? null,
+      domain: null,
+      tool: 'read',
+      openPanelIds: [...(panelIds ?? DEFAULT_SIDE_PANELS)],
+      error: null,
+    },
+    settings: mergeIrSettings(opened, settings),
+  };
+}
+
 /**
  * Fold a change into the workspace, refusing what no chart survives.
  *
@@ -123,7 +182,9 @@ export const DEFAULT_SETTINGS: IrSettings = {
  * not yet a number — a lone minus sign, an empty box — and a limit of `NaN`
  * silently stops every label being drawn. So each is checked, and the current
  * value is kept where the new one is unusable rather than the field being
- * fought with while it is being typed in.
+ * fought with while it is being typed in. The technique is never changed, and a
+ * mode it does not offer is refused the same way: a Raman spectrum has no
+ * absorbance to draw.
  * @param current - The workspace in force.
  * @param change - What to change about it.
  * @returns The new workspace.
@@ -137,6 +198,10 @@ export function mergeIrSettings(
   return {
     ...current,
     ...change,
+    technique: current.technique,
+    mode: offersIrMode(current.technique, change.mode)
+      ? change.mode
+      : irModeFor(current.technique, current.mode),
     picking: { ...current.picking, ...change.picking },
     labelLimit: Number.isFinite(asked)
       ? Math.min(MAXIMUM_LABEL_LIMIT, Math.max(0, Math.round(asked)))

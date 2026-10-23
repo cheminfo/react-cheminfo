@@ -21,10 +21,18 @@ import { useChartZoom } from '../../chart/ui/useChartZoom.ts';
 import { fittedTo, fullDomain } from '../core/irDomain.ts';
 import { yAxisRules, zoomGestures } from '../core/irMode.ts';
 import type { IrDomain, IrMode, IrSpectrum } from '../core/irSpectrum.ts';
+import type { IrTechnique } from '../core/irTechnique.ts';
+import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 
 export interface IrZoomOptions {
   /** Everything the chart holds, which is what the window is fitted to. */
   spectra: readonly IrSpectrum[];
+  /**
+   * What the spectra were measured with, which decides which way the
+   * wavenumber axis runs.
+   * @default 'infrared'
+   */
+  technique?: IrTechnique;
   /** Which value axis is being drawn. */
   mode: IrMode;
   /** The SVG the gestures are made on, as it was handed to its `ref`. */
@@ -58,6 +66,7 @@ export interface IrZoomOptions {
 export function useIrZoom(options: IrZoomOptions): ChartZoom {
   const {
     spectra,
+    technique = 'infrared',
     mode,
     svgRef,
     plot,
@@ -71,8 +80,8 @@ export function useIrZoom(options: IrZoomOptions): ChartZoom {
   const gestures = useMemo(() => zoomGestures(mode, drag), [mode, drag]);
 
   // `reverseX` is not decoration: the hook measures every gesture by inverting a
-  // pixel through the scale it builds, so it has to build the same reversed one
-  // the chart draws with.
+  // pixel through the scale it builds, so it has to build the same scale the
+  // chart draws with — reversed for infrared, forward for Raman.
   return useChartZoom({
     fitted,
     fitKey,
@@ -81,6 +90,6 @@ export function useIrZoom(options: IrZoomOptions): ChartZoom {
     yAxis,
     domain,
     gestures,
-    reverseX: true,
+    reverseX: IR_TECHNIQUE_RULES[technique].reverseX,
   });
 }

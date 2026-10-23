@@ -16,12 +16,7 @@
 import type { IrSidePanelId } from './irSidePanels.ts';
 import type { IrDomain, IrSpectrum } from './irSpectrum.ts';
 import type { IrSettings, IrState, IrTool, PartialIrState } from './irState.ts';
-import {
-  DEFAULT_SETTINGS,
-  DEFAULT_SIDE_PANELS,
-  isIrWindow,
-  mergeIrSettings,
-} from './irState.ts';
+import { isIrWindow, mergeIrSettings } from './irState.ts';
 
 /** Everything that can be asked of the viewer. */
 export type IrAction =
@@ -40,49 +35,6 @@ export type IrAction =
   | { type: 'setSettings'; settings: Partial<IrSettings> }
   | { type: 'loadState'; state: PartialIrState }
   | { type: 'clear' };
-
-/** What a viewer opens on. */
-export interface CreateIrStateOptions {
-  /**
-   * The spectra to open on.
-   * @default []
-   */
-  spectra?: IrSpectrum[];
-  /**
-   * The workspace to open in.
-   * @default DEFAULT_SETTINGS
-   */
-  settings?: Partial<IrSettings>;
-  /**
-   * The panels open to begin with.
-   * @default DEFAULT_SIDE_PANELS
-   */
-  panelIds?: IrSidePanelId[];
-}
-
-/**
- * The state a viewer opens with.
- *
- * The panel list is spread rather than stored by reference: a caller's array is
- * the caller's to mutate, and a viewer holding it would find its open panels
- * changing under it.
- * @param options - What it opens on.
- * @returns The state.
- */
-export function createIrState(options: CreateIrStateOptions = {}): IrState {
-  const { spectra = [], settings, panelIds } = options;
-  return {
-    data: { spectra: [...spectra] },
-    view: {
-      selectedId: spectra[0]?.id ?? null,
-      domain: null,
-      tool: 'read',
-      openPanelIds: [...(panelIds ?? DEFAULT_SIDE_PANELS)],
-      error: null,
-    },
-    settings: mergeIrSettings(DEFAULT_SETTINGS, settings),
-  };
-}
 
 /**
  * Fold one action into the state.

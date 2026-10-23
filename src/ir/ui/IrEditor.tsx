@@ -1,13 +1,10 @@
 import type { Ref } from 'react';
-import { RootLayout } from 'react-science/ui';
 
 import type { IrEditorHandle } from '../core/irEditorApi.ts';
 import type { IrSidePanelId } from '../core/irSidePanels.ts';
 import type { IrMode, IrSpectrum } from '../core/irSpectrum.ts';
 
-import { IrShell } from './IrShell.tsx';
-import { IrStateProvider } from './IrStateProvider.tsx';
-import { useIrEditor } from './useIrEditor.ts';
+import { VibrationalEditor } from './VibrationalEditor.tsx';
 
 export interface IrEditorProps {
   /**
@@ -29,7 +26,8 @@ export interface IrEditorProps {
    */
   onChange?: (spectra: IrSpectrum[]) => void;
   /**
-   * Which value axis to open in.
+   * Which value axis to open in: transmittance or absorbance. Intensity, which
+   * infrared does not offer, opens transmittance instead.
    * @default 'transmittance'
    */
   mode?: IrMode;
@@ -49,6 +47,7 @@ export interface IrEditorProps {
 /**
  * An infrared spectrum viewer: a header across the top, the chart in the middle,
  * the tools down the left, and the panels that interrogate it down the right.
+ * `RamanEditor`, from `react-cheminfo/raman`, is the same viewer for Raman.
  *
  * The same shape as the mass viewer, deliberately — a page may well hold both,
  * and a chemist who has learned one should not have to learn the other. The chart
@@ -65,35 +64,5 @@ export interface IrEditorProps {
  * @returns The viewer.
  */
 export function IrEditor(props: IrEditorProps) {
-  const { data = NO_SPECTRA, onChange, mode, defaultPanelIds, ref } = props;
-
-  const editor = useIrEditor({
-    spectra: data,
-    settings: mode === undefined ? undefined : { mode },
-    panelIds: defaultPanelIds,
-    onChange,
-  });
-
-  return (
-    <IrStateProvider editor={editor}>
-      {/* `react-science`'s own root: it holds the element the browser is asked
-          to show full screen, points Blueprint's portals at that element so
-          dialogs and tooltips are not left behind in `document.body`, and paints
-          the backdrop white. Above the shell rather than inside it, so the shell
-          can ask whether it is full screen and offer the way out. */}
-      <RootLayout style={rootLayoutStyle}>
-        <IrShell handle={ref} />
-      </RootLayout>
-    </IrStateProvider>
-  );
+  return <VibrationalEditor technique="infrared" {...props} />;
 }
-
-/**
- * The viewer fills what it is given, and its own children scroll rather than
- * push: `react-science` lays its root out as a column of full width and height,
- * and a flex column with no `minHeight` grows past its parent instead.
- */
-const rootLayoutStyle = { minHeight: 0 } as const;
-
-/** What a viewer opens on when it is handed nothing, kept stable for the memo. */
-const NO_SPECTRA: IrSpectrum[] = [];

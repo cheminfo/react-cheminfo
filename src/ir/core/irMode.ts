@@ -1,14 +1,14 @@
 /**
- * Everything that differs between reading a spectrum as absorbance and reading
- * it as percent transmittance.
+ * Everything that differs between reading a spectrum as absorbance, as percent
+ * transmittance, or — for a Raman spectrum — as intensity.
  *
- * The two are the same measurement drawn upside down, and nearly every
+ * The first two are the same measurement drawn upside down, and nearly every
  * difference between them is one of a handful of facts: what the axis is called,
  * where its baseline is, whether that baseline is held in the window, which way
  * a band points, and which zoom gestures are worth answering. Gathering them
  * here is what keeps the switch from being an `if (mode === …)` in the chart,
  * the tracker, the band marks, the zoom and the fitting separately, where they
- * would eventually disagree.
+ * would eventually disagree. Intensity is one more entry of the same facts.
  *
  * **No conversion happens here, or anywhere in this package.** `ir-spectrum`
  * adds both an absorbance and a transmittance variable to every spectrum it
@@ -24,9 +24,14 @@ import type {
 } from '../../chart/core/chartDomain.ts';
 
 import type { IrMode } from './irSpectrum.ts';
+import type { IrTechnique } from './irTechnique.ts';
+import { IR_TECHNIQUE_RULES, irModeTechnique } from './irTechnique.ts';
 
-/** The two ways a spectrum is read, in the order a control offers them. */
-export const IR_MODES: readonly IrMode[] = ['transmittance', 'absorbance'];
+/**
+ * The two ways an infrared spectrum is read, in the order a control offers
+ * them.
+ */
+export const IR_MODES: readonly IrMode[] = IR_TECHNIQUE_RULES.infrared.modes;
 
 /**
  * How each mode behaves, every fact in one place.
@@ -115,6 +120,22 @@ export const IR_MODE_RULES = {
      */
     wheelZoom: true,
   },
+  intensity: {
+    title: 'intensity',
+    /** No light scattered is a real floor, as no light absorbed is. */
+    baseline: 0,
+    /** Not held in a dragged window, for the reason absorbance gives. */
+    keepBaseline: false,
+    /** A Raman band stands up out of the baseline under it. */
+    bandsPointDown: false,
+    /**
+     * Both drags are worth having: intensity is open at the top and its weak
+     * bands lie against zero, as absorbance's do.
+     */
+    boxZoomOnly: false,
+    /** The wheel scales the axis about zero, bringing a weak band up. */
+    wheelZoom: true,
+  },
 } as const satisfies Record<
   IrMode,
   {
@@ -199,10 +220,21 @@ export function bandsPointDown(mode: IrMode): boolean {
 }
 
 /**
- * The other mode, for a control that toggles between the two.
+ * The next mode, for a control that toggles between them.
+ *
+ * It never leaves the technique: an infrared viewer goes back and forth
+ * between its two axes, and a Raman one, reading intensity alone, stays where
+ * it is.
  * @param mode - The mode in force.
- * @returns The one to switch to.
+ * @param technique - The technique whose modes are toggled through. Defaults to
+ * the one that reads `mode`.
+ * @returns The one to switch to: the technique's first when `mode` is not one
+ * of its own.
  */
-export function otherIrMode(mode: IrMode): IrMode {
-  return mode === 'absorbance' ? 'transmittance' : 'absorbance';
+export function otherIrMode(
+  mode: IrMode,
+  technique: IrTechnique = irModeTechnique(mode),
+): IrMode {
+  const modes: readonly IrMode[] = IR_TECHNIQUE_RULES[technique].modes;
+  return modes[(modes.indexOf(mode) + 1) % modes.length] ?? mode;
 }

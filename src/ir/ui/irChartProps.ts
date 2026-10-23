@@ -7,8 +7,9 @@
  * of half a dozen layers nobody needs to read in order to mount one.
  *
  * Everything arrives as a prop and nothing is reached for: the chart reads no
- * context and no store, so the same component serves an editor, a report page
- * that only ever draws one spectrum, and a test.
+ * store and no context but the language the page is written in, so the same
+ * component serves an editor, a report page that only ever draws one spectrum,
+ * and a test.
  */
 
 import type { ReactNode } from 'react';
@@ -17,17 +18,26 @@ import type { ZoomDragMode } from '../../chart/core/chartDomain.ts';
 import type { AssignedBand } from '../core/assignBands.ts';
 import type { IrBand } from '../core/irBand.ts';
 import type { IrDomain, IrMode, IrSpectrum } from '../core/irSpectrum.ts';
+import type { IrTechnique } from '../core/irTechnique.ts';
 
 export interface IrChartProps {
   /** The spectra to draw, each saying in itself whether it is drawn. */
   spectra: readonly IrSpectrum[];
   /**
-   * Which value axis to draw them in.
+   * What the spectra were measured with, which names the wavenumber axis and
+   * decides which way it runs: high to low for infrared, low to high for Raman.
+   * @default 'infrared'
+   */
+  technique?: IrTechnique;
+  /**
+   * Which value axis to draw them in. One the technique does not offer draws
+   * its first instead.
    *
    * A prop rather than state, so the switch lives with whoever owns the toolbar
    * that flips it — and so two charts of the same spectra can be shown side by
    * side, one in each, which is the clearest way to see what the pair means.
-   * @default 'transmittance'
+   * @default the technique's first: `'transmittance'` for infrared,
+   * `'intensity'` for Raman
    */
   mode?: IrMode;
   /**

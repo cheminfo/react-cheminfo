@@ -54,7 +54,7 @@ export function IrCanvas(props: IrCanvasProps) {
   const { state, visibleSpectra, assigned } = useIrEditorState();
   const actions = useIrActions();
   const { domain, tool, selectedId } = state.view;
-  const { mode, showAssignments, labelLimit } = state.settings;
+  const { technique, mode, showAssignments, labelLimit } = state.settings;
 
   const onDomainChange = useCallback(
     (next: IrDomain) => {
@@ -68,6 +68,7 @@ export function IrCanvas(props: IrCanvasProps) {
       <div ref={attachChart} id={chartId} style={chartStyle}>
         <IrChart
           spectra={visibleSpectra}
+          technique={technique}
           mode={mode}
           assigned={assigned}
           showAssignments={showAssignments}

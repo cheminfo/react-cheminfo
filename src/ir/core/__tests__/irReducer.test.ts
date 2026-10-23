@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
 
-import { createIrState, irReducer } from '../irReducer.ts';
+import { irReducer } from '../irReducer.ts';
 import type { IrSidePanelId } from '../irSidePanels.ts';
 import type { IrSpectrum } from '../irSpectrum.ts';
-import { DEFAULT_SIDE_PANELS } from '../irState.ts';
+import { DEFAULT_SIDE_PANELS, createIrState } from '../irState.ts';
 
 /**
  * One spectrum, of the little a reducer test needs.

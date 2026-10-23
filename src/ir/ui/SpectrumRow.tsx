@@ -1,12 +1,20 @@
 import { Button } from 'react-science/ui';
 
 import { SpectrumColorSwatch } from '../../panel/ui/SpectrumColorSwatch.tsx';
-import { formatWavenumber } from '../core/irFormat.ts';
+import { formatWavenumberRange } from '../core/irFormat.ts';
 import type { IrSpectrum } from '../core/irSpectrum.ts';
+import type { IrTechnique } from '../core/irTechnique.ts';
+import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 
 export interface SpectrumRowProps {
   /** The spectrum the row is about. */
   spectrum: IrSpectrum;
+  /**
+   * What it was measured with, which decides the order its range is written
+   * in: high to low for infrared, low to high for Raman.
+   * @default 'infrared'
+   */
+  technique?: IrTechnique;
   /** Whether the panels are about it. */
   selected: boolean;
   /** Point the panels at it. */
@@ -31,6 +39,7 @@ export interface SpectrumRowProps {
 export function SpectrumRow(props: SpectrumRowProps) {
   const {
     spectrum,
+    technique = 'infrared',
     selected,
     onSelect,
     onToggle,
@@ -40,10 +49,10 @@ export function SpectrumRow(props: SpectrumRowProps) {
     onRename,
   } = props;
 
-  const range =
-    spectrum.wavenumber.length === 0
-      ? ''
-      : `${formatWavenumber(spectrum.wavenumber.at(-1) as number)}–${formatWavenumber(spectrum.wavenumber[0] as number)} cm⁻¹`;
+  const range = formatWavenumberRange(
+    spectrum.wavenumber,
+    IR_TECHNIQUE_RULES[technique].reverseX,
+  );
 
   return (
     <div

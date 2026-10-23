@@ -37,7 +37,7 @@ export function SpectraPanel() {
   const actions = useIrActions();
   const { spectra } = state.data;
   const { selectedId } = state.view;
-  const { mode } = state.settings;
+  const { mode, technique } = state.settings;
 
   const selected = spectra.find((spectrum) => spectrum.id === selectedId);
   const allDrawn = spectra.every((spectrum) => spectrum.visible);
@@ -96,6 +96,7 @@ export function SpectraPanel() {
             <SpectrumRow
               key={spectrum.id}
               spectrum={spectrum}
+              technique={technique}
               selected={spectrum.id === selectedId}
               onSelect={() => actions.selectSpectrum(spectrum.id)}
               onToggle={() =>

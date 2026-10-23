@@ -2,10 +2,19 @@ import { TooltipHelpContent } from 'react-science/ui';
 
 import type { IrCommand, IrCommandId } from '../core/irCommands.ts';
 import { irCommands } from '../core/irCommands.ts';
+import type { IrTechnique } from '../core/irTechnique.ts';
+
+import { useIrText } from './useIrText.ts';
 
 export interface IrCommandTooltipProps {
   /** Which command the tooltip is about. */
   id: IrCommandId;
+  /**
+   * What the spectra were measured with, which decides how the command is
+   * worded.
+   * @default 'infrared'
+   */
+  technique?: IrTechnique;
 }
 
 /**
@@ -18,8 +27,8 @@ export interface IrCommandTooltipProps {
  * @returns The tooltip's content.
  */
 export function IrCommandTooltip(props: IrCommandTooltipProps) {
-  const { id } = props;
-  const entry = irCommands[id] as IrCommand;
+  const { id, technique = 'infrared' } = props;
+  const entry: IrCommand = useIrText(technique).command(id) ?? irCommands[id];
   const shortcuts = entry.shortcut?.label ?? entry.shortcut?.keys;
 
   return (

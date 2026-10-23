@@ -76,8 +76,8 @@ test('the two value axes are the same measurement read either way up', async () 
 
   // ir-spectrum owns this conversion; the test pins that it was applied, not how.
   for (const index of [0, 200, 450, 700, 900]) {
-    const transmittance = spectrum.transmittance[index] as number;
-    const absorbance = spectrum.absorbance[index] as number;
+    const transmittance = spectrum.transmittance?.[index] as number;
+    const absorbance = spectrum.absorbance?.[index] as number;
 
     expect(absorbance).toBeCloseTo(-Math.log10(transmittance / 100), 10);
   }
@@ -88,8 +88,8 @@ test('the strongest band of the fixture is where it was put', async () => {
 
   let lowest = Number.POSITIVE_INFINITY;
   let atWavenumber = 0;
-  for (let index = 0; index < spectrum.transmittance.length; index++) {
-    const value = spectrum.transmittance[index] as number;
+  for (let index = 0; index < (spectrum.transmittance?.length ?? 0); index++) {
+    const value = spectrum.transmittance?.[index] as number;
     if (value < lowest) {
       lowest = value;
       atWavenumber = spectrum.wavenumber[index] as number;

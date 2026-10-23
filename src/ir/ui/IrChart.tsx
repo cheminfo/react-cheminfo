@@ -9,14 +9,14 @@ import { chartSurfaceStyle } from '../../chart/ui/chartSurface.ts';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
 import type { AssignedBand } from '../core/assignBands.ts';
 import type { IrBand } from '../core/irBand.ts';
-import { boxZoomOnly, yAxisTitle } from '../core/irMode.ts';
-import type { IrMode } from '../core/irSpectrum.ts';
+import { irModeFor } from '../core/irTechnique.ts';
 
 import { BandMarks } from './BandMarks.tsx';
 import { IrPointerTracker } from './IrPointerTracker.tsx';
 import { IrTraces } from './IrTraces.tsx';
 import type { IrChartProps } from './irChartProps.ts';
 import { useIrPointer } from './useIrPointer.ts';
+import { useIrText } from './useIrText.ts';
 import { useIrZoom } from './useIrZoom.ts';
 
 /**
@@ -28,7 +28,8 @@ import { useIrZoom } from './useIrZoom.ts';
  * building the scale onto a reversed pixel range and nothing else: the data stays
  * in ascending wavenumbers, every window stays low end first, and no other piece
  * of arithmetic in either package has to know. That is the whole reason
- * `createScale` takes its range rather than deriving it.
+ * `createScale` takes its range rather than deriving it. A Raman spectrum is
+ * drawn the other way, low shifts at the left, by the same means.
  *
  * The axes go under the data, so a grid line is never read as a band. Only the
  * data band is clipped, so a zoomed trace stops at the plot edge while the
@@ -46,7 +47,8 @@ import { useIrZoom } from './useIrZoom.ts';
 export function IrChart(props: IrChartProps): ReactElement {
   const {
     spectra,
-    mode = 'transmittance',
+    technique = 'infrared',
+    mode: asked,
     assigned = NO_BANDS,
     showAssignments = false,
     labelLimit,
@@ -61,6 +63,8 @@ export function IrChart(props: IrChartProps): ReactElement {
     children,
   } = props;
 
+  const mode = irModeFor(technique, asked);
+  const text = useIrText(technique);
   const [containerRef, measured] = useChartSize<HTMLDivElement>();
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -79,7 +83,15 @@ export function IrChart(props: IrChartProps): ReactElement {
 
   // The host's window goes *into* the zoom rather than over it, so a drag is
   // always measured against what is on screen.
-  const zoom = useIrZoom({ spectra, mode, svgRef, plot, domain, drag });
+  const zoom = useIrZoom({
+    spectra,
+    technique,
+    mode,
+    svgRef,
+    plot,
+    domain,
+    drag,
+  });
 
   // The scales the zoom measured its gestures against — the x one running right
   // to left. Taken from the hook rather than built here, because two scales over
@@ -128,7 +140,7 @@ export function IrChart(props: IrChartProps): ReactElement {
       <svg
         ref={svgRef}
         role="img"
-        aria-label={chartLabel(mode)}
+        aria-label={text.chart(mode)}
         width={frameWidth}
         height={frameHeight}
         viewBox={`0 0 ${frameWidth} ${frameHeight}`}
@@ -154,8 +166,8 @@ export function IrChart(props: IrChartProps): ReactElement {
           yDomain={shown.y}
           xScale={xScale}
           yScale={yScale}
-          xTitle="wavenumber (cm⁻¹)"
-          yTitle={yAxisTitle(mode)}
+          xTitle={text.xTitle}
+          yTitle={text.yTitle(mode)}
         />
 
         <g clipPath={`url(#${clipId})`}>
@@ -190,22 +202,6 @@ export function IrChart(props: IrChartProps): ReactElement {
       </svg>
     </div>
   );
-}
-
-/**
- * What the chart is, and what can be done to it, for whoever cannot see it.
- *
- * The gestures differ by mode, so the sentence does too — a label promising the
- * wheel to a reader who cannot watch it fail to do anything is worse than no
- * label at all.
- * @param mode - Which value axis is being drawn.
- * @returns The label.
- */
-function chartLabel(mode: IrMode): string {
-  const axis = `Infrared spectrum read as ${yAxisTitle(mode)}, wavenumber running from high at the left to low at the right.`;
-  return boxZoomOnly(mode)
-    ? `${axis} Drag a rectangle over it to zoom to that rectangle, and double click to fit everything again.`
-    : `${axis} Drag across it to zoom the wavenumber axis, drag past the baseline to take the value axis with it, turn the wheel to scale the value axis, and double click to fit everything again.`;
 }
 
 /** What a chart nobody has picked any bands for marks. */

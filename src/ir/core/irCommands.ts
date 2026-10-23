@@ -10,6 +10,9 @@
  * this one, because a module that exports a component and a constant together
  * cannot be hot reloaded — `react-refresh/only-export-components` is the rule
  * that says so, and the split is the fix rather than the exception.
+ *
+ * This is the infrared table; `irTechniqueCommands.ts` derives the Raman one
+ * from it.
  */
 
 /** The key a command answers to. */
@@ -134,6 +137,9 @@ export const irCommands = {
 /** Identity of one of the commands the viewer offers. */
 export type IrCommandId = keyof typeof irCommands;
 
+/** The commands a viewer offers, in the order they are reached for. */
+export type IrCommandTable = Readonly<Partial<Record<IrCommandId, IrCommand>>>;
+
 /** What to do when each command is run, as the shell wires them. */
 export type IrCommandHandlers = Partial<
   Record<IrCommandId, (() => void) | undefined>
@@ -148,7 +154,15 @@ export type RunIrCommand = (id: IrCommandId) => void;
  * @returns The title, and the key in parentheses when it has one.
  */
 export function irCommandLabel(id: IrCommandId): string {
-  const entry = irCommands[id] as IrCommand;
+  return irCommandEntryLabel(irCommands[id]);
+}
+
+/**
+ * A command's title, with its key in parentheses when it has one.
+ * @param entry - The command, as a table words it.
+ * @returns The label.
+ */
+export function irCommandEntryLabel(entry: IrCommand): string {
   const key = entry.shortcut?.label?.[0] ?? entry.shortcut?.keys[0];
   return key === undefined ? entry.title : `${entry.title} (${key})`;
 }

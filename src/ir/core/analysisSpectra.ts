@@ -14,14 +14,31 @@ import { xySortX } from 'ml-spectra-processing';
 
 import type { IrMeta, IrMode, IrOrigin } from './irSpectrum.ts';
 
-/** One spectrum as a reader produced it, before it is named and coloured. */
+/**
+ * One spectrum as a reader produced it, before it is named and coloured.
+ *
+ * The readers of this package produce infrared spectra, which carry absorbance
+ * and transmittance; a host reading a Raman file builds one carrying its
+ * intensity instead.
+ */
 export interface LoadedIrSpectrum {
-  /** The wavenumbers, ascending. */
+  /** The wavenumbers — or, for a Raman spectrum, the Raman shifts — ascending. */
   wavenumber: Float64Array;
-  /** Absorbance at each. */
-  absorbance: Float64Array;
-  /** Percent transmittance at each. */
-  transmittance: Float64Array;
+  /**
+   * Absorbance at each, for an infrared spectrum.
+   * @default undefined
+   */
+  absorbance?: Float64Array;
+  /**
+   * Percent transmittance at each, for an infrared spectrum.
+   * @default undefined
+   */
+  transmittance?: Float64Array;
+  /**
+   * Intensity at each, for a Raman spectrum.
+   * @default undefined
+   */
+  intensity?: Float64Array;
   /** What the file said about the acquisition, `null` when it said nothing. */
   meta: IrMeta | null;
   /** Where it came from. */
@@ -96,10 +113,9 @@ export function analysisSpectra(
   return spectra;
 }
 
-/** The three arrays of one spectrum, in ascending wavenumber. */
-type SortedTraces = Pick<
-  LoadedIrSpectrum,
-  'wavenumber' | 'absorbance' | 'transmittance'
+/** The three arrays of one infrared spectrum, in ascending wavenumber. */
+type SortedTraces = Required<
+  Pick<LoadedIrSpectrum, 'wavenumber' | 'absorbance' | 'transmittance'>
 >;
 
 /**

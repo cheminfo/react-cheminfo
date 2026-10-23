@@ -100,9 +100,9 @@ test('the trace shares the spectrum arrays rather than copying them', () => {
   const absorbance = traceOf(spectrum, 'absorbance');
   const transmittance = traceOf(spectrum, 'transmittance');
 
-  expect(absorbance.x).toBe(spectrum.wavenumber);
-  expect(absorbance.y).toBe(spectrum.absorbance);
-  expect(transmittance.y).toBe(spectrum.transmittance);
+  expect(absorbance?.x).toBe(spectrum.wavenumber);
+  expect(absorbance?.y).toBe(spectrum.absorbance);
+  expect(transmittance?.y).toBe(spectrum.transmittance);
 });
 
 test('both modes still answer exactly the gestures they always did', () => {

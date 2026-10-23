@@ -12,14 +12,18 @@ import type {
   IrCommandId,
   RunIrCommand,
 } from '../core/irCommands.ts';
-import { irCommandLabel } from '../core/irCommands.ts';
+import { irCommandEntryLabel, irCommands } from '../core/irCommands.ts';
+import type { IrTechnique } from '../core/irTechnique.ts';
 
 import { IrCommandTooltip } from './IrCommandTooltip.tsx';
+import { useIrText } from './useIrText.ts';
 
 /** What the provider holds. */
 export interface IrCommandContextValue {
   /** What each command does. */
   handlers: IrCommandHandlers;
+  /** What the spectra were measured with, which words the commands. */
+  technique: IrTechnique;
   /** Run one. */
   run: RunIrCommand;
 }
@@ -37,6 +41,14 @@ export function useIrCommand(): RunIrCommand {
 }
 
 /**
+ * What the spectra were measured with, from anywhere inside the viewer.
+ * @returns The technique; infrared outside a provider.
+ */
+export function useIrCommandTechnique(): IrTechnique {
+  return useContext(commandContext)?.technique ?? 'infrared';
+}
+
+/**
  * Everything a toolbar item needs to be one command, in one spread.
  *
  * The tooltip, the label a screen reader is given and the click handler all come
@@ -46,10 +58,13 @@ export function useIrCommand(): RunIrCommand {
  */
 export function useIrCommandProps() {
   const run = useIrCommand();
+  const technique = useIrCommandTechnique();
+  const text = useIrText(technique);
   return function command(id: IrCommandId) {
+    const entry = text.command(id) ?? irCommands[id];
     return {
-      tooltip: <IrCommandTooltip id={id} />,
-      'aria-label': irCommandLabel(id),
+      tooltip: <IrCommandTooltip id={id} technique={technique} />,
+      'aria-label': irCommandEntryLabel(entry),
       onClick: () => run(id),
     };
   };

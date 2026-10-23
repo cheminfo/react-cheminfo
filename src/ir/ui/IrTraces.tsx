@@ -26,7 +26,10 @@ export interface IrTracesProps {
    * the *high* end, the opposite of what every other chart's does.
    */
   xDomain: readonly [number, number];
-  /** The wavenumber axis as it is currently zoomed, running right to left. */
+  /**
+   * The wavenumber axis as it is currently zoomed, running right to left for
+   * infrared.
+   */
   xScale: ChartScale;
   /** The value axis as it is currently zoomed. */
   yScale: ChartScale;
@@ -85,6 +88,7 @@ export function IrTraces(props: IrTracesProps): ReactElement {
     for (const spectrum of spectra) {
       if (!spectrum.visible) continue;
       const trace = traceOf(spectrum, mode);
+      if (trace === undefined) continue;
       const { x, y } = xyReduce(trace, { from, to, nbPoints: wanted });
       const d = profilePath(x, y, xScale, yScale);
       if (d !== '') drawn.push({ id: spectrum.id, color: spectrum.color, d });

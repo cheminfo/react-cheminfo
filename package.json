@@ -27,6 +27,7 @@
     "./molstar/*": "./lib/molstar/*/index.js",
     "./orbital": "./lib/orbital.js",
     "./pages": "./lib/pages.js",
+    "./raman": "./lib/raman.js",
     "./server": "./lib/server.js",
     "./slides": "./lib/slides.js",
     "./spectra": "./lib/spectra.js",

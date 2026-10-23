@@ -17,10 +17,13 @@ import { useEffect, useMemo, useReducer, useRef } from 'react';
 
 import type { AssignedBand } from '../core/assignBands.ts';
 import { assignBands } from '../core/assignBands.ts';
-import type { CreateIrStateOptions } from '../core/irReducer.ts';
-import { createIrState, irReducer } from '../core/irReducer.ts';
+import type { BandAssignment } from '../core/bandAssignments.ts';
+import { BAND_ASSIGNMENTS } from '../core/bandAssignments.ts';
+import { irReducer } from '../core/irReducer.ts';
 import type { IrSpectrum } from '../core/irSpectrum.ts';
-import type { IrState } from '../core/irState.ts';
+import type { CreateIrStateOptions, IrState } from '../core/irState.ts';
+import { createIrState } from '../core/irState.ts';
+import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 import { pickBands } from '../core/pickBands.ts';
 
 import type { IrEditorActions } from './irActions.ts';
@@ -46,7 +49,8 @@ export interface IrEditorApi {
   selectedSpectrum: IrSpectrum | null;
   /**
    * The bands of the selected spectrum, with everything each might be. Empty
-   * while nothing is selected or while picking is switched off.
+   * while nothing is selected or while picking is switched off, and every band
+   * without a candidate for a technique the correlation table does not cover.
    */
   assigned: AssignedBand[];
   /** Everything to do. */
@@ -67,7 +71,7 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
   const { spectra } = state.data;
   const { selectedId } = state.view;
   const { pickBands: picking, picking: pickingOptions } = state.settings;
-  const { assignmentTolerance } = state.settings;
+  const { assignmentTolerance, technique } = state.settings;
 
   const visibleSpectra = useMemo(() => {
     const visible: IrSpectrum[] = [];
@@ -95,10 +99,15 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
 
   // Assigning is a walk of thirty ranges per band, which is nothing beside the
   // picking — so it is a memo of its own, and moving the tolerance does not
-  // re-pick.
+  // re-pick. A technique the table does not cover is matched against no table.
+  const { assignments } = IR_TECHNIQUE_RULES[technique];
   const assigned = useMemo(
-    () => assignBands(bands, { tolerance: assignmentTolerance }),
-    [bands, assignmentTolerance],
+    () =>
+      assignBands(bands, {
+        tolerance: assignmentTolerance,
+        assignments: assignments ? BAND_ASSIGNMENTS : NO_ASSIGNMENTS,
+      }),
+    [bands, assignmentTolerance, assignments],
   );
 
   // What was reported last, so a host passing a fresh callback on every render
@@ -117,6 +126,9 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
     [state, visibleSpectra, selectedSpectrum, assigned, actions],
   );
 }
+
+/** The table a technique the correlation table does not cover is matched against. */
+const NO_ASSIGNMENTS: readonly BandAssignment[] = [];
 
 /**
  * Whether two lists hold the same spectra, by identity and in order.

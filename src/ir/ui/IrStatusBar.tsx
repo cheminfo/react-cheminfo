@@ -8,18 +8,21 @@ import {
   statusSpacerStyle as spacerStyle,
 } from '../../panel/core/statusBar.ts';
 import { countAssigned } from '../core/assignBands.ts';
-import { formatWavenumber } from '../core/irFormat.ts';
-import { boxZoomOnly, yAxisTitle } from '../core/irMode.ts';
+import { formatWavenumberRange } from '../core/irFormat.ts';
+import { boxZoomOnly } from '../core/irMode.ts';
+import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 
 import { useIrEditorState } from './irStateContext.ts';
+import { useIrText } from './useIrText.ts';
 
 /**
  * The one line under the chart: what is drawn, what was found, what went wrong.
  *
  * Everything in it is derived, so it is the cheapest place in the viewer to
  * answer "did that work" — how many spectra are drawn of those open, how many
- * bands the picking found and how many the table had something to say about, and
- * the range the selected spectrum covers.
+ * bands the picking found and how many the table had something to say about
+ * (where the table covers the technique), and the range the selected spectrum
+ * covers, in the order its axis is read.
  *
  * The refusal is last and is the only red in the shell, so the eye that has just
  * pressed something and seen nothing happen lands on the reason.
@@ -30,12 +33,14 @@ export function IrStatusBar() {
     useIrEditorState();
   const { spectra } = state.data;
   const { error, tool } = state.view;
-  const { mode, pickBands } = state.settings;
+  const { mode, pickBands, technique } = state.settings;
+  const { reverseX, assignments } = IR_TECHNIQUE_RULES[technique];
+  const text = useIrText(technique);
 
   const range =
-    selectedSpectrum === null || selectedSpectrum.wavenumber.length === 0
-      ? null
-      : `${formatWavenumber(selectedSpectrum.wavenumber.at(-1) as number)}–${formatWavenumber(selectedSpectrum.wavenumber[0] as number)} cm⁻¹`;
+    selectedSpectrum === null
+      ? ''
+      : formatWavenumberRange(selectedSpectrum.wavenumber, reverseX);
 
   return (
     <div style={barStyle}>
@@ -45,7 +50,7 @@ export function IrStatusBar() {
           : `${countLabel(visibleSpectra.length, 'spectrum', 'spectra')} drawn of ${spectra.length}`}
       </span>
 
-      <span style={itemStyle}>{yAxisTitle(mode)}</span>
+      <span style={itemStyle}>{text.yTitle(mode)}</span>
 
       {selectedSpectrum === null ? null : (
         <span style={nameStyle} title={selectedSpectrum.name}>
@@ -53,12 +58,12 @@ export function IrStatusBar() {
         </span>
       )}
 
-      {range === null ? null : <span style={mutedStyle}>{range}</span>}
+      {range === '' ? null : <span style={mutedStyle}>{range}</span>}
 
       {pickBands && assigned.length > 0 ? (
         <span style={itemStyle}>
-          {countLabel(assigned.length, 'band', 'bands')},{' '}
-          {countAssigned(assigned)} assigned
+          {countLabel(assigned.length, 'band', 'bands')}
+          {assignments ? `, ${countAssigned(assigned)} assigned` : null}
         </span>
       ) : null}
 

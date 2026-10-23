@@ -1,10 +1,13 @@
 import { Toolbar } from 'react-science/ui';
 
 import type { FigureDownloadState } from '../../download/ui/useFigureDownload.tsx';
-import { boxZoomOnly } from '../core/irMode.ts';
+import { bandsPointDown, boxZoomOnly } from '../core/irMode.ts';
+import { defaultIrMode } from '../core/irTechnique.ts';
+import { irCommandOffered } from '../core/irTechniqueCommands.ts';
 
 import { useIrCommandProps } from './irCommandContext.tsx';
 import { useIrEditorState } from './irStateContext.ts';
+import { useIrText } from './useIrText.ts';
 
 /** What {@link IrToolbar} needs. */
 export interface IrToolbarProps {
@@ -29,6 +32,9 @@ export interface IrToolbarProps {
  * drag on that axis is a rectangle, so both buttons go dead with the square zoom
  * lit. Showing `read` as available there would offer a gesture the chart does not
  * make, and showing it as *active* would name the wrong one.
+ *
+ * A button whose command the technique does not offer is not drawn: a Raman
+ * spectrum has a single value axis and no assignment to name.
  * @param props - Component props.
  * @returns The toolbar.
  */
@@ -38,7 +44,8 @@ export function IrToolbar(props: IrToolbarProps) {
   const command = useIrCommandProps();
   const { spectra } = state.data;
   const { domain, tool } = state.view;
-  const { mode, pickBands, showAssignments } = state.settings;
+  const { mode, pickBands, showAssignments, technique } = state.settings;
+  const text = useIrText(technique);
 
   const isEmpty = spectra.length === 0;
   // The popover opens the panel itself, so the command's own click is left out.
@@ -49,7 +56,7 @@ export function IrToolbar(props: IrToolbarProps) {
     // `collapse`, not the default `wrap`: a wrapping vertical toolbar measures
     // itself and writes the result back as an inline width, so in a row short of
     // space it settles at half an icon and stays there.
-    <Toolbar vertical overflow="collapse" aria-label="Infrared spectrum tools">
+    <Toolbar vertical overflow="collapse" aria-label={text.tools}>
       <Toolbar.Item
         icon="trash"
         intent="danger"
@@ -83,24 +90,28 @@ export function IrToolbar(props: IrToolbarProps) {
         disabled={domain === null}
       />
 
-      <Toolbar.Item
-        icon={mode === 'absorbance' ? 'arrow-up' : 'arrow-down'}
-        active={mode === 'absorbance'}
-        {...command('toggleMode')}
-        disabled={isEmpty}
-      />
+      {irCommandOffered(technique, 'toggleMode') ? (
+        <Toolbar.Item
+          icon={bandsPointDown(mode) ? 'arrow-down' : 'arrow-up'}
+          active={mode !== defaultIrMode(technique)}
+          {...command('toggleMode')}
+          disabled={isEmpty}
+        />
+      ) : null}
       <Toolbar.Item
         icon="locate"
         active={pickBands}
         {...command('togglePicking')}
         disabled={selectedSpectrum === null}
       />
-      <Toolbar.Item
-        icon="label"
-        active={showAssignments}
-        {...command('toggleAssignments')}
-        disabled={!pickBands || selectedSpectrum === null}
-      />
+      {irCommandOffered(technique, 'toggleAssignments') ? (
+        <Toolbar.Item
+          icon="label"
+          active={showAssignments}
+          {...command('toggleAssignments')}
+          disabled={!pickBands || selectedSpectrum === null}
+        />
+      ) : null}
 
       {/* What the chart looks like right now is what a figure is of — the
           window it was dragged to, the way up it is being read, the

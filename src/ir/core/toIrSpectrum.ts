@@ -64,8 +64,7 @@ export function toIrSpectrum(
     name: name ?? loaded.name ?? loaded.origin.fileName ?? 'spectrum',
     color,
     wavenumber: loaded.wavenumber,
-    absorbance: loaded.absorbance,
-    transmittance: loaded.transmittance,
+    ...valueAxes(loaded),
     meta: loaded.meta,
     origin: loaded.origin,
     visible,
@@ -99,4 +98,23 @@ export function toIrSpectra(
     spectra.push(spectrum);
   }
   return spectra;
+}
+
+/**
+ * The value axes a loaded spectrum carries, and only those.
+ *
+ * An absent axis is an absent key, never a key holding `undefined`: the two
+ * read the same in a debugger and differently in every structural comparison.
+ * @param loaded - What the reader produced.
+ * @returns Its absorbance and transmittance, or its intensity.
+ */
+function valueAxes(
+  loaded: LoadedIrSpectrum,
+): Pick<IrSpectrum, 'absorbance' | 'transmittance' | 'intensity'> {
+  const { absorbance, transmittance, intensity } = loaded;
+  return {
+    ...(absorbance === undefined ? {} : { absorbance }),
+    ...(transmittance === undefined ? {} : { transmittance }),
+    ...(intensity === undefined ? {} : { intensity }),
+  };
 }

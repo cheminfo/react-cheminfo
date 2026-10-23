@@ -80,10 +80,10 @@ test('a transmittance spectrum comes back on the axis it was written on', async 
   expect(read.origin.recorded).toBe('transmittance');
   expect(read.wavenumber).toHaveLength(200);
   expect(read.wavenumber[0]).toBe(400);
-  expect(read.transmittance[0]).toBeCloseTo(95, 10);
+  expect(read.transmittance?.[0]).toBeCloseTo(95, 10);
   // The other axis is derived on the way back in, as it was on the way in.
-  expect(read.absorbance[100]).toBeCloseTo(
-    original.absorbance[100] as number,
+  expect(read.absorbance?.[100]).toBeCloseTo(
+    original.absorbance?.[100] as number,
     8,
   );
 });
@@ -93,8 +93,8 @@ test('the axis being read is written when the file named none', async () => {
   const read = await onlySpectrum(irSpectrumToJcamp(original, 'absorbance'));
 
   expect(read.origin.recorded).toBe('absorbance');
-  expect(read.absorbance[100]).toBeCloseTo(
-    original.absorbance[100] as number,
+  expect(read.absorbance?.[100]).toBeCloseTo(
+    original.absorbance?.[100] as number,
     10,
   );
 });
@@ -135,5 +135,84 @@ test('a one-spectrum list is written as that spectrum, not as a container', () =
 
   expect(irSpectraToJcamp([only], 'absorbance')).toBe(
     irSpectrumToJcamp(only, 'absorbance'),
+  );
+});
+
+/**
+ * A Raman spectrum of three points, as a host reading a WDF hands it over.
+ * @param name - What the list calls it.
+ * @returns The spectrum.
+ */
+function ramanSpectrum(name: string): IrSpectrum {
+  return {
+    id: name,
+    name,
+    color: '#0072b2',
+    wavenumber: Float64Array.from([150, 282, 1086]),
+    intensity: Float64Array.from([12, 340, 2048.5]),
+    meta: null,
+    origin: { format: 'wdf' },
+    visible: true,
+  };
+}
+
+test('a Raman spectrum is written as its intensity, saying it is Raman', () => {
+  expect(irSpectrumToJcamp(ramanSpectrum('calcite'), 'intensity')).toBe(
+    `##TITLE=calcite
+##JCAMP-DX=4.24
+##DATA TYPE=RAMAN SPECTRUM
+##ORIGIN=
+##OWNER=
+##XUNITS=1/CM
+##YUNITS=INTENSITY
+##NPOINTS=3
+##FIRSTX=150
+##LASTX=1086
+##FIRSTY=12
+##LASTY=2048.5
+##XFACTOR=1
+##YFACTOR=1
+##PEAK TABLE=(XY..XY)
+150 12
+282 340
+1086 2048.5
+##END=`,
+  );
+});
+
+test('a Raman spectrum asked for in an infrared axis still writes its intensity', () => {
+  expect(irSpectrumToJcamp(ramanSpectrum('calcite'), 'transmittance')).toBe(
+    irSpectrumToJcamp(ramanSpectrum('calcite'), 'intensity'),
+  );
+});
+
+test('a list of Raman spectra is titled as Raman', () => {
+  const written = irSpectraToJcamp(
+    [ramanSpectrum('calcite'), ramanSpectrum('aragonite')],
+    'intensity',
+  );
+
+  expect(written.split('\n').slice(0, 4)).toStrictEqual([
+    '##TITLE=2 Raman spectra',
+    '##JCAMP-DX=4.24',
+    '##DATA TYPE=LINK',
+    '##BLOCKS=2',
+  ]);
+  expect(written.match(/##DATA TYPE=RAMAN SPECTRUM/g)).toHaveLength(2);
+});
+
+test('a spectrum carrying no value axis is refused, by name', () => {
+  const blank: IrSpectrum = {
+    id: 'blank',
+    name: 'blank',
+    color: '#0072b2',
+    wavenumber: Float64Array.from([150, 282]),
+    meta: null,
+    origin: { format: 'wdf' },
+    visible: true,
+  };
+
+  expect(() => irSpectrumToJcamp(blank, 'intensity')).toThrow(
+    'blank carries no value axis to write.',
   );
 });

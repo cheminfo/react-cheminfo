@@ -7,7 +7,8 @@
  * turned inside out, and a bare column of numbers leaves whoever opens it next
  * to guess which. `##YUNITS=` states it, and `ir-spectrum` reads it back and
  * derives the other axis from it, so a spectrum written here returns carrying
- * both.
+ * both. A Raman spectrum is written as its intensity, under a `##DATA TYPE=`
+ * that says it is Raman.
  *
  * The points are written as an `##PEAK TABLE=` of explicit `x y` pairs rather
  * than as a compressed `##XYDATA=` record. An XYDATA record states a first
@@ -20,6 +21,7 @@
 import { fromJSON } from 'convert-to-jcamp';
 
 import type { IrMode, IrSpectrum } from './irSpectrum.ts';
+import { IR_TECHNIQUE_RULES, irModeTechnique } from './irTechnique.ts';
 
 /** The extension a written spectrum is saved under. */
 export const JCAMP_EXTENSION = '.jdx';
@@ -27,8 +29,8 @@ export const JCAMP_EXTENSION = '.jdx';
 /** What a JCAMP-DX file is served as. */
 export const JCAMP_MIME_TYPE = 'chemical/x-jcamp-dx';
 
-/** How the technique is named when the file that was read named nothing. */
-export const DEFAULT_DATA_TYPE = 'INFRARED SPECTRUM';
+/** The infrared data type, written when the file that was read named none. */
+export const DEFAULT_DATA_TYPE = IR_TECHNIQUE_RULES.infrared.dataType;
 
 /**
  * Write one spectrum as a JCAMP-DX block.
@@ -37,15 +39,20 @@ export const DEFAULT_DATA_TYPE = 'INFRARED SPECTRUM';
  * which that was, and only otherwise the one being read. Writing what is on
  * screen instead would export a spectrum that had been through a logarithm it
  * was never measured with — and, where a band bottoms out at zero transmittance,
- * an absorbance of infinity that no reader can take back.
+ * an absorbance of infinity that no reader can take back. A spectrum carrying
+ * neither falls back on whichever axis it does carry, so a Raman spectrum is
+ * written as its intensity.
  * @param spectrum - The spectrum.
  * @param mode - The axis being read, used when the file named none.
  * @returns The block, `##TITLE=` through `##END=`.
+ * @throws {Error} When the spectrum carries no value axis at all.
  */
 export function irSpectrumToJcamp(spectrum: IrSpectrum, mode: IrMode): string {
-  const written = spectrum.origin.recorded ?? mode;
-  const values =
-    written === 'absorbance' ? spectrum.absorbance : spectrum.transmittance;
+  const written = writtenAxis(spectrum, mode);
+  const values = spectrum[written];
+  if (values === undefined) {
+    throw new Error(`${spectrum.name} carries no value axis to write.`);
+  }
   return fromJSON(
     { x: spectrum.wavenumber, y: values },
     { info: infoRecords(spectrum, written), meta: metaRecords(spectrum) },
@@ -67,13 +74,14 @@ export function irSpectrumToJcamp(spectrum: IrSpectrum, mode: IrMode): string {
  * spectrum would have written.
  * @param spectra - The spectra, in the order the list holds them.
  * @param mode - The axis being read, used for a spectrum whose file named none.
- * @param title - What to call the file's own outer block.
+ * @param title - What to call the file's own outer block. Defaults to the
+ * count and the technique that reads `mode`: `2 infrared spectra`.
  * @returns The file.
  */
 export function irSpectraToJcamp(
   spectra: readonly IrSpectrum[],
   mode: IrMode,
-  title = `${spectra.length} infrared spectra`,
+  title = `${spectra.length} ${IR_TECHNIQUE_RULES[irModeTechnique(mode)].name} spectra`,
 ): string {
   const only = spectra.length === 1 ? spectra[0] : undefined;
   if (only !== undefined) return irSpectrumToJcamp(only, mode);
@@ -92,6 +100,32 @@ ${blocks.join('\n')}
 }
 
 /**
+ * Which axis of a spectrum is written.
+ * @param spectrum - The spectrum.
+ * @param mode - The axis being read.
+ * @returns The axis its file recorded, else the one being read, else the first
+ * it carries; `mode` when it carries none, which the caller refuses.
+ */
+function writtenAxis(spectrum: IrSpectrum, mode: IrMode): IrMode {
+  const { recorded } = spectrum.origin;
+  if (recorded !== undefined && spectrum[recorded] !== undefined) {
+    return recorded;
+  }
+  if (spectrum[mode] !== undefined) return mode;
+  for (const axis of WRITTEN_AXES) {
+    if (spectrum[axis] !== undefined) return axis;
+  }
+  return mode;
+}
+
+/** The axes a spectrum may carry, in the order one is looked for. */
+const WRITTEN_AXES: readonly IrMode[] = [
+  'transmittance',
+  'absorbance',
+  'intensity',
+];
+
+/**
  * The standard records of a block: what it is called, and what its axes are.
  * @param spectrum - The spectrum.
  * @param written - The axis being written.
@@ -103,16 +137,31 @@ function infoRecords(
 ): Record<string, string> {
   return {
     title: recordValue(spectrum.name),
-    // The technique as the file stated it, so a Raman spectrum that was opened
-    // here is not written back out claiming to be infrared.
-    dataType: technique(spectrum) ?? DEFAULT_DATA_TYPE,
+    // The technique as the file stated it, and otherwise the one the written
+    // axis belongs to, so a Raman spectrum is never written out claiming to be
+    // infrared.
+    dataType:
+      technique(spectrum) ??
+      IR_TECHNIQUE_RULES[irModeTechnique(written)].dataType,
     xUnits: '1/CM',
-    // Spelled the way `ir-spectrum` reads it: it takes the axis to be
-    // transmittance when the label says `trans`, and to be a percentage rather
-    // than a fraction when it carries a `%`.
-    yUnits: written === 'absorbance' ? 'ABSORBANCE' : 'Transmittance (%)',
+    yUnits: Y_UNITS[written],
   };
 }
+
+/**
+ * What each axis is called in `##YUNITS=`.
+ *
+ * Spelled the way `ir-spectrum` reads them: it takes the axis to be
+ * transmittance when the label says `trans`, and to be a percentage rather than
+ * a fraction when it carries a `%`. A Raman intensity has no unit of its own —
+ * counts on one instrument, a fraction of the strongest band on another — so it
+ * is named, as Raman instruments write it.
+ */
+const Y_UNITS: Record<IrMode, string> = {
+  transmittance: 'Transmittance (%)',
+  absorbance: 'ABSORBANCE',
+  intensity: 'INTENSITY',
+};
 
 /**
  * The `$`-prefixed records of a block: the acquisition, as the file stated it.

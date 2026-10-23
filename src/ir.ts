@@ -7,6 +7,9 @@
  * arrive in — `ir-spectrum` for the band correlations, `convert-to-jcamp` for
  * writing them back out, and a JCAMP or SPC reader fetched only once the bytes
  * turn out to need it. A site with no spectra to look at installs none of it.
+ *
+ * Raman spectra are drawn by the same code, opened through
+ * `react-cheminfo/raman`.
  */
 
 export * from './ir/core/index.ts';

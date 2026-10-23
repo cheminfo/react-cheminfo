@@ -18,6 +18,7 @@ import { labelStackBaselines } from '../../chart/core/labelStack.ts';
 import type { AssignedBand } from './assignBands.ts';
 import { bandLabel } from './assignBands.ts';
 import type { IrBand } from './irBand.ts';
+import { bandHeight, bandValue } from './irBand.ts';
 import { formatWavenumber } from './irFormat.ts';
 import { bandsPointDown } from './irMode.ts';
 import type { IrMode } from './irSpectrum.ts';
@@ -99,12 +100,15 @@ export function planBandLabels(options: BandLabelPlanOptions): BandLabelPlan[] {
     limit = 12,
   } = options;
 
-  const inside: AssignedBand[] = [];
+  const inside: NamedBand[] = [];
   for (const entry of assigned) {
+    // A band with no value on the axis being read has no tip to hang from.
+    const value = bandValue(entry.band, mode);
+    if (value === undefined) continue;
     const pixelX = chartPixel(xScale, entry.band.wavenumber);
     if (!Number.isFinite(pixelX)) continue;
     if (pixelX < plot.left || pixelX > plot.right) continue;
-    inside.push(entry);
+    inside.push({ entry, value });
   }
 
   const named =
@@ -112,18 +116,20 @@ export function planBandLabels(options: BandLabelPlanOptions): BandLabelPlan[] {
       ? inside
       : inside
           .toSorted(
-            (first, second) => second.band.absorbance - first.band.absorbance,
+            (first, second) =>
+              bandHeight(second.entry.band) - bandHeight(first.entry.band),
           )
           .slice(0, limit)
           .toSorted(
-            (first, second) => first.band.wavenumber - second.band.wavenumber,
+            (first, second) =>
+              first.entry.band.wavenumber - second.entry.band.wavenumber,
           );
 
   const centres = new Float64Array(named.length);
   for (let index = 0; index < named.length; index++) {
     centres[index] = chartPixel(
       xScale,
-      (named[index] as AssignedBand).band.wavenumber,
+      (named[index] as NamedBand).entry.band.wavenumber,
     );
   }
   const placed = layoutAnnotationBoxes(
@@ -136,12 +142,9 @@ export function planBandLabels(options: BandLabelPlanOptions): BandLabelPlan[] {
   const down = bandsPointDown(mode);
   const plans: BandLabelPlan[] = new Array<BandLabelPlan>(named.length);
   for (let index = 0; index < named.length; index++) {
-    const entry = named[index] as AssignedBand;
+    const { entry, value } = named[index] as NamedBand;
     const lines = labelLines(entry, showAssignments);
-    const tipY = chartPixel(
-      yScale,
-      mode === 'absorbance' ? entry.band.absorbance : entry.band.transmittance,
-    );
+    const tipY = chartPixel(yScale, value);
     plans[index] = {
       band: entry.band,
       tipX: centres[index] as number,
@@ -159,6 +162,14 @@ export function planBandLabels(options: BandLabelPlanOptions): BandLabelPlan[] {
     };
   }
   return plans;
+}
+
+/** A band inside the window, with its value on the axis being read. */
+interface NamedBand {
+  /** The band and whatever the table said about it. */
+  entry: AssignedBand;
+  /** Where its tip is, on the value axis. */
+  value: number;
 }
 
 /**

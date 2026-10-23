@@ -3,11 +3,12 @@
  *
  * Everything here is the two things that call needs and does not have: a
  * `MeasurementXY` built out of the arrays the viewer holds, and the decision to
- * pick on **absorbance** rather than on transmittance. That second one is the
- * only judgement in the file and it is not a preference — peak picking finds
- * maxima, and a band is a maximum in absorbance but a *minimum* in transmittance,
- * so picking on transmittance would return the flat baseline between the bands
- * and miss every band there is.
+ * pick an infrared spectrum on **absorbance** rather than on transmittance. That
+ * second one is the only judgement in the file and it is not a preference — peak
+ * picking finds maxima, and a band is a maximum in absorbance but a *minimum* in
+ * transmittance, so picking on transmittance would return the flat baseline
+ * between the bands and miss every band there is. A Raman spectrum is picked on
+ * its intensity, by `ramanBands`, with the same picker.
  */
 
 import type { MeasurementXY } from 'cheminfo-types';
@@ -15,7 +16,10 @@ import { autoPeakPicking } from 'ir-spectrum';
 import { xMaxValue, xMinValue } from 'ml-spectra-processing';
 
 import type { IrBand, IrBandStrength } from './irBand.ts';
+import { bandHeight } from './irBand.ts';
 import type { IrSpectrum } from './irSpectrum.ts';
+import type { PeakPickingOptions } from './ramanBands.ts';
+import { ramanBands } from './ramanBands.ts';
 
 /** How the bands are picked. */
 export interface PickBandsOptions {
@@ -86,20 +90,50 @@ export function pickBands(
   } = options;
   if (spectrum.wavenumber.length < 2) return [];
 
-  const picked = autoPeakPicking(measurementOf(spectrum), {
-    // Absorbance, because a band is a maximum there and a minimum in the other.
-    yVariable: 'a',
+  const picking: PeakPickingOptions = {
     minMaxRatio: minRelativeHeight,
     minPeakWidth,
     ...(from === undefined ? {} : { from }),
     ...(to === undefined ? {} : { to }),
-  });
+  };
+  // A spectrum carrying an intensity is a Raman one; any other is infrared.
+  const bands =
+    spectrum.intensity === undefined
+      ? infraredBands(spectrum, picking)
+      : ramanBands(spectrum, spectrum.intensity, picking);
+
+  const kept =
+    limit === undefined || bands.length <= limit
+      ? bands
+      : bands.toSorted(byDescendingHeight).slice(0, limit);
+  return kept.toSorted(byAscendingWavenumber);
+}
+
+/**
+ * The bands of an infrared spectrum, picked on its absorbance.
+ * @param spectrum - The spectrum to pick from.
+ * @param picking - Where to pick, and how finely.
+ * @returns The bands, in the order they were found; none when the spectrum
+ * carries only one of its two axes, since the strength is read off the other.
+ */
+function infraredBands(
+  spectrum: IrSpectrum,
+  picking: PeakPickingOptions,
+): IrBand[] {
+  const { id, wavenumber, absorbance, transmittance } = spectrum;
+  if (absorbance === undefined || transmittance === undefined) return [];
+
+  const picked = autoPeakPicking(
+    measurementOf(wavenumber, absorbance, transmittance),
+    // Absorbance, because a band is a maximum there and a minimum in the other.
+    { yVariable: 'a', ...picking },
+  );
 
   const bands: IrBand[] = [];
   for (const peak of picked) {
     if (!Number.isFinite(peak.wavenumber)) continue;
     bands.push({
-      spectrumId: spectrum.id,
+      spectrumId: id,
       wavenumber: peak.wavenumber,
       absorbance: peak.absorbance,
       // `ConvertedPeak.transmittance` is a fraction where the spectrum's own
@@ -109,12 +143,7 @@ export function pickBands(
       strength: peak.kind as IrBandStrength,
     });
   }
-
-  const kept =
-    limit === undefined || bands.length <= limit
-      ? bands
-      : bands.toSorted(byDescendingAbsorbance).slice(0, limit);
-  return kept.toSorted(byAscendingWavenumber);
+  return bands;
 }
 
 /**
@@ -124,17 +153,23 @@ export function pickBands(
  * letter is worked out from: without them the conversion assumes a spectrum
  * running the full 0 to 100 percent, and every band of a shallow ATR trace that
  * never leaves the eighties comes back weak.
- * @param spectrum - The spectrum the viewer holds.
+ * @param wavenumber - The wavenumbers, ascending.
+ * @param absorbance - Absorbance at each.
+ * @param transmittance - Percent transmittance at each.
  * @returns A measurement carrying all three variables.
  */
-function measurementOf(spectrum: IrSpectrum): MeasurementXY {
-  const transmittance = {
+function measurementOf(
+  wavenumber: Float64Array,
+  absorbance: Float64Array,
+  transmittance: Float64Array,
+): MeasurementXY {
+  const percent = {
     label: 'Transmittance (%)',
     units: '%',
     symbol: 't' as const,
-    data: spectrum.transmittance,
-    min: xMinValue(spectrum.transmittance),
-    max: xMaxValue(spectrum.transmittance),
+    data: transmittance,
+    min: xMinValue(transmittance),
+    max: xMaxValue(transmittance),
   };
   return {
     variables: {
@@ -142,20 +177,20 @@ function measurementOf(spectrum: IrSpectrum): MeasurementXY {
         label: 'Wavenumber',
         units: '1/cm',
         symbol: 'x',
-        data: spectrum.wavenumber,
+        data: wavenumber,
       },
       // `y` is required of every measurement, and stands for whichever axis was
       // recorded. Nothing here reads it — the picking is told to use `a` and the
       // strength letter is read off `t` — so it carries the transmittance rather
       // than a third copy of anything.
-      y: transmittance,
+      y: percent,
       a: {
         label: 'Absorbance',
         units: '',
         symbol: 'a',
-        data: spectrum.absorbance,
+        data: absorbance,
       },
-      t: transmittance,
+      t: percent,
     },
   };
 }
@@ -166,8 +201,8 @@ function measurementOf(spectrum: IrSpectrum): MeasurementXY {
  * @param second - The other.
  * @returns The comparison.
  */
-function byDescendingAbsorbance(first: IrBand, second: IrBand): number {
-  return second.absorbance - first.absorbance;
+function byDescendingHeight(first: IrBand, second: IrBand): number {
+  return bandHeight(second) - bandHeight(first);
 }
 
 /**

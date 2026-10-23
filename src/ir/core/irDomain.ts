@@ -5,9 +5,10 @@
  * something usable when it is handed nothing at all — a chart with no data is
  * still mounted, still measured, and still builds its scales.
  *
- * The x window is in ascending wavenumbers even though the axis is drawn from
- * 4000 down to 400: which way round it is read is the chart's business, and
- * every piece of arithmetic that moves a window expects its ends in order.
+ * The x window is in ascending wavenumbers even though the infrared axis is
+ * drawn from 4000 down to 400: which way round it is read is the chart's
+ * business, and every piece of arithmetic that moves a window expects its ends
+ * in order.
  */
 
 import { xMaxValue, xMinValue } from 'ml-spectra-processing';
@@ -57,9 +58,8 @@ export function fullDomain(
   const extent =
     traceExtent(spectra, mode, false) ?? traceExtent(spectra, mode, true);
   if (extent === null) {
-    return mode === 'absorbance'
-      ? { x: [400, 4000], y: [0, 1] }
-      : { x: [400, 4000], y: [0, 100] };
+    // A percentage runs to 100; absorbance and intensity are open at the top.
+    return { x: [400, 4000], y: mode === 'transmittance' ? [0, 100] : [0, 1] };
   }
 
   const { xMinimum, xMaximum, yMinimum, yMaximum } = extent;
@@ -135,7 +135,9 @@ function traceExtent(
   for (const spectrum of spectra) {
     if (!spectrum.visible) continue;
     if (!includeExcluded && spectrum.excludeFromDomain) continue;
-    const { x, y } = traceOf(spectrum, mode);
+    const trace = traceOf(spectrum, mode);
+    if (trace === undefined) continue;
+    const { x, y } = trace;
     if (x.length === 0 || y.length === 0) continue;
     // The wavenumber ends are read off the first and last sample rather than
     // searched for: the array is ascending by construction, so a scan would walk
