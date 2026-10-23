@@ -1,8 +1,12 @@
 import { toError } from '../../error/core/toError.ts';
 
-import type { WorkerLike } from './messages.ts';
+import type {
+  WorkerEventLike,
+  WorkerLike,
+  WorkerResponseMessage,
+} from './messages.ts';
 import { isProgressMessage, isResponseMessage } from './messages.ts';
-import type { WorkerJobContext } from './workerChannelTypes.ts';
+import type { WorkerFailure, WorkerJobContext } from './workerChannelTypes.ts';
 
 /** How long a request waits when neither the call nor the channel says. */
 export const DEFAULT_TIMEOUT_MS = 120_000;
@@ -62,10 +66,13 @@ export type Outcome<TResponse> =
 interface WorkerMessageHandlers {
   /** News about a running job. */
   progress: (id: number, progress: unknown) => void;
-  /** The end of a job. */
-  answer: (id: number, outcome: Outcome<unknown>) => void;
-  /** The worker failed outright, with what it said, possibly nothing. */
-  failure: (detail: string) => void;
+  /** The end of a job, as the worker posted it. */
+  answer: (id: number, message: WorkerResponseMessage<unknown>) => void;
+  /**
+   * The worker failed outright, with what it said — possibly nothing — and
+   * the error event itself.
+   */
+  failure: (detail: string, event: WorkerEventLike) => void;
 }
 
 /**
@@ -121,17 +128,30 @@ export function subscribeToWorker(
     if (isProgressMessage(message)) {
       handlers.progress(message.id, message.progress);
     } else if (isResponseMessage(message)) {
-      handlers.answer(
-        message.id,
-        message.ok
-          ? { ok: true, response: message.response }
-          : { ok: false, error: new Error(message.message) },
-      );
+      handlers.answer(message.id, message);
     }
   });
   target.addEventListener('error', (event) => {
-    handlers.failure(event.message ?? '');
+    handlers.failure(event.message ?? '', event);
   });
+}
+
+/**
+ * The error a failure rejects its requests with when the channel is given no
+ * `failure` of its own: the job's own error or message, `<name> failed: …` for
+ * a worker that died, and what creating the worker threw.
+ * @param failure - What went wrong.
+ * @returns The error.
+ */
+export function defaultFailureError(failure: WorkerFailure): Error {
+  if (failure.kind === 'worker') {
+    const suffix = failure.message === '' ? '' : `: ${failure.message}`;
+    return new Error(`${failure.name} failed${suffix}`);
+  }
+  if (failure.cause instanceof Error) return failure.cause;
+  return failure.kind === 'job'
+    ? new Error(failure.message)
+    : toError(failure.cause);
 }
 
 /**

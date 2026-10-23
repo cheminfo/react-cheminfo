@@ -1,6 +1,8 @@
 import type { InlineSegment } from '../../pedagogy/core/inlineMarks.ts';
 import { parseInlineMarks } from '../../pedagogy/core/inlineMarks.ts';
 
+import { DESCRIPTION_MAX, DESCRIPTION_MIN } from './limits.ts';
+
 /** The room a search result gives a description. */
 export interface PlainDescriptionOptions {
   /**
@@ -34,8 +36,8 @@ export function plainDescription(
   prose: string,
   options: PlainDescriptionOptions = {},
 ): string {
-  const maxLength = options.maxLength ?? 160;
-  const minLength = options.minLength ?? 110;
+  const maxLength = options.maxLength ?? DESCRIPTION_MAX;
+  const minLength = options.minLength ?? DESCRIPTION_MIN;
   const text = plainProse(prose);
   if (text.length <= maxLength) return text;
   const whole = wholeSentences(text, maxLength);

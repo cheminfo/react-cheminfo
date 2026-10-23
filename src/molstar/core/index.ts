@@ -25,8 +25,28 @@ export {
   framedRadius,
   setSpin,
 } from './camera.ts';
+export type {
+  FocusOptions,
+  Point3,
+  ResetCameraOptions,
+  SceneSphereOptions,
+  ViewOrientation,
+} from './framing.ts';
+export {
+  focusPoint,
+  resetCamera,
+  sceneSphere,
+  unionSphere,
+} from './framing.ts';
 export { HighlightPainter, highlightOverpaint } from './highlights.ts';
-export { atomName, atomText, lociText, subscribeHover } from './hover.ts';
+export type { HoverLabel } from './hover.ts';
+export {
+  atomName,
+  atomText,
+  lociText,
+  subscribeHover,
+  subscribeHoverLabel,
+} from './hover.ts';
 export type { MolstarPluginOptions } from './plugin.ts';
 export { MolstarPlugin } from './plugin.ts';
 export { captureScene } from './captureScene.ts';

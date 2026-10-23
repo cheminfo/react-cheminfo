@@ -11,14 +11,8 @@
  * The paths are `assertRoutes`' business; this is about the words.
  */
 
+import { DESCRIPTION_MAX, DESCRIPTION_MIN, TITLE_LIMIT } from './limits.ts';
 import type { RouteMeta } from './routes.ts';
-
-/** The longest title that survives a search result whole. */
-const TITLE_LIMIT = 60;
-/** The shortest description that says anything. */
-const DESCRIPTION_MIN = 110;
-/** The longest description a result shows without clipping it. */
-const DESCRIPTION_MAX = 160;
 
 /**
  * What a site never says about itself, in the words it would say it in. A

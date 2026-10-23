@@ -52,6 +52,11 @@ export function createSiteAddresses(
     return environment || ownUrl;
   }
 
+  function storedAssetSrc(url: string): string {
+    if (OWN_ORIGIN.test(url) || url.startsWith('//')) return url;
+    return url.startsWith('/') ? withBase(url) : url;
+  }
+
   return {
     basePath,
     siteName: siteDisplayName(site),
@@ -60,8 +65,30 @@ export function createSiteAddresses(
     pathWithoutBase,
     absoluteUrl,
     configuredSiteUrl,
+    anchorHref,
+    storedAssetSrc,
   };
 }
+
+/**
+ * A link to an anchor on the page being read.
+ *
+ * Every page of ours carries a `<base>`, so a bare `#id` resolves against the
+ * mount rather than against the address open, and clicking it leaves the page
+ * instead of scrolling down it. The link names the page's own address and its
+ * query instead — the browser's, since that is the document a click scrolls.
+ * @param id - The `id` of the element to jump to.
+ * @returns The address of that anchor on the page on screen, or `#id` where
+ * there is no page.
+ */
+export function anchorHref(id: string): string {
+  const location = globalThis.location as Location | undefined;
+  if (location === undefined) return `#${id}`;
+  return `${location.pathname}${location.search}#${id}`;
+}
+
+// A scheme names its own origin: `https:`, `data:`, `blob:`.
+const OWN_ORIGIN = /^[a-z][\w+.-]*:/i;
 
 /** How {@link createSiteAddresses} reads the mount. */
 export interface SiteAddressesOptions {
@@ -95,4 +122,15 @@ export interface SiteAddresses {
    * it says something, the site's own address otherwise.
    */
   configuredSiteUrl: () => string;
+  /** A link to an anchor on the page on screen; see {@link anchorHref}. */
+  anchorHref: (id: string) => string;
+  /**
+   * The address of something a backend stored and the page shows — an
+   * uploaded picture — as this deployment serves it. A backend names those
+   * from its own root, `/uploads/<name>`, because a proxy mounting the site
+   * under a path strips the path before the request reaches it; so a
+   * root-relative address is put under the mount, and one carrying its own
+   * scheme or origin, or relative already, is handed back untouched.
+   */
+  storedAssetSrc: (url: string) => string;
 }

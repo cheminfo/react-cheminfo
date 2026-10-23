@@ -15,6 +15,7 @@ export { handleListNavigationKey } from './listNavigation.ts';
 export type { PollingOptions, PollingSnapshot } from './pollingController.ts';
 export type { ActiveHeadingOptions } from './useActiveHeading.ts';
 export { useActiveHeading } from './useActiveHeading.ts';
+export type { AsyncResult } from './useAsync.ts';
 export { useAsync } from './useAsync.ts';
 export { useContainerSize } from './useContainerSize.ts';
 export { useDebouncedValue } from './useDebouncedValue.ts';

@@ -9,6 +9,7 @@ export {
 export type { WriteRouteOptions } from './history.ts';
 export {
   ROUTE_CHANGE_EVENT,
+  openingRoute,
   readRoute,
   subscribeToRoute,
   writeRoute,
@@ -35,12 +36,12 @@ export {
   parseQueryString,
 } from './query.ts';
 export type { SiteAddresses, SiteAddressesOptions } from './siteAddresses.ts';
-export { createSiteAddresses } from './siteAddresses.ts';
+export { anchorHref, createSiteAddresses } from './siteAddresses.ts';
 export type {
   TabDefinition,
   TabRoute,
   TabRouteInput,
   TabRouter,
   TabRouterOptions,
-} from './tabRouter.ts';
+} from './tabRouterTypes.ts';
 export { createTabRouter } from './tabRouter.ts';

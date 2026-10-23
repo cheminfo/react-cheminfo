@@ -65,4 +65,12 @@ export interface ShareVocabulary<
    * @default {}
    */
   params?: Codecs;
+  /**
+   * The `?hide=` keys older links dropped the chrome with, before the site
+   * spoke `?embed` — `header`, `menu`. A link naming one still opens framed,
+   * because course pages built then must keep opening bare; the key is no part
+   * of the page, so it is never offered and never written back.
+   * @default []
+   */
+  legacyEmbedParts?: readonly string[];
 }

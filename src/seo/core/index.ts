@@ -1,6 +1,14 @@
 export type { AlternateOptions } from './alternates.ts';
 export { alternateLinkTags } from './alternates.ts';
 export type { DocumentMeta } from './documentMeta.ts';
+export type { FitDescriptionOptions } from './fitDescription.ts';
+export { fitDescription } from './fitDescription.ts';
+export {
+  DESCRIPTION_MAX,
+  DESCRIPTION_MIN,
+  DESCRIPTION_TARGET,
+  TITLE_LIMIT,
+} from './limits.ts';
 export { writeDocumentMeta } from './documentMeta.ts';
 export type {
   NoscriptEcosystem,

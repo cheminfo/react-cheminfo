@@ -34,10 +34,11 @@ const SPIN_AXIS = Vec3.create(0, 1, 0);
  * measured against — so reading a camera and applying it are the same move in
  * opposite directions.
  * @param radius - Radius of the scene's visible bounding sphere.
+ * @param margin - Fraction of the radius kept as breathing room.
  * @returns The framed radius.
  */
-export function framedRadius(radius: number): number {
-  return Math.max(radius * (1 + FRAMING_MARGIN), MINIMUM_FRAMING_RADIUS);
+export function framedRadius(radius: number, margin = FRAMING_MARGIN): number {
+  return Math.max(radius * (1 + margin), MINIMUM_FRAMING_RADIUS);
 }
 
 /**

@@ -1,3 +1,5 @@
+import type { LegacyStorageKey } from './legacyEntries.ts';
+import { adoptLegacyEntries } from './legacyEntries.ts';
 import { isPlainRecord, mergeStored } from './mergeStored.ts';
 import {
   readStorageEntry,
@@ -16,29 +18,45 @@ import {
  * quota is full still gets a working site, with their preferences lasting only
  * as long as the tab.
  * @param options - See {@link PersistBucketOptions}.
- * @returns The three ways to use the bucket: read it, write it, forget it.
+ * @returns The ways to use the bucket: read it, write it, forget it, and
+ * hear another tab write it.
  */
 export function persistBucket<T extends object>(
   options: PersistBucketOptions<T>,
 ): PersistedBucket<T> {
   const { key, version = 1, defaults, onQuotaExceeded } = options;
+  const { legacyKeys = [], forgetLegacyKeys = false } = options;
   const storageKey = versionedStorageKey(key, version);
+  adoptLegacyEntries(storageKey, legacyKeys, forgetLegacyKeys);
+
+  function read(): BucketRead<T> {
+    const stored = readStorageEntry(storageKey);
+    const usable = isPlainRecord(stored) ? stored : undefined;
+    return {
+      value: mergeStored(defaults, usable),
+      firstRun: usable === undefined,
+    };
+  }
 
   return {
     storageKey,
-    read: () => {
-      const stored = readStorageEntry(storageKey);
-      const usable = isPlainRecord(stored) ? stored : undefined;
-      return {
-        value: mergeStored(defaults, usable),
-        firstRun: usable === undefined,
-      };
-    },
+    read,
     write: (value: T) => {
       writeStorageEntry(storageKey, value, onQuotaExceeded);
     },
     clear: () => {
       removeStorageEntry(storageKey);
+    },
+    subscribe: (listener) => {
+      function handleStorage(event: Event): void {
+        const change = event as { key?: unknown; newValue?: unknown };
+        if (change.key !== storageKey || change.newValue === null) return;
+        listener(read());
+      }
+      globalThis.addEventListener?.('storage', handleStorage);
+      return () => {
+        globalThis.removeEventListener?.('storage', handleStorage);
+      };
     },
   };
 }
@@ -70,9 +88,23 @@ export interface PersistBucketOptions<T extends object> {
    * @default undefined
    */
   onQuotaExceeded?: (error: unknown) => void;
+  /**
+   * The entries the bucket was kept under before this key: an unversioned
+   * one, another site's, or a shape that needs a `migrate`. The first holding
+   * something is copied over once, while the versioned entry does not exist.
+   * @default []
+   */
+  legacyKeys?: readonly LegacyStorageKey[];
+  /**
+   * Remove every legacy entry found once it has been read, so a bucket
+   * cleared later is not filled again from the old key. Left off, the old
+   * entries stay where they are.
+   * @default false
+   */
+  forgetLegacyKeys?: boolean;
 }
 
-/** The three ways a page uses its bucket. */
+/** The ways a page uses its bucket. */
 export interface PersistedBucket<T extends object> {
   /** The versioned key the bucket occupies, e.g. `smiles:exercises:v1`. */
   readonly storageKey: string;
@@ -82,6 +114,14 @@ export interface PersistedBucket<T extends object> {
   write: (value: T) => void;
   /** Forget the bucket, leaving whatever the page holds in memory untouched. */
   clear: () => void;
+  /**
+   * Hear another tab of the same site store the bucket. The tab writing never
+   * hears its own write, and a removal is not news: the listener is handed
+   * what is stored now, merged over the defaults.
+   * @param listener - Called with the fresh read after each write elsewhere.
+   * @returns The function that stops listening.
+   */
+  subscribe: (listener: (read: BucketRead<T>) => void) => () => void;
 }
 
 /** What one read of a bucket found. */

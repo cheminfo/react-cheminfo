@@ -41,9 +41,12 @@ export function parseShareConfig<
 >(search: string, vocabulary: ShareVocabulary<Codecs>): ShareConfig<Codecs> {
   const values = firstValues(parseQuery(search));
   const embed = values.get(EMBED_PARAM);
+  const asked = splitHidden(values.get(HIDE_PARAM));
   return {
-    embed: embed !== undefined && embed !== '0',
-    hidden: orderHidden(splitHidden(values.get(HIDE_PARAM)), vocabulary.parts),
+    embed:
+      (embed !== undefined && embed !== '0') ||
+      namesAny(asked, vocabulary.legacyEmbedParts ?? []),
+    hidden: orderHidden(asked, vocabulary.parts),
     params: readParams(values, vocabulary.params) as ShareParamValues<Codecs>,
   };
 }
@@ -152,6 +155,46 @@ export function suggestedShareConfig<
     if (part.hiddenByDefault === true) hidden.push(part.key);
   }
   return { ...parseShareConfig('', vocabulary), embed: true, hidden };
+}
+
+/**
+ * Read the parts a `?hide=` value switches off, for a page that holds its
+ * query decoded rather than as a string.
+ * @param raw - The raw value, comma separated; `undefined` when absent.
+ * @param parts - The hideable parts, in the vocabulary order.
+ * @returns The keys of the parts named, in that order; a key the vocabulary
+ * does not list is dropped, so a hand-written link cannot hide what it cannot
+ * name.
+ */
+export function readHiddenParts(
+  raw: string | undefined,
+  parts: readonly HideablePart[],
+): readonly string[] {
+  return orderHidden(splitHidden(raw), parts);
+}
+
+/**
+ * Write a `?hide=` value in the vocabulary order, so one selection always
+ * produces one link.
+ * @param hidden - The keys switched off, in any order and any collection.
+ * @param parts - The hideable parts, in the vocabulary order.
+ * @returns The value, empty when nothing the vocabulary lists is switched off.
+ */
+export function formatHiddenParts(
+  hidden: Iterable<string>,
+  parts: readonly HideablePart[],
+): string {
+  return orderHidden(new Set(hidden), parts).join(',');
+}
+
+function namesAny(
+  asked: ReadonlySet<string>,
+  keys: readonly string[],
+): boolean {
+  for (const key of keys) {
+    if (asked.has(key)) return true;
+  }
+  return false;
 }
 
 function splitHidden(raw: string | undefined): ReadonlySet<string> {

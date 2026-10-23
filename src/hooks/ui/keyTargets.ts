@@ -1,7 +1,9 @@
 /**
  * Whether a key event is aimed at somewhere the visitor types: a text field, a
- * select, an editable region or anything carrying `role="textbox"`. A keyboard
- * shortcut listening above it leaves such a key alone.
+ * select, an editable region, anything carrying `role="textbox"`, or a canvas
+ * holding the focus — a structure editor reads its own keys there, `Delete`
+ * and the arrows included. A keyboard shortcut listening above it leaves such
+ * a key alone.
  * @param target - The `target` of the keyboard event.
  * @returns True when the key belongs to the field.
  */
@@ -42,7 +44,7 @@ export function isInteractiveTarget(
   return role !== null && INTERACTIVE_ROLES.has(role);
 }
 
-const TEXT_ENTRY_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+const TEXT_ENTRY_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'CANVAS']);
 const INTERACTIVE_TAGS = new Set(['BUTTON', 'A', 'SUMMARY']);
 const INTERACTIVE_ROLES = new Set([
   'button',

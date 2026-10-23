@@ -108,6 +108,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Range filter**           | `isRangeBounded`, `isRangeDomain`, `rangeHandles`, `movedRange`, `settleHandles`, `sameRange`, `rangeHistogramPath`, `OPEN_RANGE`                                                                                                                                                                                                      | `RangeSlider`                                                                                                                                                                                                                                                                                       |
 | **Widgets**                | `CREDITS`, `credits`                                                                                                                                                                                                                                                                                                                   | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                                                                                                                                |
 | **Hooks & state**          | `createWorkerChannel`, `persistBucket`, `persistSignalBucket`                                                                                                                                                                                                                                                                          | `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                                                                                                                                               |
+| **Requests**               | `fetchJson`, `ApiError`, `readApiError`, `keySetParam`, `readHiddenParts`, `formatHiddenParts`, `fitDescription`, `DESCRIPTION_MIN`, `DESCRIPTION_MAX`, `openingRoute`, `anchorHref`                                                                                                                                                   | `useAsync` (signal, `pending`)                                                                                                                                                                                                                                                                      |
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                           | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                                                                                                                                   |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                             | —                                                                                                                                                                                                                                                                                                   |
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                          | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
@@ -1018,6 +1019,39 @@ overlay redraws the page without the site holding a version of its own.
 Still English, with the runtime in place and no catalog yet: the spectra
 settings editor and the projection panels (`react-cheminfo/spectra`, the
 projection viewers), which no site of the family reads in a second language yet.
+
+## Routing a translated site
+
+A router given `languages` reads the language off the prefix and writes it
+back, English bare, so the share vocabulary, the query and the mount stay where
+they were:
+
+```ts
+const router = createTabRouter<Tab>({
+  tabs: ['generator', 'exercises'],
+  home: 'generator',
+  languages: ['en', 'fr', 'de'],
+});
+
+router.parse('/fr/exercises?embed'); // { tab: 'exercises', language: 'fr', … }
+router.format({ tab: 'exercises', language: 'de' }); // '/de/exercises'
+```
+
+`readRoute` moves a `?lang=` a sibling handed over into the path, once, in
+place; a prefix the address already carries always wins, so a deep link is
+never steered. `openingRoute(router, preferred)` opens a bare `/` in the
+language the reader last chose, and nothing else. `writeRoute` keeps the
+language on screen when the route names none.
+
+Beside it: `persistSignalBucket` takes `legacyKeys` (adopted once, through a
+`migrate` when the shape changed) and `syncAcrossTabs`; `createSiteAddresses`
+answers `anchorHref` and `storedAssetSrc`; a vocabulary takes
+`legacyEmbedParts`, so `?hide=header` still opens framed; `keySetParam` writes
+`?flags=` with `none` for the empty set; `createWorkerChannel` takes a
+`failure` hook, `retryAfterWorkerFailure`, and runs in-process when a browser
+refuses the worker; `oclResourcesUrl()` comes from `./conformers`, and
+`resetCamera`, `focusPoint`, `sceneSphere` and `subscribeHoverLabel` from
+`./molstar/core`.
 
 ## Carrying talks
 

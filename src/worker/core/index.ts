@@ -18,6 +18,7 @@ export { createWorkerChannel } from './workerChannel.ts';
 export type {
   WorkerChannel,
   WorkerChannelOptions,
+  WorkerFailure,
   WorkerJobContext,
   WorkerRequestOptions,
   WorkerSchedule,

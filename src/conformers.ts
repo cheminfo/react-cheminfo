@@ -85,3 +85,7 @@ export {
   hasFiniteCoordinates,
 } from './structure/core/conformerShape.ts';
 export { registerResources } from './structure/core/oclResources.ts';
+export {
+  OCL_RESOURCES_FILE,
+  oclResourcesUrl,
+} from './worker/core/oclResourcesUrl.ts';

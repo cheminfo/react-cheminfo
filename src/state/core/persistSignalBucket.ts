@@ -1,5 +1,7 @@
+import type { LegacyStorageKey } from './legacyEntries.ts';
 import { isPlainRecord } from './mergeStored.ts';
 import { persistBucket } from './persistBucket.ts';
+import { readStorageText } from './storageEntry.ts';
 
 /**
  * Keep a tree of signals in `localStorage`, under one versioned key.
@@ -19,6 +21,12 @@ import { persistBucket } from './persistBucket.ts';
  * the tracking is always done by the copy of the library that made the
  * signals. A member that is neither a signal nor a plain object is ignored.
  * Never put a `computed()` in a bucket: it cannot be written back.
+ *
+ * With `syncAcrossTabs`, every tab follows the entry: a tab opened before
+ * another one stored its work would otherwise write its stale copy over it. A
+ * write that would store what is already there is skipped, so two tabs cannot
+ * echo each other, and nothing is written while another tab's copy is being
+ * taken on.
  * @param options - See {@link PersistSignalBucketOptions}.
  * @returns The same bucket, rehydrated, so it can be exported directly.
  */
@@ -26,25 +34,50 @@ export function persistSignalBucket<TBucket extends object>(
   options: PersistSignalBucketOptions<TBucket>,
 ): TBucket {
   const { key, version, bucket, effect, onQuotaExceeded } = options;
+  const { legacyKeys, forgetLegacyKeys, syncAcrossTabs = false } = options;
   const stored = persistBucket({
     key,
     version,
     defaults: snapshotBucket(bucket),
     onQuotaExceeded,
+    legacyKeys,
+    forgetLegacyKeys,
   });
 
   const { value, firstRun } = stored.read();
   if (!firstRun) hydrateBucket(bucket, value);
 
   let subscribed = false;
+  let adopting = false;
   effect(() => {
     const snapshot = snapshotBucket(bucket);
     if (!subscribed) {
       subscribed = true;
       return;
     }
+    if (adopting) return;
+    if (
+      syncAcrossTabs !== false &&
+      readStorageText(stored.storageKey) === JSON.stringify(snapshot)
+    ) {
+      return;
+    }
     stored.write(snapshot);
   });
+
+  if (syncAcrossTabs !== false) {
+    stored.subscribe((read) => {
+      if (typeof syncAcrossTabs === 'function' && !syncAcrossTabs(bucket)) {
+        return;
+      }
+      adopting = true;
+      try {
+        hydrateBucket(bucket, read.value);
+      } finally {
+        adopting = false;
+      }
+    });
+  }
 
   return bucket;
 }
@@ -77,6 +110,25 @@ export interface PersistSignalBucketOptions<TBucket extends object> {
    * @default undefined
    */
   onQuotaExceeded?: (error: unknown) => void;
+  /**
+   * The entries the bucket was kept under before this key, the preferred one
+   * first; see `persistBucket`.
+   * @default []
+   */
+  legacyKeys?: readonly LegacyStorageKey[];
+  /**
+   * Remove every legacy entry found once it has been read.
+   * @default false
+   */
+  forgetLegacyKeys?: boolean;
+  /**
+   * Take on what another tab stores, and skip a write that would store what is
+   * already there. A function decides each time, handed the bucket as this tab
+   * holds it: a bucket of work in progress keeps its own while it has some,
+   * rather than two tabs overwriting each other in turn.
+   * @default false
+   */
+  syncAcrossTabs?: boolean | ((bucket: TBucket) => boolean);
 }
 
 interface SignalLeaf {

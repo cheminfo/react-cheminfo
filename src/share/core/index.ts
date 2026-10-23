@@ -3,9 +3,11 @@ export {
   EMBED_PARAM,
   HIDE_PARAM,
   applyShareConfig,
+  formatHiddenParts,
   isHidden,
   isShareConfigured,
   parseShareConfig,
+  readHiddenParts,
   suggestedShareConfig,
   visibleShareParts,
 } from './config.ts';
@@ -17,6 +19,8 @@ export {
   sharePreviewSize,
 } from './devices.ts';
 export { escapeAttribute, escapeText } from './escape.ts';
+export type { KeySetParamOptions } from './keySetParam.ts';
+export { keySetParam } from './keySetParam.ts';
 export type { ShareRegion } from './regions.ts';
 export {
   SHARE_REGIONS_MESSAGE,

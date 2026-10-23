@@ -38,6 +38,32 @@ export function subscribeHover(
   };
 }
 
+/** What the pointer rests on, in a line, and the loci it names. */
+export interface HoverLabel {
+  /** `O 1`, `Si 4 — O 8`, or the label a drawing of the site carries. */
+  label: string;
+  /** The loci, for a site that wants more of it — the atom it holds, say. */
+  loci: Loci;
+}
+
+/**
+ * Report the label of whatever the pointer rests on: an atom named as a
+ * reader would name it, anything else by the label it was drawn with.
+ * @param plugin - The molstar context.
+ * @param listener - Called with the label and its loci, or `null` when the
+ * pointer leaves everything or rests on something with nothing to say.
+ * @returns The unsubscribe function.
+ */
+export function subscribeHoverLabel(
+  plugin: PluginContext,
+  listener: (hover: HoverLabel | null) => void,
+): () => void {
+  return subscribeHover(plugin, (loci) => {
+    const label = loci === null ? null : (atomText(loci) ?? lociText(loci));
+    listener(label === null || loci === null ? null : { label, loci });
+  });
+}
+
 /**
  * The one line a loci is worth, in molstar's own words.
  * @param loci - What the pointer is over.

@@ -37,6 +37,14 @@ export interface ServeWorkerRequestsOptions<TRequest, TResponse> {
    * @default undefined — every answer is copied
    */
   transfer?: (response: TResponse) => Transferable[];
+  /**
+   * What a failed answer carries besides its message, for the page's channel
+   * to word the failure in its own language — the key of a translatable
+   * message and its values, say. It must survive being posted; answering
+   * `undefined` adds nothing.
+   * @default undefined — a failure carries its message alone
+   */
+  detail?: (error: unknown) => unknown;
 }
 
 /**
@@ -59,7 +67,7 @@ export function serveWorkerRequests<TRequest, TResponse, TProgress = never>(
   ) => TResponse | Promise<TResponse>,
   options: ServeWorkerRequestsOptions<TRequest, TResponse> = {},
 ): boolean {
-  const { accepts, transfer } = options;
+  const { accepts, transfer, detail } = options;
   const scope = options.scope ?? dedicatedWorkerScope();
   if (scope === undefined) return false;
   const running = new Map<number, AbortController>();
@@ -99,7 +107,15 @@ export function serveWorkerRequests<TRequest, TResponse, TProgress = never>(
           answer(scope, { id, ok: true, response }, transfer);
         },
         (error: unknown) => {
-          answer(scope, { id, ok: false, message: errorMessage(error) });
+          const message = errorMessage(error);
+          const extra =
+            detail === undefined ? undefined : describe(detail, error);
+          answer(
+            scope,
+            extra === undefined
+              ? { id, ok: false, message }
+              : { id, ok: false, message, detail: extra },
+          );
         },
       )
       .finally(() => {
@@ -124,6 +140,18 @@ function answer<TResponse>(
       ok: false,
       message: errorMessage(error),
     });
+  }
+}
+
+function describe(
+  detail: (error: unknown) => unknown,
+  error: unknown,
+): unknown {
+  try {
+    return detail(error);
+  } catch {
+    // A detail that cannot be worked out leaves the message to say it all.
+    return undefined;
   }
 }
 

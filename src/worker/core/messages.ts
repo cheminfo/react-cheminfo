@@ -27,12 +27,13 @@ export interface WorkerProgressMessage<TProgress> {
 
 /**
  * What a worker posts once a job is over. An `Error` does not survive the
- * boundary, so a failure travels as its message and becomes an `Error` again
- * on this side.
+ * boundary, so a failure travels as its message — plus, when the worker was
+ * told how, a `detail` the page reads to say it in its own words — and becomes
+ * an `Error` again on this side.
  */
 export type WorkerResponseMessage<TResponse> =
   | { id: number; ok: true; response: TResponse }
-  | { id: number; ok: false; message: string };
+  | { id: number; ok: false; message: string; detail?: unknown };
 
 /**
  * As much of a `Worker` as a channel uses. A real `Worker` satisfies it, and so

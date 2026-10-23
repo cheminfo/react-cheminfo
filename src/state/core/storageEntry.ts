@@ -81,6 +81,38 @@ export function removeStorageEntry(storageKey: string): void {
   }
 }
 
+/**
+ * Read one `localStorage` entry as the text it was stored as, so two copies of
+ * a payload can be compared without parsing either.
+ * @param storageKey - The full key.
+ * @returns The stored text, or `null` when there is none or the store cannot
+ * be reached.
+ */
+export function readStorageText(storageKey: string): string | null {
+  try {
+    return globalThis.localStorage?.getItem(storageKey) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Write one `localStorage` entry as text, exactly as given. Best effort.
+ * @param storageKey - The full key.
+ * @param text - What to store.
+ * @returns Whether the store took it.
+ */
+export function writeStorageText(storageKey: string, text: string): boolean {
+  try {
+    const storage = globalThis.localStorage as Storage | undefined;
+    if (storage === undefined) return false;
+    storage.setItem(storageKey, text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function isQuotaExceeded(error: unknown): boolean {
   if (typeof error !== 'object' || error === null) return false;
   const { name, code } = error as { name?: unknown; code?: unknown };

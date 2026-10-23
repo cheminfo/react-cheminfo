@@ -63,14 +63,59 @@ export interface WorkerChannelOptions<TRequest, TResponse, TProgress = never> {
   cooperativeCancel?: boolean;
   /**
    * The same job run on this thread, used instead of the worker where the page
-   * has no `Worker` at all — Node.js, a unit test. Only a channel built from a
-   * function that creates the worker falls back to it.
+   * has no `Worker` at all — Node.js, a unit test — or where creating one
+   * throws, as a browser refuses a page framed under an opaque origin a worker
+   * from its own server; every later job then runs here too. Only a channel
+   * built from a function that creates the worker falls back to it.
    * @default undefined — every job goes to the worker
    */
   runInProcess?: (
     request: TRequest,
     context: WorkerJobContext<TProgress>,
   ) => Promise<TResponse>;
+  /**
+   * Turn what went wrong into the error the requests reject with, so a page
+   * can say it in its own words — a translated message, an error class of its
+   * own. Answering `undefined` keeps the default error. Cancellations and
+   * timeouts are not failures: they keep their own error classes.
+   * @default undefined — the job's message, or `<name> failed: …`
+   */
+  failure?: (failure: WorkerFailure) => Error | undefined;
+  /**
+   * Post a job again, once, on a fresh worker when its worker failed before
+   * answering, rather than reporting the failure: a worker whose module graph
+   * was still loading when the channel replaced it dies without having run
+   * anything. A job posted with buffers to transfer is not posted twice. Only
+   * a channel built from a function that creates the worker can do it.
+   * @default false
+   */
+  retryAfterWorkerFailure?: boolean;
+}
+
+/** What went wrong, before it becomes the error a request rejects with. */
+export interface WorkerFailure {
+  /**
+   * `job`: the job failed — its worker answered with a failure, or its
+   * in-process run threw. `worker`: the worker itself failed outright; an
+   * empty `message` means it never ran at all, its module graph not loading.
+   * `start`: creating the worker threw, and no in-process run stood in.
+   */
+  kind: 'job' | 'worker' | 'start';
+  /** The channel's name, e.g. `conformers`. */
+  name: string;
+  /** What was said: the job's message, the error event's, or the thrown error's. */
+  message: string;
+  /**
+   * The `detail` a failed answer carried, as `serveWorkerRequests` was told to
+   * write it — the key of a translatable message, say.
+   * @default undefined
+   */
+  detail?: unknown;
+  /**
+   * What the failure came with: the failed answer the worker posted, the error
+   * the in-process run threw, the error event, or what the factory threw.
+   */
+  cause: unknown;
 }
 
 /** What one call may ask of the channel. */

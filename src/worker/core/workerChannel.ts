@@ -1,7 +1,7 @@
 import { toError } from '../../error/core/toError.ts';
 
 import { CancelledRequestError, RequestTimeoutError } from './errors.ts';
-import type { WorkerLike, WorkerRequestMessage } from './messages.ts';
+import type { WorkerRequestMessage } from './messages.ts';
 import type {
   Outcome,
   PendingRequest,
@@ -12,7 +12,6 @@ import {
   positiveMilliseconds,
   postCancel,
   runJobInProcess,
-  subscribeToWorker,
   watchRequest,
 } from './workerChannelParts.ts';
 import type {
@@ -21,6 +20,7 @@ import type {
   WorkerRequestOptions,
   WorkerSource,
 } from './workerChannelTypes.ts';
+import { createWorkerSlot } from './workerSlot.ts';
 
 /**
  * Turn a worker into something a page can await.
@@ -30,10 +30,9 @@ import type {
  * — cancelled, superseded, timed out, or failed — drops out of the pending map
  * at that moment. The worker may post progress about a job while it runs.
  *
- * Handed a worker, the channel posts to it and terminates it when asked, but
- * never creates one. Handed a function, it creates the worker on the first
- * request, replaces one that failed or was terminated, and can fall back to an
- * in-process run where there is no `Worker`.
+ * Handed a worker, the channel posts to it and terminates it when asked. Handed
+ * a function, it creates the worker when needed and can run the job in-process
+ * instead; see `createWorkerSlot`.
  * @param source - The worker, or the function that creates it.
  * @param options - See {@link WorkerChannelOptions}.
  * @returns The channel.
@@ -43,38 +42,44 @@ export function createWorkerChannel<TRequest, TResponse, TProgress = never>(
   source: WorkerSource,
   options: WorkerChannelOptions<TRequest, TResponse, TProgress> = {},
 ): WorkerChannel<TRequest, TResponse, TProgress> {
-  const {
-    name = 'worker',
-    schedule = 'parallel',
-    cooperativeCancel = false,
-    defaultTimeoutMs,
-    runInProcess,
-  } = options;
+  const { name = 'worker', schedule = 'parallel' } = options;
+  const { cooperativeCancel = false, retryAfterWorkerFailure } = options;
+  const { defaultTimeoutMs, runInProcess, failure } = options;
   const fallbackTimeoutMs = positiveMilliseconds(
     defaultTimeoutMs,
     DEFAULT_TIMEOUT_MS,
   );
-  const factory = typeof source === 'function' ? source : undefined;
-  if (schedule === 'restart' && factory === undefined) {
+  if (schedule === 'restart' && typeof source !== 'function') {
     throw new Error(`${name}: the restart schedule needs a worker factory`);
   }
-  const hasNoWorker = !('Worker' in globalThis);
-  const runLocally = factory && hasNoWorker ? runInProcess : undefined;
+  const retries = typeof source === 'function' && retryAfterWorkerFailure;
 
   const pending = new Map<number, PendingRequest<TResponse, TProgress>>();
-  let worker: WorkerLike | null = null;
+  const posted = new Map<number, QueuedRequest<TRequest>>();
+  const retried = new Set<number>();
   let closed = false;
   let nextId = 0;
   let activeId: number | null = null;
   let queued: QueuedRequest<TRequest> | null = null;
-  if (typeof source !== 'function') {
-    worker = source;
-    listen(source);
-  }
+  const slot = createWorkerSlot<TRequest, TResponse, TProgress>(source, {
+    name,
+    runInProcess,
+    failure,
+    isWaited: (id) => pending.has(id),
+    report: {
+      progress: (id, progress) => {
+        pending.get(id)?.onProgress?.(progress as TProgress);
+      },
+      answer: (id, outcome) => complete(id, outcome),
+      failure: (error) => workerFailed(error),
+    },
+  });
 
   function take(id: number): PendingRequest<TResponse, TProgress> | undefined {
     const entry = pending.get(id);
     pending.delete(id);
+    posted.delete(id);
+    retried.delete(id);
     entry?.dispose();
     return entry;
   }
@@ -93,7 +98,7 @@ export function createWorkerChannel<TRequest, TResponse, TProgress = never>(
     const entry = take(id);
     if (entry === undefined) return false;
     entry.controller?.abort();
-    if (cooperativeCancel && entry.dispatched) postCancel(worker, id);
+    if (cooperativeCancel && entry.dispatched) postCancel(slot.current, id);
     entry.reject(error);
     return true;
   }
@@ -106,22 +111,18 @@ export function createWorkerChannel<TRequest, TResponse, TProgress = never>(
   }
 
   function rejectAll(error: Error): void {
-    for (const entry of pending.values()) {
-      entry.dispose();
+    for (const [id, entry] of pending) {
+      take(id);
       entry.controller?.abort();
       entry.reject(error);
     }
-    pending.clear();
     activeId = null;
     queued = null;
   }
 
   function abandonActive(): void {
     activeId = null;
-    if (factory !== undefined && worker !== null) {
-      worker.terminate();
-      worker = null;
-    }
+    slot.abandon();
   }
 
   function startQueued(): void {
@@ -135,55 +136,55 @@ export function createWorkerChannel<TRequest, TResponse, TProgress = never>(
     if (entry === undefined) return;
     entry.dispatched = true;
     if (schedule !== 'parallel') activeId = id;
-    if (runLocally !== undefined) {
-      entry.controller = runJobInProcess(
-        runLocally,
-        payload,
-        (progress) => pending.get(id)?.onProgress?.(progress),
-        (outcome) => complete(id, outcome),
-      );
-      return;
-    }
-    const message: WorkerRequestMessage<TRequest> = { id, request: payload };
     try {
-      const target = currentWorker();
-      if (transfer === undefined) target.postMessage(message);
-      else target.postMessage(message, transfer);
+      const target = slot.acquire();
+      if (target !== null) {
+        if (retries && transfer === undefined) {
+          posted.set(id, { id, payload, transfer });
+        }
+        const message: WorkerRequestMessage<TRequest> = {
+          id,
+          request: payload,
+        };
+        if (transfer === undefined) target.postMessage(message);
+        else target.postMessage(message, transfer);
+        return;
+      }
     } catch (error) {
       complete(id, { ok: false, error: toError(error) });
+      return;
     }
+    entry.controller = runJobInProcess(
+      slot.runLocally,
+      payload,
+      (progress) => pending.get(id)?.onProgress?.(progress),
+      (outcome) => complete(id, outcomeOf(outcome)),
+    );
   }
 
-  function currentWorker(): WorkerLike {
-    if (worker === null) {
-      if (factory === undefined) {
-        throw new CancelledRequestError(`${name} was terminated`);
+  function outcomeOf(outcome: Outcome<TResponse>): Outcome<TResponse> {
+    return outcome.ok
+      ? outcome
+      : { ok: false, error: slot.jobFailed(outcome.error) };
+  }
+
+  function workerFailed(error: Error): void {
+    if (!retries) {
+      rejectAll(error);
+      return;
+    }
+    activeId = null;
+    for (const [id, entry] of pending) {
+      if (!entry.dispatched) continue;
+      const job = posted.get(id);
+      if (job === undefined || retried.has(id)) {
+        drop(id, error);
+        continue;
       }
-      worker = factory();
-      listen(worker);
+      retried.add(id);
+      dispatch(id, job.payload);
     }
-    return worker;
-  }
-
-  function listen(target: WorkerLike): void {
-    subscribeToWorker(target, {
-      progress: (id, progress) => {
-        if (target !== worker) return;
-        pending.get(id)?.onProgress?.(progress as TProgress);
-      },
-      answer: (id, outcome) => {
-        if (target === worker) complete(id, outcome as Outcome<TResponse>);
-      },
-      failure: (detail) => {
-        if (target !== worker) return;
-        if (factory !== undefined) {
-          target.terminate();
-          worker = null;
-        }
-        const suffix = detail === '' ? '' : `: ${detail}`;
-        rejectAll(new Error(`${name} failed${suffix}`));
-      },
-    });
+    if (activeId === null) startQueued();
   }
 
   function expire(id: number, budget: number): void {
@@ -242,9 +243,8 @@ export function createWorkerChannel<TRequest, TResponse, TProgress = never>(
     cancel: () => dropAll('was cancelled'),
     terminate: () => {
       rejectAll(new CancelledRequestError(`${name} was terminated`));
-      worker?.terminate();
-      if (factory === undefined) closed = true;
-      else worker = null;
+      slot.terminate();
+      if (!slot.hasFactory) closed = true;
     },
   };
 }
