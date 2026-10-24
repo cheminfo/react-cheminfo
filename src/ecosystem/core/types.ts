@@ -30,7 +30,7 @@ export type SiteId =
   | 'atoms'
   | 'moles'
   | 'inorganic'
-  | 'powerpoint'
+  | 'slides'
   | 'chembio'
   | 'wikidata'
   | 'mz';

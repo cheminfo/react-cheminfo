@@ -493,7 +493,7 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // A slide on its stand, with a ring standing on it: the slide is the
   // presentation and the ring is the live tool put on it, so the ring carries
   // the answering colour.
-  powerpoint: (alt) => (
+  slides: (alt) => (
     <>
       <rect x="4.5" y="6.5" width="23" height="14.5" rx="1.6" fill="#ffffff" />
       <path

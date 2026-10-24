@@ -312,9 +312,9 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#a3620a', accent: '#22d3ee' },
   },
   {
-    id: 'powerpoint',
-    name: { lead: 'powerpoint', alt: 'cheminfo', dot: true },
-    host: 'powerpoint.cheminfo.org',
+    id: 'slides',
+    name: { lead: 'slides', alt: 'cheminfo', dot: true },
+    host: 'slides.cheminfo.org',
     tagline:
       'Put a live tool on a slide, from the link its Share button gives.',
     group: 'computing',
