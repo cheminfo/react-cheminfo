@@ -103,6 +103,9 @@ test('nothing drawn is said rather than guessed at', async ({ page }) => {
 test("the export button's tooltip leaves when the button is pressed", async ({
   page,
 }) => {
+  // A tooltip opens on a timer, so the page's clock is moved past it rather
+  // than waited out.
+  await page.clock.install();
   await openStory(page, 'structure-structureeditor--default');
   // The editor pulls openchemlib, and a cold dev server compiles it before it
   // serves it: hovering before the canvas is there races the chunk.
@@ -135,13 +138,16 @@ test("the export button's tooltip leaves when the button is pressed", async ({
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.mouse.move(400, 500);
-  await page.waitForTimeout(700);
+  await page.clock.fastForward(PAST_OPEN_DELAY);
   await expect(tooltip).toHaveCount(0);
 });
 
 test('the help button lets go of its tooltip when it is pressed', async ({
   page,
 }) => {
+  // A tooltip opens on a timer, so the page's clock is moved past it rather
+  // than waited out.
+  await page.clock.install();
   await openStory(page, 'structure-structureeditor--default');
   await expect(page.locator('[data-openchemlib-canvas-editor]')).toBeAttached({
     timeout: 60_000,
@@ -159,6 +165,9 @@ test('the help button lets go of its tooltip when it is pressed', async ({
 
   await page.keyboard.press('Escape');
   await page.mouse.move(400, 500);
-  await page.waitForTimeout(700);
+  await page.clock.fastForward(PAST_OPEN_DELAY);
   await expect(tooltip).toHaveCount(0);
 });
+
+/** Past every delay a tooltip opens after, in ms. */
+const PAST_OPEN_DELAY = 1000;

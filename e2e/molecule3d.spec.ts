@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test';
 import type { Molecule3DCamera } from '../src/molecule3d/core/camera.ts';
 import { parseMolecule3DCamera } from '../src/molecule3d/core/camera.ts';
 
+import { drawnPixels } from './sceneChanges.ts';
+import { settledScene } from './sceneInk.ts';
 import { openStory } from './story.ts';
 
 // molstar needs a real WebGL2 context, which headless Chromium only gets from
@@ -195,7 +197,11 @@ test('a camera a link carries is the one the reopened viewer stands at', async (
   const centreY = box.y + box.height / 2;
 
   // A view nobody chose is never reported, however the scene settles.
-  await page.waitForTimeout(1500);
+  await expect
+    .poll(async () => drawnPixels(page, await settledScene(page, canvas)), {
+      timeout: 60_000,
+    })
+    .toBeGreaterThan(0);
   await expect(readout).toHaveText('—');
 
   await page.mouse.move(centreX, centreY);

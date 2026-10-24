@@ -182,6 +182,7 @@ const STORY_IDS = [
   'molecule3d-moleculeviewer3d--polar-surface',
   'molecule3d-moleculeviewer3d--shared-camera',
   'molecule3d-moleculeviewer3d--surface-and-spin',
+  'molecule3d-moleculeviewer3d--trajectory',
   'molecule3d-moleculeviewer3d--view-only',
   'molecule3d-moleculeviewer3d--with-measurement',
   'molecules-moleculestokentable--not-checked-yet',

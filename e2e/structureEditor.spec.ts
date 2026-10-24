@@ -4,14 +4,15 @@ import { expect, test } from '@playwright/test';
 import { openStory } from './story.ts';
 
 /**
- * How long openchemlib is held back before it is served.
+ * How many frames the page draws before openchemlib is served: twice the 120
+ * — about two seconds — a deadline counted in frames would wait.
  *
  * The editor is imported lazily, and the bug this covers was a measuring loop
  * that gave up after about two seconds and left the toolbar cut off for the
  * life of the page. So the chunk arrives later than any deadline would have
  * waited, which is a slow connection, a cold cache or a busy laptop.
  */
-const CHUNK_DELAY = 4000;
+const LATE_FRAMES = 240;
 
 // The editor pulls openchemlib, which a cold Vite dev server compiles before it
 // serves, and one of these specs then holds it back on purpose.
@@ -117,14 +118,25 @@ async function toolbarRect(page: Page): Promise<{ x: number; y: number }> {
 
 /**
  * Serve openchemlib late, so the editor appears well after a deadline would
- * have expired.
+ * have expired: only once the page has drawn {@link LATE_FRAMES} frames, which
+ * holds however fast or slow the machine draws them.
  * @param page - The page to slow down.
  */
 async function delayOpenchemlib(page: Page): Promise<void> {
   await page.route('**/*openchemlib*', async (route) => {
-    await new Promise((resolve) => {
-      setTimeout(resolve, CHUNK_DELAY);
-    });
+    await page.evaluate(
+      (count) =>
+        new Promise<void>((resolve) => {
+          let left = count;
+          function tick(): void {
+            left--;
+            if (left === 0) resolve();
+            else requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        }),
+      LATE_FRAMES,
+    );
     await route.continue();
   });
 }
@@ -146,7 +158,7 @@ async function editorSize(page: Page): Promise<EditorSize> {
           () =>
             document.querySelector('[data-openchemlib-canvas-editor]') !== null,
         ),
-      { timeout: CHUNK_DELAY + 15_000 },
+      { timeout: 30_000 },
     )
     .toBe(true);
 

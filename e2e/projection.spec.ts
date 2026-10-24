@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { CHART_WHEEL_DWELL } from '../src/chart/ui/useWheelZoom.ts';
+
 import type { Vertex } from './lasso.ts';
 import { lasso, plotBox, plotSurface } from './lasso.ts';
 import { openStory } from './story.ts';
@@ -323,6 +325,8 @@ test('the bar writes less of itself as the figure narrows, and never less than t
 test('the map catches the wheel once the pointer has rested on it, and a double click gives the view back', async ({
   page,
 }) => {
+  // The dwell is a timer, so the page's clock is moved on rather than waited out.
+  await page.clock.install();
   await openStory(page, IRIS);
   const ticks = page.locator('.chart-frame .chart-axis-bottom text');
   const WHOLE = ['-4', '-2', '0', '2', '4', 'PC1 — 73.0 %'];
@@ -338,7 +342,7 @@ test('the map catches the wheel once the pointer has rested on it, and a double 
   // Half a second later the same gesture zooms about the middle of the plot,
   // where the pointer is: a quarter off each end, and the axis written in
   // steps of one because that is what the frame it is left with carries.
-  await page.waitForTimeout(CAUGHT_MS);
+  await page.clock.fastForward(CHART_WHEEL_DWELL);
   await page.mouse.wheel(0, -200);
   await expect(ticks).toHaveText(['-2', '-1', '0', '1', '2', 'PC1 — 73.0 %']);
 
@@ -347,13 +351,6 @@ test('the map catches the wheel once the pointer has rested on it, and a double 
   });
   await expect(ticks).toHaveText(WHOLE);
 });
-
-/**
- * Long enough for the dwell to be up. It is the component's own half second
- * plus room for a slow frame, since a test that races the timer fails on a
- * loaded machine and says nothing about the gesture.
- */
-const CAUGHT_MS = 800;
 
 test('picking from a list inside the options panel keeps the panel open', async ({
   page,

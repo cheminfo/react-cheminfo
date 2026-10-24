@@ -2,6 +2,9 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import react from 'eslint-config-cheminfo-react/base';
 import typescript from 'eslint-config-cheminfo-typescript';
 
+const NO_FIXED_WAIT =
+  'Wait for a condition (a web-first assertion, expect.poll, toPass, waitForEvent), or move the clock with page.clock.';
+
 export default defineConfig(
   globalIgnores([
     'coverage',
@@ -21,6 +24,38 @@ export default defineConfig(
       'no-restricted-imports': [
         'error',
         { patterns: ['**/ir/**', '**/structure/**', '**/spectra/**'] },
+      ],
+    },
+  },
+  {
+    // A fixed wait is a guess about how fast the machine is: an e2e test waits
+    // for a condition, or moves the page's clock with `page.clock`.
+    files: ['e2e/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.property.name='waitForTimeout']",
+          message: NO_FIXED_WAIT,
+        },
+        {
+          selector: 'CallExpression[callee.name=/^set(Timeout|Interval)$/]',
+          message: NO_FIXED_WAIT,
+        },
+        {
+          selector:
+            'CallExpression[callee.object.name=/^(globalThis|window|self)$/][callee.property.name=/^set(Timeout|Interval)$/]',
+          message: NO_FIXED_WAIT,
+        },
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            { name: 'node:timers', message: NO_FIXED_WAIT },
+            { name: 'node:timers/promises', message: NO_FIXED_WAIT },
+          ],
+        },
       ],
     },
   },

@@ -110,3 +110,36 @@ export async function changedPixels(
   );
   return { width, pixels: new Set(pixels) };
 }
+
+/**
+ * How many pixels of a picture of the scene differ from its top left corner,
+ * which only the background reaches: none until a model is drawn.
+ * @param page - Any page: it decodes the picture.
+ * @param shot - The picture.
+ * @returns The count.
+ */
+export async function drawnPixels(
+  page: Page,
+  shot: SceneShot,
+): Promise<number> {
+  return page.evaluate(async (png) => {
+    const response = await fetch(`data:image/png;base64,${png}`);
+    const bitmap = await globalThis.createImageBitmap(await response.blob());
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const context = canvas.getContext('2d');
+    if (context === null) throw new Error('no 2D context to read with');
+    context.drawImage(bitmap, 0, 0);
+    const { data } = context.getImageData(0, 0, bitmap.width, bitmap.height);
+    let count = 0;
+    for (let index = 4; index < data.length; index += 4) {
+      if (
+        data[index] !== data[0] ||
+        data[index + 1] !== data[1] ||
+        data[index + 2] !== data[2]
+      ) {
+        count++;
+      }
+    }
+    return count;
+  }, shot.png.toString('base64'));
+}

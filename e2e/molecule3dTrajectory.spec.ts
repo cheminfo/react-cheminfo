@@ -16,18 +16,19 @@ const PANEL = '.bp6-popover:not(.bp6-tooltip)';
 test('a file of several frames plays, and saves as an animated PNG of every frame', async ({
   page,
 }) => {
-  // molstar's lazy chunk and twenty software-rendered frames outlast 30 s cold.
-  test.setTimeout(120_000);
+  // molstar's lazy chunk and twenty software-rendered frames outlast 30 s cold,
+  // and a two-core CI runner takes three times as long as a laptop.
+  test.setTimeout(180_000);
   await openStory(page, 'molecule3d-moleculeviewer3d--trajectory');
   const canvas = page.getByTestId('molecule3d').locator('canvas');
   await expect(canvas).toBeVisible({ timeout: 60_000 });
 
-  // Playing: two pictures of the canvas a moment apart differ.
+  // Playing: at 20 frames a second, two pictures of the canvas taken one
+  // after the other differ.
   await expect
     .poll(
       async () => {
         const first = await canvas.screenshot();
-        await page.waitForTimeout(120);
         return first.equals(await canvas.screenshot());
       },
       { timeout: 30_000 },
@@ -39,6 +40,10 @@ test('a file of several frames plays, and saves as an animated PNG of every fram
   await expect(
     panel.getByRole('radio', { name: 'All 20, animated' }),
   ).toBeChecked();
+  // The animation is under test, not the resolution: at 1× there are a quarter
+  // of the pixels to render in software and to encode, which keeps the save
+  // well inside the wait on CI, where the default 2× outlasted it.
+  await panel.getByRole('radio', { name: '1×' }).click();
 
   const [download] = await Promise.all([
     page.waitForEvent('download', { timeout: 90_000 }),
