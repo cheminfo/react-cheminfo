@@ -8,28 +8,25 @@
  */
 
 import type { CSSProperties, ReactElement } from 'react';
-import {
-  Suspense,
-  lazy,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import type { CanvasEditorInputFormat } from 'react-ocl';
+import { Suspense, lazy, useCallback } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
-import { createPendingCall } from '../core/pendingCall.ts';
 
 import { EditorHelpButton } from './EditorHelpButton.tsx';
+import { EditorImportButton } from './EditorImportButton.tsx';
+import { EditorImportProblem } from './EditorImportProblem.tsx';
+import { StructureDropOverlay } from './StructureDropOverlay.tsx';
 import { ToolbarTooltip } from './ToolbarTooltip.tsx';
-import type {
-  StructureEditorChange,
-  StructureEditorMode,
-} from './editorChange.ts';
+import type { StructureEditorChange } from './editorChange.ts';
+import type { StructureEditorProps } from './structureEditorProps.ts';
+import { useDebouncedChange } from './useDebouncedChange.ts';
 import { useEditorStructure } from './useEditorStructure.ts';
+import { useStructureDrop } from './useStructureDrop.ts';
+import { useStructureImport } from './useStructureImport.ts';
 import { useToolbarFloor } from './useToolbarFloor.ts';
+
+export type { StructureEditorProps } from './structureEditorProps.ts';
 
 const EditorExportButton = lazy(async () => {
   const module = await import('./EditorExportButton.tsx');
@@ -40,84 +37,6 @@ const EditorCanvas = lazy(async () => {
   const module = await import('./EditorCanvas.tsx');
   return { default: module.EditorCanvas };
 });
-
-/** What {@link StructureEditor} needs. */
-export interface StructureEditorProps {
-  /**
-   * Called after every edit, once the drawing has been still for `debounce`
-   * milliseconds, with every notation read out of the editor.
-   */
-  onChange: (change: StructureEditorChange) => void;
-  /**
-   * Draw a query fragment rather than a whole structure, which is what a
-   * substructure filter needs.
-   * @default false
-   */
-  fragment?: boolean;
-  /**
-   * How `value` is written.
-   * @default 'idcode'
-   */
-  inputFormat?: CanvasEditorInputFormat;
-  /**
-   * What the canvas holds. Read once, when the editor appears and again on
-   * every change of `revision`: the editor is uncontrolled, so feeding the
-   * drawing back into it would replace the structure and reset every
-   * coordinate under the pen.
-   * @default ''
-   */
-  value?: string;
-  /**
-   * Bumped by the caller to load `value` into the canvas again, which is what
-   * an example, a share link or a Clear button does. Changing it discards
-   * whatever was being drawn.
-   * @default 0
-   */
-  revision?: number;
-  /**
-   * How long the drawing has to be still before `onChange` is called, in
-   * milliseconds. Long enough that drawing a ring does not publish six
-   * structures; `0` reports every stroke.
-   * @default 300
-   */
-  debounce?: number;
-  /**
-   * Smallest height of the drawing area, in pixels. Raised to whatever the
-   * toolbar needs, which is usually more.
-   * @default 320
-   */
-  minHeight?: number;
-  /**
-   * Whether the editor draws one structure or a reaction. A reaction canvas
-   * has its own toolbar and its own arrow.
-   * @default 'molecule'
-   */
-  mode?: StructureEditorMode;
-  /**
-   * Explain each toolbar button in a tooltip, and put a button in the corner
-   * that opens a guide to the mouse and the keyboard, which F1 opens too.
-   * @default true
-   */
-  help?: boolean;
-  /**
-   * Put a button in the corner that opens every notation of the drawing — its
-   * SMILES, its molfiles, its canonical identifiers — and the picture of it,
-   * ready to copy or to save. A reaction has none of those, so it is never
-   * offered one.
-   * @default true
-   */
-  exportable?: boolean;
-  /**
-   * Class the container carries, so a site can reach it from its stylesheet.
-   * @default undefined
-   */
-  className?: string;
-  /**
-   * Extra style for the container, merged over the packaged one.
-   * @default undefined
-   */
-  style?: CSSProperties;
-}
 
 /**
  * The canvas structure editor, sized to fill its container and never to hide
@@ -138,13 +57,15 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
     mode = 'molecule',
     help = true,
     exportable = true,
+    importable = true,
+    onImport,
     className,
     style,
   } = props;
 
   const t = useChromeT();
   const containerRef = useToolbarFloor({ minHeight, revision });
-  const handleChange = useDebounced(onChange, debounce, revision);
+  const handleChange = useDebouncedChange(onChange, debounce, revision);
   const drawing = useEditorStructure({ value, inputFormat, revision });
   const handleEdit = useCallback(
     (change: StructureEditorChange) => {
@@ -155,12 +76,21 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
     },
     [drawing, handleChange],
   );
+  const imports = useStructureImport({
+    revision,
+    fragment,
+    onImport,
+    onRead: handleEdit,
+  });
+  const takesImports = importable && mode === 'molecule';
+  const drop = useStructureDrop(takesImports ? imports.load : undefined);
 
   return (
     <div
       ref={containerRef}
       className={className}
       style={{ ...ROOT_STYLE, minHeight, ...style }}
+      {...drop.targetProps}
     >
       <Suspense
         fallback={
@@ -168,17 +98,23 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
         }
       >
         <EditorCanvas
-          key={revision}
+          key={imports.canvasKey}
           onChange={handleEdit}
           fragment={fragment}
-          inputFormat={inputFormat}
-          value={value}
+          inputFormat={imports.idCode === null ? inputFormat : 'idcode'}
+          value={imports.idCode ?? value}
           mode={mode}
         />
         {help ? (
           <ToolbarTooltip containerRef={containerRef} mode={mode} />
         ) : null}
         <div style={CORNER_STYLE}>
+          {takesImports ? (
+            <EditorImportButton
+              onImport={imports.load}
+              accept={onImport === undefined ? STRUCTURE_FILES : undefined}
+            />
+          ) : null}
           {exportable && mode === 'molecule' ? (
             <EditorExportButton
               source={drawing.source}
@@ -194,44 +130,20 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
             />
           ) : null}
         </div>
+        {imports.problem === null ? null : (
+          <EditorImportProblem
+            problem={imports.problem}
+            onDismiss={imports.dismiss}
+          />
+        )}
       </Suspense>
+      {drop.over ? (
+        <StructureDropOverlay
+          label={t('structure.import.drop')}
+          handlers={drop.overlayProps}
+        />
+      ) : null}
     </div>
-  );
-}
-
-/**
- * Report the last edit of a burst rather than every one of them.
- *
- * The editor's own event is read out before the wait starts, so what arrives
- * late is a plain object rather than a handle on an editor that has moved on.
- * An editor removed mid-burst — a tab switched, a card folded — still reports
- * its last edit, which would otherwise be lost with the timer.
- * @param onChange - What the caller wants told.
- * @param delay - How long the drawing has to be still, in milliseconds.
- * @param resetKey - Dropped edits: a burst still waiting when the caller
- * replaces the structure describes a canvas that no longer exists.
- * @returns The handler to give the canvas.
- */
-function useDebounced(
-  onChange: (change: StructureEditorChange) => void,
-  delay: number,
-  resetKey: number,
-): (change: StructureEditorChange) => void {
-  const [pending] = useState(createPendingCall<StructureEditorChange>);
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  });
-  useEffect(() => {
-    pending.drop();
-  }, [pending, resetKey]);
-  useEffect(() => () => pending.flush(), [pending]);
-
-  return useCallback(
-    (change: StructureEditorChange) => {
-      pending.push(change, delay, (value) => onChangeRef.current(value));
-    },
-    [pending, delay],
   );
 }
 
@@ -252,8 +164,8 @@ const ROOT_STYLE: CSSProperties = {
 };
 
 /**
- * The corner the editor's own buttons sit in: export first, then help, so the
- * one that does something to the drawing is the nearer of the two to it.
+ * The corner the editor's own buttons sit in: open, export, then help — the
+ * drawing in, the drawing out, and the guide last.
  */
 const CORNER_STYLE: CSSProperties = {
   position: 'absolute',
@@ -273,3 +185,6 @@ const LOADING_STYLE: CSSProperties = {
   color: TOKEN.textFaint,
   fontSize: 13,
 };
+
+/** What the editor reads itself, offered first by the file picker. */
+const STRUCTURE_FILES = '.mol,.sdf,.sd,.smi,.smiles,.txt';

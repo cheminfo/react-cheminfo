@@ -21,6 +21,8 @@ export type { StructureLabels, StructureProps } from './Structure.tsx';
 export { Structure } from './Structure.tsx';
 export type { StructureEditorProps } from './StructureEditor.tsx';
 export { StructureEditor } from './StructureEditor.tsx';
+export type { StructureDropProps } from './StructureDrop.tsx';
+export { StructureDrop } from './StructureDrop.tsx';
 export type { StructureEditorHelpProps } from './StructureEditorHelp.tsx';
 export { StructureEditorHelp } from './StructureEditorHelp.tsx';
 export type { StructureExportDialogProps } from './StructureExportDialog.tsx';

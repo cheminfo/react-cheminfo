@@ -34,6 +34,7 @@ const meta = {
   argTypes: {
     fragment: { control: 'boolean' },
     exportable: { control: 'boolean' },
+    importable: { control: 'boolean' },
     mode: { control: 'inline-radio', options: ['molecule', 'reaction'] },
     help: { control: 'boolean' },
     inputFormat: {
@@ -49,7 +50,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The canvas structure editor, sized so its toolbar is never clipped. Hovering a toolbar button names it, shows its key and says what it does; the two buttons in the corner hand the drawing over — every notation of it and the picture — and open a guide to the keys, which F1 opens too. It is uncontrolled: the value is read when the editor appears and again whenever `revision` changes, and an edit is reported once the drawing has been still.',
+          'The canvas structure editor, sized so its toolbar is never clipped. Hovering a toolbar button names it, shows its key and says what it does; the buttons in the corner open a structure file, hand the drawing over — every notation of it and the picture — and open a guide to the keys, which F1 opens too. A molfile, an SDF, a SMILES or an idCode dropped on the canvas, as a file or as text, replaces the drawing. It is uncontrolled: the value is read when the editor appears and again whenever `revision` changes, and an edit is reported once the drawing has been still.',
       },
     },
   },
@@ -86,11 +87,11 @@ export const NoHelp: Story = {
 };
 
 /**
- * Neither button in the corner, for a page that hands the structure over its
- * own way.
+ * No button in the corner and no drop, for a page that takes and hands the
+ * structure over its own way.
  */
 export const NoCornerButtons: Story = {
-  args: { help: false, exportable: false },
+  args: { help: false, exportable: false, importable: false },
 };
 
 /** Every stroke reported, rather than only the last one of a burst. */

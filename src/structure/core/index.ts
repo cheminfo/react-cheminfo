@@ -82,3 +82,11 @@ export type {
   StructureSourceInput,
 } from './structureSource.ts';
 export { structureSource } from './structureSource.ts';
+export type {
+  StructureTransfer,
+  StructureTransferSource,
+} from './structureTransfer.ts';
+export {
+  carriesStructure,
+  readStructureTransfer,
+} from './structureTransfer.ts';

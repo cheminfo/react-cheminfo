@@ -398,6 +398,17 @@ import { StructureEditor } from 'react-cheminfo/structure';
   the structure back out. A box is still worth having where a structure arrives
   as _text the visitor keeps_ — a share link, a value they read back — and not
   merely to get a SMILES onto the canvas.
+- **A structure can be dropped on the canvas, or opened from its corner.** A
+  molfile, an SDF (its first record), a SMILES or an idCode, as a file or as
+  text dragged from another page, replaces the drawing and is reported through
+  `onChange` like an edit; a 3D molfile is laid out flat. Text that holds none
+  leaves the drawing as it was and says so on the canvas. `importable={false}`
+  turns both off. A page that reads more than the canvas does — an XYZ, a PDB,
+  a geometry it must keep in 3D — passes `onImport` and receives the files or
+  the text unread, then loads its structure back through `value` and
+  `revision`. `<StructureDrop onDrop>` gives any other area of the page the
+  same drop and the same veil, and `readStructureTransfer` reads a paste or a
+  drop into the same shape.
 - **The editor is uncontrolled**: `value` is read at mount and again on every
   change of `revision`, never on every render. Feeding the drawing back into
   `value` would replace every coordinate under the pen, so bump `revision` when
