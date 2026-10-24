@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.67.0](https://github.com/cheminfo/react-cheminfo/compare/v0.66.0...v0.67.0) (2026-10-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename the surge site to isomers
+
+### Features
+
+* export every frame of a 3D trajectory as an animated PNG ([4733729](https://github.com/cheminfo/react-cheminfo/commit/4733729d5e7fa69cf8d3908c79d250e08fff88f7))
+* let a host add panels to the IR and Raman viewers and hear plot clicks ([93198ba](https://github.com/cheminfo/react-cheminfo/commit/93198ba78d0b988c1c81a6d56cccd9a555c1c1fa))
+* open or drop a structure file onto the StructureEditor ([d296b6f](https://github.com/cheminfo/react-cheminfo/commit/d296b6f62a53bfeb6daa17648f7a0ddcc4b4f9cb))
+* rename the surge site to isomers ([fda980d](https://github.com/cheminfo/react-cheminfo/commit/fda980dc261a65072ecffaf0a7479f631bc945e7))
+
 ## [0.66.0](https://github.com/cheminfo/react-cheminfo/compare/v0.65.0...v0.66.0) (2026-10-23)
 
 
