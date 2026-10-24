@@ -1,5 +1,6 @@
+import type { Molecule3DFile } from '../core/file.ts';
 import type { Measurement } from '../core/measurement.ts';
-import type { Molecule3DFile, Molecule3DSettings } from '../core/settings.ts';
+import type { Molecule3DSettings } from '../core/settings.ts';
 import { normalizeMolecule3DSettings } from '../core/settings.ts';
 
 import type { Molecule3DViewer } from './viewer.ts';

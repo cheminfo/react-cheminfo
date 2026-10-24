@@ -211,3 +211,35 @@ const VIEWER_STYLE: CSSProperties = {
   height: 420,
   display: 'flex',
 };
+
+/**
+ * A file of several frames — the symmetric stretch of water, one period in 20
+ * frames — played in a loop. The export panel offers every frame as an
+ * animated PNG.
+ */
+export const Trajectory: Story = {
+  args: {
+    molfile: { format: 'xyz', data: waterStretch(20) },
+    playing: true,
+    framesPerSecond: 20,
+  },
+};
+
+/**
+ * One period of the symmetric stretch of water, as a multi-frame XYZ: both
+ * hydrogens move along their bond to the oxygen, in phase.
+ * @param frameCount - Frames in the period.
+ * @returns The XYZ text, one model per frame.
+ */
+function waterStretch(frameCount: number): string {
+  const frames: string[] = [];
+  for (let frame = 0; frame < frameCount; frame++) {
+    const stretch = 0.25 * Math.sin((2 * Math.PI * frame) / frameCount);
+    const y = 0.7572 * (1 + stretch);
+    const z = -0.4692 * (1 + stretch);
+    frames.push(
+      `3\nframe ${frame + 1}\nO 0.0000 0.0000 0.1173\nH 0.0000 ${y.toFixed(4)} ${z.toFixed(4)}\nH 0.0000 ${(-y).toFixed(4)} ${z.toFixed(4)}\n`,
+    );
+  }
+  return frames.join('');
+}

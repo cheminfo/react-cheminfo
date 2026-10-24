@@ -1,3 +1,5 @@
+export type { RgbaFrame } from './animatedPng.ts';
+export { DEFAULT_FRAMES_PER_SECOND, encodeAnimatedPng } from './animatedPng.ts';
 export type {
   Molecule3DCamera,
   Molecule3DRotation,
@@ -33,8 +35,8 @@ export {
   MEASUREMENT_LABELS,
   sameMeasurements,
 } from './measurement.ts';
+export type { Molecule3DFile } from './file.ts';
 export type {
-  Molecule3DFile,
   Molecule3DSettings,
   Molecule3DTools,
   RepresentationId,

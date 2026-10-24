@@ -19,6 +19,12 @@ export interface Molecule3DViewerOptions {
    * @default undefined
    */
   onMeasure?: (measurement: Measurement) => void;
+  /**
+   * Called with how many frames the file on screen holds, each time a file is
+   * drawn, and with 0 once the scene is emptied.
+   * @default undefined
+   */
+  onFrameCountChange?: (frameCount: number) => void;
 }
 
 /** How to draw the model. */

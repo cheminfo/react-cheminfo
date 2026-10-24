@@ -15,7 +15,8 @@ import { StructureFromModel } from 'molstar/lib/mol-plugin-state/transforms/mode
 import { StructureRepresentation3D } from 'molstar/lib/mol-plugin-state/transforms/representation.js';
 import type { StateTransformer } from 'molstar/lib/mol-state/index.js';
 
-import type { Molecule3DFile, RepresentationId } from '../core/settings.ts';
+import type { Molecule3DFile } from '../core/file.ts';
+import type { RepresentationId } from '../core/settings.ts';
 
 import type { MoleculeStyle } from './viewerTypes.ts';
 
@@ -48,7 +49,7 @@ const STICK_SCALE = 1.2;
  * @param plugin - The molstar context.
  * @param molfile - Molfile text plus the format id.
  * @param style - See {@link MoleculeStyle}.
- * @returns Nothing; resolves once the model is on screen.
+ * @returns How many frames the file holds, the first of which is on screen.
  * @throws {Error} When the file parses to zero atoms. molstar's `mol` parser returns
  * exactly that on a V3000 file, with no error, so without this check the viewer
  * would show an empty scene and report nothing.
@@ -57,7 +58,7 @@ export async function renderMolecule(
   plugin: PluginContext,
   molfile: Molecule3DFile,
   style: MoleculeStyle = {},
-): Promise<void> {
+): Promise<number> {
   const { representation = 'ball-and-stick', sizeFactor = 1 } = style;
   await clearMolecule(plugin);
   const data = await plugin.builders.data.rawData(
@@ -99,6 +100,7 @@ export async function renderMolecule(
       ),
     )
     .commit();
+  return trajectory.data?.frameCount ?? 1;
 }
 
 /**

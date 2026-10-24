@@ -10,6 +10,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { DEFAULT_SPIN_SPEED } from '../../molstar/core/index.ts';
+import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 import {
@@ -21,14 +22,13 @@ import { Molecule3DExport } from './Molecule3DExport.tsx';
 import { Molecule3DOptions } from './Molecule3DOptions.tsx';
 import { Molecule3DStage } from './Molecule3DStage.tsx';
 import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
-import { createMolecule3DViewer } from './createViewer.ts';
 import { highlightColorOf } from './highlightColor.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
 import { useControlledState } from './useControlledState.ts';
 import { useImageExport } from './useImageExport.ts';
 import { useMoleculeScene } from './useMoleculeScene.ts';
+import { useMoleculeViewer } from './useMoleculeViewer.ts';
 import { usePolarSurfaceArea } from './usePolarSurfaceArea.ts';
-import type { Molecule3DViewer } from './viewer.ts';
 
 /** Props of {@link MoleculeCanvas3D}. */
 export interface MoleculeCanvas3DProps extends Omit<
@@ -56,6 +56,8 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     defaultSpinning = false,
     onSpinningChange,
     spinSpeed = DEFAULT_SPIN_SPEED,
+    playing = false,
+    framesPerSecond = DEFAULT_FRAMES_PER_SECOND,
     measurements: measurementsProp,
     onMeasurementsChange,
     highlights = NO_HIGHLIGHTS,
@@ -82,6 +84,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     readonly Measurement[]
   >(measurementsProp, NO_MEASUREMENTS, onMeasurementsChange);
   const [measureKind, setMeasureKind] = useState<MeasurementKind | null>(null);
+  const [frameCount, setFrameCount] = useState(0);
   const polarSurfaceArea = usePolarSurfaceArea(
     molfile,
     settings.surfaceColoring === 'polarity',
@@ -90,51 +93,31 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
   // A callback ref: the element arriving is what creates the viewer, and every
   // effect keyed on it runs again, in order, after the viewer exists.
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
-  const viewerRef = useRef<Molecule3DViewer | null>(null);
   // The viewer is created once, so what its callbacks read is kept fresh here.
-  const latest = useRef({
-    measurements,
-    setMeasurements,
-    onFailureChange,
+  const latest = useRef({ measurements, setMeasurements });
+  useEffect(() => {
+    latest.current = { measurements, setMeasurements };
+  });
+  const viewerRef = useMoleculeViewer(container, {
     background,
+    onMeasure: (measurement) => {
+      const current = latest.current;
+      current.setMeasurements([...current.measurements, measurement]);
+    },
+    onFrameCountChange: setFrameCount,
   });
-  useEffect(() => {
-    latest.current = {
-      measurements,
-      setMeasurements,
-      onFailureChange,
-      background,
-    };
-  });
-
-  useEffect(() => {
-    if (container === null) return;
-    const viewer = createMolecule3DViewer(container, {
-      background: latest.current.background,
-      onMeasure: (measurement) => {
-        const current = latest.current;
-        current.setMeasurements([...current.measurements, measurement]);
-      },
-    });
-    viewerRef.current = viewer;
-    const observer = new ResizeObserver(() => {
-      viewer.handleResize();
-    });
-    observer.observe(container);
-    return () => {
-      observer.disconnect();
-      viewerRef.current = null;
-      viewer.dispose();
-    };
-  }, [container]);
 
   useEffect(() => {
     void viewerRef.current?.setSpin(spinning, spinSpeed);
-  }, [container, spinning, spinSpeed]);
+  }, [container, viewerRef, spinning, spinSpeed]);
+
+  useEffect(() => {
+    void viewerRef.current?.frames.play(playing, framesPerSecond);
+  }, [container, viewerRef, playing, framesPerSecond]);
 
   useEffect(() => {
     void viewerRef.current?.setMeasureKind(measureKind);
-  }, [container, measureKind]);
+  }, [container, viewerRef, measureKind]);
 
   // Kept out of the scene: a new highlight repaints the model, never redraws it.
   useEffect(() => {
@@ -142,7 +125,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
       highlights,
       highlightColorOf(container),
     );
-  }, [container, highlights]);
+  }, [container, viewerRef, highlights]);
 
   const { resetView } = useMoleculeScene({
     container,
@@ -160,6 +143,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     container,
     viewerRef,
     fileName,
+    framesPerSecond,
   );
 
   return (
@@ -202,6 +186,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
                     getSize={canvasSize}
                     onExport={exportImage}
                     onCopy={copyImage}
+                    frameCount={frameCount}
                   />
                 }
               />
@@ -231,6 +216,7 @@ const CANVAS_STYLE: CSSProperties = { position: 'absolute', inset: 0 };
 const OVERLAY_STYLE: CSSProperties = {
   position: 'absolute',
   top: 8,
+  bottom: 8,
   left: 8,
   zIndex: 2,
   display: 'flex',

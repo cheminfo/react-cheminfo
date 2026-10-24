@@ -12,8 +12,9 @@
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
+import type { Molecule3DFile } from '../core/file.ts';
 import type { Measurement } from '../core/measurement.ts';
-import type { Molecule3DFile, Molecule3DSettings } from '../core/settings.ts';
+import type { Molecule3DSettings } from '../core/settings.ts';
 
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
 import { SceneDrawer } from './sceneDrawer.ts';

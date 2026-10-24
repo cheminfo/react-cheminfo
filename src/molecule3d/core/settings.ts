@@ -3,14 +3,6 @@
  * free of React and molstar so a site can persist and validate them.
  */
 
-/** A molfile for the viewer, with the parser molstar has to read it with. */
-export interface Molecule3DFile {
-  /** molstar's format id: `mol` reads V2000, `sdf` reads V2000 and V3000. */
-  format: 'mol' | 'sdf';
-  /** The molfile text. It must carry 3D coordinates. */
-  data: string;
-}
-
 /** Ways the model can be drawn, in the order the picker offers them. */
 export const REPRESENTATIONS = [
   'ball-and-stick',

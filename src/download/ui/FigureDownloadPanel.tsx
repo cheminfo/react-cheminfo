@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
@@ -67,6 +67,12 @@ export interface FigureDownloadPanelProps {
    * @default undefined
    */
   sizing?: FigureSizing;
+  /**
+   * Rows of the figure's own, shown after the format: what else decides the
+   * file, such as which frames of an animation go into it.
+   * @default undefined
+   */
+  children?: ReactNode;
 }
 
 /**
@@ -93,7 +99,7 @@ export function FigureDownloadPanel(
 ): ReactElement {
   const { title, format, scale, scales, size, failure, saving } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
-  const { sizing, onCopy, notice = null } = props;
+  const { sizing, onCopy, notice = null, children } = props;
   const t = useChromeT();
 
   // What the file is drawn at: the figure on screen, or the shape picked.
@@ -142,6 +148,7 @@ export function FigureDownloadPanel(
         options={FORMAT_CHOICES}
         onChange={onFormatChange}
       />
+      {children}
       {sizing === undefined ? null : (
         <FigureSizeRows sizing={sizing} size={size} />
       )}

@@ -1,6 +1,7 @@
 /**
  * The molstar layer under the 3D views: the plugin lifecycle, the camera, the
- * hover labels, the measurements, the highlights and the picture of a scene.
+ * hover labels, the measurements, the highlights, the frames of a trajectory
+ * and the picture of a scene.
  *
  * Three of our sites mount a headless molstar canvas — the molecule viewer
  * here, lcao's orbitals and symmetry's crystals — and each of them had its own
@@ -49,7 +50,8 @@ export {
 } from './hover.ts';
 export type { MolstarPluginOptions } from './plugin.ts';
 export { MolstarPlugin } from './plugin.ts';
-export { captureScene } from './captureScene.ts';
+export type { FramePlayback } from './captureScene.ts';
+export { captureFrames, captureScene } from './captureScene.ts';
 export type { MoleculeStructureSource } from './measurements.ts';
 export {
   MeasurementPicker,
@@ -57,3 +59,12 @@ export {
   clearMeasurements,
   renderMeasurements,
 } from './measurements.ts';
+export {
+  PLAYBACK_FPS_RANGE,
+  clampFramesPerSecond,
+  setTrajectoryPlayback,
+  showTrajectoryFrame,
+  shownTrajectoryFrame,
+  stopTrajectory,
+  trajectoryFrameCount,
+} from './trajectory.ts';

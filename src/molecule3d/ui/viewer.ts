@@ -8,7 +8,6 @@
  * is the component's.
  */
 
-import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import { Color } from 'molstar/lib/mol-util/color/color.js';
 
 import {
@@ -24,11 +23,12 @@ import {
 } from '../../molstar/core/index.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
 import type { ImageSize } from '../core/exportImage.ts';
+import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
-import type { Molecule3DFile } from '../core/settings.ts';
 
 import { applyCamera, resetCamera, watchCamera } from './camera.ts';
+import { MoleculeFrames } from './moleculeFrames.ts';
 import {
   MODEL_REPRESENTATION_REF,
   clearMolecule,
@@ -54,16 +54,24 @@ export class Molecule3DViewer {
   /** Resolves once the canvas exists; every method awaits it internally. */
   readonly ready: Promise<void>;
 
+  /** The frames of the file on screen: playing them, and their pictures. */
+  readonly frames: MoleculeFrames;
+
   /**
    * Mount the canvas and start initialising the plugin.
    * @param container - A positioned element.
    * @param options - See {@link Molecule3DViewerOptions}.
    */
   constructor(container: HTMLElement, options: Molecule3DViewerOptions = {}) {
-    const { background, onMeasure = ignore } = options;
+    const {
+      background,
+      onMeasure = ignore,
+      onFrameCountChange = ignore,
+    } = options;
     this.#plugin = new MolstarPlugin(container, { background });
     this.ready = this.#plugin.ready;
-    // Registered before any `#run`, so the picker exists by the time one runs.
+    this.frames = new MoleculeFrames(this.#plugin, onFrameCountChange);
+    // Registered before any other `run`, so the picker exists by the time one runs.
     void this.#plugin
       .run((plugin) => {
         this.#picker = new MeasurementPicker(
@@ -84,10 +92,12 @@ export class Molecule3DViewer {
    * @throws {Error} When the file parses to zero atoms.
    */
   showMolecule(molfile: Molecule3DFile, style?: MoleculeStyle): Promise<void> {
-    return this.#run(async (plugin) => {
-      await clearMeasurements(plugin);
-      await renderMolecule(plugin, molfile, style);
-    });
+    return this.#plugin.run((plugin) =>
+      this.frames.redraw(plugin, async () => {
+        await clearMeasurements(plugin);
+        return renderMolecule(plugin, molfile, style);
+      }),
+    );
   }
 
   /**
@@ -95,10 +105,13 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the scene is empty.
    */
   hideMolecule(): Promise<void> {
-    return this.#run(async (plugin) => {
-      await clearMeasurements(plugin);
-      await clearMolecule(plugin);
-    });
+    return this.#plugin.run((plugin) =>
+      this.frames.redraw(plugin, async () => {
+        await clearMeasurements(plugin);
+        await clearMolecule(plugin);
+        return 0;
+      }),
+    );
   }
 
   /**
@@ -107,7 +120,7 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the surface is on screen.
    */
   showSurface(style?: SurfaceStyle): Promise<void> {
-    return this.#run((plugin) => renderSurface(plugin, style));
+    return this.#plugin.run((plugin) => renderSurface(plugin, style));
   }
 
   /**
@@ -115,7 +128,7 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the surface is gone.
    */
   hideSurface(): Promise<void> {
-    return this.#run((plugin) => clearSurface(plugin));
+    return this.#plugin.run((plugin) => clearSurface(plugin));
   }
 
   /**
@@ -124,7 +137,7 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the labels are on screen.
    */
   showMeasurements(measurements: readonly Measurement[]): Promise<void> {
-    return this.#run((plugin) =>
+    return this.#plugin.run((plugin) =>
       renderMeasurements(plugin, measurements, moleculeStructure),
     );
   }
@@ -140,7 +153,7 @@ export class Molecule3DViewer {
     highlights: readonly Molecule3DHighlight[],
     color: string,
   ): Promise<void> {
-    return this.#run(() => {
+    return this.#plugin.run(() => {
       this.#painter?.set(highlights, Color.fromHexStyle(color));
     });
   }
@@ -151,7 +164,7 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the plugin has switched mode.
    */
   setMeasureKind(kind: MeasurementKind | null): Promise<void> {
-    return this.#run(() => {
+    return this.#plugin.run(() => {
       this.#picker?.setKind(kind);
     });
   }
@@ -164,7 +177,7 @@ export class Molecule3DViewer {
    * @throws {Error} When the plugin has no screenshot helper.
    */
   captureImage(size: ImageSize): Promise<string | undefined> {
-    return this.#run((plugin) => captureScene(plugin, size));
+    return this.#plugin.run((plugin) => captureScene(plugin, size));
   }
 
   /**
@@ -177,7 +190,7 @@ export class Molecule3DViewer {
     durationMilliseconds = DEFAULT_CAMERA_DURATION,
     fromFront = false,
   ): Promise<void> {
-    return this.#run((plugin) => {
+    return this.#plugin.run((plugin) => {
       resetCamera(plugin, durationMilliseconds, fromFront);
     });
   }
@@ -189,7 +202,7 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the move has been ordered.
    */
   setCamera(camera: Molecule3DCamera, durationMilliseconds = 0): Promise<void> {
-    return this.#run((plugin) => {
+    return this.#plugin.run((plugin) => {
       applyCamera(plugin, camera, durationMilliseconds);
     });
   }
@@ -211,7 +224,7 @@ export class Molecule3DViewer {
    * @returns Nothing; resolves once the trackball has been reconfigured.
    */
   setSpin(spinning: boolean, speed = DEFAULT_SPIN_SPEED): Promise<void> {
-    return this.#run((plugin) => {
+    return this.#plugin.run((plugin) => {
       setSpin(plugin, spinning, speed);
     });
   }
@@ -226,12 +239,6 @@ export class Molecule3DViewer {
     this.#picker?.dispose();
     this.#painter?.dispose();
     this.#plugin.dispose();
-  }
-
-  #run<Result>(
-    action: (plugin: PluginContext) => Result | Promise<Result>,
-  ): Promise<Result | undefined> {
-    return this.#plugin.run(action);
   }
 }
 

@@ -4,13 +4,22 @@ import { FIGURE_PNG_TYPE } from '../../download/core/figurePng.ts';
 import { figurePixels } from '../../download/core/figureScale.ts';
 import { FIGURE_SVG_TYPE } from '../../download/core/figureSvg.ts';
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import { encodeAnimatedPng } from '../core/animatedPng.ts';
 import type { ImageSize } from '../core/exportImage.ts';
 import { dataUriBytes, rasterSvgMarkup } from '../core/exportImage.ts';
 
-/** The one thing an export asks of a viewer: a picture of its scene. */
+/** What an export asks of a viewer: a picture of its scene. */
 export interface SceneCapture {
   /** Render the scene at that pixel size, as a `data:` URI. */
   captureImage: (size: ImageSize) => Promise<string | undefined>;
+  /**
+   * The frames of the scene, each rendered at that pixel size, for an animated
+   * PNG.
+   * @default undefined — the viewer has a single frame to give
+   */
+  frames?: {
+    capture: (size: ImageSize) => Promise<ImageData[] | undefined>;
+  };
 }
 
 /** What {@link exportMoleculeImage} writes. */
@@ -22,6 +31,12 @@ export interface MoleculeImageRequest {
   size: ImageSize;
   /** File name without its extension. */
   fileName: string;
+  /**
+   * Every frame of the scene as one animated PNG, played at this many frames a
+   * second, rather than the frame on screen. Ignored for an SVG.
+   * @default undefined — the frame on screen
+   */
+  framesPerSecond?: number;
 }
 
 /**
@@ -54,11 +69,21 @@ export async function exportMoleculeImage(
   viewer: SceneCapture,
   request: MoleculeImageRequest,
 ): Promise<void> {
-  const { format, scale, size, fileName } = request;
+  const { format, scale, size, fileName, framesPerSecond } = request;
   const pixels = figurePixels(size, scale);
+  const base = sanitizeFileName(fileName, 'molecule');
+  if (format === 'png' && framesPerSecond !== undefined) {
+    if (viewer.frames === undefined) {
+      throw new Error('This viewer has no frames to animate.');
+    }
+    const frames = await viewer.frames.capture(pixels);
+    if (frames === undefined) return;
+    const bytes = await encodeAnimatedPng(frames, framesPerSecond);
+    downloadBlob(new Blob([bytes], { type: FIGURE_PNG_TYPE }), `${base}.png`);
+    return;
+  }
   const dataUri = await viewer.captureImage(pixels);
   if (dataUri === undefined) return;
-  const base = sanitizeFileName(fileName, 'molecule');
   if (format === 'png') {
     downloadBlob(
       new Blob([dataUriBytes(dataUri)], { type: FIGURE_PNG_TYPE }),

@@ -7,8 +7,8 @@
 import { expect, test } from 'vitest';
 
 import type { Molecule3DCamera } from '../../core/camera.ts';
+import type { Molecule3DFile } from '../../core/file.ts';
 import type { Measurement } from '../../core/measurement.ts';
-import type { Molecule3DFile } from '../../core/settings.ts';
 import { DEFAULT_MOLECULE_3D_SETTINGS } from '../../core/settings.ts';
 import type { SceneRequest } from '../sceneDrawer.ts';
 
@@ -172,6 +172,39 @@ test('an empty scene keeps the measurements for the molecule to come', async () 
     'empty',
     'model ethanol ball-and-stick',
     'measurements angle 0-1-2',
+    'frame',
+  ]);
+});
+
+test('another file naming the same molecule is drawn, its measurements kept, the camera left alone', async () => {
+  const stretch: Molecule3DFile = {
+    format: 'xyz',
+    data: 'stretch',
+    moleculeId: 'ethanol',
+  };
+  const bend: Molecule3DFile = {
+    format: 'xyz',
+    data: 'bend',
+    moleculeId: 'ethanol',
+  };
+  const { drawer, calls } = standIn();
+
+  await drawer.draw(scene({ molfile: stretch, measurements: [C_O] }));
+  await drawer.draw(scene({ molfile: bend, measurements: [C_O] }));
+  await drawer.draw(
+    scene({
+      molfile: { format: 'xyz', data: 'propane', moleculeId: 'propane' },
+    }),
+  );
+
+  expect(calls).toStrictEqual([
+    'model stretch ball-and-stick',
+    'measurements distance 1-2',
+    'frame',
+    'model bend ball-and-stick',
+    'measurements distance 1-2',
+    'model propane ball-and-stick',
+    'measurements none',
     'frame',
   ]);
 });

@@ -2,13 +2,10 @@ import type { ReactNode } from 'react';
 
 import type { ViewerCapability } from '../../orbital/ui/capability.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
+import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement } from '../core/measurement.ts';
-import type {
-  Molecule3DFile,
-  Molecule3DSettings,
-  Molecule3DTools,
-} from '../core/settings.ts';
+import type { Molecule3DSettings, Molecule3DTools } from '../core/settings.ts';
 
 /**
  * Props of `MoleculeViewer3D`.
@@ -69,6 +66,18 @@ export interface MoleculeViewer3DProps {
    * @default 1 / 3
    */
   spinSpeed?: number;
+  /**
+   * Whether the frames of a file holding several are played in a loop. A file
+   * of one model stays still whatever this says.
+   * @default false
+   */
+  playing?: boolean;
+  /**
+   * How many frames are shown per second while playing, and in an animated
+   * PNG; molstar plays between 5 and 60.
+   * @default 25
+   */
+  framesPerSecond?: number;
   /**
    * The measurements drawn over the model, when the site owns them. They name
    * atoms by position, so they carry over to another conformer of the same

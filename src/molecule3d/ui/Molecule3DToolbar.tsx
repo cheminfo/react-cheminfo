@@ -225,11 +225,18 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
 
 const TOOLTIP_PROPS = { placement: 'right' } as const;
 
+// A canvas too short for both cards puts the second one beside the first,
+// rather than cutting it off; the column itself lets clicks through to the
+// canvas between and below the cards.
 const COLUMN_STYLE: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
+  flexWrap: 'wrap',
+  alignContent: 'flex-start',
+  alignItems: 'flex-start',
   gap: 6,
-  pointerEvents: 'auto',
+  height: '100%',
+  pointerEvents: 'none',
 };
 
-const CARD_STYLE: CSSProperties = { padding: 0 };
+const CARD_STYLE: CSSProperties = { padding: 0, pointerEvents: 'auto' };

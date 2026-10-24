@@ -11,9 +11,10 @@
  */
 
 import type { Molecule3DCamera } from '../core/camera.ts';
+import type { Molecule3DFile } from '../core/file.ts';
 import type { Measurement } from '../core/measurement.ts';
 import { sameMeasurements } from '../core/measurement.ts';
-import type { Molecule3DFile, Molecule3DSettings } from '../core/settings.ts';
+import type { Molecule3DSettings } from '../core/settings.ts';
 import { sameMolecule3DSettings } from '../core/settings.ts';
 
 import type { SceneViewer } from './drawScene.ts';
@@ -103,7 +104,7 @@ export class SceneDrawer {
     const { molfile, settings, measurements, frameNewMolecule } = request;
     const isNew =
       molfile !== null &&
-      (this.#framed === null || !sameFile(this.#framed, molfile));
+      (this.#framed === null || !sameMolecule(this.#framed, molfile));
     this.#framed = molfile;
     // A link's camera is spent on the first molecule framed; afterwards the
     // camera is the reader's and a new molecule is framed as usual.
@@ -117,6 +118,17 @@ export class SceneDrawer {
     this.#measured = measurements;
     if (linked !== null) await this.viewer.setCamera(linked);
   }
+}
+
+// Two files a site names alike draw one molecule, whatever their text.
+function sameMolecule(first: Molecule3DFile, second: Molecule3DFile): boolean {
+  if (
+    first.moleculeId !== undefined &&
+    first.moleculeId === second.moleculeId
+  ) {
+    return true;
+  }
+  return sameFile(first, second);
 }
 
 function sameFile(
