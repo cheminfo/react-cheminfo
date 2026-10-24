@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.68.0](https://github.com/cheminfo/react-cheminfo/compare/v0.67.0...v0.68.0) (2026-10-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename the powerpoint site to slides
+
+### Features
+
+* rename the powerpoint site to slides ([652bf8d](https://github.com/cheminfo/react-cheminfo/commit/652bf8df29679fc8486c39716af75ed38bb5272a))
+
+
+### Bug Fixes
+
+* require xtb-wasm 1.1.1, whose occjs makes GFN2's D4 self-consistent ([3aa68c7](https://github.com/cheminfo/react-cheminfo/commit/3aa68c76de14828a0423007259bb7c788380fb0f))
+
 ## [0.67.0](https://github.com/cheminfo/react-cheminfo/compare/v0.66.0...v0.67.0) (2026-10-24)
 
 
