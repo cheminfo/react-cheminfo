@@ -1,0 +1,15 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t,n}from"./iframe-NL4eeIar.js";import{n as r,t as i}from"./useT-CS0HjKDW.js";import{n as a}from"./joinClassNames-BbK_6p9Z.js";import{n as o,t as s}from"./OverlayLayer-GYOflQXU.js";import{n as c,t as l}from"./FigureDownload-CYybCt0Y.js";function u(e){let{children:t,fileName:n,tools:i,className:o,label:c}=e,{fill:u=!1,html:p=!1}=e,m=r(),h=(0,d.useId)();return(0,f.jsxs)(`div`,{className:a(`card-figure`,u&&`card-figure--fill`),children:[(0,f.jsx)(`div`,{id:h,className:a(`card-figure__drawing`,o),"data-figure":p?`html`:void 0,children:t}),(0,f.jsx)(s,{density:`compact`,awake:!0,children:(0,f.jsxs)(`div`,{className:`card-figure__tools`,"data-testid":`figure-tools`,children:[i,(0,f.jsx)(l,{targetId:h,fileName:n,label:c??m(`card.copyPicture`),testId:`card-save-figure`})]})})]})}var d,f;function p(){return(p=e((()=>{d=t(),c(),i(),o(),f=n(),u.__docgenInfo={description:`A figure of a card with the glyphs that take it away: the picture copied as
+a PNG or saved as a PNG or an SVG, as the chat offers it for its own
+figures, and whatever else the figure carries.
+
+The glyphs stand in a column beside the figure's top right corner rather
+than over it, so they hide no part of a curve or an atom, and they fade
+until the figure is pointed at or one of them holds the focus: a card shown
+in a chat is read far more often than it is copied. \`styles/card.css\` draws
+the column.
+@param props - See {@link CardFigureProps}.
+@returns The figure, with its column of glyphs.`,methods:[],displayName:`CardFigure`,props:{children:{required:!0,tsType:{name:`ReactNode`},description:`The drawing: a chart, a structure, a grid of them.`},fileName:{required:!0,tsType:{name:`string`},description:`What a saved file is called, without its extension.`},tools:{required:!1,tsType:{name:`ReactNode`},description:"Glyphs drawn above the one copying the picture: the copy of the data the\nfigure is drawn from, the notations of its structure\n(`StructureExportButton` of `react-cheminfo/structure`).\n@default undefined - the picture's glyph alone"},className:{required:!1,tsType:{name:`string`},description:`Class of the box the drawing is in, which is what the picture holds.
+@default undefined`},fill:{required:!1,tsType:{name:`boolean`},description:`Take the whole width the card gives, as a grid of structures does.
+@default false - as wide as the drawing`},html:{required:!1,tsType:{name:`boolean`},description:`The drawing is HTML rather than one SVG or canvas — a grid of cells — and
+the picture saved is painted from it as it is seen.
+@default false`},label:{required:!1,tsType:{name:`string`},description:"What the picture's glyph is called, for the pointer and a screen reader.\n@default the chrome's own line, `Copy or save the picture`"}}}})))()}export{p as n,u as t};
