@@ -8,11 +8,11 @@ const INSTALL_COMMAND = 'npm install react-cheminfo @blueprintjs/core';
 
 // What a share dialog hands a teacher to paste into a course page.
 const EMBED_SNIPPET = `<iframe
-  src="https://surge.cheminfo.org/exercises?mf=C5H12,C6H14&embed=1"
+  src="https://isomers.cheminfo.org/exercises?mf=C5H12,C6H14&embed=1"
   width="100%"
   height="700"
   style="border: 1px solid #ddd; border-radius: 8px"
-  title="Surge — Exercises"
+  title="Isomers — Exercises"
 ></iframe>`;
 
 // Caffeine, written by OpenChemLib, so the scrolling block holds a real file

@@ -70,7 +70,7 @@ export const OneSite: Story = { args: { manifests: [CHEMCALC] } };
 export const Empty: Story = {
   args: {
     manifests: [
-      { site: 'surge', origin: 'https://surge.cheminfo.org', talks: [] },
+      { site: 'isomers', origin: 'https://isomers.cheminfo.org', talks: [] },
     ],
   },
 };

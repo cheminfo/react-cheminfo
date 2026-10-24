@@ -130,7 +130,7 @@ export function originOf(options: SiteOrigin): string {
   const origin = options.origin ?? `https://${resolveSite(options.site).host}`;
   if (!HTTP_ORIGIN.test(origin) || !URL.canParse(origin)) {
     throw new Error(
-      `an origin is an absolute address, e.g. https://surge.cheminfo.org: ${JSON.stringify(origin)}`,
+      `an origin is an absolute address, e.g. https://isomers.cheminfo.org: ${JSON.stringify(origin)}`,
     );
   }
   return trimTrailingSlash(origin);

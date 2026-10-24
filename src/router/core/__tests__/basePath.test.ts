@@ -51,38 +51,38 @@ test('a path that only looks like the mount is left alone', () => {
 });
 
 test('the mount path is the path half of the address the site is served at', () => {
-  expect(basePathOf('https://surge.cheminfo.org/')).toBe('');
-  expect(basePathOf('https://surge.cheminfo.org')).toBe('');
-  expect(basePathOf('https://www.cheminfo.org/surge/')).toBe('/surge');
+  expect(basePathOf('https://isomers.cheminfo.org/')).toBe('');
+  expect(basePathOf('https://isomers.cheminfo.org')).toBe('');
+  expect(basePathOf('https://www.cheminfo.org/isomers/')).toBe('/isomers');
   expect(basePathOf('https://www.cheminfo.org/tools/surge')).toBe(
     '/tools/surge',
   );
 });
 
 test('the mount is read off the page rather than off the build', () => {
-  stubPage('https://surge.cheminfo.org/');
+  stubPage('https://isomers.cheminfo.org/');
 
   expect(readMountPath()).toBe('');
 
-  stubPage('https://www.cheminfo.org/surge/');
+  stubPage('https://www.cheminfo.org/isomers/');
 
-  expect(readMountPath()).toBe('/surge');
+  expect(readMountPath()).toBe('/isomers');
 });
 
 test('the mount is the same on every address of the site', () => {
-  // `<base href="/surge/">` resolves to the mount whatever was opened, so a
+  // `<base href="/isomers/">` resolves to the mount whatever was opened, so a
   // deep address, one without the slash that closes it, and one only the SPA
   // fallback answered all read alike.
   for (const address of [
-    'https://www.cheminfo.org/surge/',
-    'https://www.cheminfo.org/surge/exercises',
-    'https://www.cheminfo.org/surge/exercises/',
-    'https://www.cheminfo.org/surge/exercises/word-boundary',
-    'https://www.cheminfo.org/surge/typo',
+    'https://www.cheminfo.org/isomers/',
+    'https://www.cheminfo.org/isomers/exercises',
+    'https://www.cheminfo.org/isomers/exercises/',
+    'https://www.cheminfo.org/isomers/exercises/word-boundary',
+    'https://www.cheminfo.org/isomers/typo',
   ]) {
-    stubPage(new URL('/surge/', address).href);
+    stubPage(new URL('/isomers/', address).href);
 
-    expect(readMountPath()).toBe('/surge');
+    expect(readMountPath()).toBe('/isomers');
   }
 });
 

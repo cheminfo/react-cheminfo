@@ -981,7 +981,7 @@ into one `s` token, so a class can neither read nor edit what the link sets
 up, and the page's address stays fixed while it is used.
 
 ```
-https://surge.cheminfo.org/exercises?s=e1.x9dasYuwqR9SZzw…
+https://isomers.cheminfo.org/exercises?s=e1.x9dasYuwqR9SZzw…
 ```
 
 A site offers it by opening its address before anything reads it. Everything
@@ -1024,7 +1024,7 @@ language to carry; the chrome now reads the same declaration:
 ```tsx
 <SiteLanguage value={language === 'en' ? undefined : language}>
   <SiteHeader
-    siteId="surge"
+    siteId="isomers"
     nav={nav}
     actions={<ShareButton onClick={open} />}
   />
@@ -1043,8 +1043,8 @@ import { MessageCatalog } from 'react-cheminfo/core';
 import en from '../locales/en.json' with { type: 'json' };
 
 export const SITE_CATALOG = new MessageCatalog({
-  id: 'surge.cheminfo.org',
-  repository: 'cheminfo/surge.cheminfo.org',
+  id: 'isomers.cheminfo.org',
+  repository: 'cheminfo/isomers.cheminfo.org',
   directory: 'src/locales',
   source: en,
   translations: {
@@ -1247,21 +1247,21 @@ mount, and every absolute address is built on it. There is no second option to
 keep in step.
 
 ```ts
-cheminfoPrerender({ site: 'surge', routes: PAGE_ROUTES });
-// origin defaults to https://surge.cheminfo.org — the site owns its host,
+cheminfoPrerender({ site: 'isomers', routes: PAGE_ROUTES });
+// origin defaults to https://isomers.cheminfo.org — the site owns its host,
 // the mount is '', and /exercises is written at dist/exercises.html.
 
 cheminfoPrerender({
-  site: 'surge',
+  site: 'isomers',
   routes: PAGE_ROUTES,
-  origin: 'https://learn.cheminfo.org/surge',
+  origin: 'https://learn.cheminfo.org/isomers',
 });
-// the same build, mounted under /surge: canonicals and the sitemap read
-// https://learn.cheminfo.org/surge/exercises, and robots.txt allows /surge/.
+// the same build, mounted under /isomers: canonicals and the sitemap read
+// https://learn.cheminfo.org/isomers/exercises, and robots.txt allows /isomers/.
 ```
 
 The **files on disk are laid out from the build's own root either way** —
-`dist/exercises.html`, never `dist/surge/exercises.html`. It is the
+`dist/exercises.html`, never `dist/isomers/exercises.html`. It is the
 server that puts them under the mount. An origin must be an absolute `http` or
 `https` address or it is refused: one written `localhost:3000` parses with
 `localhost:` as its scheme, which would read the mount back as `/3000`.

@@ -39,10 +39,10 @@ test('a relative address resolves under the base a container stamps in', () => {
   const emitted = hrefsOf(noscriptIndex({ ...OPTIONS, hrefs: 'relative' }));
 
   expect(
-    resolvedAgainst(emitted, 'https://www.cheminfo.org/surge/'),
+    resolvedAgainst(emitted, 'https://www.cheminfo.org/isomers/'),
   ).toStrictEqual([
-    'https://www.cheminfo.org/surge/',
-    'https://www.cheminfo.org/surge/about',
+    'https://www.cheminfo.org/isomers/',
+    'https://www.cheminfo.org/isomers/about',
   ]);
   expect(resolvedAgainst(emitted, 'https://3d.cheminfo.org/')).toStrictEqual([
     'https://3d.cheminfo.org/',

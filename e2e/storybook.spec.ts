@@ -478,7 +478,7 @@ test('the brand toolbar retunes the colours a story reads', async ({
   await expect(page.getByRole('button', { name: 'Cite' })).toBeVisible();
   expect(await brandOf(page)).toBe('#2d72d2');
 
-  await openStory(page, 'citation-citebutton--default', 'brand:surge');
+  await openStory(page, 'citation-citebutton--default', 'brand:isomers');
   await expect(page.getByRole('button', { name: 'Cite' })).toBeVisible();
   expect(await brandOf(page)).toBe('#4338ca');
 });

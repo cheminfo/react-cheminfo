@@ -6,7 +6,7 @@ import type { SiteId } from '../src/ecosystem/core/sites.ts';
  */
 export const BRAND_SITES = [
   'vcl',
-  'surge',
+  'isomers',
   'smiles',
 ] as const satisfies readonly SiteId[];
 

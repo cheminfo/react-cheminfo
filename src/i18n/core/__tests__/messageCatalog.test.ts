@@ -37,7 +37,7 @@ test('a language the catalog does not carry reads as English', () => {
 
 test('a key no catalog declares reads as its fallback, placeholders filled', () => {
   expect(
-    catalog().translate('site.surge.tagline', 'fr', {
+    catalog().translate('site.isomers.tagline', 'fr', {
       fallback: 'A {what}',
       values: { what: 'tagline' },
     }),

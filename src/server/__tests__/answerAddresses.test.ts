@@ -21,19 +21,19 @@ test('the two addresses are written alike, ending in a slash', () => {
 test('a mount is kept, and a query or a fragment is not', () => {
   expect(
     answerAddresses({
-      siteUrl: new URL('https://www.cheminfo.org/surge?x=1#top'),
+      siteUrl: new URL('https://www.cheminfo.org/isomers?x=1#top'),
       publicUrl: 'http://localhost:10321',
     }),
   ).toStrictEqual({
-    siteUrl: 'https://www.cheminfo.org/surge/',
+    siteUrl: 'https://www.cheminfo.org/isomers/',
     publicUrl: 'http://localhost:10321/',
   });
 });
 
 test('an address that is not http or https is refused', () => {
   expect(() =>
-    answerAddresses({ siteUrl: 'surge.cheminfo.org', publicUrl: 'http://a' }),
-  ).toThrow('siteUrl is not an address: surge.cheminfo.org');
+    answerAddresses({ siteUrl: 'isomers.cheminfo.org', publicUrl: 'http://a' }),
+  ).toThrow('siteUrl is not an address: isomers.cheminfo.org');
   expect(() =>
     answerAddresses({
       siteUrl: 'https://a.org',

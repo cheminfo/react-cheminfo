@@ -16,7 +16,7 @@ import {
  *
  * The mount is read off the page, not off the build: the build carries no
  * mount, and the `<base>` a deployment stamps into its pages is what tells
- * `https://surge.cheminfo.org/` from `https://www.cheminfo.org/surge/`. Under
+ * `https://isomers.cheminfo.org/` from `https://www.cheminfo.org/isomers/`. Under
  * Node there is no page, and the mount is the root.
  * @param siteId - The site, as `ECOSYSTEM_SITES` names it.
  * @param options - A mount path to use instead of the one read off the page.

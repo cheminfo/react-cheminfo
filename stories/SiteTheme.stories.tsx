@@ -27,7 +27,7 @@ button { font: inherit; }
 const meta = {
   title: 'Ecosystem/SiteTheme',
   component: SiteTheme,
-  args: { siteId: 'surge' },
+  args: { siteId: 'isomers' },
   argTypes: {
     siteId: {
       control: 'select',
@@ -45,7 +45,7 @@ const meta = {
   },
   render: (args) => (
     <div style={{ width: 'min(26rem, 92vw)' }}>
-      <ThemedPage siteId={args.siteId ?? 'surge'} height={CARD_FRAME_HEIGHT}>
+      <ThemedPage siteId={args.siteId ?? 'isomers'} height={CARD_FRAME_HEIGHT}>
         <ResultCard />
       </ThemedPage>
     </div>
@@ -65,7 +65,7 @@ export const Default: Story = {};
 export const SideBySide: Story = {
   render: () => (
     <div style={PANES_STYLE}>
-      {(['surge', 'periodic-table'] as const).map((siteId) => (
+      {(['isomers', 'periodic-table'] as const).map((siteId) => (
         <ThemedPage key={siteId} siteId={siteId} height={CARD_FRAME_HEIGHT}>
           <ResultCard />
         </ThemedPage>
@@ -83,7 +83,10 @@ export const SideBySide: Story = {
 export const Tokens: Story = {
   render: (args) => (
     <div style={{ width: 'min(26rem, 92vw)' }}>
-      <ThemedPage siteId={args.siteId ?? 'surge'} height={SWATCH_FRAME_HEIGHT}>
+      <ThemedPage
+        siteId={args.siteId ?? 'isomers'}
+        height={SWATCH_FRAME_HEIGHT}
+      >
         <TokenSwatches />
       </ThemedPage>
     </div>

@@ -19,7 +19,7 @@ function render(): string {
       onClose={() => undefined}
       vocabulary={VOCABULARY}
       title="Exercises"
-      baseUrl="https://surge.cheminfo.org/exercises"
+      baseUrl="https://isomers.cheminfo.org/exercises"
       search="formulas=C4H10O"
     />,
   );
@@ -61,7 +61,7 @@ test('a dialog opened on a preset keeps the switch within reach', () => {
       ]}
       defaultPreset="figure"
       title="Exercises"
-      baseUrl="https://surge.cheminfo.org/exercises"
+      baseUrl="https://isomers.cheminfo.org/exercises"
       search="formulas=C4H10O"
     />,
   );

@@ -51,7 +51,7 @@ test('an embedded page is given no bar at all', () => {
 test('the utilities sit in their own group after the spacer', () => {
   const html = renderToStaticMarkup(
     <SiteHeader
-      siteId="surge"
+      siteId="isomers"
       nav={PAGES}
       actions={
         <a className="nav-link" href="/docs">
@@ -71,7 +71,7 @@ test('the utilities sit in their own group after the spacer', () => {
 
 test('a bar with no utilities holds no group for them', () => {
   const html = renderToStaticMarkup(
-    <SiteHeader siteId="surge" nav={PAGES} contact={false} />,
+    <SiteHeader siteId="isomers" nav={PAGES} contact={false} />,
   );
 
   expect(html).not.toContain('app-header-actions');

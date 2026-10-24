@@ -14,14 +14,14 @@ beforeAll(async () => {
 test('the entry opens the form in a new tab, with the site and the page filled in', () => {
   const html = renderToStaticMarkup(
     <ContactButton
-      siteId="surge"
+      siteId="isomers"
       formUrl={FORM}
-      page="https://surge.cheminfo.org/?mf=C6H14"
+      page="https://isomers.cheminfo.org/?mf=C6H14"
     />,
   );
 
   expect(html).toContain(
-    'href="https://forms.example.org/contact?site=surge&amp;page=https%3A%2F%2Fsurge.cheminfo.org%2F%3Fmf%3DC6H14"',
+    'href="https://forms.example.org/contact?site=isomers&amp;page=https%3A%2F%2Fisomers.cheminfo.org%2F%3Fmf%3DC6H14"',
   );
   expect(html).toContain('target="_blank"');
   expect(html).toContain('rel="noreferrer"');
@@ -35,7 +35,7 @@ test('the entry opens the form in a new tab, with the site and the page filled i
 
 test('without a form address there is no entry', () => {
   expect(
-    renderToStaticMarkup(<ContactButton siteId="surge" formUrl="" />),
+    renderToStaticMarkup(<ContactButton siteId="isomers" formUrl="" />),
   ).toBe('');
 });
 

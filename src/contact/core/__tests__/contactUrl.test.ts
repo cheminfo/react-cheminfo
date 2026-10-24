@@ -17,14 +17,14 @@ test('the site and the page are written into the form address, encoded', () => {
 });
 
 test('a missing page leaves its field empty', () => {
-  expect(contactUrl(TEMPLATE, { site: 'surge' })).toBe(
-    'https://docs.google.com/forms/d/e/FORM/viewform?usp=pp_url&entry.1=surge&entry.2=',
+  expect(contactUrl(TEMPLATE, { site: 'isomers' })).toBe(
+    'https://docs.google.com/forms/d/e/FORM/viewform?usp=pp_url&entry.1=isomers&entry.2=',
   );
 });
 
 test('a template without placeholders is returned unchanged', () => {
   expect(
-    contactUrl('https://example.org/contact', { site: 'surge', page: '/x' }),
+    contactUrl('https://example.org/contact', { site: 'isomers', page: '/x' }),
   ).toBe('https://example.org/contact');
 });
 

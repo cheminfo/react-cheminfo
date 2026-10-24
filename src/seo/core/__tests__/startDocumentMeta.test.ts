@@ -44,15 +44,15 @@ test('an address the site does not know is described as its home page', () => {
 test('the canonical is built on the address the deployment answers on', () => {
   const page = withDocument(() => {
     startDocumentMeta({
-      site: 'surge',
+      site: 'isomers',
       routes: ROUTES,
-      url: () => '/surge/exercises',
-      origin: 'https://learn.cheminfo.org/surge',
+      url: () => '/isomers/exercises',
+      origin: 'https://learn.cheminfo.org/isomers',
     });
   });
 
   expect(page.find('link[rel="canonical"]')?.href).toBe(
-    'https://learn.cheminfo.org/surge/exercises',
+    'https://learn.cheminfo.org/isomers/exercises',
   );
 });
 

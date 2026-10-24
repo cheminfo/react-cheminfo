@@ -6,9 +6,9 @@
  * The two are written however the deployment writes them — an origin, an
  * origin and a mount, with or without a trailing slash — and a page is named
  * from the site's own root, `/titration` and `titration` alike: every helper
- * joins the two with exactly one slash, so `https://www.cheminfo.org/surge`
- * and `https://www.cheminfo.org/surge/` both put `/generator` at
- * `https://www.cheminfo.org/surge/generator`.
+ * joins the two with exactly one slash, so `https://www.cheminfo.org/isomers`
+ * and `https://www.cheminfo.org/isomers/` both put `/generator` at
+ * `https://www.cheminfo.org/isomers/generator`.
  */
 
 import { trimTrailingSlash } from '../router/core/address.ts';

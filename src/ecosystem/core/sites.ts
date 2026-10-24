@@ -141,9 +141,9 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#1e293b', accent: '#127ba3' },
   },
   {
-    id: 'surge',
-    name: { lead: 'surge', alt: 'cheminfo', dot: true },
-    host: 'surge.cheminfo.org',
+    id: 'isomers',
+    name: { lead: 'isomers', alt: 'cheminfo', dot: true },
+    host: 'isomers.cheminfo.org',
     tagline: 'Every constitutional isomer of a molecular formula.',
     group: 'structures',
     brand: '#4338ca',

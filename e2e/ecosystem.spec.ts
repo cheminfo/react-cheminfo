@@ -42,10 +42,13 @@ test('every other site opens its own https address in a new tab', async ({
 }) => {
   await openTools(page, 'ecosystem-ecosystembutton--current-site');
 
-  const surge = tiles(page).filter({ hasText: /surge/ });
-  await expect(surge).toHaveAttribute('href', 'https://surge.cheminfo.org/');
-  await expect(surge).toHaveAttribute('target', '_blank');
-  await expect(surge).toHaveAttribute('rel', 'noreferrer');
+  const isomers = tiles(page).filter({ hasText: /isomers/ });
+  await expect(isomers).toHaveAttribute(
+    'href',
+    'https://isomers.cheminfo.org/',
+  );
+  await expect(isomers).toHaveAttribute('target', '_blank');
+  await expect(isomers).toHaveAttribute('rel', 'noreferrer');
 });
 
 test('the menu stands on its own, outside the button that opens it', async ({

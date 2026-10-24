@@ -70,13 +70,13 @@ test('a page with no query links to its bare address', () => {
   expect(
     pageAnswer(
       {
-        siteUrl: 'https://www.cheminfo.org/surge/',
+        siteUrl: 'https://www.cheminfo.org/isomers/',
         publicUrl: 'http://localhost:10321',
       },
       '/',
     ),
   ).toStrictEqual({
-    link: 'https://www.cheminfo.org/surge/',
+    link: 'https://www.cheminfo.org/isomers/',
     meta: {
       [EMBED_META_KEY]: {
         url: 'http://localhost:10321/?embed=1&card=1',

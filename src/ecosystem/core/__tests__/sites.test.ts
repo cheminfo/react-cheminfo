@@ -22,7 +22,7 @@ test('the family is the twenty-seven sites, listed once each', () => {
     'nmrium',
     'metabo',
     'derepflow',
-    'surge',
+    'isomers',
     'tex',
     'lcao',
     'regexp',

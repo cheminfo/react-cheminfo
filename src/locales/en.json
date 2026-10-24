@@ -34,7 +34,7 @@
   "site.nmrium.tagline": "Process and assign NMR spectra in the browser.",
   "site.metabo.tagline": "Turn a batch of NMR spectra into a map of your samples.",
   "site.derepflow.tagline": "Identify the constituents of a mixture from its ¹³C spectrum.",
-  "site.surge.tagline": "Every constitutional isomer of a molecular formula.",
+  "site.isomers.tagline": "Every constitutional isomer of a molecular formula.",
   "site.tex.tagline": "LaTeX formulas rendered to SVG or PNG from a URL.",
   "site.lcao.tagline": "Combine atomic orbitals into molecular ones.",
   "site.regexp.tagline": "Learn regular expressions in a live playground.",

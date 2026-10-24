@@ -29,7 +29,7 @@ function chrome(language: string | undefined): ReactElement {
     <SiteLanguage value={language}>
       <ShareButton onClick={() => undefined} />
       <CiteButton reference={PLATFORM_WORK.reference} />
-      <EcosystemLinks currentSiteId="surge" layout="row" />
+      <EcosystemLinks currentSiteId="isomers" layout="row" />
     </SiteLanguage>
   );
 }

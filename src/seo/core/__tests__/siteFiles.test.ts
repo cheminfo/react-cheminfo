@@ -53,15 +53,15 @@ test('the mount is the path half of the address the deployment named', () => {
 
 test('an address that is not one is refused, not read as the host root', () => {
   expect(() => mountPathOf({ ...OPTIONS, origin: '' })).toThrow(
-    'an origin is an absolute address, e.g. https://surge.cheminfo.org: ""',
+    'an origin is an absolute address, e.g. https://isomers.cheminfo.org: ""',
   );
   expect(() => mountPathOf({ ...OPTIONS, origin: '/surge' })).toThrow(
-    'an origin is an absolute address, e.g. https://surge.cheminfo.org: "/surge"',
+    'an origin is an absolute address, e.g. https://isomers.cheminfo.org: "/surge"',
   );
   expect(() =>
     originOf({ ...OPTIONS, origin: 'learn.cheminfo.org/surge' }),
   ).toThrow(
-    'an origin is an absolute address, e.g. https://surge.cheminfo.org: "learn.cheminfo.org/surge"',
+    'an origin is an absolute address, e.g. https://isomers.cheminfo.org: "learn.cheminfo.org/surge"',
   );
 });
 
@@ -91,10 +91,10 @@ test('an origin in a scheme no crawler fetches is refused, not read as a path', 
     'x:',
   ]) {
     expect(() => originOf({ ...OPTIONS, origin })).toThrow(
-      `an origin is an absolute address, e.g. https://surge.cheminfo.org: ${JSON.stringify(origin)}`,
+      `an origin is an absolute address, e.g. https://isomers.cheminfo.org: ${JSON.stringify(origin)}`,
     );
     expect(() => mountPathOf({ ...OPTIONS, origin })).toThrow(
-      `an origin is an absolute address, e.g. https://surge.cheminfo.org: ${JSON.stringify(origin)}`,
+      `an origin is an absolute address, e.g. https://isomers.cheminfo.org: ${JSON.stringify(origin)}`,
     );
   }
 });

@@ -24,13 +24,13 @@ test('the family is listed under the site pages, never the site itself', () => {
 test('the family list names the sites the page chose, in the order it named them', () => {
   const block = noscriptIndex({
     ...OPTIONS,
-    ecosystem: { sites: ['tex', 'surge', '3d'] },
+    ecosystem: { sites: ['tex', 'isomers', '3d'] },
   });
 
   expect(block).toContain(`  <h2>Our other tools</h2>
   <ul>
     <li><a href="https://tex.cheminfo.org/">tex.cheminfo.org</a> — LaTeX formulas rendered to SVG or PNG from a URL.</li>
-    <li><a href="https://surge.cheminfo.org/">surge.cheminfo.org</a> — Every constitutional isomer of a molecular formula.</li>
+    <li><a href="https://isomers.cheminfo.org/">isomers.cheminfo.org</a> — Every constitutional isomer of a molecular formula.</li>
   </ul>`);
   expect(block).not.toContain('>3d.cheminfo.org</a>');
   expect(block).not.toContain('inchi.cheminfo.org');
@@ -39,13 +39,13 @@ test('the family list names the sites the page chose, in the order it named them
 test('the family list drops the taglines when the page asks for hosts alone', () => {
   const block = noscriptIndex({
     ...OPTIONS,
-    ecosystem: { sites: ['tex', 'surge'], taglines: false },
+    ecosystem: { sites: ['tex', 'isomers'], taglines: false },
   });
 
   expect(block).toContain(`  <h2>Our other tools</h2>
   <ul>
     <li><a href="https://tex.cheminfo.org/">tex.cheminfo.org</a></li>
-    <li><a href="https://surge.cheminfo.org/">surge.cheminfo.org</a></li>
+    <li><a href="https://isomers.cheminfo.org/">isomers.cheminfo.org</a></li>
   </ul>`);
   expect(block).not.toContain('—');
 });

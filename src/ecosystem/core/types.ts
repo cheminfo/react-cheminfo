@@ -13,7 +13,7 @@ export type SiteId =
   | 'nmrium'
   | 'metabo'
   | 'derepflow'
-  | 'surge'
+  | 'isomers'
   | 'tex'
   | 'lcao'
   | 'regexp'

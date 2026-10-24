@@ -134,7 +134,7 @@ test('an origin that is not an absolute address is refused', () => {
       origin: 'learn.cheminfo.org/surge',
     }),
   ).toThrow(
-    'an origin is an absolute address, e.g. https://surge.cheminfo.org: "learn.cheminfo.org/surge"',
+    'an origin is an absolute address, e.g. https://isomers.cheminfo.org: "learn.cheminfo.org/surge"',
   );
 });
 

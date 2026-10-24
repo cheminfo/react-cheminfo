@@ -38,7 +38,7 @@ import { DEFAULT_LANGUAGE, LANGUAGES, MessageCatalog } from '../core/index.ts';
 export interface LocaleCatalogSource {
   /**
    * The name the page knows the catalog by, which is the site's host, e.g.
-   * `surge.cheminfo.org`. A translator's edit is routed back to the right
+   * `isomers.cheminfo.org`. A translator's edit is routed back to the right
    * repository with it, so the build and the page must agree on it.
    */
   id: string;

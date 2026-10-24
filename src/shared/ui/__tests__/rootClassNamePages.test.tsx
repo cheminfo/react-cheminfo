@@ -44,8 +44,8 @@ const SYNTAX = {
 
 const TALKS: TalkManifest[] = [
   {
-    site: 'surge',
-    origin: 'https://surge.cheminfo.org',
+    site: 'isomers',
+    origin: 'https://isomers.cheminfo.org',
     talks: [
       {
         id: 'enumeration',

@@ -26,7 +26,7 @@ export type MessagesLoader = () => Promise<{ default: Messages }>;
 /**
  * A key the catalog declares, or any other string.
  *
- * Many keys are built from the data — `site.surge.tagline`, `element.Fe.name`
+ * Many keys are built from the data — `site.isomers.tagline`, `element.Fe.name`
  * — so a row added before the catalogs have caught up must read as itself
  * rather than fail to compile.
  */
@@ -51,7 +51,7 @@ export interface TranslateOptions {
 export interface MessageCatalogOptions<TKey extends string> {
   /**
    * The name the page knows the catalog by, unique on the page, e.g.
-   * `react-cheminfo` or `surge.cheminfo.org`.
+   * `react-cheminfo` or `isomers.cheminfo.org`.
    */
   id: string;
   /** The GitHub repository the files live in, written `owner/repo`. */

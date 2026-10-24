@@ -90,7 +90,7 @@ test('the noscript index lists the family the site curated for it', async () => 
   expect(page).toContain(
     '    <li><a href="https://tex.cheminfo.org/">tex.cheminfo.org</a></li>',
   );
-  expect(page).not.toContain('surge.cheminfo.org');
+  expect(page).not.toContain('isomers.cheminfo.org');
 });
 
 test('the head and the crawl path go exactly where the template kept room', async () => {

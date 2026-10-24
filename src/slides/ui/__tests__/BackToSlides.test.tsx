@@ -28,13 +28,13 @@ test('the pill points at the slide the demo was opened from', () => {
 test('a talk given by another site is still one click away', () => {
   const html = renderToStaticMarkup(
     <BackToSlides
-      origin={{ talkId: 'enumeration', slide: 0, site: 'surge' }}
-      href="https://surge.cheminfo.org/talk/enumeration?slide=0"
+      origin={{ talkId: 'enumeration', slide: 0, site: 'isomers' }}
+      href="https://isomers.cheminfo.org/talk/enumeration?slide=0"
     />,
   );
 
   expect(html).toContain(
-    'href="https://surge.cheminfo.org/talk/enumeration?slide=0"',
+    'href="https://isomers.cheminfo.org/talk/enumeration?slide=0"',
   );
   expect(html).toContain('title="Back to slide 1"');
 });

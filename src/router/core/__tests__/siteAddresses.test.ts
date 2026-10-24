@@ -23,25 +23,27 @@ test('a site mounted under a shared host writes its addresses under the mount', 
 });
 
 test('the mount and the origin are read off the page a browser shows', () => {
-  vi.stubGlobal('document', { baseURI: 'https://www.cheminfo.org/surge/' });
+  vi.stubGlobal('document', { baseURI: 'https://www.cheminfo.org/isomers/' });
   vi.stubGlobal('location', { origin: 'https://www.cheminfo.org' });
 
-  const surge = createSiteAddresses('surge');
+  const isomers = createSiteAddresses('isomers');
 
-  expect(surge.basePath).toBe('/surge');
-  expect(surge.absoluteUrl('/about')).toBe(
-    'https://www.cheminfo.org/surge/about',
+  expect(isomers.basePath).toBe('/isomers');
+  expect(isomers.absoluteUrl('/about')).toBe(
+    'https://www.cheminfo.org/isomers/about',
   );
 });
 
 test('under Node the site owns its root and names its own address', () => {
-  const surge = createSiteAddresses('surge');
+  const isomers = createSiteAddresses('isomers');
 
-  expect(surge.basePath).toBe('');
-  expect(surge.withBase('/news')).toBe('/news');
-  expect(surge.configuredSiteUrl()).toBe('https://surge.cheminfo.org/');
+  expect(isomers.basePath).toBe('');
+  expect(isomers.withBase('/news')).toBe('/news');
+  expect(isomers.configuredSiteUrl()).toBe('https://isomers.cheminfo.org/');
 
-  vi.stubEnv('SITE_URL', 'https://mirror.example.org/surge/');
+  vi.stubEnv('SITE_URL', 'https://mirror.example.org/isomers/');
 
-  expect(surge.configuredSiteUrl()).toBe('https://mirror.example.org/surge/');
+  expect(isomers.configuredSiteUrl()).toBe(
+    'https://mirror.example.org/isomers/',
+  );
 });

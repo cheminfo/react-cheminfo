@@ -26,9 +26,9 @@ const CHEMCALC: TalkManifest = {
   ],
 };
 
-const SURGE: TalkManifest = {
-  site: 'surge',
-  origin: 'https://surge.cheminfo.org',
+const ISOMERS: TalkManifest = {
+  site: 'isomers',
+  origin: 'https://isomers.cheminfo.org',
   talks: [
     {
       id: 'enumeration',
@@ -43,15 +43,15 @@ const SURGE: TalkManifest = {
 test('two sites are two groups, each named', () => {
   const html = renderToStaticMarkup(
     <TalkList
-      manifests={[CHEMCALC, SURGE]}
+      manifests={[CHEMCALC, ISOMERS]}
       onOpen={() => undefined}
-      siteName={(site) => (site === 'surge' ? 'Surge' : 'ChemCalc')}
+      siteName={(site) => (site === 'isomers' ? 'Isomers' : 'ChemCalc')}
     />,
   );
 
   expect(html).toContain('<h2 class="talk-list-site">ChemCalc</h2>');
-  expect(html).toContain('<h2 class="talk-list-site">Surge</h2>');
-  expect(html.indexOf('ChemCalc')).toBeLessThan(html.indexOf('Surge'));
+  expect(html).toContain('<h2 class="talk-list-site">Isomers</h2>');
+  expect(html.indexOf('ChemCalc')).toBeLessThan(html.indexOf('Isomers'));
 });
 
 test('a site with one manifest is not labelled with its own name', () => {
@@ -119,14 +119,14 @@ test('a card reads its title, its occasion and its length', () => {
 test('a card is a real link when the site says where the talk sits', () => {
   const html = renderToStaticMarkup(
     <TalkList
-      manifests={[SURGE]}
+      manifests={[ISOMERS]}
       onOpen={() => undefined}
       renderHref={(manifest, talk) => `${manifest.origin}/talk/${talk.id}`}
     />,
   );
 
   expect(html).toContain(
-    '<a class="talk-card" href="https://surge.cheminfo.org/talk/enumeration">',
+    '<a class="talk-card" href="https://isomers.cheminfo.org/talk/enumeration">',
   );
 });
 
@@ -142,7 +142,7 @@ test('a site that has published nothing is not a heading over a void', () => {
   const html = renderToStaticMarkup(
     <TalkList
       manifests={[
-        { site: 'surge', origin: 'https://surge.cheminfo.org', talks: [] },
+        { site: 'isomers', origin: 'https://isomers.cheminfo.org', talks: [] },
       ]}
       onOpen={() => undefined}
       emptyNote="Nothing here yet — write the first one."

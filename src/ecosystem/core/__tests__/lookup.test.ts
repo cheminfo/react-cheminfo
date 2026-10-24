@@ -49,8 +49,8 @@ test('a site no menu lists yet is under no topic', () => {
 });
 
 test('a port and a missing or added www. are the same host', () => {
-  expect(findSiteByHost('surge.cheminfo.org:8080')?.id).toBe('surge');
-  expect(findSiteByHost('www.surge.cheminfo.org')?.id).toBe('surge');
+  expect(findSiteByHost('isomers.cheminfo.org:8080')?.id).toBe('isomers');
+  expect(findSiteByHost('www.isomers.cheminfo.org')?.id).toBe('isomers');
   expect(findSiteByHost('chemcalc.org')?.id).toBe('chemcalc');
   expect(findSiteByHost('WWW.ChemCalc.org:443')?.id).toBe('chemcalc');
   expect(findSiteByHost('  nmrium.org  ')?.id).toBe('nmrium');

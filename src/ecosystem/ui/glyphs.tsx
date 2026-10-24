@@ -216,7 +216,7 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
     </>
   ),
   // One formula branching into every structure it can be.
-  surge: (alt) => (
+  isomers: (alt) => (
     <>
       <g
         fill="none"

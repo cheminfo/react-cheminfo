@@ -78,7 +78,7 @@ export const SITE_BARS: readonly SiteBar[] = [
     ],
   },
   {
-    siteId: 'surge',
+    siteId: 'isomers',
     activeId: 'isomers',
     nav: [
       { id: 'isomers', label: 'Isomers', href: '/', icon: 'graph' },

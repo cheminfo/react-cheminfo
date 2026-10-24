@@ -110,12 +110,12 @@ test('the token of an address is the value of s', () => {
 
 test('a sealed share link keeps the page and carries only s', async () => {
   const sealed = await sealShareUrl(
-    'https://surge.cheminfo.org/fr/exercises?formulas=C4H10O,C5H12&embed=0&hide=answers#top',
+    'https://isomers.cheminfo.org/fr/exercises?formulas=C4H10O,C5H12&embed=0&hide=answers#top',
   );
 
   const address = new URL(sealed);
 
-  expect(address.origin).toBe('https://surge.cheminfo.org');
+  expect(address.origin).toBe('https://isomers.cheminfo.org');
   expect(address.pathname).toBe('/fr/exercises');
   expect(address.hash).toBe('#top');
   expect([...address.searchParams.keys()]).toStrictEqual(['s']);

@@ -4,8 +4,8 @@ import { trimTrailingSlash } from './address.ts';
  * Where a site is mounted, read off the page rather than off the build.
  *
  * The build is mount-agnostic — vite is given a relative base, so the same
- * `dist` serves `https://surge.cheminfo.org/` and
- * `https://www.cheminfo.org/surge/`. What tells the two apart is the `<base>`
+ * `dist` serves `https://isomers.cheminfo.org/` and
+ * `https://www.cheminfo.org/isomers/`. What tells the two apart is the `<base>`
  * the deployment stamps into the page it hands out, and `document.baseURI`
  * resolves it against the address actually opened. So this answers correctly
  * whether or not a slash closes the address, and on an address the SPA
