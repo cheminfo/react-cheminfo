@@ -151,6 +151,43 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'ml-distance',
+    name: 'ml-distance',
+    href: 'https://github.com/mljs/distance',
+    description:
+      'the distance and similarity measures spectra are compared by.',
+    license: 'MIT',
+  },
+  {
+    id: 'spectrum-generator',
+    name: 'spectrum-generator',
+    href: 'https://github.com/cheminfo/spectrum-generator',
+    description: 'turns a list of bands into a broadened spectrum.',
+    license: 'MIT',
+  },
+  {
+    id: 'ir-spectrum',
+    name: 'ir-spectrum',
+    href: 'https://github.com/cheminfo/ir-spectrum',
+    description: 'reads infrared spectra from JCAMP-DX, SPC and text files.',
+    license: 'MIT',
+  },
+  {
+    id: 'raman-spectrum',
+    name: 'raman-spectrum',
+    href: 'https://github.com/cheminfo/raman-spectrum',
+    description: 'reads Raman spectra, Renishaw WDF files included.',
+    license: 'MIT',
+  },
+  {
+    id: 'spc-parser',
+    name: 'spc-parser',
+    href: 'https://github.com/cheminfo/spc-parser',
+    description:
+      'reads the SPC files of Thermo Galactic GRAMS, Shimadzu and PerkinElmer.',
+    license: 'MIT',
+  },
+  {
     id: 'occ',
     name: 'OCC',
     href: 'https://github.com/peterspackman/occ',
@@ -159,11 +196,35 @@ export const CREDITS = [
     license: 'GPL-3.0',
   },
   {
+    id: 'xtb',
+    name: 'xtb',
+    href: 'https://github.com/grimme-lab/xtb',
+    description:
+      'the reference GFN2-xTB program of the Grimme group, which the results are checked against.',
+    license: 'LGPL-3.0-or-later',
+  },
+  {
     id: 'xtb-wasm',
     name: 'xtb-wasm',
     href: 'https://github.com/cheminfo/xtb-wasm',
     description:
       'GFN2-xTB compiled to WebAssembly, driven from a pool of web workers.',
+    license: 'GPL-3.0-or-later',
+  },
+  {
+    id: 'ase',
+    name: 'ASE',
+    href: 'https://gitlab.com/ase/ase',
+    description:
+      'the bond-polarizability Raman model and its parameter tables, from the Atomic Simulation Environment.',
+    license: 'LGPL-2.1-or-later',
+  },
+  {
+    id: 'xtbservice',
+    name: 'xtbservice',
+    href: 'https://github.com/cheminfo-py/xtbservice',
+    description:
+      'the curated teaching collections of molecules, and the guided tour through them.',
     license: 'MIT',
   },
   {
@@ -208,6 +269,13 @@ export const CREDITS = [
     name: 'nivo',
     href: 'https://nivo.rocks/',
     description: 'draws the charts — the curves, the diagrams and the axes.',
+    license: 'MIT',
+  },
+  {
+    id: 'react-plot',
+    name: 'react-plot',
+    href: 'https://github.com/zakodium-oss/react-plot',
+    description: 'the SVG plots a spectrum is drawn and zoomed in.',
     license: 'MIT',
   },
   {

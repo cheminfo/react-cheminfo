@@ -113,7 +113,21 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(40);
+  expect(CREDITS).toHaveLength(49);
+});
+
+test('the xtb family is credited under the licences its authors chose', () => {
+  expect(
+    credits(['xtb-wasm', 'occ', 'xtb', 'ase']).map((entry) => [
+      entry.name,
+      entry.license,
+    ]),
+  ).toStrictEqual([
+    ['xtb-wasm', 'GPL-3.0-or-later'],
+    ['OCC', 'GPL-3.0'],
+    ['xtb', 'LGPL-3.0-or-later'],
+    ['ASE', 'LGPL-2.1-or-later'],
+  ]);
 });
 
 test('every entry names a work, an address and what it does', () => {
