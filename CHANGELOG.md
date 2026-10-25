@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.69.0](https://github.com/cheminfo/react-cheminfo/compare/v0.68.0...v0.69.0) (2026-10-25)
+
+
+### Features
+
+* credit xtb, ASE, xtbservice, react-plot and the spectrum readers ([6a909dc](https://github.com/cheminfo/react-cheminfo/commit/6a909dc03aeed1a9bdd74c6cc88dc45f5cab7f69))
+* give the header brand the neutral hover wash ([3e37232](https://github.com/cheminfo/react-cheminfo/commit/3e37232acaf213b9c366b96ff84887a2a250b78d))
+
 ## [0.68.0](https://github.com/cheminfo/react-cheminfo/compare/v0.67.0...v0.68.0) (2026-10-24)
 
 
