@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.72.0](https://github.com/cheminfo/react-cheminfo/compare/v0.71.0...v0.72.0) (2026-10-26)
+
+
+### Features
+
+* **credits:** credit nmr-processing ([07b0ce4](https://github.com/cheminfo/react-cheminfo/commit/07b0ce45885376623d6ebdd8ea75713cf5d92f6c))
+
 ## [0.71.0](https://github.com/cheminfo/react-cheminfo/compare/v0.70.0...v0.71.0) (2026-10-26)
 
 
