@@ -281,6 +281,15 @@ export const CREDITS = [
     license: 'MIT AND CC-BY-NC-SA-4.0',
   },
   {
+    // 22.x publishes no repository URL, so its npm page stands for it.
+    id: 'nmr-processing',
+    name: 'nmr-processing',
+    href: 'https://www.npmjs.com/package/nmr-processing',
+    description:
+      'simulates NMR spectra from chemical shifts and coupling constants.',
+    license: 'CC-BY-NC-SA-4.0',
+  },
+  {
     id: 'blueprint',
     name: 'Blueprint',
     href: 'https://blueprintjs.com/',

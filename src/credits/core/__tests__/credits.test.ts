@@ -113,7 +113,7 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(56);
+  expect(CREDITS).toHaveLength(57);
 });
 
 test('NMRium names both its licences, and PubChem, a source of data, none', () => {
