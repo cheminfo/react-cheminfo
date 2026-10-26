@@ -27,10 +27,7 @@ test('every symbol and name still agrees with chemical-elements', () => {
     }
   }
 
-  // `chemical-elements` 2.3.2 spells element 117 "Teennessine". The fix is
-  // committed upstream in mass-tools; delete this exception once it ships, at
-  // which point this test says so by failing.
-  expect(disagreeing).toStrictEqual(['Ts']);
+  expect(disagreeing).toStrictEqual([]);
 });
 
 test('the f block carries no group, and every other element carries one', () => {

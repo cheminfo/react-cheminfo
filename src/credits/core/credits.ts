@@ -188,6 +188,42 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'ms-spectrum',
+    name: 'ms-spectrum',
+    href: 'https://github.com/cheminfo/mass-tools/tree/main/packages/ms-spectrum',
+    description:
+      'tells a profile from a peak table, picks the peaks and establishes their charges.',
+    license: 'MIT',
+  },
+  {
+    id: 'ml-gsd',
+    name: 'ml-gsd',
+    href: 'https://github.com/mljs/global-spectral-deconvolution',
+    description: 'finds the peaks of a continuous spectrum, and their widths.',
+    license: 'MIT',
+  },
+  {
+    id: 'jcampconverter',
+    name: 'jcampconverter',
+    href: 'https://www.npmjs.com/package/jcampconverter',
+    description: 'reads JCAMP-DX files.',
+    license: 'CC-BY-NC-SA-4.0',
+  },
+  {
+    id: 'xy-parser',
+    name: 'xy-parser',
+    href: 'https://github.com/cheminfo/xy-parser',
+    description: 'reads two columns of numbers out of any text file.',
+    license: 'MIT',
+  },
+  {
+    id: 'convert-to-jcamp',
+    name: 'convert-to-jcamp',
+    href: 'https://github.com/cheminfo/convert-to-jcamp',
+    description: 'writes spectra back out as JCAMP-DX.',
+    license: 'MIT',
+  },
+  {
     id: 'occ',
     name: 'OCC',
     href: 'https://github.com/peterspackman/occ',
@@ -233,6 +269,16 @@ export const CREDITS = [
     href: 'https://molstar.org/',
     description: 'the 3D viewer, its representations and its surfaces.',
     license: 'MIT',
+  },
+  {
+    // The viewer is MIT; the core and plugins that read and process the
+    // spectra (@zakodium/nmrium-core, -core-plugins) are CC-BY-NC-SA-4.0.
+    id: 'nmrium',
+    name: 'NMRium',
+    href: 'https://www.nmrium.org/',
+    description:
+      'displays and processes the NMR spectra, read from their original files.',
+    license: 'MIT AND CC-BY-NC-SA-4.0',
   },
   {
     id: 'blueprint',
@@ -383,6 +429,13 @@ export const CREDITS = [
     description:
       'the name of every compound in every language, and its article in each Wikipedia.',
     license: 'CC0-1.0',
+  },
+  {
+    id: 'pubchem',
+    name: 'PubChem',
+    href: 'https://pubchem.ncbi.nlm.nih.gov/',
+    description:
+      'the identifier, the names and the synonyms each compound is linked to.',
   },
   {
     id: 'country-flag-icons',

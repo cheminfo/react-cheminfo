@@ -1,0 +1,29 @@
+##TITLE=Peppermint oil, three scans across the limonene peak
+##JCAMP-DX=5.01
+##DATA TYPE=MASS SPECTRUM
+##DATA CLASS=NTUPLES
+##ORIGIN=HP 5971A GC/MS
+##OWNER=public domain
+##$MODE=positive
+##NTUPLES=MASS SPECTRUM
+##VAR_NAME=MASS,        INTENSITY,          RETENTION TIME
+##SYMBOL=X,             Y,                  T
+##VAR_TYPE=INDEPENDENT, DEPENDENT,          INDEPENDENT
+##VAR_FORM=AFFN,        AFFN,               AFFN
+##VAR_DIM=,             ,                   3
+##UNITS=M/Z,            RELATIVE ABUNDANCE, SECONDS
+##FIRST=,               ,                   720
+##PAGE=T= 720
+##NPOINTS=4
+##DATA TABLE=(XY..XY), PEAKS
+41,180 68,999 93,410 136,210
+##PAGE=T= 750
+##NPOINTS=3
+##DATA TABLE=(XY..XY), PEAKS
+41,220 68,999 93,380
+##PAGE=T= 780
+##NPOINTS=5
+##DATA TABLE=(XY..XY), PEAKS
+41,160 67,340 68,999 93,350 136,190
+##END NTUPLES=MASS SPECTRUM
+##END=

@@ -23,7 +23,14 @@ export default defineConfig(
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: ['**/ir/**', '**/structure/**', '**/spectra/**'] },
+        {
+          patterns: [
+            '**/ir/**',
+            '**/mass/**',
+            '**/structure/**',
+            '**/spectra/**',
+          ],
+        },
       ],
     },
   },

@@ -113,7 +113,27 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(49);
+  expect(CREDITS).toHaveLength(56);
+});
+
+test('NMRium names both its licences, and PubChem, a source of data, none', () => {
+  expect(credits(['nmrium', 'pubchem'])).toStrictEqual([
+    {
+      id: 'nmrium',
+      name: 'NMRium',
+      href: 'https://www.nmrium.org/',
+      description:
+        'displays and processes the NMR spectra, read from their original files.',
+      license: 'MIT AND CC-BY-NC-SA-4.0',
+    },
+    {
+      id: 'pubchem',
+      name: 'PubChem',
+      href: 'https://pubchem.ncbi.nlm.nih.gov/',
+      description:
+        'the identifier, the names and the synonyms each compound is linked to.',
+    },
+  ]);
 });
 
 test('the xtb family is credited under the licences its authors chose', () => {
