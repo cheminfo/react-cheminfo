@@ -19,7 +19,9 @@ import {
   figureElement,
   figureLegends,
   figurePaintings,
+  pieceBounds,
 } from './figureTarget.ts';
+import { drawingCrop } from './svgBounds.ts';
 
 /** How the figure is copied. */
 export interface FigureSvgOptions {
@@ -85,9 +87,10 @@ export function figureSvg(
   const styles = window.getComputedStyle(element);
   const pieces: FigurePiece[] = [];
   for (const drawing of drawings) {
-    const box = drawing.getBoundingClientRect();
+    const crop = drawingCrop(drawing);
+    const box = pieceBounds(drawing, crop);
     pieces.push({
-      markup: drawingMarkup(drawing),
+      markup: drawingMarkup(drawing, crop),
       x: box.left - bounds.left,
       y: box.top - bounds.top,
     });

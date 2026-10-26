@@ -9,6 +9,8 @@
  */
 
 import type { FigurePixels } from './figureScale.ts';
+import type { SvgBox } from './svgBounds.ts';
+import { drawingCrop } from './svgBounds.ts';
 
 /** Chrome floating over a figure, which is not part of the picture. */
 const CHROME = '[data-figure="chrome"]';
@@ -129,16 +131,39 @@ export function figureBounds(drawings: readonly Element[]): FigureBounds {
   let right = Number.NEGATIVE_INFINITY;
   let bottom = Number.NEGATIVE_INFINITY;
   for (const drawing of drawings) {
-    const box = drawing.getBoundingClientRect();
+    const box = pieceBounds(drawing);
     if (box.left < left) left = box.left;
     if (box.top < top) top = box.top;
-    if (box.right > right) right = box.right;
-    if (box.bottom > bottom) bottom = box.bottom;
+    if (box.left + box.width > right) right = box.left + box.width;
+    if (box.top + box.height > bottom) bottom = box.top + box.height;
   }
   if (!Number.isFinite(left) || !Number.isFinite(top)) {
     return { left: 0, top: 0, width: 0, height: 0 };
   }
   return { left, top, width: right - left, height: bottom - top };
+}
+
+/**
+ * Where one piece of a figure goes in the file, and how much room it takes.
+ *
+ * A piece is its box on the page, except for a drawing cropped to what it is
+ * of: that one keeps the corner it stands at and takes the size of its marks,
+ * since its window on screen is only wherever the canvas was last left.
+ * @param piece - A drawing, or a part drawn in HTML, as it sits on the page.
+ * @param crop - The rectangle of it that is saved, in drawing units. Defaults
+ *   to the one `drawingCrop` finds in a drawing, and to none for anything else.
+ * @returns Its box.
+ */
+export function pieceBounds(
+  piece: Element,
+  crop: SvgBox | null = piece instanceof SVGSVGElement
+    ? drawingCrop(piece)
+    : null,
+): FigureBounds {
+  const { left, top, width, height } = piece.getBoundingClientRect();
+  return crop === null
+    ? { left, top, width, height }
+    : { left, top, width: crop.width, height: crop.height };
 }
 
 /**

@@ -43,6 +43,27 @@ export function contentBox(svg: SVGSVGElement, padding = 0): SvgBox | null {
   };
 }
 
+/** Room left around the marks of a drawing saved from what it is of. */
+export const CONTENT_PADDING = 12;
+
+/**
+ * The part of a drawing a saved figure is made of, when the drawing says.
+ *
+ * Only a drawing that marks the group it is *of* is cropped: a canvas the
+ * reader pans and zooms, whose window on screen is wherever it was last left.
+ * Every other drawing is saved at the box it is drawn to, which is what a
+ * chart is — its axes reach the edges of that box, and a crop to where its
+ * trace happens to reach would leave them hanging.
+ * @param svg - The drawing, as it is rendered.
+ * @returns The rectangle to save, in drawing units, or `null` when the drawing
+ *   marks no such group or nothing is drawn in it.
+ */
+export function drawingCrop(svg: SVGSVGElement): SvgBox | null {
+  const marked = `[${CSS.escape(CONTENT_ATTRIBUTE)}]`;
+  if (svg.querySelector(marked) === null) return null;
+  return contentBox(svg, CONTENT_PADDING);
+}
+
 /**
  * The rectangle the element itself covers, rather than the marks inside it.
  *
