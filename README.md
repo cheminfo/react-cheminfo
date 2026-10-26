@@ -321,6 +321,9 @@ import { AccountButton } from 'react-cheminfo/ui';
 - `items` are the account's own pages, listed in the menu above Sign out.
 - `signInHref` keeps the invitation a real link, so a middle click opens a tab;
   a site with no page for it passes `onSignIn` alone and opens a dialog.
+- A site on the shared accounts draws the `AccountMenu` of
+  [service-accounts-frontend](https://github.com/cheminfo/service-monitor/tree/main/accounts-frontend),
+  which feeds this button from the session.
 
 ### `AtomicOrbitalViewer`
 
