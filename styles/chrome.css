@@ -54,6 +54,13 @@ button {
   font-family: inherit;
 }
 
+/* A formula is MathML the browser draws natively, in a font made for it: the
+   one a browser falls back to neither stretches a bracket around a fraction
+   nor sizes a `∑` for display. */
+math {
+  font-family: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', math;
+}
+
 /* Blueprint lets a button shrink in a flex row, below the width of its own
    content, and the icon then spills out of its left edge. Blueprint's fill
    rules are more specific and still stretch a button that asks to. */

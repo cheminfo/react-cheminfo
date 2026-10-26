@@ -82,6 +82,33 @@ test('what decks write in raw HTML is kept', () => {
   );
 });
 
+test('a formula written in MathML is kept for the browser to draw', () => {
+  const html = render(
+    [
+      'Larmor:',
+      '',
+      '<math display="block"><mi>ν</mi><mo>=</mo><mfrac><mi>γ</mi><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><msub><mi mathvariant="normal">B</mi><mn>0</mn></msub></math>',
+      '',
+      'and <math><msup><mn>10</mn><mn>6</mn></msup></math> inline.',
+    ].join('\n'),
+  );
+
+  expect(html).toBe(
+    '<p>Larmor:</p>\n<p><math display="block"><mi>ν</mi><mo>=</mo><mfrac><mi>γ</mi><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><msub><mi mathvariant="normal">B</mi><mn>0</mn></msub></math></p>\n<p>and <math><msup><mn>10</mn><mn>6</mn></msup></math> inline.</p>',
+  );
+});
+
+test('a formula loses its handlers, its colours and any HTML it smuggles', () => {
+  const html = render(
+    '<math display="block" onclick="alert(1)"><mi mathcolor="red" onmouseover="alert(2)">x</mi><annotation-xml encoding="text/html"><img src="x" onerror="alert(3)"></annotation-xml></math>',
+  );
+
+  expect(html).not.toContain('alert');
+  expect(html).not.toContain('mathcolor');
+  expect(html).not.toContain('annotation-xml');
+  expect(html).toContain('<math display="block"><mi>x</mi>');
+});
+
 test('the embed layout still frames its tool under sanitised prose', () => {
   const html = renderToStaticMarkup(
     <SlideView

@@ -251,6 +251,53 @@
   margin: 0.5em auto 0;
 }
 
+/* What a slide singles out in a line — the digits that differ — takes the
+   deck's accent rather than the browser's yellow. */
+.slide-content mark {
+  padding: 0 0.08em;
+  border-radius: 6px;
+  background: var(--slide-accent-soft);
+  color: var(--slide-answer);
+}
+
+/* A formula is MathML the browser draws natively; its font is chrome.css's. */
+.slide-content math[display='block'] {
+  margin: 0.5em 0;
+  font-size: 1.15em;
+}
+
+/* A table of values reads across: figures right-aligned in tabular digits,
+   one rule under each row and never a number broken over two lines. */
+.slide-content table {
+  border-collapse: collapse;
+  margin: 0.4em 0;
+  font-size: 0.82em;
+  font-variant-numeric: tabular-nums;
+}
+
+.slide-content th,
+.slide-content td {
+  padding: 0.22em 0.9em;
+  border-bottom: 2px solid var(--slide-line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.slide-content th {
+  color: var(--slide-muted);
+  font-weight: 600;
+}
+
+.slide-content th[align='right'],
+.slide-content td[align='right'] {
+  text-align: right;
+}
+
+.slide-content th[align='center'],
+.slide-content td[align='center'] {
+  text-align: center;
+}
+
 /* ── Content and thanks: title pinned to the top, demos sunk to the bottom ── */
 
 .slide--content,
