@@ -395,3 +395,24 @@ test('without accounts and without a build, the hero keeps no corner', () => {
   expect(html).not.toContain('about-corner');
   expect(html).not.toContain('about-sign-in');
 });
+
+test('provided by: the École des sciences criminelles, its name set in type beside UNIL', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        people: [{ name: 'Pierre Esseiva' }, { name: 'Luc Patiny' }],
+        providedBy: ['unil-esc', 'epfl'],
+      }}
+    />,
+  );
+
+  expect(html).toContain('href="https://www.unil.ch/esc/"');
+  expect(html).toContain(
+    'role="img" aria-label="ESC — École des sciences criminelles, Université de Lausanne"',
+  );
+  expect(html).toContain('>UNIL</span>');
+  expect(html).toContain('École des<br/>sciences criminelles');
+  expect(html).toContain('>Pierre Esseiva and Luc Patiny</p>');
+  expect(html.indexOf('unil.ch/esc')).toBeLessThan(html.indexOf('epfl.ch'));
+});

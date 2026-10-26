@@ -88,9 +88,28 @@ function ProviderLogo(props: { provider: ProviderEntry }): ReactElement {
   switch (provider.id) {
     case 'epfl':
       return <EpflLogo label={label} />;
+    case 'unil-esc':
+      return <UnilEscLockup label={label} />;
     default:
       return <span>{provider.name}</span>;
   }
+}
+
+// The school's name set in type beside its university's, in the black the
+// university writes its name in: no drawing of its emblem is kept here, and a
+// name nobody can misread credits it better than a guess at one.
+function UnilEscLockup(props: { label: string }): ReactElement {
+  return (
+    <span role="img" aria-label={props.label} style={UNIL_LOCKUP_STYLE}>
+      <span style={UNIL_NAME_STYLE}>UNIL</span>
+      <span style={UNIL_RULE_STYLE} />
+      <span style={UNIL_SCHOOL_STYLE}>
+        École des
+        <br />
+        sciences criminelles
+      </span>
+    </span>
+  );
 }
 
 function EpflLogo(props: { label: string }): ReactElement {
@@ -172,4 +191,34 @@ const ROLES_STYLE = {
   paddingTop: 12,
   paddingLeft: 20,
   borderTop: '1px solid var(--border)',
+} as const satisfies CSSProperties;
+
+const UNIL_LOCKUP_STYLE = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  height: 31,
+  // The institution's own colour, not a family token: the tile is white on
+  // every theme.
+  color: 'black',
+} as const satisfies CSSProperties;
+
+const UNIL_NAME_STYLE = {
+  fontSize: 24,
+  fontWeight: 800,
+  letterSpacing: '0.02em',
+  lineHeight: 1,
+} as const satisfies CSSProperties;
+
+const UNIL_RULE_STYLE = {
+  alignSelf: 'stretch',
+  width: 1,
+  background: 'black',
+} as const satisfies CSSProperties;
+
+const UNIL_SCHOOL_STYLE = {
+  fontSize: 10.5,
+  fontWeight: 600,
+  lineHeight: 1.15,
+  whiteSpace: 'nowrap',
 } as const satisfies CSSProperties;

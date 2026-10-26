@@ -42,4 +42,11 @@ export const PROVIDERS = [
     href: 'https://www.epfl.ch',
     location: 'Lausanne, Switzerland',
   },
+  {
+    id: 'unil-esc',
+    name: 'ESC',
+    fullName: 'École des sciences criminelles, Université de Lausanne',
+    href: 'https://www.unil.ch/esc/',
+    location: 'Lausanne, Switzerland',
+  },
 ] as const satisfies readonly ProviderEntry[];
