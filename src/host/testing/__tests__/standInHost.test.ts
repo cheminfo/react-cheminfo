@@ -38,3 +38,19 @@ test('the log is read off the page it was recorded in', () => {
 
   expect(readStandInHostLog()).toBe(log);
 });
+
+test('a setup carrying a whole spectrum still opens the page', async () => {
+  const host = await startStandInHost();
+  try {
+    const jdx = '##TITLE=film\n'.padEnd(60_000, '1 2 3\n');
+    const url = host.pageUrl('http://localhost:10600/?embed=1', [
+      { type: 'load', id: 'l1', document: 'd', items: [{ jdx }] },
+    ]);
+
+    const response = await fetch(url);
+
+    expect(response.status).toBe(200);
+  } finally {
+    await host.close();
+  }
+});

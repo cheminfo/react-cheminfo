@@ -7,17 +7,25 @@
 
 import { useEffect, useRef } from 'react';
 
-import type { LoadedInput } from '../core/connectHost.ts';
+import type { HostOutputs } from '../core/hostOutputs.ts';
 import type { ToolInterface } from '../core/protocol.ts';
+import type { LoadedInput } from '../core/selectInputs.ts';
 
 /** What a tool does with what its host sends, and what it says about itself. */
 export interface HostHandlers {
   /**
-   * Show the inputs of a new document. Throwing means they could not be read:
-   * the error's message goes back to the host, and nothing should have changed
-   * on screen.
+   * Show the inputs of a new document. Throwing, or rejecting, means they
+   * could not be read: the error's message goes back to the host, and nothing
+   * should have changed on screen.
    */
-  load: (inputs: readonly LoadedInput[]) => void;
+  load: (inputs: readonly LoadedInput[]) => void | Promise<void>;
+  /**
+   * Where the values of the tool's outputs are read, and their changes heard.
+   * Read once, when the host connects, so it lives as long as the page — a
+   * store of signals rather than a value of one render.
+   * @default undefined — nothing goes back
+   */
+  outputs?: HostOutputs;
   /**
    * The build that is running — `BUILD_INFO` from `react-cheminfo/build-info`
    * — so a host can record which version produced what it stores.
@@ -67,9 +75,10 @@ export function useHostConnection(
           tool,
           origin: globalThis.location.origin,
           build: latest.current.build ?? null,
-          load: (inputs) => {
-            latest.current.load(inputs);
-          },
+          load: (inputs) => latest.current.load(inputs),
+          ...(latest.current.outputs === undefined
+            ? {}
+            : { outputs: latest.current.outputs }),
         });
       })
       .catch(() => {

@@ -25,6 +25,8 @@ import type { DataXY } from 'cheminfo-types';
 
 import type { ChartDomain } from '../../chart/core/chartDomain.ts';
 
+import type { IrBand } from './irBand.ts';
+
 /**
  * One trace of a measurement: wavenumber against whichever value axis is drawn.
  *
@@ -150,6 +152,20 @@ export interface IrSpectrum {
    * @default false
    */
   excludeFromDomain?: boolean;
+  /**
+   * The bands picked on it, ascending by wavenumber. The viewer picks them
+   * when a spectrum arrives without any; a host may hand them over with it, as
+   * a notebook that keeps them does.
+   * @default undefined
+   */
+  bands?: IrBand[];
+  /**
+   * Whether `bands` were picked by hand — edited in the viewer, or handed over
+   * — rather than found with the picking settings, which re-pick only a list
+   * that was not.
+   * @default false
+   */
+  bandsByHand?: boolean;
 }
 
 /**

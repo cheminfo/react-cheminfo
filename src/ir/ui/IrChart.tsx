@@ -11,6 +11,7 @@ import { useChartSize } from '../../chart/ui/useChartSize.ts';
 import type { AssignedBand } from '../core/assignBands.ts';
 import type { IrBand } from '../core/irBand.ts';
 import { irModeFor } from '../core/irTechnique.ts';
+import { BAND_HIT_RADIUS } from '../core/nearestBand.ts';
 
 import { BandMarks } from './BandMarks.tsx';
 import { IrPointerTracker } from './IrPointerTracker.tsx';
@@ -83,11 +84,15 @@ export function IrChart(props: IrChartProps): ReactElement {
   const frameWidth = plot.right + MARGIN.right;
   const frameHeight = plot.bottom + MARGIN.bottom;
 
+  // The scale a click is measured against comes out of the zoom the click is
+  // handed to, so the handler reads the latest one when the click happens.
+  const xFactor = useRef(0);
   const onClick = useMemo(
     () =>
       onPlotClick === undefined
         ? undefined
-        : (point: ChartPoint) => onPlotClick(point.x),
+        : (point: ChartPoint) =>
+            onPlotClick(point.x, BAND_HIT_RADIUS / Math.abs(xFactor.current)),
     [onPlotClick],
   );
 
@@ -110,6 +115,10 @@ export function IrChart(props: IrChartProps): ReactElement {
   // disagreed with its own gestures would zoom to the mirror image of whatever
   // was dragged over.
   const { domain: shown, xScale, yScale, selection, handlers } = zoom;
+
+  useLayoutEffect(() => {
+    xFactor.current = xScale.factor;
+  }, [xScale]);
 
   const reported = useRef(shown);
   // Before the browser paints, so a host that stores the window and hands it

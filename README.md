@@ -134,7 +134,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                           | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                                                                                                                                   |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                             | —                                                                                                                                                                                                                                                                                                   |
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                          | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
-| **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                                                                                                | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`)                                                                                                                                                                           |
+| **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromPeaks`, `peaksFromBands`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                               | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`)                                                                                                                                                                           |
 | **Mass spectra**           | `loadMassSpectra`, `toMassSpectra`, `analyseSpectrum`, `decideResolution`, `resolutionOf`, `mzDecimalsOf`, `planPeakLabels`, `peakTableRows`, `massSpectrumToJcamp`, `massReducer` (all `/mass`)                                                                                                                                       | `MassEditor`, `MassChart`, `SpectraPanel`, `PeaksPanel`, `MetadataPanel`, `useMassEditor` (all `/mass`)                                                                                                                                                                                             |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                   | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                           |
 | **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                                                                                                        | `AboutPage`                                                                                                                                                                                                                                                                                         |
@@ -146,7 +146,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Parallel coordinates**   | `parallelAxisOf`, `parallelAxisLayouts`, `parallelIncludedMask`, `parallelKeptCount`, `parallelNearestRow`, `parallelSegmentAt`, `parallelBandAt`, `parallelRangeOf`, `parallelPalette`, `parallelColorSteps`, `paintParallelLines`                                                                                                    | `ParallelCoordinates`                                                                                                                                                                                                                                                                               |
 | **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `EMPTY_BLOCK`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                                                                                   | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                                                                                                                                    |
 | **Taxonomy**               | `TAXON_RANKS`, `PRINCIPAL_RANKS`, `rankOrder`, `isPrincipalRank`, `isGenusOrBelow`, `isAboveGenus`, `principalLineage`, `lineageFromNodes`, `lineageFromRanks`, `genusOrBelow`, `ncbiTaxonomyUrl`, `splitOrganismName`                                                                                                                 | `TaxonLineage`, `OrganismName`, `useRankLabel`                                                                                                                                                                                                                                                      |
-| **Framed by a host**       | `hostStructureLoader`, `readHostMolecule`, `STRUCTURE_KINDS`, `connectHost`, `selectInputs`, `checkValue`, `kindAccepts`, `parseRequest` (all `/host`); `startStandInHost`, `SCIPEAKS_ETHYLBENZENE_LOAD` (`/host-testing`)                                                                                                             | `useHostConnection` (`/host`)                                                                                                                                                                                                                                                                       |
+| **Framed by a host**       | `hostStructureLoader`, `readHostMolecule`, `STRUCTURE_KINDS`, `IR_JDX_SCHEMA`, `IR_PEAKS_SCHEMA`, `connectHost`, `selectInputs`, `checkValue`, `kindAccepts`, `parseRequest`, `OUTPUT_DELAY` (all `/host`); `startStandInHost`, `sendStandInHostRequest`, `SCIPEAKS_ETHYLBENZENE_LOAD`, `sciPeaksEthylbenzeneIrLoad` (`/host-testing`) | `useHostConnection` (`/host`)                                                                                                                                                                                                                                                                       |
 | **Answer cards**           | `CARD_PARAM`, `isCardAddress`, `sitePageUrl`, `cardPageUrl`, `framedPageUrl`, `roomForPanels`; `answerAddresses`, `joinAddress`, `viewOrigins`, `cardMeta`, `pageAnswer`, `siteView` (all `/server`)                                                                                                                                   | `CardFrame`, `CardDetailsButton`, `CardFigure`, `CopyTableButton`, `fitCardToFrame`, `useFitCardToFrame`, `useOverlayRoom`, `holdRoomForPanels` (all `/card`); `StructureExportButton`, `useStructureDraft` (`/structure`)                                                                          |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
@@ -988,6 +988,54 @@ useHostConnection(TOOL, { load: loadFromHost, build: BUILD_INFO });
 - **The same document twice is applied once**, so a host re-sending a sample
   never overwrites what the visitor did with it.
 
+### Spectra in, bands back
+
+A measured infrared spectrum travels as `spectra.ir.jdx` — the JCAMP-DX text
+and the bands picked on it — and its bands alone as `spectra.ir.peaks`. A band
+is written the way SciPeaks stores one, so what comes back is saved as it
+arrives:
+
+```json
+{
+  "wavenumber": 1613.86,
+  "absorbance": 0.4737,
+  "transmittance": 0.336,
+  "kind": "m"
+}
+```
+
+`transmittance` is a fraction, not a percentage, and only `wavenumber` is
+required. Pipeline's own `spectra.ir` is a computed spectrum, not a measurement.
+
+An input with `many: true` takes every item of its kinds, and one with
+`optional: true` may go without; the request is refused only when no input got
+anything. `load` may return a promise, and requests are served in order.
+
+A tool hands values back through `outputs`, a store read synchronously — a
+`computed` signal does it:
+
+```ts
+// One item per value, with its `key` and the `id` of the item it came from.
+const peaks = computed(() => peakItems(measured.value, hostIds.value));
+
+useHostConnection(TOOL, {
+  load,
+  outputs: {
+    read: () => peaks.value,
+    subscribe: (heard) => peaks.subscribe(heard),
+  },
+  build: BUILD_INFO,
+});
+```
+
+- **`get`** is answered with the current values: `{ ok: true, items }`.
+- **`output`** is sent unasked when a value the host's load `accept`s, by
+  its key or its kind, changes: `{ type: 'output', document, items }`, 300 ms after the
+  last edit. It carries only the items that changed, each with the `id` of the
+  item it was made from, so a host knows which spectrum to save them on.
+- **Opening a document sends nothing back.** What the tool shows once `load`
+  returns is what the host already has, so `read` must reflect a load by then.
+
 `react-cheminfo/host-testing` serves a stand-in host for Playwright on
 `127.0.0.1`, and exports `SCIPEAKS_ETHYLBENZENE_LOAD`: the message SciPeaks'
 tool tab sends for a sample, byte for byte. visualizer-helper's tests pin the
@@ -1000,6 +1048,10 @@ await page.goto(
 );
 const { results } = await page.evaluate(readStandInHostLog);
 ```
+
+`sciPeaksEthylbenzeneIrLoad(jdx)` is the load SciPeaks' tool tab is to send
+for that sample's infrared spectrum, its bands as stored. Hand it the
+attachment's JCAMP-DX. `sendStandInHostRequest` sends a later `get`.
 
 ## Protecting a link
 

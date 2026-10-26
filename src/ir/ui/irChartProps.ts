@@ -98,9 +98,12 @@ export interface IrChartProps {
    * Told the wavenumber a click on the plot landed at: a press let go over the
    * plot without travelling. The end of a drag is never one, nor is a press let
    * go over the axis labels, which inverts to a value the chart is not drawing.
+   *
+   * `reach` is how many cm⁻¹ a band's hit radius spans at the zoom the chart is
+   * at, so a band the click was aimed at can be told from one it was not.
    * @default undefined
    */
-  onPlotClick?: (wavenumber: number) => void;
+  onPlotClick?: (wavenumber: number, reach: number) => void;
   /**
    * What a drag across the plot asks for: the wavenumber axis alone, or exactly
    * the rectangle it sweeps out. A viewer offering a square-zoom tool switches

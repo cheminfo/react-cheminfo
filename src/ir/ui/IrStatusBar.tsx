@@ -63,11 +63,14 @@ export function IrStatusBar() {
       {pickBands && assigned.length > 0 ? (
         <span style={itemStyle}>
           {countLabel(assigned.length, 'band', 'bands')}
+          {selectedSpectrum?.bandsByHand ? ' picked by hand' : null}
           {assignments ? `, ${countAssigned(assigned)} assigned` : null}
         </span>
       ) : null}
 
-      {boxZoomOnly(mode) || tool === 'box' ? (
+      {tool === 'pick' ? (
+        <span style={mutedStyle}>click to add or remove a band</span>
+      ) : boxZoomOnly(mode) || tool === 'box' ? (
         <span style={mutedStyle}>square zoom: drag a rectangle</span>
       ) : null}
 

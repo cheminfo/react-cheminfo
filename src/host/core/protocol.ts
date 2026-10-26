@@ -4,9 +4,10 @@
  *
  * Two messages travel between the windows — `hello`, from the tool, and
  * `connect`, the host's answer carrying a private `MessagePort` — and everything
- * else goes through that port: the host's requests (`load`, `get`) and the
- * tool's `result` for each. This module only spells the messages, and reads
- * what arrives as the untrusted input it is.
+ * else goes through that port: the host's requests (`load`, `get`), the tool's
+ * `result` for each, and the `output` the tool sends when a value the host
+ * takes back changes. This module only spells the messages, and reads what
+ * arrives as the untrusted input it is.
  */
 
 /** The version a tool speaks; a `connect` naming another is ignored. */
@@ -52,9 +53,24 @@ export interface ToolInput {
   key: string;
   /** Kinds in order of preference; a category accepts every kind under it. */
   kinds: readonly string[];
+  /**
+   * Whether it takes every item of its kinds, in the host's order, rather than
+   * the one it prefers — every spectrum of a sample.
+   * @default false
+   */
+  many?: boolean;
+  /**
+   * Whether a request may leave it without an item. A request is still
+   * refused when no input at all gets one.
+   * @default false
+   */
+  optional?: boolean;
 }
 
-/** One value the tool can hand back. */
+/**
+ * One value the tool can hand back: answered to `get`, and sent as `output`
+ * whenever it changes, when the host accepted it.
+ */
 export interface ToolOutput {
   key: string;
   kind: string;
@@ -86,6 +102,13 @@ export interface LoadRequest {
   /** What the data belongs to; the same document twice is applied once. */
   document: string;
   items: HostItem[];
+  /**
+   * The outputs the host takes back for this document, by key or by kind — a
+   * kind taking every kind under it: the tool sends an `output` whenever one
+   * of their values changes.
+   * @default undefined — nothing is sent unasked
+   */
+  accept?: string[];
 }
 
 /** `get`: the current value of some outputs. */
@@ -119,18 +142,35 @@ export interface UsedItem {
   kind: string;
 }
 
-/** The answer to one request, carrying its `id`. */
+/**
+ * The answer to one request, carrying its `id`: which items a `load` used, or
+ * the values a `get` asked for.
+ */
 export type ResultMessage =
   | { type: 'result'; id: string; ok: true; used: UsedItem[] }
+  | { type: 'result'; id: string; ok: true; items: HostItem[] }
   | { type: 'result'; id: string; ok: false; error: HostError };
+
+/**
+ * Sent by the tool, unasked, when values the host accepted have changed — the
+ * user picked a band. It carries only the items that changed: one missing is
+ * unchanged, never deleted.
+ */
+export interface OutputMessage {
+  type: 'output';
+  /** The document the values belong to, as the host's `load` named it. */
+  document: string;
+  /** Each with its `key`, and the `id` of the item it was made from. */
+  items: HostItem[];
+}
 
 /**
  * Read a message that arrived through the port.
  *
  * Anything that is not a well-formed `load` or `get` is `null`, and goes
  * unanswered: an unknown request is a newer host talking, not an error. An item
- * without a string `kind` is dropped, and a label is cut to
- * {@link MAX_LABEL_LENGTH}.
+ * without a string `kind` is dropped, a label is cut to
+ * {@link MAX_LABEL_LENGTH}, and a `load` without `accept` takes nothing back.
  * @param data - What the port delivered.
  * @returns The request, or `null`.
  */
@@ -140,12 +180,14 @@ export function parseRequest(data: unknown): HostRequest | null {
     if (typeof data.document !== 'string' || !Array.isArray(data.items)) {
       return null;
     }
-    return {
+    const load: LoadRequest = {
       type: 'load',
       id: data.id,
       document: data.document,
       items: readItems(data.items),
     };
+    if (Array.isArray(data.accept)) load.accept = readStrings(data.accept);
+    return load;
   }
   if (data.type === 'get') {
     return { type: 'get', id: data.id, keys: readStrings(data.keys) };

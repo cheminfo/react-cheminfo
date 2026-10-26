@@ -86,6 +86,13 @@ export const irCommands = {
       'A drag zooms to exactly the rectangle it sweeps out, both axes at once — for looking into a baseline or a shoulder rather than across the spectrum. It is the only drag on percent transmittance.',
     gestures: [{ title: 'Over the chart', shortcuts: ['Drag a rectangle'] }],
   },
+  pickTool: {
+    title: 'Pick bands by hand',
+    shortcut: { keys: ['k'] },
+    description:
+      'A click adds the band under it to the selected spectrum, at its top; a click on a marked band takes it away. A drag still zooms, and bands picked by hand stay put when the threshold moves.',
+    gestures: [{ title: 'Over the chart', shortcuts: ['Click'] }],
+  },
   zoomIn: {
     title: 'Zoom in',
     shortcut: { keys: ['+', '='] },

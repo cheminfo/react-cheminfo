@@ -1,4 +1,4 @@
-import { Icon } from '@blueprintjs/core';
+import { Button, Icon } from '@blueprintjs/core';
 
 import {
   panelCellStyle,
@@ -24,6 +24,11 @@ export interface BandRowProps {
    * @default undefined
    */
   onHighlight?: (band: IrBand | null) => void;
+  /**
+   * Takes the band away; the row ends with the button that calls it.
+   * @default undefined — no button
+   */
+  onRemove?: (band: IrBand) => void;
 }
 
 /**
@@ -37,7 +42,7 @@ export interface BandRowProps {
  * @returns The row.
  */
 export function BandRow(props: BandRowProps) {
-  const { entry, mode, assignments, lit, onHighlight } = props;
+  const { entry, mode, assignments, lit, onHighlight, onRemove } = props;
   const { band } = entry;
 
   return (
@@ -54,6 +59,17 @@ export function BandRow(props: BandRowProps) {
         {formatIrValue(bandValue(band, mode) ?? Number.NaN, mode)}
       </td>
       {assignments ? <CandidatesCell entry={entry} /> : null}
+      {onRemove === undefined ? null : (
+        <td style={removeCellStyle}>
+          <Button
+            variant="minimal"
+            size="small"
+            icon="small-cross"
+            aria-label={`Take away the band at ${formatWavenumber(band.wavenumber)} cm⁻¹`}
+            onClick={() => onRemove(band)}
+          />
+        </td>
+      )}
     </tr>
   );
 }
@@ -105,3 +121,5 @@ const STRENGTH_TITLES = {
 } as const;
 
 const litRowStyle = { background: '#fff3e0' } as const;
+
+const removeCellStyle = { ...panelCellStyle, padding: 0, width: 1 } as const;

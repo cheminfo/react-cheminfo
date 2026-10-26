@@ -48,7 +48,8 @@ export interface VibrationalEditorProps {
   panels?: readonly IrHostPanel[];
   /**
    * The plot was clicked at this wavenumber (a press that did not travel, i.e.
-   * not a zoom drag), with the spectrum selected at that moment.
+   * not a zoom drag), with the spectrum selected at that moment. Not called
+   * while bands are picked by hand.
    * @default undefined
    */
   onPlotClick?: (click: IrPlotClick) => void;

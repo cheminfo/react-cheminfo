@@ -79,6 +79,7 @@ test('a Raman viewer offers neither the mode toggle nor the assignments', () => 
     'fullScreen',
     'readTool',
     'boxTool',
+    'pickTool',
     'zoomIn',
     'zoomOut',
     'resetZoom',

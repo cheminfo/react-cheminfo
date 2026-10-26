@@ -13,10 +13,19 @@
  * closed.
  */
 
+import type { IrBand } from './irBand.ts';
+import {
+  arriving,
+  changeSettings,
+  mapSpectrum,
+  resetSpectrumBands,
+  restoreState,
+  setSpectrumBands,
+} from './irBandState.ts';
 import type { IrPanelId } from './irSidePanels.ts';
 import type { IrDomain, IrSpectrum } from './irSpectrum.ts';
 import type { IrSettings, IrState, IrTool, PartialIrState } from './irState.ts';
-import { isIrWindow, mergeIrSettings } from './irState.ts';
+import { isIrWindow } from './irState.ts';
 
 /** Everything that can be asked of the viewer. */
 export type IrAction =
@@ -26,6 +35,8 @@ export type IrAction =
   | { type: 'renameSpectrum'; id: string; name: string }
   | { type: 'setSpectrumColor'; id: string; color: string }
   | { type: 'setSpectrumVisible'; id: string; visible: boolean }
+  | { type: 'setBands'; id: string; bands: IrBand[] }
+  | { type: 'resetBands'; id: string }
   | { type: 'selectSpectrum'; id: string | null }
   | { type: 'setDomain'; domain: IrDomain }
   | { type: 'resetDomain' }
@@ -46,7 +57,10 @@ export function irReducer(state: IrState, action: IrAction): IrState {
   switch (action.type) {
     case 'addSpectra': {
       if (action.spectra.length === 0) return state;
-      const spectra = [...state.data.spectra, ...action.spectra];
+      const spectra = [
+        ...state.data.spectra,
+        ...arriving(state, action.spectra),
+      ];
       return {
         ...state,
         data: { spectra },
@@ -65,7 +79,7 @@ export function irReducer(state: IrState, action: IrAction): IrState {
     case 'setSpectra': {
       return {
         ...state,
-        data: { spectra: [...action.spectra] },
+        data: { spectra: arriving(state, action.spectra) },
         view: {
           ...state.view,
           selectedId: action.spectra[0]?.id ?? null,
@@ -122,6 +136,14 @@ export function irReducer(state: IrState, action: IrAction): IrState {
       );
     }
 
+    case 'setBands': {
+      return setSpectrumBands(state, action.id, action.bands);
+    }
+
+    case 'resetBands': {
+      return resetSpectrumBands(state, action.id);
+    }
+
     case 'selectSpectrum': {
       if (state.view.selectedId === action.id) return state;
       return { ...state, view: { ...state.view, selectedId: action.id } };
@@ -162,17 +184,11 @@ export function irReducer(state: IrState, action: IrAction): IrState {
     }
 
     case 'setSettings': {
-      const settings = mergeIrSettings(state.settings, action.settings);
-      return { ...state, settings };
+      return changeSettings(state, action.settings);
     }
 
     case 'loadState': {
-      const { data, view, settings } = action.state;
-      return {
-        data: data === undefined ? state.data : { spectra: [...data.spectra] },
-        view: { ...state.view, ...view },
-        settings: mergeIrSettings(state.settings, settings),
-      };
+      return restoreState(state, action.state);
     }
 
     case 'clear': {
@@ -189,29 +205,6 @@ export function irReducer(state: IrState, action: IrAction): IrState {
        when one is added — so there is nothing for a fallback to do. */
     // no default
   }
-}
-
-/**
- * Change one spectrum, leaving the state alone when it did not change.
- * @param state - The state in force.
- * @param id - Which spectrum.
- * @param change - What to make of it; return it unchanged for no change.
- * @returns The new state, or the old one.
- */
-function mapSpectrum(
-  state: IrState,
-  id: string,
-  change: (spectrum: IrSpectrum) => IrSpectrum,
-): IrState {
-  let changed = false;
-  const spectra = state.data.spectra.map((spectrum) => {
-    if (spectrum.id !== id) return spectrum;
-    const next = change(spectrum);
-    if (next !== spectrum) changed = true;
-    return next;
-  });
-  if (!changed) return state;
-  return { ...state, data: { spectra }, view: { ...state.view, error: null } };
 }
 
 /**

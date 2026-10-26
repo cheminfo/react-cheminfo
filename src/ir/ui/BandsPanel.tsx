@@ -1,21 +1,19 @@
-import { useMemo } from 'react';
-import { Button, Toolbar } from 'react-science/ui';
-
 import {
   panelBodyStyle,
   panelEmptyStyle,
   panelHeaderCellStyle,
   panelStyle,
   panelTableStyle,
-  panelToolbarStyle,
 } from '../../panel/core/panelStyles.ts';
+import { removeBand } from '../core/handPicking.ts';
 import type { IrBand } from '../core/irBand.ts';
 import { sameIrBand } from '../core/irBand.ts';
 import { shortModeLabel } from '../core/irFormat.ts';
+import type { IrSpectrum } from '../core/irSpectrum.ts';
 import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 
 import { BandRow } from './BandRow.tsx';
-import { bandsToTsv } from './bandsTsv.ts';
+import { BandsToolbar } from './BandsToolbar.tsx';
 import { useIrActions, useIrEditorState } from './irStateContext.ts';
 
 export interface BandsPanelProps {
@@ -45,6 +43,11 @@ export interface BandsPanelProps {
  * row, which is the whole reason the highlight is threaded through the shell
  * rather than held here: the two views are of one thing.
  *
+ * The list is the spectrum's own and can be edited: a band is taken away from
+ * its row, added by a click on the chart while picking by hand, and the whole
+ * list found automatically again. Once edited it is the spectrum's as picked
+ * by hand, and the threshold no longer moves it.
+ *
  * For a technique the correlation table does not cover — Raman — the column of
  * candidates and the button naming them are left out, and the table is the
  * bands themselves.
@@ -55,89 +58,25 @@ export function BandsPanel(props: BandsPanelProps) {
   const { highlight = null, onHighlight } = props;
   const { state, selectedSpectrum, assigned } = useIrEditorState();
   const actions = useIrActions();
-  const { mode, pickBands, showAssignments, picking, technique } =
-    state.settings;
+  const { mode, pickBands, technique } = state.settings;
   const { assignments } = IR_TECHNIQUE_RULES[technique];
+  const empty = emptyMessage(selectedSpectrum, pickBands, assigned.length);
 
-  const rows = useMemo(() => assigned, [assigned]);
-
-  const tsv = useMemo(
-    () => bandsToTsv(rows, mode, assignments),
-    [rows, mode, assignments],
-  );
+  function remove(band: IrBand): void {
+    if (selectedSpectrum === null) return;
+    actions.setBands(
+      selectedSpectrum.id,
+      removeBand(selectedSpectrum.bands ?? [], band.wavenumber),
+    );
+    onHighlight?.(null);
+  }
 
   return (
     <div style={panelStyle}>
-      <div style={panelToolbarStyle}>
-        <Toolbar aria-label="Band actions">
-          <Toolbar.Item
-            icon="locate"
-            active={pickBands}
-            tooltip={pickBands ? 'Stop picking bands' : 'Pick the bands'}
-            aria-label="Pick the bands"
-            onClick={() => actions.setSettings({ pickBands: !pickBands })}
-          />
-          {assignments ? (
-            <Toolbar.Item
-              icon="label"
-              active={showAssignments}
-              tooltip="Name the assignments on the chart"
-              aria-label="Name the assignments on the chart"
-              disabled={!pickBands}
-              onClick={() =>
-                actions.setSettings({ showAssignments: !showAssignments })
-              }
-            />
-          ) : null}
-        </Toolbar>
-
-        {/* The threshold is the one picking setting worth reaching for while
-            reading: everything else about a band follows from the spectrum, and
-            this is what decides whether a shoulder is a band at all. */}
-        <label style={thresholdStyle}>
-          <span style={{ opacity: 0.7 }}>threshold</span>
-          <input
-            type="range"
-            min={0.005}
-            max={0.3}
-            step={0.005}
-            value={picking.minRelativeHeight ?? 0.02}
-            disabled={!pickBands}
-            aria-label="How tall a band must be to be picked"
-            onChange={(event) =>
-              actions.setSettings({
-                picking: { minRelativeHeight: event.target.valueAsNumber },
-              })
-            }
-          />
-        </label>
-
-        <span style={{ flex: 1 }} />
-
-        <Button
-          variant="minimal"
-          icon="clipboard"
-          disabled={rows.length === 0}
-          tooltipProps={{ content: 'Copy the table' }}
-          aria-label="Copy the table"
-          onClick={() => void navigator.clipboard?.writeText(tsv)}
-        />
-      </div>
+      <BandsToolbar />
 
       <div style={panelBodyStyle}>
-        {selectedSpectrum === null ? (
-          <p style={panelEmptyStyle}>No spectrum is selected.</p>
-        ) : !pickBands ? (
-          <p style={panelEmptyStyle}>
-            The bands are not being picked. Press the locate button above to
-            find them.
-          </p>
-        ) : rows.length === 0 ? (
-          <p style={panelEmptyStyle}>
-            No band was found above the threshold. Lower it to pick the weaker
-            ones.
-          </p>
-        ) : (
+        {empty === null ? (
           <table style={panelTableStyle}>
             <thead>
               <tr>
@@ -149,10 +88,11 @@ export function BandsPanel(props: BandsPanelProps) {
                 {assignments ? (
                   <th style={panelHeaderCellStyle}>could be</th>
                 ) : null}
+                <th style={panelHeaderCellStyle} />
               </tr>
             </thead>
             <tbody>
-              {rows.map((entry) => (
+              {assigned.map((entry) => (
                 <BandRow
                   key={`${entry.band.spectrumId} ${entry.band.wavenumber}`}
                   entry={entry}
@@ -160,19 +100,37 @@ export function BandsPanel(props: BandsPanelProps) {
                   assignments={assignments}
                   lit={sameIrBand(entry.band, highlight)}
                   onHighlight={onHighlight}
+                  onRemove={remove}
                 />
               ))}
             </tbody>
           </table>
+        ) : (
+          <p style={panelEmptyStyle}>{empty}</p>
         )}
       </div>
     </div>
   );
 }
 
-const thresholdStyle = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-  fontSize: 11,
-} as const;
+/**
+ * What the panel says in place of the table, when it has no band to list.
+ * @param spectrum - The selected spectrum, `null` for none.
+ * @param picking - Whether the bands are picked at all.
+ * @param count - How many bands there are to list.
+ * @returns The sentence, or `null` when there is a table to show.
+ */
+function emptyMessage(
+  spectrum: IrSpectrum | null,
+  picking: boolean,
+  count: number,
+): string | null {
+  if (spectrum === null) return 'No spectrum is selected.';
+  if (!picking) {
+    return 'The bands are not being picked. Press the locate button above to find them.';
+  }
+  if (count > 0) return null;
+  return spectrum.bandsByHand
+    ? 'No band is picked. Click the chart while picking by hand, or find them automatically again.'
+    : 'No band was found above the threshold. Lower it to pick the weaker ones.';
+}

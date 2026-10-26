@@ -4,15 +4,19 @@
  * name, a JSON Schema, and ajv.
  *
  * The names are pipeline's (`chem.molfile.2d`, `chem.ocl.id`…), plus
- * `chem.smiles`, which pipeline lists among its future schemas. A name with
- * children is a category whose schema every child satisfies, so `chem.molfile`
- * reads `chem.molfile.2d` and `chem.molfile.3d.h.energy` alike; the fields a
- * tool does not read are stripped rather than refused, so a host sending more
- * than it needs to is never turned away.
+ * `chem.smiles`, which pipeline lists among its future schemas, and the two
+ * infrared kinds of `./irKinds.ts`. A name with children is a category whose
+ * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
+ * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
+ * stripped rather than refused, so a host sending more than it needs to is
+ * never turned away.
  */
 
 import type { JSONSchemaType, ValidateFunction } from 'ajv';
 import { Ajv } from 'ajv';
+
+import type { IrJdxValue, IrPeaksValue } from './irKinds.ts';
+import { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
 
 /** A molfile, V2000 or V3000. */
 export interface MolfileValue {
@@ -34,7 +38,9 @@ export interface SmilesValue {
 export type CheckedValue =
   | { kind: 'chem.molfile'; value: MolfileValue }
   | { kind: 'chem.ocl.id'; value: OclIdValue }
-  | { kind: 'chem.smiles'; value: SmilesValue };
+  | { kind: 'chem.smiles'; value: SmilesValue }
+  | { kind: 'spectra.ir.jdx'; value: IrJdxValue }
+  | { kind: 'spectra.ir.peaks'; value: IrPeaksValue };
 
 /** The name of a kind a tool can read. */
 export type KnownKind = CheckedValue['kind'];
@@ -125,4 +131,8 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'chem.molfile': ajv.compile(MOLFILE_SCHEMA),
   'chem.ocl.id': ajv.compile(OCL_ID_SCHEMA),
   'chem.smiles': ajv.compile(SMILES_SCHEMA),
+  // Written as plain schemas rather than `JSONSchemaType`, which would demand
+  // `nullable` on every optional field and so let a `null` band through.
+  'spectra.ir.jdx': ajv.compile<IrJdxValue>(IR_JDX_SCHEMA),
+  'spectra.ir.peaks': ajv.compile<IrPeaksValue>(IR_PEAKS_SCHEMA),
 };

@@ -37,7 +37,7 @@ export interface StandInHost {
 export interface StandInHostLog {
   /** The tool's `hello`, or `null` before it came. */
   hello: HelloMessage | null;
-  /** Every message the tool sent on the port, in order. */
+  /** Every message the tool sent on the port, in order: results and outputs. */
   results: unknown[];
 }
 
@@ -46,10 +46,15 @@ export interface StandInHostLog {
  * @returns The host; close it when the tests are done.
  */
 export async function startStandInHost(): Promise<StandInHost> {
-  const server: Server = createServer((_request, response) => {
-    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-    response.end(HOST_PAGE);
-  });
+  // A setup carrying a spectrum is tens of kilobytes of address, past the
+  // 16 KiB Node allows a request's head by default.
+  const server: Server = createServer(
+    { maxHeaderSize: MAX_SETUP_BYTES },
+    (_request, response) => {
+      response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      response.end(HOST_PAGE);
+    },
+  );
   await new Promise<void>((resolve) => {
     server.listen(0, '127.0.0.1', resolve);
   });
@@ -82,6 +87,24 @@ export function readStandInHostLog(): StandInHostLog {
 }
 
 /**
+ * Send one more request on the port, once the tool has connected — a `get`
+ * after the user has worked. Runs in the page, as
+ * `page.evaluate(sendStandInHostRequest, request)`.
+ * @param request - What to send.
+ * @returns Whether there was a port to send it on.
+ */
+export function sendStandInHostRequest(request: unknown): boolean {
+  const { hostPort } = globalThis as unknown as {
+    hostPort: MessagePort | null;
+  };
+  hostPort?.postMessage(request);
+  return hostPort !== null;
+}
+
+/** How long the page's address may be, in bytes: Chrome's own limit is 2 MB. */
+const MAX_SETUP_BYTES = 2 * 1024 * 1024;
+
+/**
  * The page. Its setup is its own `?setup=`, so one page serves every test, and
  * it listens before it frames, so the tool's `hello` cannot be missed.
  */
@@ -95,11 +118,13 @@ const { toolUrl, requests } = JSON.parse(new URLSearchParams(location.search).ge
 const toolOrigin = new URL(toolUrl).origin;
 const frame = document.querySelector('#tool');
 globalThis.hostLog = { hello: null, results: [] };
+globalThis.hostPort = null;
 globalThis.addEventListener('message', (event) => {
   if (event.source !== frame.contentWindow || event.origin !== toolOrigin) return;
   if (event.data?.type !== 'cheminfo:hello') return;
   globalThis.hostLog.hello = event.data;
   const channel = new MessageChannel();
+  globalThis.hostPort = channel.port1;
   channel.port1.onmessage = (answer) => {
     globalThis.hostLog.results.push(answer.data);
   };

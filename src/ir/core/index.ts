@@ -24,6 +24,14 @@ export type { BandLabelPlan, BandLabelPlanOptions } from './bandLabelPlan.ts';
 export { planBandLabels } from './bandLabelPlan.ts';
 export { detectIrFormat } from './detectIrFormat.ts';
 export { downloadIrSpectra, downloadIrSpectrum } from './downloadSpectra.ts';
+export {
+  addBand,
+  bandAtIndex,
+  editBandsAt,
+  pickBandAt,
+  removeBand,
+} from './handPicking.ts';
+export { bandsFromPeaks, peaksFromBands } from './irPeaks.ts';
 export type { IrJcampReadOptions } from './fromJcamp.ts';
 export type { IrSpcReadOptions } from './fromSpc.ts';
 export type { IrBand, IrBandStrength } from './irBand.ts';
@@ -124,6 +132,12 @@ export { loadIrSpectra } from './loadIrSpectra.ts';
 export { BAND_HIT_RADIUS, nearestBandAt } from './nearestBand.ts';
 export type { PickBandsOptions } from './pickBands.ts';
 export { pickBands } from './pickBands.ts';
+export {
+  orderedBands,
+  repickBands,
+  samePicking,
+  withBands,
+} from './spectrumBands.ts';
 export {
   DEFAULT_DATA_TYPE,
   JCAMP_EXTENSION,

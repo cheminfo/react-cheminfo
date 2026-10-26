@@ -1,10 +1,11 @@
-export type {
-  HostConnectionOptions,
-  HostMessageEvent,
-  InputSelection,
-  LoadedInput,
-} from './connectHost.ts';
-export { connectHost, selectInputs } from './connectHost.ts';
+export type { HostConnectionOptions, HostMessageEvent } from './connectHost.ts';
+export { connectHost } from './connectHost.ts';
+export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';
+export {
+  OUTPUT_DELAY,
+  answerGet,
+  createOutputPublisher,
+} from './hostOutputs.ts';
 export type { StructureValue } from './hostStructure.ts';
 export {
   STRUCTURE_KINDS,
@@ -12,6 +13,8 @@ export {
   hostStructureSource,
   readHostMolecule,
 } from './hostStructure.ts';
+export type { IrJdxValue, IrPeakValue, IrPeaksValue } from './irKinds.ts';
+export { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
 export type {
   CheckOutcome,
   CheckedValue,
@@ -29,6 +32,7 @@ export type {
   HostItem,
   HostRequest,
   LoadRequest,
+  OutputMessage,
   ResultMessage,
   ToolInput,
   ToolInterface,
@@ -44,3 +48,5 @@ export {
   isConnect,
   parseRequest,
 } from './protocol.ts';
+export type { InputSelection, LoadedInput } from './selectInputs.ts';
+export { selectInputs } from './selectInputs.ts';

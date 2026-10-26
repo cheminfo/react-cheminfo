@@ -18,7 +18,8 @@ export interface IrEditorProps {
   data?: IrSpectrum[];
   /**
    * Called whenever the spectra open change — one loaded, one closed, the chart
-   * cleared — with the spectra now open.
+   * cleared, the bands of one picked — with the spectra now open, each carrying
+   * its bands.
    *
    * The document only. A zoom, a selection, a rename and a colour change what is
    * being looked at rather than what is loaded, and a host told about those would
@@ -50,7 +51,8 @@ export interface IrEditorProps {
   panels?: readonly IrHostPanel[];
   /**
    * The plot was clicked at this wavenumber (a press that did not travel, i.e.
-   * not a zoom drag), with the spectrum selected at that moment.
+   * not a zoom drag), with the spectrum selected at that moment. Not called
+   * while bands are picked by hand: a click is a band then.
    * @default undefined
    */
   onPlotClick?: (click: IrPlotClick) => void;

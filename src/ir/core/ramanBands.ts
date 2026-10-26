@@ -56,7 +56,7 @@ export function ramanBands(
       spectrumId: id,
       wavenumber: peak.wavenumber,
       intensity: value,
-      strength: strengthOf(value, min, max),
+      strength: intensityStrength(value, min, max),
     });
   }
   return bands;
@@ -69,7 +69,7 @@ export function ramanBands(
  * @param highest - Its highest.
  * @returns The letter a correlation table would use.
  */
-function strengthOf(
+export function intensityStrength(
   value: number,
   lowest: number,
   highest: number,

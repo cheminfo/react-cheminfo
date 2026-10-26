@@ -92,6 +92,11 @@ export function IrShell(props: IrShellProps) {
       fullScreen: toggleFullScreen,
       readTool: () => actions.setTool('read'),
       boxTool: () => actions.setTool(tool === 'box' ? 'read' : 'box'),
+      // Picking by hand is done on the marks, so they are shown for it.
+      pickTool: () => {
+        actions.setTool(tool === 'pick' ? 'read' : 'pick');
+        if (!pickBands) actions.setSettings({ pickBands: true });
+      },
       zoomIn,
       zoomOut,
       resetZoom: () => actions.resetDomain(),

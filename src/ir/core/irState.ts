@@ -7,10 +7,10 @@
  * `settings` is the workspace, which is how every spectrum is drawn whichever
  * ones happen to be open.
  *
- * The bands are **not** in here. They are derived from the spectra and the
- * picking settings, so holding them would mean holding an answer that has to be
- * kept in step with its own inputs — `useIrEditor` recomputes them instead, and
- * a stale band is then impossible rather than merely unlikely.
+ * The bands are in `data`, each spectrum carrying its own: picked when it
+ * arrives, picked again by the reducer when the settings change while they were
+ * found automatically, and left alone once picked by hand. That is what lets a
+ * band be added or taken away, and a list be handed to a host and back.
  */
 
 import type { IrPanelId, IrSidePanelId } from './irSidePanels.ts';
@@ -18,6 +18,7 @@ import type { IrDomain, IrMode, IrSpectrum } from './irSpectrum.ts';
 import type { IrTechnique } from './irTechnique.ts';
 import { defaultIrMode, irModeFor, offersIrMode } from './irTechnique.ts';
 import type { PickBandsOptions } from './pickBands.ts';
+import { withBands } from './spectrumBands.ts';
 
 /** The document: what a file holds. */
 export interface IrData {
@@ -25,8 +26,11 @@ export interface IrData {
   spectra: IrSpectrum[];
 }
 
-/** What a drag across the chart is for while it is chosen. */
-export type IrTool = 'read' | 'box';
+/**
+ * What a drag across the chart is for while it is chosen, and for `pick`, what
+ * a click is: a band added where it lands, or taken away.
+ */
+export type IrTool = 'read' | 'box' | 'pick';
 
 /** Where you are in the viewer. */
 export interface IrView {
@@ -165,8 +169,11 @@ export function createIrState(options: CreateIrStateOptions = {}): IrState {
     technique,
     mode: defaultIrMode(technique),
   };
+  const merged = mergeIrSettings(opened, settings);
   return {
-    data: { spectra: [...spectra] },
+    data: {
+      spectra: spectra.map((spectrum) => withBands(spectrum, merged.picking)),
+    },
     view: {
       selectedId: spectra[0]?.id ?? null,
       domain: null,
@@ -174,7 +181,7 @@ export function createIrState(options: CreateIrStateOptions = {}): IrState {
       openPanelIds: [...(panelIds ?? DEFAULT_SIDE_PANELS)],
       error: null,
     },
-    settings: mergeIrSettings(opened, settings),
+    settings: merged,
   };
 }
 

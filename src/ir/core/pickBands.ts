@@ -21,6 +21,13 @@ import type { IrSpectrum } from './irSpectrum.ts';
 import type { PeakPickingOptions } from './ramanBands.ts';
 import { ramanBands } from './ramanBands.ts';
 
+/**
+ * How many points the picker smooths over before it looks for a band. `ml-gsd`
+ * refuses a trace shorter than that — a few points typed in by hand — rather
+ * than finding no band in it.
+ */
+const SMOOTHING_WINDOW = 9;
+
 /** How the bands are picked. */
 export interface PickBandsOptions {
   /**
@@ -88,7 +95,7 @@ export function pickBands(
     minPeakWidth = 4,
     limit,
   } = options;
-  if (spectrum.wavenumber.length < 2) return [];
+  if (spectrum.wavenumber.length < SMOOTHING_WINDOW) return [];
 
   const picking: PeakPickingOptions = {
     minMaxRatio: minRelativeHeight,
@@ -110,43 +117,6 @@ export function pickBands(
 }
 
 /**
- * The bands of an infrared spectrum, picked on its absorbance.
- * @param spectrum - The spectrum to pick from.
- * @param picking - Where to pick, and how finely.
- * @returns The bands, in the order they were found; none when the spectrum
- * carries only one of its two axes, since the strength is read off the other.
- */
-function infraredBands(
-  spectrum: IrSpectrum,
-  picking: PeakPickingOptions,
-): IrBand[] {
-  const { id, wavenumber, absorbance, transmittance } = spectrum;
-  if (absorbance === undefined || transmittance === undefined) return [];
-
-  const picked = autoPeakPicking(
-    measurementOf(wavenumber, absorbance, transmittance),
-    // Absorbance, because a band is a maximum there and a minimum in the other.
-    { yVariable: 'a', ...picking },
-  );
-
-  const bands: IrBand[] = [];
-  for (const peak of picked) {
-    if (!Number.isFinite(peak.wavenumber)) continue;
-    bands.push({
-      spectrumId: id,
-      wavenumber: peak.wavenumber,
-      absorbance: peak.absorbance,
-      // `ConvertedPeak.transmittance` is a fraction where the spectrum's own
-      // transmittance is a percentage; brought onto the one scale here so that
-      // nothing downstream has to remember which of the two it is holding.
-      transmittance: peak.transmittance * 100,
-      strength: peak.kind as IrBandStrength,
-    });
-  }
-  return bands;
-}
-
-/**
  * The spectrum as `ir-spectrum` wants it.
  *
  * The `t` variable is given its extremes, because that is what the strength
@@ -158,7 +128,7 @@ function infraredBands(
  * @param transmittance - Percent transmittance at each.
  * @returns A measurement carrying all three variables.
  */
-function measurementOf(
+export function infraredMeasurement(
   wavenumber: Float64Array,
   absorbance: Float64Array,
   transmittance: Float64Array,
@@ -193,6 +163,43 @@ function measurementOf(
       t: percent,
     },
   };
+}
+
+/**
+ * The bands of an infrared spectrum, picked on its absorbance.
+ * @param spectrum - The spectrum to pick from.
+ * @param picking - Where to pick, and how finely.
+ * @returns The bands, in the order they were found; none when the spectrum
+ * carries only one of its two axes, since the strength is read off the other.
+ */
+function infraredBands(
+  spectrum: IrSpectrum,
+  picking: PeakPickingOptions,
+): IrBand[] {
+  const { id, wavenumber, absorbance, transmittance } = spectrum;
+  if (absorbance === undefined || transmittance === undefined) return [];
+
+  const picked = autoPeakPicking(
+    infraredMeasurement(wavenumber, absorbance, transmittance),
+    // Absorbance, because a band is a maximum there and a minimum in the other.
+    { yVariable: 'a', ...picking },
+  );
+
+  const bands: IrBand[] = [];
+  for (const peak of picked) {
+    if (!Number.isFinite(peak.wavenumber)) continue;
+    bands.push({
+      spectrumId: id,
+      wavenumber: peak.wavenumber,
+      absorbance: peak.absorbance,
+      // `ConvertedPeak.transmittance` is a fraction where the spectrum's own
+      // transmittance is a percentage; brought onto the one scale here so that
+      // nothing downstream has to remember which of the two it is holding.
+      transmittance: peak.transmittance * 100,
+      strength: peak.kind as IrBandStrength,
+    });
+  }
+  return bands;
 }
 
 /**

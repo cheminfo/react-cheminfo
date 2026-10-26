@@ -112,6 +112,13 @@ function InfraredGuide() {
         row.
       </p>
       <p style={paragraphStyle}>
+        The bands are found automatically until you pick them by hand: with the
+        hand tool a click on the chart adds the band under it, at its top, and a
+        click on a mark takes it away, as does the cross at the end of its row.
+        From then on the threshold leaves the list alone, until it is found
+        automatically again.
+      </p>
+      <p style={paragraphStyle}>
         A band is reported at the sampled point it peaked on, so on a 4 cm⁻¹
         grid a carbonyl centred at 1710 reads 1708 or 1712. Do not quote one as
         though it were measured to the wavenumber.

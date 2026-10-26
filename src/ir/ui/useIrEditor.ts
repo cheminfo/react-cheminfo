@@ -1,16 +1,10 @@
 /**
  * One viewer's state, and everything derived from it.
  *
- * The bands are derived here rather than held, and that is the one structural
- * decision in this file. Picking is a pure function of a spectrum and the
- * picking settings, so a band held in state would be an answer that has to be
- * invalidated by hand every time either changes — and the version that is wrong
- * is the one drawn on the chart. Derived, a stale band cannot exist.
- *
- * It is memoised on the selected spectrum rather than on all of them: picking
- * runs a peak detection over a few thousand points, and doing it for six loaded
- * spectra when the panels only ever show one would cost six times what it needs
- * to on every change of a threshold.
+ * The bands are the selected spectrum's own: the reducer picks them when it
+ * arrives and keeps them on it, so a band picked by hand is still there the
+ * next time it is selected, and goes to the host with it. What is derived here
+ * is what each band could be, which the correlation table answers per band.
  */
 
 import { useEffect, useMemo, useReducer, useRef } from 'react';
@@ -19,12 +13,12 @@ import type { AssignedBand } from '../core/assignBands.ts';
 import { assignBands } from '../core/assignBands.ts';
 import type { BandAssignment } from '../core/bandAssignments.ts';
 import { BAND_ASSIGNMENTS } from '../core/bandAssignments.ts';
+import type { IrBand } from '../core/irBand.ts';
 import { irReducer } from '../core/irReducer.ts';
 import type { IrSpectrum } from '../core/irSpectrum.ts';
 import type { CreateIrStateOptions, IrState } from '../core/irState.ts';
 import { createIrState } from '../core/irState.ts';
 import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
-import { pickBands } from '../core/pickBands.ts';
 
 import type { IrEditorActions } from './irActions.ts';
 import { createIrActions } from './irActions.ts';
@@ -33,7 +27,7 @@ import { createIrActions } from './irActions.ts';
 export interface UseIrEditorOptions extends CreateIrStateOptions {
   /**
    * Called whenever the spectra open change — one loaded, one closed, the chart
-   * cleared — with the spectra now open.
+   * cleared, the bands of one picked — with the spectra now open.
    * @default undefined
    */
   onChange?: (spectra: IrSpectrum[]) => void;
@@ -70,8 +64,7 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
 
   const { spectra } = state.data;
   const { selectedId } = state.view;
-  const { pickBands: picking, picking: pickingOptions } = state.settings;
-  const { assignmentTolerance, technique } = state.settings;
+  const { pickBands: picking, assignmentTolerance, technique } = state.settings;
 
   const visibleSpectra = useMemo(() => {
     const visible: IrSpectrum[] = [];
@@ -92,9 +85,9 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
   const bands = useMemo(
     () =>
       selectedSpectrum === null || !picking
-        ? []
-        : pickBands(selectedSpectrum, pickingOptions),
-    [selectedSpectrum, picking, pickingOptions],
+        ? NO_BANDS
+        : (selectedSpectrum.bands ?? NO_BANDS),
+    [selectedSpectrum, picking],
   );
 
   // Assigning is a walk of thirty ranges per band, which is nothing beside the
@@ -130,8 +123,15 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
 /** The table a technique the correlation table does not cover is matched against. */
 const NO_ASSIGNMENTS: readonly BandAssignment[] = [];
 
+/** What is shown while nothing is selected or picking is off, kept stable. */
+const NO_BANDS: readonly IrBand[] = [];
+
 /**
- * Whether two lists hold the same spectra, by identity and in order.
+ * Whether two lists hold the same spectra, with the same bands, in order.
+ *
+ * By identity, and the bands by reference: a rename or a colour builds a new
+ * spectrum around the same list, so neither is reported, while a band picked
+ * builds a new list.
  * @param current - What was reported last.
  * @param next - What is open now.
  * @returns Whether the report can be skipped.
@@ -143,9 +143,9 @@ function sameSpectra(
   if (current === next) return true;
   if (current.length !== next.length) return false;
   for (let index = 0; index < current.length; index++) {
-    if ((current[index] as IrSpectrum).id !== (next[index] as IrSpectrum).id) {
-      return false;
-    }
+    const before = current[index] as IrSpectrum;
+    const after = next[index] as IrSpectrum;
+    if (before.id !== after.id || before.bands !== after.bands) return false;
   }
   return true;
 }

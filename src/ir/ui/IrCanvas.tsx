@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
+import { editBandsAt } from '../core/handPicking.ts';
 import type { IrBand } from '../core/irBand.ts';
 import type { IrPlotClick } from '../core/irEditorApi.ts';
 import type { IrDomain } from '../core/irSpectrum.ts';
@@ -35,7 +36,8 @@ export interface IrCanvasProps {
   chartId?: string;
   /**
    * Told of a click on the plot — a press let go without travelling, never the
-   * end of a drag — with the spectrum selected at that moment.
+   * end of a drag — with the spectrum selected at that moment. Not told while
+   * bands are picked by hand, which is what a click is then.
    * @default undefined
    */
   onPlotClick?: (click: IrPlotClick) => void;
@@ -64,7 +66,8 @@ export function IrCanvas(props: IrCanvasProps) {
     chartId,
     onPlotClick,
   } = props;
-  const { state, visibleSpectra, assigned } = useIrEditorState();
+  const { state, visibleSpectra, selectedSpectrum, assigned } =
+    useIrEditorState();
   const actions = useIrActions();
   const { domain, tool, selectedId } = state.view;
   const { technique, mode, showAssignments, labelLimit } = state.settings;
@@ -77,15 +80,23 @@ export function IrCanvas(props: IrCanvasProps) {
   );
 
   // Which spectrum was selected is the viewer's to say, not the chart's: the
-  // chart only knows where the press landed.
-  const onClickAt = useMemo(
-    () =>
-      onPlotClick === undefined
-        ? undefined
-        : (wavenumber: number) =>
-            onPlotClick({ wavenumber, spectrumId: selectedId }),
-    [onPlotClick, selectedId],
-  );
+  // chart only knows where the press landed. While picking by hand a click is
+  // a band, and is the viewer's own rather than the host's.
+  const onClickAt = useMemo(() => {
+    if (tool === 'pick') {
+      if (selectedSpectrum === null) return undefined;
+      return (wavenumber: number, reach: number) => {
+        const bands = editBandsAt(selectedSpectrum, wavenumber, reach);
+        if (bands !== selectedSpectrum.bands) {
+          actions.setBands(selectedSpectrum.id, bands);
+        }
+      };
+    }
+    return onPlotClick === undefined
+      ? undefined
+      : (wavenumber: number) =>
+          onPlotClick({ wavenumber, spectrumId: selectedId });
+  }, [tool, selectedSpectrum, actions, onPlotClick, selectedId]);
 
   return (
     <div style={rootStyle}>

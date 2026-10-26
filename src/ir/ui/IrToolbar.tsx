@@ -22,9 +22,10 @@ export interface IrToolbarProps {
  * The tools, down the left of the chart.
  *
  * Only what is done to the spectra: what is asked of the viewer itself — the
- * mark, help, full screen — is in the header. The two **tools** — read and
- * square zoom — come first and show which of the two a drag is currently
- * running, then the zoom commands that act at once, then what is being read: the
+ * mark, help, full screen — is in the header. The **tools** — read and square
+ * zoom, which say what a drag is running, and picking by hand, which says what
+ * a click is — come first, then the zoom commands that act at once, then what
+ * is being read: the
  * value axis, the picking, the assignments. Closing every spectrum is last and
  * alone, being the only one that throws something away.
  *
@@ -64,10 +65,12 @@ export function IrToolbar(props: IrToolbarProps) {
         disabled={isEmpty}
       />
       {/* The read tool drags along one axis, so it is drawn as that; the box
-          tool sweeps a rectangle, which is what a marquee icon means. */}
+          tool sweeps a rectangle, which is what a marquee icon means. Picking
+          by hand is about a click, and a drag still reads while it is chosen,
+          so the two light together. */}
       <Toolbar.Item
         icon="arrows-horizontal"
-        active={!settled && tool === 'read'}
+        active={!settled && tool !== 'box'}
         {...command('readTool')}
         disabled={isEmpty || settled}
       />
@@ -76,6 +79,12 @@ export function IrToolbar(props: IrToolbarProps) {
         active={settled || tool === 'box'}
         {...command('boxTool')}
         disabled={isEmpty || settled}
+      />
+      <Toolbar.Item
+        icon="add-location"
+        active={tool === 'pick'}
+        {...command('pickTool')}
+        disabled={selectedSpectrum === null}
       />
 
       <Toolbar.Item icon="zoom-in" {...command('zoomIn')} disabled={isEmpty} />

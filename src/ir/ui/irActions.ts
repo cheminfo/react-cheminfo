@@ -8,6 +8,7 @@
 
 import type { Dispatch } from 'react';
 
+import type { IrBand } from '../core/irBand.ts';
 import type { IrAction } from '../core/irReducer.ts';
 import type { IrPanelId } from '../core/irSidePanels.ts';
 import type { IrDomain, IrSpectrum } from '../core/irSpectrum.ts';
@@ -27,6 +28,10 @@ export interface IrEditorActions {
   setSpectrumColor: (id: string, color: string) => void;
   /** Draw one, or stop drawing it. */
   setSpectrumVisible: (id: string, visible: boolean) => void;
+  /** Give one these bands, as picked by hand. */
+  setBands: (id: string, bands: IrBand[]) => void;
+  /** Have one's bands found automatically again, with the settings in force. */
+  resetBands: (id: string) => void;
   /** Point the panels at one, or at none. */
   selectSpectrum: (id: string | null) => void;
   /** Show this window. */
@@ -71,6 +76,12 @@ export function createIrActions(dispatch: Dispatch<IrAction>): IrEditorActions {
     },
     setSpectrumVisible(id, visible) {
       dispatch({ type: 'setSpectrumVisible', id, visible });
+    },
+    setBands(id, bands) {
+      dispatch({ type: 'setBands', id, bands });
+    },
+    resetBands(id) {
+      dispatch({ type: 'resetBands', id });
     },
     selectSpectrum(id) {
       dispatch({ type: 'selectSpectrum', id });
