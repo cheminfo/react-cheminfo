@@ -16,7 +16,7 @@
  */
 
 import type { RefObject } from 'react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { PlotRect } from '../core/chartGeometry.ts';
 import type { ChartPoint } from '../core/svgPoint.ts';
@@ -42,7 +42,9 @@ export interface ChartPointerOptions<TReadout> {
   /**
    * What the chart reads at a point. Called on every move the pointer makes
    * inside the plot, and read live rather than closed over, so it may capture
-   * the scales as they are currently zoomed.
+   * the scales as they are currently zoomed — and called again at the held
+   * position whenever it changes, which is how a zoom made without moving the
+   * pointer is read under it.
    */
   read: (point: ChartPoint) => TReadout;
   /**
@@ -83,6 +85,12 @@ export interface ChartPointerOptions<TReadout> {
  * is under the pointer" **after** the row's "this trace is being read", and
  * wipes it. Heard as `pointerout`, the report lands first and the row has the
  * last word. The containment test is what `pointerleave` was giving for free.
+ *
+ * What is returned is read again at render whenever `read` changes, because a
+ * zoom by the wheel, a key or the end of a drag changes the scales without
+ * moving the pointer, and a crosshair still quoting the window before it would
+ * name a mass the line it is drawn on no longer stands at. `onReadout` is told
+ * on the next move, as it always is.
  * @param options - The chart, and how to read a point on it.
  * @returns Where the pointer is and what it reads, both `null` while it is
  * anywhere but over the plot.
@@ -90,7 +98,7 @@ export interface ChartPointerOptions<TReadout> {
 export function useChartPointer<TReadout>(
   options: ChartPointerOptions<TReadout>,
 ): ChartPointer<TReadout> {
-  const { svgRef } = options;
+  const { svgRef, read } = options;
   const [pointer, setPointer] = useState<ChartPointer<TReadout>>(POINTER_AWAY);
   const latest = useRef(options);
   const reported = useRef<TReadout | null>(null);
@@ -133,7 +141,13 @@ export function useChartPointer<TReadout>(
     };
   }, [svgRef]);
 
-  return pointer;
+  return useMemo(
+    () =>
+      pointer.position === null
+        ? pointer
+        : { position: pointer.position, readout: read(pointer.position) },
+    [pointer, read],
+  );
 }
 
 /**
