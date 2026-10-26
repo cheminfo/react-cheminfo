@@ -50,15 +50,15 @@ afterEach(() => {
  * @returns The items.
  */
 function railButtons(): HTMLButtonElement[] {
-  return [...host.querySelectorAll<HTMLButtonElement>('button[id]')];
+  return [...host.querySelectorAll<HTMLButtonElement>('button[data-panel-id]')];
 }
 
 /**
- * The id of every item of the activity bar, top to bottom.
+ * The panel id of every item of the activity bar, top to bottom.
  * @returns The ids.
  */
 function railIds(): string[] {
-  return railButtons().map((button) => button.id);
+  return railButtons().map((button) => button.dataset.panelId ?? '');
 }
 
 /**
@@ -68,7 +68,7 @@ function railIds(): string[] {
 function activeRailIds(): string[] {
   return railButtons()
     .filter((button) => button.classList.contains(Classes.ACTIVE))
-    .map((button) => button.id);
+    .map((button) => button.dataset.panelId ?? '');
 }
 
 /**
@@ -113,12 +113,12 @@ test("a host panel's icon comes first in the activity bar", () => {
     'Close the bands panel',
   ]);
   // Each toggle is named by its panel's title, the host's like the viewer's.
-  expect(getByRole(host, 'button', { name: 'Prediction' }).id).toBe(
-    'prediction',
-  );
-  expect(getByRole(host, 'button', { name: 'Acquisition' }).id).toBe(
-    'metadata',
-  );
+  expect(
+    getByRole(host, 'button', { name: 'Prediction' }).dataset.panelId,
+  ).toBe('prediction');
+  expect(
+    getByRole(host, 'button', { name: 'Acquisition' }).dataset.panelId,
+  ).toBe('metadata');
 });
 
 test('a host panel named in defaultPanelIds opens on its content', () => {

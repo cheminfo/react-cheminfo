@@ -51,8 +51,12 @@ export function PanelRail<TId extends string>(
     <ActivityBar>
       {panels.map((panel) => (
         <ActivityBar.Item
+          // The panel id goes on a data attribute rather than on `id`: it is
+          // unique within one rail, not on the page, and a page can hold two —
+          // AGA2S hands the mass viewer the glycan editor's own panels, so both
+          // rails carry `fragments`.
+          data-panel-id={panel.id}
           key={panel.id}
-          id={panel.id}
           icon={panel.icon}
           tooltip={panel.title}
           // A tooltip is not an accessible name: without this every toggle is
