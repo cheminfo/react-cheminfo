@@ -53,3 +53,19 @@ test('an instant that is missing or unreadable writes the missing text', () => {
   expect(formatRelativeTime(undefined, { missing: 'unknown' })).toBe('unknown');
   expect(formatRelativeTime('garbage', { now: NOW, missing: '' })).toBe('');
 });
+
+test('the phrase is written in the language asked for, now included', () => {
+  expect(
+    ['en', 'fr', 'de', 'es', 'it'].map((locale) => [
+      formatRelativeTime(NOW - 2 * HOUR, { now: NOW, locale }),
+      formatRelativeTime(NOW - DAY, { now: NOW, locale }),
+      formatRelativeTime(NOW - 5000, { now: NOW, locale }),
+    ]),
+  ).toStrictEqual([
+    ['2 hours ago', 'yesterday', 'just now'],
+    ['il y a 2 heures', 'hier', 'maintenant'],
+    ['vor 2 Stunden', 'gestern', 'jetzt'],
+    ['hace 2 horas', 'ayer', 'ahora'],
+    ['2 ore fa', 'ieri', 'ora'],
+  ]);
+});
