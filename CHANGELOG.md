@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.70.0](https://github.com/cheminfo/react-cheminfo/compare/v0.69.0...v0.70.0) (2026-10-26)
+
+
+### Features
+
+* add the mass spectrum viewer ([a280314](https://github.com/cheminfo/react-cheminfo/commit/a28031434904f797bd9e93e45cb92a3e7b5a3172))
+* **download:** save a canvas from its marks ([f398e78](https://github.com/cheminfo/react-cheminfo/commit/f398e78c84ac2487febb1ffa2adecef45d02cb5b))
+
+
+### Bug Fixes
+
+* **chart:** refresh the crosshair readout after a zoom ([4a19807](https://github.com/cheminfo/react-cheminfo/commit/4a1980782b204fcc1bd3b14e597f14570db7e4ab))
+* **panel:** keep panel ids off the rail buttons ([0322055](https://github.com/cheminfo/react-cheminfo/commit/0322055899537bab9bbc03cef99ac60d65e52ff1))
+
 ## [0.69.0](https://github.com/cheminfo/react-cheminfo/compare/v0.68.0...v0.69.0) (2026-10-25)
 
 
