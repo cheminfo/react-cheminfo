@@ -42,18 +42,31 @@ export async function figurePng(
 }
 
 /**
- * The SVG document, decoded and ready to be painted.
+ * Where the browser reads an SVG document back from, to paint it.
  *
- * It goes through an object URL rather than a `data:` one because a figure of
- * a few thousand dots runs to hundreds of kilobytes, and a `data:` URL that
- * long is refused outright by some browsers.
+ * An object URL rather than a `data:` one, because a figure of a few thousand
+ * dots runs to hundreds of kilobytes and a `data:` URL that long is refused
+ * outright by some browsers — except for a document holding a
+ * `<foreignObject>`, which is how native MathML sits in a chart. Chromium
+ * taints any canvas that paints such a document read from an object URL, and
+ * the figure then cannot be saved at all; read from a `data:` URL it paints
+ * clean. Such a figure carries a handful of labels, far short of that length.
+ * @param markup - The SVG document.
+ * @returns The URL; one starting with `blob:` is revoked once read.
+ */
+export function svgImageUrl(markup: string): string {
+  return markup.includes('<foreignObject')
+    ? `data:${FIGURE_SVG_TYPE},${encodeURIComponent(markup)}`
+    : URL.createObjectURL(new Blob([markup], { type: FIGURE_SVG_TYPE }));
+}
+
+/**
+ * The SVG document, decoded and ready to be painted.
  * @param figure - The figure, already copied off the page.
  * @returns The decoded image.
  */
 async function loadFigure(figure: FigureSvg): Promise<HTMLImageElement> {
-  const url = URL.createObjectURL(
-    new Blob([figure.markup], { type: FIGURE_SVG_TYPE }),
-  );
+  const url = svgImageUrl(figure.markup);
   try {
     const image = new Image(figure.width, figure.height);
     await new Promise<void>((resolve, reject) => {
@@ -65,7 +78,7 @@ async function loadFigure(figure: FigureSvg): Promise<HTMLImageElement> {
     });
     return image;
   } finally {
-    URL.revokeObjectURL(url);
+    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
   }
 }
 

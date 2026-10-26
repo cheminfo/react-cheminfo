@@ -1,3 +1,4 @@
+import { svgImageUrl } from './figurePng.ts';
 import type { SvgBox } from './svgBounds.ts';
 import { svgToString } from './svgToString.ts';
 
@@ -92,9 +93,7 @@ function side(value: number): number {
  * @returns The image, already decoded, so it can be drawn straight away.
  */
 async function loadImage(source: string): Promise<HTMLImageElement> {
-  const url = URL.createObjectURL(
-    new Blob([source], { type: 'image/svg+xml' }),
-  );
+  const url = svgImageUrl(source);
   try {
     const image = new Image();
     image.src = url;
@@ -102,7 +101,7 @@ async function loadImage(source: string): Promise<HTMLImageElement> {
     return image;
   } finally {
     // The decoded image no longer needs the URL it came from.
-    URL.revokeObjectURL(url);
+    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
   }
 }
 
