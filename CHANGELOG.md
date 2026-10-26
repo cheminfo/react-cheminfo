@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.71.0](https://github.com/cheminfo/react-cheminfo/compare/v0.70.0...v0.71.0) (2026-10-26)
+
+
+### Features
+
+* **about:** credit the École des sciences criminelles of the University of Lausanne ([f6d7586](https://github.com/cheminfo/react-cheminfo/commit/f6d7586fbc0b56473f6d7594499255a4ec5661e3))
+* **format:** write relative times in the page's language ([477805b](https://github.com/cheminfo/react-cheminfo/commit/477805b51777a1993a184cf5cdee9bfff6e072a7))
+* **i18n:** add the account strings in every language ([ec0f02d](https://github.com/cheminfo/react-cheminfo/commit/ec0f02d0f206a0d8e1415691a019d42431db375d))
+* **ir:** edit bands by hand and return them to the host ([04e7346](https://github.com/cheminfo/react-cheminfo/commit/04e7346ae1f6b706bb966d4f67aec21cce05e95b))
+* **slides:** draw formulas as native MathML ([8be857e](https://github.com/cheminfo/react-cheminfo/commit/8be857ed99970f01d880580152f13d99f37f812e))
+
+
+### Bug Fixes
+
+* **download:** save a figure that holds native MathML ([de0b7d6](https://github.com/cheminfo/react-cheminfo/commit/de0b7d6a950078a3693386ced9ad57f0f97442fa))
+
 ## [0.70.0](https://github.com/cheminfo/react-cheminfo/compare/v0.69.0...v0.70.0) (2026-10-26)
 
 
