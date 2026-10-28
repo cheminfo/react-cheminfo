@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.73.0](https://github.com/cheminfo/react-cheminfo/compare/v0.72.0...v0.73.0) (2026-10-28)
+
+
+### Features
+
+* **citation:** cite datasets and the open chemistry paper ([a34c278](https://github.com/cheminfo/react-cheminfo/commit/a34c278e246c4035179799f848490bc4c91eea25))
+
 ## [0.72.0](https://github.com/cheminfo/react-cheminfo/compare/v0.71.0...v0.72.0) (2026-10-26)
 
 
