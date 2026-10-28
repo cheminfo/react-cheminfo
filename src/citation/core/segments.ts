@@ -1,4 +1,9 @@
-import type { Reference } from './reference.ts';
+import type {
+  ArticleReference,
+  DatasetReference,
+  Reference,
+  ReferenceAuthor,
+} from './reference.ts';
 import { doiUrl } from './reference.ts';
 
 /** One piece of a written reference, with the emphasis its style asks for. */
@@ -37,6 +42,7 @@ export function citationSegments(
   reference: Reference,
   style: CitationStyleId,
 ): CitationSegment[] {
+  if (reference.kind === 'dataset') return datasetSegments(reference, style);
   switch (style) {
     case 'acs':
       return acs(reference);
@@ -51,10 +57,62 @@ export function citationSegments(
   }
 }
 
-function acs(reference: Reference): CitationSegment[] {
+/**
+ * A dataset as each style writes one: the repository stands where the journal
+ * would, and there is neither a volume nor pages. The title is kept by every
+ * style, the RSC one included, since it is what tells two datasets of the same
+ * authors and year apart.
+ * @param reference - Dataset to write.
+ * @param style - Style to write it in.
+ * @returns The segments of the citation, in reading order.
+ */
+function datasetSegments(
+  reference: DatasetReference,
+  style: CitationStyleId,
+): CitationSegment[] {
+  const { repository, year, version } = reference;
+  const title =
+    version === undefined
+      ? reference.title
+      : `${reference.title}, version ${version}`;
+  switch (style) {
+    case 'acs':
+      return [
+        text(`${withPeriod(familyFirst(reference, '; '))} ${title}; `),
+        italic(repository),
+        text(`, ${year}. `),
+        doiLink(reference),
+      ];
+    case 'nature':
+      return [
+        text(`${withPeriod(familyFirstAmpersand(reference))} ${title}. `),
+        italic(repository),
+        text(` (${year}). `),
+        doiLink(reference),
+      ];
+    case 'rsc':
+      return [
+        text(`${initialsFirst(reference, ' and ')}, ${title}, `),
+        italic(repository),
+        text(`, ${year}. `),
+        doiLink(reference),
+      ];
+    case 'wiley':
+      return [
+        text(`${initialsFirst(reference, ', ')}, ${title}, `),
+        italic(repository),
+        text(`, ${year}. `),
+        doiLink(reference),
+      ];
+    default:
+      throw new Error(`unknown citation style: ${String(style)}`);
+  }
+}
+
+function acs(reference: ArticleReference): CitationSegment[] {
   const { title, journalAbbreviation, year, volume } = reference;
   return [
-    text(`${familyFirst(reference, '; ')} ${title}. `),
+    text(`${withPeriod(familyFirst(reference, '; '))} ${title}. `),
     italic(journalAbbreviation),
     text(' '),
     bold(String(year)),
@@ -65,10 +123,10 @@ function acs(reference: Reference): CitationSegment[] {
   ];
 }
 
-function nature(reference: Reference): CitationSegment[] {
+function nature(reference: ArticleReference): CitationSegment[] {
   const { title, journalAbbreviation, year, volume } = reference;
   return [
-    text(`${familyFirstAmpersand(reference)} ${title}. `),
+    text(`${withPeriod(familyFirstAmpersand(reference))} ${title}. `),
     italic(journalAbbreviation),
     text(' '),
     bold(volume),
@@ -77,7 +135,7 @@ function nature(reference: Reference): CitationSegment[] {
   ];
 }
 
-function rsc(reference: Reference): CitationSegment[] {
+function rsc(reference: ArticleReference): CitationSegment[] {
   const { journalAbbreviation, year, volume } = reference;
   return [
     text(`${initialsFirst(reference, ' and ')}, `),
@@ -89,7 +147,7 @@ function rsc(reference: Reference): CitationSegment[] {
   ];
 }
 
-function wiley(reference: Reference): CitationSegment[] {
+function wiley(reference: ArticleReference): CitationSegment[] {
   const { journalAbbreviation, year, volume } = reference;
   return [
     text(`${initialsFirst(reference, ', ')}, `),
@@ -124,15 +182,23 @@ function doiLink(reference: Reference): CitationSegment {
 }
 
 /**
+ * The author list closed by a full stop. A person's name already ends on the
+ * one of their last initial; an organisation's name needs its own.
+ * @param authors - The author list.
+ * @returns It, ending with a full stop.
+ */
+function withPeriod(authors: string): string {
+  return authors.endsWith('.') ? authors : `${authors}.`;
+}
+
+/**
  * `Vanderveen, J. R.; Patiny, L.` — the family name leads.
  * @param reference - The work being written.
  * @param separator - What goes between two authors.
  * @returns The authors, as one string.
  */
 function familyFirst(reference: Reference, separator: string): string {
-  return reference.authors
-    .map((author) => `${author.family}, ${author.given}`)
-    .join(separator);
+  return reference.authors.map(nameFamilyFirst).join(separator);
 }
 
 /**
@@ -141,9 +207,7 @@ function familyFirst(reference: Reference, separator: string): string {
  * @returns The authors, as one string.
  */
 function familyFirstAmpersand(reference: Reference): string {
-  const names = reference.authors.map(
-    (author) => `${author.family}, ${author.given}`,
-  );
+  const names = reference.authors.map(nameFamilyFirst);
   const last = names.at(-1);
   if (names.length < 2 || last === undefined) return names.join(', ');
   return `${names.slice(0, -1).join(', ')} & ${last}`;
@@ -156,8 +220,8 @@ function familyFirstAmpersand(reference: Reference): string {
  * @returns The authors, as one string.
  */
 function initialsFirst(reference: Reference, lastSeparator: string): string {
-  const names = reference.authors.map(
-    (author) => `${author.given} ${author.family}`,
+  const names = reference.authors.map((author) =>
+    author.given === '' ? author.family : `${author.given} ${author.family}`,
   );
   const last = names.at(-1);
   if (names.length < 2 || last === undefined) return names.join(', ');
@@ -171,8 +235,20 @@ function initialsFirst(reference: Reference, lastSeparator: string): string {
  * @returns One number for a journal that paginates by article number, the
  * range otherwise.
  */
-export function pageRange(reference: Reference, dash = '–'): string {
+export function pageRange(reference: ArticleReference, dash = '–'): string {
   const { firstPage, lastPage } = reference;
   if (firstPage === lastPage) return firstPage;
   return `${firstPage}${dash}${lastPage}`;
+}
+
+/**
+ * An author with the family name first, `Vanderveen, J. R.`, or the name of an
+ * organisation alone.
+ * @param author - The author.
+ * @returns The name, as a reference list writes it.
+ */
+export function nameFamilyFirst(author: ReferenceAuthor): string {
+  return author.given === ''
+    ? author.family
+    : `${author.family}, ${author.given}`;
 }

@@ -4,7 +4,7 @@ import type { CSSProperties, ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { CITATION_DOWNLOADS } from '../core/formats.ts';
-import { doiUrl } from '../core/reference.ts';
+import { doiUrl, referenceVenue } from '../core/reference.ts';
 import type { CitedWork } from '../core/works.ts';
 
 import { CopyFormatEntries } from './CopyFormatEntries.tsx';
@@ -52,11 +52,15 @@ export function WorkEntry(props: WorkEntryProps): ReactElement {
           {note === undefined ? null : <div style={NOTE_STYLE}>{note}</div>}
         </span>
       }
-      label={`${reference.journalAbbreviation} ${reference.year}`}
+      label={`${referenceVenue(reference)} ${reference.year}`}
     >
       <MenuItem
         icon={<SvgLogoDoi style={DOI_ICON_STYLE} />}
-        text={t('cite.openArticle')}
+        text={
+          reference.kind === 'dataset'
+            ? t('cite.openDataset')
+            : t('cite.openArticle')
+        }
         label={reference.doi}
         href={doiUrl(reference)}
         target="_blank"

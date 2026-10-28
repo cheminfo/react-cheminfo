@@ -1,8 +1,13 @@
-import type { Reference } from './reference.ts';
+import type {
+  ArticleReference,
+  DatasetReference,
+  Reference,
+  ReferenceAuthor,
+} from './reference.ts';
 import { doiUrl } from './reference.ts';
 import { renderHtml, renderMarkdown, renderText } from './render.ts';
 import type { CitationStyleId } from './segments.ts';
-import { citationSegments, pageRange } from './segments.ts';
+import { citationSegments, nameFamilyFirst, pageRange } from './segments.ts';
 
 /** The formats the reference can be copied in. */
 export type CitationFormatId =
@@ -112,8 +117,20 @@ export function formatCitation(
 }
 
 function formatBibTeX(reference: Reference): string {
+  const fields =
+    reference.kind === 'dataset'
+      ? datasetBibTeXFields(reference)
+      : articleBibTeXFields(reference);
+  const body = fields
+    .map(([name, value]) => `  ${name} = {${value}},`)
+    .join('\n');
+  const type = reference.kind === 'dataset' ? 'misc' : 'article';
+  return `@${type}{${bibTeXKey(reference)},\n${body}\n}`;
+}
+
+function articleBibTeXFields(reference: ArticleReference): Field[] {
   const { title, journal, year, volume, issue, publisher, doi } = reference;
-  const fields: Array<[string, string]> = [
+  return [
     ['author', authorList(reference, ' and ')],
     ['title', title],
     ['journal', journal],
@@ -125,21 +142,42 @@ function formatBibTeX(reference: Reference): string {
     ['doi', doi],
     ['url', doiUrl(reference)],
   ];
-  const body = fields
-    .map(([name, value]) => `  ${name} = {${value}},`)
-    .join('\n');
-  return `@article{${bibTeXKey(reference)},\n${body}\n}`;
+}
+
+/**
+ * A dataset as the `@misc` entry every BibTeX style knows, its repository
+ * standing as the publisher.
+ * @param reference - Dataset to write.
+ * @returns The fields of the entry.
+ */
+function datasetBibTeXFields(reference: DatasetReference): Field[] {
+  const { title, repository, year, version, doi } = reference;
+  return [
+    ['author', authorList(reference, ' and ')],
+    ['title', title],
+    ['howpublished', repository],
+    ['year', String(year)],
+    ...(version === undefined ? [] : [['version', version] as Field]),
+    ['publisher', repository],
+    ['doi', doi],
+    ['url', doiUrl(reference)],
+  ];
 }
 
 function formatRis(reference: Reference): string {
-  const { title, journal, year, volume, issue, publisher, doi } = reference;
-  const { authors, firstPage, lastPage } = reference;
-  const lines: Array<[string, string]> = [
+  const lines =
+    reference.kind === 'dataset'
+      ? datasetRisLines(reference)
+      : articleRisLines(reference);
+  return lines.map(([tag, value]) => `${tag}  - ${value}`).join('\n');
+}
+
+function articleRisLines(reference: ArticleReference): Field[] {
+  const { authors, title, journal, year, volume, issue } = reference;
+  const { firstPage, lastPage, publisher, doi } = reference;
+  return [
     ['TY', 'JOUR'],
-    ...authors.map((author): [string, string] => [
-      'AU',
-      `${author.family}, ${author.given}`,
-    ]),
+    ...risAuthors(authors),
     ['TI', title],
     ['JO', journal],
     ['PY', String(year)],
@@ -152,13 +190,38 @@ function formatRis(reference: Reference): string {
     ['UR', doiUrl(reference)],
     ['ER', ''],
   ];
-  return lines.map(([tag, value]) => `${tag}  - ${value}`).join('\n');
 }
 
+/**
+ * A dataset as an RIS `DATA` record, its version where reference managers
+ * read one, the edition.
+ * @param reference - Dataset to write.
+ * @returns The lines of the record.
+ */
+function datasetRisLines(reference: DatasetReference): Field[] {
+  const { authors, title, year, version, repository, doi } = reference;
+  return [
+    ['TY', 'DATA'],
+    ...risAuthors(authors),
+    ['TI', title],
+    ['PY', String(year)],
+    ...(version === undefined ? [] : [['ET', version] as Field]),
+    ['PB', repository],
+    ['DO', doi],
+    ['UR', doiUrl(reference)],
+    ['ER', ''],
+  ];
+}
+
+function risAuthors(authors: readonly ReferenceAuthor[]): Field[] {
+  return authors.map((author): Field => ['AU', nameFamilyFirst(author)]);
+}
+
+/** One field of a BibTeX entry, or one tagged line of an RIS record. */
+type Field = [name: string, value: string];
+
 function authorList(reference: Reference, separator: string): string {
-  return reference.authors
-    .map((author) => `${author.family}, ${author.given}`)
-    .join(separator);
+  return reference.authors.map(nameFamilyFirst).join(separator);
 }
 
 function bibTeXKey(reference: Reference): string {

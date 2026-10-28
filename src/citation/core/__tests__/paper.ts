@@ -1,10 +1,10 @@
-import type { Reference } from '../reference.ts';
+import type { ArticleReference } from '../reference.ts';
 
 /**
  * The work the formats are tested against: a real article, with the metadata
  * Crossref returns for it, so every field a style may reach for is filled.
  */
-export const PAPER: Reference = {
+export const PAPER: ArticleReference = {
   authors: [
     { given: 'J. R.', family: 'Vanderveen' },
     { given: 'L.', family: 'Patiny' },

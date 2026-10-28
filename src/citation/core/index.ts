@@ -13,10 +13,19 @@ export {
   formatCitation,
 } from './formats.ts';
 export { GFN2_XTB_PAPER, GFN2_XTB_WORK } from './gfn2Paper.ts';
+export {
+  OPEN_CHEMISTRY_PAPER,
+  OPEN_CHEMISTRY_WORK,
+} from './openChemistryPaper.ts';
 export { OPENCHEMLIB_PAPER, OPENCHEMLIB_WORK } from './openchemlibPaper.ts';
 export { PLATFORM_PAPER, PLATFORM_WORK } from './platformPaper.ts';
-export type { Reference, ReferenceAuthor } from './reference.ts';
-export { doiUrl } from './reference.ts';
+export type {
+  ArticleReference,
+  DatasetReference,
+  Reference,
+  ReferenceAuthor,
+} from './reference.ts';
+export { doiUrl, referenceVenue } from './reference.ts';
 export type {
   CitationSegment,
   CitationStyle,

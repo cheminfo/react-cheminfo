@@ -5,7 +5,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { CITATION_DOWNLOADS } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
-import { doiUrl } from '../core/reference.ts';
+import { doiUrl, referenceVenue } from '../core/reference.ts';
 import type { CitedWork } from '../core/works.ts';
 import { citedReferences } from '../core/works.ts';
 
@@ -78,7 +78,7 @@ function OneWorkMenu(props: CitedReferenceProps): ReactElement {
     <Menu className="citation-menu" style={MENU_STYLE}>
       <MenuItem
         icon={<SvgLogoDoi style={DOI_ICON_STYLE} />}
-        text={`${reference.journalAbbreviation} ${reference.year}`}
+        text={`${referenceVenue(reference)} ${reference.year}`}
         label={reference.doi}
         href={doiUrl(reference)}
         target="_blank"

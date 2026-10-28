@@ -114,7 +114,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Site identity**          | `siteById`, `findSiteByHost`, `siteTokensCss`                                                                                                                                                                                                                                                                                          | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                                                                                                                                |
 | **Chrome**                 | —                                                                                                                                                                                                                                                                                                                                      | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `AccountButton`, `useCompactHeader`                                                                                                                                                                                           |
 | **Languages**              | `LANGUAGES`, `DEFAULT_LANGUAGE`, `LANGUAGE_LABELS`, `isLanguage`, `MessageCatalog`, `CHROME_CATALOG`, `setMessageSession`, `loadCatalogs`, `LANGUAGE_PARAM`, `withLanguageParam`                                                                                                                                                       | `useT`, `useChromeT`, `useLanguage`, `LanguageSelect`, `SiteLanguage`                                                                                                                                                                                                                               |
-| **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`                                                                                                                                                                                                                               | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                     |
+| **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`, `referenceVenue`                                                                                                                                                                                                             | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                     |
 | **Contact**                | `CONTACT_FORM_URLS`, `contactFormUrl`, `contactUrl`                                                                                                                                                                                                                                                                                    | `ContactButton`                                                                                                                                                                                                                                                                                     |
 | **Share & embed**          | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, `visibleShareParts`, `applySharePreset`, `findSharePreset`, the param codecs, `syncPreferencesWithUrl`, `applyPreferencesFromSearch`, `writePreferencesToSearch`, sealed links: `openSealedAddress`, `sealShareUrl`, `sealQuery`, `unsealQuery` | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`, `SealedLinkRefused`                                                                                                                                                                                                 |
 | **Routing & head**         | `createTabRouter`, `readRoute`, `writeRoute`, `subscribeToRoute`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `pageLocation`, `pageHistory`                                                                                                                                                                                         | `useTabRoute`                                                                                                                                                                                                                                                                                       |
@@ -241,19 +241,40 @@ sections below carry the whole set at once, so one copy pastes both citations an
 one saved file holds both records (`references.ris`). Nothing changes for a site
 asking for a single work.
 
-The two works the whole family shares are held here rather than copied into each
-site, so none of them can name a different version of the same paper — import
-them from `react-cheminfo/core` and put the site's own work first:
+The works the family shares are held here rather than copied into each site, so
+none of them can name a different version of the same paper — import them from
+`react-cheminfo/core` and put the site's own work first:
 
-| Export                             | The work                                                                                                               |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `PLATFORM_PAPER` / `PLATFORM_WORK` | Chemical data processed in the browser, which is what makes these applications rather than queues of jobs. Every site. |
-| `TEACHING_PAPER` / `TEACHING_WORK` | Two decades of online teaching, which is what the tutorials and the exercises are. The sites that teach.               |
+| Export                                         | The work                                                                                                               |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `PLATFORM_PAPER` / `PLATFORM_WORK`             | Chemical data processed in the browser, which is what makes these applications rather than queues of jobs. Every site. |
+| `TEACHING_PAPER` / `TEACHING_WORK`             | Two decades of online teaching, which is what the tutorials and the exercises are. The sites that teach.               |
+| `OPEN_CHEMISTRY_PAPER` / `OPEN_CHEMISTRY_WORK` | Chemistry's data published open and machine actionable. The sites that read research data where it was deposited.      |
 
 ```tsx
 import { PLATFORM_WORK, TEACHING_WORK } from 'react-cheminfo/core';
 
 <CiteButton works={[OWN_WORK, TEACHING_WORK, PLATFORM_WORK]} />;
+```
+
+A dataset is cited too. Give the reference `kind: 'dataset'` and a
+`repository` in place of the journal, volume and pages: every style writes it
+the way it writes data, BibTeX as a `@misc` entry and RIS as a `DATA` record,
+and its entry opens the dataset rather than an article.
+
+```tsx
+const RECORD: DatasetReference = {
+  kind: 'dataset',
+  authors: [{ given: 'J.', family: 'Waser' }],
+  title: 'Raw data for the article "Accessing CF3-Cyclopropenes"',
+  repository: 'Zenodo',
+  year: 2026,
+  doi: '10.5281/zenodo.18380123',
+};
+
+<CiteButton
+  works={[{ reference: RECORD, what: 'This dataset' }, OPEN_CHEMISTRY_WORK]}
+/>;
 ```
 
 ### `ContactButton`
