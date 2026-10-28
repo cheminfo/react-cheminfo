@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.74.0](https://github.com/cheminfo/react-cheminfo/compare/v0.73.0...v0.74.0) (2026-10-28)
+
+
+### Features
+
+* **structure:** paint the match of a substructure query on Structure ([dd1a735](https://github.com/cheminfo/react-cheminfo/commit/dd1a735efa8a9911a5ba4d52da8ffec818fe198b))
+* **structure:** share the structure search dialog ([6d8e745](https://github.com/cheminfo/react-cheminfo/commit/6d8e745b141572e77d7bdedbb915f38acaa085a5))
+
 ## [0.73.0](https://github.com/cheminfo/react-cheminfo/compare/v0.72.0...v0.73.0) (2026-10-28)
 
 
