@@ -399,6 +399,7 @@ const STORY_IDS = [
   'structure-structure--highlighted',
   'structure-structure--labels',
   'structure-structure--real-molecules',
+  'structure-structure--substructure',
   'structure-structure--unreadable',
   'structure-structureeditor--default',
   'structure-structureeditor--empty',

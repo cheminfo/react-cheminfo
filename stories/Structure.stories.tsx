@@ -9,6 +9,7 @@ import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 import {
   ASPIRIN,
   ASPIRIN_ACETYL,
+  BENZENE_QUERY,
   CAFFEINE,
   DEMO_MOLECULES,
 } from './structureFixtures.ts';
@@ -154,6 +155,28 @@ export const Highlighted: Story = {
     atomHighlight: ASPIRIN_ACETYL,
     labels: { caption: 'acetyl' },
   },
+};
+
+/**
+ * The hits of a substructure search, each painted where the drawn query sits:
+ * the ring of aspirin and of benzene, and nothing on caffeine, which has none.
+ */
+export const Substructure: Story = {
+  args: { substructure: BENZENE_QUERY },
+  parameters: { layout: 'padded' },
+  render: (args) => (
+    <div style={ROW_STYLE}>
+      {DEMO_MOLECULES.map((molecule) => (
+        <Structure
+          key={molecule.name}
+          {...args}
+          autoCrop={false}
+          smiles={molecule.smiles}
+          labels={{ caption: molecule.name }}
+        />
+      ))}
+    </div>
+  ),
 };
 
 /**

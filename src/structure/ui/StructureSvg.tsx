@@ -17,6 +17,7 @@ import type { AtomLabelPlacement } from '../core/atomLabels.ts';
 import { applyAtomLabels } from '../core/atomLabels.ts';
 import { sourceMolecule } from '../core/sourceMolecule.ts';
 import type { StructureSource } from '../core/structureSource.ts';
+import { substructureMatch } from '../core/substructureMatch.ts';
 
 import { StructurePlaceholder } from './StructurePlaceholder.tsx';
 
@@ -46,6 +47,15 @@ interface StructureSvgProps {
   bondHighlight?: number[];
   /** The colour the highlighted bonds are painted. */
   bondHighlightColor: string;
+  /**
+   * A query idCode whose matches are painted in place of the highlights.
+   * @default undefined
+   */
+  substructure?: string;
+  /** The colour the substructure match is painted. */
+  substructureColor: string;
+  /** How opaque the substructure match is painted, from 0 to 1. */
+  substructureOpacity: number;
   /** Write the index of every atom next to it. */
   showAtomNumber: boolean;
   /** Write the index of every bond next to it. */
@@ -94,6 +104,13 @@ export function StructureSvg(props: StructureSvgProps): ReactElement {
     onAtomClick,
     onBondClick,
     showCIPParity,
+    atomHighlight,
+    atomHighlightColor,
+    bondHighlight,
+    bondHighlightColor,
+    substructure,
+    substructureColor,
+    substructureOpacity,
     ...rest
   } = props;
   const { kind, value, coordinates } = source;
@@ -105,6 +122,14 @@ export function StructureSvg(props: StructureSvgProps): ReactElement {
   const drawing = useMemo(
     () => readDrawing(kind, value, coordinates, labelsKey, atomLabelPlacement),
     [kind, value, coordinates, labelsKey, atomLabelPlacement],
+  );
+  // Matched on the very molecule drawn, so the indices are the drawn atoms.
+  const match = useMemo(
+    () =>
+      drawing === null || substructure === undefined
+        ? null
+        : substructureMatch(drawing.molecule, substructure),
+    [drawing, substructure],
   );
 
   if (drawing === null) {
@@ -118,6 +143,16 @@ export function StructureSvg(props: StructureSvgProps): ReactElement {
   return (
     <SvgRenderer
       {...rest}
+      atomHighlight={match === null ? atomHighlight : match.atoms}
+      atomHighlightColor={
+        match === null ? atomHighlightColor : substructureColor
+      }
+      bondHighlight={match === null ? bondHighlight : match.bonds}
+      bondHighlightColor={
+        match === null ? bondHighlightColor : substructureColor
+      }
+      atomHighlightOpacity={match === null ? undefined : substructureOpacity}
+      bondHighlightOpacity={match === null ? undefined : substructureOpacity}
       molecule={drawing.molecule}
       noCarbonLabelWithCustomLabel={drawing.labelled}
       suppressCIPParity={!showCIPParity}

@@ -33,3 +33,9 @@ export const ACETONE_ENOL = 'CC(O)=C';
  * over: the methyl, the carbonyl carbon, its oxygen and the ester oxygen.
  */
 export const ASPIRIN_ACETYL = [0, 1, 2, 3];
+
+/**
+ * A benzene ring drawn in query mode, as a structure editor hands it over:
+ * the idCode of a fragment, which any substituent may hang off.
+ */
+export const BENZENE_QUERY = 'gFp@DiTt@@B';

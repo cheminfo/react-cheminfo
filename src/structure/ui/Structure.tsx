@@ -134,6 +134,24 @@ export interface StructureProps {
    */
   bondHighlightColor?: string;
   /**
+   * A query fragment, as an openchemlib idCode, whose every match is painted —
+   * atoms and bonds alike, so the hit reads as one shape. When set, it takes
+   * the place of `atomHighlight` and `bondHighlight`.
+   * @default undefined
+   */
+  substructure?: string;
+  /**
+   * The colour the `substructure` match is painted.
+   * @default '#ffd500'
+   */
+  substructureColor?: string;
+  /**
+   * How opaque the `substructure` match is painted, from 0 to 1. Light, so the
+   * bonds and the atom labels under it stay legible.
+   * @default 0.15
+   */
+  substructureOpacity?: number;
+  /**
    * Called with the index of the atom that was clicked, counted from 0 as
    * openchemlib counts atoms.
    * @default undefined
@@ -181,6 +199,9 @@ export function Structure(props: StructureProps): ReactElement {
     atomHighlightColor = '#a5d8ff',
     bondHighlight,
     bondHighlightColor = '#ffd8a8',
+    substructure,
+    substructureColor = '#ffd500',
+    substructureOpacity = 0.15,
     onAtomClick,
     onBondClick,
     fallback = '—',
@@ -208,6 +229,9 @@ export function Structure(props: StructureProps): ReactElement {
         atomHighlightColor={atomHighlightColor}
         bondHighlight={bondHighlight}
         bondHighlightColor={bondHighlightColor}
+        substructure={substructure}
+        substructureColor={substructureColor}
+        substructureOpacity={substructureOpacity}
         showAtomNumber={labels.atoms ?? false}
         showBondNumber={labels.bonds ?? false}
         showMapping={labels.mapping ?? false}
