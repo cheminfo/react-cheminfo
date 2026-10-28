@@ -78,6 +78,16 @@ export type {
 } from './structurePicture.ts';
 export { STRUCTURE_BOND_LENGTH, structurePicture } from './structurePicture.ts';
 export type {
+  StructureSearchExample,
+  StructureSearchMode,
+  StructureSearchQuery,
+} from './structureSearch.ts';
+export {
+  SIMILARITY_THRESHOLDS,
+  STRUCTURE_SEARCH_MODES,
+  similarityThresholds,
+} from './structureSearch.ts';
+export type {
   StructureSource,
   StructureSourceInput,
 } from './structureSource.ts';

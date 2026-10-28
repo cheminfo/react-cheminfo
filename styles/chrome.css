@@ -889,6 +889,37 @@ a.source-badge:hover {
   }
 }
 
+/* The structure search dialog: the modes above the canvas, the fragments to
+   start from under it. A drag on the canvas that leaves it would otherwise
+   select the labels. */
+.structure-search {
+  width: min(56rem, calc(100vw - 2rem));
+  user-select: none;
+}
+
+.structure-search :is(input, textarea) {
+  user-select: text;
+}
+
+.structure-search__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  gap: 0.35rem;
+}
+
+.structure-search__examples {
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+}
+
+.structure-search__label {
+  margin-right: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
 /* ── Tokens for molecules.cheminfo.org ─────────────────────────────────────── */
 
 /* The heading, when the tokens were checked, and the button asking again, on
