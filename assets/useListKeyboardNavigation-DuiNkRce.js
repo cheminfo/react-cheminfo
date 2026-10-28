@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t}from"./iframe-Bf7Xc74g.js";import{n,t as r}from"./listNavigation-DJviafMM.js";function i(e){let{length:t,selectedIndex:n,onSelect:i,pageStep:o}=e;return(0,a.useCallback)(e=>{r(e,{length:t,selectedIndex:n,onSelect:i,pageStep:o})},[t,n,i,o])}var a;function o(){return(o=e((()=>{a=t(),n()})))()}export{i as n,o as t};
