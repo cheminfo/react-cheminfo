@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.76.0](https://github.com/cheminfo/react-cheminfo/compare/v0.75.0...v0.76.0) (2026-10-30)
+
+
+### Features
+
+* add CardStructure, a card's structure with its export glyph ([ed08407](https://github.com/cheminfo/react-cheminfo/commit/ed084070a76e72577da506ffdc023e5c3022b329))
+* copy a structure's picture as SVG from the export dialog ([c47e05c](https://github.com/cheminfo/react-cheminfo/commit/c47e05c9eb30db3e419e36700cfdc2c12580bc53))
+* open an IR band onto every candidate, each with the note that tells it apart ([58a742e](https://github.com/cheminfo/react-cheminfo/commit/58a742edc066ad359f51e3ca35b2e79bbff0b4a1))
+
 ## [0.75.0](https://github.com/cheminfo/react-cheminfo/compare/v0.74.0...v0.75.0) (2026-10-30)
 
 
