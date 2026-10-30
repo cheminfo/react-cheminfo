@@ -2,7 +2,10 @@ import type { Page } from '@playwright/test';
 
 /**
  * Opens one story on its own, without the Storybook chrome around it, so a
- * selector in a spec only ever reaches the component under test.
+ * selector in a spec only ever reaches the component under test. It returns
+ * once Storybook has drawn the story or its error display: the dev server
+ * compiles a story on its first request, which can take longer than any
+ * assertion waits.
  * @param page - The page to navigate.
  * @param id - The story's identifier, as `title-path--story-name`.
  * @param globals - The toolbar values to open it under, as `name:value` pairs.
@@ -14,4 +17,9 @@ export async function openStory(
   globals = '',
 ): Promise<void> {
   await page.goto(`/iframe.html?viewMode=story&globals=${globals}&id=${id}`);
+  await page.waitForFunction(
+    () =>
+      document.body.classList.contains('sb-show-main') ||
+      document.body.classList.contains('sb-show-errordisplay'),
+  );
 }

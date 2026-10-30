@@ -324,6 +324,18 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brandAlt: '#1d4ed8',
     mark: { plate: '#c8460d', accent: '#1d4ed8' },
   },
+  {
+    id: 'vibrations',
+    name: { lead: 'vibrations', alt: 'cheminfo', dot: true },
+    host: 'vibrations.cheminfo.org',
+    tagline: 'IR and Raman spectra computed in the browser.',
+    group: 'spectra',
+    brand: '#0072b2',
+    // The amber of the mark sits at 2.3:1 on white, so the wordmark sets its
+    // second half in the darker amber, at 4.9:1.
+    brandAlt: '#a16207',
+    mark: { plate: '#0072b2', accent: '#e69f00' },
+  },
 ];
 
 /** How a link to a site is written, beyond the site itself. */

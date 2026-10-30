@@ -7,7 +7,7 @@ import { UNLISTED_SITES } from '../unlistedSites.ts';
 // A site no menu shows yet owes the family the same colours as a listed one.
 const FAMILY = [...ECOSYSTEM_SITES, ...UNLISTED_SITES];
 
-test('the family is the twenty-seven sites, listed once each', () => {
+test('the family is the twenty-eight sites, listed once each', () => {
   const ids = ECOSYSTEM_SITES.map((site) => site.id);
 
   expect(ids).toStrictEqual([
@@ -39,6 +39,7 @@ test('the family is the twenty-seven sites, listed once each', () => {
     'moles',
     'inorganic',
     'slides',
+    'vibrations',
   ] satisfies SiteId[]);
 });
 

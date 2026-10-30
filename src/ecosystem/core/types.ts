@@ -33,7 +33,8 @@ export type SiteId =
   | 'slides'
   | 'chembio'
   | 'wikidata'
-  | 'mz';
+  | 'mz'
+  | 'vibrations';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {
