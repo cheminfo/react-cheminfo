@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.75.0](https://github.com/cheminfo/react-cheminfo/compare/v0.74.0...v0.75.0) (2026-10-30)
+
+
+### Features
+
+* add spectroscopy to the family ([cad44eb](https://github.com/cheminfo/react-cheminfo/commit/cad44eb904ac09ee32497c17d811b7656506d0e1))
+* add vibrations to the family ([81f41c1](https://github.com/cheminfo/react-cheminfo/commit/81f41c163a2257805c4f1f6f4a1a3a97b96a3bad))
+* share the formula lookup in react-cheminfo/formula ([ddb7705](https://github.com/cheminfo/react-cheminfo/commit/ddb7705d8487f1e0721796b86065e8e55e511472))
+
+
+### Bug Fixes
+
+* no ResizeObserver loop error when the structure editor makes room for its toolbar ([3d85d3a](https://github.com/cheminfo/react-cheminfo/commit/3d85d3aff97649f1dc561e108a576ddb722bad13))
+
 ## [0.74.0](https://github.com/cheminfo/react-cheminfo/compare/v0.73.0...v0.74.0) (2026-10-28)
 
 
