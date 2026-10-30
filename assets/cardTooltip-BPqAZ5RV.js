@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t,n;function r(){return(r=e((()=>{t=`help-tooltip card-tooltip`,n={flip:{options:{fallbackPlacements:[`left`]}}}})))()}export{n,r,t};
