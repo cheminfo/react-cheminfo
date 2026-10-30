@@ -41,18 +41,28 @@ export function useToolbarFloor(
     if (container === null) return;
 
     return watchToolbar(container, (toolbar) => {
+      let frame = 0;
       const size = new ResizeObserver(() => {
-        // offsetHeight, because a dialog opens under a scaling transform and a
-        // measured rectangle would be that of the half drawn toolbar.
-        const height = toolbar.offsetHeight;
-        // Zero is a toolbar being torn down or not yet laid out, never a
-        // toolbar that needs no room: writing the fallback for it would undo a
-        // correct floor and leave the palette cut off.
-        if (height === 0) return;
-        container.style.minHeight = `${toolbarFloorHeight(height, minHeight)}px`;
+        // Written on the next frame: growing the box from inside this callback
+        // resizes the editor element above the toolbar, whose own observer the
+        // browser then drops with a "ResizeObserver loop" error.
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          // offsetHeight, because a dialog opens under a scaling transform and
+          // a measured rectangle would be that of the half drawn toolbar.
+          const height = toolbar.offsetHeight;
+          // Zero is a toolbar being torn down or not yet laid out, never a
+          // toolbar that needs no room: writing the fallback for it would undo
+          // a correct floor and leave the palette cut off.
+          if (height === 0) return;
+          container.style.minHeight = `${toolbarFloorHeight(height, minHeight)}px`;
+        });
       });
       size.observe(toolbar);
-      return () => size.disconnect();
+      return () => {
+        cancelAnimationFrame(frame);
+        size.disconnect();
+      };
     });
   }, [minHeight, revision]);
 
