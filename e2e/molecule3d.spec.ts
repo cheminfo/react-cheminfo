@@ -103,7 +103,7 @@ test('the options return to the defaults, the surface left on', async ({
 test('a hidden surface says why its options are greyed, and a copy is offered', async ({
   page,
 }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   await openStory(page, 'molecule3d-moleculeviewer3d--default');
   await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 });
 
@@ -120,9 +120,13 @@ test('a hidden surface says why its options are greyed, and a copy is offered', 
 
   await page.getByRole('button', { name: 'Export image' }).click();
   const panel = page.locator(PANEL).filter({ hasText: 'Export image' });
+  // Headless Chromium paints WebGL in software: the surface takes 15–30 s at
+  // 2× and about 4 s at 1× on an idle machine, many times that beside the
+  // other 3D specs. The trajectory's export is given as long.
+  await panel.getByRole('radio', { name: '1×' }).click();
   await panel.getByRole('button', { name: 'Copy' }).click();
   await expect(panel).toContainText('to the clipboard, as a PNG.', {
-    timeout: 30_000,
+    timeout: 90_000,
   });
   await panel.screenshot({ path: 'test-results/molecule3d-copy.png' });
 });
