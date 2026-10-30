@@ -55,7 +55,7 @@ test('a band just outside a range is still offered it', () => {
 });
 
 test('a band in the fingerprint silence is assigned nothing, and says so', () => {
-  const [assigned] = assignBands([band(1900)]);
+  const [assigned] = assignBands([band(1860)]);
 
   expect(assigned?.candidates).toStrictEqual([]);
   expect(bandLabel(assigned as never)).toBeNull();
@@ -65,6 +65,26 @@ test('a nitrile is named where almost nothing else absorbs', () => {
   const [assigned] = assignBands([band(2240, 'm')]);
 
   expect(bandLabel(assigned as never)).toBe('nitrile C≡N stretch');
+});
+
+test('an allene is named near 1950, where only a cumulated bond absorbs', () => {
+  const [assigned] = assignBands([band(1955, 'm')]);
+
+  expect(assigned?.candidates.map((one) => one.id)).toStrictEqual([
+    'allene-stretch',
+  ]);
+});
+
+test('a terminal alkyne is offered both its ≡C–H stretch and its bend', () => {
+  const [stretch, bend] = assignBands([band(3300), band(640)]);
+
+  expect(stretch?.candidates.map((one) => one.id)).toContain(
+    'alkyne-ch-stretch',
+  );
+  expect(bend?.candidates.map((one) => one.id)).toStrictEqual([
+    'alkyne-ch-bend',
+    'c-cl-stretch',
+  ]);
 });
 
 test('a strength mismatch is kept by default and can be filtered out', () => {
@@ -77,7 +97,7 @@ test('a strength mismatch is kept by default and can be filtered out', () => {
 });
 
 test('the assigned count is bands with a candidate, not candidates', () => {
-  const assigned = assignBands([band(1715), band(1900), band(3350)]);
+  const assigned = assignBands([band(1715), band(1860), band(3350)]);
 
   expect(assigned).toHaveLength(3);
   expect(countAssigned(assigned)).toBe(2);

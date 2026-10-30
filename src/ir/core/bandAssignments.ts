@@ -54,6 +54,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 500,
     to: 600,
     strength: 'S',
+    note: 'Only with bromine in the formula; the mass spectrum shows its 1:1 M+2',
   },
   {
     id: 'c-cl-stretch',
@@ -62,6 +63,16 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 600,
     to: 800,
     strength: 'S',
+    note: 'Only with chlorine in the formula; the mass spectrum shows its 3:1 M+2',
+  },
+  {
+    id: 'alkyne-ch-bend',
+    group: 'alkyne',
+    vibration: '≡C–H bend',
+    from: 610,
+    to: 700,
+    strength: 'S',
+    note: 'Broad, and only beside the sharp ≡C–H stretch near 3300',
   },
   {
     id: 'aromatic-ch-oop',
@@ -97,6 +108,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 1000,
     to: 1400,
     strength: 'S',
+    note: 'Only with fluorine in the formula; a CF₃ gives several strong bands',
   },
   {
     id: 'c-n-stretch',
@@ -105,6 +117,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 1080,
     to: 1360,
     strength: 'm',
+    note: 'Only with nitrogen in the formula, and rarely decisive on its own',
   },
   {
     id: 'nitro-symmetric',
@@ -122,6 +135,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 1330,
     to: 1430,
     strength: 'm',
+    note: 'Only beside the broad O–H stretch above 3200',
   },
   {
     id: 'alkane-ch-bend',
@@ -148,6 +162,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 1500,
     to: 1560,
     strength: 'S',
+    note: 'Never alone: the symmetric partner sits near 1300–1390',
   },
   {
     id: 'nh-bend',
@@ -156,6 +171,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 1550,
     to: 1640,
     strength: 'm',
+    note: 'Only beside an N–H stretch between 3300 and 3500',
   },
   {
     id: 'alkene-cc-stretch',
@@ -218,6 +234,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 1770,
     to: 1815,
     strength: 'S',
+    note: 'The highest single carbonyl, and only with chlorine in the formula',
   },
   {
     id: 'anhydride-co-stretch',
@@ -227,6 +244,15 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     to: 1830,
     strength: 'S',
     note: 'Two bands, about 60 apart, which is what names it',
+  },
+  {
+    id: 'allene-stretch',
+    group: 'allene',
+    vibration: 'C=C=C asymmetric stretch',
+    from: 1900,
+    to: 2000,
+    strength: 'm',
+    note: 'Near 1950, where only a cumulated double bond absorbs',
   },
   {
     id: 'nitrile-stretch',
@@ -289,6 +315,7 @@ export const BAND_ASSIGNMENTS: readonly BandAssignment[] = [
     from: 3000,
     to: 3100,
     strength: 'm',
+    note: 'Above 3000, with the ring pair near 1500 and 1600',
   },
   {
     id: 'alkyne-ch-stretch',
