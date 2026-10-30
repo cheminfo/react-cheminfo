@@ -103,6 +103,7 @@
   "site.regexp.tagline": "Learn regular expressions in a live playground.",
   "site.pdb.tagline": "A fast look at any Protein Data Bank entry.",
   "site.elucidation.tagline": "A structure from a 1H NMR spectrum and a formula.",
+  "site.spectroscopy.tagline": "Find a structure from its IR, mass and NMR spectra.",
   "site.equilibrium.tagline": "Chemical equilibria: pH, speciation and titration curves.",
   "site.polycarp.tagline": "Predict the microstructure of a radical copolymerisation.",
   "site.3d.tagline": "Conformers in 3D from a structure you draw.",

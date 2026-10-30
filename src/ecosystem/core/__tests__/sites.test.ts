@@ -28,6 +28,7 @@ test('the family is the twenty-eight sites, listed once each', () => {
     'regexp',
     'pdb',
     'elucidation',
+    'spectroscopy',
     'equilibrium',
     'polycarp',
     '3d',

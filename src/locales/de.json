@@ -103,6 +103,7 @@
   "site.regexp.tagline": "Reguläre Ausdrücke in einer interaktiven Spielwiese lernen.",
   "site.pdb.tagline": "Ein schneller Blick auf jeden Eintrag der Protein Data Bank.",
   "site.elucidation.tagline": "Eine Struktur aus einem 1H-NMR-Spektrum und einer Formel.",
+  "site.spectroscopy.tagline": "Eine Struktur aus ihren IR-, Massen- und NMR-Spektren bestimmen.",
   "site.equilibrium.tagline": "Chemische Gleichgewichte: pH, Speziation und Titrationskurven.",
   "site.polycarp.tagline": "Die Mikrostruktur einer radikalischen Copolymerisation vorhersagen.",
   "site.3d.tagline": "Konformere in 3D aus einer Struktur, die Sie zeichnen.",

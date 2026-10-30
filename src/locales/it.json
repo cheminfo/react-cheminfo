@@ -103,6 +103,7 @@
   "site.regexp.tagline": "Imparare le espressioni regolari in un ambiente interattivo.",
   "site.pdb.tagline": "Uno sguardo rapido a qualsiasi voce della Protein Data Bank.",
   "site.elucidation.tagline": "Una struttura da uno spettro NMR 1H e da una formula.",
+  "site.spectroscopy.tagline": "Trovare una struttura dai suoi spettri IR, di massa e NMR.",
   "site.equilibrium.tagline": "Equilibri chimici: pH, speciazione e curve di titolazione.",
   "site.polycarp.tagline": "Prevedere la microstruttura di una copolimerizzazione radicalica.",
   "site.3d.tagline": "Conformeri in 3D a partire da una struttura che si disegna.",

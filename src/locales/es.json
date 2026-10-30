@@ -103,6 +103,7 @@
   "site.regexp.tagline": "Aprender expresiones regulares en un entorno interactivo.",
   "site.pdb.tagline": "Una mirada rápida a cualquier entrada del Protein Data Bank.",
   "site.elucidation.tagline": "Una estructura a partir de un espectro de RMN de 1H y una fórmula.",
+  "site.spectroscopy.tagline": "Encontrar una estructura a partir de sus espectros IR, de masas y de RMN.",
   "site.equilibrium.tagline": "Equilibrios químicos: pH, especiación y curvas de valoración.",
   "site.polycarp.tagline": "Predecir la microestructura de una copolimerización radicalaria.",
   "site.3d.tagline": "Confórmeros en 3D a partir de una estructura que usted dibuja.",

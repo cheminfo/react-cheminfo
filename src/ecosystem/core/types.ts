@@ -19,6 +19,7 @@ export type SiteId =
   | 'regexp'
   | 'pdb'
   | 'elucidation'
+  | 'spectroscopy'
   | 'equilibrium'
   | 'polycarp'
   | '3d'

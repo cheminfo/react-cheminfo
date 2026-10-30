@@ -308,6 +308,28 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <circle cx="19" cy="9" r="3" fill={alt} />
     </>
   ),
+  // Three peaks on a baseline and the ring they are read back to: the spectra
+  // are what a student is given, the structure is the answer, so the ring
+  // carries the answering colour.
+  spectroscopy: (alt) => (
+    <>
+      <path
+        d="M4 25h7l1.5-8 1.5 8h3l1.5-5 1.5 5h2l1.75-14 1.75 14H28"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 4 14.76 6.75V12.25L10 15 5.24 12.25V6.75Z"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
   // The site's own favicon: the double harpoon, one direction per colour.
   equilibrium: (alt) => (
     <g

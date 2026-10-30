@@ -201,6 +201,20 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#7e22ce', accent: '#f59e0b' },
   },
   {
+    id: 'spectroscopy',
+    name: { lead: 'spectroscopy', alt: 'cheminfo', dot: true },
+    host: 'spectroscopy.cheminfo.org',
+    tagline: 'Find a structure from its IR, mass and NMR spectra.',
+    group: 'spectra',
+    // The violet end of the spectrum: the greens a spectrum would suggest are
+    // already smiles', equilibrium's and openbabel's.
+    brand: '#744d9f',
+    // The lime the mark's ring is drawn in sits at 1.5:1 on white, so the
+    // second half of the wordmark takes this darkened form, at 5.0:1.
+    brandAlt: '#4d7c0f',
+    mark: { plate: '#744d9f', accent: '#a3e635' },
+  },
+  {
     id: 'equilibrium',
     name: { lead: 'Equi', alt: 'Librium' },
     host: 'equilibrium.cheminfo.org',

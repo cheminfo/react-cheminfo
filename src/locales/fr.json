@@ -103,6 +103,7 @@
   "site.regexp.tagline": "Apprendre les expressions régulières dans un bac à sable interactif.",
   "site.pdb.tagline": "Un coup d'œil rapide sur n'importe quelle entrée de la Protein Data Bank.",
   "site.elucidation.tagline": "Une structure à partir d'un spectre RMN 1H et d'une formule.",
+  "site.spectroscopy.tagline": "Trouver une structure à partir de ses spectres IR, de masse et RMN.",
   "site.equilibrium.tagline": "Équilibres chimiques : pH, spéciation et courbes de titrage.",
   "site.polycarp.tagline": "Prédire la microstructure d'une copolymérisation radicalaire.",
   "site.3d.tagline": "Les conformères en 3D d'une structure que vous dessinez.",
