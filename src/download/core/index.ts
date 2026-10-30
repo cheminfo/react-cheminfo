@@ -1,5 +1,6 @@
 export type { FigureNotice } from './copyFigure.ts';
 export { copyFigure } from './copyFigure.ts';
+export { copySvg } from './copySvg.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
 export { downloadBlob } from './downloadBlob.ts';
 export type { DownloadFigureOptions, FigureFormat } from './downloadFigure.ts';

@@ -587,6 +587,8 @@
   "structure.export.saveSvg": "Als SVG speichern",
   "structure.export.savePng": "Als PNG speichern",
   "structure.export.copyPng": "PNG kopieren",
+  "structure.export.copySvg": "SVG kopieren",
+  "structure.export.svgCopied": "In die Zwischenablage kopiert: SVG.",
   "structure.export.smiles": "SMILES",
   "structure.export.smilesHelp": "Die Struktur in einer Zeile, Stereochemie eingeschlossen. Jedes Programm liest sie.",
   "structure.export.molfileV3000": "Molfile V3000",

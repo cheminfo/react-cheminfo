@@ -531,6 +531,8 @@
   "structure.export.saveSvg": "Salva in SVG",
   "structure.export.savePng": "Salva in PNG",
   "structure.export.copyPng": "Copia il PNG",
+  "structure.export.copySvg": "Copia l’SVG",
+  "structure.export.svgCopied": "Copiato negli appunti: SVG.",
   "structure.export.smiles": "SMILES",
   "structure.export.smilesHelp": "La struttura su una riga, stereochimica compresa. Ogni strumento la legge.",
   "structure.export.molfileV3000": "Molfile V3000",

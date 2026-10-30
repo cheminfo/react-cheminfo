@@ -94,6 +94,22 @@ test('a notation is copied by clicking it', async ({ page }) => {
   ).resolves.toBe('C[n]1c(C(N(C)C(N2C)=O)=O)c2nc1');
 });
 
+test('the picture is copied as an SVG, which a slide pastes as a drawing', async ({
+  page,
+}) => {
+  await openStory(page, 'structure-structureexportdialog--default');
+  const dialog = page.getByRole('dialog');
+
+  await dialog.getByRole('button', { name: 'Copy SVG' }).click();
+
+  await expect(
+    dialog.getByText('Copied the SVG to the clipboard.'),
+  ).toBeVisible();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toMatch(/^<svg\b/);
+  expect(copied).toContain('</svg>');
+});
+
 test('nothing drawn is said rather than guessed at', async ({ page }) => {
   await openStory(page, 'structure-structureexportdialog--nothing');
 

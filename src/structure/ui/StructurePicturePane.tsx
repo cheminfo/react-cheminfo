@@ -4,6 +4,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 
 import { copyFigure } from '../../download/core/copyFigure.ts';
+import { copySvg } from '../../download/core/copySvg.ts';
 import { downloadBlob } from '../../download/core/downloadBlob.ts';
 import { downloadText } from '../../download/core/downloadText.ts';
 import { figurePng } from '../../download/core/figurePng.ts';
@@ -37,7 +38,7 @@ const DEFAULT_SCALE = 2;
 
 /**
  * The structure as a picture: what it looks like, how big it leaves, and the
- * three ways it leaves.
+ * four ways it leaves.
  *
  * What is shown is the file: the preview is the very SVG the save button
  * writes, laid out smaller, so nobody saves a picture they have not seen. The
@@ -134,6 +135,18 @@ export function StructurePicturePane(
               downloadBlob(await png(), `${fileName}.png`);
               return null;
             })
+          }
+        />
+        <Button
+          icon="clipboard"
+          size="small"
+          text={t('structure.export.copySvg')}
+          onClick={() =>
+            void run(async () =>
+              (await copySvg(picture.markup))
+                ? t('structure.export.svgCopied')
+                : t('clipboard.failed'),
+            )
           }
         />
         <Button

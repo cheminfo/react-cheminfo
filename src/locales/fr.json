@@ -587,6 +587,8 @@
   "structure.export.saveSvg": "Enregistrer en SVG",
   "structure.export.savePng": "Enregistrer en PNG",
   "structure.export.copyPng": "Copier le PNG",
+  "structure.export.copySvg": "Copier le SVG",
+  "structure.export.svgCopied": "Copié dans le presse-papiers : SVG.",
   "structure.export.smiles": "SMILES",
   "structure.export.smilesHelp": "La structure sur une ligne, stéréochimie comprise. Tous les logiciels le lisent.",
   "structure.export.molfileV3000": "Molfile V3000",

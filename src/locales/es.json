@@ -587,6 +587,8 @@
   "structure.export.saveSvg": "Guardar en SVG",
   "structure.export.savePng": "Guardar en PNG",
   "structure.export.copyPng": "Copiar el PNG",
+  "structure.export.copySvg": "Copiar el SVG",
+  "structure.export.svgCopied": "Copiado al portapapeles: SVG.",
   "structure.export.smiles": "SMILES",
   "structure.export.smilesHelp": "La estructura en una línea, con su estereoquímica. Todas las herramientas la leen.",
   "structure.export.molfileV3000": "Molfile V3000",

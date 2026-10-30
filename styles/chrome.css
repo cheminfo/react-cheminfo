@@ -850,9 +850,9 @@ a.source-badge:hover {
   gap: 8px;
 }
 
-/* Two columns, so the three buttons are one size: a row of buttons whose
-   widths are set by the length of their labels reads as three unrelated
-   controls. */
+/* Two columns, so the buttons are one size — the saves over the copies, SVG
+   over SVG: a row of buttons whose widths are set by the length of their
+   labels reads as unrelated controls. */
 .structure-export__actions {
   display: grid;
   margin-top: 2px;
