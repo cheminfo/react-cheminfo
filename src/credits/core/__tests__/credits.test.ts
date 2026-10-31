@@ -113,7 +113,7 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(57);
+  expect(CREDITS).toHaveLength(62);
 });
 
 test('NMRium names both its licences, and PubChem, a source of data, none', () => {
@@ -160,6 +160,28 @@ test('every entry names a work, an address and what it does', () => {
     expect(entry.description.endsWith('.')).toBe(true);
     expect(entry.license).not.toBe('');
   }
+});
+
+test('the function-key dictionary credits every source it adapts, under its licence', () => {
+  expect(
+    credits([
+      'openchemlib-search-wasm',
+      'chemcaption',
+      'accfg',
+      'medchem',
+      'rdkit',
+    ]).map((entry) => [entry.name, entry.href, entry.license]),
+  ).toStrictEqual([
+    [
+      'openchemlib-search-wasm',
+      'https://github.com/cheminfo/openchemlib-search-wasm',
+      'BSD-3-Clause',
+    ],
+    ['ChemCaption', 'https://github.com/lamalab-org/chem-caption', 'MIT'],
+    ['AccFG', 'https://github.com/xuanliugit/AccFG', 'MIT'],
+    ['medchem', 'https://github.com/datamol-io/medchem', 'Apache-2.0'],
+    ['RDKit', 'https://github.com/rdkit/rdkit', 'BSD-3-Clause'],
+  ]);
 });
 
 test('a work the registry does not hold comes back as undefined', () => {

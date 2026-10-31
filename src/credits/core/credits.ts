@@ -85,6 +85,46 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'openchemlib-search-wasm',
+    name: 'openchemlib-search-wasm',
+    href: 'https://github.com/cheminfo/openchemlib-search-wasm',
+    description:
+      'the functional-group keys of every structure, and the dictionary that names them.',
+    license: 'BSD-3-Clause',
+  },
+  {
+    id: 'chemcaption',
+    name: 'ChemCaption',
+    href: 'https://github.com/lamalab-org/chem-caption',
+    description:
+      'definitions of functional groups, adapted in the function-key dictionary.',
+    license: 'MIT',
+  },
+  {
+    id: 'accfg',
+    name: 'AccFG',
+    href: 'https://github.com/xuanliugit/AccFG',
+    description:
+      'definitions of functional groups, adapted in the function-key dictionary.',
+    license: 'MIT',
+  },
+  {
+    id: 'medchem',
+    name: 'medchem',
+    href: 'https://github.com/datamol-io/medchem',
+    description:
+      'definitions of functional groups, adapted in the function-key dictionary.',
+    license: 'Apache-2.0',
+  },
+  {
+    id: 'rdkit',
+    name: 'RDKit',
+    href: 'https://github.com/rdkit/rdkit',
+    description:
+      'definitions of functional groups, and the reference every key was checked against.',
+    license: 'BSD-3-Clause',
+  },
+  {
     id: 'osiris-property-explorer',
     name: 'OSIRIS Property Explorer',
     href: 'https://www.organic-chemistry.org/prog/peo/',
