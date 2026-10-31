@@ -9,7 +9,7 @@ import type { QueryEntry } from '../../router/core/query.ts';
 import { formatQueryEntries } from '../../router/core/query.ts';
 import { EMBED_PARAM, HIDE_PARAM } from '../../share/core/config.ts';
 
-import { CARD_PARAM } from './cardAddress.ts';
+import { CARD_PARAM, ONLY_PARAM } from './cardAddress.ts';
 
 /** How {@link framedPageUrl} frames a page. */
 export interface FramedPageOptions {
@@ -30,7 +30,13 @@ export interface CardPageOptions extends FramedPageOptions {
    */
   card?: string;
   /**
-   * What only the card reads, written after `card` in the order given, e.g.
+   * The facts a precise question asked, written `only=formula,mass` after
+   * `card`: the card draws what the answer is about and only those.
+   * @default [] - the card draws everything
+   */
+  only?: readonly string[];
+  /**
+   * What only the card reads, written after `card` and `only` in the order given, e.g.
    * `{ rows: '10' }`. A value left `undefined` or empty is not written.
    * @default {}
    */
@@ -67,8 +73,9 @@ export function cardPageUrl(
   page: string,
   options: CardPageOptions = {},
 ): string {
-  const { card = '1', extra = {} } = options;
+  const { card = '1', only = [], extra = {} } = options;
   const entries: QueryEntry[] = [[CARD_PARAM, card]];
+  if (only.length > 0) entries.push([ONLY_PARAM, only.join(',')]);
   for (const [key, value] of Object.entries(extra)) {
     if (value !== undefined && value !== '') entries.push([key, value]);
   }

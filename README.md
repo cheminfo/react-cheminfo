@@ -161,7 +161,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Periodic table**         | `PERIODIC_ELEMENTS`, `elementBySymbol`, `elementByAtomicNumber`, `cellOf`, `placedElements`, `elementByArrowKey`, `EMPTY_BLOCK`, `categorySwatch`, `CATEGORY_LABELS`                                                                                                                                                                   | `PeriodicTable`, `ElementCell`, `CategoryLegend`                                                                                                                                                                                                                                                    |
 | **Taxonomy**               | `TAXON_RANKS`, `PRINCIPAL_RANKS`, `rankOrder`, `isPrincipalRank`, `isGenusOrBelow`, `isAboveGenus`, `principalLineage`, `lineageFromNodes`, `lineageFromRanks`, `genusOrBelow`, `ncbiTaxonomyUrl`, `splitOrganismName`                                                                                                                 | `TaxonLineage`, `OrganismName`, `useRankLabel`                                                                                                                                                                                                                                                      |
 | **Framed by a host**       | `hostStructureLoader`, `readHostMolecule`, `STRUCTURE_KINDS`, `IR_JDX_SCHEMA`, `IR_PEAKS_SCHEMA`, `connectHost`, `selectInputs`, `checkValue`, `kindAccepts`, `parseRequest`, `OUTPUT_DELAY` (all `/host`); `startStandInHost`, `sendStandInHostRequest`, `SCIPEAKS_ETHYLBENZENE_LOAD`, `sciPeaksEthylbenzeneIrLoad` (`/host-testing`) | `useHostConnection` (`/host`)                                                                                                                                                                                                                                                                       |
-| **Answer cards**           | `CARD_PARAM`, `isCardAddress`, `sitePageUrl`, `cardPageUrl`, `framedPageUrl`, `roomForPanels`; `answerAddresses`, `joinAddress`, `viewOrigins`, `cardMeta`, `pageAnswer`, `siteView` (all `/server`)                                                                                                                                   | `CardFrame`, `CardDetailsButton`, `CardFigure`, `CopyTableButton`, `fitCardToFrame`, `useFitCardToFrame`, `useOverlayRoom`, `holdRoomForPanels` (all `/card`); `StructureExportButton`, `useStructureDraft` (`/structure`)                                                                          |
+| **Answer cards**           | `CARD_PARAM`, `ONLY_PARAM`, `isCardAddress`, `parseOnlyParam`, `sitePageUrl`, `cardPageUrl`, `framedPageUrl`, `roomForPanels`; `answerAddresses`, `joinAddress`, `viewOrigins`, `cardMeta`, `pageAnswer`, `siteView` (all `/server`)                                                                                                   | `CardFrame`, `CardDetailsButton`, `CardFigure`, `CopyTableButton`, `fitCardToFrame`, `useFitCardToFrame`, `useOverlayRoom`, `holdRoomForPanels` (all `/card`); `StructureExportButton`, `useStructureDraft` (`/structure`)                                                                          |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -1689,12 +1689,28 @@ const meta = cardMeta(addresses, `/?${libraryQuery}`, {
 const view = siteView({ uri: 'ui://vcl/page', name, description, addresses });
 ```
 
+**A precise question gets a card about that and nothing else.** A tool that
+looks one thing up — a compound, an element, a molecule's predictions — takes
+an optional `only` parameter listing the facts the question asked, and passes
+it on: `cardMeta(addresses, path, { only: ['formula'] })` writes
+`?card=1&only=formula`. The card then draws what the answer is about (its
+structure and name) and those facts alone, and its Details opens the whole
+page. The card reads the list with `parseOnlyParam(value, known)`, which keeps
+the facts it knows, so a missing, empty or unknown `only` draws the card as it
+always was. In the tool, declare it tolerant, so a malformed list never fails
+the call:
+
+```ts
+only: z.array(z.enum(FACTS)).optional().catch(undefined).describe('…'),
+```
+
 A card address longer than `maxLength` (8000) is not carried: `meta` is then
 undefined and the chat draws the answer itself, while `link` still names the
 page. These helpers are built on `embedMeta` and `embedView`, so
 `cheminfo-mcp-server` (an optional peer) is installed by a site that imports
-`react-cheminfo/server`. The addresses alone — `CARD_PARAM`, `sitePageUrl`,
-`cardPageUrl`, `framedPageUrl` — are in `react-cheminfo/core`, for the page.
+`react-cheminfo/server`. The addresses alone — `CARD_PARAM`, `ONLY_PARAM`, `parseOnlyParam`,
+`sitePageUrl`, `cardPageUrl`, `framedPageUrl` — are in `react-cheminfo/core`,
+for the page.
 
 The card itself is drawn with `react-cheminfo/card` and
 `react-cheminfo/styles/card.css`:

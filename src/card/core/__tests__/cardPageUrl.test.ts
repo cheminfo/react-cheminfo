@@ -39,6 +39,21 @@ test('a site with several cards names the one it asks for', () => {
   ).toBe('/compound/5793?embed=1&card=infobox&section=Hazards');
 });
 
+test('the facts a precise question asked come right after card', () => {
+  expect(
+    cardPageUrl('/compound/14034', {
+      hide: ['article'],
+      only: ['formula', 'mass'],
+      extra: { rows: '3' },
+    }),
+  ).toBe(
+    '/compound/14034?embed=1&hide=article&card=1&only=formula,mass&rows=3',
+  );
+  expect(cardPageUrl('/compound/14034', { only: [] })).toBe(
+    '/compound/14034?embed=1&card=1',
+  );
+});
+
 test('a plus is escaped, so every reader of the link reads a plus', () => {
   expect(cardPageUrl('/', { extra: { ion: 'H+' } })).toBe(
     '/?embed=1&card=1&ion=H%2B',

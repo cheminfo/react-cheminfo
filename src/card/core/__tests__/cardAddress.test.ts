@@ -1,6 +1,12 @@
 import { expect, test } from 'vitest';
 
-import { CARD_PARAM, isCardAddress, sitePageUrl } from '../cardAddress.ts';
+import {
+  CARD_PARAM,
+  ONLY_PARAM,
+  isCardAddress,
+  parseOnlyParam,
+  sitePageUrl,
+} from '../cardAddress.ts';
 
 const ORIGIN = 'https://equilibrium.cheminfo.org';
 
@@ -22,6 +28,33 @@ test('the page behind a card drops card, embed and hide, and keeps the rest as w
   expect(page).toBe(
     `${ORIGIN}/titration?ind=methyl%20red&smiles=CC[N+](C)(C)C`,
   );
+});
+
+test('the page behind a card drops what the question singled out', () => {
+  expect(ONLY_PARAM).toBe('only');
+  expect(
+    sitePageUrl({
+      origin: ORIGIN,
+      pathname: '/compound/14034',
+      search: '?embed=1&card=1&only=formula,mass',
+    }),
+  ).toBe(`${ORIGIN}/compound/14034`);
+});
+
+test('only names the facts the card knows, each once, in the order written', () => {
+  const known = ['formula', 'mass', 'names'] as const;
+
+  expect(parseOnlyParam('mass,formula', known)).toStrictEqual([
+    'mass',
+    'formula',
+  ]);
+  expect(parseOnlyParam(' formula , renamed,formula', known)).toStrictEqual([
+    'formula',
+  ]);
+  expect(parseOnlyParam('renamed', known)).toStrictEqual([]);
+  expect(parseOnlyParam('', known)).toStrictEqual([]);
+  expect(parseOnlyParam(null, known)).toStrictEqual([]);
+  expect(parseOnlyParam(undefined, known)).toStrictEqual([]);
 });
 
 test('a card with nothing of its own opens the bare page', () => {
