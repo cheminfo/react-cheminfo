@@ -1,0 +1,16 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-CYX11tGR.js";import{n,t as r}from"./FigureDownload-CeVE3Hhk.js";async function i(){return{markup:c,...l}}function a(e){return(0,s.jsxs)(`div`,{style:p,children:[(0,s.jsx)(`p`,{style:m,children:e.caption}),(0,s.jsx)(`div`,{style:h,children:e.children}),(0,s.jsx)(`div`,{id:`ring-figure`,style:g,children:(0,s.jsx)(o,{})})]})}function o(){return(0,s.jsxs)(`svg`,{width:l.width,height:l.height,viewBox:`0 0 144 72`,role:`img`,"aria-label":`Benzene`,children:[(0,s.jsx)(`polygon`,{points:`52,36 62,18.7 82,18.7 92,36 82,53.3 62,53.3`,fill:`none`,stroke:`black`,strokeWidth:1.5}),(0,s.jsx)(`circle`,{cx:72,cy:36,r:11,fill:`none`,stroke:`black`,strokeWidth:1.5})]})}var s,c,l,u,d,f,p,m,h,g,_;function v(){return(v=e((()=>{n(),s=t(),c=[`<svg xmlns="http://www.w3.org/2000/svg" width="144pt" height="72pt"`,` viewBox="0 0 144 72" data-smiles="c1ccccc1">`,`<polygon points="52,36 62,18.7 82,18.7 92,36 82,53.3 62,53.3"`,` fill="none" stroke="black" stroke-width="1.5"/>`,`<circle cx="72" cy="36" r="11" fill="none" stroke="black"`,` stroke-width="1.5"/></svg>`].join(``),l={width:192,height:96},u={title:`Download/Printed figure`,component:r,args:{unit:`dpi`,fileName:`benzene`},parameters:{layout:`padded`,docs:{description:{component:`A figure drawn to the size it prints at — a structure at a journal's bond length — is offered its resolution in dots per inch: 150 for a slide, 300 to 1200 for a journal. The PNG states it, so a document places it at its printed size, and the SVG keeps the size it states.`}}}},d={args:{writeFigure:i},render:e=>(0,s.jsx)(a,{caption:`Pick a resolution, then save: the SVG is saved as written.`,children:(0,s.jsx)(r,{...e})})},f={args:{targetId:`ring-figure`},render:e=>(0,s.jsx)(a,{caption:`The ring on the page, saved in dots per inch.`,children:(0,s.jsx)(r,{...e})})},p={display:`flex`,flexDirection:`column`,gap:8,width:360},m={margin:0,color:`var(--text-muted)`,fontSize:12},h={display:`flex`,justifyContent:`flex-end`},g={width:l.width,height:l.height},d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  args: {
+    writeFigure: writeRing
+  },
+  render: args => <Panel caption="Pick a resolution, then save: the SVG is saved as written.">
+      <FigureDownload {...args} />
+    </Panel>
+}`,...d.parameters?.docs?.source},description:{story:`The page writes the file itself, so the SVG carries the structure behind
+the picture: it is saved as written, and the PNG is painted from it.`,...d.parameters?.docs?.description}}},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{
+  args: {
+    targetId: 'ring-figure'
+  },
+  render: args => <Panel caption="The ring on the page, saved in dots per inch.">
+      <FigureDownload {...args} />
+    </Panel>
+}`,...f.parameters?.docs?.source},description:{story:`A figure on the page whose size is its printed size, read off the page.`,...f.parameters?.docs?.description}}},_=[`Written`,`OnThePage`]})))()}v();export{f as OnThePage,d as Written,_ as __namedExportsOrder,u as default};
