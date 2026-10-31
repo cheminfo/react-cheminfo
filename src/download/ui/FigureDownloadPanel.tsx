@@ -9,18 +9,13 @@ import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import type { FigureNotice } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import type { FigureResolutionUnit } from '../core/figureDpi.ts';
-import { figureResolutionLabel } from '../core/figureDpi.ts';
 import { figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
-import {
-  figurePixels,
-  figureScaleFits,
-  formatFigurePixels,
-} from '../core/figureScale.ts';
 
 import type { FigureSizing } from './FigureSizeRows.tsx';
 import { FigureSizeRows } from './FigureSizeRows.tsx';
 import { hintOf } from './figureDownloadHint.ts';
+import { resolutionHelp, scaleChoices } from './resolutionChoices.ts';
 
 /** What {@link FigureDownloadPanel} is drawn from. */
 export interface FigureDownloadPanelProps {
@@ -126,12 +121,11 @@ export function FigureDownloadPanel(
 
   const painted = format === 'png' || rasterSvg;
   const offerResolution = format === 'png' || !svgAtOwnSize;
-  const dpi = unit === 'dpi';
 
   return (
     <OverlayPanel
       title={title}
-      width={PANEL_WIDTH}
+      width={unit === 'dpi' ? DPI_PANEL_WIDTH : PANEL_WIDTH}
       hint={hintOf(
         {
           format,
@@ -182,20 +176,7 @@ export function FigureDownloadPanel(
       {offerResolution ? (
         <OverlaySegmented
           label={t('download.resolution')}
-          help={{
-            title: t('download.resolution'),
-            body: t(
-              dpi ? 'download.resolutionDpiHelp' : 'download.resolutionHelp',
-            ),
-            example: {
-              code: dpi ? '300 dpi' : '2×',
-              note: t(
-                dpi
-                  ? 'download.resolutionDpiExample'
-                  : 'download.resolutionExample',
-              ),
-            },
-          }}
+          help={resolutionHelp(unit, t)}
           value={String(scale)}
           options={scaleChoices(scales, drawn, painted, unit)}
           onChange={(picked) => onScaleChange(Number(picked))}
@@ -211,39 +192,11 @@ export function FigureDownloadPanel(
  */
 const PANEL_WIDTH = '27em';
 
+/** Wide enough for the four dots per inch on one row, `1200 dpi` last. */
+const DPI_PANEL_WIDTH = '33em';
+
 /** The two files a figure can leave the page as. */
 const FORMAT_CHOICES: ReadonlyArray<OverlayOption<FigureFormat>> = [
   { value: 'png', label: 'PNG' },
   { value: 'svg', label: 'SVG' },
 ];
-
-/**
- * The multiples offered, each saying what it would actually produce.
- *
- * One too large for the browser to paint is greyed rather than dropped, so the
- * reader learns the ceiling exists before they meet it as a blank file. An SVG
- * is not painted, so it has no such ceiling.
- * @param scales - The multiples the caller offers.
- * @param size - How big the figure is drawn for the file.
- * @param painted - Whether the file is painted into pixels.
- * @param unit - How the resolution reads.
- * @returns The choices, in the order offered.
- */
-function scaleChoices(
-  scales: readonly number[],
-  size: FigurePixels | null,
-  painted: boolean,
-  unit: FigureResolutionUnit,
-): readonly OverlayOption[] {
-  const choices: OverlayOption[] = [];
-  for (const scale of scales) {
-    const pixels = size === null ? null : figurePixels(size, scale);
-    choices.push({
-      value: String(scale),
-      label: figureResolutionLabel(scale, unit),
-      title: pixels === null ? undefined : formatFigurePixels(pixels),
-      disabled: painted && size !== null && !figureScaleFits(size, scale),
-    });
-  }
-  return choices;
-}

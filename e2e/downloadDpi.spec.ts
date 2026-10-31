@@ -102,3 +102,30 @@ test('a PNG saved at a multiple states the dots per inch it has at screen size',
 
   expect(pngDpi(file)).toBe(192);
 });
+
+test('the four dots per inch fit inside the panel', async ({ page }) => {
+  await openStory(page, WRITTEN);
+  await page.getByRole('button', { name: 'Save this figure — PNG' }).click();
+  // The popover opens from four fifths of its size, and a box measured on the
+  // way is a box the panel does not end up with.
+  await expect
+    .poll(() =>
+      page
+        .locator('.bp6-popover')
+        .first()
+        .evaluate((element) => globalThis.getComputedStyle(element).transform),
+    )
+    .toMatch(/^(?:none|matrix\(1, 0, 0, 1, 0, 0\))$/u);
+  const panel = await page
+    .getByRole('group', { name: 'Save figure' })
+    .boundingBox();
+  const last = await page
+    .getByRole('radio', { name: '1200 dpi' })
+    .boundingBox();
+
+  expect(panel).not.toBeNull();
+  expect(last).not.toBeNull();
+  expect((last?.x ?? 0) + (last?.width ?? 0)).toBeLessThanOrEqual(
+    (panel?.x ?? 0) + (panel?.width ?? 0),
+  );
+});
