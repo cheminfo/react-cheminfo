@@ -5,6 +5,7 @@ import {
   EXTRA_SPECTRUM_COLORS,
   SPECTRUM_COLORS,
 } from '../../chart/core/spectrumColor.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 export interface SpectrumColorSwatchProps {
   /** The colour the spectrum is drawn in. */
@@ -41,6 +42,7 @@ export interface SpectrumColorSwatchProps {
 export function SpectrumColorSwatch(props: SpectrumColorSwatchProps) {
   const { color, name, onPick } = props;
   const [isOpen, setIsOpen] = useState(false);
+  const t = useChromeT();
 
   function offer(offered: string) {
     return (
@@ -48,7 +50,7 @@ export function SpectrumColorSwatch(props: SpectrumColorSwatchProps) {
         key={offered}
         type="button"
         title={offered}
-        aria-label={`Draw ${name} in ${offered}`}
+        aria-label={t('panel.drawIn', { name, color: offered })}
         style={{
           ...(offered === color ? activeSwatchStyle : swatchStyle),
           background: offered,
@@ -78,8 +80,8 @@ export function SpectrumColorSwatch(props: SpectrumColorSwatchProps) {
     >
       <button
         type="button"
-        title="Draw this spectrum in another colour"
-        aria-label={`Colour of ${name}`}
+        title={t('panel.changeColour')}
+        aria-label={t('panel.colourOf', { name })}
         style={{ ...swatchStyle, background: color }}
       />
     </PopoverNext>

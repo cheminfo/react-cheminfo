@@ -1,5 +1,7 @@
 import { InputGroup } from '@blueprintjs/core';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 import { ClearButton } from './ClearButton.tsx';
 
 export interface FilterInputProps {
@@ -34,6 +36,7 @@ export interface FilterInputProps {
  */
 export function FilterInput(props: FilterInputProps) {
   const { value, onValueChange, placeholder, autoFocus = false } = props;
+  const t = useChromeT();
 
   return (
     <InputGroup
@@ -49,7 +52,7 @@ export function FilterInput(props: FilterInputProps) {
       rightElement={
         value.length > 0 ? (
           <ClearButton
-            label="Clear the filter"
+            label={t('panel.clearFilter')}
             onClick={() => onValueChange('')}
           />
         ) : undefined

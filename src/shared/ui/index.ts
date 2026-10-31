@@ -7,3 +7,9 @@ export type {
   ActionTooltipTarget,
 } from './useActionTooltip.ts';
 export { ACTION_TOOLTIP_DELAY, useActionTooltip } from './useActionTooltip.ts';
+export { canFillScreen } from './canFillScreen.ts';
+export type {
+  FullscreenStageProps,
+  StageFullscreen,
+} from './FullscreenStage.tsx';
+export { FullscreenStage } from './FullscreenStage.tsx';

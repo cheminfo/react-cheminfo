@@ -1,5 +1,7 @@
 import { expect, test } from 'vitest';
 
+import { ECOSYSTEM_SITES } from '../../../ecosystem/core/sites.ts';
+import { UNLISTED_SITES } from '../../../ecosystem/core/unlistedSites.ts';
 import { CHROME_CATALOG, CHROME_CATALOG_ID } from '../chromeCatalog.ts';
 import { LANGUAGES } from '../languages.ts';
 import { loadCatalogs } from '../translateSetup.ts';
@@ -22,6 +24,18 @@ test('every language the family speaks arrives complete', async () => {
   expect(CHROME_CATALOG.translate('share.button', 'de')).toBe('Teilen');
   expect(CHROME_CATALOG.translate('share.button', 'es')).toBe('Compartir');
   expect(CHROME_CATALOG.translate('share.button', 'it')).toBe('Condividi');
+});
+
+test('every site of the family has its tagline in the catalog, as its record words it', () => {
+  const messages: Record<string, string> = CHROME_CATALOG.source.messages;
+  const astray: string[] = [];
+  for (const site of [...ECOSYSTEM_SITES, ...UNLISTED_SITES]) {
+    if (messages[`site.${site.id}.tagline`] !== site.tagline) {
+      astray.push(site.id);
+    }
+  }
+
+  expect(astray).toStrictEqual([]);
 });
 
 test('a placeholder survives every translation', () => {

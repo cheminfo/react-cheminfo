@@ -40,12 +40,12 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function mount() {
+function mount(openPanelIds: readonly string[] = ['spectra', 'peaks']) {
   act(() => {
     root.render(
       <SidePanelStack
         panels={panels}
-        openPanelIds={['spectra', 'peaks']}
+        openPanelIds={openPanelIds}
         onClose={(id) => closed.push(id)}
       >
         {(panel) => <p>{`the ${panel.id} body`}</p>}
@@ -96,4 +96,83 @@ test('the cross closes the panel it stands in', () => {
   act(() => cross?.click());
 
   expect(closed).toStrictEqual(['peaks']);
+});
+
+/**
+ * The focus button of a panel.
+ * @param title - The panel, as its header names it.
+ * @returns The button, or null where the header offers none.
+ */
+function focusButton(title: string): HTMLElement | null {
+  return host.querySelector<HTMLElement>(
+    `[aria-label="Focus on the ${CSS.escape(title)} panel"]`,
+  );
+}
+
+test('a panel alone in the stack offers no focus', () => {
+  mount(['spectra']);
+
+  expect(focusButton('spectra')).toBeNull();
+});
+
+test('focus folds every other panel away', () => {
+  mount();
+  act(() => focusButton('peaks')?.click());
+
+  expect(chevrons().map((button) => button.dataset.panelOpen)).toStrictEqual([
+    'false',
+    'true',
+  ]);
+  expect(focusButton('peaks')?.getAttribute('aria-pressed')).toBe('true');
+  expect(focusButton('spectra')?.getAttribute('aria-pressed')).toBe('false');
+});
+
+test('focus pressed again unfolds the other panels', () => {
+  mount();
+  act(() => focusButton('peaks')?.click());
+  act(() => focusButton('peaks')?.click());
+
+  expect(chevrons().map((button) => button.dataset.panelOpen)).toStrictEqual([
+    'true',
+    'true',
+  ]);
+});
+
+test('focusing a folded panel unfolds it', () => {
+  mount();
+  act(() => chevrons()[1]?.click());
+  act(() => focusButton('peaks')?.click());
+
+  expect(chevrons().map((button) => button.dataset.panelOpen)).toStrictEqual([
+    'false',
+    'true',
+  ]);
+});
+
+test('a shift-click on a header puts its panel in focus', () => {
+  mount();
+  const header = host.querySelector<HTMLElement>('div[role="button"]');
+  act(() => {
+    header?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, shiftKey: true }),
+    );
+  });
+
+  expect(chevrons().map((button) => button.dataset.panelOpen)).toStrictEqual([
+    'true',
+    'false',
+  ]);
+  expect(focusButton('spectra')?.getAttribute('aria-pressed')).toBe('true');
+});
+
+test('a panel closed while folded opens unfolded', () => {
+  mount();
+  act(() => chevrons()[1]?.click());
+  mount(['spectra']);
+  mount(['spectra', 'peaks']);
+
+  expect(chevrons().map((button) => button.dataset.panelOpen)).toStrictEqual([
+    'true',
+    'true',
+  ]);
 });

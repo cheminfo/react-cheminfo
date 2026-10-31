@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react';
 import type { ActivityBarItemProps } from 'react-science/ui';
-import { Accordion, AccordionProvider, Button } from 'react-science/ui';
+import { Accordion, AccordionProvider } from 'react-science/ui';
+
+import { SidePanelItem } from './SidePanelItem.tsx';
+import { usePanelFolds } from './usePanelFolds.ts';
 
 /** What a rail reads about one panel, wherever that rail is drawn. */
 export interface PanelDescriptor {
@@ -44,21 +47,22 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
  * They are drawn in the order the rail stacks their icons rather than the order
  * they were switched on, so a panel always comes back where it was.
  *
- * The header carries the shell's own two gestures and nothing about what the
- * panel holds: the chevron that folds it away and the cross that closes it.
- * What a panel switches on and off is a toolbar at the top of its own body, so
- * it travels with the panel when it is folded, reordered or lent to another
- * editor, and every header in every editor reads the same — which is the reason
- * this is one component rather than one per editor.
+ * The header carries the shell's own gestures and nothing about what the panel
+ * holds: focus, which folds every other panel away and unfolds them again;
+ * filling the screen with the panel, where the browser can; the chevron that
+ * folds it away; and the cross that closes it. What a panel switches on and off
+ * is a toolbar at the top of its own body, so it travels with the panel when it
+ * is folded, reordered or lent to another editor, and every header in every
+ * editor reads the same — which is the reason this is one component rather
+ * than one per editor.
  *
  * The chevron is there because nothing else says which panels are folded. The
  * accordion draws every header identically and hides only the body, so a side
  * of four closed panels and a side of four open ones differ by white space, and
  * a reader looking for a panel that is already open reaches for its icon and
- * closes it. It is a real button rather than a glyph because the header's own
- * click never reaches the toolbar — clicks there are stopped so the close cross
- * does not also fold the panel — so a chevron that did nothing when pressed
- * would be an affordance that lies.
+ * closes it. Focus is a button as well as a shift-click because a modifier on a
+ * header is a gesture nobody finds, and it undoes itself, which a shift-click
+ * does not.
  * @param props - Component props.
  * @returns The stack.
  */
@@ -67,41 +71,30 @@ export function SidePanelStack<TPanel extends PanelDescriptor>(
 ) {
   const { panels, openPanelIds, onClose, children } = props;
   const open = panels.filter((panel) => openPanelIds.includes(panel.id));
+  const folds = usePanelFolds(open.map((panel) => panel.id));
 
   return (
     <AccordionProvider>
       <Accordion>
         {open.map((panel) => (
-          <Accordion.Item
+          <SidePanelItem
             key={panel.id}
             id={panel.id}
             title={panel.title}
-            defaultOpen
-            renderToolbar={({ isOpen, controls }) => (
-              <>
-                <Button
-                  variant="minimal"
-                  icon={isOpen ? 'chevron-down' : 'chevron-right'}
-                  data-panel-open={isOpen}
-                  aria-expanded={isOpen}
-                  aria-label={`${isOpen ? 'Fold' : 'Unfold'} the ${panel.title.toLowerCase()} panel`}
-                  tooltipProps={{
-                    content: isOpen ? 'Fold this panel away' : 'Unfold it',
-                  }}
-                  onClick={() => controls.toggle()}
-                />
-                <Button
-                  variant="minimal"
-                  icon="cross"
-                  tooltipProps={{ content: 'Close this panel' }}
-                  aria-label={`Close the ${panel.title.toLowerCase()} panel`}
-                  onClick={() => onClose(panel.id)}
-                />
-              </>
-            )}
+            isOpen={folds.isOpen(panel.id)}
+            onOpenChange={(isOpen) => folds.setOpen(panel.id, isOpen)}
+            focus={
+              open.length > 1
+                ? {
+                    active: folds.focused === panel.id,
+                    toggle: () => folds.toggleFocus(panel.id),
+                  }
+                : undefined
+            }
+            onClose={() => onClose(panel.id)}
           >
             {children(panel)}
-          </Accordion.Item>
+          </SidePanelItem>
         ))}
       </Accordion>
     </AccordionProvider>
