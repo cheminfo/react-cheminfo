@@ -15,6 +15,7 @@ import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { sourceMolecule } from '../core/sourceMolecule.ts';
 import { structureError } from '../core/structureError.ts';
+import type { SuppliedNotations } from '../core/structureNotations.ts';
 import { structureNotations } from '../core/structureNotations.ts';
 import type { StructureSourceInput } from '../core/structureSource.ts';
 import { structureSource } from '../core/structureSource.ts';
@@ -36,6 +37,13 @@ export interface StructureExportPanelProps extends StructureSourceInput {
    * @default false
    */
   fragment?: boolean;
+  /**
+   * Notations the caller wrote itself, shown and saved as they are instead of
+   * the ones OpenChemLib would write from the structure — a drawing program
+   * whose molfile keeps superatoms that a round trip would drop.
+   * @default {}
+   */
+  notations?: SuppliedNotations;
 }
 
 /**
@@ -53,12 +61,17 @@ export function StructureExportPanel(
   props: StructureExportPanelProps,
 ): ReactElement {
   const { idCode, coordinates, molfile, smiles } = props;
-  const { name = 'structure', fragment = false } = props;
+  const { name = 'structure', fragment = false, notations: supplied } = props;
   const t = useChromeT();
 
   const read = useMemo(
-    () => readStructure({ idCode, coordinates, molfile, smiles }, fragment),
-    [idCode, coordinates, molfile, smiles, fragment],
+    () =>
+      readStructure(
+        { idCode, coordinates, molfile, smiles },
+        fragment,
+        supplied,
+      ),
+    [idCode, coordinates, molfile, smiles, fragment, supplied],
   );
 
   if (read.kind !== 'read') {
@@ -120,11 +133,13 @@ type ReadStructure =
  * Read the notation the caller handed over, and write every other one from it.
  * @param input - Whatever notations the caller has.
  * @param fragment - Whether the structure is a query fragment.
+ * @param supplied - Notations the caller wrote itself.
  * @returns The molecule and its notations, or why there are none.
  */
 function readStructure(
   input: StructureSourceInput,
   fragment: boolean,
+  supplied: SuppliedNotations | undefined,
 ): ReadStructure {
   const source = structureSource(input);
   if (source.kind === 'empty') return { kind: 'empty' };
@@ -135,7 +150,11 @@ function readStructure(
     // structure from the one that was drawn.
     if (fragment) molecule.setFragment(true);
     if (molecule.getAllAtoms() === 0) return { kind: 'empty' };
-    return { kind: 'read', molecule, notations: structureNotations(molecule) };
+    return {
+      kind: 'read',
+      molecule,
+      notations: structureNotations(molecule, supplied),
+    };
   } catch (error) {
     return { kind: 'error', message: structureError(error).message };
   }

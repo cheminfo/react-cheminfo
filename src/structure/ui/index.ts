@@ -36,6 +36,10 @@ export { StructureExportButton } from './StructureExportButton.tsx';
 export type { CardStructureProps } from './CardStructure.tsx';
 export { CardStructure } from './CardStructure.tsx';
 export type { StructureExportPanelProps } from './StructureExportPanel.tsx';
+export type {
+  StructureNotationKind,
+  SuppliedNotations,
+} from '../core/structureNotations.ts';
 export type { ToolbarFloorOptions } from './useToolbarFloor.ts';
 export { useToolbarFloor } from './useToolbarFloor.ts';
 export type { StructureDraft } from './useStructureDraft.ts';

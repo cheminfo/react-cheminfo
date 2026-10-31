@@ -84,3 +84,18 @@ test('a structure with no atom is written as empty strings, not thrown on', () =
   expect(notations).toHaveLength(6);
   expect(notations[0]?.value).toBe('');
 });
+
+test('a supplied notation is used as it is, and the others are still written', () => {
+  const molfile = 'drawn elsewhere, superatoms kept\nM  END\n';
+  const molecule = Molecule.fromSmiles(CAFFEINE);
+  const values = new Map(
+    structureNotations(molecule, { molfileV2000: molfile }).map((notation) => [
+      notation.kind,
+      notation.value,
+    ]),
+  );
+
+  expect(values.get('molfileV2000')).toBe(molfile);
+  expect(values.get('molfileV3000')).toBe(molecule.toMolfileV3());
+  expect(values.get('smiles')).toBe(molecule.toIsomericSmiles());
+});

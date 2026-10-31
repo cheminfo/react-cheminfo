@@ -56,6 +56,13 @@ export interface StructureNotation {
   block: boolean;
 }
 
+/**
+ * Notations the caller has already written, shown instead of the ones
+ * OpenChemLib would write. A drawing program's molfile keeps its
+ * abbreviations as superatoms, which a round trip through OpenChemLib drops.
+ */
+export type SuppliedNotations = Partial<Record<StructureNotationKind, string>>;
+
 /** What a molfile is, for the application that opens one. */
 const MOLFILE_TYPE = 'chemical/x-mdl-molfile';
 
@@ -66,35 +73,45 @@ const MOLFILE_TYPE = 'chemical/x-mdl-molfile';
  * tautomer cannot always be canonized — comes back empty rather than taking
  * the rest of the list down with it.
  * @param molecule - The structure, as the editor handed it over. Not modified.
+ * @param supplied - Notations the caller wrote itself, used as they are.
  * @returns One entry per notation, in the order they are shown.
  */
-export function structureNotations(molecule: Molecule): StructureNotation[] {
-  const idCode = written(() => molecule.getIDCode());
+export function structureNotations(
+  molecule: Molecule,
+  supplied: SuppliedNotations = {},
+): StructureNotation[] {
+  const value = (kind: StructureNotationKind, write: () => string) =>
+    supplied[kind] ?? written(write);
   return [
     {
       kind: 'smiles',
-      value: written(() => molecule.toIsomericSmiles()),
+      value: value('smiles', () => molecule.toIsomericSmiles()),
       canonical: false,
       block: false,
     },
     {
       kind: 'molfileV3000',
-      value: written(() => molecule.toMolfileV3()),
+      value: value('molfileV3000', () => molecule.toMolfileV3()),
       canonical: false,
       file: { suffix: '-v3000', extension: 'mol', mimeType: MOLFILE_TYPE },
       block: true,
     },
     {
       kind: 'molfileV2000',
-      value: written(() => molecule.toMolfile()),
+      value: value('molfileV2000', () => molecule.toMolfile()),
       canonical: false,
       file: { suffix: '-v2000', extension: 'mol', mimeType: MOLFILE_TYPE },
       block: true,
     },
-    { kind: 'idCode', value: idCode, canonical: true, block: false },
+    {
+      kind: 'idCode',
+      value: value('idCode', () => molecule.getIDCode()),
+      canonical: true,
+      block: false,
+    },
     {
       kind: 'noStereoIdCode',
-      value: written(() =>
+      value: value('noStereoIdCode', () =>
         CanonizerUtil.getIDCode(molecule, CanonizerUtil.NOSTEREO),
       ),
       canonical: true,
@@ -102,7 +119,7 @@ export function structureNotations(molecule: Molecule): StructureNotation[] {
     },
     {
       kind: 'noStereoTautomerIdCode',
-      value: written(() =>
+      value: value('noStereoTautomerIdCode', () =>
         CanonizerUtil.getIDCode(molecule, CanonizerUtil.NOSTEREO_TAUTOMER),
       ),
       canonical: true,
