@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.77.0](https://github.com/cheminfo/react-cheminfo/compare/v0.76.0...v0.77.0) (2026-10-31)
+
+
+### Features
+
+* add draw.cheminfo.org to the ecosystem ([67d7691](https://github.com/cheminfo/react-cheminfo/commit/67d76917ff8a6e33f7142c1fac881a7d62331081))
+* add react-cheminfo/osiris and osiris-ui, the OSIRIS predictions and property panel ([7dff779](https://github.com/cheminfo/react-cheminfo/commit/7dff7799ed7dbd2c147736a41acca88b15a339e8))
+* credit openchemlib-search-wasm and the sources of its function-key dictionary ([b5f08d7](https://github.com/cheminfo/react-cheminfo/commit/b5f08d7e9e46a4b067ce1566692c0dd3438733e4))
+* draw the draw.cheminfo mark as a pen nib on paper ([5228ca5](https://github.com/cheminfo/react-cheminfo/commit/5228ca5384e23294d923e1dc4f7c08ef5fab5b76))
+* let a card answer only the facts a question asked ([320a07d](https://github.com/cheminfo/react-cheminfo/commit/320a07d48064d5828a2648862d9972c193f5a6c1))
+* let a side panel take the focus or fill the screen ([8fdbb2f](https://github.com/cheminfo/react-cheminfo/commit/8fdbb2fc4976335844f178ee89ec84d0884856f2))
+* let the structure export dialog show notations the caller wrote ([544a48e](https://github.com/cheminfo/react-cheminfo/commit/544a48e20c6d0f90ec9029389cfbe45e20f41b2d))
+* offer a figure's resolution in dpi, state it in every PNG, and save a figure the page writes ([29407c4](https://github.com/cheminfo/react-cheminfo/commit/29407c443f461c789ff1e936d15967a4ee2619a7))
+
+
+### Bug Fixes
+
+* let the splitter bar alone separate two panes ([38af9f7](https://github.com/cheminfo/react-cheminfo/commit/38af9f719861e32aebf221da23fce34539e3bf98))
+* widen the figure panel so the four dots per inch fit on one row ([2adbd80](https://github.com/cheminfo/react-cheminfo/commit/2adbd803bd636a96f6b70d996c92c497da2eeb65))
+
 ## [0.76.0](https://github.com/cheminfo/react-cheminfo/compare/v0.75.0...v0.76.0) (2026-10-30)
 
 
