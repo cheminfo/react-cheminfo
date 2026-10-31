@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{a as t,l as n}from"./openchemlib-B3kaENos.js";function r(e){try{let n=t.fromSmiles(e);return n.setFragment(!0),n.getIDCode()}catch{return``}}function i(){return(i=e((()=>{n()})))()}i();export{r as fragmentIdCode};
