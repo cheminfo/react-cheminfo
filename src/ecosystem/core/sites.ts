@@ -358,10 +358,11 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     group: 'computing',
     // The ink a structure is printed in.
     brand: '#1f2a44',
-    // The red curly arrows are taught in sits at 3.5:1 on white, so the
-    // wordmark sets its second half in the darker red, at 5.9:1.
+    // The red curly arrows are taught in, at 5.9:1 on white.
     brandAlt: '#c0261d',
-    mark: { plate: '#1f2a44', accent: '#f04438' },
+    // Ink and red on paper: a red nib on the navy stays under 4:1, where on
+    // white it reads at 5.9:1.
+    mark: { plate: '#ffffff', accent: '#c0261d', edge: '#dfe3e8' },
   },
 ];
 
