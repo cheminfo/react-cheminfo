@@ -27,6 +27,8 @@
     "./molecule3d": "./lib/molecule3d.js",
     "./molstar/*": "./lib/molstar/*/index.js",
     "./orbital": "./lib/orbital.js",
+    "./osiris": "./lib/osiris.js",
+    "./osiris-ui": "./lib/osiris-ui.js",
     "./pages": "./lib/pages.js",
     "./raman": "./lib/raman.js",
     "./server": "./lib/server.js",

@@ -1,0 +1,339 @@
+/*
+ * The OSIRIS property panel of `react-cheminfo/osiris-ui`: the four risk
+ * squares, the ten bars, and the explanation a square opens. Imported once by
+ * the page that draws the panel, after `chrome.css`, whose tokens it reads.
+ *
+ * Every colour is a token. The neutrals and the geometry are the family's, the
+ * accent is the site's own, and the three status colours below are the shared
+ * semantic ones — the same values on every site, never retuned. They are
+ * declared here because `chrome.css` does not declare them; a page that loads
+ * both reads the same three values either way.
+ */
+
+:root {
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+}
+
+/* ── The panel ──────────────────────────────────────────────────────────── */
+
+.property-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.property-panel__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+/* A name from an SD field, or the molecule's own SMILES when it carried none:
+   either can be long, and neither is worth pushing the numbers off the card. */
+.property-panel__label {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.osiris-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+/* The spinner while an explanation is fetched, on the line it explains. */
+.osiris-note--working {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.risk-panel,
+.property-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.risk-panel h5,
+.property-section h5 {
+  margin: 0;
+}
+
+/* ── The four risks ─────────────────────────────────────────────────────── */
+
+/* Two columns at the least: in a side panel too narrow for two 11rem squares,
+   the names wrap rather than stacking the four risks one under another. */
+.risk-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(11rem, calc(50% - 3px)), 1fr)
+  );
+}
+
+.risk-square {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 0;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  gap: 8px;
+  text-align: left;
+}
+
+button.risk-square {
+  cursor: pointer;
+}
+
+button.risk-square:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-sunken);
+}
+
+button.risk-square[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 10%, white);
+}
+
+/* A cell of the comparison table: the square alone, centred in its column. */
+.risk-square--compact {
+  justify-content: center;
+  padding: 2px;
+  border: 0;
+  background: none;
+}
+
+.risk-square__swatch {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--text-faint);
+}
+
+/* The three levels are the three the drug score multiplies by — ×1, ×0.8, ×0.6
+   — so the colour says what the score already counted. `unknown` is the
+   library's own "the tables did not load", which is never green. */
+.risk-square__swatch[data-level='none'] {
+  background: var(--success);
+}
+
+.risk-square__swatch[data-level='low'] {
+  background: var(--warning);
+}
+
+.risk-square__swatch[data-level='high'] {
+  background: var(--danger);
+}
+
+.risk-square__swatch[data-level='unknown'] {
+  background: var(--text-faint);
+}
+
+.risk-square__swatch[data-level='pending'] {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--border),
+    var(--border) 3px,
+    var(--surface) 3px,
+    var(--surface) 6px
+  );
+}
+
+.risk-square__text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.risk-square__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.risk-square__level {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ── Why a risk came back as it did ─────────────────────────────────────── */
+
+.risk-findings {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+  gap: 10px;
+}
+
+.risk-finding__heading {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.risk-finding__drawings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.risk-finding__figure {
+  margin: 0;
+}
+
+.risk-finding__figure > figcaption {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* ── The ten numbers ────────────────────────────────────────────────────
+
+   A name, a bar and a value on one line each. The bar's colour is the only
+   thing here that is not a neutral, and it is mixed from the three status
+   tokens — there is no hex code in this part and none in the component that
+   sets the fill's length. */
+
+.property-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.property-row {
+  display: grid;
+  align-items: center;
+  gap: 0 10px;
+  grid-template-columns: minmax(6rem, 8.5rem) minmax(4rem, 1fr) minmax(
+      3.5rem,
+      auto
+    );
+}
+
+.property-row__label {
+  font-size: 0.8125rem;
+}
+
+.property-row__unit {
+  color: var(--text-faint);
+  font-size: 0.6875rem;
+}
+
+.property-row__unit::before {
+  content: ' ';
+}
+
+.property-row__value {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* The bar carries its threshold label under it, so the row keeps room for one
+   whether or not that property has a published rule of thumb. */
+.property-bar {
+  position: relative;
+  padding-bottom: 0.875rem;
+}
+
+.property-bar__track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.property-bar__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 2px;
+  border-radius: inherit;
+
+  /* The green-to-red ramp, mixed from the three shared status colours rather
+     than computed in JavaScript, which would put a hex code in a component.
+     `color-mix` clamps a percentage into 0–100%, so the first mix is pure amber
+     from the middle of the scale up and the second is pure amber down to it:
+     red → amber → green, with no muddy midpoint. */
+  --ramp-low: color-mix(
+    in oklab,
+    var(--warning) calc(var(--fitness, 1) * 200%),
+    var(--danger)
+  );
+
+  background: color-mix(
+    in oklab,
+    var(--success) calc((var(--fitness, 1) - 0.5) * 200%),
+    var(--ramp-low)
+  );
+}
+
+/* Where a diverging bar grows from. A fill that starts a quarter of the way
+   along says nothing without it. */
+.property-bar__origin {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: var(--border-strong);
+}
+
+/* The published rule of thumb: cLogP ≤ 5, logS > −4, molweight < 450,
+   drug-likeness > 0. */
+.property-bar__mark {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--text-faint);
+}
+
+.property-bar__threshold {
+  position: absolute;
+  bottom: 0;
+  color: var(--text-faint);
+  font-size: 0.6875rem;
+  line-height: 1;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* A narrow card has no width to spend on a bar: the name and the number are
+   what a phone reads, and the bar takes the line under them. */
+@media (max-width: 480px) {
+  .property-row {
+    grid-template-columns: minmax(0, 1fr) minmax(3.5rem, auto);
+  }
+
+  .property-row__bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* The panel is worth printing beside the structure. */
+@media print {
+  .risk-findings {
+    break-inside: avoid;
+  }
+}

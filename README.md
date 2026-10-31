@@ -30,30 +30,33 @@ would mean two Blueprint style trees in one page.
 Subpaths are **bundle boundaries, not taxonomy**: a feature gets its own door
 only when it drags a heavy dependency behind it.
 
-| Import                             | Holds                                                 | Costs                                            |
-| ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
-| `react-cheminfo/core`              | every framework-free helper — 140 value exports       | nothing                                          |
-| `react-cheminfo/formula`           | formulas: read, compared, drawn and copied            | mf-parser, react-mf; React on the components     |
-| `react-cheminfo/ui`                | every React component and hook — 60 value exports     | React                                            |
-| `react-cheminfo/vite`              | the prerender plugin and the OG card                  | nothing; React on the card                       |
-| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware             | nothing                                          |
-| `react-cheminfo/server`            | the prerendered build, served from Node               | fastify, @fastify/static; Node only              |
-| `react-cheminfo/card`              | the card an answer is shown as in a chat              | React; cheminfo-mcp-server, an optional peer     |
-| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                          | React, molstar                                   |
-| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                | React, molstar                                   |
-| `react-cheminfo/structure`         | the structure editor and renderer                     | React, react-ocl, OCL                            |
-| `react-cheminfo/conformers`        | conformer generation, ranking and refinement          | OCL                                              |
-| `react-cheminfo/slides`            | the deck format and the slideshow player              | React, react-markdown                            |
-| `react-cheminfo/spectra`           | the spectra processing settings editors               | React; types only from spectra-processor, ml-pca |
-| `react-cheminfo/ir`                | the infrared chart, band table and editor             | React, ir-spectrum, convert-to-jcamp             |
-| `react-cheminfo/raman`             | the Raman editor: the infrared one, read for Raman    | the same as `react-cheminfo/ir`                  |
-| `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor        | React, ms-spectrum, jcampconverter, xy-parser    |
-| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                        | nothing on import; xtb-wasm on the first call    |
-| `react-cheminfo/host`              | data handed over by a page that frames the tool       | nothing on import; ajv once the page is framed   |
-| `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
-| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
-| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
-| `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens         | nothing                                          |
+| Import                             | Holds                                                  | Costs                                            |
+| ---------------------------------- | ------------------------------------------------------ | ------------------------------------------------ |
+| `react-cheminfo/core`              | every framework-free helper — 140 value exports        | nothing                                          |
+| `react-cheminfo/formula`           | formulas: read, compared, drawn and copied             | mf-parser, react-mf; React on the components     |
+| `react-cheminfo/ui`                | every React component and hook — 60 value exports      | React                                            |
+| `react-cheminfo/vite`              | the prerender plugin and the OG card                   | nothing; React on the card                       |
+| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware              | nothing                                          |
+| `react-cheminfo/server`            | the prerendered build, served from Node                | fastify, @fastify/static; Node only              |
+| `react-cheminfo/card`              | the card an answer is shown as in a chat               | React; cheminfo-mcp-server, an optional peer     |
+| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                           | React, molstar                                   |
+| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                 | React, molstar                                   |
+| `react-cheminfo/structure`         | the structure editor and renderer                      | React, react-ocl, OCL                            |
+| `react-cheminfo/conformers`        | conformer generation, ranking and refinement           | OCL                                              |
+| `react-cheminfo/osiris`            | OSIRIS predictions and the pool of workers making them | nothing on import; OCL on the first prediction   |
+| `react-cheminfo/osiris-ui`         | the OSIRIS property panel and `usePredictions`         | React, react-mf; react-ocl to draw a fragment    |
+| `react-cheminfo/slides`            | the deck format and the slideshow player               | React, react-markdown                            |
+| `react-cheminfo/spectra`           | the spectra processing settings editors                | React; types only from spectra-processor, ml-pca |
+| `react-cheminfo/ir`                | the infrared chart, band table and editor              | React, ir-spectrum, convert-to-jcamp             |
+| `react-cheminfo/raman`             | the Raman editor: the infrared one, read for Raman     | the same as `react-cheminfo/ir`                  |
+| `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor         | React, ms-spectrum, jcampconverter, xy-parser    |
+| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                         | nothing on import; xtb-wasm on the first call    |
+| `react-cheminfo/host`              | data handed over by a page that frames the tool        | nothing on import; ajv once the page is framed   |
+| `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests  | nothing; Node only                               |
+| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet           | nothing                                          |
+| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours      | nothing                                          |
+| `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens          | nothing                                          |
+| `react-cheminfo/styles/osiris.css` | the OSIRIS panel's stylesheet, on the family's tokens  | nothing                                          |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -99,6 +102,16 @@ so the code choosing a relaxer loads neither openchemlib nor WebAssembly; `xtbRe
 `import()`s `xtb-wasm` on the **first call**, so a site that offers refinement as
 an action still ships nothing extra to a visitor who never clicks it.
 
+`react-cheminfo/osiris` predicts what OSIRIS says about a molecule — the
+four toxicity risks, cLogP, solubility, drug-likeness and the drug score — and
+spreads a set of molecules over a pool of workers, the rows a reader can see
+answered first. It is framework-free and imports `openchemlib` on the first
+prediction, never on import, because the worker serving `runPredictionJob`
+imports it, and a dev server hands a worker its dependencies unbundled: a
+component behind the same door would be evaluated in every worker. The panel
+that draws an answer and the hook that drives the pool from a page are
+`react-cheminfo/osiris-ui`, beside it.
+
 `react-cheminfo/vite` is the one door with a split bill: `cheminfoPrerender`
 needs nothing beyond Vite's own plugin type, while `ogCardHtml` renders a mark
 and therefore loads React — but on the call, not on the import, so the plugin
@@ -136,6 +149,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                          | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
 | **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromPeaks`, `peaksFromBands`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                               | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`)                                                                                                                                                                           |
 | **Mass spectra**           | `loadMassSpectra`, `toMassSpectra`, `analyseSpectrum`, `decideResolution`, `resolutionOf`, `mzDecimalsOf`, `planPeakLabels`, `peakTableRows`, `massSpectrumToJcamp`, `massReducer` (all `/mass`)                                                                                                                                       | `MassEditor`, `MassChart`, `SpectraPanel`, `PeaksPanel`, `MetadataPanel`, `useMassEditor` (all `/mass`)                                                                                                                                                                                             |
+| **OSIRIS predictions**     | `computeProperties`, `predictIdCode`, `loadPredictors`, `createPredictionPool`, `runPredictionJob`, `isPredictRequest`, `riskDetail`, `PROPERTY_SCALES`, `propertyFitness`, `barGeometry`, `riskAppearance` (all `/osiris`)                                                                                                            | `PropertyPanel`, `RiskPanel`, `RiskSquare`, `RiskFindings`, `PropertyRows`, `usePredictions` (all `/osiris-ui`)                                                                                                                                                                                     |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                   | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                           |
 | **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                                                                                                        | `AboutPage`                                                                                                                                                                                                                                                                                         |
 | **Which build is running** | `formatBuiltAt`, `shortCommit`, `BuildInfo`                                                                                                                                                                                                                                                                                            | `AboutVersion`, `cheminfoBuildInfo` (`/vite`)                                                                                                                                                                                                                                                       |
@@ -915,6 +929,57 @@ const included = useMemo(
 - **The card is a render prop**, because what belongs in it is the caller's
   subject — a formula through `react-mf`, a structure, a name — and a readout of
   strings cannot hold any of that.
+
+## Predicting with OSIRIS
+
+A site keeps two things of its own: the worker, because a bundler resolves a
+worker's address against the module naming it, and the address of
+OpenChemLib's resources, because a worker cannot read the page's mount.
+
+```ts
+// src/predict.worker.ts — the whole file
+import { serveWorkerRequests } from 'react-cheminfo/core';
+import { isPredictRequest, runPredictionJob } from 'react-cheminfo/osiris';
+
+serveWorkerRequests(runPredictionJob, { accepts: isPredictRequest });
+```
+
+```tsx
+import { OCL_RESOURCES_FILE, oclResourcesUrl } from 'react-cheminfo/conformers';
+import { PropertyPanel, usePredictions } from 'react-cheminfo/osiris-ui';
+import 'react-cheminfo/styles/osiris.css';
+
+const { results, riskDetail } = usePredictions({
+  molecules: [{ key: 'drawn', idCode }],
+  resources: oclResourcesUrl(OCL_RESOURCES_FILE) ?? fallbackUrl,
+  createWorker: () =>
+    new Worker(new URL('./predict.worker.ts', import.meta.url), {
+      type: 'module',
+    }),
+});
+
+<PropertyPanel
+  properties={results.get('drawn') ?? null}
+  pending={!results.has('drawn')}
+  openRisk={openRisk}
+  onOpenRisk={setOpenRisk}
+  loadDetail={riskDetail}
+  head={false}
+/>;
+```
+
+- **The resources must be served by the site**, as the thirteen
+  `/resources/toxpredictor/` and `/resources/druglikeness` tables of
+  OpenChemLib's `resources.json`. The predictors are proved against a molecule
+  whose answer is known before anything is predicted, so tables that did not
+  load stop the run with one sentence instead of reading as four clean risks.
+- **`createWorker` may be written inline.** It is read when a worker is made,
+  never listed as a dependency, so a new function on every render costs nothing.
+- **`head={false}`** drops the formula and the name, for a host that already
+  shows them beside the panel.
+- **A risk square explains itself** when `loadDetail` is given: a matched
+  fragment is drawn and located on the molecule, and a compound on one of the
+  RTECS-derived lists says so instead of being highlighted whole.
 
 ## A graded series, and the shell around it
 
@@ -1707,7 +1772,9 @@ curl -s https://smiles.cheminfo.org/build-info.json
 **No stylesheet, nothing for a consumer to import.** Every rule is a
 module-level `CSSProperties` constant applied with `style`, the way `react-mf`
 does it — so there is no import step, no load-order surprise, and no specificity
-fight with Blueprint, since an inline rule outranks every selector.
+fight with Blueprint, since an inline rule outranks every selector. The
+exceptions are the stylesheets under `styles/` — the chrome, the deck, the
+card and the OSIRIS panel — each imported once by the page that needs it.
 
 A component never hard-codes a site's identity: what differs per site is passed
 in as props, or read from a CSS variable (`--brand`, `--brand-alt`, `--accent`)
