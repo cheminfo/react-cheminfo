@@ -1,0 +1,8 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-BYd3uCip.js";function n(){let e=[`Volume (mL)	pH`];for(let[t,n]of r)e.push(`${t}\t${n}`);return e.join(`
+`)}var r;function i(){return(i=e((()=>{r=[[0,2.88],[2,4.15],[4,4.58],[5,4.76],[6,4.93],[8,5.36],[9,5.71],[9.9,6.76],[10,8.72],[10.1,10.7],[11,11.68],[14,12.22],[20,12.52]]})))()}function a(e){let{children:t,width:n=560}=e;return(0,s.jsx)(`div`,{style:{...c,width:n},children:t})}function o(){let e=``;for(let[t,n]of r){let r=t/20*440+10,i=170-n/14*160;e+=`${e===``?`M`:`L`}${r.toFixed(1)},${i.toFixed(1)}`}return(0,s.jsxs)(`svg`,{width:460,height:180,viewBox:`0 0 460 180`,role:`img`,"aria-label":`pH against the volume of NaOH added`,children:[(0,s.jsx)(`rect`,{x:.5,y:.5,width:459,height:179,fill:`none`,stroke:`var(--border)`}),(0,s.jsx)(`path`,{d:e,fill:`none`,stroke:`var(--accent)`,strokeWidth:2})]})}var s,c;function l(){return(l=e((()=>{i(),s=t(),c={position:`relative`,margin:16,border:`1px solid var(--border)`,borderRadius:`var(--radius)`,overflow:`hidden`},a.__docgenInfo={description:`The frame a chat shows a card in: a box of a chat column's width, outlined
+the way the chat outlines it. The card inside is what the site draws.
+@param props - The card, and the width of the frame.
+@param props.children - The card.
+@param props.width - The frame's width, in pixels.
+@returns The frame.`,methods:[],displayName:`ChatFrame`,props:{children:{required:!0,tsType:{name:`ReactNode`},description:``},width:{required:!1,tsType:{name:`number`},description:``}}},o.__docgenInfo={description:`The titration curve, drawn as the figure of the card.
+@returns An SVG of the curve.`,methods:[],displayName:`TitrationCurve`}})))()}export{n as a,i,o as n,l as r,a as t};
