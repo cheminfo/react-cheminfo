@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t}from"./iframe-CuWlRz6M.js";function n(){let e=(0,r.useContext)(i);return(0,r.useCallback)(t=>e.has(t),[e])}var r,i;function a(){return(a=e((()=>{r=t(),i=(0,r.createContext)(new Set)})))()}export{a as n,n as r,i as t};
