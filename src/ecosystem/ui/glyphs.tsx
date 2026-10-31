@@ -602,4 +602,26 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // A zig-zag chain, the skeleton every structure is drawn from, with the
+  // electron-pushing arrow above it in the answering colour.
+  draw: (alt) => (
+    <>
+      <path
+        d="M5 24.5 11.5 19 18 24.5 24.5 19"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.5 14.5C14.5 7.5 23 6.5 25.4 12.6"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path d="M22.2 12.2 28 11.3 25.6 16.8Z" fill={alt} />
+    </>
+  ),
 };

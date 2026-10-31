@@ -350,6 +350,19 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brandAlt: '#a16207',
     mark: { plate: '#0072b2', accent: '#e69f00' },
   },
+  {
+    id: 'draw',
+    name: { lead: 'draw', alt: 'cheminfo', dot: true },
+    host: 'draw.cheminfo.org',
+    tagline: 'Journal-grade structures, in an SVG that keeps the chemistry.',
+    group: 'computing',
+    // The ink a structure is printed in.
+    brand: '#1f2a44',
+    // The red curly arrows are taught in sits at 3.5:1 on white, so the
+    // wordmark sets its second half in the darker red, at 5.9:1.
+    brandAlt: '#c0261d',
+    mark: { plate: '#1f2a44', accent: '#f04438' },
+  },
 ];
 
 /** How a link to a site is written, beyond the site itself. */
