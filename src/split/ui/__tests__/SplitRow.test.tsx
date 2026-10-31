@@ -124,7 +124,8 @@ test('a column that has a height to divide takes its share of it', () => {
     // 40% of the column, written as the flex share react-science lays the
     // other pane out with: (100 - 40) / 40 * 100 = 150.
     expect(markup).toContain('flex:150 0 0%');
-    expect(markup).toContain('padding-bottom:6px');
+    // The pane meets the bar, on the edge a column divides at.
+    expect(markup).toContain('padding-bottom:0');
   } finally {
     Object.defineProperty(globalThis, 'innerHeight', {
       value: previous,

@@ -65,9 +65,9 @@ export interface SplitPanesProps extends SplitRange {
    */
   stackBelow?: number;
   /**
-   * The gutter each pane keeps beside the splitter, in pixels, so neither
-   * figure is read against its edge.
-   * @default 6
+   * The gutter each pane keeps beside the splitter, in pixels. The bar is
+   * already the separation, so a gutter only widens it into a band of page.
+   * @default 0
    */
   gutter?: number;
   /**
@@ -234,7 +234,7 @@ const STACK_ACROSS = 860;
 const STACK_DOWN = 420;
 
 /** The gutter a pane keeps beside the splitter, in pixels. */
-const GUTTER = 6;
+const GUTTER = 0;
 
 /** The gap between the panes once they have stacked, in pixels. */
 const STACKED_GAP = 16;
