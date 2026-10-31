@@ -3,11 +3,19 @@ import { expect, test } from 'vitest';
 
 import type { FigureNotice } from '../../core/copyFigure.ts';
 import type { FigureFormat } from '../../core/downloadFigure.ts';
+import type { FigureResolutionUnit } from '../../core/figureDpi.ts';
+import { FIGURE_DPIS, dpiScale } from '../../core/figureDpi.ts';
 import type { FigureLayout } from '../../core/figureLayout.ts';
 import type { FigurePixels } from '../../core/figureScale.ts';
 import { FigureDownloadPanel } from '../FigureDownloadPanel.tsx';
 
 const SCREEN = { width: 720, height: 380 };
+
+/** A figure drawn to print 4 × 2 inches: 10.16 × 5.08 cm. */
+const PRINTED = { width: 384, height: 192 };
+
+/** The dots per inch offered, as multiples. */
+const DPI_SCALES = FIGURE_DPIS.map(dpiScale);
 
 test('a figure that cannot be drawn again is offered no size', () => {
   const html = panel({ format: 'svg', scale: 1 });
@@ -102,6 +110,46 @@ test('a browser that cannot copy a picture is told to save it', () => {
   );
 });
 
+test('a figure with a printed size is offered dots per inch', () => {
+  const html = panel({
+    format: 'png',
+    unit: 'dpi',
+    scales: DPI_SCALES,
+    scale: dpiScale(300),
+    size: PRINTED,
+  });
+
+  expect(html).toContain('>150 dpi<');
+  expect(html).toContain('>1200 dpi<');
+  expect(html).not.toContain('×<');
+  expect(html).toMatch(/title="4800 × 2400 pixels" tabindex/u);
+  expect(html).toContain('Saved 1200 × 600 pixels, which print 10.2 × 5.1 cm.');
+});
+
+test('an SVG with a printed size keeps it, and is offered no resolution', () => {
+  const html = panel({
+    format: 'svg',
+    unit: 'dpi',
+    svgAtOwnSize: true,
+    scales: DPI_SCALES,
+    scale: 1,
+    size: PRINTED,
+  });
+
+  expect(html).not.toContain('>Resolution<');
+  expect(html).toContain('Prints 10.2 × 5.1 cm, and stays sharp at any size.');
+});
+
+test('an SVG kept at its own size still lets the PNG pick a resolution', () => {
+  const svg = panel({ format: 'svg', svgAtOwnSize: true, scale: 1 });
+  const png = panel({ format: 'png', svgAtOwnSize: true });
+
+  expect(svg).not.toContain('>Resolution<');
+  expect(svg).toContain('Opens at 720 × 380 pixels');
+  expect(png).toContain('>Resolution<');
+  expect(png).toContain('>2×<');
+});
+
 interface PanelOptions {
   /** The file asked for. */
   format: FigureFormat;
@@ -117,6 +165,12 @@ interface PanelOptions {
   notice?: FigureNotice | null;
   /** Whether a save or a copy is running. */
   saving?: boolean;
+  /** How the resolution reads. */
+  unit?: FigureResolutionUnit;
+  /** The multiples offered. */
+  scales?: readonly number[];
+  /** Whether the SVG keeps the size it states. */
+  svgAtOwnSize?: boolean;
 }
 
 /**
@@ -127,12 +181,15 @@ interface PanelOptions {
 function panel(options: PanelOptions): string {
   const { format, layout, custom = null, scale = 2, size = SCREEN } = options;
   const { notice = null, saving = false } = options;
+  const { unit, scales = [1, 2, 3, 4], svgAtOwnSize } = options;
   return renderToStaticMarkup(
     <FigureDownloadPanel
       title="Save figure"
       format={format}
       scale={scale}
-      scales={[1, 2, 3, 4]}
+      scales={scales}
+      unit={unit}
+      svgAtOwnSize={svgAtOwnSize}
       size={size}
       failure={null}
       notice={notice}

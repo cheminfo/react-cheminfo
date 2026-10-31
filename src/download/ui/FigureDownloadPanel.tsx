@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 
+import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
@@ -7,12 +8,13 @@ import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
 import type { FigureNotice } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
+import type { FigureResolutionUnit } from '../core/figureDpi.ts';
+import { figureResolutionLabel } from '../core/figureDpi.ts';
 import { figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 import {
   figurePixels,
   figureScaleFits,
-  figureScaleLabel,
   formatFigurePixels,
 } from '../core/figureScale.ts';
 
@@ -30,6 +32,18 @@ export interface FigureDownloadPanelProps {
   scale: number;
   /** The multiples offered. */
   scales: readonly number[];
+  /**
+   * How the resolution reads: multiples of the figure on screen, or the dots
+   * per inch it has printed at its size on the page — 1× is 96 dpi.
+   * @default 'multiple'
+   */
+  unit?: FigureResolutionUnit;
+  /**
+   * Whether an SVG is saved at the size it states, whatever the resolution:
+   * the resolution then paints the PNG alone, and is not offered for the SVG.
+   * @default false
+   */
+  svgAtOwnSize?: boolean;
   /** How big the figure is on the page, or `null` where there is none. */
   size: FigurePixels | null;
   /** What went wrong the last time save was pressed, if anything. */
@@ -100,7 +114,9 @@ export function FigureDownloadPanel(
   const { title, format, scale, scales, size, failure, saving } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
   const { sizing, onCopy, notice = null, children } = props;
+  const { unit = 'multiple', svgAtOwnSize = false } = props;
   const t = useChromeT();
+  const language = useLanguage();
 
   // What the file is drawn at: the figure on screen, or the shape picked.
   const drawn =
@@ -109,13 +125,24 @@ export function FigureDownloadPanel(
       : figureLayoutSize(sizing.layout, size, sizing.custom ?? size);
 
   const painted = format === 'png' || rasterSvg;
+  const offerResolution = format === 'png' || !svgAtOwnSize;
+  const dpi = unit === 'dpi';
 
   return (
     <OverlayPanel
       title={title}
       width={PANEL_WIDTH}
       hint={hintOf(
-        { format, size: drawn, scale, failure, notice, rasterSvg },
+        {
+          format,
+          size: drawn,
+          scale,
+          failure,
+          notice,
+          rasterSvg,
+          unit,
+          language,
+        },
         t,
       )}
       actions={
@@ -152,20 +179,28 @@ export function FigureDownloadPanel(
       {sizing === undefined ? null : (
         <FigureSizeRows sizing={sizing} size={size} />
       )}
-      <OverlaySegmented
-        label={t('download.resolution')}
-        help={{
-          title: t('download.resolution'),
-          body: t('download.resolutionHelp'),
-          example: {
-            code: '2×',
-            note: t('download.resolutionExample'),
-          },
-        }}
-        value={String(scale)}
-        options={scaleChoices(scales, drawn, painted)}
-        onChange={(picked) => onScaleChange(Number(picked))}
-      />
+      {offerResolution ? (
+        <OverlaySegmented
+          label={t('download.resolution')}
+          help={{
+            title: t('download.resolution'),
+            body: t(
+              dpi ? 'download.resolutionDpiHelp' : 'download.resolutionHelp',
+            ),
+            example: {
+              code: dpi ? '300 dpi' : '2×',
+              note: t(
+                dpi
+                  ? 'download.resolutionDpiExample'
+                  : 'download.resolutionExample',
+              ),
+            },
+          }}
+          value={String(scale)}
+          options={scaleChoices(scales, drawn, painted, unit)}
+          onChange={(picked) => onScaleChange(Number(picked))}
+        />
+      ) : null}
     </OverlayPanel>
   );
 }
@@ -191,19 +226,21 @@ const FORMAT_CHOICES: ReadonlyArray<OverlayOption<FigureFormat>> = [
  * @param scales - The multiples the caller offers.
  * @param size - How big the figure is drawn for the file.
  * @param painted - Whether the file is painted into pixels.
+ * @param unit - How the resolution reads.
  * @returns The choices, in the order offered.
  */
 function scaleChoices(
   scales: readonly number[],
   size: FigurePixels | null,
   painted: boolean,
+  unit: FigureResolutionUnit,
 ): readonly OverlayOption[] {
   const choices: OverlayOption[] = [];
   for (const scale of scales) {
     const pixels = size === null ? null : figurePixels(size, scale);
     choices.push({
       value: String(scale),
-      label: figureScaleLabel(scale),
+      label: figureResolutionLabel(scale, unit),
       title: pixels === null ? undefined : formatFigurePixels(pixels),
       disabled: painted && size !== null && !figureScaleFits(size, scale),
     });

@@ -4,8 +4,19 @@ export { copySvg } from './copySvg.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
 export { downloadBlob } from './downloadBlob.ts';
 export type { DownloadFigureOptions, FigureFormat } from './downloadFigure.ts';
-export { downloadFigure } from './downloadFigure.ts';
+export { downloadFigure, downloadFigureSvg } from './downloadFigure.ts';
 export { downloadText } from './downloadText.ts';
+export type { FigureResolutionUnit } from './figureDpi.ts';
+export {
+  CSS_PIXELS_PER_INCH,
+  DEFAULT_FIGURE_DPI,
+  FIGURE_DPIS,
+  dpiScale,
+  figureCentimetres,
+  figureDpi,
+  figureResolutionLabel,
+  formatFigureCentimetres,
+} from './figureDpi.ts';
 export type { FigureLayout } from './figureLayout.ts';
 export {
   FIGURE_COLUMN_WIDTH,
@@ -53,6 +64,7 @@ export {
   figurePaintings,
   figureSize,
 } from './figureTarget.ts';
+export { pngDpi, withPngDpi } from './pngDpi.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';
 
 export { drawingIn, stackDrawings } from './stackedDrawing.ts';

@@ -11,7 +11,7 @@
 import { downloadBlob } from './downloadBlob.ts';
 import { figurePng } from './figurePng.ts';
 import { defaultFigureScale } from './figureScale.ts';
-import type { FigureSvgOptions } from './figureSvg.ts';
+import type { FigureSvg, FigureSvgOptions } from './figureSvg.ts';
 import { FIGURE_SVG_TYPE, figureSvg } from './figureSvg.ts';
 import { sanitizeFileName } from './sanitizeFileName.ts';
 
@@ -65,5 +65,30 @@ export async function downloadFigure(
     return;
   }
   const figure = figureSvg(target, { background });
+  downloadBlob(await figurePng(figure, scale), `${name}.png`);
+}
+
+/**
+ * Save a figure its page wrote as an SVG document itself, rather than one
+ * copied off the page: a drawing whose file carries more than its picture.
+ * The SVG is saved as written, at the size it states; the PNG is painted from
+ * it at the multiple asked for.
+ * @param figure - The document, and its size in pixels of the page.
+ * @param options - Which file, at what multiple, and its name; a background
+ * is the document's own business.
+ * @throws {Error} When the browser cannot paint it.
+ */
+export async function downloadFigureSvg(
+  figure: FigureSvg,
+  options: Omit<DownloadFigureOptions, 'background'> = {},
+): Promise<void> {
+  const { format = 'png', fileName = DEFAULT_FILE_NAME } = options;
+  const name = sanitizeFileName(fileName, DEFAULT_FILE_NAME);
+  if (format === 'svg') {
+    const blob = new Blob([figure.markup], { type: FIGURE_SVG_TYPE });
+    downloadBlob(blob, `${name}.svg`);
+    return;
+  }
+  const scale = options.scale ?? defaultFigureScale(format);
   downloadBlob(await figurePng(figure, scale), `${name}.png`);
 }

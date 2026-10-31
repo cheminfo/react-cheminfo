@@ -2,6 +2,8 @@ import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
 import type { FigureNotice } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
+import type { FigureResolutionUnit } from '../core/figureDpi.ts';
+import { formatFigureCentimetres } from '../core/figureDpi.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 import { figurePixels, formatFigurePixels } from '../core/figureScale.ts';
 
@@ -19,6 +21,10 @@ export interface HintState {
   notice: FigureNotice | null;
   /** Whether the SVG embeds a rendered picture. */
   rasterSvg: boolean;
+  /** How the resolution is offered; in dpi, the printed size is written out. */
+  unit: FigureResolutionUnit;
+  /** The language of the page, which the printed size is written in. */
+  language: string;
 }
 
 /**
@@ -31,6 +37,7 @@ export interface HintState {
  */
 export function hintOf(state: HintState, t: Translate<ChromeKey>): string {
   const { format, size, scale, failure, notice, rasterSvg } = state;
+  const { unit, language } = state;
   if (failure !== null) return failure;
   if (size === null) return t('download.noFigure');
   if (notice === 'copyUnsupported') return t('download.copyUnsupported');
@@ -45,6 +52,12 @@ export function hintOf(state: HintState, t: Translate<ChromeKey>): string {
     });
   }
   const pixels = formatFigurePixels(figurePixels(size, scale));
+  if (unit === 'dpi') {
+    const printed = formatFigureCentimetres(size, language);
+    return format === 'svg'
+      ? t('download.hintSvgDpi', printed)
+      : t('download.hintPngDpi', { pixels, ...printed });
+  }
   return format === 'svg'
     ? t('download.hintSvg', { pixels })
     : t('download.hintPng', { pixels });

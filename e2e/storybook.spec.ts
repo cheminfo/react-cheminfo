@@ -135,6 +135,8 @@ const STORY_IDS = [
   'download-figuredownload--no-background',
   'download-figuredownload--several-charts',
   'download-figuredownload--with-floating-chrome',
+  'download-printed-figure--on-the-page',
+  'download-printed-figure--written',
   'ecosystem-ecosystembutton--compact',
   'ecosystem-ecosystembutton--current-site',
   'ecosystem-ecosystembutton--default',

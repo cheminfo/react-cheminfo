@@ -137,7 +137,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Formulas**               | `readFormula`, `normalizeFormula`, `canonicalFormula`, `atomCounts`, `formulaHtml`, `formulaText` (all `/formula`)                                                                                                                                                                                                                     | `CopyableFormula`, `QuestionFormula`, `FormulaInput` (all `/formula`)                                                                                                                                                                                                                               |
 | **Site shell**             | `pageContentOf`; the `pages` option of `cheminfoPrerender` (`/vite`)                                                                                                                                                                                                                                                                   | `SiteShell`, `ShareControl`                                                                                                                                                                                                                                                                         |
 | **Properties**             | `copyableText`                                                                                                                                                                                                                                                                                                                         | `PropertyTable`                                                                                                                                                                                                                                                                                     |
-| **Clipboard & files**      | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`, `downloadFigure`, `figureSvg`, `figurePng`, `figureSize`                                                                                                                                                                       | `ClickToCopy`, `CopyButton`, `CopyableValue`, `CodeBlock`, `DelimitedTextDialog`, `FigureDownload`                                                                                                                                                                                                  |
+| **Clipboard & files**      | `writeToClipboard`, `downloadBlob`, `downloadText`, `sanitizeFileName`, `toDelimited`, `readDelimited`, `downloadFigure`, `figureSvg`, `figurePng`, `figureSize`, `dpiScale`, `withPngDpi`                                                                                                                                             | `ClickToCopy`, `CopyButton`, `CopyableValue`, `CodeBlock`, `DelimitedTextDialog`, `FigureDownload`                                                                                                                                                                                                  |
 | **Formatting & colour**    | `formatInteger`, `formatDecimal`, `formatBytes`, `pluralize`, `readableInk`, `contrastRatio`, `COLOR_SCALES`, `resolveColorScale`, `formatColorScale`, `colorAt`, `swatchAt`, `sampleScale`, `colorScaleGradient`, `rgbToHsv`                                                                                                          | `ColorScaleLegend`, `ColorScaleSelect`, `ColorScaleEditor`, `ColorScaleBar`                                                                                                                                                                                                                         |
 | **Number entry**           | `readNumber`, `numberText`, `isPartialNumber`, `stepNumber`, `snapToStep`                                                                                                                                                                                                                                                              | `NumberInput`                                                                                                                                                                                                                                                                                       |
 | **Range filter**           | `isRangeBounded`, `isRangeDomain`, `rangeHandles`, `movedRange`, `settleHandles`, `sameRange`, `rangeHistogramPath`, `OPEN_RANGE`                                                                                                                                                                                                      | `RangeSlider`                                                                                                                                                                                                                                                                                       |
@@ -758,8 +758,35 @@ Marking the box itself `data-figure="html"` paints everything in it, the key's
 labels included. The corner that selects the whole table shows itself only when
 pointed at or reached from the keyboard, and is neither printed nor saved.
 
-`downloadFigure(target, options)`, `figureSvg` and `figurePng` are the same thing
-without the button, for a site saving a figure from its own menu.
+Every PNG states its resolution, so a document places it at the size the figure
+has on the page rather than at one pixel per point: a pixel of the page is a
+ninety-sixth of an inch, so 2× is 192 dpi.
+
+A figure drawn to the size it prints at — a structure at a journal's bond
+length — takes **`unit="dpi"`**: the resolution is then offered as 150, 300,
+600 and 1200 dpi, the panel writes out the printed size in centimetres, and
+the SVG keeps the size it states.
+
+A page whose file carries more than its picture — the SMILES and InChIKey
+behind a drawn structure — passes **`writeFigure`** in place of `targetId`. It
+returns the SVG document and its size in pixels of the page; the SVG is saved as
+written, and the PNG is painted from it. With your own trigger, the hook takes
+the same options, and `onScaleChange` hands back the multiple picked, for a page
+that keeps it:
+
+```tsx
+const { isOpen, setOpen, panel } = useFigureDownload({
+  writeFigure: async () => ({ markup: await writeDrawing(), width, height }),
+  unit: 'dpi',
+  defaultScale: dpiScale(600),
+  onScaleChange: (scale) => savePreference(figureDpi(scale)),
+});
+```
+
+`downloadFigure(target, options)`, `downloadFigureSvg(figure, options)`,
+`figureSvg` and `figurePng` are the same thing without the button, for a site
+saving a figure from its own menu; `withPngDpi` and `pngDpi` write and read the
+resolution of any PNG.
 
 ### `RangeSlider`
 

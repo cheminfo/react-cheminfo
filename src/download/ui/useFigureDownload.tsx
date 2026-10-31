@@ -1,8 +1,13 @@
 import type { ReactElement, ReactNode } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
+import {
+  DEFAULT_FIGURE_DPI,
+  FIGURE_DPIS,
+  dpiScale,
+} from '../core/figureDpi.ts';
 import type { FigureLayout } from '../core/figureLayout.ts';
 import { figureLayoutRedraws, figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
@@ -14,64 +19,11 @@ import {
 import { figureSize } from '../core/figureTarget.ts';
 
 import { FigureDownloadPanel } from './FigureDownloadPanel.tsx';
+import type { FigureDownloadOptions } from './figureDownloadOptions.ts';
 import { useFigureActions } from './useFigureActions.ts';
-import type { FigureRenderer } from './useFigureRedraw.tsx';
 import { useFigureRedraw } from './useFigureRedraw.tsx';
 
-/** What the "Save figure" panel is set up with. */
-export interface FigureDownloadOptions {
-  /**
-   * The `id` of the box the figure is mounted in. Everything drawn inside it
-   * is saved — sixteen charts of a pair grid as readily as one scatter plot —
-   * and the controls floating over it are left behind.
-   */
-  targetId: string;
-  /**
-   * What the saved file is called, without its extension. Name it after the
-   * data rather than after the tool: a reader with four of these in a
-   * downloads folder cannot tell four `figure.png` apart.
-   * @default 'figure'
-   */
-  fileName?: string;
-  /**
-   * The format it opens on.
-   * @default 'png'
-   */
-  defaultFormat?: FigureFormat;
-  /**
-   * The resolution a PNG opens on, as a multiple of the figure on screen. An
-   * SVG opens at 1×, the size it has on screen, and each format keeps the
-   * multiple the reader last picked for it.
-   * @default 2
-   */
-  defaultScale?: number;
-  /**
-   * The resolutions offered.
-   * @default [1, 2, 3, 4]
-   */
-  scales?: readonly number[];
-  /**
-   * What is painted under the figure. `transparent` leaves it unpainted, for a
-   * figure going onto a coloured slide.
-   * @default the surface the figure is drawn on
-   */
-  background?: string;
-  /**
-   * What the panel is called.
-   * @default the chrome's own line, in the language of the page
-   */
-  title?: string;
-  /**
-   * Draws the figure at a size, for a file. When it is given the panel offers
-   * a size — as shown, 4:3, 16:9, a journal column, or typed — and a figure
-   * saved at a size other than its own is drawn again at that size, off the
-   * page, so its axes and labels are laid out for the new shape rather than
-   * stretched into it. Draw exactly what is on screen, with the same data,
-   * zoom and colours; only the box changes.
-   * @default undefined — the figure is saved at the size it has on screen
-   */
-  renderFigure?: FigureRenderer;
-}
+export type { FigureDownloadOptions } from './figureDownloadOptions.ts';
 
 /** What {@link useFigureDownload} hands back. */
 export interface FigureDownloadState {
@@ -93,6 +45,9 @@ export interface FigureDownloadState {
   portal: ReactNode;
 }
 
+/** The dots per inch offered, as the multiples the figure is painted at. */
+const DPI_SCALES = FIGURE_DPIS.map(dpiScale);
+
 /**
  * The "Save figure" panel — save as PNG or SVG, or copy as PNG — for a caller
  * that brings its own trigger, such as a button in an editor's toolbar.
@@ -103,10 +58,18 @@ export interface FigureDownloadState {
 export function useFigureDownload(
   options: FigureDownloadOptions,
 ): FigureDownloadState {
-  const { targetId, fileName, background, scales = FIGURE_SCALES } = options;
-  const { defaultFormat = 'png', defaultScale = DEFAULT_FIGURE_SCALE } =
-    options;
-  const { title, renderFigure } = options;
+  const { targetId, writeFigure, fileName, background } = options;
+  const { unit = 'multiple', defaultFormat = 'png' } = options;
+  const { title, renderFigure, onScaleChange } = options;
+  const dpi = unit === 'dpi';
+  const scales = options.scales ?? (dpi ? DPI_SCALES : FIGURE_SCALES);
+  const defaultScale =
+    options.defaultScale ??
+    (dpi ? dpiScale(DEFAULT_FIGURE_DPI) : DEFAULT_FIGURE_SCALE);
+  // A figure with a printed size, or one its page wrote, keeps the size its
+  // SVG states: the resolution is then the PNG's alone.
+  const svgAtOwnSize = dpi || writeFigure !== undefined;
+  const redraws = renderFigure !== undefined && writeFigure === undefined;
 
   const t = useChromeT();
   const [isOpen, setIsOpen] = useState(false);
@@ -115,19 +78,23 @@ export function useFigureDownload(
     png: defaultScale,
     svg: defaultFigureScale('svg'),
   }));
-  const scale = picked[format];
+  const scale = format === 'svg' && svgAtOwnSize ? 1 : picked[format];
   const [size, setSize] = useState<FigurePixels | null>(null);
+  const opening = useRef(0);
   const [layout, setLayout] = useState<FigureLayout>('screen');
   const [custom, setCustom] = useState<FigurePixels | null>(null);
-  const { redraw, portal } = useFigureRedraw(renderFigure);
+  const { redraw, portal } = useFigureRedraw(
+    redraws ? renderFigure : undefined,
+  );
   const redrawAt =
-    renderFigure !== undefined &&
+    redraws &&
     size !== null &&
     figureLayoutRedraws(layout, size, custom ?? size)
       ? figureLayoutSize(layout, size, custom ?? size)
       : null;
   const { save, copy, busy, failure, notice, clear } = useFigureActions({
     targetId,
+    writeFigure,
     format,
     scale,
     fileName,
@@ -144,10 +111,26 @@ export function useFigureDownload(
     (next: boolean) => {
       setIsOpen(next);
       if (!next) return;
-      setSize(figureSize(targetId));
       clear();
+      if (writeFigure === undefined) {
+        setSize(targetId === undefined ? null : figureSize(targetId));
+        return;
+      }
+      // A written figure is measured once it is written; only the last
+      // opening is answered.
+      opening.current += 1;
+      const ticket = opening.current;
+      writeFigure().then(
+        (figure) => {
+          if (ticket !== opening.current) return;
+          setSize({ width: figure.width, height: figure.height });
+        },
+        () => {
+          if (ticket === opening.current) setSize(null);
+        },
+      );
     },
-    [targetId, clear],
+    [targetId, writeFigure, clear],
   );
 
   // What the last copy came to only describes the choices it was made with.
@@ -164,25 +147,28 @@ export function useFigureDownload(
       format={format}
       scale={scale}
       scales={scales}
+      unit={unit}
+      svgAtOwnSize={svgAtOwnSize}
       size={size}
       failure={failure}
       notice={notice}
       saving={busy}
       onFormatChange={changed(setFormat)}
-      onScaleChange={changed((next: number) =>
-        setPicked((current) => ({ ...current, [format]: next })),
-      )}
+      onScaleChange={changed((next: number) => {
+        setPicked((current) => ({ ...current, [format]: next }));
+        if (format === 'png') onScaleChange?.(next);
+      })}
       onSave={save}
       onCopy={copy}
       sizing={
-        renderFigure === undefined
-          ? undefined
-          : {
+        redraws
+          ? {
               layout,
               custom,
               onLayoutChange: changed(setLayout),
               onCustomChange: changed(setCustom),
             }
+          : undefined
       }
     />
   );

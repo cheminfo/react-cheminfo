@@ -1,8 +1,9 @@
 import { copyFigure } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
-import { downloadFigure } from '../core/downloadFigure.ts';
+import { downloadFigure, downloadFigureSvg } from '../core/downloadFigure.ts';
 import { figurePng } from '../core/figurePng.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
+import type { FigureSvg } from '../core/figureSvg.ts';
 import { figureSvg } from '../core/figureSvg.ts';
 
 import type { FigureRedraw } from './useFigureRedraw.tsx';
@@ -12,7 +13,9 @@ import { useFigureTask } from './useFigureTask.ts';
 /** What {@link useFigureActions} works from. */
 export interface FigureActionsOptions {
   /** The `id` of the box the figure is mounted in. */
-  targetId: string;
+  targetId?: string;
+  /** Writes the figure, in place of reading it off the page. */
+  writeFigure?: () => Promise<FigureSvg>;
   /** Which file save writes. */
   format: FigureFormat;
   /** The multiple of the figure on screen it is painted at. */
@@ -47,17 +50,26 @@ export interface FigureActions extends Omit<FigureTask, 'run'> {
  * @returns See {@link FigureActions}.
  */
 export function useFigureActions(options: FigureActionsOptions): FigureActions {
-  const { targetId, format, scale, fileName, background } = options;
+  const { targetId, writeFigure, format, scale, fileName, background } =
+    options;
   const { redrawAt, redraw } = options;
   const { run, busy, failure, notice, clear } = useFigureTask();
 
-  function withFigure(write: (box: string | Element) => Promise<void>) {
+  async function withFigure(write: (box: string | Element) => Promise<void>) {
+    if (targetId === undefined) throw new Error('There is no figure to save.');
     return redrawAt === null
       ? write(targetId)
       : redraw(targetId, redrawAt, write);
   }
 
   function save(): void {
+    if (writeFigure !== undefined) {
+      const written = writeFigure().then((figure) =>
+        downloadFigureSvg(figure, { format, scale, fileName }),
+      );
+      run(written.then(() => null));
+      return;
+    }
     const options = { format, scale, fileName, background };
     run(withFigure((box) => downloadFigure(box, options)).then(() => null));
   }
@@ -65,11 +77,14 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
   function copy(): void {
     // The clipboard is written before anything is awaited, with the picture
     // still being painted: Safari only allows a write the click itself started.
-    const png = new Promise<Blob>((resolve, reject) => {
-      withFigure(async (box) => {
-        resolve(await figurePng(figureSvg(box, { background }), scale));
-      }).catch(reject);
-    });
+    const png =
+      writeFigure === undefined
+        ? new Promise<Blob>((resolve, reject) => {
+            withFigure(async (box) => {
+              resolve(await figurePng(figureSvg(box, { background }), scale));
+            }).catch(reject);
+          })
+        : writeFigure().then((figure) => figurePng(figure, scale));
     run(copyFigure(png));
   }
 

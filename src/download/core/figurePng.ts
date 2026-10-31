@@ -6,11 +6,16 @@
  * the figure that was read, and two drawing paths are two things to keep in
  * step. Scaling is the browser's own, so a figure saved at three times is
  * genuinely three times the detail rather than a stretched screenshot.
+ *
+ * The file states its resolution, so a document places it at the size the
+ * figure has on the page rather than at one pixel per point.
  */
 
+import { figureDpi } from './figureDpi.ts';
 import { DEFAULT_FIGURE_SCALE, figurePixels } from './figureScale.ts';
 import type { FigureSvg } from './figureSvg.ts';
 import { FIGURE_SVG_TYPE } from './figureSvg.ts';
+import { withPngDpi } from './pngDpi.ts';
 
 /** What a saved raster figure is. */
 export const FIGURE_PNG_TYPE = 'image/png';
@@ -19,7 +24,7 @@ export const FIGURE_PNG_TYPE = 'image/png';
  * The figure as a PNG.
  * @param figure - The figure, already copied off the page.
  * @param scale - How many pixels are painted per pixel on screen.
- * @returns The image.
+ * @returns The image, stating `96 × scale` dots per inch.
  * @throws {Error} When the browser cannot paint or encode it.
  */
 export async function figurePng(
@@ -38,7 +43,11 @@ export async function figurePng(
   }
   context.drawImage(drawing, 0, 0, pixels.width, pixels.height);
 
-  return encode(canvas);
+  const encoded = await encode(canvas);
+  const png = new Uint8Array(await encoded.arrayBuffer());
+  return new Blob([withPngDpi(png, figureDpi(scale))], {
+    type: FIGURE_PNG_TYPE,
+  });
 }
 
 /**
