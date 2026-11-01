@@ -24,8 +24,16 @@ test('the container takes the class and the style the site gives it', () => {
     />,
   );
 
-  expect(markup).toContain('class="draw-card__editor"');
+  expect(markup).toContain('class="structure-editor draw-card__editor"');
   expect(markup).toContain('border-radius:0');
   // The packaged style is still underneath the one the site merged over it.
   expect(markup).toContain('overflow:hidden');
+});
+
+test('the box the editor is drawn in comes from the stylesheet', () => {
+  const markup = renderToStaticMarkup(<StructureEditor onChange={noop} />);
+
+  expect(markup).toContain('class="structure-editor"');
+  expect(markup).not.toContain('border:');
+  expect(markup).not.toContain('border-radius:');
 });

@@ -820,6 +820,14 @@ a.source-badge:hover {
   color: var(--text-muted);
 }
 
+/* The box a structure editor is drawn in. A class rather than an inline style,
+   so a framed page whose editor is the figure can let it meet the frame. */
+.structure-editor {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
 /* The structure export dialog: the picture of the structure on the left, with
    the resolution it leaves at, and every notation of it stacked on the right. */
 .structure-export__body {

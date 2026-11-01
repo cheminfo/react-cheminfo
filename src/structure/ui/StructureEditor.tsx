@@ -88,7 +88,11 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
   return (
     <div
       ref={containerRef}
-      className={className}
+      className={
+        className === undefined
+          ? 'structure-editor'
+          : `structure-editor ${className}`
+      }
       style={{ ...ROOT_STYLE, minHeight, ...style }}
       {...drop.targetProps}
     >
@@ -152,15 +156,13 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
  * own height is what the measured toolbar floor writes on it. The `minHeight`
  * prop is applied on top of this at first render: without a height before the
  * toolbar has been measured, the editor is built at zero size and never paints
- * the structure it was given.
+ * the structure it was given. The box it is drawn in is `.structure-editor` in
+ * `chrome.css`, so a site can take it away with a rule rather than `!important`.
  */
 const ROOT_STYLE: CSSProperties = {
   position: 'relative',
   overflow: 'hidden',
   boxSizing: 'border-box',
-  border: `1px solid ${TOKEN.border}`,
-  borderRadius: 6,
-  background: '#fff',
 };
 
 /**
