@@ -11,6 +11,12 @@ export type {
   ConformerRowRefinement,
 } from './conformerEnergy.ts';
 export {
+  GFN2_DRUGLIKE_ENERGY_ERROR,
+  GFN2_ENERGY_ERROR,
+  MMFF94_ENERGY_ERROR,
+  shareFactor,
+} from './conformerEnergyError.ts';
+export {
   bestRanking,
   relativeEnergyOf,
   totalEnergyOf,

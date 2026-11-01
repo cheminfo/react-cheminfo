@@ -41,6 +41,8 @@ export * from './taxonomy/ui/index.ts';
 // barrel: `structure/ui/index.ts` is the door that must never reach react-ocl,
 // and this component does not, but `react-cheminfo/conformers` is imported by
 // workers and must never reach React.
+export type { ConformerShareNoteProps } from './structure/ui/ConformerShareNote.tsx';
+export { ConformerShareNote } from './structure/ui/ConformerShareNote.tsx';
 export type { ConformerTableProps } from './structure/ui/ConformerTable.tsx';
 export { ConformerTable } from './structure/ui/ConformerTable.tsx';
 export type { ConformerColumn } from './structure/ui/conformerColumns.ts';
