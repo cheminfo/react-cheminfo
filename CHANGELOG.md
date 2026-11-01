@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.81.0](https://github.com/cheminfo/react-cheminfo/compare/v0.80.0...v0.81.0) (2026-11-01)
+
+
+### Features
+
+* draw the structure editor's box from the stylesheet ([0b2a146](https://github.com/cheminfo/react-cheminfo/commit/0b2a146f519dada879dc484f205dbadb8598b1da))
+
 ## [0.80.0](https://github.com/cheminfo/react-cheminfo/compare/v0.79.0...v0.80.0) (2026-11-01)
 
 
