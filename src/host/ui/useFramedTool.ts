@@ -3,6 +3,7 @@
  * keep what it sends back, and ask it for other values.
  */
 
+import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type {
@@ -25,7 +26,10 @@ export interface FramedToolOptions {
   host: string;
   /**
    * The document to show, or `null` while there is none. It is handed over
-   * whenever its `document` changes, and never twice in a row.
+   * whenever its `document` changes, and never twice in a row — and only while
+   * the frame can be seen: a frame in a collapsed panel or a hidden tab is
+   * handed the latest document when it shows again, so the tool computes
+   * nothing nobody looks at.
    */
   document: ToolDocument | null;
   /**
@@ -92,13 +96,17 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
     frame.current = element;
   }, []);
   const connection = useRef<ToolConnection | null>(null);
-  const latest = useRef(document);
+  const visible = useFrameVisibility(frame);
+  // What the tool is to show: the document, but only once the frame is seen.
+  const [shown, setShown] = useState<ToolDocument | null>(null);
+  if (visible && shown !== document) setShown(document);
+  const latest = useRef(shown);
   const [link, setLink] = useState<Link | null>(null);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [held, setHeld] = useState<Held | null>(null);
 
   useEffect(() => {
-    latest.current = document;
+    latest.current = shown;
   });
 
   useEffect(() => {
@@ -139,15 +147,15 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
     };
   }, [url, host, helloTimeout]);
 
-  const name = document?.document ?? null;
+  const name = shown?.document ?? null;
   useEffect(() => {
     const opened = connection.current;
-    const shown = latest.current;
-    if (opened === null || shown === null) return;
-    const key = `${url}\n${shown.document}`;
-    void opened.load(shown).then(async (outcome) => {
+    const handed = latest.current;
+    if (opened === null || handed === null) return;
+    const key = `${url}\n${handed.document}`;
+    void opened.load(handed).then(async (outcome) => {
       setAnswer({ key, outcome });
-      const accept = shown.accept ?? [];
+      const accept = handed.accept ?? [];
       if (outcome.status !== 'loaded' || accept.length === 0) return;
       // What the tool held once it showed the document is never sent unasked.
       const items = await opened.get(accept).catch(() => []);
@@ -180,6 +188,36 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
     outputs: held !== null && held.key === key ? held.outputs : NO_OUTPUTS,
     get,
   };
+}
+
+/**
+ * Whether the frame can be seen. Nothing counts as seen before the first
+ * report, so a frame mounted hidden is handed nothing in between; where the
+ * browser cannot tell, the frame always counts as seen.
+ * @param frame - The frame.
+ * @returns Whether it is shown.
+ */
+function useFrameVisibility(
+  frame: RefObject<HTMLIFrameElement | null>,
+): boolean {
+  const [visible, setVisible] = useState(
+    () => typeof IntersectionObserver === 'undefined',
+  );
+  useEffect(() => {
+    const element = frame.current;
+    if (element === null || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries.at(-1);
+      if (entry !== undefined) setVisible(entry.isIntersecting);
+    });
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, [frame]);
+  return visible;
 }
 
 interface Link {
