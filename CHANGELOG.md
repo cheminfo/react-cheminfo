@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.78.0](https://github.com/cheminfo/react-cheminfo/compare/v0.77.0...v0.78.0) (2026-11-01)
+
+
+### Features
+
+* let a site frame a tool and ask it for outputs ([7d60691](https://github.com/cheminfo/react-cheminfo/commit/7d60691c5b429aea86ea878698f51d4b935723e9))
+
 ## [0.77.0](https://github.com/cheminfo/react-cheminfo/compare/v0.76.0...v0.77.0) (2026-10-31)
 
 
