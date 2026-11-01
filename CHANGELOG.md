@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.80.0](https://github.com/cheminfo/react-cheminfo/compare/v0.79.0...v0.80.0) (2026-11-01)
+
+
+### Features
+
+* add the storage door: IndexedDB, autosave, tab claims and backups ([98715f6](https://github.com/cheminfo/react-cheminfo/commit/98715f638ce22c5d513d4af4ad23d5f8ebe86bbb))
+* crop a figure to what is painted on it ([1d7ce2f](https://github.com/cheminfo/react-cheminfo/commit/1d7ce2fd3b3446c25d4aaa9f5719bc1053e59460))
+* lead a side panel's header with its chevron, and let a stack say which panels fill the screen ([dd79749](https://github.com/cheminfo/react-cheminfo/commit/dd797497941e1f0d1902119552dd4bed7c9674e3))
+
+
+### Bug Fixes
+
+* let a framed page keep no gutter, so its figure runs to the frame ([01820d4](https://github.com/cheminfo/react-cheminfo/commit/01820d4c4707596100732891526370a05d0b52ff))
+
 ## [0.79.0](https://github.com/cheminfo/react-cheminfo/compare/v0.78.0...v0.79.0) (2026-11-01)
 
 
