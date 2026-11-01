@@ -823,5 +823,10 @@
   "panel.clearFilter": "Clear the filter",
   "panel.colourOf": "Colour of {name}",
   "panel.drawIn": "Draw {name} in {color}",
-  "panel.changeColour": "Draw this spectrum in another colour"
+  "panel.changeColour": "Draw this spectrum in another colour",
+  "framedTool.about": "About {host}",
+  "framedTool.cite": "How to cite {host}",
+  "framedTool.citeUnknown": "{host} has not said here how to cite it. Its About page does.",
+  "framedTool.help": "How to use {host}",
+  "framedTool.open": "Open {host} in a new tab"
 }

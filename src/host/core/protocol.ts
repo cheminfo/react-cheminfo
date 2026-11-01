@@ -10,7 +10,10 @@
  * arrives as the untrusted input it is.
  */
 
+import type { CitedWork } from '../../citation/core/works.ts';
+
 import { isRecord, readItems, readStrings } from './messageValues.ts';
+import type { ToolHelp } from './toolCredits.ts';
 
 export { MAX_ITEMS, MAX_LABEL_LENGTH } from './messageValues.ts';
 
@@ -90,6 +93,17 @@ export interface HelloMessage {
     origin: string;
     /** The build that is running, as the About states it, or `null`. */
     build: unknown;
+    /**
+     * The works the tool's About asks to be cited for, the platform paper
+     * first, so a host that frames it can say how to cite it.
+     * @default undefined — the tool did not say
+     */
+    cite?: CitedWork[];
+    /**
+     * Help on the page the host frames.
+     * @default undefined — the page needs none
+     */
+    help?: ToolHelp;
   };
 }
 

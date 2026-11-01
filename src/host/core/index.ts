@@ -67,5 +67,12 @@ export type {
 export { NAME_SCHEMA, SVG_IMAGE_SCHEMA, TABLE_SCHEMA } from './resultKinds.ts';
 export type { InputSelection, LoadedInput } from './selectInputs.ts';
 export { selectInputs } from './selectInputs.ts';
+export type { ToolHelp } from './toolCredits.ts';
+export {
+  MAX_CITED_WORKS,
+  readCitedWorks,
+  readToolHelp,
+} from './toolCredits.ts';
+export { toolAboutUrl, toolPageUrl } from './toolPage.ts';
 export type { ToolHello } from './toolMessages.ts';
 export { readHello, readToolMessage } from './toolMessages.ts';

@@ -24,6 +24,7 @@ import type {
   UsedItem,
 } from './protocol.ts';
 import { HELLO_TYPE, PROTOCOL_VERSION } from './protocol.ts';
+import { readCitedWorks, readToolHelp } from './toolCredits.ts';
 
 /** What a tool says of itself in `hello`. */
 export type ToolHello = HelloMessage['tool'];
@@ -59,13 +60,18 @@ export function readHello(data: unknown): ToolHello | null {
   ) {
     return null;
   }
-  return {
+  const hello: ToolHello = {
     name: tool.name.slice(0, MAX_LABEL_LENGTH),
     origin: tool.origin,
     build: tool.build ?? null,
     inputs: readInputs(tool.inputs),
     outputs: readOutputs(tool.outputs),
   };
+  const cite = readCitedWorks(tool.cite);
+  if (cite !== undefined) hello.cite = cite;
+  const help = readToolHelp(tool.help);
+  if (help !== undefined) hello.help = help;
+  return hello;
 }
 
 /**

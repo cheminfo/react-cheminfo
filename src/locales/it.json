@@ -823,5 +823,10 @@
   "panel.clearFilter": "Cancella il filtro",
   "panel.colourOf": "Colore di {name}",
   "panel.drawIn": "Disegna {name} in {color}",
-  "panel.changeColour": "Disegna questo spettro in un altro colore"
+  "panel.changeColour": "Disegna questo spettro in un altro colore",
+  "framedTool.about": "Informazioni su {host}",
+  "framedTool.cite": "Come citare {host}",
+  "framedTool.citeUnknown": "{host} non ha indicato qui come citarlo. La sua pagina Informazioni lo indica.",
+  "framedTool.help": "Come usare {host}",
+  "framedTool.open": "Apri {host} in una nuova scheda"
 }

@@ -7,9 +7,11 @@
 
 import { useEffect, useRef } from 'react';
 
+import type { CitedWork } from '../../citation/core/works.ts';
 import type { HostOutputs } from '../core/hostOutputs.ts';
 import type { ToolInterface } from '../core/protocol.ts';
 import type { LoadedInput } from '../core/selectInputs.ts';
+import type { ToolHelp } from '../core/toolCredits.ts';
 
 /** What a tool does with what its host sends, and what it says about itself. */
 export interface HostHandlers {
@@ -32,6 +34,18 @@ export interface HostHandlers {
    * @default null
    */
   build?: unknown;
+  /**
+   * The works the About asks to be cited for — `ABOUT.cite` — so a page that
+   * frames the tool says how to cite it.
+   * @default undefined — the host is told nothing
+   */
+  cite?: readonly CitedWork[];
+  /**
+   * Help on the page a host frames, for its toolbar: what the page is for and
+   * how to use it, in at most three short paragraphs.
+   * @default undefined — the page needs none
+   */
+  help?: ToolHelp;
 }
 
 /** Once per page: React may mount the caller twice, the host is greeted once. */
@@ -75,6 +89,12 @@ export function useHostConnection(
           tool,
           origin: globalThis.location.origin,
           build: latest.current.build ?? null,
+          ...(latest.current.cite === undefined
+            ? {}
+            : { cite: latest.current.cite }),
+          ...(latest.current.help === undefined
+            ? {}
+            : { help: latest.current.help }),
           load: (inputs) => latest.current.load(inputs),
           ...(latest.current.outputs === undefined
             ? {}

@@ -7,6 +7,8 @@
  * whole exchange with a fake host and a real `MessageChannel`.
  */
 
+import type { CitedWork } from '../../citation/core/works.ts';
+
 import type { HostOutputs } from './hostOutputs.ts';
 import {
   OUTPUT_DELAY,
@@ -28,6 +30,7 @@ import {
 } from './protocol.ts';
 import type { LoadedInput } from './selectInputs.ts';
 import { selectInputs } from './selectInputs.ts';
+import type { ToolHelp } from './toolCredits.ts';
 
 export type { InputSelection, LoadedInput } from './selectInputs.ts';
 export { selectInputs } from './selectInputs.ts';
@@ -51,6 +54,16 @@ export interface HostConnectionOptions {
   origin: string;
   /** The build that is running, as the About states it, or `null`. */
   build: unknown;
+  /**
+   * The works the About asks to be cited for, as `hello` states them.
+   * @default undefined — `hello` names none
+   */
+  cite?: readonly CitedWork[];
+  /**
+   * Help on the page, as `hello` states it.
+   * @default undefined — `hello` carries none
+   */
+  help?: ToolHelp;
   /**
    * Show the inputs of a new document. Throwing, or rejecting, means they
    * could not be read: the error's message goes back to the host, and the
@@ -84,7 +97,8 @@ export interface HostConnectionOptions {
  * @returns The function that stops listening and closes the port.
  */
 export function connectHost(options: HostConnectionOptions): () => void {
-  const { host, listen, tool, origin, build, load, outputs } = options;
+  const { host, listen, tool, origin, build, cite, help, load, outputs } =
+    options;
   const { outputDelay = OUTPUT_DELAY } = options;
   let port: MessagePort | null = null;
   let appliedDocument: string | null = null;
@@ -181,6 +195,8 @@ export function connectHost(options: HostConnectionOptions): () => void {
       build,
       inputs: tool.inputs,
       outputs: tool.outputs,
+      ...(cite === undefined || cite.length === 0 ? {} : { cite: [...cite] }),
+      ...(help === undefined ? {} : { help }),
     },
   };
   // `hello` says nothing a stranger may not read, and the parent's origin is

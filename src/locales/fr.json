@@ -823,5 +823,10 @@
   "panel.clearFilter": "Effacer le filtre",
   "panel.colourOf": "Couleur de {name}",
   "panel.drawIn": "Tracer {name} en {color}",
-  "panel.changeColour": "Tracer ce spectre dans une autre couleur"
+  "panel.changeColour": "Tracer ce spectre dans une autre couleur",
+  "framedTool.about": "À propos de {host}",
+  "framedTool.cite": "Comment citer {host}",
+  "framedTool.citeUnknown": "{host} n'a pas indiqué ici comment le citer. Sa page À propos le fait.",
+  "framedTool.help": "Comment utiliser {host}",
+  "framedTool.open": "Ouvrir {host} dans un nouvel onglet"
 }
