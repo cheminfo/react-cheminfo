@@ -1,6 +1,9 @@
 export type { FigureNotice } from './copyFigure.ts';
 export { copyFigure } from './copyFigure.ts';
 export { copySvg } from './copySvg.ts';
+export { cropFigure } from './cropFigure.ts';
+export type { RasterFigureSource } from './croppedMarkup.ts';
+export { croppedSvgMarkup, rasterFigureSource } from './croppedMarkup.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
 export { downloadBlob } from './downloadBlob.ts';
 export type { DownloadFigureOptions, FigureFormat } from './downloadFigure.ts';
@@ -64,6 +67,7 @@ export {
   figurePaintings,
   figureSize,
 } from './figureTarget.ts';
+export { paintedBox } from './paintedBox.ts';
 export { pngDpi, withPngDpi } from './pngDpi.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';
 
