@@ -7,6 +7,23 @@ import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement } from '../core/measurement.ts';
 import type { Molecule3DSettings, Molecule3DTools } from '../core/settings.ts';
 
+/** The scene on screen, rendered as a picture on request. */
+export interface Molecule3DCapture {
+  /**
+   * Render the scene as an SVG document holding the rendered image: a molecule
+   * drawn by WebGL has no vector form.
+   * @param scale - Multiple of the canvas on screen it is rendered at.
+   * @returns The SVG markup.
+   */
+  svg: (scale: number) => Promise<string>;
+  /**
+   * Render the scene as a PNG.
+   * @param scale - Multiple of the canvas on screen it is rendered at.
+   * @returns The PNG.
+   */
+  png: (scale: number) => Promise<Blob>;
+}
+
 /**
  * Props of `MoleculeViewer3D`.
  *
@@ -129,6 +146,13 @@ export interface MoleculeViewer3DProps {
    * @default 'molecule'
    */
   fileName?: string;
+  /**
+   * Handed the means to render the scene on screen once the viewer exists, and
+   * `null` when it goes — for a page that hands the picture on, to a host
+   * framing it. Keep it stable: a new function is handed the means again.
+   * @default undefined
+   */
+  onCapture?: (capture: Molecule3DCapture | null) => void;
   /**
    * Scene background, as `#rrggbb`.
    * @default '#ffffff'

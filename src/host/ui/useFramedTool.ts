@@ -1,0 +1,213 @@
+/**
+ * Frame a tool of the family and talk to it: hand it the document to show,
+ * keep what it sends back, and ask it for other values.
+ */
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import type {
+  LoadOutcome,
+  ToolConnection,
+  ToolDocument,
+} from '../core/connectTool.ts';
+import { connectTool } from '../core/connectTool.ts';
+import type { HostItem } from '../core/protocol.ts';
+import type { ToolHello } from '../core/toolMessages.ts';
+
+/** What {@link useFramedTool} frames, and what it hands over. */
+export interface FramedToolOptions {
+  /**
+   * The address the frame opens, `?embed=1` included. Its origin is the only
+   * one talked to.
+   */
+  url: string;
+  /** How the host introduces itself to the tool. */
+  host: string;
+  /**
+   * The document to show, or `null` while there is none. It is handed over
+   * whenever its `document` changes, and never twice in a row.
+   */
+  document: ToolDocument | null;
+  /**
+   * How long the tool has to say `hello` before it counts as unavailable, in
+   * milliseconds.
+   * @default HELLO_TIMEOUT
+   */
+  helloTimeout?: number;
+}
+
+/** Whether the tool answered: still loading, talking, or silent past the wait. */
+export type FramedToolStatus = 'connecting' | 'connected' | 'unavailable';
+
+/** A framed tool, as the host page sees it. */
+export interface FramedTool {
+  /**
+   * The callback ref of the `<iframe>`, rendered with the hook and given no
+   * `src` of its own: the address is set once this page listens, so the
+   * tool's `hello` cannot be missed.
+   */
+  attachFrame: (element: HTMLIFrameElement | null) => void;
+  /**
+   * Show the frame on the whole screen, from a click; Esc brings it back.
+   * Rejects where the browser will not.
+   */
+  fullscreen: () => Promise<void>;
+  /** Whether the tool answered. */
+  status: FramedToolStatus;
+  /** What the tool said it takes and gives, once it has. */
+  tool: ToolHello | null;
+  /** What became of the document on screen, once the tool answered. */
+  outcome: LoadOutcome | null;
+  /**
+   * The values the document's `accept` names, by output key: those the tool
+   * held once it showed the document, then every change it sent.
+   */
+  outputs: ReadonlyMap<string, HostItem>;
+  /** Ask for the current value of some outputs; rejects with the tool's reason. */
+  get: (keys: readonly string[]) => Promise<HostItem[]>;
+}
+
+/**
+ * How long a tool has to say `hello`, in milliseconds: a cold start fetches the
+ * tool's page, its scripts and its fonts, on a slow line as well.
+ */
+export const HELLO_TIMEOUT = 20_000;
+
+const NO_OUTPUTS: ReadonlyMap<string, HostItem> = new Map();
+
+/**
+ * Frame a tool, and keep it showing a document.
+ *
+ * The frame is opened once and stays: a new document goes to the tool through
+ * the protocol, the way a host hands over data, rather than as a new address
+ * that would reload the tool and lose what its visitor did in it. A tool that
+ * reloads all the same is handed the document again.
+ * @param options - See {@link FramedToolOptions}.
+ * @returns See {@link FramedTool}.
+ */
+export function useFramedTool(options: FramedToolOptions): FramedTool {
+  const { url, host, document, helloTimeout = HELLO_TIMEOUT } = options;
+  const frame = useRef<HTMLIFrameElement | null>(null);
+  const attachFrame = useCallback((element: HTMLIFrameElement | null) => {
+    frame.current = element;
+  }, []);
+  const connection = useRef<ToolConnection | null>(null);
+  const latest = useRef(document);
+  const [link, setLink] = useState<Link | null>(null);
+  const [answer, setAnswer] = useState<Answer | null>(null);
+  const [held, setHeld] = useState<Held | null>(null);
+
+  useEffect(() => {
+    latest.current = document;
+  });
+
+  useEffect(() => {
+    const element = frame.current;
+    if (element === null) return;
+    let greeted = false;
+    const opened = connectTool({
+      frame: () => element.contentWindow,
+      origin: new URL(url, globalThis.location.href).origin,
+      host: { name: host },
+      listen: (listener) => {
+        globalThis.addEventListener('message', listener);
+        return () => {
+          globalThis.removeEventListener('message', listener);
+        };
+      },
+      onHello: (tool) => {
+        greeted = true;
+        setLink({ url, status: 'connected', tool });
+      },
+      onOutput: (message) => {
+        setHeld((previous) =>
+          hold(previous, `${url}\n${message.document}`, message.items),
+        );
+      },
+    });
+    connection.current = opened;
+    const timer = setTimeout(() => {
+      if (!greeted) setLink({ url, status: 'unavailable', tool: null });
+    }, helloTimeout);
+    // Set once the listener exists, and again when the effect runs anew, so
+    // the tool greets this listener rather than one already closed.
+    element.src = url;
+    return () => {
+      clearTimeout(timer);
+      opened.close();
+      if (connection.current === opened) connection.current = null;
+    };
+  }, [url, host, helloTimeout]);
+
+  const name = document?.document ?? null;
+  useEffect(() => {
+    const opened = connection.current;
+    const shown = latest.current;
+    if (opened === null || shown === null) return;
+    const key = `${url}\n${shown.document}`;
+    void opened.load(shown).then(async (outcome) => {
+      setAnswer({ key, outcome });
+      const accept = shown.accept ?? [];
+      if (outcome.status !== 'loaded' || accept.length === 0) return;
+      // What the tool held once it showed the document is never sent unasked.
+      const items = await opened.get(accept).catch(() => []);
+      setHeld((previous) => hold(previous, key, items));
+    });
+  }, [name, url, host]);
+
+  const fullscreen = useCallback(async () => {
+    const element = frame.current;
+    if (element === null) throw new Error('The tool is not open.');
+    await element.requestFullscreen();
+  }, []);
+
+  const get = useCallback(async (keys: readonly string[]) => {
+    const opened = connection.current;
+    if (opened === null) {
+      throw new Error('The tool is not open, so it has nothing to give.');
+    }
+    return opened.get(keys);
+  }, []);
+
+  const key = name === null ? null : `${url}\n${name}`;
+  const current = link?.url === url ? link : null;
+  return {
+    attachFrame,
+    fullscreen,
+    status: current?.status ?? 'connecting',
+    tool: current?.tool ?? null,
+    outcome: answer !== null && answer.key === key ? answer.outcome : null,
+    outputs: held !== null && held.key === key ? held.outputs : NO_OUTPUTS,
+    get,
+  };
+}
+
+interface Link {
+  url: string;
+  status: Exclude<FramedToolStatus, 'connecting'>;
+  tool: ToolHello | null;
+}
+
+interface Answer {
+  key: string;
+  outcome: LoadOutcome;
+}
+
+interface Held {
+  key: string;
+  outputs: ReadonlyMap<string, HostItem>;
+}
+
+function hold(
+  previous: Held | null,
+  key: string,
+  items: readonly HostItem[],
+): Held {
+  const outputs = new Map(
+    previous?.key === key ? previous.outputs : NO_OUTPUTS,
+  );
+  for (const item of items) {
+    if (item.key !== undefined) outputs.set(item.key, item);
+  }
+  return { key, outputs };
+}

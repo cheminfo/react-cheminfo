@@ -109,7 +109,7 @@ export function connectHost(options: HostConnectionOptions): () => void {
         const result =
           request.type === 'load'
             ? await applyLoad(request)
-            : answerGet(request, tool, outputs);
+            : await answerGet(request, tool, outputs);
         port?.postMessage(result);
       })
       // A request that failed must not stop the ones after it being served,

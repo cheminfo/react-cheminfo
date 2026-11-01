@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { checkValue, isKnownKind, kindAccepts } from '../kinds.ts';
+import { checkValue, isKnownKind, kindAccepts, readOutput } from '../kinds.ts';
 
 test('a category accepts every kind under it, on a segment boundary', () => {
   expect(kindAccepts('chem.molfile', 'chem.molfile')).toBe(true);
@@ -49,4 +49,62 @@ test('an invalid value is refused with the errors pipeline writes', () => {
     valid: false,
     errors: ['/: must be object'],
   });
+});
+
+test('a picture, a name and a table are kinds a host reads back', () => {
+  expect(checkValue('image.svg', { svg: '<svg/>', width: 3 })).toStrictEqual({
+    valid: true,
+    checked: { kind: 'image.svg', value: { svg: '<svg/>' } },
+  });
+  expect(checkValue('chem.name', { name: 'ethanol' })).toStrictEqual({
+    valid: true,
+    checked: { kind: 'chem.name', value: { name: 'ethanol' } },
+  });
+  expect(
+    checkValue('data.table', {
+      columns: ['Property', 'Value'],
+      rows: [
+        ['cLogP', 1.42],
+        ['Mutagenic', null],
+      ],
+    }),
+  ).toStrictEqual({
+    valid: true,
+    checked: {
+      kind: 'data.table',
+      value: {
+        columns: ['Property', 'Value'],
+        rows: [
+          ['cLogP', 1.42],
+          ['Mutagenic', null],
+        ],
+      },
+    },
+  });
+  expect(
+    checkValue('data.table', { columns: ['Value'], rows: [[{ x: 1 }]] }),
+  ).toStrictEqual({
+    valid: false,
+    errors: ['/rows/0/0: must be string,number,null'],
+  });
+});
+
+test('an output is read as the kind asked for, a kind under it included', () => {
+  const items = [
+    { key: 'name', kind: 'chem.name.iupac', value: { name: 'ethanol' } },
+    { key: 'figure', kind: 'image.png', value: { png: 'AAAA' } },
+    { key: 'table', kind: 'data.table', value: { columns: ['A'] } },
+  ];
+
+  expect(readOutput(items, 'name', 'chem.name')).toStrictEqual({
+    kind: 'chem.name',
+    value: { name: 'ethanol' },
+  });
+  expect(readOutput(items, 'structure', 'chem.molfile')).toBeUndefined();
+  expect(() => readOutput(items, 'figure', 'image.svg')).toThrow(
+    'The figure handed back is a image.png, not a image.svg.',
+  );
+  expect(() => readOutput(items, 'table', 'data.table')).toThrow(
+    "The table handed back is not shaped as a data.table: /: must have required property 'rows'.",
+  );
 });

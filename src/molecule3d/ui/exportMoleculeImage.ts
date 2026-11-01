@@ -60,6 +60,28 @@ export async function captureMoleculePng(
 }
 
 /**
+ * Render the scene as an SVG holding the rendered image, as the export writes
+ * it.
+ * @param viewer - The viewer holding the scene.
+ * @param scale - Multiple of the canvas on screen it is rendered at.
+ * @param size - Size of the canvas on screen, CSS pixels.
+ * @returns The SVG markup.
+ * @throws {Error} When the viewer has nothing to render.
+ */
+export async function captureMoleculeSvg(
+  viewer: SceneCapture,
+  scale: number,
+  size: ImageSize,
+): Promise<string> {
+  const pixels = figurePixels(size, scale);
+  const dataUri = await viewer.captureImage(pixels);
+  if (dataUri === undefined) {
+    throw new Error('There is no picture to copy yet.');
+  }
+  return rasterSvgMarkup(dataUri, pixels);
+}
+
+/**
  * Render the scene and hand it to the browser as a file.
  * @param viewer - The viewer holding the scene.
  * @param request - See {@link MoleculeImageRequest}.

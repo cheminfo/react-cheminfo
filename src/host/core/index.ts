@@ -1,5 +1,14 @@
 export type { HostConnectionOptions, HostMessageEvent } from './connectHost.ts';
 export { connectHost } from './connectHost.ts';
+export type {
+  LoadOutcome,
+  ToolConnection,
+  ToolConnectionOptions,
+  ToolDocument,
+  ToolFrameWindow,
+  ToolWindowEvent,
+} from './connectTool.ts';
+export { REQUEST_TIMEOUT, connectTool } from './connectTool.ts';
 export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';
 export {
   OUTPUT_DELAY,
@@ -17,13 +26,14 @@ export type { IrJdxValue, IrPeakValue, IrPeaksValue } from './irKinds.ts';
 export { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
 export type {
   CheckOutcome,
+  CheckedOf,
   CheckedValue,
   KnownKind,
   MolfileValue,
   OclIdValue,
   SmilesValue,
 } from './kinds.ts';
-export { checkValue, isKnownKind, kindAccepts } from './kinds.ts';
+export { checkValue, isKnownKind, kindAccepts, readOutput } from './kinds.ts';
 export type {
   GetRequest,
   HelloMessage,
@@ -48,5 +58,14 @@ export {
   isConnect,
   parseRequest,
 } from './protocol.ts';
+export type {
+  NameValue,
+  SvgImageValue,
+  TableCell,
+  TableValue,
+} from './resultKinds.ts';
+export { NAME_SCHEMA, SVG_IMAGE_SCHEMA, TABLE_SCHEMA } from './resultKinds.ts';
 export type { InputSelection, LoadedInput } from './selectInputs.ts';
 export { selectInputs } from './selectInputs.ts';
+export type { ToolHello } from './toolMessages.ts';
+export { readHello, readToolMessage } from './toolMessages.ts';

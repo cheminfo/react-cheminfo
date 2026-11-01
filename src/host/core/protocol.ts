@@ -10,6 +10,10 @@
  * arrives as the untrusted input it is.
  */
 
+import { isRecord, readItems, readStrings } from './messageValues.ts';
+
+export { MAX_ITEMS, MAX_LABEL_LENGTH } from './messageValues.ts';
+
 /** The version a tool speaks; a `connect` naming another is ignored. */
 export const PROTOCOL_VERSION = 1;
 
@@ -18,12 +22,6 @@ export const HELLO_TYPE = 'cheminfo:hello';
 
 /** The host's answer to `hello`, carrying the port the rest goes through. */
 export const CONNECT_TYPE = 'cheminfo:connect';
-
-/** How many items one request may carry; the rest are dropped. */
-export const MAX_ITEMS = 64;
-
-/** How long a label may be, in characters; a longer one is cut. */
-export const MAX_LABEL_LENGTH = 80;
 
 /** One typed value crossing the frame boundary. */
 export interface HostItem {
@@ -170,7 +168,7 @@ export interface OutputMessage {
  * Anything that is not a well-formed `load` or `get` is `null`, and goes
  * unanswered: an unknown request is a newer host talking, not an error. An item
  * without a string `kind` is dropped, a label is cut to
- * {@link MAX_LABEL_LENGTH}, and a `load` without `accept` takes nothing back.
+ * `MAX_LABEL_LENGTH`, and a `load` without `accept` takes nothing back.
  * @param data - What the port delivered.
  * @returns The request, or `null`.
  */
@@ -206,34 +204,4 @@ export function isConnect(data: unknown): boolean {
     data.type === CONNECT_TYPE &&
     data.version === PROTOCOL_VERSION
   );
-}
-
-function readItems(values: readonly unknown[]): HostItem[] {
-  const items: HostItem[] = [];
-  const count = Math.min(values.length, MAX_ITEMS);
-  for (let index = 0; index < count; index++) {
-    const value = values[index];
-    if (!isRecord(value) || typeof value.kind !== 'string') continue;
-    const item: HostItem = { kind: value.kind, value: value.value };
-    if (typeof value.id === 'string') item.id = value.id;
-    if (typeof value.key === 'string') item.key = value.key;
-    if (typeof value.label === 'string') {
-      item.label = value.label.slice(0, MAX_LABEL_LENGTH);
-    }
-    items.push(item);
-  }
-  return items;
-}
-
-function readStrings(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  const strings: string[] = [];
-  for (const entry of value) {
-    if (typeof entry === 'string') strings.push(entry);
-  }
-  return strings;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

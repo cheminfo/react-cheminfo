@@ -25,4 +25,7 @@ export { exportMoleculeImage } from './exportMoleculeImage.ts';
 export type { ImageExport } from './useImageExport.ts';
 export { useImageExport } from './useImageExport.ts';
 export { MoleculeViewer3D } from './MoleculeViewer3D.tsx';
-export type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
+export type {
+  Molecule3DCapture,
+  MoleculeViewer3DProps,
+} from './moleculeViewer3DProps.ts';

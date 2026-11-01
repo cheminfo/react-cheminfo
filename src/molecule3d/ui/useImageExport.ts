@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import type { FigureNotice } from '../../download/core/copyFigure.ts';
 import { copyFigure } from '../../download/core/copyFigure.ts';
@@ -10,8 +10,10 @@ import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
 import type { SceneCapture } from './exportMoleculeImage.ts';
 import {
   captureMoleculePng,
+  captureMoleculeSvg,
   exportMoleculeImage,
 } from './exportMoleculeImage.ts';
+import type { Molecule3DCapture } from './moleculeViewer3DProps.ts';
 
 /** What {@link useImageExport} hands the export panel. */
 export interface ImageExport {
@@ -31,6 +33,8 @@ export interface ImageExport {
    * from the click itself: Safari only allows a write the click started.
    */
   copyImage: (scale: number) => Promise<FigureNotice>;
+  /** The scene rendered on request, for a page handing the picture on. */
+  capture: Molecule3DCapture;
 }
 
 /**
@@ -85,5 +89,27 @@ export function useImageExport(
     [canvasSize, viewerRef],
   );
 
-  return { canvasSize, exportImage, copyImage };
+  const capture = useMemo(
+    (): Molecule3DCapture => ({
+      svg: async (scale) => {
+        const viewer = viewerRef.current;
+        const size = canvasSize();
+        if (viewer === null || size === null) {
+          throw new Error('There is no picture to copy yet.');
+        }
+        return captureMoleculeSvg(viewer, scale, size);
+      },
+      png: async (scale) => {
+        const viewer = viewerRef.current;
+        const size = canvasSize();
+        if (viewer === null || size === null) {
+          throw new Error('There is no picture to copy yet.');
+        }
+        return captureMoleculePng(viewer, scale, size);
+      },
+    }),
+    [canvasSize, viewerRef],
+  );
+
+  return { canvasSize, exportImage, copyImage, capture };
 }

@@ -4,8 +4,9 @@
  * name, a JSON Schema, and ajv.
  *
  * The names are pipeline's (`chem.molfile.2d`, `chem.ocl.id`…), plus
- * `chem.smiles`, which pipeline lists among its future schemas, and the two
- * infrared kinds of `./irKinds.ts`. A name with children is a category whose
+ * `chem.smiles`, which pipeline lists among its future schemas, the two
+ * infrared kinds of `./irKinds.ts`, and the kinds a tool hands back, of
+ * `./resultKinds.ts`. A name with children is a category whose
  * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
  * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
  * stripped rather than refused, so a host sending more than it needs to is
@@ -17,6 +18,9 @@ import { Ajv } from 'ajv';
 
 import type { IrJdxValue, IrPeaksValue } from './irKinds.ts';
 import { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
+import type { HostItem } from './protocol.ts';
+import type { NameValue, SvgImageValue, TableValue } from './resultKinds.ts';
+import { NAME_SCHEMA, SVG_IMAGE_SCHEMA, TABLE_SCHEMA } from './resultKinds.ts';
 
 /** A molfile, V2000 or V3000. */
 export interface MolfileValue {
@@ -40,13 +44,19 @@ export type CheckedValue =
   | { kind: 'chem.ocl.id'; value: OclIdValue }
   | { kind: 'chem.smiles'; value: SmilesValue }
   | { kind: 'spectra.ir.jdx'; value: IrJdxValue }
-  | { kind: 'spectra.ir.peaks'; value: IrPeaksValue };
+  | { kind: 'spectra.ir.peaks'; value: IrPeaksValue }
+  | { kind: 'image.svg'; value: SvgImageValue }
+  | { kind: 'chem.name'; value: NameValue }
+  | { kind: 'data.table'; value: TableValue };
 
-/** The name of a kind a tool can read. */
+/** The name of a kind there is a schema for: one a tool reads, or one it hands back. */
 export type KnownKind = CheckedValue['kind'];
 
-/** The value a kind a tool can read carries. */
-type ValueOf<K extends KnownKind> = Extract<CheckedValue, { kind: K }>['value'];
+/** A checked value of one kind. */
+export type CheckedOf<K extends KnownKind> = Extract<CheckedValue, { kind: K }>;
+
+/** The value a kind with a schema carries. */
+type ValueOf<K extends KnownKind> = CheckedOf<K>['value'];
 
 /** What checking a value gave. */
 export type CheckOutcome =
@@ -100,6 +110,37 @@ export function checkValue(kind: KnownKind, value: unknown): CheckOutcome {
   return { valid: false, errors };
 }
 
+/**
+ * Read the value a tool handed back under an output, as the kind the host
+ * asked for: the item must be of that kind or one under it, and pass that
+ * kind's schema.
+ * @param items - What the tool handed back.
+ * @param key - The output.
+ * @param kind - The kind it is read as.
+ * @returns The value tagged with the kind, or `undefined` when the tool handed
+ * nothing back under that key.
+ * @throws {Error} When the item is of another kind, or not of its shape.
+ */
+export function readOutput<K extends KnownKind>(
+  items: readonly HostItem[],
+  key: string,
+  kind: K,
+): CheckedOf<K> | undefined {
+  const item = items.find((entry) => entry.key === key);
+  if (item === undefined) return undefined;
+  if (!kindAccepts(kind, item.kind)) {
+    throw new Error(`The ${key} handed back is a ${item.kind}, not a ${kind}.`);
+  }
+  const outcome = checkValue(kind, item.value);
+  if (!outcome.valid) {
+    throw new Error(
+      `The ${key} handed back is not shaped as a ${kind}: ${outcome.errors.join('; ')}.`,
+    );
+  }
+  // The validator of `kind` just vouched for the shape of the value.
+  return outcome.checked as CheckedOf<K>;
+}
+
 const MOLFILE_SCHEMA: JSONSchemaType<MolfileValue> = {
   type: 'object',
   properties: { molfile: { type: 'string' } },
@@ -124,8 +165,9 @@ const SMILES_SCHEMA: JSONSchemaType<SmilesValue> = {
   additionalProperties: false,
 };
 
-// `removeAdditional` strips what `additionalProperties: false` would refuse.
-const ajv = new Ajv({ removeAdditional: true });
+// `removeAdditional` strips what `additionalProperties: false` would refuse;
+// a table's cell is a string, a number or null, which is a union of types.
+const ajv = new Ajv({ removeAdditional: true, allowUnionTypes: true });
 
 const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'chem.molfile': ajv.compile(MOLFILE_SCHEMA),
@@ -135,4 +177,7 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   // `nullable` on every optional field and so let a `null` band through.
   'spectra.ir.jdx': ajv.compile<IrJdxValue>(IR_JDX_SCHEMA),
   'spectra.ir.peaks': ajv.compile<IrPeaksValue>(IR_PEAKS_SCHEMA),
+  'image.svg': ajv.compile<SvgImageValue>(SVG_IMAGE_SCHEMA),
+  'chem.name': ajv.compile<NameValue>(NAME_SCHEMA),
+  'data.table': ajv.compile<TableValue>(TABLE_SCHEMA),
 };

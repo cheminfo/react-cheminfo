@@ -6,6 +6,10 @@
  * already has: the values as they stood once its document was applied, then
  * every value sent since. Opening a document therefore never writes it back,
  * and a band picked on one spectrum of a sample leaves the others alone.
+ *
+ * A value that costs something to make — a picture rendered from the scene on
+ * screen — is not read with the others: it is rendered when a `get` names it,
+ * and never sent unasked.
  */
 
 import { kindAccepts } from './kinds.ts';
@@ -27,6 +31,14 @@ export interface HostOutputs {
   read: () => readonly HostItem[];
   /** Be told whenever they may have changed; the returned function stops it. */
   subscribe: (listener: () => void) => () => void;
+  /**
+   * The outputs made only when a host asks for them, by key: a `get` naming one
+   * waits for its value, which is never sent unasked. A function resolving to
+   * `undefined` has nothing to give yet; one that rejects answers the `get`
+   * with its error's message.
+   * @default undefined — every output is read by `read`
+   */
+  render?: Readonly<Record<string, () => Promise<HostItem | undefined>>>;
 }
 
 /**
@@ -37,17 +49,18 @@ export const OUTPUT_DELAY = 300;
 
 /**
  * Answer a `get` with the values it asks for — every output when it names
- * none.
+ * none — rendering those made on request.
  * @param request - The request.
  * @param tool - What the tool hands back.
  * @param outputs - Where the values are read, if anywhere.
- * @returns The values, or `no-output` when the tool has none of those asked.
+ * @returns The values, or `no-output` when the tool has none of those asked,
+ * or one could not be made.
  */
-export function answerGet(
+export async function answerGet(
   request: GetRequest,
   tool: ToolInterface,
   outputs: HostOutputs | undefined,
-): ResultMessage {
+): Promise<ResultMessage> {
   const { id, keys } = request;
   const declared = new Set<string>();
   for (const output of tool.outputs) declared.add(output.key);
@@ -66,9 +79,38 @@ export function answerGet(
   }
   const items: HostItem[] = [];
   for (const item of outputs.read()) {
-    if (item.key !== undefined && wanted.has(item.key)) items.push(item);
+    if (item.key === undefined || !wanted.has(item.key)) continue;
+    if (renderOf(outputs, item.key) === undefined) items.push(item);
+  }
+  const renders: Array<() => Promise<HostItem | undefined>> = [];
+  const renderedKeys: string[] = [];
+  for (const key of wanted) {
+    const render = renderOf(outputs, key);
+    if (render === undefined) continue;
+    renders.push(render);
+    renderedKeys.push(key);
+  }
+  try {
+    const made = await Promise.all(renders.map((render) => render()));
+    for (let index = 0; index < made.length; index++) {
+      const item = made[index];
+      const key = renderedKeys[index];
+      if (item !== undefined && key !== undefined) items.push({ ...item, key });
+    }
+  } catch (error) {
+    return noOutput(id, error instanceof Error ? error.message : String(error));
   }
   return { type: 'result', id, ok: true, items };
+}
+
+function renderOf(
+  outputs: HostOutputs,
+  key: string,
+): (() => Promise<HostItem | undefined>) | undefined {
+  const { render } = outputs;
+  return render !== undefined && Object.hasOwn(render, key)
+    ? render[key]
+    : undefined;
 }
 
 /** What the connection tells the publisher, and the means to stop it. */

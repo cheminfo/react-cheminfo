@@ -64,6 +64,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     fileName = 'molecule',
     background,
     minHeight = 320,
+    onCapture,
     onFailureChange,
   } = props;
   const tools = resolveMolecule3DTools(toolsProp);
@@ -139,12 +140,20 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     camera: props,
   });
 
-  const { canvasSize, exportImage, copyImage } = useImageExport(
+  const { canvasSize, exportImage, copyImage, capture } = useImageExport(
     container,
     viewerRef,
     fileName,
     framesPerSecond,
   );
+
+  useEffect(() => {
+    if (onCapture === undefined || container === null) return;
+    onCapture(capture);
+    return () => {
+      onCapture(null);
+    };
+  }, [onCapture, container, capture]);
 
   return (
     <Molecule3DStage style={{ ...STAGE_STYLE, minHeight }}>
