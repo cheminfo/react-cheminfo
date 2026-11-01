@@ -51,6 +51,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                        | nothing on import; xtb-wasm on the first call    |
 | `react-cheminfo/host`              | data handed over by a page that frames the tool       | nothing on import; ajv once the page is framed   |
 | `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
+| `react-cheminfo/storage`           | work kept in the browser: autosave, tabs, backups     | React on the backup menu; idb, @zip.js/zip.js    |
 | `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
 | `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
 | `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens         | nothing                                          |
@@ -98,6 +99,16 @@ framework-free `GeometryRelaxer` contract — which `react-cheminfo/core` owns,
 so the code choosing a relaxer loads neither openchemlib nor WebAssembly; `xtbRelaxer` from this subpath is the implementation, and it
 `import()`s `xtb-wasm` on the **first call**, so a site that offers refinement as
 an action still ships nothing extra to a visitor who never clicks it.
+
+`react-cheminfo/storage` is what a site needs so a crash loses nothing:
+`openSiteDatabase` opens IndexedDB through `idb` and turns a blocked upgrade or
+a browser refusing storage into an error rather than a hang; `createAutosave`
+writes a changing value at most every two seconds, never two writes at once, and
+at once when the page is hidden; `createTabClaims` says which tab holds which
+piece of work through Web Locks, so a tab that crashed lets go by itself;
+`createRestoreGuard` stops a page reopening, on every load, the work that took
+it down; and `writeArchive` / `readArchive` with `<BackupMenu>` or
+`useBackupRestore` take everything out as one file and back in.
 
 `react-cheminfo/vite` is the one door with a split bill: `cheminfoPrerender`
 needs nothing beyond Vite's own plugin type, while `ogCardHtml` renders a mark

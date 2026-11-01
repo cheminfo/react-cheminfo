@@ -828,5 +828,11 @@
   "framedTool.cite": "How to cite {host}",
   "framedTool.citeUnknown": "{host} has not said here how to cite it. Its About page does.",
   "framedTool.help": "How to use {host}",
-  "framedTool.open": "Open {host} in a new tab"
+  "framedTool.open": "Open {host} in a new tab",
+  "storage.menuTitle": "Back up or restore everything this site keeps in your browser",
+  "storage.backup": "Back up everything…",
+  "storage.restore": "Restore a backup…",
+  "storage.backupFailed": "The backup failed. {message}",
+  "storage.restoreFailed": "The restore failed. {message}",
+  "storage.close": "Close"
 }

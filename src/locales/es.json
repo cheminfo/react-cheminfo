@@ -828,5 +828,11 @@
   "framedTool.cite": "Cómo citar {host}",
   "framedTool.citeUnknown": "{host} no ha indicado aquí cómo citarlo. Su página «Acerca de» lo indica.",
   "framedTool.help": "Cómo usar {host}",
-  "framedTool.open": "Abrir {host} en una pestaña nueva"
+  "framedTool.open": "Abrir {host} en una pestaña nueva",
+  "storage.menuTitle": "Hacer una copia de seguridad o restaurar todo lo que este sitio guarda en su navegador",
+  "storage.backup": "Copiar todo…",
+  "storage.restore": "Restaurar una copia…",
+  "storage.backupFailed": "La copia de seguridad ha fallado. {message}",
+  "storage.restoreFailed": "La restauración ha fallado. {message}",
+  "storage.close": "Cerrar"
 }

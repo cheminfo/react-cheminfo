@@ -828,5 +828,11 @@
   "framedTool.cite": "So zitieren Sie {host}",
   "framedTool.citeUnknown": "{host} hat hier nicht angegeben, wie es zu zitieren ist. Seine Seite „Über“ sagt es.",
   "framedTool.help": "So verwenden Sie {host}",
-  "framedTool.open": "{host} in einem neuen Tab öffnen"
+  "framedTool.open": "{host} in einem neuen Tab öffnen",
+  "storage.menuTitle": "Alles sichern oder wiederherstellen, was diese Website in Ihrem Browser speichert",
+  "storage.backup": "Alles sichern…",
+  "storage.restore": "Sicherung wiederherstellen…",
+  "storage.backupFailed": "Die Sicherung ist fehlgeschlagen. {message}",
+  "storage.restoreFailed": "Die Wiederherstellung ist fehlgeschlagen. {message}",
+  "storage.close": "Schließen"
 }
