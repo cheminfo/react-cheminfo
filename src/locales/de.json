@@ -808,7 +808,7 @@
   "ir.raman.credit.picking": "**ir-spectrum** (cheminfo, MIT) findet die Banden, mit dem Peakfinder von **common-spectrum** und **ml-gsd**.",
   "ir.raman.credit.jcamp": "**convert-to-jcamp** (cheminfo, MIT) schreibt die heruntergeladene JCAMP-DX-Datei.",
   "panel.focus": "Auf das Panel „{panel}“ konzentrieren",
-  "panel.focusTooltip": "Auf dieses Panel konzentrieren: alle anderen einklappen",
+  "panel.focusTooltip": "Auf dieses Panel konzentrieren: alle anderen einklappen. Umschalt-Klick auf seine Titelleiste bewirkt dasselbe.",
   "panel.unfocusTooltip": "Die anderen Panels wieder ausklappen",
   "panel.fillScreen": "Panel „{panel}“ im Vollbild zeigen",
   "panel.fillScreenTooltip": "Dieses Panel im Vollbild zeigen",

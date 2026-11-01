@@ -808,7 +808,7 @@
   "ir.raman.credit.picking": "**ir-spectrum** (cheminfo, MIT) picks the bands, with the peak picker of **common-spectrum** and **ml-gsd**.",
   "ir.raman.credit.jcamp": "**convert-to-jcamp** (cheminfo, MIT) writes the JCAMP-DX download.",
   "panel.focus": "Focus on the {panel} panel",
-  "panel.focusTooltip": "Focus on this panel: fold every other one away",
+  "panel.focusTooltip": "Focus on this panel: fold every other one away. Shift-clicking its title bar does the same.",
   "panel.unfocusTooltip": "Unfold the other panels again",
   "panel.fillScreen": "Fill the screen with the {panel} panel",
   "panel.fillScreenTooltip": "Fill the screen with this panel",

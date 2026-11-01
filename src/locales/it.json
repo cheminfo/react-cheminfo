@@ -808,7 +808,7 @@
   "ir.raman.credit.picking": "**ir-spectrum** (cheminfo, MIT) trova le bande, con il rilevatore di picchi di **common-spectrum** e **ml-gsd**.",
   "ir.raman.credit.jcamp": "**convert-to-jcamp** (cheminfo, MIT) scrive il file JCAMP-DX scaricato.",
   "panel.focus": "Concentrati sul pannello {panel}",
-  "panel.focusTooltip": "Concentrati su questo pannello: comprimi tutti gli altri",
+  "panel.focusTooltip": "Concentrati su questo pannello: comprimi tutti gli altri. Maiusc-clic sulla sua barra del titolo fa lo stesso.",
   "panel.unfocusTooltip": "Espandi di nuovo gli altri pannelli",
   "panel.fillScreen": "Mostra il pannello {panel} a schermo intero",
   "panel.fillScreenTooltip": "Mostra questo pannello a schermo intero",

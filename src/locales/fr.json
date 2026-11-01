@@ -808,7 +808,7 @@
   "ir.raman.credit.picking": "**ir-spectrum** (cheminfo, MIT) repère les bandes, avec le détecteur de pics de **common-spectrum** et **ml-gsd**.",
   "ir.raman.credit.jcamp": "**convert-to-jcamp** (cheminfo, MIT) écrit le fichier JCAMP-DX téléchargé.",
   "panel.focus": "Se concentrer sur le panneau {panel}",
-  "panel.focusTooltip": "Se concentrer sur ce panneau : replier tous les autres",
+  "panel.focusTooltip": "Se concentrer sur ce panneau : replier tous les autres. Maj-clic sur sa barre de titre fait de même.",
   "panel.unfocusTooltip": "Déplier de nouveau les autres panneaux",
   "panel.fillScreen": "Afficher le panneau {panel} en plein écran",
   "panel.fillScreenTooltip": "Afficher ce panneau en plein écran",
