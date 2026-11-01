@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.82.0](https://github.com/cheminfo/react-cheminfo/compare/v0.81.0...v0.82.0) (2026-11-01)
+
+
+### Features
+
+* **host:** open a tool whose every input is optional on nothing, and tell a host what it sends ([2d3db47](https://github.com/cheminfo/react-cheminfo/commit/2d3db47a0ffb5f7c6f69f4cc8c264cb47bab6dcd))
+
+
+### Bug Fixes
+
+* say in the focus tooltip that shift-clicking a panel's title bar does the same ([b9c3d3e](https://github.com/cheminfo/react-cheminfo/commit/b9c3d3e74fa961d1e99a48ba5d02a0aa2e1f6e4a))
+
 ## [0.81.0](https://github.com/cheminfo/react-cheminfo/compare/v0.80.0...v0.81.0) (2026-11-01)
 
 
