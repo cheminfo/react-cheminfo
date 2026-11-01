@@ -189,6 +189,29 @@ test('opening a document sends nothing back; a change goes back alone, once sett
   site.close();
 });
 
+test('a value that went away goes back again when it returns', async () => {
+  const site = connect(() => undefined);
+  await ask(site, LOAD);
+
+  site.setOutputs([peaks('a.jdx', 1715)]);
+  vi.advanceTimersByTime(OUTPUT_DELAY);
+  site.setOutputs([]);
+  vi.advanceTimersByTime(OUTPUT_DELAY);
+  site.setOutputs([peaks('a.jdx', 1715)]);
+  vi.advanceTimersByTime(OUTPUT_DELAY);
+  await ask(site, { type: 'get', id: 'g1', keys: [] });
+
+  const output = {
+    type: 'output',
+    document: 'eln:sample',
+    items: [peaks('a.jdx', 1715)],
+  };
+
+  expect(site.received.slice(1, 3)).toStrictEqual([output, output]);
+
+  site.close();
+});
+
 test('a document that accepts nothing is sent nothing', async () => {
   const site = connect(() => {
     site.setOutputs([peaks('a.jdx', 1715)]);

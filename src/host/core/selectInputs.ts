@@ -33,7 +33,9 @@ export type InputSelection =
  * An item naming another input's `key` is left to that input.
  *
  * A required input left without an item refuses the request. An optional one
- * is passed over, unless no input got an item at all.
+ * is passed over, unless no input got an item at all. A request carrying no
+ * item opens a tool whose every input is optional on nothing, so a host can
+ * take back what the tool's visitor picks before it has anything to hand over.
  * @param tool - What the tool takes.
  * @param items - What the host sent.
  * @returns The items the inputs took, or why the request loads nothing.
@@ -58,6 +60,9 @@ export function selectInputs(
     }
   }
   if (inputs.length > 0 || tool.inputs.length === 0) {
+    return { ok: true, inputs };
+  }
+  if (items.length === 0 && tool.inputs.every((input) => input.optional)) {
     return { ok: true, inputs };
   }
   return { ok: false, error: refusal(tool, tool.inputs, passedOver) };

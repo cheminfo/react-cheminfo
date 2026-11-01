@@ -55,3 +55,14 @@ test('no usable item is no-input; only items of the wrong shape is invalid', () 
     },
   });
 });
+
+test('a request carrying nothing is refused by a tool that needs an input', () => {
+  expect(selectInputs(TOOL, [])).toStrictEqual({
+    ok: false,
+    error: {
+      code: 'no-input',
+      message:
+        'No item is a chem.molfile, chem.ocl.id, or chem.smiles, so 3d loaded nothing.',
+    },
+  });
+});

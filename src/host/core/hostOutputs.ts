@@ -148,8 +148,14 @@ export function createOutputPublisher(
   function flush(): void {
     timer = undefined;
     if (document === null) return;
+    const current = readAccepted(outputs, accepted);
+    // A value that went away is forgotten, so it goes back again if it
+    // returns: the reader let go of a pick, then picked it once more.
+    for (const identity of known.keys()) {
+      if (!current.has(identity)) known.delete(identity);
+    }
     const items: HostItem[] = [];
-    for (const [identity, entry] of readAccepted(outputs, accepted)) {
+    for (const [identity, entry] of current) {
       if (known.get(identity) === entry.text) continue;
       known.set(identity, entry.text);
       items.push(entry.item);

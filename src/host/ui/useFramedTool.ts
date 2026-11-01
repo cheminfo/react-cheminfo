@@ -38,6 +38,13 @@ export interface FramedToolOptions {
    * @default HELLO_TIMEOUT
    */
   helloTimeout?: number;
+  /**
+   * Told of the values the tool sends unasked about the document on screen —
+   * what its visitor just picked — and never of those it already held when it
+   * showed the document.
+   * @default undefined
+   */
+  onOutput?: (items: readonly HostItem[]) => void;
 }
 
 /** Whether the tool answered: still loading, talking, or silent past the wait. */
@@ -90,7 +97,13 @@ const NO_OUTPUTS: ReadonlyMap<string, HostItem> = new Map();
  * @returns See {@link FramedTool}.
  */
 export function useFramedTool(options: FramedToolOptions): FramedTool {
-  const { url, host, document, helloTimeout = HELLO_TIMEOUT } = options;
+  const {
+    url,
+    host,
+    document,
+    helloTimeout = HELLO_TIMEOUT,
+    onOutput,
+  } = options;
   const frame = useRef<HTMLIFrameElement | null>(null);
   const attachFrame = useCallback((element: HTMLIFrameElement | null) => {
     frame.current = element;
@@ -101,12 +114,14 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
   const [shown, setShown] = useState<ToolDocument | null>(null);
   if (visible && shown !== document) setShown(document);
   const latest = useRef(shown);
+  const told = useRef(onOutput);
   const [link, setLink] = useState<Link | null>(null);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [held, setHeld] = useState<Held | null>(null);
 
   useEffect(() => {
     latest.current = shown;
+    told.current = onOutput;
   });
 
   useEffect(() => {
@@ -131,6 +146,9 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
         setHeld((previous) =>
           hold(previous, `${url}\n${message.document}`, message.items),
         );
+        if (message.document === latest.current?.document) {
+          told.current?.(message.items);
+        }
       },
     });
     connection.current = opened;

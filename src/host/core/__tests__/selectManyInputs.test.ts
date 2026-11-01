@@ -75,6 +75,13 @@ test('a request that gives no input anything is refused, naming every kind', () 
   });
 });
 
+test('a request carrying nothing opens a tool whose every input is optional', () => {
+  expect(selectInputs(SPECTRA_TOOL, [])).toStrictEqual({
+    ok: true,
+    inputs: [],
+  });
+});
+
 test("SciPeaks' sample gives its spectrum and its molfile, the bands read as stored", () => {
   const load = sciPeaksEthylbenzeneIrLoad('##TITLE=ETHYL BENZENE');
 

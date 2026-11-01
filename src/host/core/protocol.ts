@@ -62,7 +62,8 @@ export interface ToolInput {
   many?: boolean;
   /**
    * Whether a request may leave it without an item. A request is still
-   * refused when no input at all gets one.
+   * refused when no input at all gets one — except a request carrying no item,
+   * which opens a tool whose every input is optional on nothing.
    * @default false
    */
   optional?: boolean;
