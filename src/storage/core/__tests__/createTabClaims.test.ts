@@ -2,41 +2,50 @@ import { afterEach, expect, test, vi } from 'vitest';
 
 import { createTabClaims } from '../createTabClaims.ts';
 
+// Node 22 has no Web Locks; what a runtime without them does is tested below.
+const hasWebLocks = globalThis.navigator?.locks !== undefined;
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test('an id one tab claims cannot be claimed by another until it is released', async () => {
-  const thisTab = createTabClaims('draw:drafts');
-  const otherTab = createTabClaims('draw:drafts');
+test.runIf(hasWebLocks)(
+  'an id one tab claims cannot be claimed by another until it is released',
+  async () => {
+    const thisTab = createTabClaims('draw:drafts');
+    const otherTab = createTabClaims('draw:drafts');
 
-  await expect(thisTab.claim('a')).resolves.toBe(true);
-  await expect(thisTab.claim('a')).resolves.toBe(true);
-  await expect(otherTab.claim('a')).resolves.toBe(false);
-  await expect(otherTab.claim('b')).resolves.toBe(true);
-  await expect(thisTab.held()).resolves.toStrictEqual(new Set(['a', 'b']));
+    await expect(thisTab.claim('a')).resolves.toBe(true);
+    await expect(thisTab.claim('a')).resolves.toBe(true);
+    await expect(otherTab.claim('a')).resolves.toBe(false);
+    await expect(otherTab.claim('b')).resolves.toBe(true);
+    await expect(thisTab.held()).resolves.toStrictEqual(new Set(['a', 'b']));
 
-  thisTab.release('a');
-  await Promise.resolve();
+    thisTab.release('a');
+    await Promise.resolve();
 
-  await expect(otherTab.claim('a')).resolves.toBe(true);
+    await expect(otherTab.claim('a')).resolves.toBe(true);
 
-  otherTab.release('a');
-  otherTab.release('b');
-});
+    otherTab.release('a');
+    otherTab.release('b');
+  },
+);
 
-test('the ids held are those of the scope only', async () => {
-  const drafts = createTabClaims('draw:drafts');
-  const scripts = createTabClaims('pdb:scripts');
-  await drafts.claim('a');
-  await scripts.claim('1ABC');
+test.runIf(hasWebLocks)(
+  'the ids held are those of the scope only',
+  async () => {
+    const drafts = createTabClaims('draw:drafts');
+    const scripts = createTabClaims('pdb:scripts');
+    await drafts.claim('a');
+    await scripts.claim('1ABC');
 
-  await expect(drafts.held()).resolves.toStrictEqual(new Set(['a']));
-  await expect(scripts.held()).resolves.toStrictEqual(new Set(['1ABC']));
+    await expect(drafts.held()).resolves.toStrictEqual(new Set(['a']));
+    await expect(scripts.held()).resolves.toStrictEqual(new Set(['1ABC']));
 
-  drafts.release('a');
-  scripts.release('1ABC');
-});
+    drafts.release('a');
+    scripts.release('1ABC');
+  },
+);
 
 test('without Web Locks every claim holds, and nobody can tell which ids are held', async () => {
   vi.stubGlobal('navigator', {});
