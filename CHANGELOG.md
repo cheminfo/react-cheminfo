@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.79.0](https://github.com/cheminfo/react-cheminfo/compare/v0.78.0...v0.79.0) (2026-11-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove the osiris and osiris-ui subpaths, kept by the osiris site
+
+### Features
+
+* add the conformer share note and the force-field energy errors ([9d0ede9](https://github.com/cheminfo/react-cheminfo/commit/9d0ede96a2ab8d40b3194298f6f4bbb4b9aea541))
+* hand a hidden framed tool nothing until it shows again ([758aaf3](https://github.com/cheminfo/react-cheminfo/commit/758aaf3319c8fbb96043669b9ba0414113513174))
+* remove the osiris and osiris-ui subpaths, kept by the osiris site ([f614737](https://github.com/cheminfo/react-cheminfo/commit/f614737cc20713f554af15d4e47a88973addbba4))
+* show a framed tool's About, Cite and Help in the host ([f49422e](https://github.com/cheminfo/react-cheminfo/commit/f49422e2ce43b1aa10ae3842676357f23cba38ff))
+
 ## [0.78.0](https://github.com/cheminfo/react-cheminfo/compare/v0.77.0...v0.78.0) (2026-11-01)
 
 
