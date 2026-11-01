@@ -112,7 +112,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/semver": "^7.8.0",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-istanbul": "^4.1.12",
     "@zakodium/tsconfig": "^1.0.5",
     "benchmark": "^2.1.4",
     "chemical-elements": "^2.3.2",
@@ -137,7 +137,7 @@
     "storybook": "^10.5.8",
     "typescript": "^6.0.3",
     "vite": "^8.2.1",
-    "vitest": "^4.1.10",
+    "vitest": "^4.1.12",
     "xtb-wasm": "^1.1.1"
   },
   "peerDependencies": {
