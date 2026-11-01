@@ -65,13 +65,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function mount() {
+function mount(fillScreen?: (panel: (typeof panels)[number]) => boolean) {
   act(() => {
     root.render(
       <SidePanelStack
         panels={panels}
         openPanelIds={['spectra', 'peaks']}
         onClose={() => undefined}
+        fillScreen={fillScreen}
       >
         {(panel) => <p>{`the ${panel.id} body`}</p>}
       </SidePanelStack>,
@@ -101,6 +102,15 @@ test('no panel offers to fill a screen the browser cannot fill', () => {
   mount();
 
   expect(fillButton('peaks')).toBeNull();
+});
+
+test('only the panels the stack names offer to fill the screen', () => {
+  mount((panel) => panel.id === 'spectra');
+
+  expect([fillButton('spectra') !== null, fillButton('peaks')]).toStrictEqual([
+    true,
+    null,
+  ]);
 });
 
 test('the button fills the screen with the body of its own panel', () => {

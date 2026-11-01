@@ -2017,3 +2017,19 @@ span.taxon-lineage__name {
   text-align: left;
   word-break: break-all;
 }
+
+/* The chevron of a side panel leads its header, where a disclosure is looked
+   for. react-science draws every header button on the right, so the chevron is
+   lifted out of that run and set before the title. */
+[role='button']:has(.side-panel__fold) {
+  position: relative;
+  padding-left: 32px;
+}
+
+/* Under the header, so it outweighs the button's own emotion class. */
+[role='button'] .side-panel__fold {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  translate: 0 -50%;
+}

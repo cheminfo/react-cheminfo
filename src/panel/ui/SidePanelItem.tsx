@@ -29,6 +29,11 @@ export interface SidePanelItemProps {
    * is alone in the stack, where there is nothing to fold.
    */
   focus: { active: boolean; toggle: () => void } | undefined;
+  /**
+   * Whether the header offers to fill the screen with the panel, where the
+   * browser can.
+   */
+  fillScreen: boolean;
   /** Called when the close cross is pressed. */
   onClose: () => void;
   /** The body. */
@@ -39,22 +44,28 @@ export interface SidePanelItemProps {
  * One panel of the stack: the header with the shell's gestures, and the body,
  * which is also the box that fills the screen.
  *
+ * The chevron leads the header, where a disclosure is looked for. The header
+ * takes only a string title and draws its toolbar on the right, so the chevron
+ * is the toolbar's first item and `chrome.css` sets it before the title.
+ *
  * The header is not part of what fills the screen, so a body that does carries
  * a bar of its own with the title and the way back.
  * @param props - See {@link SidePanelItemProps}.
  * @returns The accordion item.
  */
 export function SidePanelItem(props: SidePanelItemProps) {
-  const { id, title, isOpen, onOpenChange, focus, onClose, children } = props;
+  const { id, title, isOpen, onOpenChange, focus, fillScreen } = props;
+  const { onClose, children } = props;
   const t = useChromeT();
   const panel = inSentence(title, useLanguage());
-  const [canFill] = useState(canFillScreen);
+  const [screenFillable] = useState(canFillScreen);
+  const canFill = fillScreen && screenFillable;
   const body = useRef<HTMLDivElement | null>(null);
   const onStage = useCallback((element: HTMLDivElement | null) => {
     body.current = element;
   }, []);
 
-  function fillScreen(): void {
+  function fill(): void {
     if (!isOpen) onOpenChange(true);
     void body.current?.requestFullscreen().catch(() => undefined);
   }
@@ -67,6 +78,18 @@ export function SidePanelItem(props: SidePanelItemProps) {
       onOpenChange={onOpenChange}
       renderToolbar={() => (
         <>
+          <Button
+            variant="minimal"
+            className="side-panel__fold"
+            icon={isOpen ? 'chevron-down' : 'chevron-right'}
+            data-panel-open={isOpen}
+            aria-expanded={isOpen}
+            aria-label={t(isOpen ? 'panel.fold' : 'panel.unfold', { panel })}
+            tooltipProps={{
+              content: t(isOpen ? 'panel.foldTooltip' : 'panel.unfoldTooltip'),
+            }}
+            onClick={() => onOpenChange(!isOpen)}
+          />
           {focus !== undefined && (
             <Button
               variant="minimal"
@@ -87,20 +110,9 @@ export function SidePanelItem(props: SidePanelItemProps) {
               icon="fullscreen"
               aria-label={t('panel.fillScreen', { panel })}
               tooltipProps={{ content: t('panel.fillScreenTooltip') }}
-              onClick={fillScreen}
+              onClick={fill}
             />
           )}
-          <Button
-            variant="minimal"
-            icon={isOpen ? 'chevron-down' : 'chevron-right'}
-            data-panel-open={isOpen}
-            aria-expanded={isOpen}
-            aria-label={t(isOpen ? 'panel.fold' : 'panel.unfold', { panel })}
-            tooltipProps={{
-              content: t(isOpen ? 'panel.foldTooltip' : 'panel.unfoldTooltip'),
-            }}
-            onClick={() => onOpenChange(!isOpen)}
-          />
           <Button
             variant="minimal"
             icon="cross"

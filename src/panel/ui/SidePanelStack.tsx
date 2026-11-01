@@ -33,6 +33,14 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
    * @returns Its body.
    */
   children: (panel: TPanel) => ReactNode;
+  /**
+   * Whether a panel offers to fill the screen, for a stack where only some
+   * panels hold something worth it.
+   * @param panel - The panel asked about.
+   * @returns Whether its header carries the button.
+   * @default every panel does, where the browser can fill the screen
+   */
+  fillScreen?: (panel: TPanel) => boolean;
 }
 
 /**
@@ -48,9 +56,10 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
  * they were switched on, so a panel always comes back where it was.
  *
  * The header carries the shell's own gestures and nothing about what the panel
- * holds: focus, which folds every other panel away and unfolds them again;
- * filling the screen with the panel, where the browser can; the chevron that
- * folds it away; and the cross that closes it. What a panel switches on and off
+ * holds: the chevron that folds it away, before the title; focus, which folds
+ * every other panel away and unfolds them again; filling the screen with the
+ * panel, where the browser can and the panel asks for it; and the cross that
+ * closes it. What a panel switches on and off
  * is a toolbar at the top of its own body, so it travels with the panel when it
  * is folded, reordered or lent to another editor, and every header in every
  * editor reads the same — which is the reason this is one component rather
@@ -69,7 +78,7 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
 export function SidePanelStack<TPanel extends PanelDescriptor>(
   props: SidePanelStackProps<TPanel>,
 ) {
-  const { panels, openPanelIds, onClose, children } = props;
+  const { panels, openPanelIds, onClose, children, fillScreen } = props;
   const open = panels.filter((panel) => openPanelIds.includes(panel.id));
   const folds = usePanelFolds(open.map((panel) => panel.id));
 
@@ -91,6 +100,7 @@ export function SidePanelStack<TPanel extends PanelDescriptor>(
                   }
                 : undefined
             }
+            fillScreen={fillScreen?.(panel) ?? true}
             onClose={() => onClose(panel.id)}
           >
             {children(panel)}

@@ -71,6 +71,13 @@ test('a header says whether its panel is open', () => {
   ]);
 });
 
+test('the chevron is the first button of its header', () => {
+  mount();
+  const [header] = host.querySelectorAll('[role="button"]');
+
+  expect(header?.querySelector('button')?.dataset.panelOpen).toBe('true');
+});
+
 test('the chevron folds its own panel away', () => {
   mount();
   act(() => chevrons()[0]?.click());
