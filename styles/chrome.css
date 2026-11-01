@@ -1681,10 +1681,12 @@ span.taxon-lineage__name {
   max-width: none;
 }
 
-/* Framed in another site: the frame is the margin, and it is usually narrow. */
+/* Framed in another site, the frame is the edge: the page keeps no gutter, so
+   a figure runs to the frame and the host's panel spends nothing on grey. Text
+   keeps its inset from the card or section that holds it, never from here. */
 .site-shell__main--embedded {
   max-width: none;
-  padding: 8px;
+  padding: 0;
 }
 
 @media (max-width: 40rem) {
