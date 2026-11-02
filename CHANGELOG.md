@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.82.1](https://github.com/cheminfo/react-cheminfo/compare/v0.82.0...v0.82.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* keep a typed number the parent ignores instead of writing the old value over it ([fc66096](https://github.com/cheminfo/react-cheminfo/commit/fc66096c18add7f74bf6033fdae1776443213c94))
+
 ## [0.82.0](https://github.com/cheminfo/react-cheminfo/compare/v0.81.0...v0.82.0) (2026-11-01)
 
 
