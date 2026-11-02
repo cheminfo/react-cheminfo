@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.83.0](https://github.com/cheminfo/react-cheminfo/compare/v0.82.1...v0.83.0) (2026-11-02)
+
+
+### Features
+
+* let an editor keep the folds of its side panels ([cf91a85](https://github.com/cheminfo/react-cheminfo/commit/cf91a85e5762aa5c808f9ab70edee7db49c50b12))
+
 ## [0.82.1](https://github.com/cheminfo/react-cheminfo/compare/v0.82.0...v0.82.1) (2026-11-02)
 
 
