@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.84.0](https://github.com/cheminfo/react-cheminfo/compare/v0.83.0...v0.84.0) (2026-11-02)
+
+
+### Features
+
+* flatten the side panel headers in every editor ([a51bebf](https://github.com/cheminfo/react-cheminfo/commit/a51bebf4b83ceed8d44d3058d9be9475fff5a649))
+
 ## [0.83.0](https://github.com/cheminfo/react-cheminfo/compare/v0.82.1...v0.83.0) (2026-11-02)
 
 
