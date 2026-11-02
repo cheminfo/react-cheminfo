@@ -28,8 +28,8 @@ export interface FramedToolUtilitiesProps {
    */
   document?: ToolDocument | null;
   /**
-   * Whether the tool's site has an About at `/about`. Without one, neither
-   * the About nor a greyed Cite is offered.
+   * Whether the tool's site has an About at `/about`. Without one, the About
+   * is not offered.
    * @default true
    */
   about?: boolean;
@@ -48,7 +48,8 @@ export interface FramedToolUtilitiesProps {
  *
  * The About is the tool's own page, framed: it says what the tool's site
  * says, in the version that site runs. The works to cite and the help come
- * from the tool's `hello`, so Cite is greyed until the tool has said.
+ * from the tool's `hello`; until the tool names a work, there is no Cite,
+ * rather than a button that does nothing.
  * Render inside a `Toolbar` of `react-science`.
  * @param props - See {@link FramedToolUtilitiesProps}.
  * @returns The toolbar items.
@@ -78,16 +79,7 @@ export function FramedToolUtilities(
           }}
         />
       ) : null}
-      {works === undefined ? (
-        hasAbout ? (
-          <Toolbar.Item
-            icon="citation"
-            tooltip={t('framedTool.citeUnknown', { host: name })}
-            aria-label={cite}
-            disabled
-          />
-        ) : null
-      ) : (
+      {works === undefined || works.length === 0 ? null : (
         <Toolbar.PopoverItem
           placement="bottom-end"
           content={<CitationMenu works={works} />}

@@ -832,7 +832,6 @@
   "panel.changeColour": "Tracer ce spectre dans une autre couleur",
   "framedTool.about": "À propos de {host}",
   "framedTool.cite": "Comment citer {host}",
-  "framedTool.citeUnknown": "{host} n'a pas indiqué ici comment le citer. Sa page À propos le fait.",
   "framedTool.help": "Comment utiliser {host}",
   "framedTool.open": "Ouvrir {host} dans un nouvel onglet",
   "storage.menuTitle": "Sauvegarder ou restaurer tout ce que ce site garde dans votre navigateur",
