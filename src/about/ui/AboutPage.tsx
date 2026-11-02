@@ -102,12 +102,18 @@ export function AboutPage(props: AboutPageProps): ReactElement {
         ) : null}
       </header>
 
-      {about.people.length === 0 && about.providedBy.length === 0 ? null : (
+      {about.people.length === 0 &&
+      about.providedBy.length === 0 &&
+      about.team.length === 0 ? null : (
         <AboutSection
           title={t('about.providedBy')}
           className="about-provided-by"
         >
-          <AboutProvidedBy people={about.people} providers={about.providedBy} />
+          <AboutProvidedBy
+            people={about.people}
+            team={about.team}
+            providers={about.providedBy}
+          />
         </AboutSection>
       )}
 
@@ -156,8 +162,10 @@ const PAGE_STYLE = {
   gap: 10,
 } as const satisfies CSSProperties;
 
+// A zero basis, so the text shares its row with the mark at any width and only
+// the corner wraps under it on a phone (`chrome.css`).
 const HERO_BODY_STYLE = {
-  flex: '1 1 auto',
+  flex: '1 1 0',
   minWidth: 0,
 } as const satisfies CSSProperties;
 
@@ -172,11 +180,11 @@ const HERO_STYLE = {
   lineHeight: 1.55,
 } as const satisfies CSSProperties;
 
+// Where it sits and how wide it is are `chrome.css`'s, which moves it under the
+// text on a phone.
 const CORNER_STYLE = {
   display: 'flex',
-  flex: '0 0 auto',
   flexDirection: 'column',
-  alignItems: 'flex-end',
   gap: 2,
 } as const satisfies CSSProperties;
 

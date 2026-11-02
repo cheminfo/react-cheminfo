@@ -6,3 +6,5 @@ export type { FormulaLookupProps } from './FormulaLookup.tsx';
 export { FormulaLookup } from './FormulaLookup.tsx';
 export type { QuestionFormulaProps } from './QuestionFormula.tsx';
 export { QuestionFormula } from './QuestionFormula.tsx';
+export type { QuestionCompoundProps } from './QuestionCompound.tsx';
+export { QuestionCompound } from './QuestionCompound.tsx';

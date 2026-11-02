@@ -62,6 +62,14 @@ body:has(.card) {
   font-size: 0.8125rem;
 }
 
+/* A card whose answer is on its way, or could not be had: the spinner or the
+   reason takes the row, the way to the site's page keeps its end. */
+.card__status {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+}
+
 /* A dialog a card opens is as tall as what it holds: the card grows to hold
    it, where Blueprint would cut its body to seven tenths of a frame that is
    only as tall as the card. */

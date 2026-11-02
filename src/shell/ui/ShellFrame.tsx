@@ -48,6 +48,7 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
     belowHeader,
     mainClassName,
     mainTestId,
+    mainElement: Main = 'main',
     footer = {},
     account,
     children,
@@ -82,7 +83,7 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
           account={account}
         />
         {embedded ? null : belowHeader}
-        <main
+        <Main
           className={joinClassNames(
             'site-shell__main',
             width === 'full' ? 'site-shell__main--full' : undefined,
@@ -91,10 +92,10 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
           )}
           data-testid={mainTestId}
         >
-          {aboutOnShow
+          {aboutOnShow && about.routed !== true
             ? (about.page ?? <AboutPage content={about.content} />)
             : children}
-        </main>
+        </Main>
       </div>
       {footer === false || footerSiteId === undefined ? null : (
         <SiteFooter

@@ -81,7 +81,11 @@ export const NeverReleased: Story = {
   },
 };
 
-/** A site provided by one person at EPFL. */
+/**
+ * A site provided by Luc Patiny at EPFL. The list under the names is the
+ * family's: Luc Patiny first, then Michaël Zasso, who maintains OpenChemLib —
+ * credited here — and the tooling, at Zakodium.
+ */
 export const ProvidedBy: Story = {
   args: {
     content: {
@@ -92,14 +96,36 @@ export const ProvidedBy: Story = {
   },
 };
 
-/** Several people, each with the one line they contributed. */
+/**
+ * A site whose design is react-science: Daniel Kostro, who maintains it at
+ * Zakodium, comes second.
+ */
+export const ProvidedWithReactScience: Story = {
+  args: {
+    content: {
+      ...CITED,
+      credits: ['openchemlib', 'react-science', 'blueprint', 'react', 'vite'],
+      people: [{ name: 'Luc Patiny' }],
+      providedBy: ['epfl'],
+    },
+  },
+};
+
+/** A site some others worked on: they follow the family, each with one line. */
 export const ProvidedByATeam: Story = {
   args: {
     content: {
       ...CITED,
-      people: [
-        { name: 'Daniel Kostro', role: 'wrote the solver every page runs on.' },
-        { name: 'Luc Patiny', role: 'maintains the tooling and the data.' },
+      people: [{ name: 'Luc Patiny' }],
+      contributors: [
+        {
+          name: 'Daniel Kostro',
+          role: 'wrote chem-equilibrium, the solver every page runs on.',
+        },
+        {
+          name: 'Régis Turin',
+          role: 'wrote the exercises and the worked examples.',
+        },
       ],
       providedBy: ['epfl'],
     },

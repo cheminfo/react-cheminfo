@@ -255,10 +255,53 @@ test('provided by: the EPFL logo, the name and the institution, right under the 
   expect(html).toContain(
     'aria-label="EPFL — École polytechnique fédérale de Lausanne"',
   );
-  expect(html).not.toContain('<ul style="margin:16px 0 0');
   expect(html.indexOf('about-hero')).toBeLessThan(html.indexOf('Provided by'));
   expect(html.indexOf('Provided by')).toBeLessThan(
     html.indexOf('What you can do here'),
+  );
+});
+
+test('under the names, the family: Luc Patiny first, then Michaël Zasso at Zakodium', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        people: [{ name: 'Luc Patiny' }],
+        providedBy: ['epfl'],
+      }}
+    />,
+  );
+  const luc =
+    '<li><strong>Luc Patiny</strong> — had the idea, coordinates the project and contributes code.</li>';
+  const michael =
+    '<li><strong>Michaël Zasso</strong> — maintains OpenChemLib and the tooling this site is built with, at <a href="https://www.zakodium.com" target="_blank" rel="noopener noreferrer">Zakodium</a>.</li>';
+
+  expect(html).toContain(luc);
+  expect(html).toContain(michael);
+  expect(html.indexOf(luc)).toBeLessThan(html.indexOf(michael));
+  expect(html).not.toContain('Daniel Kostro');
+});
+
+test('Daniel Kostro comes second on a site whose design is react-science', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        credits: ['react', 'react-science'],
+        people: [{ name: 'Luc Patiny' }],
+        providedBy: ['epfl'],
+      }}
+    />,
+  );
+  const daniel =
+    '<li><strong>Daniel Kostro</strong> — maintains react-science, the library the design of this site relies on, at <a href="https://www.zakodium.com" target="_blank" rel="noopener noreferrer">Zakodium</a>.</li>';
+
+  expect(html).toContain(daniel);
+  expect(html.indexOf('<strong>Luc Patiny</strong>')).toBeLessThan(
+    html.indexOf(daniel),
+  );
+  expect(html.indexOf(daniel)).toBeLessThan(
+    html.indexOf('<strong>Michaël Zasso</strong> — maintains the tooling'),
   );
 });
 
@@ -281,16 +324,23 @@ test('several people are joined into one line, and their roles listed under it',
   expect(html).toContain(
     '<li><strong>Daniel Kostro</strong> — wrote the solver.</li>',
   );
-  expect(html).toContain(
-    '<li><strong>Luc Patiny</strong> — curates the data.</li>',
+  // The family's people keep the family's words, and come first.
+  expect(html).not.toContain('curates the data.');
+
+  const order = ['Luc Patiny', 'Michaël Zasso', 'Daniel Kostro'].map((name) =>
+    html.indexOf(`<li><strong>${name}</strong>`),
   );
-  expect(html).not.toContain('<li><strong>Michaël Zasso</strong>');
+
+  expect(order).not.toContain(-1);
+  expect(order).toStrictEqual(order.toSorted((left, right) => left - right));
 });
 
-test('a site naming nobody and no provider has no "Provided by" section', () => {
+test('a site naming nobody and no provider still lists the family', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
-  expect(html).not.toContain('Provided by');
+  expect(html).toContain('Provided by');
+  expect(html).toContain('<li><strong>Luc Patiny</strong>');
+  expect(html).not.toContain('epfl.ch');
 });
 
 test('a provider no registry entry answers to stops the page being drawn', () => {
@@ -356,7 +406,7 @@ test('a site with accounts offers to sign in under the version, in the hero', ()
   );
 
   expect(html).toContain(
-    '<div class="about-corner" style="display:flex;flex:0 0 auto;flex-direction:column;align-items:flex-end;gap:2px"><span',
+    '<div class="about-corner" style="display:flex;flex-direction:column;gap:2px"><span',
   );
   expect(html).toContain(
     '>2.4.0 · 2026-09-16 09:41 UTC</span></span><a class="about-sign-in" href="/admin">Sign in</a></div>',

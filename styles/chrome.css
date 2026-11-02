@@ -1703,6 +1703,27 @@ span.taxon-lineage__name {
   }
 }
 
+/* ── The About's hero ────────────────────────────────────────────────────── */
+
+/* The build stamp and the sign-in sit in the hero's corner. */
+.about-corner {
+  flex: 0 0 auto;
+  align-items: flex-end;
+}
+
+/* On a phone the corner would leave the text a column one word wide, so it
+   takes a line of its own under the text. */
+@media (max-width: 40rem) {
+  .about-hero {
+    flex-wrap: wrap;
+  }
+
+  .about-corner {
+    flex-basis: 100%;
+    align-items: flex-start;
+  }
+}
+
 /* ── A graded series ─────────────────────────────────────────────────────── */
 
 .exercise-series {

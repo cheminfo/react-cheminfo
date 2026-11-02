@@ -1,6 +1,7 @@
 /**
- * A stand-in host for a tool's end-to-end tests, and the messages SciPeaks
- * sends. Node only: it serves a page.
+ * A stand-in host for a tool's end-to-end tests, the messages SciPeaks sends,
+ * and the frames a chat or a page draws a card in. Node only: it serves a page, and
+ * drives Playwright's.
  */
 
 export type {
@@ -20,3 +21,17 @@ export {
   SCIPEAKS_HOST_NAME,
   sciPeaksEthylbenzeneIrLoad,
 } from './host/testing/sciPeaks.ts';
+export type {
+  ChatFrameLog,
+  ChatFrameOptions,
+} from './host/testing/chatFrame.ts';
+export {
+  frameAsChat,
+  readChatFrameLog,
+  readClipboardText,
+  readClipboardTypes,
+  readLastHeight,
+  resetClipboard,
+} from './host/testing/chatFrame.ts';
+export type { CardFrameOptions } from './host/testing/cardFrame.ts';
+export { frameAsCard, readOpenedAddress } from './host/testing/cardFrame.ts';

@@ -60,6 +60,13 @@ export interface ShellAbout {
    * @default `<AboutPage content={content} />`
    */
   page?: ReactNode;
+  /**
+   * Whether the site's own router draws the About among pages it keeps
+   * mounted: the shell then marks the entry active and leaves the main area
+   * to the children, so going to the About and back loses nothing.
+   * @default false
+   */
+  routed?: boolean;
 }
 
 /** The strip under the page. */
@@ -239,6 +246,12 @@ export interface SiteShellProps<
    * @default undefined
    */
   mainTestId?: string;
+  /**
+   * The element the page is drawn in: `div` for a page that brings its own
+   * `<main>` — an embedded Swagger UI — so the document keeps one landmark.
+   * @default 'main'
+   */
+  mainElement?: 'main' | 'div';
   /**
    * The strip under the page, or `false` for none on this page.
    * @default the family's links alone

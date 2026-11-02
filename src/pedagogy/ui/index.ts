@@ -53,6 +53,8 @@ export type { TutorialLevelColours } from './tutorialLevels.ts';
 export { TUTORIAL_LEVEL_COLOURS } from './tutorialLevels.ts';
 export type { AnswerFieldsProps } from './AnswerFields.tsx';
 export { AnswerFields } from './AnswerFields.tsx';
+export type { CalculatorTableProps } from './CalculatorTable.tsx';
+export { CalculatorTable } from './CalculatorTable.tsx';
 export type {
   ExerciseListEntry,
   ExerciseListProgress,
@@ -69,3 +71,5 @@ export type {
 export { QuestionCard } from './QuestionCard.tsx';
 export { SERIES_COUNTS } from './seriesCounts.ts';
 export { useAttemptRecords } from './useAttemptRecords.ts';
+export type { PracticePageProps } from './PracticePage.tsx';
+export { PracticePage } from './PracticePage.tsx';

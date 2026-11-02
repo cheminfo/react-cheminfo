@@ -1,14 +1,22 @@
-import type { CSSProperties, ReactElement } from 'react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Language } from '../../i18n/core/languages.ts';
+import { Prose } from '../../i18n/ui/Prose.tsx';
+import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { AboutPerson } from '../core/about.ts';
 import type { ProviderEntry } from '../core/providers.ts';
+import type { TeamMember } from '../core/team.ts';
+
+import { ProviderLogo } from './ProviderLogo.tsx';
 
 export interface AboutProvidedByProps {
-  /** Who provides the site, in display order. */
+  /** Who provides the site, named beside the logos. */
   people: readonly AboutPerson[];
+  /** The list under the names: who does what, the family's people first. */
+  team: readonly TeamMember[];
   /** The institutions providing the site, drawn as linked logos. */
   providers: readonly ProviderEntry[];
 }
@@ -21,51 +29,94 @@ export interface AboutProvidedByProps {
  * @returns The lockup.
  */
 export function AboutProvidedBy(props: AboutProvidedByProps): ReactElement {
-  const { people, providers } = props;
+  const { people, team, providers } = props;
   const t = useChromeT();
-  const withRoles = people.filter((person) => person.role !== undefined);
+  const language = useLanguage();
 
   return (
     <div>
-      <div style={LOCKUP_STYLE}>
-        {providers.map((provider) => (
-          <a
-            key={provider.id}
-            href={provider.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={provider.fullName}
-            style={LOGO_TILE_STYLE}
-          >
-            <ProviderLogo provider={provider} />
-          </a>
-        ))}
-        <div
-          style={
-            providers.length === 0 ? IDENTITY_STYLE : DIVIDED_IDENTITY_STYLE
-          }
-        >
-          {people.length === 0 ? null : (
-            <p style={NAMES_STYLE}>{joinNames(people, t)}</p>
-          )}
+      {people.length === 0 && providers.length === 0 ? null : (
+        <div style={LOCKUP_STYLE}>
           {providers.map((provider) => (
-            <p key={provider.id} style={INSTITUTION_STYLE}>
-              {provider.fullName}
-              <span style={LOCATION_STYLE}>{provider.location}</span>
-            </p>
+            <a
+              key={provider.id}
+              href={provider.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={provider.fullName}
+              style={LOGO_TILE_STYLE}
+            >
+              <ProviderLogo provider={provider} />
+            </a>
           ))}
+          <div
+            style={
+              providers.length === 0 ? IDENTITY_STYLE : DIVIDED_IDENTITY_STYLE
+            }
+          >
+            {people.length === 0 ? null : (
+              <p style={NAMES_STYLE}>{joinNames(people, t)}</p>
+            )}
+            {providers.map((provider) => (
+              <p key={provider.id} style={INSTITUTION_STYLE}>
+                {provider.fullName}
+                <span style={LOCATION_STYLE}>{provider.location}</span>
+              </p>
+            ))}
+          </div>
         </div>
-      </div>
-      {withRoles.length === 0 ? null : (
+      )}
+      {team.length === 0 ? null : (
         <ul style={ROLES_STYLE}>
-          {withRoles.map((person) => (
-            <li key={person.name}>
-              <strong>{person.name}</strong> — {person.role}
+          {team.map((member) => (
+            <li key={member.name}>
+              <strong>{member.name}</strong> — {roleOf(member, t, language)}
             </li>
           ))}
         </ul>
       )}
     </div>
+  );
+}
+
+/**
+ * What one person of the list does: the family's words for one of its
+ * people, with where they do it linked, or the site's own.
+ * @param member - The person.
+ * @param t - The chrome's messages.
+ * @param language - The page's language, which the works are listed in.
+ * @returns The role, as it reads after the name.
+ */
+function roleOf(
+  member: TeamMember,
+  t: Translate<ChromeKey>,
+  language: Language,
+): ReactNode {
+  const { family } = member;
+  if (family === undefined) return member.role;
+  const { role, organisation, works } = family;
+  let text = t('about.role.coordinates');
+  if (role === 'design') text = t('about.role.design');
+  if (role === 'tooling') {
+    text =
+      works.length === 0
+        ? t('about.role.tooling')
+        : t('about.role.toolingAnd', {
+            works: new Intl.ListFormat(language).format(works),
+          });
+  }
+  if (organisation === undefined) return text;
+  return (
+    <Prose
+      text={text}
+      nodes={{
+        organisation: (
+          <a href={organisation.href} target="_blank" rel="noopener noreferrer">
+            {organisation.name}
+          </a>
+        ),
+      }}
+    />
   );
 }
 
@@ -79,62 +130,6 @@ function joinNames(
     names: names.slice(0, -1).join(', '),
     last: names.at(-1) ?? '',
   });
-}
-
-function ProviderLogo(props: { provider: ProviderEntry }): ReactElement {
-  const { provider } = props;
-  const label = `${provider.name} — ${provider.fullName}`;
-
-  switch (provider.id) {
-    case 'epfl':
-      return <EpflLogo label={label} />;
-    case 'unil-esc':
-      return <UnilEscLockup label={label} />;
-    default:
-      return <span>{provider.name}</span>;
-  }
-}
-
-// The school's name set in type beside its university's, in the black the
-// university writes its name in: no drawing of its emblem is kept here, and a
-// name nobody can misread credits it better than a guess at one.
-function UnilEscLockup(props: { label: string }): ReactElement {
-  return (
-    <span role="img" aria-label={props.label} style={UNIL_LOCKUP_STYLE}>
-      <span style={UNIL_NAME_STYLE}>UNIL</span>
-      <span style={UNIL_RULE_STYLE} />
-      <span style={UNIL_SCHOOL_STYLE}>
-        École des
-        <br />
-        sciences criminelles
-      </span>
-    </span>
-  );
-}
-
-function EpflLogo(props: { label: string }): ReactElement {
-  return (
-    <svg
-      width={112}
-      height={(112 * 53) / 182.4}
-      viewBox="0 0 182.4 53"
-      role="img"
-      aria-label={props.label}
-      style={{ display: 'block' }}
-    >
-      {/* The institution's own colour, not a family token. */}
-      <g fill="red">
-        <polygon points="0 21.6 11.43 21.6 11.43 9.8 38.34 9.8 38.34 0 0 0 0 21.6" />
-        <polygon points="0 53 38.34 53 38.34 43.2 11.43 43.2 11.43 31.4 0 31.4 0 53" />
-        <rect x="11.43" y="21.6" width="24.61" height="9.8" />
-        <path d="M86,4.87a16.12,16.12,0,0,0-5.68-3.53A23.76,23.76,0,0,0,71.82,0H48.14V53H59.57V31.4H71.82a23.76,23.76,0,0,0,8.46-1.34A16.12,16.12,0,0,0,86,26.53a13.43,13.43,0,0,0,3.19-5,17.38,17.38,0,0,0,0-11.62A13.52,13.52,0,0,0,86,4.87ZM78,18.73a5.7,5.7,0,0,1-2.26,1.8,11.33,11.33,0,0,1-3.27.85,32,32,0,0,1-3.86.22H59.57V9.8h9.05a32,32,0,0,1,3.86.22,11,11,0,0,1,3.27.86A5.59,5.59,0,0,1,78,12.67a5,5,0,0,1,.86,3A5,5,0,0,1,78,18.73Z" />
-        <polygon points="155.47 43.2 155.47 0 144.04 0 144.04 53 182.38 53 182.38 43.2 155.47 43.2" />
-        <polygon points="97.42 21.6 108.85 21.6 108.85 9.8 135.76 9.8 135.76 0 97.42 0 97.42 21.6" />
-        <rect x="97.42" y="31.4" width="11.43" height="21.6" />
-        <rect x="108.85" y="21.6" width="24.61" height="9.8" />
-      </g>
-    </svg>
-  );
 }
 
 const LOCKUP_STYLE = {
@@ -191,34 +186,4 @@ const ROLES_STYLE = {
   paddingTop: 12,
   paddingLeft: 20,
   borderTop: '1px solid var(--border)',
-} as const satisfies CSSProperties;
-
-const UNIL_LOCKUP_STYLE = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  height: 31,
-  // The institution's own colour, not a family token: the tile is white on
-  // every theme.
-  color: 'black',
-} as const satisfies CSSProperties;
-
-const UNIL_NAME_STYLE = {
-  fontSize: 24,
-  fontWeight: 800,
-  letterSpacing: '0.02em',
-  lineHeight: 1,
-} as const satisfies CSSProperties;
-
-const UNIL_RULE_STYLE = {
-  alignSelf: 'stretch',
-  width: 1,
-  background: 'black',
-} as const satisfies CSSProperties;
-
-const UNIL_SCHOOL_STYLE = {
-  fontSize: 10.5,
-  fontWeight: 600,
-  lineHeight: 1.15,
-  whiteSpace: 'nowrap',
 } as const satisfies CSSProperties;

@@ -1,4 +1,8 @@
 import { pageHistory, pageLocation } from '../../router/core/pageAddress.ts';
+import {
+  formatQueryEntries,
+  parseQueryEntries,
+} from '../../router/core/query.ts';
 
 import { EMBED_PARAM, HIDE_PARAM } from './config.ts';
 import type { ShareParamCodec } from './params.ts';
@@ -186,6 +190,52 @@ export function syncPreferencesWithUrl(
   };
 }
 
+/**
+ * Watch every preference through a signal effect, for
+ * {@link syncPreferencesWithUrl}: the effect reads each value, which subscribes
+ * it to whatever signals they come from.
+ * @param preferences - The preferences, keyed by their URL parameter name.
+ * @param effect - `effect` from `@preact/signals-react`.
+ * @returns What `syncPreferencesWithUrl` takes as `subscribe`.
+ */
+export function preferenceEffect(
+  preferences: UrlPreferences,
+  effect: (callback: () => void) => () => void,
+): (listener: () => void) => () => void {
+  return (listener) =>
+    effect(() => {
+      for (const preference of Object.values(preferences)) preference.get();
+      listener();
+    });
+}
+
+/**
+ * The query string with every preference written out, its default included,
+ * for the share dialog. A link only names a preference that differs from the
+ * default, and one it does not name leaves the visitor's own stored value in
+ * place — so the link a teacher hands out pins them all.
+ * @param preferences - The preferences, keyed by their URL parameter name.
+ * @param search - The query string the link starts from.
+ * @returns The query string with its `?`, or an empty string.
+ */
+export function pinnedPreferenceSearch(
+  preferences: UrlPreferences,
+  search: string = pageLocation()?.search ?? '',
+): string {
+  assertPreferenceNames(preferences);
+  const entries: QueryEntry[] = [];
+  for (const entry of parseQueryEntries(search)) {
+    if (!Object.hasOwn(preferences, entry[0])) entries.push(entry);
+  }
+  for (const [name, preference] of Object.entries(preferences)) {
+    const value = preference.get();
+    const raw = preference.codec.serialize(value) ?? pinnedText(value);
+    if (raw !== null) entries.push([name, raw]);
+  }
+  const query = formatQueryEntries(entries);
+  return query === '' ? '' : `?${query}`;
+}
+
 const RESERVED_NAMES = new Set([EMBED_PARAM, HIDE_PARAM]);
 
 function assertPreferenceNames(preferences: UrlPreferences): void {
@@ -208,4 +258,12 @@ function sameQuery(current: string, next: string): boolean {
     if (left?.[0] !== right?.[0] || left?.[1] !== right?.[1]) return false;
   }
   return true;
+}
+
+function pinnedText(value: unknown): string | null {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return null;
 }

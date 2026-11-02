@@ -26,5 +26,5 @@ export {
   setMessageSession,
   subscribeToMessages,
 } from './session.ts';
-export type { LoadedCatalogs } from './translateSetup.ts';
-export { loadCatalogs } from './translateSetup.ts';
+export type { LoadedCatalogs, TranslateModeOptions } from './translateSetup.ts';
+export { loadCatalogs, startTranslateMode } from './translateSetup.ts';

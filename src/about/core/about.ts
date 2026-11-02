@@ -7,6 +7,8 @@ import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 
 import type { ProviderEntry, ProviderId } from './providers.ts';
 import { providers } from './providers.ts';
+import type { TeamMember } from './team.ts';
+import { aboutTeam, isFamilyPerson } from './team.ts';
 
 /**
  * What a site says about itself: the one page a visitor opens to find out what
@@ -48,6 +50,12 @@ export interface AboutContent {
    */
   people?: readonly AboutPerson[];
   /**
+   * Who else worked on the site, listed under the names with what they did,
+   * after the family's own people.
+   * @default undefined
+   */
+  contributors?: readonly AboutPerson[];
+  /**
    * Ids into the provider registry: the institutions that provide the site,
    * drawn as logos under "Provided by".
    * @default undefined
@@ -87,8 +95,13 @@ export interface ResolvedAbout {
   credits: CreditEntry[];
   /** The works to cite, empty when the site asks for none. */
   cite: readonly CitedWork[];
-  /** Who made the site, empty when the site names nobody. */
+  /** Who provides the site, empty when the site names nobody. */
   people: readonly AboutPerson[];
+  /**
+   * The list under the names: the family's people where they apply, then
+   * whoever else the site names with a role.
+   */
+  team: readonly TeamMember[];
   /** The institutions providing the site, empty when the site names none. */
   providedBy: ProviderEntry[];
   /** Which build is running, or `undefined` when the site does not say. */
@@ -108,14 +121,19 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
     typeof content.siteId === 'string'
       ? siteById(content.siteId)
       : content.siteId;
+  const borrowed = credits(content.credits);
   return {
     site,
     what: content.what,
     paragraphs: content.paragraphs ?? [],
     can: content.can,
-    credits: credits(content.credits),
+    credits: borrowed,
     cite: content.cite ?? [],
     people: content.people ?? [],
+    team: aboutTeam(
+      [...(content.people ?? []), ...(content.contributors ?? [])],
+      borrowed,
+    ),
     providedBy: providers(content.providedBy ?? []),
     build: content.build,
   };
@@ -166,6 +184,20 @@ export function aboutProblems(content: AboutContent): string[] {
     if (paragraph.length > PARAGRAPH_LIMIT) {
       problems.push(
         `paragraph ${index + 1} is ${paragraph.length} characters: at most ${PARAGRAPH_LIMIT}, or it is documentation rather than context.`,
+      );
+    }
+  }
+
+  for (const person of [
+    ...(content.people ?? []),
+    ...(content.contributors ?? []),
+  ]) {
+    if (
+      person.role !== undefined &&
+      isFamilyPerson(person.name, content.credits)
+    ) {
+      problems.push(
+        `${person.name} is one of the family's people: every site lists them with the same role, so leave \`role\` out.`,
       );
     }
   }

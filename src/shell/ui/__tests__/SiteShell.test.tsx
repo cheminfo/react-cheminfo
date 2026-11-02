@@ -91,6 +91,24 @@ test('a framed page is the page alone', () => {
   );
 });
 
+test('a site routing its own About keeps its page on show', () => {
+  render({ about: { content: ABOUT, active: true, routed: true } });
+
+  expect(host.querySelector('[data-testid="page"]')?.textContent).toBe(
+    'The electrons page',
+  );
+  expect(
+    host.querySelector('.app-header-actions .nav-link--active')?.textContent,
+  ).toBe('About');
+});
+
+test('a page bringing its own main landmark is drawn in a div', () => {
+  render({ mainElement: 'div', mainTestId: 'page-api' });
+
+  expect(host.querySelector('main')).toBeNull();
+  expect(host.querySelector('[data-testid="page-api"]')?.tagName).toBe('DIV');
+});
+
 test('a link hiding the tabs empties the bar of its pages only', () => {
   render({ hidden: ['tabs'] });
 

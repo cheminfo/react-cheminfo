@@ -74,6 +74,7 @@ test('the first run is loading and pending, its answer neither', async () => {
     data: undefined,
     error: undefined,
     pending: true,
+    failure: undefined,
   });
 
   await act(async () => {
@@ -85,6 +86,7 @@ test('the first run is loading and pending, its answer neither', async () => {
     data: 'C6H6',
     error: undefined,
     pending: false,
+    failure: undefined,
   });
 });
 
@@ -103,6 +105,7 @@ test('a changed question keeps the old answer, pending, and aborts the old run',
     data: 'C6H6',
     error: undefined,
     pending: true,
+    failure: undefined,
   });
 
   render(askAgain, 1);
@@ -119,17 +122,19 @@ test('a changed question keeps the old answer, pending, and aborts the old run',
     data: 'C6H12',
     error: undefined,
     pending: false,
+    failure: undefined,
   });
 });
 
-test('a failed refresh keeps the data and stops being pending', async () => {
+test('a failed refresh keeps the data, stops being pending and says why', async () => {
   const render = mount(ask);
   await act(async () => {
     questions[0]?.resolve('H2O');
   });
   render(ask, 1);
+  const down = new Error('network down');
   await act(async () => {
-    questions[1]?.reject(new Error('network down'));
+    questions[1]?.reject(down);
   });
 
   expect(last()).toStrictEqual({
@@ -137,6 +142,57 @@ test('a failed refresh keeps the data and stops being pending', async () => {
     data: 'H2O',
     error: undefined,
     pending: false,
+    failure: down,
+  });
+  expect(last().failure).toBe(down);
+});
+
+test('a first failure is both the error state and the failure', async () => {
+  mount(ask);
+  await act(async () => {
+    questions[0]?.reject('503');
+  });
+
+  const result = last();
+
+  expect(result.status).toBe('error');
+  expect(result.error?.message).toBe('503');
+  expect(result.failure).toBe(result.error);
+  expect(result.pending).toBe(false);
+});
+
+test('a failure belongs to its question: gone while the next is asked and once it is answered', async () => {
+  const render = mount(ask);
+  await act(async () => {
+    questions[0]?.resolve('C6H6');
+  });
+  render(askAgain, 0);
+  await act(async () => {
+    questions[1]?.reject(new Error('no such formula'));
+  });
+
+  expect(last().failure?.message).toBe('no such formula');
+
+  render(ask, 0);
+
+  expect(last()).toStrictEqual({
+    status: 'success',
+    data: 'C6H6',
+    error: undefined,
+    pending: true,
+    failure: undefined,
+  });
+
+  await act(async () => {
+    questions[2]?.resolve('C6H12');
+  });
+
+  expect(last()).toStrictEqual({
+    status: 'success',
+    data: 'C6H12',
+    error: undefined,
+    pending: false,
+    failure: undefined,
   });
 });
 

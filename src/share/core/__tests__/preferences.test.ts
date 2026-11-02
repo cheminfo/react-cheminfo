@@ -1,6 +1,11 @@
 import { expect, test } from 'vitest';
 
-import { booleanParam, enumParam, numberParam } from '../params.ts';
+import {
+  booleanParam,
+  enumParam,
+  integerParam,
+  numberParam,
+} from '../params.ts';
 import type {
   PreferenceHistory,
   PreferenceLocation,
@@ -9,6 +14,8 @@ import type {
 } from '../preferences.ts';
 import {
   applyPreferencesFromSearch,
+  pinnedPreferenceSearch,
+  preferenceEffect,
   syncPreferencesWithUrl,
   writePreferencesToSearch,
 } from '../preferences.ts';
@@ -265,3 +272,71 @@ test('a share link built from the synced address carries the preferences', () =>
     'https://3d.cheminfo.org/tool?smiles=CCO&size=2.5&embed=1&hide=menu',
   );
 });
+
+test('a pinned link names every preference, its default included', () => {
+  let count = 10;
+  let level = 'school';
+  const pinned: UrlPreferences = {
+    count: {
+      codec: integerParam({ min: 3, max: 30, default: 10 }),
+      get: () => count,
+      set: (value) => {
+        count = value as number;
+      },
+    },
+    level: {
+      codec: enumParam(['all', 'school'] as const, 'all'),
+      get: () => level,
+      set: (value) => {
+        level = value as string;
+      },
+    },
+  };
+
+  expect(pinnedPreferenceSearch(pinned, '?seed=42&count=7')).toBe(
+    '?seed=42&count=10&level=school',
+  );
+
+  level = 'all';
+
+  expect(pinnedPreferenceSearch(pinned, '')).toBe('?count=10&level=all');
+});
+
+test('a preference effect reads every value before it calls the listener', () => {
+  const read: string[] = [];
+  const watched: UrlPreferences = {
+    first: {
+      codec: integerParam({ min: 0, max: 9, default: 0 }),
+      get: () => {
+        read.push('first');
+        return 1;
+      },
+      set: () => undefined,
+    },
+    second: {
+      codec: integerParam({ min: 0, max: 9, default: 0 }),
+      get: () => {
+        read.push('second');
+        return 2;
+      },
+      set: () => undefined,
+    },
+  };
+  preferenceEffect(
+    watched,
+    runEffect,
+  )(() => {
+    read.push('listener');
+  });
+
+  expect(read).toStrictEqual(['first', 'second', 'listener']);
+});
+
+function runEffect(callback: () => void): () => void {
+  callback();
+  return stopNothing;
+}
+
+function stopNothing(): void {
+  // An effect run once has nothing to stop.
+}

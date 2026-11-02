@@ -16,6 +16,8 @@ const SMILES: AboutContent = {
   credits: ['openchemlib', 'react'],
 };
 
+const ZAKODIUM = { name: 'Zakodium', href: 'https://www.zakodium.com' };
+
 const OUTSIDE: EcosystemSite = {
   id: 'images' as SiteId,
   name: { lead: 'images', alt: 'cheminfo', dot: true },
@@ -75,6 +77,90 @@ test('credit ids become the entries of the shared registry, in order', () => {
       license: 'MIT',
     },
   ]);
+});
+
+test('every site lists Luc Patiny, then Michaël Zasso for the tooling and OpenChemLib', () => {
+  const about = resolveAbout({ ...SMILES, people: [{ name: 'Luc Patiny' }] });
+
+  expect(about.people).toStrictEqual([{ name: 'Luc Patiny' }]);
+  expect(about.team).toStrictEqual([
+    { name: 'Luc Patiny', family: { role: 'coordinates', works: [] } },
+    {
+      name: 'Michaël Zasso',
+      family: {
+        role: 'tooling',
+        organisation: ZAKODIUM,
+        works: ['OpenChemLib'],
+      },
+    },
+  ]);
+});
+
+test('Daniel Kostro is listed for react-science on a site that credits it', () => {
+  const about = resolveAbout({
+    ...SMILES,
+    credits: ['react', 'react-science'],
+  });
+
+  expect(about.team).toStrictEqual([
+    { name: 'Luc Patiny', family: { role: 'coordinates', works: [] } },
+    {
+      name: 'Daniel Kostro',
+      family: { role: 'design', organisation: ZAKODIUM, works: [] },
+    },
+    {
+      name: 'Michaël Zasso',
+      family: { role: 'tooling', organisation: ZAKODIUM, works: [] },
+    },
+  ]);
+});
+
+test("a site's own contributors follow the family, with the site's words", () => {
+  const about = resolveAbout({
+    ...SMILES,
+    people: [{ name: 'Luc Patiny' }],
+    contributors: [
+      { name: 'Daniel Kostro', role: 'wrote the solver.' },
+      { name: 'Régis Turin', role: 'wrote the exercises.' },
+    ],
+  });
+
+  expect(about.people).toStrictEqual([{ name: 'Luc Patiny' }]);
+  expect(about.team.map((member) => member.name)).toStrictEqual([
+    'Luc Patiny',
+    'Michaël Zasso',
+    'Daniel Kostro',
+    'Régis Turin',
+  ]);
+  expect(about.team[2]).toStrictEqual({
+    name: 'Daniel Kostro',
+    role: 'wrote the solver.',
+  });
+});
+
+test("a role written for one of the family's people is refused, where they are listed", () => {
+  expect(
+    aboutProblems({
+      ...SMILES,
+      people: [{ name: 'Luc Patiny', role: 'maintains the tooling.' }],
+    }),
+  ).toStrictEqual([
+    "Luc Patiny is one of the family's people: every site lists them with the same role, so leave `role` out.",
+  ]);
+
+  // Daniel Kostro is the family's only where react-science is credited.
+  const contributor = { name: 'Daniel Kostro', role: 'wrote the solver.' };
+
+  expect(
+    aboutProblems({ ...SMILES, contributors: [contributor] }),
+  ).toStrictEqual([]);
+  expect(
+    aboutProblems({
+      ...SMILES,
+      credits: ['react', 'react-science'],
+      contributors: [contributor],
+    }),
+  ).toHaveLength(1);
 });
 
 test('the works to cite are carried through as the site names them', () => {

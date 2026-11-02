@@ -37,6 +37,12 @@ export {
 } from './query.ts';
 export type { SiteAddresses, SiteAddressesOptions } from './siteAddresses.ts';
 export { anchorHref, createSiteAddresses } from './siteAddresses.ts';
+export { createSiteRouter } from './siteRouter.ts';
+export type {
+  SiteRoute,
+  SiteRouter,
+  SiteRouterOptions,
+} from './siteRouterTypes.ts';
 export type {
   TabDefinition,
   TabRoute,

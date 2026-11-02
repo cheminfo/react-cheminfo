@@ -4,6 +4,10 @@ export type { CardFigureProps } from './CardFigure.tsx';
 export { CardFigure } from './CardFigure.tsx';
 export type { CardFrameProps } from './CardFrame.tsx';
 export { CardFrame } from './CardFrame.tsx';
+export type { CardMissingProps } from './CardMissing.tsx';
+export { CardMissing } from './CardMissing.tsx';
+export type { CardStatusProps } from './CardStatus.tsx';
+export { CardStatus } from './CardStatus.tsx';
 export type { CopyTableButtonProps } from './CopyTableButton.tsx';
 export { CopyTableButton } from './CopyTableButton.tsx';
 export {
