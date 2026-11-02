@@ -2028,12 +2028,30 @@ span.taxon-lineage__name {
   word-break: break-all;
 }
 
-/* The chevron of a side panel leads its header, where a disclosure is looked
-   for. react-science draws every header button on the right, so the chevron is
-   lifted out of that run and set before the title. */
+/* react-science draws a panel header embossed, a grey gradient under a white
+   text shadow, which reads as a raised pill rather than as the top of the panel
+   under it. A side panel's header is flat and one grey, open or folded: the
+   chevron says which are folded, and the border under an open header closes it
+   against its body.
+
+   The chevron leads the header, where a disclosure is looked for. react-science
+   draws every header button on the right, so the chevron is lifted out of that
+   run and set before the title. */
 [role='button']:has(.side-panel__fold) {
   position: relative;
   padding-left: 32px;
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--text) 4%, var(--surface-sunken));
+  color: var(--text);
+  text-shadow: none;
+}
+
+[role='button']:has(.side-panel__fold):hover {
+  background: color-mix(in oklab, var(--text) 9%, var(--surface-sunken));
+}
+
+[role='button']:has(.side-panel__fold[data-panel-open='true']) {
+  border-bottom: 1px solid var(--border);
 }
 
 /* Under the header, so it outweighs the button's own emotion class. */
