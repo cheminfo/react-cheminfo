@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.85.0](https://github.com/cheminfo/react-cheminfo/compare/v0.84.0...v0.85.0) (2026-11-02)
+
+
+### Features
+
+* take in the sites' duplicated code and the family's About list ([ba13e1d](https://github.com/cheminfo/react-cheminfo/commit/ba13e1d9a83a8fdeb1f9e0f5a91b982c39f993c3))
+
+
+### Bug Fixes
+
+* show no Cite in a framed tool until it names a work ([6d276b3](https://github.com/cheminfo/react-cheminfo/commit/6d276b3a38fce2bc78e449ffe03c352ff8551c24))
+
 ## [0.84.0](https://github.com/cheminfo/react-cheminfo/compare/v0.83.0...v0.84.0) (2026-11-02)
 
 
