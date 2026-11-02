@@ -158,20 +158,29 @@ export function NumberInput(props: NumberInputProps): ReactElement {
   const [draft, setDraft] = useState(() => ({
     text: numberText(value),
     held: value,
+    given: value,
   }));
 
   // The number changed elsewhere — a preset, a reset, a link — so the box has
-  // to follow. `held` is what this box last handed up, not the prop it was
-  // rendered with: comparing against the prop would make the box's own edit
-  // look external and rewrite `-0.` as `0` under the caret.
-  if (draft.held !== value) setDraft({ text: numberText(value), held: value });
+  // to follow. Only a change of the prop counts: a parent that ignores a typed
+  // number, the `1` of `15` below its minimum, leaves the prop where it was
+  // and the `1` stays typed. A change to what the box itself handed up is not
+  // followed either, or `-0.` would be rewritten as `0` under the caret.
+  if (value !== draft.given) {
+    setDraft(
+      value === draft.held
+        ? { ...draft, given: value }
+        : { text: numberText(value), held: value, given: value },
+    );
+  }
 
-  function hold(text: string, held: number | undefined) {
-    setDraft({ text, held });
+  function hold(text: string, held: number | undefined, given = draft.given) {
+    setDraft({ text, held, given });
   }
 
   function commit(next: number) {
-    hold(numberText(next), next);
+    // A settled number is final, so one the parent refuses is not left shown.
+    hold(numberText(next), next, Number.NaN);
     onChange(next);
   }
 

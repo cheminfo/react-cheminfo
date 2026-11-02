@@ -173,6 +173,57 @@ test('the bounds are applied when the box is left, not under the caret', () => {
   expect(committed).toHaveBeenLastCalledWith(2000);
 });
 
+test('a number the parent ignores stays typed until the box is left', () => {
+  function Bounded() {
+    const [value, setValue] = useState(43);
+    return (
+      <NumberInput
+        value={value}
+        min={10}
+        max={1000}
+        ariaLabel="Size"
+        onChange={(next) => {
+          if (next < 10) return;
+          committed(next);
+          setValue(next);
+        }}
+      />
+    );
+  }
+  act(() => root.render(<Bounded />));
+  const input = host.querySelector('input') as HTMLInputElement;
+  type(input, '');
+  type(input, '1');
+
+  expect(input.value).toBe('1');
+  expect(committed).not.toHaveBeenCalled();
+
+  type(input, '10');
+
+  expect(input.value).toBe('10');
+  expect(committed).toHaveBeenLastCalledWith(10);
+
+  type(input, '1');
+  fire(input, new FocusEvent('focusout', { bubbles: true }));
+
+  expect(input.value).toBe('10');
+});
+
+test('a settled number the parent refuses gives way to the parent’s', () => {
+  function Refusing() {
+    return (
+      <NumberInput value={43} onChange={committed} ariaLabel="Size" step={1} />
+    );
+  }
+  act(() => root.render(<Refusing />));
+  const input = host.querySelector('input') as HTMLInputElement;
+  type(input, '7');
+  fire(input, new FocusEvent('focusout', { bubbles: true }));
+
+  expect(committed).toHaveBeenLastCalledWith(7);
+  expect(input.value).toBe('43');
+});
+
 test('a whole-number box rounds what was typed when it is left', () => {
   const input = render({ initial: 3, integer: true });
 
