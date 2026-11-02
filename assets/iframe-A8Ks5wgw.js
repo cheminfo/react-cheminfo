@@ -1,0 +1,1 @@
+import{t as e}from"./iframe-BboMv_vx.js";e();
