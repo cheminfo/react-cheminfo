@@ -15,6 +15,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import type { PanelDescriptor } from '../SidePanelStack.tsx';
 import { SidePanelStack } from '../SidePanelStack.tsx';
 
 const panels = [
@@ -182,4 +183,81 @@ test('a panel closed while folded opens unfolded', () => {
     'true',
     'true',
   ]);
+});
+
+/**
+ * Draw the stack with folds the editor keeps, reporting each change without
+ * drawing it, as an editor that has not rendered again yet.
+ * @param foldedPanelIds - The panels the editor keeps folded.
+ * @param stack - The panels on offer, all open.
+ * @returns Every change reported, in order.
+ */
+function mountKept(
+  foldedPanelIds: readonly string[],
+  stack: readonly PanelDescriptor[] = panels,
+): string[][] {
+  const reported: string[][] = [];
+  act(() => {
+    root.render(
+      <SidePanelStack
+        panels={stack}
+        openPanelIds={stack.map((panel) => panel.id)}
+        onClose={(id) => closed.push(id)}
+        foldedPanelIds={foldedPanelIds}
+        onFoldedPanelIdsChange={(ids) => reported.push(ids)}
+      >
+        {(panel) => <p>{`the ${panel.id} body`}</p>}
+      </SidePanelStack>,
+    );
+  });
+  return reported;
+}
+
+test('the folds an editor keeps are the ones drawn', () => {
+  mountKept(['peaks']);
+
+  expect(chevrons().map((button) => button.dataset.panelOpen)).toStrictEqual([
+    'true',
+    'false',
+  ]);
+});
+
+test('a chevron reports the folds to the editor that keeps them', () => {
+  const reported = mountKept(['peaks']);
+  act(() => chevrons()[0]?.click());
+
+  expect(reported).toStrictEqual([['spectra', 'peaks']]);
+});
+
+test('a kept fold of a closed panel is neither drawn nor reported', () => {
+  const reported = mountKept(['closed', 'peaks']);
+  act(() => chevrons()[1]?.click());
+
+  expect(reported).toStrictEqual([[]]);
+});
+
+test('a shift-click reports every other panel folded, one after another', () => {
+  const reported = mountKept(
+    [],
+    [
+      { id: 'spectra', title: 'Spectra', icon: 'chart' },
+      { id: 'peaks', title: 'Peaks', icon: 'chart' },
+      { id: 'metadata', title: 'Metadata', icon: 'chart' },
+    ],
+  );
+  const header = host.querySelector<HTMLElement>('div[role="button"]');
+  act(() => {
+    header?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, shiftKey: true }),
+    );
+  });
+
+  expect(reported).toStrictEqual([['peaks'], ['peaks', 'metadata']]);
+});
+
+test('focus reports every other panel folded', () => {
+  const reported = mountKept([]);
+  act(() => focusButton('spectra')?.click());
+
+  expect(reported).toStrictEqual([['peaks']]);
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 /** Which panels of a stack are folded, and the gestures that change that. */
 export interface PanelFolds {
@@ -24,6 +24,18 @@ export interface PanelFolds {
   toggleFocus: (id: string) => void;
 }
 
+/** The folds of a stack kept by the editor rather than by the stack. */
+export interface FoldKeeper<TId extends string = string> {
+  /** The panels folded away. */
+  folded: readonly string[];
+  /**
+   * Called with the panels folded after a gesture.
+   * @param folded - The panels of the stack folded, in the order they are
+   * drawn.
+   */
+  onChange: (folded: TId[]) => void;
+}
+
 const NOTHING_FOLDED: ReadonlySet<string> = new Set();
 
 /**
@@ -32,30 +44,47 @@ const NOTHING_FOLDED: ReadonlySet<string> = new Set();
  * undone.
  *
  * A panel closed while folded comes back unfolded when it is opened again: a
- * reader reopening a panel from the rail is asking to see it.
+ * reader reopening a panel from the rail is asking to see it. An editor that
+ * keeps the folds itself drops a panel from them when it closes it.
  * @param openIds - The panels in the stack, in the order they are drawn.
+ * @param keeper - The folds as the editor keeps them; left out, the stack
+ * keeps them, and forgets them when it unmounts.
  * @returns The folds.
  */
-export function usePanelFolds(openIds: readonly string[]): PanelFolds {
-  const [folded, setFolded] = useState(NOTHING_FOLDED);
+export function usePanelFolds<TId extends string>(
+  openIds: readonly TId[],
+  keeper?: FoldKeeper<TId>,
+): PanelFolds {
+  const [own, setOwn] = useState(NOTHING_FOLDED);
+  const kept = keepOnly(keeper ? new Set(keeper.folded) : own, openIds);
+  if (!keeper && kept !== own) setOwn(kept);
 
-  const kept = keepOnly(folded, openIds);
-  if (kept !== folded) setFolded(kept);
+  // A shift-click folds every other panel in one event, one call each, so a
+  // fold builds on the one written just before rather than on the render.
+  const latest = useRef(kept);
+  useLayoutEffect(() => {
+    latest.current = kept;
+  });
+
+  function write(next: ReadonlySet<string>): void {
+    latest.current = next;
+    if (keeper) keeper.onChange(openIds.filter((id) => next.has(id)));
+    else setOwn(next);
+  }
 
   return {
     isOpen: (id) => !kept.has(id),
     setOpen: (id, open) => {
-      setFolded((previous) => {
-        if (previous.has(id) !== open) return previous;
-        const next = new Set(previous);
-        if (open) next.delete(id);
-        else next.add(id);
-        return next;
-      });
+      const previous = latest.current;
+      if (previous.has(id) !== open) return;
+      const next = new Set(previous);
+      if (open) next.delete(id);
+      else next.add(id);
+      write(next);
     },
     focused: focusedPanel(openIds, kept),
     toggleFocus: (id) => {
-      setFolded(
+      write(
         focusedPanel(openIds, kept) === id
           ? NOTHING_FOLDED
           : new Set(openIds.filter((other) => other !== id)),

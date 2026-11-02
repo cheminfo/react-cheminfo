@@ -41,6 +41,20 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
    * @default every panel does, where the browser can fill the screen
    */
   fillScreen?: (panel: TPanel) => boolean;
+  /**
+   * The panels folded away, for an editor that keeps them — across a reload,
+   * say. The editor drops a panel from them when it closes it, so that it
+   * comes back unfolded.
+   * @default undefined, the stack keeps them and forgets them when it unmounts
+   */
+  foldedPanelIds?: readonly string[];
+  /**
+   * Called with the panels folded when a chevron, a header or a focus folds or
+   * unfolds one; read only with `foldedPanelIds`.
+   * @param ids - The open panels folded, in the order they are drawn.
+   * @default undefined
+   */
+  onFoldedPanelIdsChange?: (ids: Array<TPanel['id']>) => void;
 }
 
 /**
@@ -79,8 +93,17 @@ export function SidePanelStack<TPanel extends PanelDescriptor>(
   props: SidePanelStackProps<TPanel>,
 ) {
   const { panels, openPanelIds, onClose, children, fillScreen } = props;
+  const { foldedPanelIds, onFoldedPanelIdsChange } = props;
   const open = panels.filter((panel) => openPanelIds.includes(panel.id));
-  const folds = usePanelFolds(open.map((panel) => panel.id));
+  const folds = usePanelFolds(
+    open.map((panel) => panel.id),
+    foldedPanelIds === undefined
+      ? undefined
+      : {
+          folded: foldedPanelIds,
+          onChange: (ids) => onFoldedPanelIdsChange?.(ids),
+        },
+  );
 
   return (
     <AccordionProvider>
