@@ -24,6 +24,15 @@ test('the QR code copies as a PNG of the link the dialog hands out', async ({
   await expect(
     panel.getByRole('img', { name: 'QR code of the link' }),
   ).toBeVisible();
+  // Both copy buttons sit inside the panel, which is as wide as the code.
+  const sides = await panel.evaluate((group) => {
+    const box = group.getBoundingClientRect();
+    return [...group.querySelectorAll('button')].map((button) => {
+      const { left, right } = button.getBoundingClientRect();
+      return left >= box.left && right <= box.right;
+    });
+  });
+  expect(sides).toStrictEqual([true, true]);
   await panel.getByRole('button', { name: 'Copy as PNG', exact: true }).click();
 
   // The code is painted after the click, so the clipboard holds it a moment later.

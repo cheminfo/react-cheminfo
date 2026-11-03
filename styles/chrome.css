@@ -581,9 +581,12 @@ a.source-badge:hover {
   text-align: center;
 }
 
+/* Stacked, so the two buttons fit the code's width in every language. */
 .share-qr__actions {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 6px;
 }
 
 .share-dialog__panes {
