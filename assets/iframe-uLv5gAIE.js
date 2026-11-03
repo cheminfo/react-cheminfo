@@ -1,0 +1,1 @@
+import{t as e}from"./iframe-BC2s_ssO.js";e();
