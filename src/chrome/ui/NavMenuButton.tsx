@@ -113,6 +113,7 @@ function NavMenuEntry(props: {
   activeId: string | undefined;
 }): ReactElement {
   const { item, activeId } = props;
+  const isPage = item.items === undefined && item.id === activeId;
 
   return (
     <MenuItem
@@ -123,10 +124,9 @@ function NavMenuEntry(props: {
       href={item.href}
       target={item.external ? '_blank' : undefined}
       active={
-        item.items === undefined
-          ? item.id === activeId
-          : holdsId(item.items, activeId)
+        isPage || (item.items !== undefined && holdsId(item.items, activeId))
       }
+      aria-current={isPage ? 'page' : undefined}
       onClick={(event) => {
         if (item.onSelect === undefined || isModifiedClick(event)) return;
         event.preventDefault();

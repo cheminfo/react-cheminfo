@@ -30,7 +30,7 @@ test('exactly the page on show takes the brand tint', () => {
 
   expect(html).toContain('<a class="nav-link" href="/">Convert</a>');
   expect(html).toContain(
-    '<a class="nav-link nav-link--active" href="/tutorial">Tutorial</a>',
+    '<a class="nav-link nav-link--active" href="/tutorial" aria-current="page">Tutorial</a>',
   );
 });
 

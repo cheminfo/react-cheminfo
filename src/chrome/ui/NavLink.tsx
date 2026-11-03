@@ -9,7 +9,8 @@ export interface NavLinkProps {
   item: NavItem;
   /**
    * Whether this is the page on show, which is the one thing in the bar the
-   * brand tint is spent on.
+   * brand tint is spent on, and what a screen reader announces as the current
+   * page.
    * @default false
    */
   active?: boolean;
@@ -58,6 +59,7 @@ export function NavLink(props: NavLinkProps): ReactElement {
         className={classes}
         title={title}
         aria-label={ariaLabel}
+        aria-current={active ? 'page' : undefined}
         disabled={disabled}
         onClick={disabled ? undefined : onSelect}
       >
@@ -72,6 +74,7 @@ export function NavLink(props: NavLinkProps): ReactElement {
       href={href}
       title={title}
       aria-label={ariaLabel}
+      aria-current={active ? 'page' : undefined}
       target={external ? '_blank' : undefined}
       rel={external ? 'noreferrer' : undefined}
       onClick={(event) => {

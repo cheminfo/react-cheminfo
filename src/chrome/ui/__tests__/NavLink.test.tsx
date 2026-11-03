@@ -31,6 +31,29 @@ test('the page on show takes the brand tint', () => {
   expect(html).toContain('class="nav-link nav-link--active"');
 });
 
+test('the page on show is announced as the current page, and no other', () => {
+  const page = renderToStaticMarkup(
+    <NavLink
+      item={{ id: 'browse', label: 'Browse', href: '/browse' }}
+      active
+    />,
+  );
+  const action = renderToStaticMarkup(
+    <NavLink item={{ id: 'browse', label: 'Browse' }} active />,
+  );
+  const elsewhere = renderToStaticMarkup(
+    <NavLink item={{ id: 'browse', label: 'Browse', href: '/browse' }} />,
+  );
+
+  expect(page).toBe(
+    '<a class="nav-link nav-link--active" href="/browse" aria-current="page">Browse</a>',
+  );
+  expect(action).toBe(
+    '<button type="button" class="nav-link nav-link--active" aria-current="page">Browse</button>',
+  );
+  expect(elsewhere).not.toContain('aria-current');
+});
+
 test('the class a site gives is carried beside nav-link', () => {
   const html = renderToStaticMarkup(
     <NavLink item={{ id: 'share', label: 'Share' }} className="share-entry" />,
