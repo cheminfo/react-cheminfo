@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.86.0](https://github.com/cheminfo/react-cheminfo/compare/v0.85.0...v0.86.0) (2026-11-03)
+
+
+### Features
+
+* accept a reaction from a host as the chem.rxn kind ([059e251](https://github.com/cheminfo/react-cheminfo/commit/059e251e0ceb7067ff8e4d0430165141d02c3e1e))
+* hand a share link out as a QR code, copied as PNG or SVG ([de471ac](https://github.com/cheminfo/react-cheminfo/commit/de471acfb24c11b043e4b0332f24e55f15bd6b06))
+* step an empty number box from a value it is given ([6425318](https://github.com/cheminfo/react-cheminfo/commit/6425318ccfd0cb5801ee1ab00ecbea6649ccac96))
+
 ## [0.85.0](https://github.com/cheminfo/react-cheminfo/compare/v0.84.0...v0.85.0) (2026-11-02)
 
 
