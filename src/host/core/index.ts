@@ -58,6 +58,8 @@ export {
   isConnect,
   parseRequest,
 } from './protocol.ts';
+export type { RxnValue } from './reactionKinds.ts';
+export { REACTION_KINDS, RXN_SCHEMA } from './reactionKinds.ts';
 export type {
   NameValue,
   SvgImageValue,

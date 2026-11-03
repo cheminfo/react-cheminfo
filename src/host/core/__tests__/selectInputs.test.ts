@@ -1,6 +1,9 @@
 import { expect, test } from 'vitest';
 
 import { selectInputs } from '../connectHost.ts';
+import { STRUCTURE_KINDS } from '../hostStructure.ts';
+import type { ToolInterface } from '../protocol.ts';
+import { REACTION_KINDS } from '../reactionKinds.ts';
 
 import { TOOL } from './fakeHost.ts';
 
@@ -64,5 +67,28 @@ test('a request carrying nothing is refused by a tool that needs an input', () =
       message:
         'No item is a chem.molfile, chem.ocl.id, or chem.smiles, so 3d loaded nothing.',
     },
+  });
+});
+
+test('a reaction input takes the RXN, beside a structure input that finds nothing', () => {
+  const editor: ToolInterface = {
+    name: 'draw',
+    inputs: [
+      { key: 'reaction', kinds: REACTION_KINDS, optional: true },
+      { key: 'structure', kinds: STRUCTURE_KINDS, optional: true },
+    ],
+    outputs: [],
+  };
+  const reaction = { kind: 'chem.rxn', value: { rxn: '$RXN\n' } };
+
+  expect(selectInputs(editor, [reaction])).toStrictEqual({
+    ok: true,
+    inputs: [
+      {
+        key: 'reaction',
+        item: reaction,
+        checked: { kind: 'chem.rxn', value: { rxn: '$RXN\n' } },
+      },
+    ],
   });
 });

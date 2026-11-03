@@ -5,8 +5,8 @@
  *
  * The names are pipeline's (`chem.molfile.2d`, `chem.ocl.id`…), plus
  * `chem.smiles`, which pipeline lists among its future schemas, the two
- * infrared kinds of `./irKinds.ts`, and the kinds a tool hands back, of
- * `./resultKinds.ts`. A name with children is a category whose
+ * infrared kinds of `./irKinds.ts`, the reaction of `./reactionKinds.ts`, and
+ * the kinds a tool hands back, of `./resultKinds.ts`. A name with children is a category whose
  * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
  * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
  * stripped rather than refused, so a host sending more than it needs to is
@@ -19,6 +19,8 @@ import { Ajv } from 'ajv';
 import type { IrJdxValue, IrPeaksValue } from './irKinds.ts';
 import { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
 import type { HostItem } from './protocol.ts';
+import type { RxnValue } from './reactionKinds.ts';
+import { RXN_SCHEMA } from './reactionKinds.ts';
 import type { NameValue, SvgImageValue, TableValue } from './resultKinds.ts';
 import { NAME_SCHEMA, SVG_IMAGE_SCHEMA, TABLE_SCHEMA } from './resultKinds.ts';
 
@@ -43,6 +45,7 @@ export type CheckedValue =
   | { kind: 'chem.molfile'; value: MolfileValue }
   | { kind: 'chem.ocl.id'; value: OclIdValue }
   | { kind: 'chem.smiles'; value: SmilesValue }
+  | { kind: 'chem.rxn'; value: RxnValue }
   | { kind: 'spectra.ir.jdx'; value: IrJdxValue }
   | { kind: 'spectra.ir.peaks'; value: IrPeaksValue }
   | { kind: 'image.svg'; value: SvgImageValue }
@@ -173,6 +176,7 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'chem.molfile': ajv.compile(MOLFILE_SCHEMA),
   'chem.ocl.id': ajv.compile(OCL_ID_SCHEMA),
   'chem.smiles': ajv.compile(SMILES_SCHEMA),
+  'chem.rxn': ajv.compile<RxnValue>(RXN_SCHEMA),
   // Written as plain schemas rather than `JSONSchemaType`, which would demand
   // `nullable` on every optional field and so let a `null` band through.
   'spectra.ir.jdx': ajv.compile<IrJdxValue>(IR_JDX_SCHEMA),

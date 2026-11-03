@@ -23,6 +23,7 @@ test('only the kinds this site reads are known', () => {
   expect(isKnownKind('chem.molfile')).toBe(true);
   expect(isKnownKind('chem.ocl.id')).toBe(true);
   expect(isKnownKind('chem.smiles')).toBe(true);
+  expect(isKnownKind('chem.rxn')).toBe(true);
   expect(isKnownKind('chem.mf')).toBe(false);
   expect(isKnownKind('chem.molfile.2d')).toBe(false);
   expect(isKnownKind('toString')).toBe(false);
@@ -48,6 +49,19 @@ test('an invalid value is refused with the errors pipeline writes', () => {
   expect(checkValue('chem.smiles', 'CCO')).toStrictEqual({
     valid: false,
     errors: ['/: must be object'],
+  });
+});
+
+test('a reaction travels as its RXN file, under its own name', () => {
+  expect(
+    checkValue('chem.rxn', { rxn: '$RXN\n', reactionRXN: 'stale' }),
+  ).toStrictEqual({
+    valid: true,
+    checked: { kind: 'chem.rxn', value: { rxn: '$RXN\n' } },
+  });
+  expect(checkValue('chem.rxn', { molfile: 'M  END' })).toStrictEqual({
+    valid: false,
+    errors: ["/: must have required property 'rxn'"],
   });
 });
 
