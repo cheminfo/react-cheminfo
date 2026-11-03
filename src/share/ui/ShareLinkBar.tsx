@@ -5,13 +5,15 @@ import { CopyButton } from '../../clipboard/ui/index.ts';
 import { HelpTooltip } from '../../help/ui/index.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 
+import { ShareQrCode } from './ShareQrCode.tsx';
+
 export interface ShareLinkBarProps {
   /** The address the link hands out. */
   url: string;
   /** The markup that frames the page in someone else's site. */
   frame: string;
   /**
-   * Called once either copy has landed on the clipboard.
+   * Called once any copy has landed on the clipboard.
    * @default undefined
    */
   onCopied?: () => void;
@@ -23,7 +25,7 @@ export interface ShareLinkBarProps {
 }
 
 /**
- * The three things one does with a share link, in the dialog's footer and
+ * The four things one does with a share link, in the dialog's footer and
  * never scrolled away: a dialog whose Copy button is below the fold is a dialog
  * one scrolls through every single time. A copy is what the dialog was opened
  * for, so the dialog is told when one lands and closes on it.
@@ -55,6 +57,7 @@ export function ShareLinkBar(props: ShareLinkBarProps): ReactElement {
           onCopied={onCopied}
         />
       </HelpTooltip>
+      <ShareQrCode url={url} disabled={disabled} onCopied={onCopied} />
       <HelpTooltip
         content={{
           title: t('share.openInNewTabHelpTitle'),

@@ -16,9 +16,11 @@ export interface CopyButtonProps {
    * What to copy. A function is called when the button is pressed, which is
    * what a whole list has to be: writing ten thousand structures out on every
    * render, for a button nobody may press, is a page that stutters as it is
-   * scrolled.
+   * scrolled. A function may also make the write itself and say whether the
+   * clipboard took it — `() => writeBlobToClipboard(png)` for an image — and
+   * is then called inside the click, which is the only time Safari allows it.
    */
-  content: string | (() => string);
+  content: string | (() => string | Promise<boolean>);
   /**
    * Text of the button. Left out for an icon-only button, which is what a
    * dense row of them needs.
@@ -124,7 +126,8 @@ export function CopyButton(props: CopyButtonProps): ReactElement {
       title={hoverTitle}
       aria-label={label ?? hoverTitle}
       onClick={() => {
-        void copy(typeof content === 'function' ? content() : content).then(
+        const value = typeof content === 'function' ? content() : content;
+        void copy(typeof value === 'string' ? value : () => value).then(
           (written) => {
             if (written) onCopied?.();
           },

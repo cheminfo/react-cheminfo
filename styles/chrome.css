@@ -556,6 +556,36 @@ a.source-badge:hover {
   gap: 8px;
 }
 
+/* The link as a QR code. The code itself is black on white whatever the page
+   wears: a camera reads contrast, not the brand. */
+.share-qr {
+  display: flex;
+  width: 256px;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  gap: 10px;
+}
+
+.share-qr__code {
+  display: block;
+  width: 232px;
+  height: 232px;
+}
+
+.share-qr__hint,
+.share-qr--too-long {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.share-qr__actions {
+  display: flex;
+  gap: 8px;
+}
+
 .share-dialog__panes {
   display: grid;
   overflow: hidden;

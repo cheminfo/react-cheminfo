@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * What the dialog's three buttons put on the clipboard.
+ * What the dialog's buttons put on the clipboard.
  *
  * Neither the address nor the frame markup is printed in the dialog any more,
  * so the clipboard is the only way either reaches the person sharing the page,
@@ -13,6 +13,7 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import type { ShareVocabulary } from '../../core/index.ts';
+import { qrCodeSvg } from '../../core/index.ts';
 import { ShareDialog } from '../ShareDialog.tsx';
 
 const VOCABULARY: ShareVocabulary = {
@@ -103,6 +104,28 @@ test('the third copies a frame carrying the name and the height it was given', a
 
   expect(written).toStrictEqual([
     `<iframe src="${BASE}?set=alkanes&amp;embed=1" title="SMILES — Exercises" width="100%" height="800" style="border: 1px solid #ddd; border-radius: 8px" loading="lazy"></iframe>`,
+  ]);
+  expect(dialog.closed).toBe(1);
+});
+
+test('the QR code opens on the link, and its SVG copies the code of that link', async () => {
+  await clickButton('QR code');
+
+  const panel = document.querySelector('[role="group"][aria-label="QR code"]');
+
+  expect(panel?.querySelector('img')?.getAttribute('alt')).toBe(
+    'QR code of the link',
+  );
+
+  const copy = [...document.querySelectorAll('button')].find(
+    (candidate) => candidate.textContent === 'Copy as SVG',
+  );
+  await act(async () => {
+    copy?.click();
+  });
+
+  expect(written).toStrictEqual([
+    qrCodeSvg(`${BASE}?set=alkanes&embed=1`)?.markup,
   ]);
   expect(dialog.closed).toBe(1);
 });

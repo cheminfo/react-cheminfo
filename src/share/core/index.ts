@@ -58,6 +58,7 @@ export {
   syncPreferencesWithUrl,
   writePreferencesToSearch,
 } from './preferences.ts';
+export { qrCodeSvg } from './qrCode.ts';
 export type { SharePreset } from './presets.ts';
 export { applySharePreset, findSharePreset } from './presets.ts';
 export type { SealProblem, UnsealResult } from './seal.ts';

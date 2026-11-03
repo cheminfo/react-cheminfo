@@ -9,4 +9,6 @@ export type { ShareButtonProps, ShareButtonVariant } from './ShareButton.tsx';
 export { ShareButton } from './ShareButton.tsx';
 export type { ShareDialogProps } from './ShareDialog.tsx';
 export type { SharePartDescriptions } from './SharePartRow.tsx';
+export type { ShareQrCodeProps } from './ShareQrCode.tsx';
+export { ShareQrCode } from './ShareQrCode.tsx';
 export { ShareDialog } from './ShareDialog.tsx';
