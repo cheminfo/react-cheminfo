@@ -78,6 +78,21 @@ export const NoButtons: Story = {
   args: { value: -1.5, min: -5, max: 5, step: 0.1, buttons: false },
 };
 
+/**
+ * A box standing for the heights of shapes selected together, which differ:
+ * it is empty, and its steppers start from the first shape's 12.
+ */
+export const Mixed: Story = {
+  args: {
+    value: undefined,
+    allowEmpty: true,
+    stepFrom: 12,
+    min: 1,
+    step: 0.5,
+    placeholder: 'Mixed',
+  },
+};
+
 const STACK_STYLE = {
   display: 'flex',
   flexDirection: 'column',

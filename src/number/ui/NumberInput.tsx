@@ -111,6 +111,14 @@ export interface OptionalNumberInputProps extends NumberInputBaseProps {
   /** The number the box shows, or nothing when it is empty. */
   value: number | undefined;
   allowEmpty: true;
+  /**
+   * Where an arrow key or a stepper button starts from while the box is
+   * empty. A box standing for several values that differ — the sizes of the
+   * objects selected together — steps from one of them rather than from zero,
+   * which would bring every one of them down to the bottom of the range.
+   * @default undefined — an empty box steps from zero
+   */
+  stepFrom?: number;
   /** Called with the new number, or with `undefined` when the box is emptied. */
   onChange: (value: number | undefined) => void;
 }
@@ -155,6 +163,7 @@ export function NumberInput(props: NumberInputProps): ReactElement {
   } = props;
   const t = useChromeT();
   const onChange = props.onChange as (next: number | undefined) => void;
+  const stepFrom = props.allowEmpty ? props.stepFrom : undefined;
   const [draft, setDraft] = useState(() => ({
     text: numberText(value),
     held: value,
@@ -219,7 +228,7 @@ export function NumberInput(props: NumberInputProps): ReactElement {
   }
 
   function move(scale: number) {
-    const from = readNumber(draft.text) ?? value ?? 0;
+    const from = readNumber(draft.text) ?? value ?? stepFrom ?? 0;
     commit(settle(stepNumber(from, step * scale), integer, min, max));
   }
 
@@ -251,7 +260,7 @@ export function NumberInput(props: NumberInputProps): ReactElement {
 
   if (!buttons) return box;
 
-  const shown = readNumber(draft.text) ?? value;
+  const shown = readNumber(draft.text) ?? value ?? stepFrom;
   return (
     <ControlGroup
       fill={fill}
