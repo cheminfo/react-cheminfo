@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{d as t,u as n}from"./figurePng-D2hskKeB.js";async function r(e){return await t(e)?`copied`:(await e,`copyUnsupported`)}function i(){return(i=e((()=>{n()})))()}export{i as n,r as t};
