@@ -28,6 +28,8 @@ export type {
 } from './PanelMessage.tsx';
 export { PanelEmpty, PanelMessage } from './PanelMessage.tsx';
 export type { PanelRailProps, RailPanel } from './PanelRail.tsx';
+export type { PanelSettingsButtonProps } from './PanelSettingsButton.tsx';
+export { PanelSettingsButton } from './PanelSettingsButton.tsx';
 export type { PanelStatusTableProps } from './PanelStatusTable.tsx';
 export { PanelStatusTable } from './PanelStatusTable.tsx';
 export { PanelRail } from './PanelRail.tsx';
@@ -41,6 +43,8 @@ export { SidePanelStack } from './SidePanelStack.tsx';
 export type { SpectrumColorSwatchProps } from './SpectrumColorSwatch.tsx';
 export { SpectrumColorSwatch } from './SpectrumColorSwatch.tsx';
 export { useConfirmOnEnter } from './useConfirmOnEnter.ts';
+export type { PanelSettings, PanelSettingsValues } from './usePanelSettings.ts';
+export { usePanelSettings } from './usePanelSettings.ts';
 export type { FilterBox } from './useFilterBox.ts';
 export { useFilterBox } from './useFilterBox.ts';
 export type { VirtualRows } from './useVirtualRows.ts';

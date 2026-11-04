@@ -118,7 +118,10 @@ own workspaces beside the visitor's, saved, renamed, reset and carried as a
 `.<site>-workspace.json` file. `<SettingsDialog>` from `react-cheminfo/ui` is
 their dialog: the workspace at the top, vertical sections, and Cancel, Apply
 and Apply and save, each change shown on the page as it is set;
-`<PanelStatusTable>` sets each panel hidden, available, folded or open. A site's
+`<PanelStatusTable>` sets each panel hidden, available, folded or open. A panel
+with settings of its own turns to them with `<PanelSettingsButton>` and
+`usePanelSettings`, on the same terms: the gear gives way to a green tick that
+keeps the changes and a red cross that puts them back. A site's
 **document** is `writeSiteDocument` / `readSiteDocument`: one `.<site>.zip`
 holding its data files as they open anywhere, and, when asked, the view and the
 workspace, which `<SaveDocumentDialog>` offers.
