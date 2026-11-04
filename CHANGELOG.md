@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.88.0](https://github.com/cheminfo/react-cheminfo/compare/v0.87.0...v0.88.0) (2026-11-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* spectra.ir.* drops `filename` and a band's `kind` for `strength`; bandsFromPeaks and peaksFromBands become bandsFromIrPeaks and irPeaksFromBands.
+
+### Features
+
+* add the Raman host kinds, and write band strengths as words ([6744296](https://github.com/cheminfo/react-cheminfo/commit/67442962bf3bd520b6ac973950b81188b41170a5))
+* carry a figure's source and inputs inside its SVG, and reopen it from them ([e48767f](https://github.com/cheminfo/react-cheminfo/commit/e48767f805dc851962b5b788c5c9112c84e1a207))
+
 ## [0.87.0](https://github.com/cheminfo/react-cheminfo/compare/v0.86.0...v0.87.0) (2026-11-04)
 
 
