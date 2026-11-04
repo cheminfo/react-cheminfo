@@ -2,6 +2,25 @@ export type { FigureNotice } from './copyFigure.ts';
 export { copyFigure } from './copyFigure.ts';
 export { copySvg } from './copySvg.ts';
 export { cropFigure } from './cropFigure.ts';
+export type { FigureInput } from './figureInputs.ts';
+export {
+  FIGURE_INPUT_ENCODING,
+  MAX_FIGURE_INPUTS,
+  MAX_FIGURE_INPUT_BYTES,
+} from './figureInputs.ts';
+export type { FigureSource } from './figureSource.ts';
+export {
+  FIGURE_SOURCE_NAMESPACE,
+  figureAddress,
+  readFigureInputs,
+  readFigureSource,
+  withFigureSource,
+} from './figureSource.ts';
+export type { FigureSourceReader } from './pageFigureSource.ts';
+export {
+  setPageFigureSource,
+  withPageFigureSource,
+} from './pageFigureSource.ts';
 export type { RasterFigureSource } from './croppedMarkup.ts';
 export { croppedSvgMarkup, rasterFigureSource } from './croppedMarkup.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';

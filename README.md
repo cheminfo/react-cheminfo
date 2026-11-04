@@ -1116,6 +1116,35 @@ useHostConnection(TOOL, {
   item it was made from, so a host knows which spectrum to save them on.
 - **Opening a document sends nothing back.** What the tool shows once `load`
   returns is what the host already has, so `read` must reflect a load by then.
+- **Every picture handed back says where it came from.** An `image.svg` gets a
+  `<cheminfo:source site href>` in its metadata: the tool's name and the page's
+  address as it stood, `embed`, `hide` and `card` left out. A site keeps what is
+  on screen in its address, so a host frames that address again to change the
+  picture — 3d's camera and conformer, the periodic table's selection.
+  `withFigureSource`, `readFigureSource` and `figureAddress` (`/core`) write and
+  read it, inside the figure's own `<metadata>` when it has one, and
+  `cropFigure` keeps it.
+- **What the address cannot hold, the picture carries.** A tool drawn from a
+  measured spectrum passes `inputs` — the values that redraw the page, in the
+  kinds it takes them in — and every picture it hands back or saves carries
+  them inside its source, each as gzipped JSON in base64. A host frames the
+  address, then loads `figureToolDocument(svg, id)`: the figure opens as it
+  was, wherever it was pasted. `readFigureInputs` unpacks them, refusing
+  anything that would grow past 16 MB.
+
+```ts
+useHostConnection(TOOL, {
+  load,
+  outputs,
+  // Read when a picture is asked for or saved, never before.
+  inputs: () =>
+    spectra.value.map((spectrum) => ({
+      kind: 'spectra.ir.jdx',
+      key: 'spectra',
+      value: { jdx: irSpectrumToJcamp(spectrum, mode.value) },
+    })),
+});
+```
 
 `react-cheminfo/playwright` holds the configuration every site's browser suite
 runs with — specs in `e2e/`, one worker, two retries and the GitHub reporter on

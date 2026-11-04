@@ -9,12 +9,10 @@
 
 import type { CitedWork } from '../../citation/core/works.ts';
 
+import type { FigurePage } from './answerGet.ts';
+import { answerGet } from './answerGet.ts';
 import type { HostOutputs } from './hostOutputs.ts';
-import {
-  OUTPUT_DELAY,
-  answerGet,
-  createOutputPublisher,
-} from './hostOutputs.ts';
+import { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';
 import type {
   HelloMessage,
   LoadRequest,
@@ -77,6 +75,12 @@ export interface HostConnectionOptions {
    */
   outputs?: HostOutputs;
   /**
+   * What the page is drawn from that its address does not hold, written into
+   * every picture handed back so a host can hand it over again.
+   * @default undefined — the address is the whole page
+   */
+  inputs?: FigurePage['inputs'];
+  /**
    * How long the outputs must stay still before a change is sent, in
    * milliseconds.
    * @default OUTPUT_DELAY
@@ -99,6 +103,7 @@ export interface HostConnectionOptions {
 export function connectHost(options: HostConnectionOptions): () => void {
   const { host, listen, tool, origin, build, cite, help, load, outputs } =
     options;
+  const { inputs } = options;
   const { outputDelay = OUTPUT_DELAY } = options;
   let port: MessagePort | null = null;
   let appliedDocument: string | null = null;
@@ -123,7 +128,12 @@ export function connectHost(options: HostConnectionOptions): () => void {
         const result =
           request.type === 'load'
             ? await applyLoad(request)
-            : await answerGet(request, tool, outputs);
+            : await answerGet(
+                request,
+                tool,
+                outputs,
+                inputs === undefined ? {} : { inputs },
+              );
         port?.postMessage(result);
       })
       // A request that failed must not stop the ones after it being served,

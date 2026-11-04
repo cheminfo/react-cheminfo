@@ -18,6 +18,12 @@ export interface ZoomToBandOptions {
   width?: number;
 }
 
+/**
+ * How a page finds the chart a viewer draws, to hand it on as a picture: the
+ * box the viewer's own figure panel saves, without the toolbars around it.
+ */
+export const IR_FIGURE_SELECTOR = '[data-ir-figure]';
+
 /** What a host can ask of the viewer. */
 export interface IrEditorHandle {
   /** The spectra that are open, in the order they were loaded. */

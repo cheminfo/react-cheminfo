@@ -13,13 +13,7 @@
  */
 
 import { kindAccepts } from './kinds.ts';
-import type {
-  GetRequest,
-  HostItem,
-  OutputMessage,
-  ResultMessage,
-  ToolInterface,
-} from './protocol.ts';
+import type { HostItem, OutputMessage } from './protocol.ts';
 
 /** Where a tool's outputs are read, and how their changes are heard. */
 export interface HostOutputs {
@@ -46,72 +40,6 @@ export interface HostOutputs {
  * milliseconds: a burst of edits is one message.
  */
 export const OUTPUT_DELAY = 300;
-
-/**
- * Answer a `get` with the values it asks for — every output when it names
- * none — rendering those made on request.
- * @param request - The request.
- * @param tool - What the tool hands back.
- * @param outputs - Where the values are read, if anywhere.
- * @returns The values, or `no-output` when the tool has none of those asked,
- * or one could not be made.
- */
-export async function answerGet(
-  request: GetRequest,
-  tool: ToolInterface,
-  outputs: HostOutputs | undefined,
-): Promise<ResultMessage> {
-  const { id, keys } = request;
-  const declared = new Set<string>();
-  for (const output of tool.outputs) declared.add(output.key);
-  if (outputs === undefined || declared.size === 0) {
-    return noOutput(id, `${tool.name} has nothing to give back yet.`);
-  }
-  const wanted = keys.length === 0 ? declared : new Set<string>();
-  for (const key of keys) {
-    if (declared.has(key)) wanted.add(key);
-  }
-  if (wanted.size === 0) {
-    return noOutput(
-      id,
-      `${tool.name} has no output called ${LIST.format(keys)}.`,
-    );
-  }
-  const items: HostItem[] = [];
-  for (const item of outputs.read()) {
-    if (item.key === undefined || !wanted.has(item.key)) continue;
-    if (renderOf(outputs, item.key) === undefined) items.push(item);
-  }
-  const renders: Array<() => Promise<HostItem | undefined>> = [];
-  const renderedKeys: string[] = [];
-  for (const key of wanted) {
-    const render = renderOf(outputs, key);
-    if (render === undefined) continue;
-    renders.push(render);
-    renderedKeys.push(key);
-  }
-  try {
-    const made = await Promise.all(renders.map((render) => render()));
-    for (let index = 0; index < made.length; index++) {
-      const item = made[index];
-      const key = renderedKeys[index];
-      if (item !== undefined && key !== undefined) items.push({ ...item, key });
-    }
-  } catch (error) {
-    return noOutput(id, error instanceof Error ? error.message : String(error));
-  }
-  return { type: 'result', id, ok: true, items };
-}
-
-function renderOf(
-  outputs: HostOutputs,
-  key: string,
-): (() => Promise<HostItem | undefined>) | undefined {
-  const { render } = outputs;
-  return render !== undefined && Object.hasOwn(render, key)
-    ? render[key]
-    : undefined;
-}
 
 /** What the connection tells the publisher, and the means to stop it. */
 export interface OutputPublisher {
@@ -232,14 +160,3 @@ function isAccepted(item: HostItem, accepted: ReadonlySet<string>): boolean {
   }
   return false;
 }
-
-function noOutput(id: string, message: string): ResultMessage {
-  return {
-    type: 'result',
-    id,
-    ok: false,
-    error: { code: 'no-output', message },
-  };
-}
-
-const LIST = new Intl.ListFormat('en', { type: 'disjunction' });

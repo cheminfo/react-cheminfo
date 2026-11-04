@@ -13,6 +13,7 @@ import { figurePng } from './figurePng.ts';
 import { defaultFigureScale } from './figureScale.ts';
 import type { FigureSvg, FigureSvgOptions } from './figureSvg.ts';
 import { FIGURE_SVG_TYPE, figureSvg } from './figureSvg.ts';
+import { withPageFigureSource } from './pageFigureSource.ts';
 import { sanitizeFileName } from './sanitizeFileName.ts';
 
 /** Which file a figure is saved as. */
@@ -60,7 +61,8 @@ export async function downloadFigure(
 
   if (format === 'svg') {
     const figure = figureSvg(target, { background, scale });
-    const blob = new Blob([figure.markup], { type: FIGURE_SVG_TYPE });
+    const markup = await withPageFigureSource(figure.markup);
+    const blob = new Blob([markup], { type: FIGURE_SVG_TYPE });
     downloadBlob(blob, `${name}.svg`);
     return;
   }
@@ -85,7 +87,8 @@ export async function downloadFigureSvg(
   const { format = 'png', fileName = DEFAULT_FILE_NAME } = options;
   const name = sanitizeFileName(fileName, DEFAULT_FILE_NAME);
   if (format === 'svg') {
-    const blob = new Blob([figure.markup], { type: FIGURE_SVG_TYPE });
+    const markup = await withPageFigureSource(figure.markup);
+    const blob = new Blob([markup], { type: FIGURE_SVG_TYPE });
     downloadBlob(blob, `${name}.svg`);
     return;
   }

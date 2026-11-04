@@ -63,6 +63,7 @@ export type {
   IrPlotClick,
   ZoomToBandOptions,
 } from './irEditorApi.ts';
+export { IR_FIGURE_SELECTOR } from './irEditorApi.ts';
 export {
   ABSORBANCE_DECIMALS,
   INTENSITY_DIGITS,

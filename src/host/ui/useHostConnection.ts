@@ -8,6 +8,9 @@
 import { useEffect, useRef } from 'react';
 
 import type { CitedWork } from '../../citation/core/works.ts';
+import type { FigureInput } from '../../download/core/figureInputs.ts';
+import { figureAddress } from '../../download/core/figureSource.ts';
+import { setPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import type { HostOutputs } from '../core/hostOutputs.ts';
 import type { ToolInterface } from '../core/protocol.ts';
 import type { LoadedInput } from '../core/selectInputs.ts';
@@ -46,6 +49,14 @@ export interface HostHandlers {
    * @default undefined — the page needs none
    */
   help?: ToolHelp;
+  /**
+   * What the page is drawn from that its address does not hold — the spectra
+   * a notebook handed over, a file the visitor dropped — in the kinds the tool
+   * takes them in. Every figure the page hands back or saves carries them, so
+   * a host that hands them over again opens the figure as it was.
+   * @default undefined — the address is the whole page
+   */
+  inputs?: () => readonly FigureInput[] | Promise<readonly FigureInput[]>;
 }
 
 /** Once per page: React may mount the caller twice, the host is greeted once. */
@@ -70,6 +81,19 @@ export function useHostConnection(
   useEffect(() => {
     latest.current = handlers;
   });
+
+  // Framed or not, every figure the page saves says where it came from.
+  useEffect(
+    () =>
+      setPageFigureSource(async () => {
+        const href = figureAddress(globalThis.location.href);
+        const inputs = (await latest.current.inputs?.()) ?? [];
+        return inputs.length === 0
+          ? { site: tool.name, href }
+          : { site: tool.name, href, inputs };
+      }),
+    [tool],
+  );
 
   useEffect(() => {
     if (started) return;
@@ -99,6 +123,7 @@ export function useHostConnection(
           ...(latest.current.outputs === undefined
             ? {}
             : { outputs: latest.current.outputs }),
+          inputs: async () => (await latest.current.inputs?.()) ?? [],
         });
       })
       .catch(() => {

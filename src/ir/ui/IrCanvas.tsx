@@ -100,7 +100,7 @@ export function IrCanvas(props: IrCanvasProps) {
 
   return (
     <div style={rootStyle}>
-      <div ref={attachChart} id={chartId} style={chartStyle}>
+      <div ref={attachChart} id={chartId} data-ir-figure="" style={chartStyle}>
         <IrChart
           spectra={visibleSpectra}
           technique={technique}

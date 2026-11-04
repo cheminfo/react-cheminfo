@@ -9,12 +9,11 @@ export type {
   ToolWindowEvent,
 } from './connectTool.ts';
 export { REQUEST_TIMEOUT, connectTool } from './connectTool.ts';
+export { figureToolDocument } from './figureDocument.ts';
+export type { FigurePage } from './answerGet.ts';
+export { answerGet } from './answerGet.ts';
 export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';
-export {
-  OUTPUT_DELAY,
-  answerGet,
-  createOutputPublisher,
-} from './hostOutputs.ts';
+export { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';
 export type { StructureValue } from './hostStructure.ts';
 export {
   STRUCTURE_KINDS,
