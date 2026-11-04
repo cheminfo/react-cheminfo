@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.87.0](https://github.com/cheminfo/react-cheminfo/compare/v0.86.0...v0.87.0) (2026-11-04)
+
+
+### Features
+
+* add workspaces, a settings dialog and the .&lt;site&gt;.zip document ([d9bfdfa](https://github.com/cheminfo/react-cheminfo/commit/d9bfdfacbcccfeeed6352d8ab7117999592363ff))
+* refuse an account token, and an account still owning data, in words that fit ([a540542](https://github.com/cheminfo/react-cheminfo/commit/a54054244f9d291356ac7e28d03f41e4a7824cc5))
+
+
+### Bug Fixes
+
+* announce the page on show as the current page ([246b87f](https://github.com/cheminfo/react-cheminfo/commit/246b87fed6da35598174c754ee18f97f256b5fb2))
+* stack the QR code's copy buttons, so they fit in every language ([1c479bf](https://github.com/cheminfo/react-cheminfo/commit/1c479bf55ace29aed5a4daa9ea325ed616119270))
+
 ## [0.86.0](https://github.com/cheminfo/react-cheminfo/compare/v0.85.0...v0.86.0) (2026-11-03)
 
 
