@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.89.0](https://github.com/cheminfo/react-cheminfo/compare/v0.88.0...v0.89.0) (2026-11-04)
+
+
+### Features
+
+* add PanelSettingsButton and usePanelSettings for a panel's own settings ([0d947db](https://github.com/cheminfo/react-cheminfo/commit/0d947dbb28a685e2626f9d460cca5b28c8075ba8))
+
 ## [0.88.0](https://github.com/cheminfo/react-cheminfo/compare/v0.87.0...v0.88.0) (2026-11-04)
 
 
