@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`)}function n(e){return t(e).replaceAll(`"`,`&quot;`)}function r(){return(r=e((()=>{})))()}export{r as n,n as t};
