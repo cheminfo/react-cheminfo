@@ -17,3 +17,32 @@ export { openSiteDatabase } from './openSiteDatabase.ts';
 export type { StorageUsage } from './persistentStorage.ts';
 export { requestPersistentStorage, storageUsage } from './persistentStorage.ts';
 export { watchPageLeave } from './watchPageLeave.ts';
+export { createWorkspaces } from './createWorkspaces.ts';
+export type {
+  SiteDocument,
+  SiteDocumentParts,
+  WriteSiteDocumentOptions,
+} from './siteDocument.ts';
+export {
+  DOCUMENT_FORMAT,
+  readSiteDocument,
+  siteDocumentExtension,
+  siteDocumentName,
+  writeSiteDocument,
+} from './siteDocument.ts';
+export type { WorkspaceRecord } from './workspaceFile.ts';
+export {
+  WORKSPACE_FORMAT,
+  readWorkspaceText,
+  readWorkspaceValue,
+  workspaceFileName,
+  writeWorkspaceText,
+} from './workspaceFile.ts';
+export type {
+  BuiltinWorkspace,
+  WorkspaceSource,
+  WorkspaceSummary,
+  Workspaces,
+  WorkspacesOptions,
+  WorkspacesState,
+} from './workspaceTypes.ts';

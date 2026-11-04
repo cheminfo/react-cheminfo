@@ -2115,3 +2115,175 @@ span.taxon-lineage__name {
   left: 2px;
   translate: 0 -50%;
 }
+
+/* ── Settings and workspaces ─────────────────────────────────────────────── */
+
+/* The workspace at the top, the sections down the left, the one picked beside
+   them, and the footer never scrolled away: one height whatever the section,
+   so the dialog does not jump as the reader goes down the list. */
+.settings-dialog {
+  width: min(880px, 94vw);
+  padding-bottom: 0;
+}
+
+.settings-dialog__workspace {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.settings-dialog__label {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.settings-dialog__notice {
+  margin: 8px 16px 0;
+}
+
+.settings-dialog__tabs.bp6-tabs.bp6-vertical {
+  height: min(560px, 66vh);
+  align-items: stretch;
+}
+
+.settings-dialog__tabs.bp6-vertical > .bp6-tab-list {
+  overflow-y: auto;
+  flex: 0 0 176px;
+  padding: 10px 8px;
+  border-right: 1px solid var(--border);
+  background: var(--surface-sunken);
+}
+
+.settings-dialog__tabs.bp6-vertical > .bp6-tab-list > .bp6-tab {
+  width: 100%;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* The brand tint marks the section open, as it marks the page in the bar. */
+.settings-dialog__tabs.bp6-vertical
+  > .bp6-tab-list
+  > .bp6-tab[aria-selected='true'] {
+  background: color-mix(in oklab, var(--accent) 12%, white);
+  color: var(--accent);
+}
+
+.settings-dialog__tabs.bp6-vertical > .bp6-tab-panel {
+  overflow-y: auto;
+  min-width: 0;
+  flex: 1 1 auto;
+  padding: 0 18px 16px;
+  margin: 0;
+}
+
+.settings-group {
+  margin-top: 14px;
+}
+
+.settings-group__title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.settings-group__body {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  gap: 10px;
+}
+
+.settings-group__body > .bp6-form-group,
+.settings-group__body > .bp6-control {
+  margin: 0;
+}
+
+.settings-group__note,
+.panel-status__help {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.settings-name-dialog {
+  width: min(420px, 92vw);
+}
+
+/* One row per panel: its icon and title, then the four ways it can stand. */
+.panel-status__table {
+  width: 100%;
+  margin-bottom: 8px;
+  border-collapse: collapse;
+}
+
+.panel-status__table th,
+.panel-status__table td {
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.panel-status__table thead th {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.panel-status__table tbody th {
+  font-weight: 400;
+}
+
+.panel-status__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.panel-status__table td {
+  text-align: right;
+}
+
+/* Save as: the name with its extension on the same line, the formats, and what
+   else goes into the file. */
+.save-document-dialog {
+  width: min(520px, 92vw);
+}
+
+.save-document-dialog__extension {
+  color: var(--text-muted);
+}
+
+.save-document-dialog__part {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.save-document-dialog__description {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+/* A fixed part of a field's value — an extension, a unit — sits on the field's
+   line, in the field's type: Blueprint hangs it from the top of the box. */
+.input-affix .bp6-input-left-container,
+.input-affix .bp6-input-action {
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.input-affix .bp6-input-left-container > *,
+.input-affix .bp6-input-action > * {
+  padding: 0 8px;
+  color: var(--text-muted);
+  font-size: var(--bp-typography-size-body-medium);
+  line-height: 1;
+}

@@ -11,6 +11,13 @@
 
 export { listStyle, paragraphStyle } from './dialogStyles.ts';
 export { isEditingField } from './isEditingField.ts';
+export type { PanelLayout, PanelStatus } from './panelLayout.ts';
+export {
+  PANEL_STATUSES,
+  isPanelStatus,
+  panelStatusOf,
+  withPanelStatus,
+} from './panelLayout.ts';
 export {
   inlineLabelStyle,
   labelRowStyle,

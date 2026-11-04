@@ -10,3 +10,8 @@ export type {
   SignalEffect,
 } from './persistSignalBucket.ts';
 export { persistSignalBucket } from './persistSignalBucket.ts';
+export {
+  fitSignalBucket,
+  hydrateSignalBucket,
+  snapshotSignalBucket,
+} from './signalBucket.ts';

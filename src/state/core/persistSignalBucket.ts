@@ -1,6 +1,6 @@
 import type { LegacyStorageKey } from './legacyEntries.ts';
-import { isPlainRecord } from './mergeStored.ts';
 import { persistBucket } from './persistBucket.ts';
+import { hydrateSignalBucket, snapshotSignalBucket } from './signalBucket.ts';
 import { readStorageText } from './storageEntry.ts';
 
 /**
@@ -38,19 +38,19 @@ export function persistSignalBucket<TBucket extends object>(
   const stored = persistBucket({
     key,
     version,
-    defaults: snapshotBucket(bucket),
+    defaults: snapshotSignalBucket(bucket),
     onQuotaExceeded,
     legacyKeys,
     forgetLegacyKeys,
   });
 
   const { value, firstRun } = stored.read();
-  if (!firstRun) hydrateBucket(bucket, value);
+  if (!firstRun) hydrateSignalBucket(bucket, value);
 
   let subscribed = false;
   let adopting = false;
   effect(() => {
-    const snapshot = snapshotBucket(bucket);
+    const snapshot = snapshotSignalBucket(bucket);
     if (!subscribed) {
       subscribed = true;
       return;
@@ -72,7 +72,7 @@ export function persistSignalBucket<TBucket extends object>(
       }
       adopting = true;
       try {
-        hydrateBucket(bucket, read.value);
+        hydrateSignalBucket(bucket, read.value);
       } finally {
         adopting = false;
       }
@@ -129,42 +129,4 @@ export interface PersistSignalBucketOptions<TBucket extends object> {
    * @default false
    */
   syncAcrossTabs?: boolean | ((bucket: TBucket) => boolean);
-}
-
-interface SignalLeaf {
-  value: unknown;
-}
-
-function snapshotBucket(node: object): Record<string, unknown> {
-  const snapshot: Record<string, unknown> = {};
-  for (const [name, member] of Object.entries(node)) {
-    if (isSignalLeaf(member)) {
-      snapshot[name] = member.value;
-    } else if (isPlainRecord(member)) {
-      snapshot[name] = snapshotBucket(member);
-    }
-  }
-  return snapshot;
-}
-
-function hydrateBucket(node: object, stored: Record<string, unknown>): void {
-  for (const [name, member] of Object.entries(node)) {
-    const value = stored[name];
-    if (value === undefined) continue;
-    if (isSignalLeaf(member)) {
-      member.value = value;
-    } else if (isPlainRecord(member) && isPlainRecord(value)) {
-      hydrateBucket(member, value);
-    }
-  }
-}
-
-function isSignalLeaf(member: unknown): member is SignalLeaf {
-  if (typeof member !== 'object' || member === null) return false;
-  const candidate = member as { peek?: unknown; subscribe?: unknown };
-  return (
-    'value' in member &&
-    typeof candidate.peek === 'function' &&
-    typeof candidate.subscribe === 'function'
-  );
 }

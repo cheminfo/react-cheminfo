@@ -28,6 +28,8 @@ export type {
 } from './PanelMessage.tsx';
 export { PanelEmpty, PanelMessage } from './PanelMessage.tsx';
 export type { PanelRailProps, RailPanel } from './PanelRail.tsx';
+export type { PanelStatusTableProps } from './PanelStatusTable.tsx';
+export { PanelStatusTable } from './PanelStatusTable.tsx';
 export { PanelRail } from './PanelRail.tsx';
 export type { LinkProps, SectionProps } from './Section.tsx';
 export { Link, Section } from './Section.tsx';

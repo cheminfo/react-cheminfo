@@ -52,7 +52,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/host`              | data handed over by a page that frames the tool       | nothing on import; ajv once the page is framed   |
 | `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
 | `react-cheminfo/playwright`        | the browser-suite configuration every site shares     | nothing; types from @playwright/test             |
-| `react-cheminfo/storage`           | work kept in the browser: autosave, tabs, backups     | React on the backup menu; idb, @zip.js/zip.js    |
+| `react-cheminfo/storage`           | work kept in the browser, workspaces, documents       | React on the backup menu; idb, @zip.js/zip.js    |
 | `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
 | `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
 | `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens         | nothing                                          |
@@ -110,6 +110,18 @@ piece of work through Web Locks, so a tab that crashed lets go by itself;
 `createRestoreGuard` stops a page reopening, on every load, the work that took
 it down; and `writeArchive` / `readArchive` with `<BackupMenu>` or
 `useBackupRestore` take everything out as one file and back in.
+
+It also keeps a site's preferences as **workspaces**: `createWorkspaces` fills
+the site's tree of preference signals from the workspace last used, keeps every
+change at once — a localStorage journal, then IndexedDB — and offers the site's
+own workspaces beside the visitor's, saved, renamed, reset and carried as a
+`.<site>-workspace.json` file. `<SettingsDialog>` from `react-cheminfo/ui` is
+their dialog: the workspace at the top, vertical sections, and Cancel, Apply
+and Apply and save, each change shown on the page as it is set;
+`<PanelStatusTable>` sets each panel hidden, available, folded or open. A site's
+**document** is `writeSiteDocument` / `readSiteDocument`: one `.<site>.zip`
+holding its data files as they open anywhere, and, when asked, the view and the
+workspace, which `<SaveDocumentDialog>` offers.
 
 `react-cheminfo/vite` is the one door with a split bill: `cheminfoPrerender`
 needs nothing beyond Vite's own plugin type, while `ogCardHtml` renders a mark
