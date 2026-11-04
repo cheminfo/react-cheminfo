@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { sciPeaksEthylbenzeneIrLoad } from '../../testing/sciPeaks.ts';
+import { sciPeaksEthylbenzeneIrLoad } from '../../testing/sciPeaksIr.ts';
 import type { IrJdxValue } from '../irKinds.ts';
 import type { ToolInterface } from '../protocol.ts';
 import type { InputSelection } from '../selectInputs.ts';
@@ -82,7 +82,7 @@ test('a request carrying nothing opens a tool whose every input is optional', ()
   });
 });
 
-test("SciPeaks' sample gives its spectrum and its molfile, the bands read as stored", () => {
+test("SciPeaks' sample gives its spectrum and its molfile, the bands as its reader writes them", () => {
   const load = sciPeaksEthylbenzeneIrLoad('##TITLE=ETHYL BENZENE');
 
   const selection = selectInputs(SPECTRA_TOOL, load.items);
@@ -109,7 +109,7 @@ test("SciPeaks' sample gives its spectrum and its molfile, the bands read as sto
     wavenumber: 1753.706831155787,
     absorbance: 0.0834934128848443,
     transmittance: 0.8251000000000001,
-    kind: 'w',
+    strength: 'weak',
   });
   expect(load.accept).toStrictEqual(['spectra.ir.peaks']);
 });

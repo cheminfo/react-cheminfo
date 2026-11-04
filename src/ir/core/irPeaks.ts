@@ -1,14 +1,17 @@
 /**
- * The bands of an infrared spectrum as a notebook writes them, and back: the
- * peaks of the host protocol's `spectra.ir.jdx` and `spectra.ir.peaks`.
+ * The bands of a spectrum as a host writes them, and back: the peaks of the
+ * host protocol's `spectra.ir.*` and `spectra.raman.*` kinds.
  *
- * The two differ in two ways only: a notebook's transmittance is a fraction
- * where the viewer holds a percentage, and it calls a band's strength `kind`.
+ * A peak differs from the band the viewer holds in two ways only: an infrared
+ * transmittance is a fraction where the viewer holds a percentage, and a
+ * strength is a word (`strong`) where the viewer holds a table's letter (`S`).
  */
 
 import { xFindClosestIndex } from 'ml-spectra-processing';
 
+import type { BandStrength } from '../../host/core/bandStrength.ts';
 import type { IrPeakValue } from '../../host/core/irKinds.ts';
+import type { RamanPeakValue } from '../../host/core/ramanKinds.ts';
 
 import { bandAtIndex } from './handPicking.ts';
 import type { IrBand, IrBandStrength } from './irBand.ts';
@@ -16,64 +19,116 @@ import type { IrSpectrum } from './irSpectrum.ts';
 import { orderedBands } from './spectrumBands.ts';
 
 /**
- * The bands a notebook handed over with a spectrum.
+ * The bands a host handed over with an infrared spectrum.
  *
- * Each stays where the notebook put it, with the values it gave; a value it
- * left out is read off the spectrum at the nearest sample, and a strength
- * letter that is not one of `w`, `m` and `S` is worked out again.
+ * Each stays where the host put it, with the values it gave; a value it left
+ * out is read off the spectrum at the nearest sample.
  * @param spectrum - The spectrum they were picked on.
  * @param peaks - The peaks, in any order.
  * @returns The bands, ascending, one per wavenumber.
  */
-export function bandsFromPeaks(
+export function bandsFromIrPeaks(
   spectrum: IrSpectrum,
   peaks: readonly IrPeakValue[],
 ): IrBand[] {
-  const bands: IrBand[] = [];
-  for (const peak of peaks) {
-    const { wavenumber, absorbance, transmittance, kind } = peak;
-    if (!Number.isFinite(wavenumber)) continue;
-    const read = bandAtIndex(
-      spectrum,
-      xFindClosestIndex(spectrum.wavenumber, wavenumber),
-    );
-    if (read === null) continue;
-    bands.push({
-      ...read,
-      wavenumber,
-      ...(absorbance === undefined ? {} : { absorbance }),
-      ...(transmittance === undefined
-        ? {}
-        : { transmittance: transmittance * 100 }),
-      strength: isStrength(kind) ? kind : read.strength,
-    });
-  }
-  return orderedBands(spectrum.id, bands);
+  return bandsFromPeaks(spectrum, peaks, (peak) => ({
+    ...(peak.absorbance === undefined ? {} : { absorbance: peak.absorbance }),
+    ...(peak.transmittance === undefined
+      ? {}
+      : { transmittance: peak.transmittance * 100 }),
+  }));
 }
 
 /**
- * Bands as a notebook keeps them.
+ * The bands a host handed over with a Raman spectrum, kept as
+ * {@link bandsFromIrPeaks} keeps infrared ones.
+ * @param spectrum - The spectrum they were picked on.
+ * @param peaks - The peaks, in any order.
+ * @returns The bands, ascending, one per shift.
+ */
+export function bandsFromRamanPeaks(
+  spectrum: IrSpectrum,
+  peaks: readonly RamanPeakValue[],
+): IrBand[] {
+  return bandsFromPeaks(spectrum, peaks, (peak) =>
+    peak.intensity === undefined ? {} : { intensity: peak.intensity },
+  );
+}
+
+/**
+ * An infrared spectrum's bands as a host keeps them: `spectra.ir.peaks`.
  * @param bands - The bands, as the viewer holds them.
  * @returns The peaks, in the same order.
  */
-export function peaksFromBands(bands: readonly IrBand[]): IrPeakValue[] {
+export function irPeaksFromBands(bands: readonly IrBand[]): IrPeakValue[] {
   const peaks: IrPeakValue[] = [];
-  for (const band of bands) {
-    const { wavenumber, absorbance, transmittance, strength } = band;
+  for (const { wavenumber, absorbance, transmittance, strength } of bands) {
     peaks.push({
       wavenumber,
       ...(absorbance === undefined ? {} : { absorbance }),
       ...(transmittance === undefined
         ? {}
         : { transmittance: transmittance / 100 }),
-      kind: strength,
+      strength: WORDS[strength],
     });
   }
   return peaks;
 }
 
-function isStrength(kind: string | undefined): kind is IrBandStrength {
-  return kind !== undefined && STRENGTHS.includes(kind);
+/**
+ * A Raman spectrum's bands as a host keeps them: `spectra.raman.peaks`.
+ * @param bands - The bands, as the viewer holds them.
+ * @returns The peaks, in the same order.
+ */
+export function ramanPeaksFromBands(
+  bands: readonly IrBand[],
+): RamanPeakValue[] {
+  const peaks: RamanPeakValue[] = [];
+  for (const { wavenumber, intensity, strength } of bands) {
+    peaks.push({
+      wavenumber,
+      ...(intensity === undefined ? {} : { intensity }),
+      strength: WORDS[strength],
+    });
+  }
+  return peaks;
 }
 
-const STRENGTHS: readonly string[] = ['w', 'm', 'S'] satisfies IrBandStrength[];
+const WORDS: Record<IrBandStrength, BandStrength> = {
+  w: 'weak',
+  m: 'medium',
+  S: 'strong',
+};
+
+const LETTERS: Record<BandStrength, IrBandStrength> = {
+  weak: 'w',
+  medium: 'm',
+  strong: 'S',
+};
+
+function bandsFromPeaks<
+  Peak extends { wavenumber: number; strength?: BandStrength },
+>(
+  spectrum: IrSpectrum,
+  peaks: readonly Peak[],
+  valuesOf: (peak: Peak) => Partial<IrBand>,
+): IrBand[] {
+  const bands: IrBand[] = [];
+  for (const peak of peaks) {
+    const { wavenumber } = peak;
+    if (!Number.isFinite(wavenumber)) continue;
+    const read = bandAtIndex(
+      spectrum,
+      xFindClosestIndex(spectrum.wavenumber, wavenumber),
+    );
+    if (read === null) continue;
+    const { strength } = peak;
+    bands.push({
+      ...read,
+      wavenumber,
+      ...valuesOf(peak),
+      strength: strength === undefined ? read.strength : LETTERS[strength],
+    });
+  }
+  return orderedBands(spectrum.id, bands);
+}

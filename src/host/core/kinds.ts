@@ -4,8 +4,9 @@
  * name, a JSON Schema, and ajv.
  *
  * The names are pipeline's (`chem.molfile.2d`, `chem.ocl.id`…), plus
- * `chem.smiles`, which pipeline lists among its future schemas, the two
- * infrared kinds of `./irKinds.ts`, the reaction of `./reactionKinds.ts`, and
+ * `chem.smiles`, which pipeline lists among its future schemas, the infrared
+ * kinds of `./irKinds.ts` and the Raman ones of `./ramanKinds.ts`, the
+ * reaction of `./reactionKinds.ts`, and
  * the kinds a tool hands back, of `./resultKinds.ts`. A name with children is a category whose
  * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
  * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
@@ -19,6 +20,8 @@ import { Ajv } from 'ajv';
 import type { IrJdxValue, IrPeaksValue } from './irKinds.ts';
 import { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
 import type { HostItem } from './protocol.ts';
+import type { RamanJdxValue, RamanPeaksValue } from './ramanKinds.ts';
+import { RAMAN_JDX_SCHEMA, RAMAN_PEAKS_SCHEMA } from './ramanKinds.ts';
 import type { RxnValue } from './reactionKinds.ts';
 import { RXN_SCHEMA } from './reactionKinds.ts';
 import type { NameValue, SvgImageValue, TableValue } from './resultKinds.ts';
@@ -48,6 +51,8 @@ export type CheckedValue =
   | { kind: 'chem.rxn'; value: RxnValue }
   | { kind: 'spectra.ir.jdx'; value: IrJdxValue }
   | { kind: 'spectra.ir.peaks'; value: IrPeaksValue }
+  | { kind: 'spectra.raman.jdx'; value: RamanJdxValue }
+  | { kind: 'spectra.raman.peaks'; value: RamanPeaksValue }
   | { kind: 'image.svg'; value: SvgImageValue }
   | { kind: 'chem.name'; value: NameValue }
   | { kind: 'data.table'; value: TableValue };
@@ -181,6 +186,8 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   // `nullable` on every optional field and so let a `null` band through.
   'spectra.ir.jdx': ajv.compile<IrJdxValue>(IR_JDX_SCHEMA),
   'spectra.ir.peaks': ajv.compile<IrPeaksValue>(IR_PEAKS_SCHEMA),
+  'spectra.raman.jdx': ajv.compile<RamanJdxValue>(RAMAN_JDX_SCHEMA),
+  'spectra.raman.peaks': ajv.compile<RamanPeaksValue>(RAMAN_PEAKS_SCHEMA),
   'image.svg': ajv.compile<SvgImageValue>(SVG_IMAGE_SCHEMA),
   'chem.name': ajv.compile<NameValue>(NAME_SCHEMA),
   'data.table': ajv.compile<TableValue>(TABLE_SCHEMA),

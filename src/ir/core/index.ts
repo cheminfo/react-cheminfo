@@ -31,7 +31,12 @@ export {
   pickBandAt,
   removeBand,
 } from './handPicking.ts';
-export { bandsFromPeaks, peaksFromBands } from './irPeaks.ts';
+export {
+  bandsFromIrPeaks,
+  bandsFromRamanPeaks,
+  irPeaksFromBands,
+  ramanPeaksFromBands,
+} from './irPeaks.ts';
 export type { IrJcampReadOptions } from './fromJcamp.ts';
 export type { IrSpcReadOptions } from './fromSpc.ts';
 export type { IrBand, IrBandStrength } from './irBand.ts';

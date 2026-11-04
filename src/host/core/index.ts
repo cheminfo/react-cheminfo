@@ -21,6 +21,8 @@ export {
   hostStructureSource,
   readHostMolecule,
 } from './hostStructure.ts';
+export type { BandStrength } from './bandStrength.ts';
+export { BAND_STRENGTHS, BAND_STRENGTH_SCHEMA } from './bandStrength.ts';
 export type { IrJdxValue, IrPeakValue, IrPeaksValue } from './irKinds.ts';
 export { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
 export type {
@@ -57,6 +59,12 @@ export {
   isConnect,
   parseRequest,
 } from './protocol.ts';
+export type {
+  RamanJdxValue,
+  RamanPeakValue,
+  RamanPeaksValue,
+} from './ramanKinds.ts';
+export { RAMAN_JDX_SCHEMA, RAMAN_PEAKS_SCHEMA } from './ramanKinds.ts';
 export type { RxnValue } from './reactionKinds.ts';
 export { REACTION_KINDS, RXN_SCHEMA } from './reactionKinds.ts';
 export type {

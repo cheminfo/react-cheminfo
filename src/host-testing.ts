@@ -14,13 +14,21 @@ export {
   startStandInHost,
 } from './host/testing/standInHost.ts';
 export {
-  SCIPEAKS_ETHYLBENZENE_IR_FILENAME,
-  SCIPEAKS_ETHYLBENZENE_IR_PEAKS,
   SCIPEAKS_ETHYLBENZENE_LOAD,
   SCIPEAKS_ETHYLBENZENE_MOLFILE,
   SCIPEAKS_HOST_NAME,
-  sciPeaksEthylbenzeneIrLoad,
 } from './host/testing/sciPeaks.ts';
+export {
+  SCIPEAKS_ETHYLBENZENE_IR_FILENAME,
+  SCIPEAKS_ETHYLBENZENE_IR_PEAKS,
+  sciPeaksEthylbenzeneIrLoad,
+} from './host/testing/sciPeaksIr.ts';
+export {
+  SCIPEAKS_ETHYLBENZENE_RAMAN_FILENAME,
+  SCIPEAKS_ETHYLBENZENE_RAMAN_MAP_FILENAME,
+  SCIPEAKS_ETHYLBENZENE_RAMAN_PEAKS,
+  sciPeaksEthylbenzeneRamanLoad,
+} from './host/testing/sciPeaksRaman.ts';
 export type {
   ChatFrameLog,
   ChatFrameOptions,

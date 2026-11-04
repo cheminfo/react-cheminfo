@@ -1,71 +1,77 @@
 /**
- * The kinds a measured infrared spectrum travels as: the JCAMP-DX a notebook
- * keeps with the bands picked on it, and those bands alone, which is what a
- * tool hands back.
+ * The kinds a measured infrared spectrum travels as: the JCAMP-DX a host keeps
+ * with the bands picked on it, and those bands alone, which is what a tool
+ * hands back.
  *
- * Shaped on what SciPeaks keeps for a sample's infrared spectrum — a JCAMP-DX
- * attachment and a `peak` list beside it — with the text of the attachment in
- * place of its address, since a tool framed from another origin cannot fetch
- * what the notebook serves its own pages. A band is written the way SciPeaks
- * and `ir-spectrum` write one, so what a tool hands back can be stored as it
- * arrives.
+ * The value carries the data and the item names it: the item's `id` is the
+ * host's own reference to the spectrum — the bands go back under it — and its
+ * `label` is what the tool shows. One item is one spectrum: when its JCAMP-DX
+ * holds several, the bands belong to the first. The text of the file travels
+ * rather than its address, since a tool framed from another origin cannot
+ * fetch what the host serves its own pages.
  *
  * Named after pipeline's `spectra.nmr.1d.jdx`. Pipeline's own `spectra.ir` is
- * a computed spectrum — normal modes, not a measurement — and is not one of the
- * kinds read here.
+ * a computed spectrum — normal modes, not a measurement — so no tool declares
+ * the bare `spectra.ir`: it would take a list of bands for a spectrum.
  */
 
-/** One band of an infrared spectrum, as SciPeaks and `ir-spectrum` write it. */
+import type { BandStrength } from './bandStrength.ts';
+import { BAND_STRENGTH_SCHEMA } from './bandStrength.ts';
+
+/** One band of an infrared spectrum. */
 export interface IrPeakValue {
-  /** Where it sits, in cm⁻¹. */
+  /** Where it sits, in cm⁻¹; greater than zero. */
   wavenumber: number;
   /**
-   * Its absorbance.
+   * Its decadic absorbance.
    * @default read off the spectrum
    */
   absorbance?: number;
   /**
-   * Its transmittance, as a fraction between 0 and 1 — not a percentage.
+   * Its transmittance, as a fraction — `0.42`, not `42`.
    * @default read off the spectrum
    */
   transmittance?: number;
   /**
-   * How strong it is: `w` weak, `m` medium, `S` strong. Any other letter is
-   * worked out again from the spectrum.
+   * How strong it is, relative to the strongest band of its spectrum.
    * @default worked out from the spectrum
    */
-  kind?: string;
+  strength?: BandStrength;
 }
 
-/** `spectra.ir.jdx`: a measured infrared spectrum and the bands picked on it. */
+/** `spectra.ir.jdx`: a measured infrared spectrum and the bands kept for it. */
 export interface IrJdxValue {
   /** The JCAMP-DX, as text. */
   jdx: string;
   /**
-   * The name the notebook keeps it under, e.g. `spectra/ir/sample.jdx`.
-   * @default undefined
-   */
-  filename?: string;
-  /**
-   * The bands picked on it. Absent or empty, the tool picks them itself.
+   * The bands the host keeps for it. Absent, none were ever picked, and the
+   * tool picks its own; empty, the host kept none, and the tool keeps none.
    * @default undefined
    */
   peaks?: IrPeakValue[];
 }
 
-/** `spectra.ir.peaks`: the bands picked on an infrared spectrum, alone. */
+/**
+ * `spectra.ir.peaks`: every band of one infrared spectrum, ascending by
+ * wavenumber, one per wavenumber. It replaces what the host kept, and travels
+ * under the `id` of the spectrum it was picked on.
+ */
 export interface IrPeaksValue {
-  /** The bands, ascending by wavenumber. */
+  /** The bands. */
   peaks: IrPeakValue[];
 }
 
+// Written as plain schemas rather than `JSONSchemaType`, which would demand
+// `nullable` on every optional field and so let a `null` band through. No
+// value is bounded but the wavenumber: a measured baseline dips below zero
+// absorbance and above full transmittance.
 const IR_PEAK_SCHEMA = {
   type: 'object',
   properties: {
-    wavenumber: { type: 'number' },
+    wavenumber: { type: 'number', exclusiveMinimum: 0 },
     absorbance: { type: 'number' },
     transmittance: { type: 'number' },
-    kind: { type: 'string' },
+    strength: BAND_STRENGTH_SCHEMA,
   },
   required: ['wavenumber'],
   additionalProperties: false,
@@ -76,7 +82,6 @@ export const IR_JDX_SCHEMA = {
   type: 'object',
   properties: {
     jdx: { type: 'string' },
-    filename: { type: 'string' },
     peaks: { type: 'array', items: IR_PEAK_SCHEMA },
   },
   required: ['jdx'],
