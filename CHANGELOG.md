@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.91.0](https://github.com/cheminfo/react-cheminfo/compare/v0.90.0...v0.91.0) (2026-11-05)
+
+
+### Features
+
+* draw the periodic table in 32 columns ([023846c](https://github.com/cheminfo/react-cheminfo/commit/023846c13c5e7318b15a6121d1b2924badb71846))
+
 ## [0.90.0](https://github.com/cheminfo/react-cheminfo/compare/v0.89.0...v0.90.0) (2026-11-05)
 
 
