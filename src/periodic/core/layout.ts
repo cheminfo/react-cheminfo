@@ -2,21 +2,38 @@
  * Where every element is drawn.
  *
  * The group and the period place the main block, but not the lanthanoids and
- * the actinoids: those have no group, and are drawn on the two rows underneath.
- * The grid is therefore 18 columns by 10 rows — seven periods, a blank spacer,
- * and the two inner-transition rows.
+ * the actinoids: those have no group. An 18-column table draws them on the two
+ * rows underneath; a 32-column one sets them back in periods 6 and 7, between
+ * groups 2 and 3. The shape of each form is in `geometry.ts`.
  *
  * The cells here are the *logical* ones, so column 1 is group 1 and row 1 is
  * period 1. A table drawn with the group and period header strips offsets them
  * by one; nothing in this module needs to know that.
  */
 
-import type {
-  ElementBlock,
-  ElementCategory,
-  PeriodicElement,
-} from './elements.ts';
+import type { ElementBlock, PeriodicElement } from './elements.ts';
 import { PERIODIC_ELEMENTS, elementBySymbol } from './elements.ts';
+import type { Cell, TableColumns, TableGeometry } from './geometry.ts';
+import { tableGeometry } from './geometry.ts';
+
+export type {
+  BlockLabel,
+  Cell,
+  GridBlock,
+  InnerTransitionMarker,
+  InnerTransitionRow,
+  TableColumns,
+  TableGeometry,
+} from './geometry.ts';
+export {
+  BLOCK_LABELS,
+  COLUMN_COUNT,
+  EMPTY_BLOCK,
+  INNER_TRANSITION_MARKERS,
+  INNER_TRANSITION_ROWS,
+  ROW_COUNT,
+  tableGeometry,
+} from './geometry.ts';
 
 /**
  * A whole run of the table: one group, one period, or one block.
@@ -62,131 +79,68 @@ export interface ElementPick {
   additive: boolean;
 }
 
-/** A cell of the grid, one-based as CSS grid lines are. */
-export interface Cell {
-  /** Grid column, one-based. */
-  column: number;
-  /** Grid row, one-based. */
-  row: number;
-}
-
-/** Columns of the table. */
-export const COLUMN_COUNT = 18;
-
-/** Rows of the table, the blank spacer between the blocks included. */
-export const ROW_COUNT = 10;
-
-/** Row the lanthanoids are drawn on, and the actinoids on the one below. */
-const INNER_TRANSITION_ROW = 9;
+/** How many elements each inner-transition series holds. */
+const INNER_TRANSITION_LENGTH = 15;
 
 /** Atomic number the lanthanoids and the actinoids start at. */
 const INNER_TRANSITION_STARTS = [57, 89] as const;
 
-/** How many elements each inner-transition series holds. */
-const INNER_TRANSITION_LENGTH = 15;
-
-/** Column the inner-transition rows start at, under the d block. */
-const INNER_TRANSITION_COLUMN = 3;
-
 /**
  * The cell an element occupies.
  * @param element - Element to place.
+ * @param columns - How many columns the table is drawn in.
  * @returns Its column and row, both one-based.
+ * @default columns 18
  */
-export function cellOf(element: PeriodicElement): Cell {
-  const inner = innerTransitionCell(element);
+export function cellOf(
+  element: PeriodicElement,
+  columns: TableColumns = 18,
+): Cell {
+  const geometry = tableGeometry(columns);
+  const inner = innerTransitionCell(element, geometry);
   if (inner !== null) return inner;
-  return { column: element.group ?? 1, row: element.period };
+  const group = element.group ?? 1;
+  return {
+    column: geometry.groupColumns[group - 1] ?? group,
+    row: element.period,
+  };
+}
+
+/** An element and the cell it occupies. */
+export interface PlacedElement {
+  /** The element. */
+  element: PeriodicElement;
+  /** Its cell. */
+  cell: Cell;
 }
 
 /**
  * Every element with the cell it occupies, in reading order.
+ * @param columns - How many columns the table is drawn in.
  * @returns One entry per element, ordered by row then column, so a keyboard
- * walk over the list moves the way the eye does.
+ * walk over the list moves the way the eye does. In 32 columns that is the
+ * order of the atomic numbers.
+ * @default columns 18
  */
-export function placedElements(): ReadonlyArray<{
-  element: PeriodicElement;
-  cell: Cell;
-}> {
-  placedCache ??= PERIODIC_ELEMENTS.map((element) => ({
-    element,
-    cell: cellOf(element),
-  })).toSorted((first, second) =>
-    first.cell.row === second.cell.row
-      ? first.cell.column - second.cell.column
-      : first.cell.row - second.cell.row,
-  );
-  return placedCache;
+export function placedElements(
+  columns: TableColumns = 18,
+): readonly PlacedElement[] {
+  let placed = placedCache.get(columns);
+  if (placed === undefined) {
+    placed = PERIODIC_ELEMENTS.map((element) => ({
+      element,
+      cell: cellOf(element, columns),
+    })).toSorted((first, second) =>
+      first.cell.row === second.cell.row
+        ? first.cell.column - second.cell.column
+        : first.cell.row - second.cell.row,
+    );
+    placedCache.set(columns, placed);
+  }
+  return placed;
 }
 
-let placedCache: ReadonlyArray<{
-  element: PeriodicElement;
-  cell: Cell;
-}> | null = null;
-
-/**
- * The block of cells the table leaves empty, where no element belongs: logical
- * columns 3 to 12 of the first three periods.
- *
- * It is a tenth of the drawing, in the middle of the top edge, and the one
- * place a tool can write without covering an element — which is why a table
- * printed on a wall puts its title or its key there.
- */
-export const EMPTY_BLOCK: {
-  /** Leftmost column of the block, one-based. */
-  column: number;
-  /** Topmost row of the block, one-based. */
-  row: number;
-  /** How many columns it spans. */
-  columnSpan: number;
-  /** How many rows it spans. */
-  rowSpan: number;
-} = { column: 3, row: 1, columnSpan: 10, rowSpan: 3 };
-
-/**
- * The two cells the lanthanoids and the actinoids were lifted out of.
- *
- * Without them the main block has a hole in it and the two rows underneath
- * belong nowhere; with them the reader can see where each series was taken
- * from.
- */
-export const INNER_TRANSITION_MARKERS: ReadonlyArray<{
-  cell: Cell;
-  label: string;
-  category: ElementCategory;
-}> = [
-  { cell: { column: 3, row: 6 }, label: '57–71', category: 'lanthanoid' },
-  { cell: { column: 3, row: 7 }, label: '89–103', category: 'actinoid' },
-];
-
-/**
- * Where each block is named, in the cells no element occupies: s, d and p
- * along the spacer under period 7, each under the columns it holds, and f in
- * the two cells left of the inner-transition rows.
- *
- * Helium is an s element standing over the p block; a label follows the
- * columns, and the element its electrons.
- */
-export const BLOCK_LABELS: ReadonlyArray<{
-  block: ElementBlock;
-  cell: Cell;
-  columnSpan: number;
-  rowSpan: number;
-}> = [
-  { block: 's', cell: { column: 1, row: 8 }, columnSpan: 2, rowSpan: 1 },
-  { block: 'd', cell: { column: 3, row: 8 }, columnSpan: 10, rowSpan: 1 },
-  { block: 'p', cell: { column: 13, row: 8 }, columnSpan: 6, rowSpan: 1 },
-  { block: 'f', cell: { column: 1, row: 9 }, columnSpan: 2, rowSpan: 2 },
-];
-
-/** The period each inner-transition row belongs to, for its row label. */
-export const INNER_TRANSITION_ROWS: ReadonlyArray<{
-  row: number;
-  period: number;
-}> = [
-  { row: INNER_TRANSITION_ROW, period: 6 },
-  { row: INNER_TRANSITION_ROW + 1, period: 7 },
-];
+const placedCache = new Map<TableColumns, readonly PlacedElement[]>();
 
 /**
  * The element an arrow key walks to.
@@ -195,30 +149,35 @@ export const INNER_TRANSITION_ROWS: ReadonlyArray<{
  * silicon, the cell underneath it, and a step of 18 protons would instead be
  * chromium because period 2 holds only eight elements. Left and right follow
  * reading order, so the end of a period continues at the start of the next one
- * and the two inner-transition rows come after the main block.
+ * and, in 18 columns, the two inner-transition rows come after the main block.
  * @param key - The pressed key, as `KeyboardEvent.key` reports it.
  * @param from - Symbol the walk starts at; any arrow lands on hydrogen when it names no element.
+ * @param columns - How many columns the table is drawn in.
  * @returns The element to move to, or `null` when the key is not an arrow or the table has no cell that way.
+ * @default columns 18
  */
 export function elementByArrowKey(
   key: string,
   from: string | undefined,
+  columns: TableColumns = 18,
 ): PeriodicElement | null {
   const direction = ARROW_DIRECTIONS[key];
   if (direction === undefined) return null;
 
-  const placed = placedElements();
+  const placed = placedElements(columns);
   const start = from === undefined ? undefined : elementBySymbol(from);
   if (start === undefined) return placed[0]?.element ?? null;
 
   if (direction.column !== 0) {
-    const index = readingOrderIndex().get(start.symbol);
+    const index = readingOrderIndex(columns).get(start.symbol);
     if (index === undefined) return null;
     return placed[index + direction.column]?.element ?? null;
   }
 
-  const cell = cellOf(start);
-  return byCell().get(cellKey(cell.column, cell.row + direction.row)) ?? null;
+  const cell = cellOf(start, columns);
+  return (
+    byCell(columns).get(cellKey(cell.column, cell.row + direction.row)) ?? null
+  );
 }
 
 /** Which way each arrow key moves, in grid cells. */
@@ -229,38 +188,52 @@ const ARROW_DIRECTIONS: Record<string, { column: number; row: number }> = {
   ArrowUp: { column: 0, row: -1 },
 };
 
-function readingOrderIndex(): Map<string, number> {
-  readingOrderCache ??= new Map(
-    placedElements().map(({ element }, index) => [element.symbol, index]),
-  );
-  return readingOrderCache;
+function readingOrderIndex(columns: TableColumns): Map<string, number> {
+  let index = readingOrderCache.get(columns);
+  if (index === undefined) {
+    index = new Map(
+      placedElements(columns).map(({ element }, position) => [
+        element.symbol,
+        position,
+      ]),
+    );
+    readingOrderCache.set(columns, index);
+  }
+  return index;
 }
 
-let readingOrderCache: Map<string, number> | null = null;
+const readingOrderCache = new Map<TableColumns, Map<string, number>>();
 
-function byCell(): Map<string, PeriodicElement> {
-  cellIndexCache ??= new Map(
-    placedElements().map(({ element, cell }) => [
-      cellKey(cell.column, cell.row),
-      element,
-    ]),
-  );
-  return cellIndexCache;
+function byCell(columns: TableColumns): Map<string, PeriodicElement> {
+  let index = cellIndexCache.get(columns);
+  if (index === undefined) {
+    index = new Map(
+      placedElements(columns).map(({ element, cell }) => [
+        cellKey(cell.column, cell.row),
+        element,
+      ]),
+    );
+    cellIndexCache.set(columns, index);
+  }
+  return index;
 }
 
-let cellIndexCache: Map<string, PeriodicElement> | null = null;
+const cellIndexCache = new Map<TableColumns, Map<string, PeriodicElement>>();
 
 function cellKey(column: number, row: number): string {
   return `${String(column)}:${String(row)}`;
 }
 
-function innerTransitionCell(element: PeriodicElement): Cell | null {
+function innerTransitionCell(
+  element: PeriodicElement,
+  geometry: TableGeometry,
+): Cell | null {
   for (const [index, start] of INNER_TRANSITION_STARTS.entries()) {
     const offset = element.atomicNumber - start;
     if (offset >= 0 && offset < INNER_TRANSITION_LENGTH) {
       return {
-        column: INNER_TRANSITION_COLUMN + offset,
-        row: INNER_TRANSITION_ROW + index,
+        column: geometry.innerTransitionColumn + offset,
+        row: geometry.innerTransitionRow + index,
       };
     }
   }

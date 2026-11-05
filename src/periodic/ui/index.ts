@@ -4,6 +4,7 @@ export type { ElementCellProps } from './ElementCell.tsx';
 export { ElementCell } from './ElementCell.tsx';
 export type { PeriodicTableProps } from './PeriodicTable.tsx';
 export { PeriodicTable } from './PeriodicTable.tsx';
+export { periodicTableMinWidth } from './tableLayout.ts';
 export type { PeriodicTableHelpProps } from './PeriodicTableHelp.tsx';
 export {
   PeriodicTableGestures,

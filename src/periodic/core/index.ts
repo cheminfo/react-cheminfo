@@ -16,11 +16,18 @@ export {
   categorySwatch,
 } from './categories.ts';
 export type {
+  BlockLabel,
   BlockRange,
   Cell,
   ElementPick,
   ElementRange,
+  GridBlock,
+  InnerTransitionMarker,
+  InnerTransitionRow,
   NumberedRange,
+  PlacedElement,
+  TableColumns,
+  TableGeometry,
 } from './layout.ts';
 export {
   BLOCK_LABELS,
@@ -32,4 +39,5 @@ export {
   cellOf,
   elementByArrowKey,
   placedElements,
+  tableGeometry,
 } from './layout.ts';

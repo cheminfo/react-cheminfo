@@ -11,13 +11,14 @@
  */
 
 import type { KeyboardEvent, ReactElement } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
 import { useResizeObserver } from '../../hooks/ui/useResizeObserver.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { categorySwatch } from '../core/categories.ts';
 import type { PeriodicElement } from '../core/elements.ts';
+import { tableGeometry } from '../core/geometry.ts';
 import type { ElementPick } from '../core/layout.ts';
 import { elementByArrowKey, placedElements } from '../core/layout.ts';
 
@@ -35,7 +36,7 @@ import {
   textWidthInEm,
 } from './cellType.ts';
 import type { PeriodicTableProps } from './periodicTableProps.ts';
-import { gridStyle, insetStyle, rootStyle } from './tableLayout.ts';
+import { gridStyle, insetStyle, rootStyleFor } from './tableLayout.ts';
 import { UNIT_PROPERTY, unitValue } from './unit.ts';
 
 export type { PeriodicTableProps } from './periodicTableProps.ts';
@@ -61,6 +62,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     legend = false,
     markers = true,
     keyboard = true,
+    columns = 18,
     onHover,
     className,
   } = props;
@@ -69,8 +71,11 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   const rootRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const cameFromKeyRef = useRef(false);
+  const widthRef = useRef(0);
+  const columnsRef = useRef(columns);
   const offset = headers ? 1 : 0;
   const blocks = headers && onSelectRange !== undefined;
+  const geometry = tableGeometry(columns);
 
   // The drawing is read off this one number, so it is written straight onto
   // the element rather than held as state: a window being dragged would
@@ -82,9 +87,19 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   useResizeObserver(rootRef, ({ width }) => {
     const root = rootRef.current;
     if (width === 0 || root === null) return;
-    root.style.setProperty(UNIT_PROPERTY, unitValue(width));
+    widthRef.current = width;
+    root.style.setProperty(UNIT_PROPERTY, unitValue(width, columnsRef.current));
     root.dataset.measured = '';
   });
+
+  // A table switched to the other form keeps its width, so the observer stays
+  // silent; the unit is rescaled here, before the switch is painted.
+  useLayoutEffect(() => {
+    columnsRef.current = columns;
+    const root = rootRef.current;
+    if (root === null || widthRef.current === 0) return;
+    root.style.setProperty(UNIT_PROPERTY, unitValue(widthRef.current, columns));
+  }, [columns]);
 
   useEffect(() => {
     if (!cameFromKeyRef.current) return;
@@ -98,7 +113,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
     if (!keyboard || onSelect === undefined) return;
-    const next = elementByArrowKey(event.key, selected);
+    const next = elementByArrowKey(event.key, selected, columns);
     if (next === null) return;
     event.preventDefault();
     cameFromKeyRef.current = true;
@@ -110,7 +125,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
   // third of its neighbour's is the one a class cannot make out. The size is
   // what the widest of them fits at, and anything wider than that is condensed
   // by the cell rather than written smaller still.
-  const placed = placedElements();
+  const placed = placedElements(columns);
   const widths: number[] = [];
   let deepest = 0;
   for (const { element } of placed) {
@@ -130,27 +145,35 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
       // from where the browser put it: a site saves the table by pointing
       // `FigureDownload` at any box around it.
       data-figure="html"
-      style={rootStyle}
+      style={rootStyleFor(geometry)}
     >
       <div
         ref={gridRef}
         role="grid"
         aria-label={t('periodic.table')}
         data-testid="periodic-table"
-        style={gridStyle(headers, blocks)}
+        style={gridStyle(headers, blocks, geometry)}
         onKeyDown={handleKeyDown}
       >
         {headers ? (
           <HeaderStrips
+            geometry={geometry}
             onSelectRange={onSelectRange}
             onSelectAll={onSelectAll}
           />
         ) : null}
-        {blocks ? <BlockStrip onSelectRange={onSelectRange} /> : null}
+        {blocks ? (
+          <BlockStrip
+            labels={geometry.blockLabels}
+            onSelectRange={onSelectRange}
+          />
+        ) : null}
         {inset === undefined ? null : (
-          <div style={insetStyle(offset)}>{inset}</div>
+          <div style={insetStyle(offset, geometry.emptyBlock)}>{inset}</div>
         )}
-        {markers ? <InnerTransitionMarkers offset={offset} /> : null}
+        {markers ? (
+          <InnerTransitionMarkers markers={geometry.markers} offset={offset} />
+        ) : null}
         {placed.map(({ element, cell }) => (
           <ElementCell
             key={element.symbol}

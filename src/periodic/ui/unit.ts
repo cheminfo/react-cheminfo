@@ -20,7 +20,13 @@
  * `1cqw` stays as the fallback, so a render that never measures — a server
  * render, a prerendered page before its script runs — is the drawing it has
  * always been.
+ *
+ * Every share is written for the 18-column table. A 32-column table of the same
+ * width draws each column 18/32 as wide, so its unit is scaled by as much, and a
+ * cell keeps its proportions and the room its writing was sized for.
  */
+
+import type { TableColumns } from '../core/geometry.ts';
 
 /** The custom property the measured share is published as. */
 export const UNIT_PROPERTY = '--periodic-unit';
@@ -41,8 +47,35 @@ export function ofWidth(share: number): string {
  * The value the custom property takes for a table of the given width.
  * @param width - The content-box width, in CSS pixels, as `ResizeObserver`
  * reports it.
- * @returns The length one per cent of that width is.
+ * @param columns - How many columns the table is drawn in.
+ * @returns The length one per cent of that width is, for an 18-column table,
+ * and that length scaled by 18/32 for a 32-column one.
+ * @default columns 18
  */
-export function unitValue(width: number): string {
-  return `${(width / 100).toFixed(3)}px`;
+export function unitValue(width: number, columns: TableColumns = 18): string {
+  const unit = `${(width / 100).toFixed(3)}px`;
+  const scale = columnScale(columns);
+  // Scaled by the engine rather than here, so the measured length is exactly
+  // the fallback's: rounded first, the two differ by a fraction of a pixel per
+  // row, and the table changing height on its first measurement makes every
+  // observer above it fire again in the same frame.
+  return scale === 1 ? unit : `calc(${unit} * ${String(scale)})`;
+}
+
+/**
+ * The value the custom property takes before the table is measured.
+ * @param columns - How many columns the table is drawn in.
+ * @returns `1cqw` scaled to the width of a column, or `undefined` for an
+ * 18-column table, which falls back to `1cqw` without declaring anything.
+ */
+export function fallbackUnit(columns: TableColumns): string | undefined {
+  const scale = columnScale(columns);
+  return scale === 1 ? undefined : `calc(1cqw * ${String(scale)})`;
+}
+
+/** The column count every share of the drawing is written for. */
+const REFERENCE_COLUMNS = 18;
+
+function columnScale(columns: TableColumns): number {
+  return REFERENCE_COLUMNS / columns;
 }

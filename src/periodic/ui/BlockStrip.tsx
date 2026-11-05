@@ -6,14 +6,16 @@ import type { CSSProperties, MouseEvent, ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
+import type { BlockLabel } from '../core/geometry.ts';
 import type { ElementRange } from '../core/layout.ts';
-import { BLOCK_LABELS } from '../core/layout.ts';
 
 import { headerButtonStyle, headerStyle } from './headerStyles.ts';
 import { ofWidth } from './unit.ts';
 
 /** What {@link BlockStrip} needs. */
 interface BlockStripProps {
+  /** Where each block is named, for the form of the table being drawn. */
+  labels: readonly BlockLabel[];
   /** Called with the block whose label was clicked. */
   onSelectRange: (range: ElementRange) => void;
 }
@@ -21,16 +23,17 @@ interface BlockStripProps {
 /**
  * A thin rule under each block with its letter on it, so the four blocks are a
  * click each, like a period or a group, without a toolbar repeating the table.
- * The f label stands beside the two rows it names, its rule running down them.
+ * In 18 columns the f label stands beside the two rows it names, its rule
+ * running down them; in 32 it runs under its columns like the other three.
  * @param props - See {@link BlockStripProps}.
  * @returns One button per block, placed on the grid with the header offset.
  */
 export function BlockStrip(props: BlockStripProps): ReactElement {
-  const { onSelectRange } = props;
+  const { labels, onSelectRange } = props;
   const t = useChromeT();
   return (
     <>
-      {BLOCK_LABELS.map(({ block, cell, columnSpan, rowSpan }) => {
+      {labels.map(({ block, cell, columnSpan, rowSpan }) => {
         const title = t('periodic.block', { block });
         const vertical = rowSpan > 1;
         return (
@@ -58,6 +61,11 @@ export function BlockStrip(props: BlockStripProps): ReactElement {
               // shortcut found on hover, not a label the table is read by.
               color: TOKEN.textFaint,
               fontSize: `max(0.4rem, ${ofWidth(1.05)})`,
+              // The letter is drawn centred on the strip whatever its line, but
+              // a line box taller than the strip hangs below it, and under
+              // period 7 of a 32-column table nothing stands there to take it:
+              // the drawing overflows, and a box around it grows a scrollbar.
+              lineHeight: 0,
             }}
           >
             {vertical ? null : <span style={horizontalRuleStyle} />}

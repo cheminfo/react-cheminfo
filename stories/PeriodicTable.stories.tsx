@@ -136,6 +136,16 @@ export const Shells: Story = {
   ),
 };
 
+/**
+ * The 32-column form: the lanthanoids and the actinoids set back in their
+ * periods, so each period reads in atomic-number order. The same property map
+ * as above, with every cell 18/32 as wide.
+ */
+export const ThirtyTwoColumns: Story = {
+  args: { headers: true, legend: false, columns: 32 },
+  render: (args) => <PropertyMapDemo {...args} maxWidth={1600} />,
+};
+
 function PickerDemo(props: PeriodicTableProps): ReactElement {
   const [selected, setSelected] = useState('C');
   return (
@@ -149,13 +159,16 @@ function PickerDemo(props: PeriodicTableProps): ReactElement {
   );
 }
 
-function PropertyMapDemo(props: PeriodicTableProps): ReactElement {
+function PropertyMapDemo(
+  props: PeriodicTableProps & { maxWidth?: number },
+): ReactElement {
+  const { maxWidth = 900, ...tableProps } = props;
   const [selected, setSelected] = useState('O');
   const [range, setRange] = useState('none');
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ maxWidth }}>
       <PeriodicTable
-        {...props}
+        {...tableProps}
         selected={selected}
         onSelect={setSelected}
         onSelectRange={(picked) => {

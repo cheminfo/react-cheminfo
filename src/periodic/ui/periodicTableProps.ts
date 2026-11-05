@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 
 import type { Swatch } from '../../color/core/interpolate.ts';
 import type { PeriodicElement } from '../core/elements.ts';
+import type { TableColumns } from '../core/geometry.ts';
 import type { ElementPick, ElementRange } from '../core/layout.ts';
 
 /** What `PeriodicTable` needs. */
@@ -56,10 +57,10 @@ export interface PeriodicTableProps {
    */
   isIncluded?: (element: PeriodicElement) => boolean;
   /**
-   * What is written in the block the table leaves empty — columns 3 to 12 of
-   * the first three periods, in the middle of the top edge. A tool that reads
-   * one element off the table puts what it says about it there, where the eye
-   * already is, rather than under the grid.
+   * What is written in the block the table leaves empty, in the middle of the
+   * top edge: columns 3 to 12 of the first three periods, or 3 to 26 in 32
+   * columns. A tool that reads one element off the table puts what it says
+   * about it there, where the eye already is, rather than under the grid.
    *
    * It is sized against the table, like everything else in the grid, so give
    * it type in `em` and it scales with the drawing.
@@ -95,10 +96,20 @@ export interface PeriodicTableProps {
   legend?: boolean;
   /**
    * Whether the dashed markers stand where the two inner-transition series were
-   * lifted out of the main block.
+   * lifted out of the main block. A 32-column table lifts nothing out, so it
+   * draws none.
    * @default true
    */
   markers?: boolean;
+  /**
+   * How many columns the table is drawn in: 18, with the lanthanoids and the
+   * actinoids on two rows underneath, or 32, with them set in periods 6 and 7
+   * between groups 2 and 3, so each period reads in atomic-number order. A
+   * 32-column table of the same width draws every cell, and what it writes,
+   * 18/32 as wide, and is never drawn narrower than 498px.
+   * @default 18
+   */
+  columns?: TableColumns;
   /**
    * Whether the arrow keys walk the grid: down from carbon is silicon, and
    * right from the end of a period is the start of the next.

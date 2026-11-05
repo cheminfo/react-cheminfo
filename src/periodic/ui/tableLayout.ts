@@ -5,25 +5,35 @@
 
 import type { CSSProperties } from 'react';
 
-import { COLUMN_COUNT, EMPTY_BLOCK } from '../core/layout.ts';
+import type {
+  GridBlock,
+  TableColumns,
+  TableGeometry,
+} from '../core/geometry.ts';
+import { EMPTY_BLOCK } from '../core/geometry.ts';
 
 import { ROW_SHARE } from './cellType.ts';
-import { ofWidth } from './unit.ts';
+import { UNIT_PROPERTY, fallbackUnit, ofWidth } from './unit.ts';
 
 /**
  * Where what the caller writes in the empty block is placed.
  * @param offset - 1 when the table draws its header strips, 0 otherwise.
+ * @param block - The empty block of the table being drawn.
  * @returns The style of the slot.
+ * @default block the empty block of the 18-column table
  */
-export function insetStyle(offset: number): CSSProperties {
+export function insetStyle(
+  offset: number,
+  block: GridBlock = EMPTY_BLOCK,
+): CSSProperties {
   return {
     alignItems: 'center',
     display: 'flex',
     // A column of air on each side, so the writing reads as sitting in the
     // block rather than as running into the cells beside it.
     padding: `0 ${ofWidth(2.4)}`,
-    gridColumn: `${String(EMPTY_BLOCK.column + offset)} / span ${String(EMPTY_BLOCK.columnSpan)}`,
-    gridRow: `${String(EMPTY_BLOCK.row + offset)} / span ${String(EMPTY_BLOCK.rowSpan)}`,
+    gridColumn: `${String(block.column + offset)} / span ${String(block.columnSpan)}`,
+    gridRow: `${String(block.row + offset)} / span ${String(block.rowSpan)}`,
     // A share of the table, with a floor, exactly as a cell sizes its symbol:
     // the block holds the same three rows at every width, so what is written
     // in it has to shrink with them.
@@ -34,8 +44,23 @@ export function insetStyle(offset: number): CSSProperties {
   };
 }
 
-/** Narrowest the table is ever drawn; under it the type stops being readable. */
+/**
+ * Narrowest an 18-column table is ever drawn; under it the type stops being
+ * readable.
+ */
 const MIN_WIDTH = 280;
+
+/**
+ * Narrowest a table is ever drawn: as narrow as its columns are at the 18-column
+ * table's floor, so a 32-column one scrolls in a narrow box rather than writing
+ * its symbols in cells too small to read.
+ * @param columns - How many columns the table is drawn in.
+ * @returns A width, in CSS pixels: 280 for 18 columns, 498 for 32.
+ * @default columns 18
+ */
+export function periodicTableMinWidth(columns: TableColumns = 18): number {
+  return Math.round((MIN_WIDTH * columns) / 18);
+}
 
 /**
  * How tall one row of elements is, as a share of the table's width.
@@ -68,6 +93,22 @@ export const rootStyle = {
   containerType: 'inline-size',
 } as const satisfies CSSProperties;
 
+/**
+ * The outermost box of a table of the given form.
+ * @param geometry - The form of the table.
+ * @returns The root style at the narrowest that form is drawn, carrying the
+ * unit it falls back to before it is measured when that is not `1cqw`.
+ */
+export function rootStyleFor(geometry: TableGeometry): CSSProperties {
+  const style: CSSProperties & Record<string, string | number> = {
+    ...rootStyle,
+    minWidth: periodicTableMinWidth(geometry.columns),
+  };
+  const fallback = fallbackUnit(geometry.columns);
+  if (fallback !== undefined) style[UNIT_PROPERTY] = fallback;
+  return style;
+}
+
 const baseGridStyle = {
   display: 'grid',
   gap: 2,
@@ -79,24 +120,41 @@ const baseGridStyle = {
  * The grid the cells are placed on.
  * @param headers - Whether a leading column and row hold the period and group
  * numbers.
- * @param blocks - Whether the gap under period 7 names the blocks, which needs
+ * @param blocks - Whether the row under period 7 names the blocks, which needs
  * it as tall as a header strip.
+ * @param geometry - The form of the table: its columns, and whether it has the
+ * two inner-transition rows.
  * @returns The style of the grid.
+ * @default blocks false
+ * @default geometry the 18-column table
  */
-export function gridStyle(headers: boolean, blocks = false): CSSProperties {
-  // The eighth row is the gap the inner-transition series are lifted out into.
-  const gap = blocks ? STRIP_HEIGHT : SERIES_GAP;
-  const rows = `repeat(7, ${ROW_HEIGHT}) ${gap} repeat(2, ${ROW_HEIGHT})`;
+export function gridStyle(
+  headers: boolean,
+  blocks = false,
+  geometry?: TableGeometry,
+): CSSProperties {
+  const columns = geometry?.columns ?? 18;
+  const rows = gridRows(
+    blocks,
+    (geometry?.innerTransitionRows.length ?? 2) > 0,
+  );
+  const base = { ...baseGridStyle, minWidth: periodicTableMinWidth(columns) };
+  const cells = `repeat(${String(columns)}, minmax(0, 1fr))`;
   if (!headers) {
-    return {
-      ...baseGridStyle,
-      gridTemplateColumns: `repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
-      gridTemplateRows: rows,
-    };
+    return { ...base, gridTemplateColumns: cells, gridTemplateRows: rows };
   }
   return {
-    ...baseGridStyle,
-    gridTemplateColumns: `max(14px, ${ofWidth(2.4)}) repeat(${String(COLUMN_COUNT)}, minmax(0, 1fr))`,
+    ...base,
+    gridTemplateColumns: `max(14px, ${ofWidth(2.4)}) ${cells}`,
     gridTemplateRows: `${STRIP_HEIGHT} ${rows}`,
   };
+}
+
+function gridRows(blocks: boolean, liftedOut: boolean): string {
+  const periods = `repeat(7, ${ROW_HEIGHT})`;
+  // The eighth row is the gap the inner-transition series are lifted out into,
+  // or, when they are in their periods, the strip naming the blocks.
+  if (!liftedOut) return blocks ? `${periods} ${STRIP_HEIGHT}` : periods;
+  const gap = blocks ? STRIP_HEIGHT : SERIES_GAP;
+  return `${periods} ${gap} repeat(2, ${ROW_HEIGHT})`;
 }

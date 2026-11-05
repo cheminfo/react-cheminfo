@@ -7,12 +7,8 @@ import type { CSSProperties, MouseEvent, ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
+import type { InnerTransitionMarker, TableGeometry } from '../core/geometry.ts';
 import type { ElementRange } from '../core/layout.ts';
-import {
-  COLUMN_COUNT,
-  INNER_TRANSITION_MARKERS,
-  INNER_TRANSITION_ROWS,
-} from '../core/layout.ts';
 
 import { SelectAllCorner } from './SelectAllCorner.tsx';
 import { headerButtonStyle, headerStyle } from './headerStyles.ts';
@@ -20,6 +16,8 @@ import { ofWidth } from './unit.ts';
 
 /** What {@link HeaderStrips} needs. */
 interface HeaderStripsProps {
+  /** The form of the table, for the column each group number stands over. */
+  geometry: TableGeometry;
   /**
    * Called with the run whose header was clicked, and whether the click was
    * additive. Without it the strips are labels rather than buttons.
@@ -38,7 +36,8 @@ interface HeaderStripsProps {
 
 /**
  * The 1–18 strip along the top, the 1–7 strip down the left, and the corner
- * where they meet.
+ * where they meet. In 32 columns the f block has no group, so the strip leaves
+ * its fourteen columns blank.
  *
  * They are buttons when the table takes a range: "plot period 3" is one click
  * there and eight on the cells. The corner takes the whole table, which is the
@@ -47,16 +46,17 @@ interface HeaderStripsProps {
  * @returns The two strips, the corner, and the inner-transition period numbers.
  */
 export function HeaderStrips(props: HeaderStripsProps): ReactElement {
-  const { onSelectRange, onSelectAll } = props;
+  const { geometry, onSelectRange, onSelectAll } = props;
   const t = useChromeT();
   const groups: ReactElement[] = [];
-  for (let group = 1; group <= COLUMN_COUNT; group++) {
+  for (let group = 1; group <= geometry.groupColumns.length; group++) {
+    const column = geometry.groupColumns[group - 1] ?? group;
     groups.push(
       <HeaderCell
         key={`group-${String(group)}`}
         label={String(group)}
         title={t('periodic.group', { group })}
-        column={group + 1}
+        column={column + 1}
         row={1}
         onClick={
           onSelectRange &&
@@ -104,7 +104,7 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
       )}
       {groups}
       {periods}
-      {INNER_TRANSITION_ROWS.map(({ row, period }) => (
+      {geometry.innerTransitionRows.map(({ row, period }) => (
         <div
           key={`inner-${String(row)}`}
           style={{ ...headerStyle, gridColumn: 1, gridRow: row + 1 }}
@@ -118,6 +118,8 @@ export function HeaderStrips(props: HeaderStripsProps): ReactElement {
 
 /** What {@link InnerTransitionMarkers} needs. */
 interface InnerTransitionMarkersProps {
+  /** The cells the series were lifted out of. */
+  markers: readonly InnerTransitionMarker[];
   /** 1 when the table draws its header strips, 0 otherwise. */
   offset: number;
 }
@@ -130,10 +132,10 @@ interface InnerTransitionMarkersProps {
 export function InnerTransitionMarkers(
   props: InnerTransitionMarkersProps,
 ): ReactElement {
-  const { offset } = props;
+  const { markers, offset } = props;
   return (
     <>
-      {INNER_TRANSITION_MARKERS.map(({ cell, label, category }) => (
+      {markers.map(({ cell, label, category }) => (
         <div
           key={category}
           aria-hidden="true"
