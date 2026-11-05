@@ -129,7 +129,8 @@ export const SCIPEAKS_ETHYLBENZENE_IR_PEAKS = [
 /**
  * The `load` the tool tab is to send that sample to a site that reads infrared
  * spectra: the structure as it is sent today, then one `spectra.ir.jdx` item
- * per spectrum, and `accept` naming the bands it saves back.
+ * per spectrum, and `accept` naming the output its `save` keeps the bands
+ * from — vibrations' `irPeaks`, by key, as the tab asks for it.
  * @param jdx - The attachment's text.
  * @returns The request.
  */
@@ -149,6 +150,6 @@ export function sciPeaksEthylbenzeneIrLoad(
         value: { jdx, peaks: SCIPEAKS_ETHYLBENZENE_IR_PEAKS.map(sentIrPeak) },
       },
     ],
-    accept: ['spectra.ir.peaks'],
+    accept: ['irPeaks'],
   };
 }

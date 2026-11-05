@@ -59,7 +59,7 @@ test("SciPeaks' Raman spectra arrive in order, the adamantane with its bands and
   expect(map?.checked.value).toStrictEqual({
     jdx: '##TITLE=Simple mapping measurement 1',
   });
-  expect(load.accept).toStrictEqual(['spectra.raman.peaks']);
+  expect(load.accept).toStrictEqual(['ramanPeaks']);
 });
 
 test('an anti-Stokes shift is negative, and an intensity is a number in any unit', () => {

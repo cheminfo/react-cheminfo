@@ -111,5 +111,5 @@ test("SciPeaks' sample gives its spectrum and its molfile, the bands as its read
     transmittance: 0.8251000000000001,
     strength: 'weak',
   });
-  expect(load.accept).toStrictEqual(['spectra.ir.peaks']);
+  expect(load.accept).toStrictEqual(['irPeaks']);
 });

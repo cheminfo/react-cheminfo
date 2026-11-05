@@ -35,7 +35,8 @@ export const SCIPEAKS_ETHYLBENZENE_RAMAN_PEAKS = [
  * The `load` the tool tab is to send that sample to a site that reads Raman
  * spectra: the structure as it is sent today, then one `spectra.raman.jdx`
  * item per spectrum — the mapping without `peaks`, since none were kept for
- * it — and `accept` naming the bands it saves back.
+ * it — and `accept` naming the output its `save` keeps the bands from —
+ * vibrations' `ramanPeaks`, by key, as the tab asks for it.
  * @param jdx - The attachments' texts.
  * @param jdx.adamantane - The text of {@link SCIPEAKS_ETHYLBENZENE_RAMAN_FILENAME}.
  * @param jdx.map - The text of {@link SCIPEAKS_ETHYLBENZENE_RAMAN_MAP_FILENAME}.
@@ -67,6 +68,6 @@ export function sciPeaksEthylbenzeneRamanLoad(jdx: {
         value: { jdx: jdx.map },
       },
     ],
-    accept: ['spectra.raman.peaks'],
+    accept: ['ramanPeaks'],
   };
 }
