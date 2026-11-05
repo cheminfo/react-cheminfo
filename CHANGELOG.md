@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.92.0](https://github.com/cheminfo/react-cheminfo/compare/v0.91.0...v0.92.0) (2026-11-05)
+
+
+### Features
+
+* add the mass spectrum host kinds ([170654c](https://github.com/cheminfo/react-cheminfo/commit/170654c630facc51a70fe3871e90679737c7ede8))
+
 ## [0.91.0](https://github.com/cheminfo/react-cheminfo/compare/v0.90.0...v0.91.0) (2026-11-05)
 
 
