@@ -681,7 +681,12 @@
 
 /* ── A slide that is the tool itself ─────────────────────── */
 /* The frame takes the whole slide under the heading: an embedded tool that is
-   200 px tall on a beamer teaches nobody anything. */
+   200 px tall on a beamer teaches nobody anything. The canvas keeps a thin
+   margin, and the heading and its line of prose stay small. */
+.slide-canvas:has(.slide--embed) {
+  padding: 24px 32px;
+}
+
 .slide--embed {
   display: flex;
   height: 100%;
@@ -692,15 +697,41 @@
   display: flex;
   height: 100%;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
-.slide-embed-frame {
-  width: 100%;
+.slide--embed .slide-content h1,
+.slide--embed .slide-content h2 {
+  margin: 0;
+  font-size: 56px;
+}
+
+.slide--embed .slide-content p {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.35;
+}
+
+.slide-embed {
+  position: relative;
+  overflow: hidden;
   flex: 1 1 auto;
   border: 1px solid var(--slide-line);
   border-radius: var(--slide-radius);
   background: var(--slide-surface);
+}
+
+/* The tool's own size and the scale that fits it in the room are written on
+   the frame once the room is measured, so the player's scale never shrinks
+   it; until then it fills the room. */
+.slide-embed-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  transform-origin: 0 0;
 }
 
 .slide-embed-missing {

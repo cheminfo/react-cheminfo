@@ -16,6 +16,7 @@ import type { RenderSlideLink } from './DemoLink.tsx';
 import type { SlideLayoutProps } from './Slide.tsx';
 import { SlideView } from './Slide.tsx';
 import { SlideshowBar } from './SlideshowBar.tsx';
+import { SlideScaleContext } from './slideScaleContext.ts';
 import type { SlideshowFullscreen } from './useSlideshowFullscreen.ts';
 import { useSlideshowFullscreen } from './useSlideshowFullscreen.ts';
 
@@ -196,21 +197,24 @@ export function Slideshow(props: SlideshowProps): ReactElement {
           keyboard equivalent is the arrow keys the player already listens for. */}
       <div className="slideshow-stage" ref={stageRef} onClick={onStageClick}>
         <div className="slide-canvas" style={{ transform: `scale(${scale})` }}>
-          {slide === undefined ? null : (
-            // Keyed on the index so an animated slide replays from its start
-            // every time it is navigated to.
-            <SlideView
-              key={current}
-              slide={slide}
-              talkId={talkId}
-              site={site}
-              talkOrigin={talkOrigin}
-              slideIndex={current}
-              meta={talk.meta}
-              layouts={layouts}
-              renderLink={renderLink}
-            />
-          )}
+          {/* A live tool on a slide reads the scale, to run at its own size. */}
+          <SlideScaleContext value={scale}>
+            {slide === undefined ? null : (
+              // Keyed on the index so an animated slide replays from its start
+              // every time it is navigated to.
+              <SlideView
+                key={current}
+                slide={slide}
+                talkId={talkId}
+                site={site}
+                talkOrigin={talkOrigin}
+                slideIndex={current}
+                meta={talk.meta}
+                layouts={layouts}
+                renderLink={renderLink}
+              />
+            )}
+          </SlideScaleContext>
         </div>
         {blank === null ? null : (
           // Clicking the blank screen brings the slide back, as does pressing

@@ -1,10 +1,14 @@
 import type { ReactElement } from 'react';
+import { useContext, useRef } from 'react';
 
+import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { frameTitle } from '../core/familyFrame.ts';
 import type { Slide } from '../core/talk.ts';
+import { toolFrame } from '../core/toolFrame.ts';
 
 import { SlideBody } from './SlideBody.tsx';
+import { SlideScaleContext } from './slideScaleContext.ts';
 
 /** What an embedded slide draws. */
 export interface EmbedSlideProps {
@@ -18,7 +22,12 @@ export interface EmbedSlideProps {
  * Every tool of the family takes `?embed`, so a lecture can show the real thing
  * instead of a screenshot of it — which is also the only version of the slide
  * that stays true after the tool is improved. The heading and any prose stay
- * above the frame; the last bare URL of the body is what is framed.
+ * above the frame, kept small; the last bare URL of the body is what is framed.
+ *
+ * The player shrinks the slide to fit the screen, but not the tool: the frame
+ * undoes that scale, so a laptop shows the tool at the size a visitor sees it,
+ * and only a room too narrow for its desktop layout shrinks it (see
+ * {@link toolFrame}).
  * @param props - See {@link EmbedSlideProps}.
  * @returns The slide.
  */
@@ -34,14 +43,37 @@ export function EmbedSlide(props: EmbedSlideProps): ReactElement {
         {src === null ? (
           <p className="slide-embed-missing">{t('slides.noAddress')}</p>
         ) : (
-          <iframe
-            className="slide-embed-frame"
-            src={src}
-            title={frameTitle(src)}
-            allow="clipboard-write; fullscreen"
-          />
+          <FramedTool src={src} />
         )}
       </div>
+    </div>
+  );
+}
+
+function FramedTool(props: { src: string }): ReactElement {
+  const { src } = props;
+  const slideScale = useContext(SlideScaleContext);
+  const roomRef = useRef<HTMLDivElement>(null);
+  const room = useContainerSize(roomRef);
+  const frame = room.width === 0 ? null : toolFrame(room, slideScale);
+
+  return (
+    <div ref={roomRef} className="slide-embed">
+      <iframe
+        className="slide-embed-frame"
+        src={src}
+        title={frameTitle(src)}
+        allow="clipboard-write; fullscreen"
+        style={
+          frame === null
+            ? undefined
+            : {
+                width: frame.width,
+                height: frame.height,
+                transform: `scale(${frame.scale})`,
+              }
+        }
+      />
     </div>
   );
 }

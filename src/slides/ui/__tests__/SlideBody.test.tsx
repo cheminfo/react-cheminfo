@@ -123,6 +123,6 @@ test('the embed layout still frames its tool under sanitised prose', () => {
   );
 
   expect(html).toBe(
-    '<div class="slide slide--embed"><div class="slide-content"><h1>Compute it while I talk</h1>\n<p>Type C6H12O6</p><iframe class="slide-embed-frame" src="https://www.chemcalc.org/?embed=1&amp;mf=C6H12O6" title="www.chemcalc.org, embedded" allow="clipboard-write; fullscreen"></iframe></div></div>',
+    '<div class="slide slide--embed"><div class="slide-content"><h1>Compute it while I talk</h1>\n<p>Type C6H12O6</p><div class="slide-embed"><iframe class="slide-embed-frame" src="https://www.chemcalc.org/?embed=1&amp;mf=C6H12O6" title="www.chemcalc.org, embedded" allow="clipboard-write; fullscreen"></iframe></div></div></div>',
   );
 });
