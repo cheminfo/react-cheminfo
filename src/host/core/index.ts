@@ -36,6 +36,18 @@ export type {
 } from './kinds.ts';
 export { checkValue, isKnownKind, kindAccepts, readOutput } from './kinds.ts';
 export type {
+  MsAssignmentValue,
+  MsAssignmentsValue,
+  MsIonValue,
+  MsIonsValue,
+  MsJdxValue,
+} from './msKinds.ts';
+export {
+  MS_ASSIGNMENTS_SCHEMA,
+  MS_IONS_SCHEMA,
+  MS_JDX_SCHEMA,
+} from './msKinds.ts';
+export type {
   GetRequest,
   HelloMessage,
   HostError,

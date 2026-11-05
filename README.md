@@ -1102,6 +1102,27 @@ between those bands and the viewer's. No tool declares the bare `spectra.ir` or
 `spectra.raman`: either would take a list of bands for a spectrum, and
 pipeline's own `spectra.ir` is a computed spectrum, not a measurement.
 
+### A mass spectrum, and the ions found in it
+
+A mass spectrum travels as its JCAMP-DX alone: a tool picks its peaks again.
+What a host looks for in it — the fragments a drawing cuts a molecule into —
+travels as a list of ions, and comes back as the peak each was found at:
+
+| Kind                     | Value             | One entry                               |
+| ------------------------ | ----------------- | --------------------------------------- |
+| `spectra.ms.jdx`         | `{ jdx }`         |                                         |
+| `spectra.ms.ions`        | `{ ions }`        | `{ id, mz, mf?, radical?, label? }`     |
+| `spectra.ms.assignments` | `{ assignments }` | `{ id, mz, intensity }`, the peak found |
+
+- **An ion is named by the host**: its `id` comes back with the peak it was
+  found at, whose `intensity` is a percentage of the spectrum's tallest peak.
+  An ion found at no peak does not come back.
+- **`mf` is the ion's formula with its charge**, in mf-parser notation
+  (`C7H7O(+1)`), and `radical` marks an unpaired electron. The tool writes them
+  at the peak; without them it writes the m/z alone.
+- **What comes back replaces what was sent before**, so an ion no longer found
+  is simply absent.
+
 An input with `many: true` takes every item of its kinds, and one with
 `optional: true` may go without; the request is refused only when no input got
 anything. `load` may return a promise, and requests are served in order.

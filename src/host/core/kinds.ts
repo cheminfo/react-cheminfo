@@ -5,8 +5,9 @@
  *
  * The names are pipeline's (`chem.molfile.2d`, `chem.ocl.id`…), plus
  * `chem.smiles`, which pipeline lists among its future schemas, the infrared
- * kinds of `./irKinds.ts` and the Raman ones of `./ramanKinds.ts`, the
- * reaction of `./reactionKinds.ts`, and
+ * kinds of `./irKinds.ts`, the Raman ones of `./ramanKinds.ts` and the mass
+ * spectrometry ones of `./msKinds.ts`, the reaction of `./reactionKinds.ts`,
+ * and
  * the kinds a tool hands back, of `./resultKinds.ts`. A name with children is a category whose
  * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
  * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
@@ -19,6 +20,12 @@ import { Ajv } from 'ajv';
 
 import type { IrJdxValue, IrPeaksValue } from './irKinds.ts';
 import { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
+import type { MsAssignmentsValue, MsIonsValue, MsJdxValue } from './msKinds.ts';
+import {
+  MS_ASSIGNMENTS_SCHEMA,
+  MS_IONS_SCHEMA,
+  MS_JDX_SCHEMA,
+} from './msKinds.ts';
 import type { HostItem } from './protocol.ts';
 import type { RamanJdxValue, RamanPeaksValue } from './ramanKinds.ts';
 import { RAMAN_JDX_SCHEMA, RAMAN_PEAKS_SCHEMA } from './ramanKinds.ts';
@@ -53,6 +60,9 @@ export type CheckedValue =
   | { kind: 'spectra.ir.peaks'; value: IrPeaksValue }
   | { kind: 'spectra.raman.jdx'; value: RamanJdxValue }
   | { kind: 'spectra.raman.peaks'; value: RamanPeaksValue }
+  | { kind: 'spectra.ms.jdx'; value: MsJdxValue }
+  | { kind: 'spectra.ms.ions'; value: MsIonsValue }
+  | { kind: 'spectra.ms.assignments'; value: MsAssignmentsValue }
   | { kind: 'image.svg'; value: SvgImageValue }
   | { kind: 'chem.name'; value: NameValue }
   | { kind: 'data.table'; value: TableValue };
@@ -188,6 +198,11 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'spectra.ir.peaks': ajv.compile<IrPeaksValue>(IR_PEAKS_SCHEMA),
   'spectra.raman.jdx': ajv.compile<RamanJdxValue>(RAMAN_JDX_SCHEMA),
   'spectra.raman.peaks': ajv.compile<RamanPeaksValue>(RAMAN_PEAKS_SCHEMA),
+  'spectra.ms.jdx': ajv.compile<MsJdxValue>(MS_JDX_SCHEMA),
+  'spectra.ms.ions': ajv.compile<MsIonsValue>(MS_IONS_SCHEMA),
+  'spectra.ms.assignments': ajv.compile<MsAssignmentsValue>(
+    MS_ASSIGNMENTS_SCHEMA,
+  ),
   'image.svg': ajv.compile<SvgImageValue>(SVG_IMAGE_SCHEMA),
   'chem.name': ajv.compile<NameValue>(NAME_SCHEMA),
   'data.table': ajv.compile<TableValue>(TABLE_SCHEMA),
