@@ -85,6 +85,31 @@ test('the bar a column is dragged by comes to rest where it was let go', async (
   expect(rested.height).toBeLessThan(opened.height - 80);
 });
 
+test('the bar follows the pointer across a framed pane, and is let go there', async ({
+  page,
+}) => {
+  await openStory(page, 'split-splitpanes--beside-a-frame');
+  const rect = await box(bar(page));
+  const opened = await box(page.getByTestId('split-start'));
+  const x = rect.x + rect.width / 2;
+  const y = rect.y + rect.height / 2;
+
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  // Straight into the frame, whose own page is what the pointer is over now.
+  await page.mouse.move(x + 200, y, { steps: 10 });
+  await page.mouse.up();
+
+  const dragged = await box(page.getByTestId('split-start'));
+  expect(dragged.width).toBeGreaterThan(opened.width + 150);
+
+  // Released over the frame, the drag is over: back over the page, the bar
+  // stays where it was let go.
+  await page.mouse.move(x - 100, y, { steps: 10 });
+  const released = await box(page.getByTestId('split-start'));
+  expect(released.width).toBeCloseTo(dragged.width, 0);
+});
+
 test('a printed page carries no bar, and the panes keep their shares', async ({
   page,
 }) => {

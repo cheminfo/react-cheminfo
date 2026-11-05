@@ -40,6 +40,8 @@ import { useResizeObserver } from '../../hooks/ui/useResizeObserver.ts';
 import type { SplitRange } from '../core/split.ts';
 import { clampSplit } from '../core/split.ts';
 
+import { captureBarPointer } from './captureBarPointer.ts';
+
 /** What both splitters take. */
 export interface SplitPanesProps extends SplitRange {
   /**
@@ -161,6 +163,7 @@ export function SplitPanes(props: InternalProps): ReactElement | null {
       ref={box}
       className={across ? 'split-row' : 'split-row split-row--down'}
       style={across ? undefined : FILL}
+      onPointerDown={captureBarPointer}
     >
       <SplitPane
         direction={direction}

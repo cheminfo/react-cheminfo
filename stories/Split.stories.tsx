@@ -43,6 +43,33 @@ function RowDemo(): ReactElement {
 }
 
 /**
+ * A row whose second pane is a frame, the way a site frames a sibling beside
+ * what it draws.
+ * @returns The pane, the frame and the bar between them.
+ */
+function FramedDemo(): ReactElement {
+  const [ratio, setRatio] = useState<number | null>(null);
+
+  return (
+    <div style={{ height: 320 }}>
+      <SplitRow
+        ratio={ratio}
+        defaultRatio={40}
+        onRatio={setRatio}
+        start={<Pane title="The drawing">what the frame is handed</Pane>}
+        end={
+          <iframe
+            title="A framed site"
+            srcDoc="<p>A framed site</p>"
+            style={FRAME_STYLE}
+          />
+        }
+      />
+    </div>
+  );
+}
+
+/**
  * A column, divided down.
  * @returns The two panes and the bar between them.
  */
@@ -89,6 +116,12 @@ export const Across: Story = {};
  */
 export const Down: Story = { render: () => <ColumnDemo /> };
 
+/**
+ * Beside a frame: the bar is dragged across a page it cannot hear the pointer
+ * on.
+ */
+export const BesideAFrame: Story = { render: () => <FramedDemo /> };
+
 const PANE_STYLE = {
   display: 'flex',
   flex: '1 1 0%',
@@ -100,4 +133,11 @@ const PANE_STYLE = {
   borderRadius: 'var(--radius)',
   background: 'var(--surface)',
   gap: '0.25rem',
+} as const;
+
+const FRAME_STYLE = {
+  flex: '1 1 0%',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius)',
+  background: 'var(--surface)',
 } as const;
