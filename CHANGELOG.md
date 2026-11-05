@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.90.0](https://github.com/cheminfo/react-cheminfo/compare/v0.89.0...v0.90.0) (2026-11-05)
+
+
+### Features
+
+* run a live tool on an embed slide at its own size, not shrunk with the slide ([887c23d](https://github.com/cheminfo/react-cheminfo/commit/887c23d228ddb276816431fc1bded8d0a10009af))
+
+
+### Bug Fixes
+
+* ask for the SciPeaks IR and Raman bands back by output key, as the tool tab does ([15c4a90](https://github.com/cheminfo/react-cheminfo/commit/15c4a9009ef44f19d9167264a82a12f499593a80))
+* keep a split bar following the pointer across a framed pane ([c32f23f](https://github.com/cheminfo/react-cheminfo/commit/c32f23f2c2526ed95fa78c7b9d24b5256f9af380))
+
 ## [0.89.0](https://github.com/cheminfo/react-cheminfo/compare/v0.88.0...v0.89.0) (2026-11-04)
 
 
