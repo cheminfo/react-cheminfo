@@ -27,6 +27,13 @@ export const MIN_SPLIT = 20;
 /** The widest the first pane goes, which is {@link MIN_SPLIT} from the other end. */
 export const MAX_SPLIT = 100 - MIN_SPLIT;
 
+/**
+ * The share that says the second pane is closed: the first takes the whole row.
+ * It is still a share, so a site whose row does not close brings it back inside
+ * its range and opens the link with both panes on show.
+ */
+export const SPLIT_CLOSED = 100;
+
 /** The range a row may be divided in, where a page wants its own. */
 export interface SplitRange {
   /**
@@ -64,4 +71,27 @@ export function splitParam(
 ): ShareParamCodec<number | null> {
   const { min = MIN_SPLIT, max = MAX_SPLIT } = range;
   return integerParam({ min, max, default: null });
+}
+
+/**
+ * The codec of a row whose second pane can be closed. `split=100` is
+ * {@link SPLIT_CLOSED}; every other value reads as it does under
+ * {@link splitParam}.
+ * @param range - The range this row is divided in while both panes are open.
+ * @returns The codec.
+ */
+export function closableSplitParam(
+  range: SplitRange = {},
+): ShareParamCodec<number | null> {
+  const share = splitParam(range);
+  return {
+    parse(raw) {
+      return Number(raw) === SPLIT_CLOSED ? SPLIT_CLOSED : share.parse(raw);
+    },
+    serialize(value) {
+      return value === SPLIT_CLOSED
+        ? String(SPLIT_CLOSED)
+        : share.serialize(value);
+    },
+  };
 }

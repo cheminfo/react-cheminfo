@@ -6,7 +6,7 @@ import type { SplitPanesProps } from '../../split/ui/splitPanes.tsx';
 /** Props of {@link PanelRow}. */
 export interface PanelRowProps extends Pick<
   SplitPanesProps,
-  'ratio' | 'defaultRatio' | 'onRatio' | 'min' | 'max'
+  'ratio' | 'defaultRatio' | 'onRatio' | 'min' | 'max' | 'open' | 'onOpenChange'
 > {
   /**
    * Whether the window has no room for the panels beside the figure, as
@@ -46,12 +46,16 @@ export interface PanelRowProps extends Pick<
  * - **Only somebody asking opens one.** A press on the rail or a link naming the
  *   panel does; a gesture on the figure that opens a panel beside it with room
  *   must not, or selecting an atom covers the atom.
+ *
+ * With room, an editor passing `open` and `onOpenChange` has the double click on
+ * the bar hide the panels and bring them back. The figure takes the row, and the
+ * panels stay mounted beside it, so nothing typed into them is lost.
  * @param props - See {@link PanelRowProps}.
  * @returns The split row, or the figure with the panels over it.
  */
 export function PanelRow(props: PanelRowProps): ReactElement {
   const { collapsed, view, panels, ratio, defaultRatio, onRatio } = props;
-  const { min, max } = props;
+  const { min, max, open, onOpenChange } = props;
 
   if (!collapsed && panels !== null) {
     return (
@@ -61,6 +65,8 @@ export function PanelRow(props: PanelRowProps): ReactElement {
         onRatio={onRatio}
         {...(min === undefined ? {} : { min })}
         {...(max === undefined ? {} : { max })}
+        {...(open === undefined ? {} : { open })}
+        {...(onOpenChange === undefined ? {} : { onOpenChange })}
         // Collapsing is what a narrow window does here, so this never stacks.
         stackBelow={0}
         start={view}

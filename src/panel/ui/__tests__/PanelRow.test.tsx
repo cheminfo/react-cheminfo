@@ -45,3 +45,40 @@ test('with no panel to show the figure has the row, however wide the window', ()
   expect(row(true, null)).toBe(figureAlone);
   expect(row(false, null)).toBe(figureAlone);
 });
+
+test('an editor can hide its panels behind the bar, and keeps them mounted', () => {
+  const markup = renderToStaticMarkup(
+    <PanelRow
+      collapsed={false}
+      ratio={100}
+      defaultRatio={72}
+      onRatio={() => undefined}
+      open={false}
+      onOpenChange={() => undefined}
+      view={<p>the figure</p>}
+      panels={<p>a panel</p>}
+    />,
+  );
+
+  expect(markup).toContain('class="split-row"');
+  expect(markup).toContain('<div style="display:none">');
+  expect(markup).toContain('a panel');
+});
+
+test('with no room the row hides nothing: the rail decides what covers the figure', () => {
+  const markup = renderToStaticMarkup(
+    <PanelRow
+      collapsed
+      ratio={100}
+      defaultRatio={72}
+      onRatio={() => undefined}
+      open={false}
+      onOpenChange={() => undefined}
+      view={<p>the figure</p>}
+      panels={<p>a panel</p>}
+    />,
+  );
+
+  expect(markup).toContain('panel-row__drawer');
+  expect(markup).not.toContain('display:none');
+});

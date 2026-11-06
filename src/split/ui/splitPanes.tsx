@@ -53,9 +53,24 @@ export interface SplitPanesProps extends SplitRange {
   defaultRatio: number;
   /**
    * Take the share a drag came to rest at, or `null` when the splitter was
-   * double-clicked back to the default.
+   * double-clicked back to the default. A row given
+   * {@link SplitPanesProps.onOpenChange} hears the double click there instead.
    */
   onRatio: (ratio: number | null) => void;
+  /**
+   * Whether the second pane is on show. Closed, it stays mounted, the first pane
+   * takes the row and the bar stays at the edge to bring it back.
+   * @default true
+   */
+  open?: boolean;
+  /**
+   * Makes the second pane closable: told what a double click on the bar asks for.
+   * Whoever passes it keeps the state, in the address, so that a link opens the
+   * way it was shared: `SPLIT_CLOSED` is how. Without it the double click returns
+   * the row to its default share.
+   * @param open - Whether the second pane should now be on show.
+   */
+  onOpenChange?: (open: boolean) => void;
   /** The first pane — left, or top — or `null` when a link left nothing in it. */
   start: ReactNode;
   /** The second pane, or `null` when a link left nothing in it. */
@@ -104,6 +119,8 @@ export function SplitPanes(props: InternalProps): ReactElement | null {
     stackBelow = direction === 'horizontal' ? STACK_ACROSS : STACK_DOWN,
     gutter = GUTTER,
     stackedGap = STACKED_GAP,
+    open = true,
+    onOpenChange,
   } = props;
   const across = direction === 'horizontal';
   const box = useRef<HTMLDivElement>(null);
@@ -167,16 +184,18 @@ export function SplitPanes(props: InternalProps): ReactElement | null {
     >
       <SplitPane
         direction={direction}
-        controlledSide="start"
+        // The side react-science closes is the side it calls controlled, and
+        // only the second pane closes here.
+        controlledSide={open ? 'start' : 'end'}
         size={`${share}%`}
-        // Held open, so the only layout a visitor can reach is one the address
-        // describes: left to itself a double click collapses a pane, and a link
-        // shared from there would open with the pane back. The double click is
-        // answered here instead, by returning to the page's own share.
-        open
-        onOpenChange={() => {
+        // Never left to itself, so the only layout a visitor can reach is one
+        // the address describes: on its own a double click collapses a pane, and
+        // a link shared from there would open with the pane back.
+        open={open}
+        onOpenChange={(next) => {
           setDragged(null);
-          onRatio(null);
+          if (onOpenChange) onOpenChange(next);
+          else onRatio(null);
         }}
         onSizeChange={(asked) => {
           setDragged(shareOf(asked, share, { min, max }));

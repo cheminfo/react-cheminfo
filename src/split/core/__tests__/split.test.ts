@@ -3,8 +3,10 @@ import { expect, test } from 'vitest';
 import {
   MAX_SPLIT,
   MIN_SPLIT,
+  SPLIT_CLOSED,
   SPLIT_PARAM,
   clampSplit,
+  closableSplitParam,
   splitParam,
 } from '../split.ts';
 
@@ -51,4 +53,29 @@ test('a share survives the address it is written into', () => {
   for (const share of [MIN_SPLIT, 35, 42, 61, MAX_SPLIT]) {
     expect(codec.parse(codec.serialize(share))).toBe(share);
   }
+});
+
+test('a row that closes reads 100 as closed and survives the address', () => {
+  const codec = closableSplitParam({ min: 50, max: 85 });
+
+  expect(codec.parse('100')).toBe(SPLIT_CLOSED);
+  expect(codec.serialize(SPLIT_CLOSED)).toBe('100');
+  expect(codec.parse(codec.serialize(SPLIT_CLOSED))).toBe(SPLIT_CLOSED);
+});
+
+test('a row that closes reads every other share as a row that does not', () => {
+  const codec = closableSplitParam({ min: 50, max: 85 });
+
+  expect(codec.parse(null)).toBeNull();
+  expect(codec.parse('')).toBeNull();
+  expect(codec.parse('half')).toBeNull();
+  expect(codec.parse('60')).toBe(60);
+  expect(codec.parse('99')).toBe(85);
+  expect(codec.parse('3')).toBe(50);
+  expect(codec.serialize(null)).toBeNull();
+  expect(codec.serialize(60)).toBe('60');
+});
+
+test('a row that does not close keeps a link written for one on the page', () => {
+  expect(splitParam({ min: 50, max: 85 }).parse(String(SPLIT_CLOSED))).toBe(85);
 });

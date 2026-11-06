@@ -79,6 +79,27 @@ test('a share no splitter could reach is brought back inside the range', () => {
   expect(markup).toContain('flex:25 0 0%');
 });
 
+test('a closed second pane stays mounted, hidden, with the bar left to reopen it', () => {
+  const markup = render(
+    <SplitRow
+      ratio={100}
+      defaultRatio={42}
+      onRatio={ignore}
+      open={false}
+      onOpenChange={ignore}
+      start={<p>the figure</p>}
+      end={<p>the panels</p>}
+    />,
+  );
+
+  expect(markup).toContain('the figure');
+  expect(markup).toContain('the panels');
+  expect(markup).toContain('style="display:none"');
+  // The first pane takes the row, and the bar still stands between them.
+  expect(markup).toContain('flex:1 1 0%;display:flex;overflow:hidden');
+  expect(markup).toContain('⋮');
+});
+
 test('a column divided by a share needs a height, and stacks where there is none', () => {
   // Rendered to a string there is no box to measure, so the fallback is the
   // viewport — and a page rendered to a string has none of that either, which

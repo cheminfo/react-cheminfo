@@ -2039,6 +2039,12 @@ The row reads no store, so the editor keeps three rules:
 The panel takes the whole row, with the rail beside it to swap it or send it
 away. The figure stays mounted underneath and comes back as it was.
 
+With room, an editor may let the double click on the bar hide the panels. Read
+`split=` with `closableSplitParam`, then pass `open={ratio !== SPLIT_CLOSED}` and
+an `onOpenChange` that writes `SPLIT_CLOSED`, or the share to go back to. A link
+then opens the way it was shared, as `?split=100`. Without those two props the
+double click returns the row to its default share.
+
 `<MassEditor>` and `<IrEditor>` do all of this themselves, so a site rendering
 one writes nothing.
 
