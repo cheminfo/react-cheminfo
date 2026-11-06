@@ -140,6 +140,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Site identity**          | `siteById`, `findSiteByHost`, `siteTokensCss`                                                                                                                                                                                                                                                                                                                                                                                       | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                                                                                                                                |
 | **Chrome**                 | —                                                                                                                                                                                                                                                                                                                                                                                                                                   | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `AccountButton`, `useCompactHeader`                                                                                                                                                                                           |
+| **An empty tool**          | —                                                                                                                                                                                                                                                                                                                                                                                                                                   | `EmptyGuide`, `EmptyGuideSection`, `ShortcutList`, `ShortcutKeys`                                                                                                                                                                                                                                   |
 | **Languages**              | `LANGUAGES`, `DEFAULT_LANGUAGE`, `LANGUAGE_LABELS`, `isLanguage`, `MessageCatalog`, `CHROME_CATALOG`, `setMessageSession`, `loadCatalogs`, `startTranslateMode`, `LANGUAGE_PARAM`, `withLanguageParam`                                                                                                                                                                                                                              | `useT`, `useChromeT`, `useLanguage`, `LanguageSelect`, `SiteLanguage`                                                                                                                                                                                                                               |
 | **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`, `referenceVenue`                                                                                                                                                                                                                                                                                                          | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                     |
 | **Contact**                | `CONTACT_FORM_URLS`, `contactFormUrl`, `contactUrl`                                                                                                                                                                                                                                                                                                                                                                                 | `ContactButton`                                                                                                                                                                                                                                                                                     |
@@ -160,7 +161,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Requests**               | `fetchJson`, `ApiError`, `readApiError`, `keySetParam`, `readHiddenParts`, `formatHiddenParts`, `fitDescription`, `DESCRIPTION_MIN`, `DESCRIPTION_MAX`, `openingRoute`, `anchorHref`                                                                                                                                                                                                                                                | `useAsync` (signal, `pending`)                                                                                                                                                                                                                                                                      |
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                                                                                                                        | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                                                                                                                                   |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                                                                                                                          | —                                                                                                                                                                                                                                                                                                   |
-| **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                       | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
+| **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                       | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `PanelRow`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
 | **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                                                                          | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`)                                                                                                                                                                           |
 | **Mass spectra**           | `loadMassSpectra`, `toMassSpectra`, `analyseSpectrum`, `decideResolution`, `resolutionOf`, `mzDecimalsOf`, `planPeakLabels`, `peakTableRows`, `massSpectrumToJcamp`, `massReducer` (all `/mass`)                                                                                                                                                                                                                                    | `MassEditor`, `MassChart`, `SpectraPanel`, `PeaksPanel`, `MetadataPanel`, `useMassEditor` (all `/mass`)                                                                                                                                                                                             |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                                                                                                                | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                           |
@@ -1915,6 +1916,84 @@ family answers one question with one request each:
 ```sh
 curl -s https://smiles.cheminfo.org/build-info.json
 ```
+
+## A tool that holds nothing
+
+The space a tool leaves empty says how to start. `<EmptyGuide>` is drawn over
+the tool's view while it holds nothing, and the site stops rendering it at the
+first stroke:
+
+```tsx
+{
+  nothingDrawn && !embedded && !drawing ? (
+    <EmptyGuide
+      help={
+        <EmptyGuideSection title="Point at an atom and press">
+          <ShortcutList
+            rows={[{ keys: ['c', 'n', 'o'], label: 'Set the element' }]}
+          />
+        </EmptyGuideSection>
+      }
+      linksTitle="Learn"
+      links={[
+        { label: 'The first talk', href: '/talks/first', onSelect: openFirst },
+      ]}
+      hints={['Paste a SMILES to add it to the drawing.']}
+      figures={[
+        { src: schemeUrl, alt: 'A reaction scheme', onSelect: copyScheme },
+      ]}
+    />
+  ) : null;
+}
+```
+
+- **Help is what stays**: how to start, the keys. **A hint is what changes**:
+  one sentence at a time, the next one after `hintInterval`, and another one
+  first on the next visit, chosen by the clock.
+- **The figures are faint pictures of what the tool can make**, side by side in
+  the height left, each taking its `share` of the row. A view under 640 px wide
+  or 520 px tall shows the words alone. One with an `onSelect` comes up to full
+  strength under the pointer, and a click does what it says.
+- **It is grey, and never in the way.** The pointer goes through it to the tool,
+  except on a link or a figure with an `onSelect`, so a first stroke can start
+  on the words. Its parent has to be positioned.
+- **A framed page shows none**: what frames it says what to do there.
+
+`<ShortcutList>` and `<ShortcutKeys>` draw the keys, here and in a site's help.
+
+## An editor on a narrow window
+
+A figure and the panels that drive it share a row while the window has room for
+both. Under `COLLAPSE_PANELS_BELOW` (900 px) the figure keeps the whole row, and
+one panel at a time comes over it from the rail, to be used and sent away again:
+
+```tsx
+<PanelRow
+  collapsed={collapsed} // readPanelsCollapsed(), then watchPanelsCollapsed()
+  ratio={ratio}
+  defaultRatio={72}
+  min={50}
+  max={85}
+  onRatio={writeSplit}
+  view={<Figure />}
+  panels={shownIds.length > 0 ? <PanelStack /> : null}
+/>
+```
+
+The row reads no store, so the editor keeps three rules:
+
+- **One panel at a time.** With the panels collapsed, what the stack draws and
+  what the rail lights is the one panel on show. A rail press swaps it, and the
+  second press, the cross and the fold send it away.
+- **The workspace stays as it was.** The panel on show is not written to the list
+  of open panels, so a wider window finds what it left, plus the panel that was
+  on screen.
+- **Only somebody asking opens one.** A rail press or a link naming the panel
+  does. A gesture on the figure that opens a panel beside it with room only adds
+  it to the list: selecting an atom must not cover the atom.
+
+The part of the figure still showing goes on answering the pointer, so a panel
+follows the selection while it is open.
 
 ## Styling
 

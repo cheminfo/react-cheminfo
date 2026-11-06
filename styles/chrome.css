@@ -1640,6 +1640,47 @@ span.taxon-lineage__name {
   min-height: 7px;
 }
 
+/* ── The figure and its panels, on a window with no room for both ───────── */
+
+/*
+  The figure keeps the row and the panel comes over it, against the rail it was
+  opened from. The view is its own stacking context, so whatever a figure lifts
+  above its own marks stays under the panel. `chrome.css` leaves the panel's
+  edge to the panels themselves: a line here beside the one a stack already
+  draws would be two.
+*/
+.panel-row {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 0%;
+}
+
+.panel-row__view {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 0%;
+  flex-direction: column;
+}
+
+.panel-row__drawer {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  width: min(100%, 24rem);
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
 /* ── Printing ────────────────────────────────────────────────────────────── */
 
 /*
@@ -2286,4 +2327,196 @@ span.taxon-lineage__name {
   color: var(--text-muted);
   font-size: var(--bp-typography-size-body-medium);
   line-height: 1;
+}
+
+/*
+  What a tool shows while it holds nothing: `<EmptyGuide>`. Grey on purpose, so
+  it reads as the empty space saying how to start and never as content. The
+  pointer goes through it to the tool, except on a link or a figure that can be
+  clicked, so a first stroke can start on the words.
+*/
+.empty-guide {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+  color: var(--text-muted);
+  container-type: size;
+  font-size: 12.5px;
+  gap: 10px;
+  inset: 0;
+  line-height: 1.4;
+  overflow: hidden;
+  pointer-events: none;
+
+  /* A short delay, so a page opening on a drawing never flashes the guide. */
+  animation: empty-guide-in 240ms ease-out 120ms both;
+}
+
+.empty-guide a,
+.empty-guide button {
+  color: inherit;
+  pointer-events: auto;
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 2px;
+}
+
+.empty-guide a:hover,
+.empty-guide button:hover {
+  color: var(--accent);
+  text-decoration-color: currentcolor;
+}
+
+.empty-guide button {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.empty-guide__help {
+  display: grid;
+  flex: none;
+  gap: 8px 28px;
+  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+}
+
+.empty-guide__title {
+  margin: 0 0 3px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.empty-guide__links {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+}
+
+.empty-guide__links .empty-guide__title {
+  margin: 0;
+}
+
+/* What is left of the height, shared out; a very short view leaves them none. */
+.empty-guide__figures {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 0;
+  justify-content: space-between;
+  gap: 3%;
+}
+
+.empty-guide__figure {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  margin: 0;
+}
+
+.empty-guide__figure img {
+  display: block;
+  min-height: 0;
+  width: 100%;
+  flex: 1 1 0;
+  object-fit: contain;
+  opacity: 0.35;
+  transition: opacity 150ms ease-out;
+}
+
+/* A figure that can be clicked comes up to full strength to say so. */
+button.empty-guide__figure:hover img,
+button.empty-guide__figure:focus-visible img {
+  opacity: 1;
+}
+
+.empty-guide__hint {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  justify-content: center;
+  margin: 0;
+  gap: 6px;
+  text-align: center;
+}
+
+.empty-guide__hint .bp6-icon {
+  align-self: center;
+  color: var(--text-faint);
+}
+
+.empty-guide__hint > span {
+  animation: empty-guide-in 400ms ease-out both;
+}
+
+/* On a narrow or a short view the words take the whole of it: a picture the
+   size of a stamp shows nothing, and leaves its caption floating. */
+@container (max-width: 640px) or (max-height: 520px) {
+  .empty-guide__figures {
+    display: none;
+  }
+
+  .empty-guide__hint {
+    margin-top: auto;
+  }
+}
+
+@keyframes empty-guide-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empty-guide,
+  .empty-guide__hint > span {
+    animation: none;
+  }
+}
+
+/* Keys and what they do: `<ShortcutList>`. */
+.shortcut-list {
+  display: grid;
+  margin: 0;
+  gap: 2px 8px;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.shortcut-list__row {
+  display: contents;
+}
+
+.shortcut-list dt {
+  font-weight: inherit;
+}
+
+.shortcut-list dd {
+  margin: 0;
+}
+
+.shortcut-keys {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.shortcut-keys kbd {
+  display: inline-block;
+  min-width: 1.5em;
+  padding: 0 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
 }
