@@ -1659,6 +1659,7 @@ span.taxon-lineage__name {
   flex: 1 1 0%;
 }
 
+/* Clipped, or a status line too long for a narrow row runs on under the rail. */
 .panel-row__view {
   position: relative;
   z-index: 0;
@@ -1667,6 +1668,7 @@ span.taxon-lineage__name {
   min-height: 0;
   flex: 1 1 0%;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .panel-row__drawer {

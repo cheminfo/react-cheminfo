@@ -1,9 +1,10 @@
 import type { Ref } from 'react';
 import { useId, useMemo, useState } from 'react';
-import { SplitPane, useFullscreen } from 'react-science/ui';
+import { useFullscreen } from 'react-science/ui';
 
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { useFigureDownload } from '../../download/ui/useFigureDownload.tsx';
+import { FixedPanelRow } from '../../panel/ui/FixedPanelRow.tsx';
 import { PanelRail } from '../../panel/ui/PanelRail.tsx';
 import type { IrBand } from '../core/irBand.ts';
 import type { IrCommandHandlers } from '../core/irCommands.ts';
@@ -61,7 +62,7 @@ export function IrShell(props: IrShellProps) {
   const { state, visibleSpectra, selectedSpectrum } = useIrEditorState();
   const actions = useIrActions();
   const { toggle: toggleFullScreen } = useFullscreen();
-  const { openPanelIds, tool } = state.view;
+  const { tool } = state.view;
   const side = useIrSide(panels);
   const { mode, pickBands, showAssignments, technique } = state.settings;
 
@@ -151,34 +152,35 @@ export function IrShell(props: IrShellProps) {
             <IrToolbar figure={figure} />
           </div>
 
-          <SplitPane
-            direction="horizontal"
-            controlledSide="end"
-            defaultSize="360px"
-            open={side.isOpen}
+          <FixedPanelRow
+            collapsed={side.collapsed}
+            isOpen={side.isOpen}
             onOpenChange={side.setOpen}
-          >
-            <IrCanvas
-              highlight={highlight}
-              onHighlight={setHighlight}
-              chartId={chartId}
-              onPlotClick={onPlotClick}
-            />
-
-            <IrSidePanel
-              panels={panels}
-              highlight={highlight}
-              onHighlight={setHighlight}
-            />
-          </SplitPane>
+            view={
+              <IrCanvas
+                highlight={highlight}
+                onHighlight={setHighlight}
+                chartId={chartId}
+                onPlotClick={onPlotClick}
+              />
+            }
+            panels={
+              <IrSidePanel
+                panels={panels}
+                side={side}
+                highlight={highlight}
+                onHighlight={setHighlight}
+              />
+            }
+          />
 
           {/* Outside the split, so the icons stay put against the right edge
               while the panel beside them is resized or closed. */}
           <div style={railStyle}>
             <PanelRail
               panels={side.panels}
-              openIds={openPanelIds}
-              onToggle={actions.togglePanel}
+              openIds={side.shownIds}
+              onToggle={side.toggle}
             />
           </div>
         </div>

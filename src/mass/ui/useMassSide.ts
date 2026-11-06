@@ -8,6 +8,9 @@
 
 import { useMemo } from 'react';
 
+import type { CollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
+import { useCollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
+import type { MassPanelId } from '../core/massSidePanels.ts';
 import { DEFAULT_SIDE_PANEL } from '../core/massState.ts';
 
 import type { MassHostPanel, MassStackPanel } from './massHostPanels.ts';
@@ -15,7 +18,7 @@ import { massStackPanels } from './massHostPanels.ts';
 import { useMassActions, useMassEditorState } from './massStateContext.ts';
 
 /** The side, as the shell lays it out. */
-export interface MassSide {
+export interface MassSide extends CollapsedPanels<MassPanelId> {
   /** Every panel on offer, in the order their icons are stacked. */
   panels: readonly MassStackPanel[];
   /** Whether a panel on offer is open, which is whether the side is. */
@@ -36,14 +39,19 @@ export function useMassSide(hostPanels: readonly MassHostPanel[]): MassSide {
   const { state } = useMassEditorState();
   const actions = useMassActions();
   const { openPanelIds } = state.view;
+  const collapse = useCollapsedPanels<MassPanelId>(
+    openPanelIds,
+    actions.togglePanel,
+  );
+  const { shownIds } = collapse;
 
   const panels = useMemo(() => massStackPanels(hostPanels), [hostPanels]);
   // Read off the panels on offer rather than off the ids: an id no panel
   // answers to opens nothing, and a side open on it alone is an empty column.
   const isOpen = useMemo(() => {
-    const open = new Set<string>(openPanelIds);
+    const open = new Set<string>(shownIds);
     return panels.some((panel) => open.has(panel.id));
-  }, [panels, openPanelIds]);
+  }, [panels, shownIds]);
 
   /**
    * Open or close the side.
@@ -59,5 +67,5 @@ export function useMassSide(hostPanels: readonly MassHostPanel[]): MassSide {
     if (!isOpen) actions.togglePanel(DEFAULT_SIDE_PANEL);
   }
 
-  return { panels, isOpen, setOpen };
+  return { ...collapse, panels, isOpen, setOpen };
 }

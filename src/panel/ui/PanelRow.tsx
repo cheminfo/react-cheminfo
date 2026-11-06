@@ -69,6 +69,20 @@ export function PanelRow(props: PanelRowProps): ReactElement {
     );
   }
 
+  return <CollapsedPanelRow view={view} panels={panels} />;
+}
+
+/**
+ * The figure alone in the row, with the panels over the whole of it when there
+ * are any. The figure stays mounted underneath, so sending a panel away brings
+ * it back as it was.
+ * @param props - The figure, and the panels or `null`.
+ * @returns The row.
+ */
+export function CollapsedPanelRow(
+  props: Pick<PanelRowProps, 'view' | 'panels'>,
+): ReactElement {
+  const { view, panels } = props;
   return (
     <div className="panel-row">
       <div className="panel-row__view">{view}</div>

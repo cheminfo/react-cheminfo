@@ -8,6 +8,9 @@
 
 import { useMemo } from 'react';
 
+import type { CollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
+import { useCollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
+import type { IrPanelId } from '../core/irSidePanels.ts';
 import { DEFAULT_SIDE_PANEL } from '../core/irState.ts';
 
 import type { IrHostPanel, IrStackPanel } from './irHostPanels.ts';
@@ -15,7 +18,7 @@ import { irStackPanels } from './irHostPanels.ts';
 import { useIrActions, useIrEditorState } from './irStateContext.ts';
 
 /** The side, as the shell lays it out. */
-export interface IrSide {
+export interface IrSide extends CollapsedPanels<IrPanelId> {
   /** Every panel on offer, in the order their icons are stacked. */
   panels: readonly IrStackPanel[];
   /** Whether a panel on offer is open, which is whether the side is. */
@@ -36,11 +39,16 @@ export function useIrSide(hostPanels: readonly IrHostPanel[]): IrSide {
   const { state } = useIrEditorState();
   const actions = useIrActions();
   const { openPanelIds } = state.view;
+  const collapse = useCollapsedPanels<IrPanelId>(
+    openPanelIds,
+    actions.togglePanel,
+  );
+  const { shownIds } = collapse;
 
   const panels = useMemo(() => irStackPanels(hostPanels), [hostPanels]);
   // Read off the panels on offer rather than off the ids: an id no panel
   // answers to opens nothing, and a side open on it alone is an empty column.
-  const isOpen = panels.some((panel) => openPanelIds.includes(panel.id));
+  const isOpen = panels.some((panel) => shownIds.includes(panel.id));
 
   /**
    * Open or close the side.
@@ -56,5 +64,5 @@ export function useIrSide(hostPanels: readonly IrHostPanel[]): IrSide {
     if (!isOpen) actions.togglePanel(DEFAULT_SIDE_PANEL);
   }
 
-  return { panels, isOpen, setOpen };
+  return { ...collapse, panels, isOpen, setOpen };
 }

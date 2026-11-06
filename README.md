@@ -2039,6 +2039,9 @@ The row reads no store, so the editor keeps three rules:
 The panel takes the whole row, with the rail beside it to swap it or send it
 away. The figure stays mounted underneath and comes back as it was.
 
+`<MassEditor>` and `<IrEditor>` do all of this themselves, so a site rendering
+one writes nothing.
+
 ## Styling
 
 **No stylesheet, nothing for a consumer to import.** Every rule is a

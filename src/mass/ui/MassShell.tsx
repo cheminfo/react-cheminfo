@@ -1,9 +1,10 @@
 import type { ChangeEvent, Ref } from 'react';
 import { useId, useMemo, useRef, useState } from 'react';
-import { SplitPane, useFullscreen } from 'react-science/ui';
+import { useFullscreen } from 'react-science/ui';
 
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { useFigureDownload } from '../../download/ui/useFigureDownload.tsx';
+import { FixedPanelRow } from '../../panel/ui/FixedPanelRow.tsx';
 import { PanelRail } from '../../panel/ui/PanelRail.tsx';
 import type { MassCommandHandlers } from '../core/massCommands.ts';
 import type { MassEditorHandle, MassPlotClick } from '../core/massEditorApi.ts';
@@ -55,7 +56,7 @@ export function MassShell(props: MassShellProps) {
   const { state, visibleSpectra, selectedSpectrum } = useMassEditorState();
   const actions = useMassActions();
   const { toggle: toggleFullScreen } = useFullscreen();
-  const { openPanelIds, tool } = state.view;
+  const { tool } = state.view;
   const { showLabels, showCharges } = state.settings;
   const side = useMassSide(panels);
   const files = useMassFiles();
@@ -128,35 +129,36 @@ export function MassShell(props: MassShellProps) {
             <MassToolbar figure={figure} />
           </div>
 
-          <SplitPane
-            direction="horizontal"
-            controlledSide="end"
-            defaultSize="360px"
-            open={side.isOpen}
+          <FixedPanelRow
+            collapsed={side.collapsed}
+            isOpen={side.isOpen}
             onOpenChange={side.setOpen}
-          >
-            <MassCanvas
-              highlightMz={highlightMz}
-              onHighlight={setHighlightMz}
-              chartId={chartId}
-              onDropFiles={(dropped) => void files.readFiles(dropped)}
-              {...(onPlotClick === undefined ? {} : { onPlotClick })}
-            />
-
-            <MassSidePanel
-              panels={panels}
-              highlightMz={highlightMz}
-              onHighlight={setHighlightMz}
-            />
-          </SplitPane>
+            view={
+              <MassCanvas
+                highlightMz={highlightMz}
+                onHighlight={setHighlightMz}
+                chartId={chartId}
+                onDropFiles={(dropped) => void files.readFiles(dropped)}
+                {...(onPlotClick === undefined ? {} : { onPlotClick })}
+              />
+            }
+            panels={
+              <MassSidePanel
+                panels={panels}
+                side={side}
+                highlightMz={highlightMz}
+                onHighlight={setHighlightMz}
+              />
+            }
+          />
 
           {/* Outside the split, so the icons stay put against the right edge
               while the panel beside them is resized or closed. */}
           <div style={railStyle}>
             <PanelRail
               panels={side.panels}
-              openIds={openPanelIds}
-              onToggle={actions.togglePanel}
+              openIds={side.shownIds}
+              onToggle={side.toggle}
             />
           </div>
         </div>

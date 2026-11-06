@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 
 import { panelStyle } from '../../panel/core/panelStyles.ts';
 import { SidePanelStack } from '../../panel/ui/SidePanelStack.tsx';
-import type { MassSidePanelId } from '../core/massSidePanels.ts';
+import type { CollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
+import type { MassPanelId, MassSidePanelId } from '../core/massSidePanels.ts';
 
 import { MetadataPanel } from './MetadataPanel.tsx';
 import { PeaksPanel } from './PeaksPanel.tsx';
@@ -12,6 +13,12 @@ import { isMassHostPanel, massStackPanels } from './massHostPanels.ts';
 import { useMassActions, useMassEditorState } from './massStateContext.ts';
 
 export interface MassSidePanelProps {
+  /**
+   * What to draw and what closes a panel, for a viewer whose panels may be
+   * collapsed.
+   * @default every panel the state has open
+   */
+  side?: Pick<CollapsedPanels<MassPanelId>, 'shownIds' | 'toggle' | 'folds'>;
   /**
    * The panels the host adds to the viewer's own, stacked above them in the
    * order given.
@@ -44,6 +51,7 @@ export interface MassSidePanelProps {
 export function MassSidePanel(props: MassSidePanelProps) {
   const {
     panels: hostPanels = NO_PANELS,
+    side,
     highlightMz = null,
     onHighlight,
   } = props;
@@ -55,8 +63,9 @@ export function MassSidePanel(props: MassSidePanelProps) {
   return (
     <SidePanelStack
       panels={panels}
-      openPanelIds={openPanelIds}
-      onClose={actions.togglePanel}
+      openPanelIds={side?.shownIds ?? openPanelIds}
+      onClose={side?.toggle ?? actions.togglePanel}
+      {...side?.folds}
     >
       {(panel) =>
         isMassHostPanel(panel) ? (

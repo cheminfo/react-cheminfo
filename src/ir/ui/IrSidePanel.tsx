@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 
 import { panelStyle } from '../../panel/core/panelStyles.ts';
 import { SidePanelStack } from '../../panel/ui/SidePanelStack.tsx';
+import type { CollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
 import type { IrBand } from '../core/irBand.ts';
-import type { IrSidePanelId } from '../core/irSidePanels.ts';
+import type { IrPanelId, IrSidePanelId } from '../core/irSidePanels.ts';
 
 import { BandsPanel } from './BandsPanel.tsx';
 import { MetadataPanel } from './MetadataPanel.tsx';
@@ -13,6 +14,12 @@ import { irStackPanels, isIrHostPanel } from './irHostPanels.ts';
 import { useIrActions, useIrEditorState } from './irStateContext.ts';
 
 export interface IrSidePanelProps {
+  /**
+   * What to draw and what closes a panel, for a viewer whose panels may be
+   * collapsed.
+   * @default every panel the state has open
+   */
+  side?: Pick<CollapsedPanels<IrPanelId>, 'shownIds' | 'toggle' | 'folds'>;
   /**
    * The panels the host adds to the viewer's own, stacked above them in the
    * order given.
@@ -49,6 +56,7 @@ export interface IrSidePanelProps {
 export function IrSidePanel(props: IrSidePanelProps) {
   const {
     panels: hostPanels = NO_PANELS,
+    side,
     highlight = null,
     onHighlight,
   } = props;
@@ -60,8 +68,9 @@ export function IrSidePanel(props: IrSidePanelProps) {
   return (
     <SidePanelStack
       panels={panels}
-      openPanelIds={openPanelIds}
-      onClose={actions.togglePanel}
+      openPanelIds={side?.shownIds ?? openPanelIds}
+      onClose={side?.toggle ?? actions.togglePanel}
+      {...side?.folds}
     >
       {(panel) =>
         isIrHostPanel(panel) ? (
