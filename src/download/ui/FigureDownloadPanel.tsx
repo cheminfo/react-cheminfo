@@ -17,12 +17,33 @@ import { FigureSizeRows } from './FigureSizeRows.tsx';
 import { hintOf } from './figureDownloadHint.ts';
 import { resolutionHelp, scaleChoices } from './resolutionChoices.ts';
 
+/**
+ * Files of another kind offered after the two a picture is saved as, such as a
+ * molfile.
+ */
+export interface FigureFileChoice<TFile extends string> {
+  /** The files offered. */
+  options: ReadonlyArray<OverlayOption<TFile>>;
+  /** The one picked, or `null` while a picture is. */
+  value: TFile | null;
+  /** Called with the file picked, and with `null` when a picture is. */
+  onChange: (value: TFile | null) => void;
+  /** The line at the foot of the panel while one is picked. */
+  hint: string;
+}
+
 /** What {@link FigureDownloadPanel} is drawn from. */
-export interface FigureDownloadPanelProps {
+export interface FigureDownloadPanelProps<TFile extends string = never> {
   /** What the panel is called. */
   title: string;
-  /** Which file the reader is about to write. */
+  /** Which picture the reader is about to write. */
   format: FigureFormat;
+  /**
+   * Files of another kind on offer. Nothing is painted for one, so no
+   * resolution is offered while it is picked.
+   * @default undefined — only pictures are offered
+   */
+  file?: FigureFileChoice<TFile>;
   /** The multiple of the figure on screen it is painted at. */
   scale: number;
   /** The multiples offered. */
@@ -103,10 +124,11 @@ export interface FigureDownloadPanelProps {
  * @param props - See {@link FigureDownloadPanelProps}.
  * @returns The panel.
  */
-export function FigureDownloadPanel(
-  props: FigureDownloadPanelProps,
+export function FigureDownloadPanel<TFile extends string = never>(
+  props: FigureDownloadPanelProps<TFile>,
 ): ReactElement {
   const { title, format, scale, scales, size, failure, saving } = props;
+  const { file } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
   const { sizing, onCopy, notice = null, children } = props;
   const { unit = 'multiple', svgAtOwnSize = false } = props;
@@ -119,55 +141,69 @@ export function FigureDownloadPanel(
       ? size
       : figureLayoutSize(sizing.layout, size, sizing.custom ?? size);
 
+  const picked = file && file.value !== null ? file : undefined;
   const painted = format === 'png' || rasterSvg;
-  const offerResolution = format === 'png' || !svgAtOwnSize;
+  const offerResolution =
+    picked === undefined && (format === 'png' || !svgAtOwnSize);
+  const cannotWrite = picked === undefined && size === null;
 
   return (
     <OverlayPanel
       title={title}
       width={unit === 'dpi' ? DPI_PANEL_WIDTH : PANEL_WIDTH}
-      hint={hintOf(
-        {
-          format,
-          size: drawn,
-          scale,
-          failure,
-          notice,
-          rasterSvg,
-          unit,
-          language,
-        },
-        t,
-      )}
+      hint={
+        picked
+          ? (failure ?? picked.hint)
+          : hintOf(
+              {
+                format,
+                size: drawn,
+                scale,
+                failure,
+                notice,
+                rasterSvg,
+                unit,
+                language,
+              },
+              t,
+            )
+      }
       actions={
         <>
           <OverlayAction
             text={t('download.save')}
             icon="download"
             intent="primary"
-            disabled={size === null}
+            disabled={cannotWrite}
             busy={saving}
             onClick={onSave}
           />
           <OverlayAction
             text={t('clipboard.copy')}
             icon="clipboard"
-            disabled={size === null}
+            disabled={cannotWrite}
             busy={saving}
             onClick={onCopy}
           />
         </>
       }
     >
-      <OverlaySegmented<FigureFormat>
+      <OverlaySegmented<FigureFormat | TFile>
         label={t('download.format')}
         help={{
           title: t('download.format'),
           body: t('download.formatHelp'),
         }}
-        value={format}
-        options={FORMAT_CHOICES}
-        onChange={onFormatChange}
+        value={file?.value ?? format}
+        options={file ? [...FORMAT_CHOICES, ...file.options] : FORMAT_CHOICES}
+        onChange={(value) => {
+          if (isFigureFormat(value)) {
+            file?.onChange(null);
+            onFormatChange(value);
+          } else {
+            file?.onChange(value);
+          }
+        }}
       />
       {children}
       {sizing === undefined ? null : (
@@ -194,6 +230,10 @@ const PANEL_WIDTH = '27em';
 
 /** Wide enough for the four dots per inch on one row, `1200 dpi` last. */
 const DPI_PANEL_WIDTH = '33em';
+
+function isFigureFormat(value: string): value is FigureFormat {
+  return value === 'png' || value === 'svg';
+}
 
 /** The two files a figure can leave the page as. */
 const FORMAT_CHOICES: ReadonlyArray<OverlayOption<FigureFormat>> = [

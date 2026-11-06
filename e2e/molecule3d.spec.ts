@@ -131,6 +131,38 @@ test('a hidden surface says why its options are greyed, and a copy is offered', 
   await panel.screenshot({ path: 'test-results/molecule3d-copy.png' });
 });
 
+test('the model on screen is copied or saved as a molfile of either dialect', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await openStory(page, 'molecule3d-moleculeviewer3d--default');
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 });
+
+  await page.getByRole('button', { name: 'Export image or molfile' }).click();
+  const panel = page.locator(PANEL).filter({ hasText: 'Export image' });
+  await expect(panel.getByRole('radio', { name: '2×' })).toBeVisible();
+
+  await panel.getByRole('radio', { name: 'Molfile' }).click();
+  // Nothing is painted for a molfile, so no resolution is offered.
+  await expect(panel.getByRole('radio', { name: '2×' })).toHaveCount(0);
+  await expect(panel).toContainText(
+    'The model on screen, with its 3D coordinates.',
+  );
+  await panel.getByRole('radio', { name: 'V3000' }).click();
+  await panel.screenshot({ path: 'test-results/molecule3d-molfile.png' });
+  await panel.getByRole('button', { name: 'Copy' }).click();
+  await expect(panel).toContainText('Copied');
+  const v3000 = await page.evaluate(() => navigator.clipboard.readText());
+  expect(v3000).toContain('V3000');
+  expect(v3000).toContain('M  V30 BEGIN ATOM');
+
+  await panel.getByRole('radio', { name: 'V2000' }).click();
+  const downloading = page.waitForEvent('download');
+  await panel.getByRole('button', { name: 'Save' }).click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toMatch(/-v2000\.mol$/);
+});
+
 test('the canvas fills the screen with its toolbars, their menus included', async ({
   page,
 }) => {

@@ -1,11 +1,13 @@
 /**
  * The export popover of the molecule viewer: the family's figure-saving panel,
- * fed by a render of the WebGL scene rather than by the SVG on the page.
+ * fed by a render of the WebGL scene rather than by the SVG on the page, with
+ * the model itself offered beside its pictures, as a molfile.
  */
 
 import type { ReactElement } from 'react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
+import { writeToClipboard } from '../../clipboard/core/writeToClipboard.ts';
 import type { FigureNotice } from '../../download/core/copyFigure.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import type { FigurePixels } from '../../download/core/figureScale.ts';
@@ -15,8 +17,19 @@ import {
 } from '../../download/core/figureScale.ts';
 import { FigureDownloadPanel } from '../../download/ui/FigureDownloadPanel.tsx';
 import { useFigureTask } from '../../download/ui/useFigureTask.ts';
+import { useAsync } from '../../hooks/ui/useAsync.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
+import type { Molecule3DFile } from '../core/file.ts';
+
+import type { MoleculeFileFormat } from './moleculeFileFormats.ts';
+import {
+  moleculeFileAtoms,
+  moleculeFileChoices,
+  moleculeFileText,
+  saveMoleculeFile,
+} from './moleculeFileFormats.ts';
 
 /** Props of {@link Molecule3DExport}. */
 export interface Molecule3DExportProps {
@@ -38,6 +51,18 @@ export interface Molecule3DExportProps {
    * @default 1
    */
   frameCount?: number;
+  /**
+   * The file on screen, offered beside the pictures as a molfile of either
+   * dialect. Not one for an XYZ or a series of frames, which a molfile cannot
+   * say.
+   * @default undefined — only pictures are offered
+   */
+  molfile?: Molecule3DFile | null;
+  /**
+   * Base name of a molfile saved from here, extension excluded.
+   * @default 'molecule'
+   */
+  fileName?: string;
 }
 
 /**
@@ -47,14 +72,38 @@ export interface Molecule3DExportProps {
  */
 export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   const { getSize, onExport, onCopy, frameCount = 1 } = props;
+  const { molfile, fileName = 'molecule' } = props;
   const t = useChromeT();
   const [size] = useState(getSize);
   const [format, setFormat] = useState<FigureFormat>('png');
+  const [file, setFile] = useState<typeof MOLFILE | null>(null);
+  const [version, setVersion] = useState<MoleculeFileFormat>('molfileV2000');
   const [scale, setScale] = useState(DEFAULT_FIGURE_SCALE);
   const [frames, setFrames] = useState<FrameChoice>('all');
-  const offerFrames = frameCount > 1 && format === 'png';
+  const offerFrames = frameCount > 1 && file === null && format === 'png';
   const animated = offerFrames && frames === 'all';
   const { run, busy, failure, notice, clear } = useFigureTask();
+  const atoms = moleculeFileAtoms(molfile, frameCount);
+  const versions = moleculeFileChoices(atoms, t);
+  const writtenVersion = versions[0]?.disabled ? 'molfileV3000' : version;
+
+  // Written once picked rather than on the press: Safari only allows a
+  // clipboard write the click itself started.
+  const written = useAsync(
+    useCallback(
+      () =>
+        file !== null && molfile
+          ? moleculeFileText(molfile, writtenVersion)
+          : Promise.resolve(null),
+      [file, molfile, writtenVersion],
+    ),
+  );
+  const text = written.pending ? null : written.data;
+
+  async function copyMolfile(molfileText: string): Promise<FigureNotice> {
+    if (await writeToClipboard(molfileText)) return 'copied';
+    throw new Error(t('clipboard.failed'));
+  }
 
   // What the last copy came to only describes the choices it was made with.
   function changed<T>(apply: (value: T) => void): (value: T) => void {
@@ -65,21 +114,55 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   }
 
   return (
-    <FigureDownloadPanel
-      title={t('molecule3d.exportImage')}
+    <FigureDownloadPanel<typeof MOLFILE>
+      title={t(
+        atoms > 0
+          ? 'molecule3d.exportImageOrMolfile'
+          : 'molecule3d.exportImage',
+      )}
       format={format}
+      file={
+        atoms > 0
+          ? {
+              options: MOLFILE_CHOICES,
+              value: file,
+              onChange: changed(setFile),
+              hint:
+                notice === 'copied'
+                  ? t('clipboard.copied')
+                  : t('molecule3d.molfileHint', { count: atoms }),
+            }
+          : undefined
+      }
       scale={scale}
       scales={FIGURE_SCALES}
       size={size}
-      failure={failure}
+      failure={failure ?? written.failure?.message ?? null}
       notice={notice}
-      saving={busy}
+      saving={busy || (file !== null && text === null)}
       rasterSvg
       onFormatChange={changed(setFormat)}
       onScaleChange={changed(setScale)}
-      onSave={() => run(onExport(format, scale, animated).then(() => null))}
-      onCopy={() => run(onCopy(scale))}
+      onSave={() => {
+        if (file === null) {
+          run(onExport(format, scale, animated).then(() => null));
+        } else if (text) {
+          saveMoleculeFile(text, writtenVersion, fileName);
+        }
+      }}
+      onCopy={() => {
+        if (file === null) run(onCopy(scale));
+        else if (text) run(copyMolfile(text));
+      }}
     >
+      {file !== null && (
+        <OverlaySegmented<MoleculeFileFormat>
+          label={t('molecule3d.molfileVersion')}
+          value={writtenVersion}
+          options={versions}
+          onChange={changed(setVersion)}
+        />
+      )}
       {offerFrames && (
         <OverlaySegmented<FrameChoice>
           label={t('molecule3d.frames')}
@@ -101,6 +184,13 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
     </FigureDownloadPanel>
   );
 }
+
+/** What the row of formats calls a molfile; the version is a row of its own. */
+const MOLFILE = 'molfile';
+
+const MOLFILE_CHOICES: ReadonlyArray<OverlayOption<typeof MOLFILE>> = [
+  { value: MOLFILE, label: 'Molfile' },
+];
 
 /** The frame on screen, or every frame as an animated PNG. */
 type FrameChoice = 'one' | 'all';

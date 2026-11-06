@@ -53,6 +53,11 @@ export interface Molecule3DToolbarProps {
   /** Content of the export popover; its tool is left out without one. */
   exportPanel?: ReactElement;
   /**
+   * What the export tool is called, for a panel offering more than pictures.
+   * @default the chrome's own line, `Export image`
+   */
+  exportLabel?: string;
+  /**
    * Whether the canvas fills the screen, and the toggle; its tool is left out
    * without one, which is what a browser that cannot fill the screen gets.
    * @default undefined
@@ -79,6 +84,7 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
     onResetView,
     options,
     exportPanel,
+    exportLabel,
     fullscreen,
   } = props;
   const t = useChromeT();
@@ -152,8 +158,8 @@ export function Molecule3DToolbar(props: Molecule3DToolbarProps): ReactElement {
                 content={exportPanel}
                 itemProps={{
                   icon: 'download',
-                  'aria-label': t('molecule3d.exportImage'),
-                  tooltip: t('molecule3d.exportImage'),
+                  'aria-label': exportLabel ?? t('molecule3d.exportImage'),
+                  tooltip: exportLabel ?? t('molecule3d.exportImage'),
                   tooltipProps: TOOLTIP_PROPS,
                 }}
               />

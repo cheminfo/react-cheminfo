@@ -72,8 +72,12 @@ export {
   looksLikeMolfile,
   molfileAtomCount,
 } from './molfile.ts';
-export type { MolfileExport } from './molfileExport.ts';
-export { readMolfileExport, toMolfileExport } from './molfileExport.ts';
+export type { MolfileDialect, MolfileExport } from './molfileExport.ts';
+export {
+  readMolfileExport,
+  toMolfileExport,
+  writeMolfile,
+} from './molfileExport.ts';
 export type { ReadStructureResult, StructureKind } from './readStructure.ts';
 export { looksLikeSmarts, readStructure } from './readStructure.ts';
 export type { StructureError } from './structureError.ts';

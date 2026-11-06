@@ -12,6 +12,8 @@
 import type { Molecule } from 'openchemlib';
 import { CanonizerUtil } from 'openchemlib';
 
+import { MOLFILE_FILES } from './molfileExport.ts';
+
 /** The notations offered, in the order they are offered in. */
 export type StructureNotationKind =
   | 'smiles'
@@ -63,9 +65,6 @@ export interface StructureNotation {
  */
 export type SuppliedNotations = Partial<Record<StructureNotationKind, string>>;
 
-/** What a molfile is, for the application that opens one. */
-const MOLFILE_TYPE = 'chemical/x-mdl-molfile';
-
 /**
  * Write a structure every way the export dialog offers.
  *
@@ -93,14 +92,14 @@ export function structureNotations(
       kind: 'molfileV3000',
       value: value('molfileV3000', () => molecule.toMolfileV3()),
       canonical: false,
-      file: { suffix: '-v3000', extension: 'mol', mimeType: MOLFILE_TYPE },
+      file: MOLFILE_FILES.v3000,
       block: true,
     },
     {
       kind: 'molfileV2000',
       value: value('molfileV2000', () => molecule.toMolfile()),
       canonical: false,
-      file: { suffix: '-v2000', extension: 'mol', mimeType: MOLFILE_TYPE },
+      file: MOLFILE_FILES.v2000,
       block: true,
     },
     {

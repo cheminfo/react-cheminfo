@@ -9,6 +9,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { DEFAULT_SPIN_SPEED } from '../../molstar/core/index.ts';
 import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
@@ -23,6 +24,7 @@ import { Molecule3DOptions } from './Molecule3DOptions.tsx';
 import { Molecule3DStage } from './Molecule3DStage.tsx';
 import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
 import { highlightColorOf } from './highlightColor.ts';
+import { moleculeFileAtoms } from './moleculeFileFormats.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
 import { useControlledState } from './useControlledState.ts';
 import { useImageExport } from './useImageExport.ts';
@@ -67,6 +69,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     onCapture,
     onFailureChange,
   } = props;
+  const t = useChromeT();
   const tools = resolveMolecule3DTools(toolsProp);
   const [initialSettings] = useState(() =>
     normalizeMolecule3DSettings(defaultSettings),
@@ -190,12 +193,19 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
                     defaults={initialSettings}
                   />
                 }
+                exportLabel={
+                  moleculeFileAtoms(molfile, frameCount) > 0
+                    ? t('molecule3d.exportImageOrMolfile')
+                    : undefined
+                }
                 exportPanel={
                   <Molecule3DExport
                     getSize={canvasSize}
                     onExport={exportImage}
                     onCopy={copyImage}
                     frameCount={frameCount}
+                    molfile={molfile}
+                    fileName={fileName}
                   />
                 }
               />
