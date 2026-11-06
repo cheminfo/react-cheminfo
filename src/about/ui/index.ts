@@ -2,6 +2,8 @@ export type { AboutVersionProps } from './AboutVersion.tsx';
 export { AboutVersion } from './AboutVersion.tsx';
 export type { AboutCitationsProps } from './AboutCitations.tsx';
 export { AboutCitations } from './AboutCitations.tsx';
+export type { AboutMaintainersProps } from './AboutMaintainers.tsx';
+export { AboutMaintainers } from './AboutMaintainers.tsx';
 export type { AboutPageProps } from './AboutPage.tsx';
 export { AboutPage } from './AboutPage.tsx';
 export type { AboutProvidedByProps } from './AboutProvidedBy.tsx';

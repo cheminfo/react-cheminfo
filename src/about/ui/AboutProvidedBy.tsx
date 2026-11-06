@@ -2,7 +2,6 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import type { Language } from '../../i18n/core/languages.ts';
-import { Prose } from '../../i18n/ui/Prose.tsx';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
@@ -11,11 +10,12 @@ import type { ProviderEntry } from '../core/providers.ts';
 import type { TeamMember } from '../core/team.ts';
 
 import { ProviderLogo } from './ProviderLogo.tsx';
+import { RoleText } from './RoleText.tsx';
 
 export interface AboutProvidedByProps {
   /** Who provides the site, named beside the logos. */
   people: readonly AboutPerson[];
-  /** The list under the names: who does what, the family's people first. */
+  /** The list under the names: who does what on this site. */
   team: readonly TeamMember[];
   /** The institutions providing the site, drawn as linked logos. */
   providers: readonly ProviderEntry[];
@@ -93,10 +93,15 @@ function roleOf(
   language: Language,
 ): ReactNode {
   const { family } = member;
-  if (family === undefined) return member.role;
+  if (family === undefined) {
+    return (
+      <RoleText text={member.role ?? ''} organisation={member.organisation} />
+    );
+  }
   const { role, organisation, works } = family;
   let text = t('about.role.coordinates');
   if (role === 'design') text = t('about.role.design');
+  if (role === 'interface') text = t('about.role.interface');
   if (role === 'tooling') {
     text =
       works.length === 0
@@ -105,19 +110,7 @@ function roleOf(
             works: new Intl.ListFormat(language).format(works),
           });
   }
-  if (organisation === undefined) return text;
-  return (
-    <Prose
-      text={text}
-      nodes={{
-        organisation: (
-          <a href={organisation.href} target="_blank" rel="noopener noreferrer">
-            {organisation.name}
-          </a>
-        ),
-      }}
-    />
-  );
+  return <RoleText text={text} organisation={organisation} />;
 }
 
 function joinNames(

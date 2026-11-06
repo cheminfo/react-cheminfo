@@ -116,9 +116,10 @@ test('Daniel Kostro is listed for react-science on a site that credits it', () =
   ]);
 });
 
-test("a site's own contributors follow the family, with the site's words", () => {
+test('a site made with others lists who made it, and who maintains what it runs on apart', () => {
   const about = resolveAbout({
     ...SMILES,
+    credits: ['react', 'react-science', 'react-ocl'],
     people: [{ name: 'Luc Patiny' }],
     contributors: [
       { name: 'Daniel Kostro', role: 'wrote the solver.' },
@@ -127,19 +128,81 @@ test("a site's own contributors follow the family, with the site's words", () =>
   });
 
   expect(about.people).toStrictEqual([{ name: 'Luc Patiny' }]);
-  expect(about.team.map((member) => member.name)).toStrictEqual([
-    'Luc Patiny',
-    'Michaël Zasso',
-    'Daniel Kostro',
-    'Régis Turin',
+  expect(about.team).toStrictEqual([
+    { name: 'Luc Patiny', family: { role: 'coordinates', works: [] } },
+    { name: 'Daniel Kostro', role: 'wrote the solver.' },
+    { name: 'Régis Turin', role: 'wrote the exercises.' },
   ]);
-  expect(about.team[2]).toStrictEqual({
-    name: 'Daniel Kostro',
-    role: 'wrote the solver.',
-  });
+  expect(about.maintainers).toStrictEqual([
+    {
+      name: 'Daniel Kostro',
+      organisation: ZAKODIUM,
+      works: ['react-science'],
+      tooling: false,
+    },
+    {
+      name: 'Michaël Zasso',
+      organisation: ZAKODIUM,
+      works: ['react-ocl', 'react-science'],
+      tooling: true,
+    },
+  ]);
 });
 
-test("a role written for one of the family's people is refused, where they are listed", () => {
+test('a site Luc Patiny made alone has no second list, whatever it credits', () => {
+  const about = resolveAbout({
+    ...SMILES,
+    credits: ['openchemlib', 'react-ocl', 'react-science'],
+    people: [{ name: 'Luc Patiny', role: 'ignored.' }],
+  });
+
+  expect(about.maintainers).toStrictEqual([]);
+  expect(about.team.map((member) => member.name)).toStrictEqual([
+    'Luc Patiny',
+    'Daniel Kostro',
+    'Michaël Zasso',
+  ]);
+});
+
+test('the people whose work a site is come first, and Luc Patiny wrote the interface', () => {
+  const student = {
+    name: 'Adrian Mirza',
+    role: 'developed the method, at {organisation}.',
+    organisation: { name: 'LamaLab', href: 'https://lamalab.org' },
+  };
+  const about = resolveAbout({
+    ...SMILES,
+    leads: [student],
+    people: [{ name: 'Adrian Mirza' }, { name: 'Luc Patiny' }],
+    contributors: [{ name: 'Régis Turin', role: 'wrote the exercises.' }],
+  });
+
+  expect(about.team).toStrictEqual([
+    student,
+    { name: 'Luc Patiny', family: { role: 'interface', works: [] } },
+    { name: 'Régis Turin', role: 'wrote the exercises.' },
+  ]);
+});
+
+test('a site naming its leads may say what Luc Patiny did, in the order it names them', () => {
+  const content: AboutContent = {
+    ...SMILES,
+    leads: [{ name: 'Mara Schilling-Wilhelmi', role: 'developed the site.' }],
+    contributors: [
+      { name: 'Luc Patiny', role: 'supported the web application.' },
+      { name: 'Sarthak Kapoor', role: 'co-developed the plugin.' },
+    ],
+  };
+
+  expect(aboutProblems(content)).toStrictEqual([]);
+  expect(resolveAbout(content).team).toStrictEqual([
+    { name: 'Mara Schilling-Wilhelmi', role: 'developed the site.' },
+    { name: 'Luc Patiny', role: 'supported the web application.' },
+    { name: 'Sarthak Kapoor', role: 'co-developed the plugin.' },
+  ]);
+});
+
+test('a role for Luc Patiny is refused on a site naming no leads', () => {
   expect(
     aboutProblems({
       ...SMILES,
@@ -148,20 +211,40 @@ test("a role written for one of the family's people is refused, where they are l
   ).toStrictEqual([
     "Luc Patiny is one of the family's people: every site lists them with the same role, so leave `role` out.",
   ]);
-
-  // Daniel Kostro is the family's only where react-science is credited.
-  const contributor = { name: 'Daniel Kostro', role: 'wrote the solver.' };
-
-  expect(
-    aboutProblems({ ...SMILES, contributors: [contributor] }),
-  ).toStrictEqual([]);
+  // Who maintains a library may still have done something on this site.
   expect(
     aboutProblems({
       ...SMILES,
       credits: ['react', 'react-science'],
-      contributors: [contributor],
+      contributors: [{ name: 'Daniel Kostro', role: 'wrote the solver.' }],
     }),
-  ).toHaveLength(1);
+  ).toStrictEqual([]);
+});
+
+/**
+ * What `aboutProblems` says of an organisation and a role that disagree.
+ * @param name - Whose line it is.
+ * @returns The problem.
+ */
+function organisationProblem(name: string): string {
+  return `${name}: \`organisation\` and \`{organisation}\` in the role go together, or the link is lost or the placeholder shows.`;
+}
+
+test('an organisation and its place in the role go together', () => {
+  expect(
+    aboutProblems({
+      ...SMILES,
+      contributors: [
+        { name: 'A', role: 'wrote it, at {organisation}.' },
+        { name: 'B', role: 'wrote it.', organisation: ZAKODIUM },
+        {
+          name: 'C',
+          role: 'wrote it, at {organisation}.',
+          organisation: ZAKODIUM,
+        },
+      ],
+    }),
+  ).toStrictEqual([organisationProblem('A'), organisationProblem('B')]);
 });
 
 test('the works to cite are carried through as the site names them', () => {

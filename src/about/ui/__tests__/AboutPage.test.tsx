@@ -324,15 +324,111 @@ test('several people are joined into one line, and their roles listed under it',
   expect(html).toContain(
     '<li><strong>Daniel Kostro</strong> — wrote the solver.</li>',
   );
-  // The family's people keep the family's words, and come first.
+  // Luc Patiny keeps the family's words, and comes first.
   expect(html).not.toContain('curates the data.');
+  expect(html.indexOf('<li><strong>Luc Patiny</strong>')).toBeLessThan(
+    html.indexOf('<li><strong>Daniel Kostro</strong>'),
+  );
+});
 
-  const order = ['Luc Patiny', 'Michaël Zasso', 'Daniel Kostro'].map((name) =>
-    html.indexOf(`<li><strong>${name}</strong>`),
+test('a site Luc Patiny made alone says "Provided by", with one list and no second section', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        credits: ['openchemlib', 'react-ocl', 'react-science', 'react'],
+        people: [{ name: 'Luc Patiny' }],
+        providedBy: ['epfl'],
+      }}
+    />,
   );
 
-  expect(order).not.toContain(-1);
-  expect(order).toStrictEqual(order.toSorted((left, right) => left - right));
+  expect(html).toContain('Provided by');
+  expect(html).not.toContain('Who made it');
+  expect(html).not.toContain('Who maintains what it runs on');
+  expect(html).not.toContain('about-maintainers');
+  expect(html).toContain(
+    '<li><strong>Michaël Zasso</strong> — maintains OpenChemLib and the tooling this site is built with, at <a href="https://www.zakodium.com" target="_blank" rel="noopener noreferrer">Zakodium</a>.</li>',
+  );
+});
+
+test('a site made with others says who made it, and who maintains what it runs on apart', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        credits: ['openchemlib', 'react-ocl', 'react-science', 'react'],
+        contributors: [{ name: 'Alain Borel', role: 'co-authored the paper.' }],
+      }}
+    />,
+  );
+  const zakodium =
+    '<a href="https://www.zakodium.com" target="_blank" rel="noopener noreferrer">Zakodium</a>';
+
+  expect(html).toContain('Who made it');
+  expect(html).not.toContain('Provided by');
+  expect(html).toContain(
+    `<li><strong>Daniel Kostro</strong> — maintains react-science, at ${zakodium}.</li>`,
+  );
+  expect(html).toContain(
+    `<li><strong>Michaël Zasso</strong> — maintains OpenChemLib, react-ocl, react-science, and the tooling this site is built with, at ${zakodium}.</li>`,
+  );
+  expect(html.indexOf('<strong>Alain Borel</strong>')).toBeLessThan(
+    html.indexOf('Who maintains what it runs on'),
+  );
+  expect(html.indexOf('Who maintains what it runs on')).toBeLessThan(
+    html.indexOf('<strong>Daniel Kostro</strong>'),
+  );
+  expect(html.indexOf('<strong>Michaël Zasso</strong>')).toBeLessThan(
+    html.indexOf('Built on'),
+  );
+});
+
+test('the people whose work a site is come first, linked to where they work', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        leads: [
+          {
+            name: 'Adrian Mirza',
+            role: 'developed SECS, at {organisation}.',
+            organisation: { name: 'LamaLab', href: 'https://lamalab.org' },
+          },
+        ],
+      }}
+    />,
+  );
+
+  expect(html).toContain(
+    '<li><strong>Adrian Mirza</strong> — developed SECS, at <a href="https://lamalab.org" target="_blank" rel="noopener noreferrer">LamaLab</a>.</li>',
+  );
+  expect(html).toContain(
+    '<li><strong>Luc Patiny</strong> — wrote this web interface.</li>',
+  );
+  expect(html).not.toContain('had the idea');
+  expect(html.indexOf('<strong>Adrian Mirza</strong>')).toBeLessThan(
+    html.indexOf('<strong>Luc Patiny</strong>'),
+  );
+});
+
+test('an institution with no drawing of its own is its name in type', () => {
+  const html = renderToStaticMarkup(
+    <AboutPage
+      content={{
+        ...SMILES,
+        people: [{ name: 'Kevin Maik Jablonka' }, { name: 'Luc Patiny' }],
+        providedBy: ['fsu-jena', 'zakodium'],
+      }}
+    />,
+  );
+
+  expect(html).toContain('href="https://www.uni-jena.de"');
+  expect(html).toContain('<span>University of Jena</span>');
+  expect(html).toContain('Friedrich Schiller University Jena');
+  expect(html).toContain('Zakodium Sàrl');
+  expect(html).toContain('Lonay, Switzerland');
+  expect(html).not.toContain('epfl.ch');
 });
 
 test('a site naming nobody and no provider still lists the family', () => {

@@ -49,4 +49,18 @@ export const PROVIDERS = [
     href: 'https://www.unil.ch/esc/',
     location: 'Lausanne, Switzerland',
   },
+  {
+    id: 'fsu-jena',
+    name: 'University of Jena',
+    fullName: 'Friedrich Schiller University Jena',
+    href: 'https://www.uni-jena.de',
+    location: 'Jena, Germany',
+  },
+  {
+    id: 'zakodium',
+    name: 'Zakodium',
+    fullName: 'Zakodium Sàrl',
+    href: 'https://www.zakodium.com',
+    location: 'Lonay, Switzerland',
+  },
 ] as const satisfies readonly ProviderEntry[];

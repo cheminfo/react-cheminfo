@@ -1871,21 +1871,45 @@ await expect.poll(() => readLastHeight(page)).toBe(height);
 
 ## Who an About names
 
-Under "Provided by", the names beside the logo are the site's `people`: who
-provides it. The list under them starts with the family: Luc Patiny, who had
-the idea and coordinates; Daniel Kostro, at Zakodium, on a site crediting
-react-science; Michaël Zasso, at Zakodium, for the tooling, and OpenChemLib
-where it is credited. The site's own `contributors` follow, one line each:
+On a site Luc Patiny made alone, "Provided by" holds everything: the names beside
+the logo are the site's `people`, and the list under them is the family: Luc
+Patiny, who had the idea and coordinates; Daniel Kostro, at Zakodium, on a site
+crediting react-science; Michaël Zasso, at Zakodium, for the tooling, and
+OpenChemLib where it is credited.
 
 ```ts
 people: [{ name: 'Luc Patiny' }],
-contributors: [{ name: 'Régis Turin', role: 'wrote the exercises.' }],
 providedBy: ['epfl'],
 ```
 
-`FAMILY_PEOPLE` holds the three and their roles, in every language of the
-chrome; a site never writes a role for one of them, and `aboutProblems` says
-so.
+A site made with anybody else names them, each with one line, and the page then
+separates two things that would otherwise read as one. "Who made it" lists the
+site's `leads`, Luc Patiny, then its `contributors`; "Who maintains what it runs
+on", further down, lists who keeps its libraries going, from `FAMILY_MAINTAINERS`
+and what the site credits.
+
+```ts
+contributors: [{ name: 'Régis Turin', role: 'wrote the exercises.' }],
+```
+
+A site built around somebody else's science names them in `leads`, which puts
+them first and has Luc Patiny's line say he wrote the web interface instead of
+having had the idea. Where a paper has an author-contribution statement, the
+roles come from it, and his line may too, written among the `contributors`.
+`{organisation}` in a role is where the link goes:
+
+```ts
+leads: [
+  {
+    name: 'Adrian Mirza',
+    role: 'ideated SECS with Kevin Maik Jablonka and developed the backend, at {organisation}.',
+    organisation: { name: 'LamaLab', href: 'https://lamalab.org' },
+  },
+],
+```
+
+`aboutProblems` refuses a role written for Luc Patiny on a site naming no leads,
+and an organisation without its place in the role.
 
 ## Saying which build is running
 

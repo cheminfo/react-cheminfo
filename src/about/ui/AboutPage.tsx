@@ -9,6 +9,7 @@ import type { AboutContent } from '../core/about.ts';
 import { resolveAbout } from '../core/about.ts';
 
 import { AboutCitations } from './AboutCitations.tsx';
+import { AboutMaintainers } from './AboutMaintainers.tsx';
 import { AboutProvidedBy } from './AboutProvidedBy.tsx';
 import { AboutSection } from './AboutSection.tsx';
 import type { AboutSignInProps } from './AboutSignIn.tsx';
@@ -70,6 +71,7 @@ export function AboutPage(props: AboutPageProps): ReactElement {
   const { content, className, children, logo, mark, signIn } = props;
   const t = useChromeT();
   const about = resolveAbout(content);
+  const madeWithOthers = about.maintainers.length > 0;
   const site = about.site;
   const hasCorner =
     buildLabel(about.build) !== undefined || signIn !== undefined;
@@ -106,7 +108,7 @@ export function AboutPage(props: AboutPageProps): ReactElement {
       about.providedBy.length === 0 &&
       about.team.length === 0 ? null : (
         <AboutSection
-          title={t('about.providedBy')}
+          title={t(madeWithOthers ? 'about.whoMadeIt' : 'about.providedBy')}
           className="about-provided-by"
         >
           <AboutProvidedBy
@@ -139,6 +141,15 @@ export function AboutPage(props: AboutPageProps): ReactElement {
       )}
 
       {children}
+
+      {madeWithOthers ? (
+        <AboutSection
+          title={t('about.maintainers')}
+          className="about-maintainers"
+        >
+          <AboutMaintainers maintainers={about.maintainers} />
+        </AboutSection>
+      ) : null}
 
       <AboutSection title={t('about.builtOn')} className="about-credits">
         <BuiltOn entries={about.credits} build={about.build} />

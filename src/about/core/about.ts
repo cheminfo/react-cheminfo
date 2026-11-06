@@ -7,8 +7,8 @@ import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 
 import type { ProviderEntry, ProviderId } from './providers.ts';
 import { providers } from './providers.ts';
-import type { TeamMember } from './team.ts';
-import { aboutTeam, isFamilyPerson } from './team.ts';
+import type { MaintainerLine, Organisation, TeamMember } from './team.ts';
+import { COORDINATOR, aboutMaintainers, aboutTeam } from './team.ts';
 
 /**
  * What a site says about itself: the one page a visitor opens to find out what
@@ -44,14 +44,23 @@ export interface AboutContent {
    */
   cite?: readonly CitedWork[];
   /**
+   * The people whose work this site is, listed first and ahead of the family's
+   * coordinator: a site built around somebody else's science says so. Luc
+   * Patiny's line then says he wrote the web interface, unless `contributors`
+   * writes it, as a paper's author contributions do.
+   * @default undefined
+   */
+  leads?: ReadonlyArray<AboutPerson & { role: string }>;
+  /**
    * Who provides the site, named under "Provided by"; a role, when given,
    * is listed under the names.
    * @default undefined
    */
   people?: readonly AboutPerson[];
   /**
-   * Who else worked on the site, listed under the names with what they did,
-   * after the family's own people.
+   * Who else worked on the site, listed under the names with what they did.
+   * Naming anyone turns "Provided by" into "Who made it", and moves the people
+   * maintaining what the site runs on to a section of their own.
    * @default undefined
    */
   contributors?: readonly AboutPerson[];
@@ -74,10 +83,16 @@ export interface AboutPerson {
   /** Their name, as they write it. */
   name: string;
   /**
-   * What they contributed, in one line.
+   * What they contributed, in one line. `{organisation}` in it is where the
+   * link to their organisation goes.
    * @default undefined
    */
   role?: string;
+  /**
+   * Where they did it, which needs `{organisation}` in the role.
+   * @default undefined
+   */
+  organisation?: Organisation;
 }
 
 /**
@@ -98,10 +113,15 @@ export interface ResolvedAbout {
   /** Who provides the site, empty when the site names nobody. */
   people: readonly AboutPerson[];
   /**
-   * The list under the names: the family's people where they apply, then
-   * whoever else the site names with a role.
+   * The list under the names: who made the site, when it names anyone besides
+   * the family's coordinator, or else the family's people where they apply.
    */
   team: readonly TeamMember[];
+  /**
+   * Who maintains what the site runs on, in a section of their own: empty
+   * unless the site was made with somebody besides the family's coordinator.
+   */
+  maintainers: readonly MaintainerLine[];
   /** The institutions providing the site, empty when the site names none. */
   providedBy: ProviderEntry[];
   /** Which build is running, or `undefined` when the site does not say. */
@@ -122,6 +142,7 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
       ? siteById(content.siteId)
       : content.siteId;
   const borrowed = credits(content.credits);
+  const named = [...(content.people ?? []), ...(content.contributors ?? [])];
   return {
     site,
     what: content.what,
@@ -130,10 +151,8 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
     credits: borrowed,
     cite: content.cite ?? [],
     people: content.people ?? [],
-    team: aboutTeam(
-      [...(content.people ?? []), ...(content.contributors ?? [])],
-      borrowed,
-    ),
+    team: aboutTeam(named, borrowed, content.leads),
+    maintainers: aboutMaintainers(named, borrowed, content.leads),
     providedBy: providers(content.providedBy ?? []),
     build: content.build,
   };
@@ -189,15 +208,23 @@ export function aboutProblems(content: AboutContent): string[] {
   }
 
   for (const person of [
+    ...(content.leads ?? []),
     ...(content.people ?? []),
     ...(content.contributors ?? []),
   ]) {
     if (
       person.role !== undefined &&
-      isFamilyPerson(person.name, content.credits)
+      person.name === COORDINATOR &&
+      !content.leads?.length
     ) {
       problems.push(
         `${person.name} is one of the family's people: every site lists them with the same role, so leave \`role\` out.`,
+      );
+    }
+    const linksOrganisation = person.role?.includes('{organisation}') ?? false;
+    if (linksOrganisation !== (person.organisation !== undefined)) {
+      problems.push(
+        `${person.name}: \`organisation\` and \`{organisation}\` in the role go together, or the link is lost or the placeholder shows.`,
       );
     }
   }
