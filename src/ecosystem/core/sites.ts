@@ -398,6 +398,19 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     // white it reads at 5.9:1.
     mark: { plate: '#ffffff', accent: '#c0261d', edge: '#dfe3e8' },
   },
+  {
+    id: 'tlc',
+    name: { lead: 'tlc', alt: 'cheminfo', dot: true },
+    host: 'tlc.cheminfo.org',
+    tagline: 'Read a TLC plate, get its Rf, and weigh its eluent.',
+    group: 'practice',
+    // Permanganate, the violet a plate is so often stained with: 15:1 on white.
+    brand: '#3b0764',
+    // The glow of a fluorescent plate under a 254 nm lamp sits at 1.6:1 on
+    // white, so the wordmark sets its second half in this darker green, at 5:1.
+    brandAlt: '#15803d',
+    mark: { plate: '#3b0764', accent: '#4ade80' },
+  },
 ];
 
 /** How a link to a site is written, beyond the site itself. */

@@ -36,7 +36,8 @@ export type SiteId =
   | 'wikidata'
   | 'mz'
   | 'vibrations'
-  | 'draw';
+  | 'draw'
+  | 'tlc';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

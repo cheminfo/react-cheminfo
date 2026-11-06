@@ -622,4 +622,13 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <circle cx="20.55" cy="8.05" r="1.25" fill="#ffffff" />
     </>
   ),
+  // A plate under a UV lamp: it glows in the answering colour, and two spots
+  // that ran to different heights stay dark on it.
+  tlc: (alt) => (
+    <>
+      <rect x="9" y="4" width="14" height="24" rx="1.5" fill={alt} />
+      <ellipse cx="13" cy="11" rx="2.8" ry="2.4" fill="#3b0764" />
+      <ellipse cx="19" cy="19" rx="2.8" ry="2.4" fill="#3b0764" />
+    </>
+  ),
 };
