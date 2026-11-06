@@ -18,7 +18,8 @@ test('an entry carries its name, address, sentence and licence', () => {
     {
       id: 'openchemlib',
       name: 'OpenChemLib',
-      href: 'https://github.com/cheminfo/openchemlib-js',
+      href: 'https://www.npmjs.com/package/openchemlib',
+      own: true,
       description:
         'reads and writes structures, and computes their properties in the browser.',
       license: 'BSD-3-Clause',
@@ -57,7 +58,8 @@ test('wikidata credits its sources, its reader and its search', () => {
     {
       id: 'openchemlib-sqlite',
       name: 'openchemlib-sqlite',
-      href: 'https://github.com/cheminfo/openchemlib-sqlite',
+      href: 'https://www.npmjs.com/package/openchemlib-sqlite',
+      own: true,
       description: 'the substructure and similarity search, inside SQLite.',
       license: 'MIT',
     },
@@ -82,13 +84,13 @@ test('the same work asked for twice is listed twice', () => {
 
 test('react-ocl and react-mf are published by zakodium-oss', () => {
   expect(creditOf('react-ocl')?.href).toBe(
-    'https://github.com/zakodium-oss/react-ocl',
+    'https://www.npmjs.com/package/react-ocl',
   );
   expect(creditOf('react-mf')?.href).toBe(
-    'https://github.com/zakodium-oss/react-mf',
+    'https://www.npmjs.com/package/react-mf',
   );
   expect(creditOf('react-science')?.href).toBe(
-    'https://github.com/zakodium-oss/react-science',
+    'https://www.npmjs.com/package/react-science',
   );
 });
 
@@ -122,6 +124,7 @@ test('NMRium names both its licences, and PubChem, a source of data, none', () =
       id: 'nmrium',
       name: 'NMRium',
       href: 'https://www.nmrium.org/',
+      own: true,
       description:
         'displays and processes the NMR spectra, read from their original files.',
       license: 'MIT AND CC-BY-NC-SA-4.0',
@@ -174,7 +177,7 @@ test('the function-key dictionary credits every source it adapts, under its lice
   ).toStrictEqual([
     [
       'openchemlib-search-wasm',
-      'https://github.com/cheminfo/openchemlib-search-wasm',
+      'https://www.npmjs.com/package/openchemlib-search-wasm',
       'BSD-3-Clause',
     ],
     ['ChemCaption', 'https://github.com/lamalab-org/chem-caption', 'MIT'],

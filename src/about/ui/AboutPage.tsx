@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import { buildLabel } from '../../build/core/buildInfo.ts';
-import { CreditsList } from '../../credits/ui/CreditsList.tsx';
+import { BuiltOn } from '../../credits/ui/BuiltOn.tsx';
 import { Wordmark } from '../../ecosystem/ui/Wordmark.tsx';
 import { SiteMark } from '../../ecosystem/ui/marks.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
@@ -141,7 +141,7 @@ export function AboutPage(props: AboutPageProps): ReactElement {
       {children}
 
       <AboutSection title={t('about.builtOn')} className="about-credits">
-        <CreditsList entries={about.credits} />
+        <BuiltOn entries={about.credits} build={about.build} />
       </AboutSection>
 
       {about.cite.length === 0 ? null : (

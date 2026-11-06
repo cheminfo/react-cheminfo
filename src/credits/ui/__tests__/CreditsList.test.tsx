@@ -9,7 +9,7 @@ test('each work is a link, followed by its licence and its sentence', () => {
     <CreditsList entries={credits(['openchemlib', 'molstar'])} />,
   );
 
-  expect(html).toContain('href="https://github.com/cheminfo/openchemlib-js"');
+  expect(html).toContain('href="https://www.npmjs.com/package/openchemlib"');
   expect(html).toContain('OpenChemLib');
   expect(html).toContain('BSD-3-Clause');
   expect(html).toContain('href="https://molstar.org/"');

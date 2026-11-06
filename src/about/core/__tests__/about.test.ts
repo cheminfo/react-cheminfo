@@ -64,7 +64,8 @@ test('credit ids become the entries of the shared registry, in order', () => {
     {
       id: 'openchemlib',
       name: 'OpenChemLib',
-      href: 'https://github.com/cheminfo/openchemlib-js',
+      href: 'https://www.npmjs.com/package/openchemlib',
+      own: true,
       description:
         'reads and writes structures, and computes their properties in the browser.',
       license: 'BSD-3-Clause',

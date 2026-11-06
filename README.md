@@ -1918,6 +1918,13 @@ family answers one question with one request each:
 curl -s https://smiles.cheminfo.org/build-info.json
 ```
 
+The same plugin lists what the build hands to its visitors, read off the
+finished bundle, workers included and tree-shaken packages left out:
+**`packages.json`** (name, version, licence, and whether the family maintains
+it) and **`licenses.txt`** (every licence text). `<AboutPage>` fetches the list,
+so Built on shows our packages in full and folds the others, with nothing for a
+site to wire. A page with no list still draws the works its record credits.
+
 ## A page waiting for data
 
 `<DataDropZone>` is what a page shows until it has something to work on. It

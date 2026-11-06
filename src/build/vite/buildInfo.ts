@@ -17,6 +17,7 @@ import type { Plugin } from 'vite';
 import type { BuildInfo } from '../core/buildInfo.ts';
 import { UNRELEASED_VERSION } from '../core/buildInfo.ts';
 
+import { createPackageCollector } from './bundledPackages.ts';
 import { commitFromEnvironment, readGitHead } from './gitHead.ts';
 
 /** The module a site imports its build record from. */
@@ -52,6 +53,7 @@ export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
   let root = process.cwd();
   let outDir = 'dist';
   let info: BuildInfo = resolveBuildInfo(root);
+  const packages = createPackageCollector();
 
   return {
     name: 'cheminfo-build-info',
@@ -59,8 +61,14 @@ export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
     // which exports `undefined`; and the dependency optimizer pre-bundles a
     // bare specifier without asking a plugin at all.
     enforce: 'pre',
-    config() {
-      return { optimizeDeps: { exclude: [BUILD_INFO_MODULE] } };
+    config(config) {
+      const workerPlugins = config.worker?.plugins;
+      return {
+        optimizeDeps: { exclude: [BUILD_INFO_MODULE] },
+        worker: {
+          plugins: () => [...(workerPlugins?.() ?? []), packages.workerPlugin],
+        },
+      };
     },
     configResolved(config) {
       root = config.root;
@@ -74,7 +82,11 @@ export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
       if (id !== RESOLVED_MODULE) return undefined;
       return `export const BUILD_INFO = ${JSON.stringify(info)};\n`;
     },
+    generateBundle(_options, bundle) {
+      packages.record(bundle);
+    },
     closeBundle() {
+      packages.write(resolve(root, outDir));
       if (fileName === false) return;
       const target = resolve(root, outDir, fileName);
       mkdirSync(dirname(target), { recursive: true });

@@ -80,7 +80,7 @@ test('every line of what a visitor can do is written, and the context under it',
 test('the borrowed works are the registry entries, licence included', () => {
   const html = renderToStaticMarkup(<AboutPage content={SMILES} />);
 
-  expect(html).toContain('href="https://github.com/cheminfo/openchemlib-js"');
+  expect(html).toContain('href="https://www.npmjs.com/package/openchemlib"');
   expect(html).toContain('>BSD-3-Clause</span>');
   expect(html).toContain('the component model the pages are written in.');
 });

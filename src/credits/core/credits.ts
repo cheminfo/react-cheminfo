@@ -13,6 +13,17 @@ export interface CreditEntry {
    * @default undefined — the work carries no licence of its own here
    */
   license?: string;
+  /**
+   * Whether the family maintains it, which puts it first under Built on.
+   * @default false
+   */
+  own?: boolean;
+  /**
+   * Its name on npm, when that is not its id: the package a build lists under
+   * this name is then not written a second time.
+   * @default the id
+   */
+  packageName?: string;
 }
 
 /** An id the registry answers to. */
@@ -65,7 +76,8 @@ export const CREDITS = [
   {
     id: 'openchemlib',
     name: 'OpenChemLib',
-    href: 'https://github.com/cheminfo/openchemlib-js',
+    href: 'https://www.npmjs.com/package/openchemlib',
+    own: true,
     description:
       'reads and writes structures, and computes their properties in the browser.',
     license: 'BSD-3-Clause',
@@ -73,21 +85,24 @@ export const CREDITS = [
   {
     id: 'openchemlib-utils',
     name: 'openchemlib-utils',
-    href: 'https://github.com/cheminfo/openchemlib-utils',
+    href: 'https://www.npmjs.com/package/openchemlib-utils',
+    own: true,
     description: 'the structure helpers built on top of OpenChemLib.',
     license: 'MIT',
   },
   {
     id: 'openchemlib-sqlite',
     name: 'openchemlib-sqlite',
-    href: 'https://github.com/cheminfo/openchemlib-sqlite',
+    href: 'https://www.npmjs.com/package/openchemlib-sqlite',
+    own: true,
     description: 'the substructure and similarity search, inside SQLite.',
     license: 'MIT',
   },
   {
     id: 'openchemlib-search-wasm',
     name: 'openchemlib-search-wasm',
-    href: 'https://github.com/cheminfo/openchemlib-search-wasm',
+    href: 'https://www.npmjs.com/package/openchemlib-search-wasm',
+    own: true,
     description:
       'the functional-group keys of every structure, and the dictionary that names them.',
     license: 'BSD-3-Clause',
@@ -134,14 +149,16 @@ export const CREDITS = [
   {
     id: 'react-ocl',
     name: 'react-ocl',
-    href: 'https://github.com/zakodium-oss/react-ocl',
+    href: 'https://www.npmjs.com/package/react-ocl',
+    own: true,
     description: 'the structure editor you draw in, and the 2D renderer.',
     license: 'MIT',
   },
   {
     id: 'react-mf',
     name: 'react-mf',
-    href: 'https://github.com/zakodium-oss/react-mf',
+    href: 'https://www.npmjs.com/package/react-mf',
+    own: true,
     description:
       'typesets a molecular formula, subscripts, isotopes and charges included.',
     license: 'MIT',
@@ -149,7 +166,8 @@ export const CREDITS = [
   {
     id: 'mass-tools',
     name: 'mass-tools',
-    href: 'https://github.com/cheminfo/mass-tools',
+    href: 'https://www.npmjs.com/package/mass-tools',
+    own: true,
     description:
       'parses molecular formulas and computes masses and isotopic distributions.',
     license: 'MIT',
@@ -157,7 +175,8 @@ export const CREDITS = [
   {
     id: 'chem-equilibrium',
     name: 'chem-equilibrium',
-    href: 'https://github.com/cheminfo/chem-equilibrium',
+    href: 'https://www.npmjs.com/package/chem-equilibrium',
+    own: true,
     description:
       'builds the mass-balance system of a solution and finds its root.',
     license: 'MIT',
@@ -165,35 +184,40 @@ export const CREDITS = [
   {
     id: 'ml-matrix',
     name: 'ml-matrix',
-    href: 'https://github.com/mljs/matrix',
+    href: 'https://www.npmjs.com/package/ml-matrix',
+    own: true,
     description: 'the linear algebra behind the numbers on the page.',
     license: 'MIT',
   },
   {
     id: 'ml-xsadd',
     name: 'ml-xsadd',
-    href: 'https://github.com/mljs/xsadd',
+    href: 'https://www.npmjs.com/package/ml-xsadd',
+    own: true,
     description: 'the seeded generator a reproducible series is drawn from.',
     license: 'MIT',
   },
   {
     id: 'cif-to-json',
     name: 'cif-to-json',
-    href: 'https://github.com/cheminfo/cif-to-json',
+    href: 'https://www.npmjs.com/package/cif-to-json',
+    own: true,
     description: 'the reader that turns a crystallographic file into data.',
     license: 'MIT',
   },
   {
     id: 'ml-spectra-processing',
     name: 'ml-spectra-processing',
-    href: 'https://github.com/mljs/spectra-processing',
+    href: 'https://www.npmjs.com/package/ml-spectra-processing',
+    own: true,
     description: 'the array and spectrum operations the data goes through.',
     license: 'MIT',
   },
   {
     id: 'ml-distance',
     name: 'ml-distance',
-    href: 'https://github.com/mljs/distance',
+    href: 'https://www.npmjs.com/package/ml-distance',
+    own: true,
     description:
       'the distance and similarity measures spectra are compared by.',
     license: 'MIT',
@@ -201,28 +225,32 @@ export const CREDITS = [
   {
     id: 'spectrum-generator',
     name: 'spectrum-generator',
-    href: 'https://github.com/cheminfo/spectrum-generator',
+    href: 'https://www.npmjs.com/package/spectrum-generator',
+    own: true,
     description: 'turns a list of bands into a broadened spectrum.',
     license: 'MIT',
   },
   {
     id: 'ir-spectrum',
     name: 'ir-spectrum',
-    href: 'https://github.com/cheminfo/ir-spectrum',
+    href: 'https://www.npmjs.com/package/ir-spectrum',
+    own: true,
     description: 'reads infrared spectra from JCAMP-DX, SPC and text files.',
     license: 'MIT',
   },
   {
     id: 'raman-spectrum',
     name: 'raman-spectrum',
-    href: 'https://github.com/cheminfo/raman-spectrum',
+    href: 'https://www.npmjs.com/package/raman-spectrum',
+    own: true,
     description: 'reads Raman spectra, Renishaw WDF files included.',
     license: 'MIT',
   },
   {
     id: 'spc-parser',
     name: 'spc-parser',
-    href: 'https://github.com/cheminfo/spc-parser',
+    href: 'https://www.npmjs.com/package/spc-parser',
+    own: true,
     description:
       'reads the SPC files of Thermo Galactic GRAMS, Shimadzu and PerkinElmer.',
     license: 'MIT',
@@ -230,7 +258,8 @@ export const CREDITS = [
   {
     id: 'ms-spectrum',
     name: 'ms-spectrum',
-    href: 'https://github.com/cheminfo/mass-tools/tree/main/packages/ms-spectrum',
+    href: 'https://www.npmjs.com/package/ms-spectrum',
+    own: true,
     description:
       'tells a profile from a peak table, picks the peaks and establishes their charges.',
     license: 'MIT',
@@ -238,7 +267,8 @@ export const CREDITS = [
   {
     id: 'ml-gsd',
     name: 'ml-gsd',
-    href: 'https://github.com/mljs/global-spectral-deconvolution',
+    href: 'https://www.npmjs.com/package/ml-gsd',
+    own: true,
     description: 'finds the peaks of a continuous spectrum, and their widths.',
     license: 'MIT',
   },
@@ -246,20 +276,23 @@ export const CREDITS = [
     id: 'jcampconverter',
     name: 'jcampconverter',
     href: 'https://www.npmjs.com/package/jcampconverter',
+    own: true,
     description: 'reads JCAMP-DX files.',
     license: 'CC-BY-NC-SA-4.0',
   },
   {
     id: 'xy-parser',
     name: 'xy-parser',
-    href: 'https://github.com/cheminfo/xy-parser',
+    href: 'https://www.npmjs.com/package/xy-parser',
+    own: true,
     description: 'reads two columns of numbers out of any text file.',
     license: 'MIT',
   },
   {
     id: 'convert-to-jcamp',
     name: 'convert-to-jcamp',
-    href: 'https://github.com/cheminfo/convert-to-jcamp',
+    href: 'https://www.npmjs.com/package/convert-to-jcamp',
+    own: true,
     description: 'writes spectra back out as JCAMP-DX.',
     license: 'MIT',
   },
@@ -267,6 +300,7 @@ export const CREDITS = [
     id: 'occ',
     name: 'OCC',
     href: 'https://github.com/peterspackman/occ',
+    packageName: '@peterspackman/occjs',
     description:
       'the GFN2-xTB implementation the refined geometries and energies come from.',
     license: 'GPL-3.0',
@@ -282,7 +316,8 @@ export const CREDITS = [
   {
     id: 'xtb-wasm',
     name: 'xtb-wasm',
-    href: 'https://github.com/cheminfo/xtb-wasm',
+    href: 'https://www.npmjs.com/package/xtb-wasm',
+    own: true,
     description:
       'GFN2-xTB compiled to WebAssembly, driven from a pool of web workers.',
     license: 'GPL-3.0-or-later',
@@ -299,6 +334,7 @@ export const CREDITS = [
     id: 'xtbservice',
     name: 'xtbservice',
     href: 'https://github.com/cheminfo-py/xtbservice',
+    own: true,
     description:
       'the curated teaching collections of molecules, and the guided tour through them.',
     license: 'MIT',
@@ -316,6 +352,7 @@ export const CREDITS = [
     id: 'nmrium',
     name: 'NMRium',
     href: 'https://www.nmrium.org/',
+    own: true,
     description:
       'displays and processes the NMR spectra, read from their original files.',
     license: 'MIT AND CC-BY-NC-SA-4.0',
@@ -325,6 +362,7 @@ export const CREDITS = [
     id: 'nmr-processing',
     name: 'nmr-processing',
     href: 'https://www.npmjs.com/package/nmr-processing',
+    own: true,
     description:
       'simulates NMR spectra from chemical shifts and coupling constants.',
     license: 'CC-BY-NC-SA-4.0',
@@ -333,6 +371,7 @@ export const CREDITS = [
     id: 'blueprint',
     name: 'Blueprint',
     href: 'https://blueprintjs.com/',
+    packageName: '@blueprintjs/core',
     description:
       'the interface components — cards, dialogs, inputs, tables and tags.',
     license: 'Apache-2.0',
@@ -340,7 +379,8 @@ export const CREDITS = [
   {
     id: 'react-science',
     name: 'react-science',
-    href: 'https://github.com/zakodium-oss/react-science',
+    href: 'https://www.npmjs.com/package/react-science',
+    own: true,
     description:
       'the scientific application shell this family of sites shares.',
     license: 'MIT',
@@ -348,14 +388,16 @@ export const CREDITS = [
   {
     id: 'react-cheminfo',
     name: 'react-cheminfo',
-    href: 'https://github.com/cheminfo/react-cheminfo',
+    href: 'https://www.npmjs.com/package/react-cheminfo',
+    own: true,
     description: 'the shared chrome and conventions of the cheminfo sites.',
     license: 'MIT',
   },
   {
     id: 'cheminfo-font',
     name: 'cheminfo-font',
-    href: 'https://github.com/cheminfo/font',
+    href: 'https://www.npmjs.com/package/cheminfo-font',
+    own: true,
     description: 'the chemistry glyphs the toolbars are drawn with.',
     license: 'CC-BY-4.0',
   },
@@ -363,13 +405,15 @@ export const CREDITS = [
     id: 'nivo',
     name: 'nivo',
     href: 'https://nivo.rocks/',
+    packageName: '@nivo/core',
     description: 'draws the charts — the curves, the diagrams and the axes.',
     license: 'MIT',
   },
   {
     id: 'react-plot',
     name: 'react-plot',
-    href: 'https://github.com/zakodium-oss/react-plot',
+    href: 'https://www.npmjs.com/package/react-plot',
+    own: true,
     description: 'the SVG plots a spectrum is drawn and zoomed in.',
     license: 'MIT',
   },
@@ -398,20 +442,23 @@ export const CREDITS = [
     id: 'dnd-kit',
     name: 'dnd kit',
     href: 'https://dndkit.com/',
+    packageName: '@dnd-kit/core',
     description: 'the dragging that arranges things into an order.',
     license: 'MIT',
   },
   {
     id: 'react-roi',
     name: 'react-roi',
-    href: 'https://github.com/zakodium-oss/react-roi',
+    href: 'https://www.npmjs.com/package/react-roi',
+    own: true,
     description: 'the box a region of an image is drawn with.',
     license: 'MIT',
   },
   {
     id: 'file-collection',
     name: 'file-collection',
-    href: 'https://github.com/cheminfo/file-collection',
+    href: 'https://www.npmjs.com/package/file-collection',
+    own: true,
     description: 'the reader that takes dropped files, folders and archives.',
     license: 'MIT',
   },
@@ -419,6 +466,7 @@ export const CREDITS = [
     id: 'zip-js',
     name: 'zip.js',
     href: 'https://github.com/gildas-lormeau/zip.js',
+    packageName: '@zip.js/zip.js',
     description: 'the ZIP archives that are read and written in the browser.',
     license: 'BSD-3-Clause',
   },
@@ -426,6 +474,7 @@ export const CREDITS = [
     id: 'preact-signals',
     name: 'Preact Signals',
     href: 'https://preactjs.com/guide/v10/signals/',
+    packageName: '@preact/signals-react',
     description: 'the state the pages read, without a store around it.',
     license: 'MIT',
   },

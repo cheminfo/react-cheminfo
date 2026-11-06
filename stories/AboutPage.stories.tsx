@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import type { AboutContent } from '../src/about/core/about.ts';
 import { AboutPage } from '../src/about/ui/AboutPage.tsx';
+import type { BundledPackage } from '../src/build/core/bundledPackages.ts';
+import { BUNDLED_PACKAGES_FILE } from '../src/build/core/bundledPackages.ts';
 import { PLATFORM_WORK } from '../src/citation/core/platformPaper.ts';
 import { SiteTheme } from '../src/ecosystem/ui/SiteTheme.tsx';
 
@@ -32,10 +34,28 @@ const CITED: AboutContent = {
   },
 };
 
+// What the build writes next to the page, which a story has no build to write.
+const PACKAGES: BundledPackage[] = [
+  { name: 'mf-parser', version: '3.4.0', license: 'MIT', own: true },
+  { name: 'react-cheminfo', version: '0.94.0', license: 'MIT', own: true },
+  { name: 'react', version: '19.3.0', license: 'MIT', own: false },
+  { name: 'tslib', version: '2.8.1', license: '0BSD', own: false },
+];
+
 const meta = {
   title: 'About/AboutPage',
   component: AboutPage,
   args: { content: SMILES },
+  beforeEach: () => {
+    const { fetch: realFetch } = globalThis;
+    globalThis.fetch = (input, init) =>
+      typeof input === 'string' && input.endsWith(`/${BUNDLED_PACKAGES_FILE}`)
+        ? Promise.resolve(Response.json(PACKAGES))
+        : realFetch(input, init);
+    return () => {
+      globalThis.fetch = realFetch;
+    };
+  },
   parameters: {
     layout: 'fullscreen',
     docs: {
