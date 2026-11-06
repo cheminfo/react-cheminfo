@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.94.0](https://github.com/cheminfo/react-cheminfo/compare/v0.93.0...v0.94.0) (2026-11-06)
+
+
+### Features
+
+* add DataDropZone, one zone for a page waiting for data ([4f2c17d](https://github.com/cheminfo/react-cheminfo/commit/4f2c17d9d796334ba36dd9ec4b744c32c07231a6))
+
 ## [0.93.0](https://github.com/cheminfo/react-cheminfo/compare/v0.92.0...v0.93.0) (2026-11-06)
 
 
