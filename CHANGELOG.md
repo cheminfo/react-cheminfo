@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.97.0](https://github.com/cheminfo/react-cheminfo/compare/v0.96.0...v0.97.0) (2026-11-06)
+
+
+### Features
+
+* say who made a site, and who maintains what it runs on ([1353330](https://github.com/cheminfo/react-cheminfo/commit/1353330767ca01756ab00ea311fc82f62f9a7806))
+
 ## [0.96.0](https://github.com/cheminfo/react-cheminfo/compare/v0.95.0...v0.96.0) (2026-11-06)
 
 
