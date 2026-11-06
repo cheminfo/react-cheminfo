@@ -186,9 +186,19 @@ function licenseBlock(source: string, entry: BundledPackage): string {
 
 function licenseTexts(directory: string): string[] {
   const texts: string[] = [];
-  for (const file of readdirSync(directory).toSorted()) {
-    if (LICENSE_FILE.test(file)) {
-      texts.push(readFileSync(join(directory, file), 'utf8').trim(), '');
+  const entries = readdirSync(directory, { withFileTypes: true }).toSorted(
+    (a, b) => (a.name < b.name ? -1 : 1),
+  );
+  for (const entry of entries) {
+    if (!LICENSE_FILE.test(entry.name)) continue;
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      // REUSE keeps one file per licence in a `LICENSES` folder.
+      for (const file of readdirSync(path).toSorted()) {
+        texts.push(readFileSync(join(path, file), 'utf8').trim(), '');
+      }
+    } else {
+      texts.push(readFileSync(path, 'utf8').trim(), '');
     }
   }
   return texts;

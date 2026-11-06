@@ -241,3 +241,26 @@ test('a build that recorded nothing writes nothing', () => {
   expect(existsSync(join(root, 'packages.json'))).toBe(false);
   expect(existsSync(join(root, 'licenses.txt'))).toBe(false);
 });
+
+test('a folder of licences is read file by file, rather than failing the build', () => {
+  const { root, module } = install({
+    'node_modules/apidom': [
+      { name: 'apidom', version: '1.0.0', license: 'Apache-2.0' },
+    ],
+  });
+  const licenses = join(root, 'node_modules/apidom/LICENSES');
+  mkdirSync(licenses);
+  writeFileSync(join(licenses, 'Apache-2.0.txt'), 'Apache License');
+  writeFileSync(join(licenses, 'MIT.txt'), 'MIT License');
+  const collector = createPackageCollector();
+
+  collector.record({
+    'a.js': { type: 'chunk', modules: module('node_modules/apidom') },
+  });
+  collector.write(root);
+
+  const texts = readFileSync(join(root, 'licenses.txt'), 'utf8');
+
+  expect(texts).toContain('apidom 1.0.0 (Apache-2.0)');
+  expect(texts).toContain('Apache License\n\nMIT License');
+});
