@@ -259,10 +259,44 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     name: { lead: 'database', alt: 'cheminfo', dot: true },
     host: 'database.cheminfo.org',
     tagline: 'Query a real chemical dataset in SQL and in Mango.',
-    group: 'research',
+    group: 'computing',
     brand: '#7c2d12',
     brandAlt: '#0b6e85',
     mark: { plate: '#7c2d12', accent: '#06b6d4' },
+  },
+  {
+    id: 'chembio',
+    // The name splits on itself, chemistry and biology, so it carries no
+    // domain.
+    name: { lead: 'chem', alt: 'bio', dot: false },
+    host: 'chembio.cheminfo.org',
+    tagline: 'Natural products, and the organisms they were found in.',
+    group: 'research',
+    // Moss, the green of the plants most natural products come from, 8.5
+    // Oklab units from the nearest lead of the family.
+    brand: '#365314',
+    // A carotenoid orange answers it, 5.2:1 on white, and is also the plate of
+    // the mark.
+    brandAlt: '#c2410c',
+    // The leaf is a fresh lime, so it reads as a leaf on the orange plate and
+    // apart from the white ring at 16 px.
+    mark: { plate: '#c2410c', accent: '#a3e635' },
+  },
+  {
+    id: 'wikidata',
+    name: { lead: 'wikidata', alt: 'cheminfo', dot: true },
+    host: 'wikidata.cheminfo.org',
+    tagline: 'The chemistry of Wikipedia’s infoboxes, searchable by structure.',
+    group: 'research',
+    // A leather-binding brown, the bound encyclopedia, 7.3 Oklab units from the
+    // nearest lead of the family (database) and 9.4:1 on white.
+    brand: '#5c4033',
+    // Wikipedia's own link blue answers it, 5.4:1 on white, so it is also the
+    // text half of the wordmark.
+    brandAlt: '#3366cc',
+    // On the brown plate that blue sits 24.5 apart, under the family's floor,
+    // so the link row of the mark takes a lighter blue of the same hue.
+    mark: { plate: '#5c4033', accent: '#6b9bf2' },
   },
   {
     id: 'symmetry',

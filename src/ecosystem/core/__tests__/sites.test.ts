@@ -34,6 +34,8 @@ test('the family is the thirty-one sites, listed once each', () => {
     '3d',
     'periodic-table',
     'database',
+    'chembio',
+    'wikidata',
     'symmetry',
     'osiris',
     'atoms',
@@ -48,8 +50,6 @@ test('the family is the thirty-one sites, listed once each', () => {
 test('the sites not linked from the others yet are named apart', () => {
   expect(UNLISTED_SITES.map((site) => site.id)).toStrictEqual([
     'molecules',
-    'chembio',
-    'wikidata',
     'mz',
   ] satisfies SiteId[]);
 });

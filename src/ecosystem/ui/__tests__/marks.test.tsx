@@ -61,14 +61,18 @@ test('every site of the family has a mark that draws', () => {
 });
 
 test('a site no menu lists yet draws its mark from its identifier', () => {
-  const chembio = renderToStaticMarkup(<SiteMark siteId="chembio" />);
   const molecules = renderToStaticMarkup(<SiteMark siteId="molecules" />);
+
+  expect(molecules).toContain('fill="#be185d"');
+  expect(molecules).toContain('fill="#5eead4"');
+});
+
+test('chembio and wikidata draw the marks they brought with them', () => {
+  const chembio = renderToStaticMarkup(<SiteMark siteId="chembio" />);
   const wikidata = renderToStaticMarkup(<SiteMark siteId="wikidata" />);
 
   expect(chembio).toContain('fill="#c2410c"');
   expect(chembio).toContain('fill="#a3e635"');
-  expect(molecules).toContain('fill="#be185d"');
-  expect(molecules).toContain('fill="#5eead4"');
   expect(wikidata).toContain('fill="#5c4033"');
   expect(wikidata).toContain('fill="#6b9bf2"');
 });

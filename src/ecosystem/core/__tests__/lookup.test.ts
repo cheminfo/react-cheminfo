@@ -27,12 +27,10 @@ test('every site of the family is found by its own host', () => {
 });
 
 test('a site no menu lists yet is still found by its identifier and its host', () => {
-  expect(siteById('chembio').host).toBe('chembio.cheminfo.org');
   expect(siteById('molecules').host).toBe('molecules.cheminfo.org');
-  expect(findSiteByHost('chembio.cheminfo.org')?.id).toBe('chembio');
   expect(findSiteByHost('www.molecules.cheminfo.org')?.id).toBe('molecules');
-  expect(siteById('wikidata').host).toBe('wikidata.cheminfo.org');
-  expect(findSiteByHost('wikidata.cheminfo.org')?.id).toBe('wikidata');
+  expect(siteById('mz').host).toBe('mz.cheminfo.org');
+  expect(findSiteByHost('mz.cheminfo.org')?.id).toBe('mz');
 });
 
 test('a site no menu lists yet is under no topic', () => {
@@ -46,6 +44,14 @@ test('a site no menu lists yet is under no topic', () => {
   for (const site of UNLISTED_SITES) {
     expect(listed.has(site.id)).toBe(false);
   }
+});
+
+test('chembio and wikidata are listed under research', () => {
+  const research = groupedSites().find(({ group }) => group.id === 'research');
+  const ids = research?.sites.map((site) => site.id);
+
+  expect(ids).toContain('chembio');
+  expect(ids).toContain('wikidata');
 });
 
 test('a port and a missing or added www. are the same host', () => {
