@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.95.0](https://github.com/cheminfo/react-cheminfo/compare/v0.94.0...v0.95.0) (2026-11-06)
+
+
+### Features
+
+* add a header slot before About ([87c7840](https://github.com/cheminfo/react-cheminfo/commit/87c7840da7765534e369458f64538746212853a8))
+* collapse the panels of the mass and IR editors on a narrow window ([26abe17](https://github.com/cheminfo/react-cheminfo/commit/26abe1724ddcd9238312e963e04f43119219bd50))
+* give an empty tool big buttons to start with, and figures that stack ([b0e7b95](https://github.com/cheminfo/react-cheminfo/commit/b0e7b952ebba00b7f439bfc318bf23bce7842150))
+* list every package a build ships on the About page, ours shown and the others folded ([738d62c](https://github.com/cheminfo/react-cheminfo/commit/738d62c005d0eb789b044fffe1d0705a32b2e9ab))
+
 ## [0.94.0](https://github.com/cheminfo/react-cheminfo/compare/v0.93.0...v0.94.0) (2026-11-06)
 
 
