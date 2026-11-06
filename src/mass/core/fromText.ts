@@ -4,11 +4,13 @@
  * Whatever separates the columns — a tab, a comma, spaces, a semicolon — and
  * whatever header lines come before the numbers, `xy-parser` finds the numbers,
  * so a peak list copied out of an instrument report, a CSV export and a
- * hand-typed table are all one format here.
+ * hand-typed table are all one format here. A table that says more about a peak
+ * than its two numbers, an assignment for instance, is one format with them.
  */
 
-import { parseXY } from 'xy-parser';
+import { parseXYAndKeepInfo } from 'xy-parser';
 
+import { readXYTable } from '../../delimited/core/readXYTable.ts';
 import { describeSource } from '../../error/core/index.ts';
 
 import { ascendingTrace } from './ascendingTrace.ts';
@@ -39,7 +41,7 @@ export function fromText(
   options: MassTextReadOptions = {},
 ): LoadedMassSpectrum[] {
   const { fileName } = options;
-  const { x, y } = parseXY(data);
+  const { x, y } = readColumns(data);
   if (x.length === 0) {
     throw new Error(
       `${describeSource(fileName)} holds no two columns of numbers — a spectrum in text is one line per point, the m/z first and the intensity after it.`,
@@ -55,4 +57,25 @@ export function fromText(
           : { format: 'text', fileName },
     },
   ];
+}
+
+/**
+ * The two columns a text holds.
+ *
+ * `xy-parser` reads only the lines holding nothing but numbers, so one peak
+ * carrying a note would leave the list without it. When it set any line aside,
+ * that line may be such a peak, so the text is read as a table too and the
+ * reading with more points is kept.
+ * @param data - The file, as bytes or as text.
+ * @returns The columns, empty when no line holds two numbers.
+ */
+function readColumns(data: Uint8Array | string): {
+  x: number[];
+  y: number[];
+} {
+  const { data: columns, info } = parseXYAndKeepInfo(data);
+  if (info.length === 0) return columns;
+  const text = typeof data === 'string' ? data : new TextDecoder().decode(data);
+  const table = readXYTable(text);
+  return table.x.length > columns.x.length ? table : columns;
 }

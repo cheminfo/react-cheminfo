@@ -6,6 +6,8 @@ export {
 } from './delimiters.ts';
 export type { ReadDelimitedOptions } from './readDelimited.ts';
 export { detectDelimiter, readDelimited } from './readDelimited.ts';
+export type { XYTable } from './readXYTable.ts';
+export { readXYTable } from './readXYTable.ts';
 export type { ToDelimitedOptions } from './toDelimited.ts';
 export { escapeCell, toDelimited } from './toDelimited.ts';
 export type { TableRecord, TableRows, TableRowsOptions } from './tableRows.ts';

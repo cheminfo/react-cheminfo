@@ -135,6 +135,49 @@ test('a JCAMP of another technique is refused, saying what it holds', async () =
   );
 });
 
+test('a copied table is read from its first two columns, as text and as bytes', async () => {
+  const table = [
+    'mz\tintensity\tdeltaNeutrons\tassignment',
+    '287.05501\t100.0000\t0\tA, [ ¹²C₁₅ ¹H₁₁ ¹⁶O₆ ]',
+    '288.05837\t16.2236\t1\tA+1, [ ¹³C ]',
+    '289.05926\t1.2330\t2\tA+2, [ ¹⁸O ]',
+  ].join('\n');
+
+  for (const data of [table, new TextEncoder().encode(table)]) {
+    // eslint-disable-next-line no-await-in-loop -- one reading after the other, each asserted on its own
+    const { spectra, format } = await loadMassSpectra(data);
+    const [spectrum] = spectra;
+
+    expect(format).toBe('text');
+    expect(Array.from(spectrum?.trace.x ?? [])).toStrictEqual([
+      287.05501, 288.05837, 289.05926,
+    ]);
+    expect(Array.from(spectrum?.trace.y ?? [])).toStrictEqual([
+      100, 16.2236, 1.233,
+    ]);
+  }
+});
+
+test('a peak carrying a note is kept among peaks that carry none', async () => {
+  const { spectra } = await loadMassSpectra(
+    '100\t50\n101\t20\n102\t10\tmolecular ion\n103\t5',
+  );
+  const [spectrum] = spectra;
+
+  expect(Array.from(spectrum?.trace.x ?? [])).toStrictEqual([
+    100, 101, 102, 103,
+  ]);
+  expect(Array.from(spectrum?.trace.y ?? [])).toStrictEqual([50, 20, 10, 5]);
+});
+
+test('columns apart by spaces under a header are still read by the column reader', async () => {
+  const { spectra } = await loadMassSpectra('mz intensity\n100 12\n101 3');
+  const [spectrum] = spectra;
+
+  expect(Array.from(spectrum?.trace.x ?? [])).toStrictEqual([100, 101]);
+  expect(Array.from(spectrum?.trace.y ?? [])).toStrictEqual([12, 3]);
+});
+
 test('text with no numbers in it is refused with a sentence', async () => {
   await expect(loadMassSpectra('hello\nworld')).rejects.toThrow(
     'The pasted text holds no two columns of numbers',
