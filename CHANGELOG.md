@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.96.0](https://github.com/cheminfo/react-cheminfo/compare/v0.95.0...v0.96.0) (2026-11-06)
+
+
+### Features
+
+* add MoleculeExport, saving what a search matches as an SDF or a text file ([6761228](https://github.com/cheminfo/react-cheminfo/commit/6761228662a8fc64aef76eb1410e5e4580b60796))
+* add tlc.cheminfo.org to the family ([44d328a](https://github.com/cheminfo/react-cheminfo/commit/44d328a7761fe095a93f33c9017391e30b4e001b))
+* let an editor hide its panels behind the bar, as ?split=100 ([ccee443](https://github.com/cheminfo/react-cheminfo/commit/ccee443da3920ebfd6bd4e865adde66271c5b59b))
+* list chembio and wikidata in the family's Tools menu ([1a75af1](https://github.com/cheminfo/react-cheminfo/commit/1a75af105cfc3ecb62f684d6fb66a132324ac142))
+* offer the model as a molfile in the 3D viewer's export ([ebdbb2a](https://github.com/cheminfo/react-cheminfo/commit/ebdbb2a607a2fc2189b889c072c78aa1aa87184b))
+* put the buttons of an empty tool on one line over its figures ([196d998](https://github.com/cheminfo/react-cheminfo/commit/196d99852feebf64c1326b75d744da941fcd5724))
+* read a mass spectrum from a table that carries more than numbers ([849ccc3](https://github.com/cheminfo/react-cheminfo/commit/849ccc378f22472c1a791db3ab829d85307c5ab6))
+
+
+### Bug Fixes
+
+* keep slicing long work in a hidden tab, which holds its timers back ([6e4bb89](https://github.com/cheminfo/react-cheminfo/commit/6e4bb89fee5c86ba5dbafb6574976542774e5f47))
+* read a LICENSES folder rather than fail the build ([c012ee5](https://github.com/cheminfo/react-cheminfo/commit/c012ee59c20d3f4a03f5d772fe626a590c96c124))
+
 ## [0.95.0](https://github.com/cheminfo/react-cheminfo/compare/v0.94.0...v0.95.0) (2026-11-06)
 
 
