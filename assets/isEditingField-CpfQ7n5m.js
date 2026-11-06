@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e){return e instanceof HTMLElement?e.isContentEditable?!0:n.has(e.tagName):!1}var n;function r(){return(r=e((()=>{n=new Set([`INPUT`,`TEXTAREA`,`SELECT`])})))()}export{t as n,r as t};
