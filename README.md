@@ -161,7 +161,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Requests**               | `fetchJson`, `ApiError`, `readApiError`, `keySetParam`, `readHiddenParts`, `formatHiddenParts`, `fitDescription`, `DESCRIPTION_MIN`, `DESCRIPTION_MAX`, `openingRoute`, `anchorHref`                                                                                                                                                                                                                                                | `useAsync` (signal, `pending`)                                                                                                                                                                                                                                                                      |
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                                                                                                                        | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                                                                                                                                   |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                                                                                                                          | —                                                                                                                                                                                                                                                                                                   |
-| **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                       | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `PanelRow`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
+| **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                       | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
 | **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                                                                          | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`)                                                                                                                                                                           |
 | **Mass spectra**           | `loadMassSpectra`, `toMassSpectra`, `analyseSpectrum`, `decideResolution`, `resolutionOf`, `mzDecimalsOf`, `planPeakLabels`, `peakTableRows`, `massSpectrumToJcamp`, `massReducer` (all `/mass`)                                                                                                                                                                                                                                    | `MassEditor`, `MassChart`, `SpectraPanel`, `PeaksPanel`, `MetadataPanel`, `useMassEditor` (all `/mass`)                                                                                                                                                                                             |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                                                                                                                | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                           |
@@ -1960,40 +1960,6 @@ first stroke:
 - **A framed page shows none**: what frames it says what to do there.
 
 `<ShortcutList>` and `<ShortcutKeys>` draw the keys, here and in a site's help.
-
-## An editor on a narrow window
-
-A figure and the panels that drive it share a row while the window has room for
-both. Under `COLLAPSE_PANELS_BELOW` (900 px) the figure keeps the whole row, and
-one panel at a time comes over it from the rail, to be used and sent away again:
-
-```tsx
-<PanelRow
-  collapsed={collapsed} // readPanelsCollapsed(), then watchPanelsCollapsed()
-  ratio={ratio}
-  defaultRatio={72}
-  min={50}
-  max={85}
-  onRatio={writeSplit}
-  view={<Figure />}
-  panels={shownIds.length > 0 ? <PanelStack /> : null}
-/>
-```
-
-The row reads no store, so the editor keeps three rules:
-
-- **One panel at a time.** With the panels collapsed, what the stack draws and
-  what the rail lights is the one panel on show. A rail press swaps it, and the
-  second press, the cross and the fold send it away.
-- **The workspace stays as it was.** The panel on show is not written to the list
-  of open panels, so a wider window finds what it left, plus the panel that was
-  on screen.
-- **Only somebody asking opens one.** A rail press or a link naming the panel
-  does. A gesture on the figure that opens a panel beside it with room only adds
-  it to the list: selecting an atom must not cover the atom.
-
-The part of the figure still showing goes on answering the pointer, so a panel
-follows the selection while it is open.
 
 ## Styling
 
