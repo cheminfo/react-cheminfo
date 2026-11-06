@@ -117,10 +117,28 @@ export async function runInChunks<TItem>(
  * worker reads its messages between tasks, never between microtasks; and
  * `setTimeout` rather than `requestAnimationFrame`, which a background tab
  * stops calling and a worker or a test does not have.
+ *
+ * A hidden page takes a message instead: a background tab holds `setTimeout` to
+ * one call a second, so work that yields after every molecule would all but
+ * stop the moment somebody changed tabs.
  * @returns When the browser has had its turn.
  */
 export function yieldToBrowser(): Promise<void> {
   return new Promise((resolve) => {
-    setTimeout(resolve, 0);
+    if (typeof document === 'undefined' || !document.hidden) {
+      setTimeout(resolve, 0);
+      return;
+    }
+    const { port1, port2 } = new MessageChannel();
+    port1.addEventListener(
+      'message',
+      () => {
+        port1.close();
+        resolve();
+      },
+      { once: true },
+    );
+    port1.start();
+    port2.postMessage(null);
   });
 }

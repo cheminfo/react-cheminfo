@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 
 import { runInChunks, yieldToBrowser } from '../chunks.ts';
 
@@ -123,4 +123,17 @@ test('a yield waits for a macrotask, after the microtasks already queued', async
   await yielded;
 
   expect(order).toStrictEqual(['microtask', 'yielded']);
+});
+
+test('a hidden page gets its turn without a timer, which a background tab holds back', async () => {
+  vi.stubGlobal('document', { hidden: true });
+  vi.useFakeTimers();
+  try {
+    await yieldToBrowser();
+
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  }
 });
