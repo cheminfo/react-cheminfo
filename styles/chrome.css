@@ -2623,3 +2623,22 @@ button.empty-guide__figure:focus-visible img {
   justify-content: center;
   gap: 0.5rem;
 }
+
+/* The control that saves what a search matches, in the row above its results. */
+.molecule-export {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.molecule-export__note {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.molecule-export__problem {
+  color: var(--danger);
+  font-size: 0.8125rem;
+}

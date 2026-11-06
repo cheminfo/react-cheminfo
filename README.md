@@ -160,7 +160,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Widgets**                | `CREDITS`, `credits`                                                                                                                                                                                                                                                                                                                                                                                                                | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                                                                                                                                            |
 | **Hooks & state**          | `createWorkerChannel`, `persistBucket`, `persistSignalBucket`                                                                                                                                                                                                                                                                                                                                                                       | `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                                                                                                                                                           |
 | **Requests**               | `fetchJson`, `ApiError`, `readApiError`, `keySetParam`, `readHiddenParts`, `formatHiddenParts`, `fitDescription`, `DESCRIPTION_MIN`, `DESCRIPTION_MAX`, `openingRoute`, `anchorHref`                                                                                                                                                                                                                                                | `useAsync` (signal, `pending`)                                                                                                                                                                                                                                                                                  |
-| **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                                                                                                                        | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure` (`/structure`)                                                                                                                                                                                                                               |
+| **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                                                                                                                        | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure`, `MoleculeExport` (`/structure`)                                                                                                                                                                                                             |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                                                                                                                          | —                                                                                                                                                                                                                                                                                                               |
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                       | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `PanelRow`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
 | **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                                                                          | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`)                                                                                                                                                                                       |
@@ -1728,6 +1728,37 @@ const molecules = createMoleculesClient({
 });
 const { importKey } = await molecules.startImport();
 ```
+
+## Saving what a search matches
+
+`<MoleculeExport>` saves the molecules a search matches, not only the page on
+show, up to 10,000: as an **SDF** with 2D coordinates invented for each
+structure, or as **TXT**, tab separated, with an isomeric SMILES in the first
+column. A site writes only the generator that reads its pages:
+
+```tsx
+import type { MoleculeFileRow } from 'react-cheminfo/structure';
+import { MoleculeExport } from 'react-cheminfo/structure';
+
+async function* searchPages(signal: AbortSignal) {
+  for (let offset = 0; ; offset += 500) {
+    const answer = await search({ offset, limit: 500 }, signal);
+    yield answer.items.map((item): MoleculeFileRow => ({
+      idCode: item.idCode,
+      name: item.title,
+      fields: { mf: item.mf, mw: item.mw },
+    }));
+    if (offset + 500 >= answer.total) return;
+  }
+}
+
+<MoleculeExport read={searchPages} fileName="matches" total={total} />;
+```
+
+The file is written in the browser, in slices, with its progress and a Cancel
+button: a molfile costs tens of milliseconds for a large natural product, which
+10,000 times over belongs on no public server. Reading stops at the limit, so
+the pages after it are never asked for.
 
 ## Answers shown in a chat
 

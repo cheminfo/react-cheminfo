@@ -36,6 +36,8 @@ export { StructureExportButton } from './StructureExportButton.tsx';
 export type { CardStructureProps } from './CardStructure.tsx';
 export { CardStructure } from './CardStructure.tsx';
 export type { StructureExportPanelProps } from './StructureExportPanel.tsx';
+export type { MoleculeExportProps } from './MoleculeExport.tsx';
+export { MoleculeExport } from './MoleculeExport.tsx';
 export type {
   StructureNotationKind,
   SuppliedNotations,

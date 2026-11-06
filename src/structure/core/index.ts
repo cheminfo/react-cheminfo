@@ -66,6 +66,13 @@ export {
   readRelaxableGeometry,
   writeRelaxedCoordinates,
 } from './moleculeCoordinates.ts';
+export type {
+  MoleculeFile,
+  MoleculeFileFormat,
+  MoleculeFileOptions,
+  MoleculeFileRow,
+} from './moleculeFileTypes.ts';
+export { MOLECULE_FILE_LIMIT } from './moleculeFileTypes.ts';
 export type { MolfileClassification, MolfileVersion } from './molfile.ts';
 export {
   classifyMolfile,
