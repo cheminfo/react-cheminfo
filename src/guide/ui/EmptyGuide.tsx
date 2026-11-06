@@ -14,7 +14,7 @@ import { useHintCycle } from './hintCycle.ts';
 /** How long a hint stays before the next one takes its place, in milliseconds. */
 const HINT_INTERVAL = 9000;
 
-/** One way to start, offered as a big button ahead of everything else. */
+/** One way to start, offered as a big button over the figures. */
 export interface EmptyGuideAction {
   /** What it does, starting with the verb. */
   label: string;
@@ -44,9 +44,9 @@ export interface EmptyGuideLink {
 /** Props of {@link EmptyGuide}. */
 export interface EmptyGuideProps {
   /**
-   * The ways to start, as big buttons ahead of everything else, the first in
-   * the site's colour. Faint figures alone read as content already on the page,
-   * so a guide showing any says here how to leave them behind.
+   * The ways to start, as big buttons on the line over the figures, the first
+   * in the site's colour. Faint figures alone read as content already on the
+   * page, so a guide showing any says here how to leave them behind.
    * @default undefined — no button
    */
   actions?: readonly EmptyGuideAction[];
@@ -84,8 +84,8 @@ export interface EmptyGuideProps {
    */
   figures?: ReadonlyArray<EmptyGuideFigure | EmptyGuideFigureStack>;
   /**
-   * What the row of figures is headed: what a click on one does.
-   * @default undefined — no heading
+   * What a click on a figure does, on the line over them, after the buttons.
+   * @default undefined — nothing said
    */
   figuresTitle?: string;
 }
@@ -113,15 +113,12 @@ export function EmptyGuide(props: EmptyGuideProps): ReactElement {
   } = props;
   return (
     <div className="empty-guide no-print" data-testid="empty-guide">
-      {actions.length > 0 ? <GuideActions actions={actions} /> : null}
       {help ? <div className="empty-guide__help">{help}</div> : null}
       {links && links.length > 0 ? (
         <GuideLinks links={links} title={linksTitle} />
       ) : null}
-      {figuresTitle ? (
-        <p className="empty-guide__title empty-guide__figures-title">
-          {figuresTitle}
-        </p>
+      {actions.length > 0 || figuresTitle ? (
+        <GuideStart actions={actions} figuresTitle={figuresTitle} />
       ) : null}
       <GuideFigures figures={figures} />
       {hints.length > 0 ? (
@@ -150,12 +147,14 @@ export function EmptyGuideSection(props: {
   );
 }
 
-function GuideActions(props: {
+function GuideStart(props: {
   actions: readonly EmptyGuideAction[];
+  figuresTitle: string | undefined;
 }): ReactElement {
+  const { actions, figuresTitle } = props;
   return (
-    <div className="empty-guide__actions">
-      {props.actions.map((action) => (
+    <div className="empty-guide__start">
+      {actions.map((action) => (
         <button
           key={action.label}
           type="button"
@@ -166,6 +165,9 @@ function GuideActions(props: {
           {action.label}
         </button>
       ))}
+      {figuresTitle ? (
+        <p className="empty-guide__figures-title">{figuresTitle}</p>
+      ) : null}
     </div>
   );
 }

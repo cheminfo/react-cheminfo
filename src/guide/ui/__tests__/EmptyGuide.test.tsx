@@ -38,18 +38,20 @@ test('a guide writes its help, its links, one hint and its figures', () => {
   expect(html).toContain('flex-grow:2');
 });
 
-test('a guide offers its ways to start as buttons, ahead of its help', () => {
+test('a guide offers its ways to start as buttons, between its help and its figures', () => {
   const html = renderToStaticMarkup(
     <EmptyGuide
       actions={[
         { label: 'Start drawing', icon: 'draw', onSelect: () => undefined },
-        { label: 'Use a template', onSelect: () => undefined },
+        { label: 'Open a file', onSelect: () => undefined },
       ]}
       help={<EmptyGuideSection title="Keys">Press one</EmptyGuideSection>}
+      figures={[{ src: '/a.svg', alt: 'A scheme' }]}
     />,
   );
 
-  expect(html.indexOf('Start drawing')).toBeLessThan(html.indexOf('Keys'));
+  expect(html.indexOf('Keys')).toBeLessThan(html.indexOf('Start drawing'));
+  expect(html.indexOf('Open a file')).toBeLessThan(html.indexOf('A scheme'));
   expect(html.match(/class="empty-guide__action"/g)).toHaveLength(2);
   expect(html).toContain('data-icon="draw"');
 });
@@ -57,7 +59,7 @@ test('a guide offers its ways to start as buttons, ahead of its help', () => {
 test('a guide with no way to start writes no row of buttons', () => {
   const html = renderToStaticMarkup(<EmptyGuide actions={[]} />);
 
-  expect(html).not.toContain('empty-guide__actions');
+  expect(html).not.toContain('empty-guide__start');
 });
 
 test('the figures are headed only when the site says what a click does', () => {
@@ -69,7 +71,20 @@ test('the figures are headed only when the site says what a click does', () => {
 
   expect(plain).not.toContain('empty-guide__figures-title');
   expect(headed).toContain(
-    '<p class="empty-guide__title empty-guide__figures-title">Click one to copy it</p>',
+    '<p class="empty-guide__figures-title">Click one to copy it</p>',
+  );
+});
+
+test('what a click on a figure does stands on the line of the buttons', () => {
+  const html = renderToStaticMarkup(
+    <EmptyGuide
+      actions={[{ label: 'Start drawing', onSelect: () => undefined }]}
+      figuresTitle="or click a figure"
+    />,
+  );
+
+  expect(html).toContain(
+    '<div class="empty-guide__start"><button type="button" class="empty-guide__action">Start drawing</button><p class="empty-guide__figures-title">or click a figure</p></div>',
   );
 });
 

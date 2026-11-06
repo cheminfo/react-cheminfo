@@ -2375,12 +2375,14 @@ span.taxon-lineage__name {
   font: inherit;
 }
 
-/* The ways to start: the one thing here that is not grey, or the faint figures
-   read as content nobody knows how to clear. */
-.empty-guide__actions {
+/* The ways to start, on one line over the figures: the buttons are the one thing
+   here that is not grey, or the faint figures read as content nobody knows how
+   to clear. */
+.empty-guide__start {
   display: flex;
   flex: none;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
   gap: 12px;
 }
@@ -2458,9 +2460,9 @@ span.taxon-lineage__name {
 }
 
 .empty-guide__figures-title {
-  flex: none;
   margin: 0;
-  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .empty-guide__stack {
@@ -2522,6 +2524,11 @@ button.empty-guide__figure:focus-visible img {
   .empty-guide__figures,
   .empty-guide__figures-title {
     display: none;
+  }
+
+  /* First, or a help taller than the view would push the buttons out of it. */
+  .empty-guide__start {
+    order: -1;
   }
 
   .empty-guide__hint {

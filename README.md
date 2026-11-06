@@ -1986,17 +1986,17 @@ first stroke:
 ```
 
 - **The way out is a big button.** Faint figures read as content already on the
-  page, so `actions` come first, the first of them in the site's colour, and
-  the site stops rendering the guide when one is pressed. `figuresTitle` says
-  what a click on a figure does.
+  page, so `actions` stand on one line over them, the first in the site's colour,
+  and the site stops rendering the guide when one is pressed. `figuresTitle`
+  finishes that line by saying what a click on a figure does.
 - **Help is what stays**: how to start, the keys. **A hint is what changes**:
   one sentence at a time, the next one after `hintInterval`, and another one
   first on the next visit, chosen by the clock.
 - **The figures are faint pictures of what the tool can make**, side by side in
   the height left, each taking its `share` of the row; `{ stack: [...] }` puts
   several one above the other in one place of it. A view under 640 px wide or
-  520 px tall shows the words alone. One with an `onSelect` comes up to full
-  strength under the pointer, and a click does what it says.
+  520 px tall shows the words alone, the buttons first. One with an `onSelect`
+  comes up to full strength under the pointer, and a click does what it says.
 - **It is grey, and never in the way.** The pointer goes through it to the tool,
   except on a button, a link or a figure with an `onSelect`, so a first stroke
   can start on the words. A site passes no `actions` while a tool is in hand, as

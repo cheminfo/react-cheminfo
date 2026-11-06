@@ -43,9 +43,8 @@ export const Default: Story = {
   args: {
     actions: [
       { label: 'Start drawing', icon: 'draw', onSelect: () => undefined },
-      { label: 'Use a template', icon: 'grid-view', onSelect: () => undefined },
     ],
-    figuresTitle: 'Click a figure to copy it to your page',
+    figuresTitle: 'or click a figure to copy it to your page',
     help: (
       <>
         <EmptyGuideSection title="Draw">
