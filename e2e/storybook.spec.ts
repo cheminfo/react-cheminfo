@@ -166,6 +166,7 @@ const STORY_IDS = [
   'guide-emptyguide--default',
   'guide-emptyguide--help-only',
   'guide-emptyguide--hint-only',
+  'guide-emptyguide--stacked-figures',
   'help-helpicon--beside-field-labels',
   'help-helpicon--default',
   'help-helpicon--every-placement',

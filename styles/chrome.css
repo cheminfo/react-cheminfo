@@ -2373,6 +2373,53 @@ span.taxon-lineage__name {
   font: inherit;
 }
 
+/* The ways to start: the one thing here that is not grey, or the faint figures
+   read as content nobody knows how to clear. */
+.empty-guide__actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.empty-guide button.empty-guide__action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 22px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.empty-guide button.empty-guide__action:hover {
+  background: var(--surface-sunken);
+  color: var(--text);
+}
+
+.empty-guide button.empty-guide__action:first-child {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--surface);
+}
+
+.empty-guide button.empty-guide__action:first-child:hover {
+  background: color-mix(in oklab, var(--accent) 85%, black);
+  color: var(--surface);
+}
+
+.empty-guide button.empty-guide__action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .empty-guide__help {
   display: grid;
   flex: none;
@@ -2406,6 +2453,21 @@ span.taxon-lineage__name {
   flex: 1 1 0;
   justify-content: space-between;
   gap: 3%;
+}
+
+.empty-guide__figures-title {
+  flex: none;
+  margin: 0;
+  text-align: center;
+}
+
+.empty-guide__stack {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .empty-guide__figure {
@@ -2455,7 +2517,8 @@ button.empty-guide__figure:focus-visible img {
 /* On a narrow or a short view the words take the whole of it: a picture the
    size of a stamp shows nothing, and leaves its caption floating. */
 @container (max-width: 640px) or (max-height: 520px) {
-  .empty-guide__figures {
+  .empty-guide__figures,
+  .empty-guide__figures-title {
     display: none;
   }
 

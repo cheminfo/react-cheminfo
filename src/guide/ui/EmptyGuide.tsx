@@ -1,34 +1,30 @@
+import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
 import type { MouseEvent, ReactElement, ReactNode } from 'react';
 
 import { isModifiedClick } from '../../chrome/ui/navItem.ts';
 
+import type {
+  EmptyGuideFigure,
+  EmptyGuideFigureStack,
+} from './GuideFigures.tsx';
+import { GuideFigures } from './GuideFigures.tsx';
 import { useHintCycle } from './hintCycle.ts';
 
 /** How long a hint stays before the next one takes its place, in milliseconds. */
 const HINT_INTERVAL = 9000;
 
-/** A picture of what the tool can make, drawn faint behind the guide. */
-export interface EmptyGuideFigure {
-  /** Where the picture is. */
-  src: string;
-  /** What it shows, for a reader who cannot see it. */
-  alt: string;
+/** One way to start, offered as a big button ahead of everything else. */
+export interface EmptyGuideAction {
+  /** What it does, starting with the verb. */
+  label: string;
+  /** What a press on it does. */
+  onSelect: () => void;
   /**
-   * Its share of the row, against the others'.
-   * @default 1
+   * Its glyph.
+   * @default undefined — no glyph
    */
-  share?: number;
-  /**
-   * What a click on it does: it comes up to full strength under the pointer.
-   * @default undefined — the pointer goes through it to the tool
-   */
-  onSelect?: () => void;
-  /**
-   * What a click on it does, in a tooltip.
-   * @default undefined — no tooltip
-   */
-  title?: string;
+  icon?: IconName;
 }
 
 /** One way to learn more, offered under the help. */
@@ -47,6 +43,13 @@ export interface EmptyGuideLink {
 
 /** Props of {@link EmptyGuide}. */
 export interface EmptyGuideProps {
+  /**
+   * The ways to start, as big buttons ahead of everything else, the first in
+   * the site's colour. Faint figures alone read as content already on the page,
+   * so a guide showing any says here how to leave them behind.
+   * @default undefined — no button
+   */
+  actions?: readonly EmptyGuideAction[];
   /**
    * What is true on every visit: how to start, the keys. Sections drawn by
    * `<EmptyGuideSection>`, side by side as far as the width allows.
@@ -75,17 +78,23 @@ export interface EmptyGuideProps {
    */
   hintInterval?: number;
   /**
-   * Pictures of what the tool can make, faint, side by side in the room left.
+   * Pictures of what the tool can make, faint, side by side in the room left,
+   * some of them stacked.
    * @default undefined — no picture
    */
-  figures?: readonly EmptyGuideFigure[];
+  figures?: ReadonlyArray<EmptyGuideFigure | EmptyGuideFigureStack>;
+  /**
+   * What the row of figures is headed: what a click on one does.
+   * @default undefined — no heading
+   */
+  figuresTitle?: string;
 }
 
 /**
  * What a tool shows while it holds nothing: the space that is empty anyway says
  * how to start. It comes in grey over the tool, lets the pointer through to it
- * everywhere but on a link or a figure that can be clicked, and the site stops
- * rendering it at the first stroke.
+ * everywhere but on a button, a link or a figure that can be clicked, and the
+ * site stops rendering it at the first stroke.
  *
  * Fill the absolute box of the tool's view with it: the parent is positioned.
  * @param props - See {@link EmptyGuideProps}.
@@ -93,24 +102,28 @@ export interface EmptyGuideProps {
  */
 export function EmptyGuide(props: EmptyGuideProps): ReactElement {
   const {
+    actions = [],
     help,
     links,
     linksTitle,
     hints = [],
     hintInterval = HINT_INTERVAL,
     figures = [],
+    figuresTitle,
   } = props;
   return (
     <div className="empty-guide no-print" data-testid="empty-guide">
+      {actions.length > 0 ? <GuideActions actions={actions} /> : null}
       {help ? <div className="empty-guide__help">{help}</div> : null}
       {links && links.length > 0 ? (
         <GuideLinks links={links} title={linksTitle} />
       ) : null}
-      <div className="empty-guide__figures">
-        {figures.map((figure) => (
-          <GuideFigure key={figure.src} figure={figure} />
-        ))}
-      </div>
+      {figuresTitle ? (
+        <p className="empty-guide__title empty-guide__figures-title">
+          {figuresTitle}
+        </p>
+      ) : null}
+      <GuideFigures figures={figures} />
       {hints.length > 0 ? (
         <GuideHint hints={hints} interval={hintInterval} />
       ) : null}
@@ -137,26 +150,23 @@ export function EmptyGuideSection(props: {
   );
 }
 
-function GuideFigure(props: { figure: EmptyGuideFigure }): ReactElement {
-  const { src, alt, share = 1, onSelect, title } = props.figure;
-  const image = <img src={src} alt={alt} draggable={false} />;
-  if (!onSelect) {
-    return (
-      <figure className="empty-guide__figure" style={{ flexGrow: share }}>
-        {image}
-      </figure>
-    );
-  }
+function GuideActions(props: {
+  actions: readonly EmptyGuideAction[];
+}): ReactElement {
   return (
-    <button
-      type="button"
-      className="empty-guide__figure"
-      style={{ flexGrow: share }}
-      title={title}
-      onClick={onSelect}
-    >
-      {image}
-    </button>
+    <div className="empty-guide__actions">
+      {props.actions.map((action) => (
+        <button
+          key={action.label}
+          type="button"
+          className="empty-guide__action"
+          onClick={action.onSelect}
+        >
+          {action.icon ? <Icon icon={action.icon} size={18} /> : null}
+          {action.label}
+        </button>
+      ))}
+    </div>
   );
 }
 

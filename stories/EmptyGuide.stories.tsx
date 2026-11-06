@@ -41,6 +41,11 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    actions: [
+      { label: 'Start drawing', icon: 'draw', onSelect: () => undefined },
+      { label: 'Use a template', icon: 'grid-view', onSelect: () => undefined },
+    ],
+    figuresTitle: 'Click a figure to copy it to your page',
     help: (
       <>
         <EmptyGuideSection title="Draw">
@@ -75,6 +80,21 @@ export const Default: Story = {
         alt: 'Another flask',
         title: 'Copy it to the page',
         onSelect: () => undefined,
+      },
+    ],
+  },
+};
+
+/** Figures stacked in one place of the row, beside one that takes the height. */
+export const StackedFigures: Story = {
+  args: {
+    figures: [
+      { src: FLASK, alt: 'A flask', share: 2 },
+      {
+        stack: [
+          { src: `${FLASK}#top`, alt: 'A flask above' },
+          { src: `${FLASK}#bottom`, alt: 'A flask below' },
+        ],
       },
     ],
   },
