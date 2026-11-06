@@ -32,11 +32,14 @@ export interface StructureDropTarget {
 /**
  * Take a file or text dropped on an element.
  * @param onDrop - Where the drop goes; `undefined` takes none.
+ * @param takesText - Whether text is taken as well as files, so a target that
+ * cannot use text raises no veil over a drag holding only text.
  * @returns Whether a drag is over the element, and the handlers to put on it
  * and on its overlay.
  */
 export function useStructureDrop(
   onDrop: ((transfer: StructureTransfer) => void) | undefined,
+  takesText = true,
 ): StructureDropTarget {
   const [over, setOver] = useState(false);
 
@@ -45,7 +48,10 @@ export function useStructureDrop(
       return { over: false, targetProps: {}, overlayProps: {} };
     }
     const accept = (event: DragEvent<HTMLElement>): boolean => {
-      if (!carriesStructure(event.dataTransfer.types)) return false;
+      const { types } = event.dataTransfer;
+      if (!(takesText ? carriesStructure(types) : types.includes('Files'))) {
+        return false;
+      }
       event.preventDefault();
       event.dataTransfer.dropEffect = 'copy';
       return true;
@@ -72,5 +78,5 @@ export function useStructureDrop(
         },
       },
     };
-  }, [onDrop, over]);
+  }, [onDrop, over, takesText]);
 }

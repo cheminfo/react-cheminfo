@@ -13,6 +13,7 @@ export * from './delimited/ui/index.ts';
 export * from './disclosure/ui/index.ts';
 export * from './document/ui/index.ts';
 export * from './download/ui/index.ts';
+export * from './dropzone/ui/index.ts';
 export * from './ecosystem/ui/index.ts';
 export * from './error/ui/index.ts';
 export * from './guide/ui/index.ts';

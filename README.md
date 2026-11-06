@@ -141,6 +141,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Site identity**          | `siteById`, `findSiteByHost`, `siteTokensCss`                                                                                                                                                                                                                                                                                                                                                                                       | `SiteMark`, `Wordmark`, `SiteTheme`, `SiteTile`, `EcosystemButton`, `EcosystemLinks`                                                                                                                                                                                                                            |
 | **Chrome**                 | —                                                                                                                                                                                                                                                                                                                                                                                                                                   | `SiteHeader`, `SiteFooter`, `NavLink`, `NavMenuButton`, `MenuButton`, `AccountButton`, `useCompactHeader`                                                                                                                                                                                                       |
 | **An empty tool**          | —                                                                                                                                                                                                                                                                                                                                                                                                                                   | `EmptyGuide`, `EmptyGuideSection`, `ShortcutList`, `ShortcutKeys`                                                                                                                                                                                                                                               |
+| **Waiting for data**       | —                                                                                                                                                                                                                                                                                                                                                                                                                                   | `DataDropZone`                                                                                                                                                                                                                                                                                                  |
 | **Languages**              | `LANGUAGES`, `DEFAULT_LANGUAGE`, `LANGUAGE_LABELS`, `isLanguage`, `MessageCatalog`, `CHROME_CATALOG`, `setMessageSession`, `loadCatalogs`, `startTranslateMode`, `LANGUAGE_PARAM`, `withLanguageParam`                                                                                                                                                                                                                              | `useT`, `useChromeT`, `useLanguage`, `LanguageSelect`, `SiteLanguage`                                                                                                                                                                                                                                           |
 | **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`, `referenceVenue`                                                                                                                                                                                                                                                                                                          | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                                 |
 | **Contact**                | `CONTACT_FORM_URLS`, `contactFormUrl`, `contactUrl`                                                                                                                                                                                                                                                                                                                                                                                 | `ContactButton`                                                                                                                                                                                                                                                                                                 |
@@ -1916,6 +1917,33 @@ family answers one question with one request each:
 ```sh
 curl -s https://smiles.cheminfo.org/build-info.json
 ```
+
+## A page waiting for data
+
+`<DataDropZone>` is what a page shows until it has something to work on. It
+takes a file dropped on it, a paste from anywhere on the page, and a file chosen
+with its Open button, so the page needs no other button for them:
+
+```tsx
+<DataDropZone
+  title="Drop, paste or open a mass spectrum"
+  description="As JCAMP-DX, or as columns of m/z and intensity."
+  accept=".jdx,.dx,.txt,.csv"
+  onFiles={addFiles}
+  onText={addText}
+  onPasteClick={openPasteDialog}
+/>
+```
+
+- `onText` takes text pasted, or dragged in from another page. Without it the
+  zone takes files only, and leaves text to the page around it.
+- `onPasteClick` is what the Paste button does; without it there is no button,
+  and the keyboard still pastes. A button cannot read the clipboard without
+  asking for permission, and a frame may not be allowed to ask, so the page opens
+  a box to paste into.
+- A click on the zone itself asks for nothing, so a visitor can click into a
+  framed page and press Ctrl+V.
+- `actions` holds whatever else starts the page, after Open and Paste.
 
 ## A tool that holds nothing
 
