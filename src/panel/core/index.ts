@@ -19,6 +19,11 @@ export {
   withPanelStatus,
 } from './panelLayout.ts';
 export {
+  COLLAPSE_PANELS_BELOW,
+  readPanelsCollapsed,
+  watchPanelsCollapsed,
+} from './panelsCollapsed.ts';
+export {
   inlineLabelStyle,
   labelRowStyle,
   labelStyle,
