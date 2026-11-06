@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.93.0](https://github.com/cheminfo/react-cheminfo/compare/v0.92.0...v0.93.0) (2026-11-06)
+
+
+### Features
+
+* collapse an editor's panels on a narrow window, so the figure keeps the row ([92bac91](https://github.com/cheminfo/react-cheminfo/commit/92bac915f47675f609b190e3f528ad929d0cbb7a))
+* say how to start in the space an empty tool leaves ([c2c9a69](https://github.com/cheminfo/react-cheminfo/commit/c2c9a69c3d3aa0299d00c8bb1d8f65b64743ce7a))
+
 ## [0.92.0](https://github.com/cheminfo/react-cheminfo/compare/v0.91.0...v0.92.0) (2026-11-05)
 
 
