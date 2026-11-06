@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{r as t}from"./delimiters-BdzFmsne.js";function n(e,t={}){let{delimiter:n=`	`,header:r,newline:a=`
+`}=t,o=[];r!==void 0&&o.push(i(r,n));for(let t of e)o.push(i(t,n));return o.join(a)}function r(e,t){return e.includes(t)||e.includes(`"`)||e.includes(`
+`)||e.includes(`\r`)?`"${e.replaceAll(`"`,`""`)}"`:e}function i(e,t){let n=[];for(let i of e)n.push(r(i,t));return n.join(t)}function a(){return(a=e((()=>{t()})))()}export{n,a as t};

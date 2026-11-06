@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e){return s.test(e)?{version:`v3000`,atomCount:i(e,l)}:o.test(e)?{version:`v2000`,atomCount:i(e,c)}:{version:`unknown`,atomCount:0}}function n(e){return t(e).atomCount}function r(e){return a(e)<4?!1:t(e).version!==`unknown`}function i(e,t){let n=t.exec(e)?.groups?.atoms;if(n===void 0)return 0;let r=Number.parseInt(n.trim(),10);return Number.isFinite(r)&&r>0?r:0}function a(e){let t=1,n=e.indexOf(`
+`);for(;n!==-1;)t++,n=e.indexOf(`
+`,n+1);return t}var o,s,c,l;function u(){return(u=e((()=>{o=/^[\d ]+V2000[^\S\n]*$/m,s=/^[\d ]+V3000[^\S\n]*$/m,c=/^(?<atoms>[\d ]{3})[\d ]*V2000[^\S\n]*$/m,l=/^M {2}V30 COUNTS +(?<atoms>\d+)/m})))()}export{n as i,u as n,r,t};
