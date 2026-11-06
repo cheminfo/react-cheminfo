@@ -1025,11 +1025,11 @@ keeps its subscripts.
 `SiteShell` is the chrome around a page: the theme, the bar with About · Cite ·
 Tools · Contact · Share, the page, and the footer, with nothing but the page
 under `?embed`. A site fills the slots between the shared entries
-(`actionsAfterAbout`, `actionsAfterCite`, `actions`, `language`, `account`) and
-never re-orders them. Given the site's router, it marks the tab on show and
-serves the About tab as `AboutPage`. Its `share` takes what `ShareControl`
-takes — the Share entry and its dialog in one, which is also what a header's
-own `share` prop takes.
+(`actionsBeforeAbout`, `actionsAfterAbout`, `actionsAfterCite`, `actions`,
+`language`, `account`) and never re-orders them. Given the site's router, it
+marks the tab on show and serves the About tab as `AboutPage`. Its `share` takes
+what `ShareControl` takes — the Share entry and its dialog in one, which is also
+what a header's own `share` prop takes.
 
 A prerendered site that writes text for a few of its pages passes them as
 `pages` to `cheminfoPrerender`; every other address then says the name and the

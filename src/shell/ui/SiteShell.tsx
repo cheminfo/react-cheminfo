@@ -195,6 +195,11 @@ export interface SiteShellProps<
    */
   ecosystem?: boolean;
   /**
+   * Entries before About — the help of a tool whose keys nobody guesses.
+   * @default undefined
+   */
+  actionsBeforeAbout?: ShellSlot;
+  /**
    * Entries between About and Cite — an API link, a version.
    * @default undefined
    */

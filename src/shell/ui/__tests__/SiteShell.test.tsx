@@ -81,6 +81,22 @@ test('the utilities keep the family’s order, About first and Share last', () =
   expect(host.querySelector('.app-footer')).not.toBeNull();
 });
 
+test('an entry of the site may stand before About, and the rest keep their order', () => {
+  render({
+    about: { content: { ...ABOUT, cite: [] }, href: '/about' },
+    share: { vocabulary: { parts: [] }, title: 'Electrons' },
+    actionsBeforeAbout: <a href="/help">Help</a>,
+  });
+
+  expect(utilities()).toStrictEqual([
+    'Help',
+    'About',
+    'Tools',
+    'Contact',
+    'Share',
+  ]);
+});
+
 test('a framed page is the page alone', () => {
   render({ embedded: true, footer: { note: 'Every series is a link.' } });
 

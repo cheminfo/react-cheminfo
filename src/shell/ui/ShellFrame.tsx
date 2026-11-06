@@ -134,6 +134,7 @@ function ShellActions<Codecs extends ShareParamCodecs, Tab extends string>(
     about = false,
     cite,
     ecosystem = true,
+    actionsBeforeAbout,
     actionsAfterAbout,
     actionsAfterCite,
     actions,
@@ -143,6 +144,7 @@ function ShellActions<Codecs extends ShareParamCodecs, Tab extends string>(
   const works = cite ?? (about === false ? [] : (about.content.cite ?? []));
   return (
     <>
+      {fill(actionsBeforeAbout, compact)}
       {about === false ? null : (
         <AboutButton
           id={about.id}
