@@ -44,7 +44,9 @@ const NO_FIELDS: readonly ToolSettingField[] = [];
 /**
  * Frame a tool, and keep it showing a document.
  *
- * The frame is opened once and stays: a new document goes to the tool through
+ * Nothing is fetched while the frame has never been seen: a panel left folded,
+ * scrolled away or behind its splitter costs no download. The frame is opened
+ * the first time it shows, and stays: a new document goes to the tool through
  * the protocol, the way a host hands over data, rather than as a new address
  * that would reload the tool and lose what its visitor did in it. A tool that
  * reloads all the same is handed the document again.
@@ -65,6 +67,9 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
   }, []);
   const connection = useRef<ToolConnection | null>(null);
   const visible = useFrameVisibility(frame);
+  // Latched: a frame folded away after it was seen keeps its tool.
+  const [seen, setSeen] = useState(false);
+  if (visible && !seen) setSeen(true);
   // What the tool is to show: the document, but only once the frame is seen.
   const [shown, setShown] = useState<ToolDocument | null>(null);
   if (visible && shown !== document) setShown(document);
@@ -82,7 +87,7 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
 
   useEffect(() => {
     const element = frame.current;
-    if (element === null) return;
+    if (element === null || !seen) return;
     let greeted = false;
     const opened = connectTool({
       frame: () => element.contentWindow,
@@ -122,7 +127,7 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
       opened.close();
       if (connection.current === opened) connection.current = null;
     };
-  }, [url, host, helloTimeout]);
+  }, [url, host, helloTimeout, seen]);
 
   const name = shown?.document ?? null;
   useEffect(() => {
