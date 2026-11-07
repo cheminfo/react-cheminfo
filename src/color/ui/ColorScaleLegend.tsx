@@ -77,42 +77,44 @@ export function ColorScaleLegend(props: ColorScaleLegendProps): ReactElement {
   return (
     <div className={className} style={ROW_STYLE}>
       {label === '' ? null : <span style={LABEL_STYLE}>{label}</span>}
-      <span style={VALUE_STYLE}>{low}</span>
-      <svg
-        style={BAR_STYLE}
-        viewBox={`0 0 ${BAR_WIDTH} ${BAR_HEIGHT}`}
-        preserveAspectRatio="none"
-        role="img"
-        aria-label={t('color.legendLabel', {
-          what: label === '' ? t('color.colourScale') : label,
-          low,
-          high,
-        })}
-      >
-        {stops.length === 0 ? null : (
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
-              {stops.map((stop) => (
-                <stop
-                  key={stop.key}
-                  offset={stop.offset}
-                  stopColor={stop.color}
-                />
-              ))}
-            </linearGradient>
-          </defs>
-        )}
-        <rect
-          x="0"
-          y="0"
-          width={BAR_WIDTH}
-          height={BAR_HEIGHT}
-          rx="2"
-          fill={stops.length === 0 ? undefined : `url(#${gradientId})`}
-          style={stops.length === 0 ? EMPTY_BAR_STYLE : undefined}
-        />
-      </svg>
-      <span style={VALUE_STYLE}>{high}</span>
+      <span style={RAMP_STYLE}>
+        <span style={VALUE_STYLE}>{low}</span>
+        <svg
+          style={BAR_STYLE}
+          viewBox={`0 0 ${BAR_WIDTH} ${BAR_HEIGHT}`}
+          preserveAspectRatio="none"
+          role="img"
+          aria-label={t('color.legendLabel', {
+            what: label === '' ? t('color.colourScale') : label,
+            low,
+            high,
+          })}
+        >
+          {stops.length === 0 ? null : (
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
+                {stops.map((stop) => (
+                  <stop
+                    key={stop.key}
+                    offset={stop.offset}
+                    stopColor={stop.color}
+                  />
+                ))}
+              </linearGradient>
+            </defs>
+          )}
+          <rect
+            x="0"
+            y="0"
+            width={BAR_WIDTH}
+            height={BAR_HEIGHT}
+            rx="2"
+            fill={stops.length === 0 ? undefined : `url(#${gradientId})`}
+            style={stops.length === 0 ? EMPTY_BAR_STYLE : undefined}
+          />
+        </svg>
+        <span style={VALUE_STYLE}>{high}</span>
+      </span>
     </div>
   );
 }
@@ -193,11 +195,23 @@ const VALUE_STYLE = {
   fontVariantNumeric: 'tabular-nums',
 } as const satisfies CSSProperties;
 
+// The two end values hold the ends of the bar, so the line only ever breaks
+// after the label: a value left behind beside it reads as part of the title.
+const RAMP_STYLE = {
+  alignItems: 'center',
+  display: 'flex',
+  flex: '1 1 auto',
+  gap: 8,
+  minWidth: 0,
+} as const satisfies CSSProperties;
+
 const BAR_STYLE = {
   display: 'inline-block',
-  flex: '1 1 160px',
-  maxWidth: 320,
+  flex: '1 1 auto',
   height: BAR_HEIGHT,
+  maxWidth: 320,
+  minWidth: 40,
+  width: 160,
 } as const satisfies CSSProperties;
 
 const EMPTY_BAR_STYLE = {
