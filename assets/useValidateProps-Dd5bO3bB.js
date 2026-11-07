@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t}from"./iframe-D_QZ0R4v.js";import{_ as n,h as r}from"./classnames-C1d53djD.js";function i(e,t=[]){(0,a.useEffect)(()=>{n(`production`)||e()},t)}var a;function o(){return(o=e((()=>{a=t(),r()})))()}export{i as n,o as t};
