@@ -11,7 +11,6 @@ export {
   suggestedShareConfig,
   visibleShareParts,
 } from './config.ts';
-export { FIGURE_PARAM, isFigureAddress } from './figureParam.ts';
 export type { SharePreviewDeviceKey, SharePreviewSize } from './devices.ts';
 export {
   SHARE_PREVIEW_DEVICES,

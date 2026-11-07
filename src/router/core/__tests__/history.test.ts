@@ -202,11 +202,3 @@ function installBrowser(address: string) {
     },
   };
 }
-
-test('moving to another tab keeps the figure alone, as it keeps embed', () => {
-  installBrowser('/tutorial/2?embed=1&figure&smiles=CCO');
-
-  const address = writeRoute(router, { tab: 'exercises', id: 'rings' });
-
-  expect(address).toBe('/exercises/rings?embed=1&figure');
-});

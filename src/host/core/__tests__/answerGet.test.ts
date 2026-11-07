@@ -1,9 +1,6 @@
 import { expect, test } from 'vitest';
 
-import {
-  readFigureInputs,
-  readFigureSource,
-} from '../../../download/core/figureSource.ts';
+import { readFigureSource } from '../../../download/core/figureSource.ts';
 import { readFigureState } from '../../../download/core/figureState.ts';
 import { answerGet } from '../answerGet.ts';
 import type { HostOutputs } from '../hostOutputs.ts';
@@ -83,19 +80,16 @@ test('a picture that already names its source keeps it, and a page with no addre
   expect(svgOf(itemsOf(bare)[0])).toBe(FIGURE);
 });
 
-test('a picture handed back carries what the page was drawn from, read once, and only when a picture is asked for', async () => {
-  const spectrum = {
-    kind: 'spectra.ir.jdx',
-    key: 'spectra',
-    label: 'ethanol.jdx',
-    value: { jdx: '##TITLE=ethanol\n##END=' },
-  };
+test('a picture handed back carries the state of the page, read once, and only when a picture is asked for', async () => {
+  const state = { version: 1, value: { spectra: ['ethanol.jdx'] } };
   let reads = 0;
-  const inputs = () => {
-    reads++;
-    return [spectrum];
+  const page = {
+    address: 'https://vibrations.cheminfo.org/ir',
+    state: () => {
+      reads++;
+      return state;
+    },
   };
-  const page = { address: 'https://vibrations.cheminfo.org/ir', inputs };
 
   const conformer = await answerGet(
     { type: 'get', id: 'g4', keys: ['conformer'] },
@@ -117,28 +111,12 @@ test('a picture handed back carries what the page was drawn from, read once, and
     site: '3d',
     href: 'https://vibrations.cheminfo.org/ir',
   });
-  await expect(readFigureInputs(svg)).resolves.toStrictEqual([spectrum]);
-});
-
-test('a page that cannot say what it was drawn from still hands its picture back', async () => {
-  const result = await answerGet(
-    { type: 'get', id: 'g6', keys: ['figure'] },
-    TOOL,
-    outputsDrawing(FIGURE),
-    {
-      address: 'https://3d.cheminfo.org/?smiles=CCO',
-      inputs: () => {
-        throw new Error('No spectrum to write.');
-      },
-    },
-  );
-  const svg = svgOf(itemsOf(result)[0]);
-
-  expect(readFigureSource(svg)).toStrictEqual({
+  await expect(readFigureState(svg, '3d')).resolves.toStrictEqual({
     site: '3d',
-    href: 'https://3d.cheminfo.org/?smiles=CCO',
+    href: 'https://vibrations.cheminfo.org/ir',
+    ...state,
+    edited: false,
   });
-  await expect(readFigureInputs(svg)).resolves.toStrictEqual([]);
 });
 
 test('a picture handed back carries what the page computed, and one that cannot say is still handed back', async () => {

@@ -17,7 +17,7 @@ afterEach(() => {
   forget = undefined;
 });
 
-test('a picture of the model saved as SVG says which page drew it, and carries what the page computed', async () => {
+test('a picture of the model saved as SVG is named after its site, says which page drew it, and carries what the page computed', async () => {
   forget = setPageFigureSource(() => ({
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO&id=1',
@@ -32,7 +32,7 @@ test('a picture of the model saved as SVG says which page drew it, and carries w
   });
   const svg = (await file?.text()) ?? '';
 
-  expect(file?.name).toBe('ethanol.svg');
+  expect(file?.name).toBe('ethanol.3d.svg');
   expect(readFigureSource(svg)).toStrictEqual({
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO&id=1',
@@ -54,5 +54,6 @@ test('a page that names no source saves the picture alone', async () => {
     fileName: 'molecule',
   });
 
+  expect(file?.name).toBe('molecule.svg');
   expect(readFigureSource((await file?.text()) ?? '')).toBeUndefined();
 });

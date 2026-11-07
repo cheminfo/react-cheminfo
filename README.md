@@ -1214,52 +1214,25 @@ useHostConnection(TOOL, {
   item it was made from, so a host knows which spectrum to save them on.
 - **Opening a document sends nothing back.** What the tool shows once `load`
   returns is what the host already has, so `read` must reflect a load by then.
-- **Every picture handed back says where it came from.** An `image.svg` gets a
-  `<cheminfo:source site href>` in its metadata: the tool's name and the page's
-  address as it stood, `embed`, `hide` and `card` left out. A site keeps what is
-  on screen in its address, so a host frames that address again to change the
-  picture — 3d's camera and conformer, the periodic table's selection.
-  `withFigureSource`, `readFigureSource` and `figureAddress` (`/core`) write and
-  read it, inside the figure's own `<metadata>` when it has one, and
-  `cropFigure` keeps it.
-- **What the address cannot hold, the picture carries.** A tool drawn from a
-  measured spectrum passes `inputs` — the values that redraw the page, in the
-  kinds it takes them in — and every picture it hands back or saves carries
-  them inside its source, each as gzipped JSON in base64. A host frames the
-  address, then loads `figureToolDocument(svg, id)`: the figure opens as it
-  was, wherever it was pasted. `readFigureInputs` unpacks them, refusing
-  anything that would grow past 16 MB.
-
-```ts
-useHostConnection(TOOL, {
-  load,
-  outputs,
-  // Read when a picture is asked for or saved, never before.
-  inputs: () =>
-    spectra.value.map((spectrum) => ({
-      kind: 'spectra.ir.jdx',
-      key: 'spectra',
-      value: { jdx: irSpectrumToJcamp(spectrum, mode.value) },
-    })),
-});
-```
-
-- **What the page computed, the picture may carry too.** An address names what
-  to compute; a `state` is what was computed — 3d's conformers and their
-  energies, lcao's relaxed geometry, tlc's plate — in the site's own format,
-  with a `version` from 1. Every picture handed back or saved carries it as
-  gzipped JSON with a digest of the picture, and the figure opens again at
-  once, the same whatever the site computes differently since.
-- **A tool opens its own figures on `FIGURE_INPUT`**, an optional `figure`
-  input of kind `image.svg`, and reads them with `loadedFigureState`; a file
-  dropped on the page goes through `readFigureState(svg, site)`, which also
-  gives the `href` the figure records, for what the address holds. `edited`
-  says the picture was redrawn in another program since. A host hands a figure back
-  with `figureToolDocument(svg, id, tool.tool)`: the whole figure to a tool
-  that takes figures, the carried values to any other.
-- **`?figure` asks for the figure alone**, filling the frame — what a host
-  editing a figure in place frames over it. It implies `embed`, each site says
-  what its figure is, and a recorded address leaves it out.
+- **Every picture handed back says where it came from, and carries what it
+  shows.** An `image.svg` gets a `<cheminfo:source site href>` in its metadata:
+  the tool's name and the page's address as it stood, `embed`, `hide` and
+  `card` left out. Inside it, `<cheminfo:state version digest>` holds the
+  page's `state` — 3d's conformers, lcao's geometry, tlc's plate, chemcalc's
+  spectra, the periodic table's colouring — in the site's own format, gzipped
+  JSON in base64, with a digest of the picture. The state is the document: a
+  site opens the figure again from it, with nothing computed anew and the same
+  whatever the site computes differently since; the address only says where.
+  `withFigureSource`, `readFigureSource`, `readFigureState` and
+  `figureAddress` (`/core`) write and read it, and `cropFigure` keeps it.
+- **One way to open a figure again, on every site.** A tool takes its own
+  figures on `FIGURE_INPUT`, an optional `figure` input of kind `image.svg`,
+  and reads them with `loadedFigureState`; a host hands one back whole with
+  `figureToolDocument(svg, id)`. A reader opens a saved `.<site>.svg` with
+  `<OpenFigureButton site onOpen>`, or drops one on a zone calling `open` from
+  `useOpenFigure` (`/host`): a figure of another site of the family offers to
+  open on that site instead. `edited` says the picture was redrawn in another
+  program since. Ctrl+S saves the site's figure through `useSaveShortcut`.
 
 ```ts
 useHostConnection(TOOL, {

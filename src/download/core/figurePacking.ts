@@ -1,50 +1,25 @@
 /**
- * What a figure was drawn from, carried inside it.
- *
- * An address says what a page shows only while what it shows fits in one: a
- * structure, a property, a camera. A measured spectrum does not, so a figure
- * drawn from one carries the spectrum itself — each value packed as gzipped
- * JSON in base64 — and opens as it was wherever it lands, with no file beside
- * it and no server behind it.
+ * How a figure packs the state it carries: JSON, gzipped, in base64, so a
+ * conformer set or a measured spectrum travels inside the picture and opens
+ * wherever it lands, with no file beside it and no server behind it.
  */
 
 import { decode, encode } from 'uint8-base64';
 
-/** One value a figure was drawn from, as a host would hand it to the site. */
-export interface FigureInput {
-  /** Its kind, as the host protocol names it, e.g. `spectra.ir.jdx`. */
-  kind: string;
-  /** The value, in that kind's shape. */
-  value: unknown;
-  /**
-   * The site's input it is for.
-   * @default undefined — any input that takes its kind
-   */
-  key?: string;
-  /**
-   * What it is called, e.g. the name of the file it was read from.
-   * @default undefined
-   */
-  label?: string;
-}
+/** How a state is packed, as its element says. */
+export const FIGURE_STATE_ENCODING = 'gzip+base64';
 
-/** How a value is packed, as its element says. */
-export const FIGURE_INPUT_ENCODING = 'gzip+base64';
-
-/** The most values a figure is read with; any more are left out. */
-export const MAX_FIGURE_INPUTS = 32;
-
-/** The most a value may weigh once unpacked: 16 MB, as a picture may. */
-export const MAX_FIGURE_INPUT_BYTES = 16 * 1024 * 1024;
+/** The most a state may weigh once unpacked: 16 MB, as a picture may. */
+export const MAX_FIGURE_STATE_BYTES = 16 * 1024 * 1024;
 
 const BASE64 = /^[A-Za-z\d+/]*={0,2}$/;
 
 /**
- * Pack a value for a figure to carry.
+ * Pack a state for a figure to carry.
  * @param value - The value, as JSON writes it.
  * @returns The value, gzipped, in base64.
  */
-export async function packFigureInput(value: unknown): Promise<string> {
+export async function packFigureValue(value: unknown): Promise<string> {
   const json = new TextEncoder().encode(JSON.stringify(value));
   const packed = await piped(json, new CompressionStream('gzip'));
   return new TextDecoder().decode(encode(packed));
@@ -52,13 +27,13 @@ export async function packFigureInput(value: unknown): Promise<string> {
 
 /**
  * Unpack a value a figure carries. The figure may come from anywhere, so a
- * value that would unpack past `MAX_FIGURE_INPUT_BYTES` is refused before it
+ * value that would unpack past `MAX_FIGURE_STATE_BYTES` is refused before it
  * is.
  * @param text - The value, gzipped, in base64; white space is ignored.
  * @returns The value.
  * @throws {Error} When it is no packed value, or unpacks too large.
  */
-export async function unpackFigureInput(text: string): Promise<unknown> {
+export async function unpackFigureValue(text: string): Promise<unknown> {
   const base64 = text.replaceAll(/\s+/g, '');
   if (base64.length % 4 !== 0 || !BASE64.test(base64)) {
     throw new Error('The value is not written in base64.');
@@ -67,7 +42,7 @@ export async function unpackFigureInput(text: string): Promise<unknown> {
   const json = await piped(
     packed,
     new DecompressionStream('gzip'),
-    MAX_FIGURE_INPUT_BYTES,
+    MAX_FIGURE_STATE_BYTES,
   );
   return JSON.parse(new TextDecoder().decode(json));
 }

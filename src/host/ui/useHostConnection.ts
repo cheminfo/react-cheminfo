@@ -8,7 +8,6 @@
 import { useEffect, useRef } from 'react';
 
 import type { CitedWork } from '../../citation/core/works.ts';
-import type { FigureInput } from '../../download/core/figureInputs.ts';
 import type { FigureSource } from '../../download/core/figureSource.ts';
 import { figureAddress } from '../../download/core/figureSource.ts';
 import type { FigureState } from '../../download/core/figureState.ts';
@@ -60,19 +59,12 @@ export interface HostHandlers {
    */
   help?: ToolHelp;
   /**
-   * What the page is drawn from that its address does not hold — the spectra
-   * a notebook handed over, a file the visitor dropped — in the kinds the tool
-   * takes them in. Every figure the page hands back or saves carries them, so
-   * a host that hands them over again opens the figure as it was.
-   * @default undefined — the address is the whole page
-   */
-  inputs?: () => readonly FigureInput[] | Promise<readonly FigureInput[]>;
-  /**
-   * What the page computed — the conformers of 3d, the plate of tlc — in the
-   * site's own format. Every figure the page hands back or saves carries it,
-   * so the site opens the figure again as it was, with nothing computed anew,
-   * through an input `FIGURE_INPUT` or a file dropped on the page.
-   * @default undefined — the address and the inputs redraw the page
+   * What the page shows — the conformers of 3d, the plate of tlc, the spectra
+   * of chemcalc — in the site's own format. Every figure the page hands back
+   * or saves carries it, so the site opens the figure again as it was, with
+   * nothing computed anew, from a file opened or dropped on the page or from a
+   * host handing it over on `FIGURE_INPUT`.
+   * @default undefined — the page's figures cannot be opened again
    */
   state?: () => FigureState | undefined | Promise<FigureState | undefined>;
 }
@@ -108,8 +100,6 @@ export function useHostConnection(
           site: tool.name,
           href: figureAddress(globalThis.location.href),
         };
-        const inputs = (await latest.current.inputs?.()) ?? [];
-        if (inputs.length > 0) source.inputs = inputs;
         const state = await latest.current.state?.();
         if (state !== undefined) source.state = state;
         return source;
@@ -148,7 +138,6 @@ export function useHostConnection(
           ...(latest.current.settings === undefined
             ? {}
             : { settings: latest.current.settings }),
-          inputs: async () => (await latest.current.inputs?.()) ?? [],
           state: async () => latest.current.state?.(),
         });
       })

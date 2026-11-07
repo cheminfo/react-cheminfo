@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
-import { packFigureInput } from '../figureInputs.ts';
-import { readFigureInputs, withFigureSource } from '../figureSource.ts';
+import { packFigureValue } from '../figurePacking.ts';
+import { withFigureSource } from '../figureSource.ts';
 import { figureDigest, readFigureState } from '../figureState.ts';
 
 const FIGURE =
@@ -56,27 +56,6 @@ test('another site’s state is none, and so is a figure that carries none', asy
   await expect(readFigureState(FIGURE)).resolves.toBeUndefined();
 });
 
-test('a state sits beside the values the figure was drawn from, and leaves them as they were', async () => {
-  const spectrum = {
-    kind: 'spectra.ir.jdx',
-    key: 'spectra',
-    value: { jdx: '##TITLE=ethanol\n##END=' },
-  };
-  const svg = await withFigureSource(FIGURE, {
-    ...SOURCE,
-    inputs: [spectrum],
-  });
-
-  await expect(readFigureInputs(svg)).resolves.toStrictEqual([spectrum]);
-  await expect(readFigureState(svg, '3d')).resolves.toStrictEqual({
-    site: '3d',
-    href: SOURCE.href,
-    version: 1,
-    value: CONFORMERS,
-    edited: false,
-  });
-});
-
 test('a picture redrawn in another program is said to be edited, one only reindented is not', async () => {
   const svg = await withFigureSource(FIGURE, SOURCE);
   const redrawn = svg.replace(
@@ -97,7 +76,7 @@ test('a picture redrawn in another program is said to be edited, one only reinde
 
 test('a state that is unreadable, of an unknown version or misnamed, is none', async () => {
   const svg = await withFigureSource(FIGURE, SOURCE);
-  const packed = await packFigureInput(CONFORMERS);
+  const packed = await packFigureValue(CONFORMERS);
 
   await expect(
     readFigureState(

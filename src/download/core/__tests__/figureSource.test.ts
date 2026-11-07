@@ -3,7 +3,6 @@ import { expect, test } from 'vitest';
 import {
   FIGURE_SOURCE_NAMESPACE,
   figureAddress,
-  readFigureInputs,
   readFigureSource,
   withFigureSource,
 } from '../figureSource.ts';
@@ -98,84 +97,4 @@ test('the address a figure records drops what only a framing page asks for', () 
   expect(
     figureAddress('https://periodic-table.cheminfo.org/table/Fe?embed'),
   ).toBe('https://periodic-table.cheminfo.org/table/Fe');
-});
-
-const SPECTRUM = {
-  kind: 'spectra.ir.jdx',
-  key: 'spectra',
-  label: 'ethanol & water.jdx',
-  value: {
-    jdx: '##TITLE=ethanol\n##JCAMP-DX=4.24\n##XYPOINTS=(XY..XY)\n400,0.1\n402,0.2\n##END=',
-    peaks: [{ wavenumber: 1050, kind: 'S' }],
-  },
-};
-
-const STRUCTURE = { kind: 'chem.smiles', value: { smiles: 'CCO' } };
-
-test('a figure carries the values it was drawn from, and gives them back', async () => {
-  const svg = await withFigureSource(FIGURE, {
-    site: 'vibrations',
-    href: 'https://vibrations.cheminfo.org/ir',
-    inputs: [SPECTRUM, STRUCTURE],
-  });
-
-  expect(svg).toMatch(
-    /<cheminfo:input kind="spectra\.ir\.jdx" key="spectra" label="ethanol &amp; water\.jdx" encoding="gzip\+base64">[\w+/=]+<\/cheminfo:input>/,
-  );
-  // The address is read alone, without unpacking anything.
-  expect(readFigureSource(svg)).toStrictEqual({
-    site: 'vibrations',
-    href: 'https://vibrations.cheminfo.org/ir',
-  });
-  await expect(readFigureInputs(svg)).resolves.toStrictEqual([
-    SPECTRUM,
-    STRUCTURE,
-  ]);
-});
-
-test('a new source drops the values of the old one, and one without values carries none', async () => {
-  const carrying = await withFigureSource(FIGURE, {
-    site: 'vibrations',
-    href: 'https://vibrations.cheminfo.org/ir',
-    inputs: [SPECTRUM],
-  });
-
-  const replaced = await withFigureSource(carrying, SOURCE);
-
-  expect(replaced).not.toContain('cheminfo:input');
-  expect(replaced.match(/<metadata>/g)).toHaveLength(1);
-  expect(readFigureSource(replaced)).toStrictEqual(SOURCE);
-  await expect(readFigureInputs(replaced)).resolves.toStrictEqual([]);
-  await expect(readFigureInputs(FIGURE)).resolves.toStrictEqual([]);
-});
-
-test('a value that does not unpack is left out, and the others are read', async () => {
-  const svg = await withFigureSource(FIGURE, {
-    site: 'vibrations',
-    href: 'https://vibrations.cheminfo.org/ir',
-    inputs: [SPECTRUM, STRUCTURE],
-  });
-
-  const damaged = svg.replace(
-    /(?<open><cheminfo:input kind="spectra\.ir\.jdx"[^>]*>)[^<]+/,
-    '$<open>H4sIAAAAAAAA',
-  );
-
-  await expect(readFigureInputs(damaged)).resolves.toStrictEqual([STRUCTURE]);
-});
-
-test('values are read whatever prefix another program gave them, and only in a source that reads', async () => {
-  const written = await withFigureSource(FIGURE, {
-    site: 'vibrations',
-    href: 'https://vibrations.cheminfo.org/ir',
-    inputs: [STRUCTURE],
-  });
-  const renamed = written
-    .replaceAll('cheminfo:', 'ns2:')
-    .replace('xmlns:cheminfo=', 'xmlns:ns2=');
-
-  await expect(readFigureInputs(renamed)).resolves.toStrictEqual([STRUCTURE]);
-  await expect(
-    readFigureInputs(renamed.replace('site="vibrations"', 'site="Bad"')),
-  ).resolves.toStrictEqual([]);
 });

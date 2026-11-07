@@ -4,6 +4,11 @@ export type { OpenToolOptions } from './openTool.ts';
 export type { ToolSettingControlsProps } from './ToolSettingControls.tsx';
 export { ToolSettingControls } from './ToolSettingControls.tsx';
 export { forwardFigure } from './forwardFigure.ts';
+export type { OpenFigureButtonProps } from './OpenFigureButton.tsx';
+export { OpenFigureButton } from './OpenFigureButton.tsx';
+export type { OpenFigure, OpenFigureOptions } from './useOpenFigure.tsx';
+export { useOpenFigure } from './useOpenFigure.tsx';
+export { useSaveShortcut } from './useSaveShortcut.ts';
 export { openTool } from './openTool.ts';
 export type {
   FramedTool,

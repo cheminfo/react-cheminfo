@@ -14,11 +14,8 @@ import {
   rounded,
 } from './croppedMarkup.ts';
 import { svgImageUrl } from './figurePng.ts';
-import {
-  readFigureInputs,
-  readFigureSource,
-  withFigureSource,
-} from './figureSource.ts';
+import { readFigureSource, withFigureSource } from './figureSource.ts';
+import { readFigureState } from './figureState.ts';
 import type { FigureSvg } from './figureSvg.ts';
 import { paintedBox } from './paintedBox.ts';
 
@@ -46,13 +43,19 @@ export async function cropFigure(figure: FigureSvg): Promise<FigureSvg> {
     const cropped =
       raster === null ? await cropDrawing(figure) : await cropImage(raster);
     if (!cropped) return figure;
-    // A figure that says where it came from still says it once cut down.
+    // A figure that says where it came from still says it once cut down,
+    // and still carries the state it opens again from.
     const source = readFigureSource(figure.markup);
     if (!source) return cropped;
-    const inputs = await readFigureInputs(figure.markup);
+    const carried = await readFigureState(figure.markup, source.site);
     const markup = await withFigureSource(
       cropped.markup,
-      inputs.length === 0 ? source : { ...source, inputs },
+      carried === undefined
+        ? source
+        : {
+            ...source,
+            state: { version: carried.version, value: carried.value },
+          },
     );
     return { ...cropped, markup };
   } catch {

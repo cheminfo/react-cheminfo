@@ -1,11 +1,9 @@
 /**
  * A tool's answer to a `get`: the values asked for, those made on request
  * rendered then. Every picture handed back says where it came from — the site,
- * the address of the page as it stood, what the page was drawn from that the
- * address does not hold, and what it computed — which opens it again.
+ * the address of the page as it stood, and the state that opens it again.
  */
 
-import type { FigureInput } from '../../download/core/figureInputs.ts';
 import type { FigureSource } from '../../download/core/figureSource.ts';
 import {
   figureAddress,
@@ -31,15 +29,9 @@ export interface FigurePage {
    */
   address?: string;
   /**
-   * What the page is drawn from that its address does not hold, written into
-   * every picture handed back.
-   * @default undefined — the address is the whole page
-   */
-  inputs?: () => readonly FigureInput[] | Promise<readonly FigureInput[]>;
-  /**
    * What the page computed, in the site's own format, written into every
    * picture handed back so the site opens it again with nothing computed anew.
-   * @default undefined — the address and the inputs redraw the page
+   * @default undefined — the pictures cannot be opened again
    */
   state?: () => FigureState | undefined | Promise<FigureState | undefined>;
 }
@@ -127,12 +119,8 @@ async function withSources(
 ): Promise<HostItem[]> {
   if (address === undefined || !URL.canParse(address)) return items;
   if (!items.some((item) => unsourcedSvg(item) !== undefined)) return items;
-  const [carried, state] = await Promise.all([
-    readSafely(page.inputs),
-    readSafely(page.state),
-  ]);
+  const state = await readSafely(page.state);
   const source: FigureSource = { site, href: figureAddress(address) };
-  if (carried !== undefined && carried.length > 0) source.inputs = carried;
   if (state !== undefined) source.state = state;
   return Promise.all(
     items.map(async (item) => {

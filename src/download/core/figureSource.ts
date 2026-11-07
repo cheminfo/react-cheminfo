@@ -1,16 +1,14 @@
 /**
  * Where a figure came from, written into the figure: the site that drew it,
- * the address of the page as it stood, and — when the address does not say it
- * all — the values the page was drawn from.
+ * the address of the page as it stood, and the state the site opens it again
+ * from (`figureState.ts`).
  *
- * Every site of the family keeps what is on screen in its address — the
- * structure, the conformer and the camera of 3d, the property and the elements
- * picked of the periodic table — so the address is most of what a figure needs
- * to be changed again: a host frames the site at it, a reader opens it on its
- * own. What no address holds, a measured spectrum, the figure carries itself,
- * and a host hands it back to the site. What the page computed — conformers,
- * a relaxed geometry, a plate — it may carry as its state, so the figure opens
- * again with nothing computed anew (`figureState.ts`).
+ * The state is what makes a figure a document rather than a picture: the
+ * structure and conformers of 3d, the geometry of lcao, the plate of tlc, the
+ * spectra of chemcalc, the table of periodic-table, the drawing of draw. The
+ * site reads it back from the file, or from a host handing the figure over
+ * whole, and shows the page as it was, with nothing computed anew. The address
+ * says only where to open it, and what the camera looked at.
  */
 
 import { CARD_PARAM } from '../../card/core/cardAddress.ts';
@@ -20,21 +18,11 @@ import {
 } from '../../router/core/query.ts';
 import { EMBED_PARAM, HIDE_PARAM } from '../../share/core/config.ts';
 import { escapeAttribute } from '../../share/core/escape.ts';
-import { FIGURE_PARAM } from '../../share/core/figureParam.ts';
 
-import type { FigureInput } from './figureInputs.ts';
-import {
-  FIGURE_INPUT_ENCODING,
-  MAX_FIGURE_INPUTS,
-  packFigureInput,
-  unpackFigureInput,
-} from './figureInputs.ts';
 import {
   FIGURE_SOURCE_NAMESPACE,
-  attribute,
   findSource,
   readSourceTag,
-  sourceChildren,
   withoutFigureSource,
 } from './figureSourceMarkup.ts';
 import type { FigureState } from './figureState.ts';
@@ -49,15 +37,9 @@ export interface FigureSource {
   /** The page as it stood, e.g. `https://3d.cheminfo.org/?smiles=CCO&view=…`. */
   href: string;
   /**
-   * The values the page was drawn from that its address does not hold — a
-   * measured spectrum — in the kinds the site takes them in.
-   * @default undefined — the address is the whole page
-   */
-  inputs?: readonly FigureInput[];
-  /**
-   * What the page computed, in the site's own format, so the figure opens
-   * again as it was with nothing computed anew. Only the site reads it.
-   * @default undefined — the address and the inputs redraw the page
+   * What the page shows, in the site's own format, so the figure opens again
+   * as it was with nothing computed anew. Only the site reads it.
+   * @default undefined — a picture the site cannot open again
    */
   state?: FigureState;
 }
@@ -67,7 +49,6 @@ const FRAME_PARAMS: ReadonlySet<string> = new Set([
   EMBED_PARAM,
   HIDE_PARAM,
   CARD_PARAM,
-  FIGURE_PARAM,
 ]);
 
 /**
@@ -98,31 +79,14 @@ export async function withFigureSource(
 
 /**
  * Where a figure came from, as its SVG says: the site and the page. A site
- * name or an address that does not read is no source. The values it was drawn
- * from are unpacked by `readFigureInputs`, when they are wanted.
+ * name or an address that does not read is no source. Its state is read by
+ * `readFigureState`, when it is wanted.
  * @param svg - The figure, as an SVG document.
  * @returns The source, or `undefined` when the figure names none.
  */
 export function readFigureSource(svg: string): FigureSource | undefined {
   const found = findSource(svg);
   return found === undefined ? undefined : readSourceTag(found);
-}
-
-/**
- * The values a figure was drawn from, as it carries them. One that does not
- * unpack is left out, so a figure damaged on the way, or written by a newer
- * site, still opens on what can be read.
- * @param svg - The figure, as an SVG document.
- * @returns The values, in the order written; none when it carries none.
- */
-export async function readFigureInputs(svg: string): Promise<FigureInput[]> {
-  const found = findSource(svg);
-  if (found === undefined || readSourceTag(found) === undefined) return [];
-  const written = sourceChildren(found, 'input').slice(0, MAX_FIGURE_INPUTS);
-  const read = await Promise.all(
-    written.map((child) => readInput(child.tag, child.text)),
-  );
-  return read.filter((input) => input !== undefined);
 }
 
 /**
@@ -146,43 +110,6 @@ async function sourceElement(
   figure: string,
 ): Promise<string> {
   const open = `<cheminfo:source xmlns:cheminfo="${FIGURE_SOURCE_NAMESPACE}" site="${escapeAttribute(source.site)}" href="${escapeAttribute(source.href)}"`;
-  const written = await Promise.all((source.inputs ?? []).map(inputElement));
-  if (source.state !== undefined) {
-    written.push(await stateElement(source.state, figure));
-  }
-  if (written.length === 0) return `${open}/>`;
-  return `${open}>${written.join('')}</cheminfo:source>`;
-}
-
-async function inputElement(input: FigureInput): Promise<string> {
-  const key =
-    input.key === undefined ? '' : ` key="${escapeAttribute(input.key)}"`;
-  const label =
-    input.label === undefined ? '' : ` label="${escapeAttribute(input.label)}"`;
-  const packed = await packFigureInput(input.value);
-  return `<cheminfo:input kind="${escapeAttribute(input.kind)}"${key}${label} encoding="${FIGURE_INPUT_ENCODING}">${packed}</cheminfo:input>`;
-}
-
-async function readInput(
-  tag: string,
-  text: string,
-): Promise<FigureInput | undefined> {
-  const kind = attribute(tag, 'kind');
-  if (!kind || attribute(tag, 'encoding') !== FIGURE_INPUT_ENCODING) {
-    return undefined;
-  }
-  let value: unknown;
-  try {
-    value = await unpackFigureInput(text);
-  } catch {
-    return undefined;
-  }
-  const key = attribute(tag, 'key');
-  const label = attribute(tag, 'label');
-  return {
-    kind,
-    value,
-    ...(key === undefined ? {} : { key }),
-    ...(label === undefined ? {} : { label }),
-  };
+  if (source.state === undefined) return `${open}/>`;
+  return `${open}>${await stateElement(source.state, figure)}</cheminfo:source>`;
 }

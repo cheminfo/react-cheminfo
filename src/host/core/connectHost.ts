@@ -49,7 +49,7 @@ export { selectInputs } from './selectInputs.ts';
 export function connectHost(options: HostConnectionOptions): () => void {
   const { host, listen, tool, origin, build, cite, help, load, outputs } =
     options;
-  const { inputs, state, settings } = options;
+  const { state, settings } = options;
   const { outputDelay = OUTPUT_DELAY } = options;
   let port: MessagePort | null = null;
   let appliedDocument: string | null = null;
@@ -97,7 +97,6 @@ export function connectHost(options: HostConnectionOptions): () => void {
       return Promise.resolve(applySettings(request, settings));
     }
     return answerGet(request, tool, outputs, {
-      ...(inputs === undefined ? {} : { inputs }),
       ...(state === undefined ? {} : { state }),
     });
   }

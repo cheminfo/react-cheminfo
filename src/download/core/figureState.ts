@@ -12,10 +12,10 @@
  */
 
 import {
-  FIGURE_INPUT_ENCODING,
-  packFigureInput,
-  unpackFigureInput,
-} from './figureInputs.ts';
+  FIGURE_STATE_ENCODING,
+  packFigureValue,
+  unpackFigureValue,
+} from './figurePacking.ts';
 import {
   attribute,
   findSource,
@@ -71,17 +71,16 @@ export async function stateElement(
     );
   }
   const [packed, digest] = await Promise.all([
-    packFigureInput(value),
+    packFigureValue(value),
     figureDigest(figure),
   ]);
   const signed = digest === undefined ? '' : ` digest="${digest}"`;
-  return `<cheminfo:state version="${version}"${signed} encoding="${FIGURE_INPUT_ENCODING}">${packed}</cheminfo:state>`;
+  return `<cheminfo:state version="${version}"${signed} encoding="${FIGURE_STATE_ENCODING}">${packed}</cheminfo:state>`;
 }
 
 /**
  * The state a figure carries, when a site of the family wrote one. A state
- * that does not unpack, or would grow past `MAX_FIGURE_INPUT_BYTES`, is none:
- * the figure still opens from its address.
+ * that does not unpack, or would grow past `MAX_FIGURE_STATE_BYTES`, is none.
  * @param svg - The figure, as an SVG document, from anywhere.
  * @param site - The site whose state is wanted; another site's is none.
  * @returns The state, or `undefined` when the figure carries none.
@@ -102,13 +101,13 @@ export async function readFigureState(
   if (
     !Number.isSafeInteger(version) ||
     version < 1 ||
-    attribute(element.tag, 'encoding') !== FIGURE_INPUT_ENCODING
+    attribute(element.tag, 'encoding') !== FIGURE_STATE_ENCODING
   ) {
     return undefined;
   }
   let value: unknown;
   try {
-    value = await unpackFigureInput(element.text);
+    value = await unpackFigureValue(element.text);
   } catch {
     return undefined;
   }

@@ -54,15 +54,9 @@ export interface HostConnectionOptions {
    */
   outputs?: HostOutputs;
   /**
-   * What the page is drawn from that its address does not hold, written into
-   * every picture handed back so a host can hand it over again.
-   * @default undefined — the address is the whole page
-   */
-  inputs?: FigurePage['inputs'];
-  /**
-   * What the page computed, in the site's own format, written into every
-   * picture handed back so the site opens it again with nothing computed anew.
-   * @default undefined — the address and the inputs redraw the page
+   * What the page shows, in the site's own format, written into every picture
+   * handed back so the site opens it again with nothing computed anew.
+   * @default undefined — the pictures cannot be opened again
    */
   state?: FigurePage['state'];
   /**

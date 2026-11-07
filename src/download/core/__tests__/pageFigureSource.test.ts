@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 
-import { readFigureInputs, readFigureSource } from '../figureSource.ts';
+import { readFigureSource } from '../figureSource.ts';
+import { readFigureState } from '../figureState.ts';
 import {
   setPageFigureSource,
   withPageFigureSource,
@@ -9,7 +10,7 @@ import {
 const FIGURE =
   '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20"/></svg>';
 
-const STRUCTURE = { kind: 'chem.smiles', value: { smiles: 'CCO' } };
+const STATE = { version: 1, value: { smiles: 'CCO' } };
 
 test('a figure the page saves says where it came from while the page names a source', async () => {
   await expect(withPageFigureSource(FIGURE)).resolves.toBe(FIGURE);
@@ -17,7 +18,7 @@ test('a figure the page saves says where it came from while the page names a sou
   const forget = setPageFigureSource(() => ({
     site: 'vibrations',
     href: 'https://vibrations.cheminfo.org/ir',
-    inputs: [STRUCTURE],
+    state: STATE,
   }));
   const saved = await withPageFigureSource(FIGURE);
   forget();
@@ -26,7 +27,12 @@ test('a figure the page saves says where it came from while the page names a sou
     site: 'vibrations',
     href: 'https://vibrations.cheminfo.org/ir',
   });
-  await expect(readFigureInputs(saved)).resolves.toStrictEqual([STRUCTURE]);
+  await expect(readFigureState(saved, 'vibrations')).resolves.toStrictEqual({
+    site: 'vibrations',
+    href: 'https://vibrations.cheminfo.org/ir',
+    ...STATE,
+    edited: false,
+  });
   await expect(withPageFigureSource(FIGURE)).resolves.toBe(FIGURE);
 });
 

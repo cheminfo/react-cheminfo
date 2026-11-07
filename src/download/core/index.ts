@@ -2,17 +2,14 @@ export type { FigureNotice } from './copyFigure.ts';
 export { copyFigure } from './copyFigure.ts';
 export { copySvg } from './copySvg.ts';
 export { cropFigure } from './cropFigure.ts';
-export type { FigureInput } from './figureInputs.ts';
 export {
-  FIGURE_INPUT_ENCODING,
-  MAX_FIGURE_INPUTS,
-  MAX_FIGURE_INPUT_BYTES,
-} from './figureInputs.ts';
+  FIGURE_STATE_ENCODING,
+  MAX_FIGURE_STATE_BYTES,
+} from './figurePacking.ts';
 export type { FigureSource } from './figureSource.ts';
 export {
   FIGURE_SOURCE_NAMESPACE,
   figureAddress,
-  readFigureInputs,
   readFigureSource,
   withFigureSource,
 } from './figureSource.ts';

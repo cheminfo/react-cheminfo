@@ -2,7 +2,6 @@ import type { Language } from '../../i18n/core/languages.ts';
 import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
 import { LANGUAGE_PARAM } from '../../language/core/languageParam.ts';
 import { EMBED_PARAM, HIDE_PARAM } from '../../share/core/config.ts';
-import { FIGURE_PARAM } from '../../share/core/figureParam.ts';
 
 import {
   openingRoute,
@@ -22,9 +21,8 @@ import type {
   TabRouterOptions,
 } from './tabRouterTypes.ts';
 
-// Written without a value, and present all the same: a page framed, or framed
-// as its figure alone.
-const SWITCHES: ReadonlySet<string> = new Set([EMBED_PARAM, FIGURE_PARAM]);
+// Written without a value, and present all the same: a page framed.
+const SWITCHES: ReadonlySet<string> = new Set([EMBED_PARAM]);
 
 /**
  * The router of a site: its tabs, read and written by path, and the browser
