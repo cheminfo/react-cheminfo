@@ -10,6 +10,7 @@
 
 import type { Language } from '../../i18n/core/languages.ts';
 import { EMBED_PARAM, HIDE_PARAM } from '../../share/core/config.ts';
+import { FIGURE_PARAM } from '../../share/core/figureParam.ts';
 
 import { stripBasePath } from './basePath.ts';
 import { pageHistory, pageLocation } from './pageAddress.ts';
@@ -190,7 +191,7 @@ function withKeptParams<Tab extends string>(
   const named = route.params ?? {};
   const shown = onScreen.params;
   const kept: QueryEntry[] = [];
-  for (const key of new Set([EMBED_PARAM, HIDE_PARAM, ...keep])) {
+  for (const key of new Set([EMBED_PARAM, HIDE_PARAM, FIGURE_PARAM, ...keep])) {
     if (Object.hasOwn(named, key)) continue;
     const value = shown[key];
     if (value !== undefined) kept.push([key, value]);

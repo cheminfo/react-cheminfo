@@ -107,3 +107,9 @@ test('an empty value is carried, unless the site ignores empty values', () => {
     }),
   ).toBe('/conformers?id=2');
 });
+
+test('a page asking for its figure alone keeps the switch, written bare or not', () => {
+  expect(
+    conformers.parse('/conformers?smiles=CCO&embed=1&figure').query,
+  ).toStrictEqual({ smiles: 'CCO', embed: '1', figure: '' });
+});
