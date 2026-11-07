@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.101.0](https://github.com/cheminfo/react-cheminfo/compare/v0.100.0...v0.101.0) (2026-11-07)
+
+
+### Features
+
+* add glassware.cheminfo.org to the family ([bc732df](https://github.com/cheminfo/react-cheminfo/commit/bc732dfb9039b76f38bba7d96c4b63f625247b1c))
+* load zip.js only when a backup is written or read ([50d007a](https://github.com/cheminfo/react-cheminfo/commit/50d007ad738a88491f2eed767c2c5e054503578e))
+* open a framed tool only once its frame is seen ([991aca2](https://github.com/cheminfo/react-cheminfo/commit/991aca297b9c9b725917e3e980885d2aac2b0270))
+* save a site's figures as .&lt;site&gt;.svg, and send a figure dropped on the wrong site to the one that drew it ([a0df025](https://github.com/cheminfo/react-cheminfo/commit/a0df0259e603954678dcfebaebdacb41cfb75074))
+
+
+### Bug Fixes
+
+* set a passing panel's pin paler than a kept one ([503329e](https://github.com/cheminfo/react-cheminfo/commit/503329eec77162aede863c6c5129cfdf21259963))
+
 ## [0.100.0](https://github.com/cheminfo/react-cheminfo/compare/v0.99.0...v0.100.0) (2026-11-07)
 
 
