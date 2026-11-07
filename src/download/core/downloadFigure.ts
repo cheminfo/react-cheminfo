@@ -54,20 +54,34 @@ export async function downloadFigure(
   target: string | Element,
   options: DownloadFigureOptions = {},
 ): Promise<void> {
+  const file = await figureFile(target, options);
+  downloadBlob(file, file.name);
+}
+
+/**
+ * The file {@link downloadFigure} saves, for a caller that hands it elsewhere,
+ * such as the share sheet.
+ * @param target - The `id` of the box, or the element itself.
+ * @param options - See {@link DownloadFigureOptions}.
+ * @returns The file, named.
+ * @throws {Error} When the box holds no figure, or the browser cannot paint it.
+ */
+export async function figureFile(
+  target: string | Element,
+  options: DownloadFigureOptions = {},
+): Promise<File> {
   const { format = 'png', fileName = DEFAULT_FILE_NAME, background } = options;
   const scale = options.scale ?? defaultFigureScale(format);
-
   const name = sanitizeFileName(fileName, DEFAULT_FILE_NAME);
 
   if (format === 'svg') {
     const figure = figureSvg(target, { background, scale });
     const markup = await withPageFigureSource(figure.markup);
-    const blob = new Blob([markup], { type: FIGURE_SVG_TYPE });
-    downloadBlob(blob, `${name}.svg`);
-    return;
+    return new File([markup], `${name}.svg`, { type: FIGURE_SVG_TYPE });
   }
   const figure = figureSvg(target, { background });
-  downloadBlob(await figurePng(figure, scale), `${name}.png`);
+  const png = await figurePng(figure, scale);
+  return new File([png], `${name}.png`, { type: png.type });
 }
 
 /**
@@ -84,14 +98,29 @@ export async function downloadFigureSvg(
   figure: FigureSvg,
   options: Omit<DownloadFigureOptions, 'background'> = {},
 ): Promise<void> {
+  const file = await figureSvgFile(figure, options);
+  downloadBlob(file, file.name);
+}
+
+/**
+ * The file {@link downloadFigureSvg} saves, for a caller that hands it
+ * elsewhere, such as the share sheet.
+ * @param figure - The document, and its size in pixels of the page.
+ * @param options - Which file, at what multiple, and its name.
+ * @returns The file, named.
+ * @throws {Error} When the browser cannot paint it.
+ */
+export async function figureSvgFile(
+  figure: FigureSvg,
+  options: Omit<DownloadFigureOptions, 'background'> = {},
+): Promise<File> {
   const { format = 'png', fileName = DEFAULT_FILE_NAME } = options;
   const name = sanitizeFileName(fileName, DEFAULT_FILE_NAME);
   if (format === 'svg') {
     const markup = await withPageFigureSource(figure.markup);
-    const blob = new Blob([markup], { type: FIGURE_SVG_TYPE });
-    downloadBlob(blob, `${name}.svg`);
-    return;
+    return new File([markup], `${name}.svg`, { type: FIGURE_SVG_TYPE });
   }
   const scale = options.scale ?? defaultFigureScale(format);
-  downloadBlob(await figurePng(figure, scale), `${name}.png`);
+  const png = await figurePng(figure, scale);
+  return new File([png], `${name}.png`, { type: png.type });
 }

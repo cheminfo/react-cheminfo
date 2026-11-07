@@ -143,12 +143,8 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     camera: props,
   });
 
-  const { canvasSize, exportImage, copyImage, capture } = useImageExport(
-    container,
-    viewerRef,
-    fileName,
-    framesPerSecond,
-  );
+  const { canvasSize, exportImage, imageFile, copyImage, capture } =
+    useImageExport(container, viewerRef, fileName, framesPerSecond);
 
   useEffect(() => {
     if (onCapture === undefined || container === null) return;
@@ -203,6 +199,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
                     getSize={canvasSize}
                     onExport={exportImage}
                     onCopy={copyImage}
+                    writeFile={imageFile}
                     frameCount={frameCount}
                     molfile={molfile}
                     fileName={fileName}

@@ -49,7 +49,8 @@ export interface FigureDownloadState {
 const DPI_SCALES = FIGURE_DPIS.map(dpiScale);
 
 /**
- * The "Save figure" panel — save as PNG or SVG, or copy as PNG — for a caller
+ * The "Save figure" panel — save as PNG or SVG, copy as PNG, or send the file
+ * to another app through the device's share sheet — for a caller
  * that brings its own trigger, such as a button in an editor's toolbar.
  * `FigureDownload` is the same panel behind the family's own glyph.
  * @param options - See {@link FigureDownloadOptions}.
@@ -92,7 +93,7 @@ export function useFigureDownload(
     figureLayoutRedraws(layout, size, custom ?? size)
       ? figureLayoutSize(layout, size, custom ?? size)
       : null;
-  const { save, copy, busy, failure, notice, clear } = useFigureActions({
+  const { save, copy, send, busy, failure, notice, clear } = useFigureActions({
     targetId,
     writeFigure,
     format,
@@ -160,6 +161,7 @@ export function useFigureDownload(
       })}
       onSave={save}
       onCopy={copy}
+      onSend={send}
       sizing={
         redraws
           ? {

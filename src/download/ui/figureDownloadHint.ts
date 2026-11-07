@@ -17,7 +17,7 @@ export interface HintState {
   scale: number;
   /** What went wrong last time, if anything. */
   failure: string | null;
-  /** What the last copy came to, if anything. */
+  /** What the last copy or send came to, if anything. */
   notice: FigureNotice | null;
   /** Whether the SVG embeds a rendered picture. */
   rasterSvg: boolean;
@@ -29,7 +29,7 @@ export interface HintState {
 
 /**
  * The line at the foot of the panel: what pressing save is about to do, or
- * what the last copy did.
+ * what the last copy or send did.
  * @param state - See {@link HintState}.
  * @param t - The chrome's formatter, so the sentence is in the language of
  * the page.
@@ -45,6 +45,15 @@ export function hintOf(state: HintState, t: Translate<ChromeKey>): string {
     return t('download.hintCopied', {
       pixels: formatFigurePixels(figurePixels(size, scale)),
     });
+  }
+  if (notice === 'sendReady') return t('download.sendReady');
+  if (notice === 'sendUnsupported') return t('download.sendUnsupported');
+  if (notice === 'sent') {
+    return format === 'svg'
+      ? t('download.hintSentSvg')
+      : t('download.hintSentPng', {
+          pixels: formatFigurePixels(figurePixels(size, scale)),
+        });
   }
   if (format === 'svg' && rasterSvg) {
     return t('download.hintRasterSvg', {

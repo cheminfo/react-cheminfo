@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import type { FigureNotice } from '../../core/copyFigure.ts';
 import type { FigureFormat } from '../../core/downloadFigure.ts';
@@ -16,6 +16,10 @@ const PRINTED = { width: 384, height: 192 };
 
 /** The dots per inch offered, as multiples. */
 const DPI_SCALES = FIGURE_DPIS.map(dpiScale);
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 test('a figure that cannot be drawn again is offered no size', () => {
   const html = panel({ format: 'svg', scale: 1 });
@@ -150,6 +154,78 @@ test('an SVG kept at its own size still lets the PNG pick a resolution', () => {
   expect(png).toContain('>2×<');
 });
 
+test('send is offered only where the device has a share sheet', () => {
+  expect(panel({ format: 'svg', send: true })).not.toContain('>Send<');
+
+  stubSheet();
+
+  expect(panel({ format: 'svg', send: true })).toContain('>Send<');
+  expect(panel({ format: 'svg' })).not.toContain('>Send<');
+});
+
+test('a format the sheet refuses greys send rather than hiding it', () => {
+  stubSheet('image/svg+xml');
+
+  expect(sendButton(panel({ format: 'png', send: true }))).not.toContain(
+    'disabled=""',
+  );
+  expect(sendButton(panel({ format: 'svg', send: true }))).toContain(
+    'disabled=""',
+  );
+});
+
+test('a running send keeps the button focusable, like save and copy', () => {
+  stubSheet();
+  const running = panel({ format: 'png', send: true, saving: true });
+
+  expect(running.match(/aria-disabled="true"/gu)).toHaveLength(3);
+  expect(running).not.toMatch(/<button[^>]*\sdisabled=""/u);
+});
+
+test('a send says what went', () => {
+  expect(panel({ format: 'svg', notice: 'sent' })).toContain(
+    'Sent as an SVG, which a chat app passes on as a file, untouched.',
+  );
+  expect(panel({ format: 'png', scale: 2, notice: 'sent' })).toContain(
+    'Sent 1440 × 760 pixels, as a PNG.',
+  );
+});
+
+test('a file written too late for the press asks for another', () => {
+  expect(panel({ format: 'svg', notice: 'sendReady' })).toContain(
+    'The file is ready. Press Send again to choose where it goes.',
+  );
+});
+
+test('a page that cannot send the file is told to save it', () => {
+  expect(panel({ format: 'svg', notice: 'sendUnsupported' })).toContain(
+    'This browser cannot send this file from here. Save it instead.',
+  );
+});
+
+/**
+ * A share sheet as Chrome and Safari expose it.
+ * @param refuse - A type it does not take.
+ */
+function stubSheet(refuse?: string): void {
+  vi.stubGlobal('navigator', {
+    share: () => Promise.resolve(),
+    canShare: (data: ShareData) =>
+      (data.files ?? []).every((file) => file.type !== refuse),
+  });
+}
+
+/**
+ * The send button, as markup.
+ * @param html - The panel.
+ * @returns The button's opening tag.
+ */
+function sendButton(html: string): string {
+  const button = /<button(?:(?!<button).)*?>Send</su.exec(html)?.[0];
+  if (button === undefined) throw new Error('no send button');
+  return button;
+}
+
 interface PanelOptions {
   /** The file asked for. */
   format: FigureFormat;
@@ -171,6 +247,8 @@ interface PanelOptions {
   scales?: readonly number[];
   /** Whether the SVG keeps the size it states. */
   svgAtOwnSize?: boolean;
+  /** Whether the caller can send the file. */
+  send?: boolean;
 }
 
 /**
@@ -181,7 +259,7 @@ interface PanelOptions {
 function panel(options: PanelOptions): string {
   const { format, layout, custom = null, scale = 2, size = SCREEN } = options;
   const { notice = null, saving = false } = options;
-  const { unit, scales = [1, 2, 3, 4], svgAtOwnSize } = options;
+  const { unit, scales = [1, 2, 3, 4], svgAtOwnSize, send = false } = options;
   return renderToStaticMarkup(
     <FigureDownloadPanel
       title="Save figure"
@@ -198,6 +276,7 @@ function panel(options: PanelOptions): string {
       onScaleChange={() => null}
       onSave={() => null}
       onCopy={() => null}
+      onSend={send ? () => null : undefined}
       sizing={
         layout === undefined
           ? undefined

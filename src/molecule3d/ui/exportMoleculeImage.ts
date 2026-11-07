@@ -91,6 +91,21 @@ export async function exportMoleculeImage(
   viewer: SceneCapture,
   request: MoleculeImageRequest,
 ): Promise<void> {
+  const file = await moleculeImageFile(viewer, request);
+  if (file !== undefined) downloadBlob(file, file.name);
+}
+
+/**
+ * Render the scene as the file {@link exportMoleculeImage} saves, for a
+ * caller that hands it elsewhere, such as the share sheet.
+ * @param viewer - The viewer holding the scene.
+ * @param request - See {@link MoleculeImageRequest}.
+ * @returns The file, or `undefined` when the viewer has nothing to render.
+ */
+export async function moleculeImageFile(
+  viewer: SceneCapture,
+  request: MoleculeImageRequest,
+): Promise<File | undefined> {
   const { format, scale, size, fileName, framesPerSecond } = request;
   const pixels = figurePixels(size, scale);
   const base = sanitizeFileName(fileName, 'molecule');
@@ -99,22 +114,18 @@ export async function exportMoleculeImage(
       throw new Error('This viewer has no frames to animate.');
     }
     const frames = await viewer.frames.capture(pixels);
-    if (frames === undefined) return;
+    if (frames === undefined) return undefined;
     const bytes = await encodeAnimatedPng(frames, framesPerSecond);
-    downloadBlob(new Blob([bytes], { type: FIGURE_PNG_TYPE }), `${base}.png`);
-    return;
+    return new File([bytes], `${base}.png`, { type: FIGURE_PNG_TYPE });
   }
   const dataUri = await viewer.captureImage(pixels);
-  if (dataUri === undefined) return;
+  if (dataUri === undefined) return undefined;
   if (format === 'png') {
-    downloadBlob(
-      new Blob([dataUriBytes(dataUri)], { type: FIGURE_PNG_TYPE }),
-      `${base}.png`,
-    );
-    return;
+    return new File([dataUriBytes(dataUri)], `${base}.png`, {
+      type: FIGURE_PNG_TYPE,
+    });
   }
-  downloadBlob(
-    new Blob([rasterSvgMarkup(dataUri, pixels)], { type: FIGURE_SVG_TYPE }),
-    `${base}.svg`,
-  );
+  return new File([rasterSvgMarkup(dataUri, pixels)], `${base}.svg`, {
+    type: FIGURE_SVG_TYPE,
+  });
 }

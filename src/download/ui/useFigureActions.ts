@@ -1,12 +1,18 @@
 import { copyFigure } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
-import { downloadFigure, downloadFigureSvg } from '../core/downloadFigure.ts';
+import {
+  downloadFigure,
+  downloadFigureSvg,
+  figureFile,
+  figureSvgFile,
+} from '../core/downloadFigure.ts';
 import { figurePng } from '../core/figurePng.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 import type { FigureSvg } from '../core/figureSvg.ts';
 import { figureSvg } from '../core/figureSvg.ts';
 
 import type { FigureRedraw } from './useFigureRedraw.tsx';
+import { useFigureSend } from './useFigureSend.ts';
 import type { FigureTask } from './useFigureTask.ts';
 import { useFigureTask } from './useFigureTask.ts';
 
@@ -39,10 +45,16 @@ export interface FigureActions extends Omit<FigureTask, 'run'> {
   save: () => void;
   /** Put the figure on the clipboard, as a PNG at the resolution picked. */
   copy: () => void;
+  /**
+   * Hand the file save would write to the share sheet of the device, for a
+   * chat, a mail or another app.
+   */
+  send: () => void;
 }
 
 /**
- * The two things the figure panel does: save the figure, and copy it.
+ * The three things the figure panel does: save the figure, copy it, and send
+ * it to another app through the share sheet.
  *
  * A copy is always a PNG, whatever format save is set to: a clipboard carries
  * a picture, and the one every slide, chat window and issue accepts is a PNG.
@@ -54,6 +66,7 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
     options;
   const { redrawAt, redraw } = options;
   const { run, busy, failure, notice, clear } = useFigureTask();
+  const sendFile = useFigureSend({ run, notice });
 
   async function withFigure(write: (box: string | Element) => Promise<void>) {
     if (targetId === undefined) throw new Error('There is no figure to save.');
@@ -88,5 +101,21 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
     run(copyFigure(png));
   }
 
-  return { save, copy, busy, failure, notice, clear };
+  function send(): void {
+    sendFile(() => {
+      if (writeFigure !== undefined) {
+        return writeFigure().then((figure) =>
+          figureSvgFile(figure, { format, scale, fileName }),
+        );
+      }
+      return new Promise<File>((resolve, reject) => {
+        const options = { format, scale, fileName, background };
+        withFigure(async (box) => {
+          resolve(await figureFile(box, options));
+        }).catch(reject);
+      });
+    });
+  }
+
+  return { save, copy, send, busy, failure, notice, clear };
 }

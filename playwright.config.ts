@@ -22,13 +22,14 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    // One spec runs in WebKit too: the periodic table's proportions broke
+    // Two specs run in WebKit too. The periodic table's proportions broke
     // there and nowhere else, because WebKit applies a host page's zoom to a
-    // container-query length twice. A defect no other engine shows is a defect
-    // only that engine can guard.
+    // container-query length twice; and Safari is the share sheet that is
+    // strictest about how fresh the press asking for it is. A defect no other
+    // engine shows is a defect only that engine can guard.
     {
       name: 'webkit',
-      testMatch: /periodicZoom\.spec\.ts/,
+      testMatch: /(?:periodicZoom|figureSend)\.spec\.ts/,
       // WebKit knows no clipboard permission, and refuses to open a context
       // asking for the one the citation specs need.
       use: { ...devices['Desktop Safari'], permissions: [] },

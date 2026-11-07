@@ -1,7 +1,12 @@
 import { writeBlobToClipboard } from '../../clipboard/core/writeBlobToClipboard.ts';
 
-/** What the last copy came to, when it is worth a line of its own. */
-export type FigureNotice = 'copied' | 'copyUnsupported';
+/**
+ * What the last copy or send came to, when it is worth a line of its own:
+ * `sendReady` is a file written too late for the press that asked for it,
+ * which the next press hands to the share sheet at once.
+ */
+export type FigureNotice =
+  'copied' | 'copyUnsupported' | 'sent' | 'sendReady' | 'sendUnsupported';
 
 /**
  * Put a figure on the clipboard as a PNG.

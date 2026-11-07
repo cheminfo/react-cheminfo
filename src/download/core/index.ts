@@ -26,8 +26,15 @@ export { croppedSvgMarkup, rasterFigureSource } from './croppedMarkup.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
 export { downloadBlob } from './downloadBlob.ts';
 export type { DownloadFigureOptions, FigureFormat } from './downloadFigure.ts';
-export { downloadFigure, downloadFigureSvg } from './downloadFigure.ts';
+export {
+  downloadFigure,
+  downloadFigureSvg,
+  figureFile,
+  figureSvgFile,
+} from './downloadFigure.ts';
 export { downloadText } from './downloadText.ts';
+export type { ShareOutcome } from './shareFile.ts';
+export { canShareFile, shareFile } from './shareFile.ts';
 export type { FigureResolutionUnit } from './figureDpi.ts';
 export {
   CSS_PIXELS_PER_INCH,

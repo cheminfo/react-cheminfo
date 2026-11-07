@@ -16,6 +16,7 @@ import {
   FIGURE_SCALES,
 } from '../../download/core/figureScale.ts';
 import { FigureDownloadPanel } from '../../download/ui/FigureDownloadPanel.tsx';
+import { useFigureSend } from '../../download/ui/useFigureSend.ts';
 import { useFigureTask } from '../../download/ui/useFigureTask.ts';
 import { useAsync } from '../../hooks/ui/useAsync.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
@@ -46,6 +47,16 @@ export interface Molecule3DExportProps {
   /** Puts a PNG at that scale on the clipboard, and says what came of it. */
   onCopy: (scale: number) => Promise<FigureNotice>;
   /**
+   * Writes the file `onExport` saves, which the panel then hands to the share
+   * sheet of the device.
+   * @default undefined — nothing is offered to send
+   */
+  writeFile?: (
+    format: FigureFormat,
+    scale: number,
+    animated: boolean,
+  ) => Promise<File>;
+  /**
    * How many frames the scene holds. Above one, a PNG may hold them all, as an
    * animation.
    * @default 1
@@ -71,7 +82,7 @@ export interface Molecule3DExportProps {
  * @returns The panel.
  */
 export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
-  const { getSize, onExport, onCopy, frameCount = 1 } = props;
+  const { getSize, onExport, onCopy, writeFile, frameCount = 1 } = props;
   const { molfile, fileName = 'molecule' } = props;
   const t = useChromeT();
   const [size] = useState(getSize);
@@ -83,6 +94,7 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   const offerFrames = frameCount > 1 && file === null && format === 'png';
   const animated = offerFrames && frames === 'all';
   const { run, busy, failure, notice, clear } = useFigureTask();
+  const send = useFigureSend({ run, notice });
   const atoms = moleculeFileAtoms(molfile, frameCount);
   const versions = moleculeFileChoices(atoms, t);
   const writtenVersion = versions[0]?.disabled ? 'molfileV3000' : version;
@@ -154,6 +166,13 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
         if (file === null) run(onCopy(scale));
         else if (text) run(copyMolfile(text));
       }}
+      onSend={
+        writeFile === undefined
+          ? undefined
+          : () => {
+              send(() => writeFile(format, scale, animated));
+            }
+      }
     >
       {file !== null && (
         <OverlaySegmented<MoleculeFileFormat>

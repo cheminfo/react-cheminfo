@@ -10,7 +10,10 @@ import type { FigureNotice } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import type { FigureResolutionUnit } from '../core/figureDpi.ts';
 import { figureLayoutSize } from '../core/figureLayout.ts';
+import { FIGURE_PNG_TYPE } from '../core/figurePng.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
+import { FIGURE_SVG_TYPE } from '../core/figureSvg.ts';
+import { canShareFile } from '../core/shareFile.ts';
 
 import type { FigureSizing } from './FigureSizeRows.tsx';
 import { FigureSizeRows } from './FigureSizeRows.tsx';
@@ -84,6 +87,14 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
    */
   onCopy: () => void;
   /**
+   * Called when they press send, which hands the file save would write to the
+   * share sheet of the device. The button is shown only where the browser has
+   * one that takes a picture — a phone, Safari, Chrome on a desktop — and only
+   * a picture is sent: a file of another kind is greyed.
+   * @default undefined — nothing is offered to send
+   */
+  onSend?: () => void;
+  /**
    * Whether the SVG holds a rendered picture rather than vector drawings, as
    * for a WebGL scene: its resolution is then the pixels of that picture, it
    * meets the same ceiling as a PNG, and the hint says so.
@@ -106,8 +117,8 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
 }
 
 /**
- * The choices behind the save glyph, and the buttons that write the file and
- * copy the picture.
+ * The choices behind the save glyph, and the buttons that write the file, copy
+ * the picture, and send the file to another app.
  *
  * The resolution applies to both formats, and means what the reader needs it
  * to: a PNG is painted with that many more pixels, and an SVG, drawn the same,
@@ -130,7 +141,7 @@ export function FigureDownloadPanel<TFile extends string = never>(
   const { title, format, scale, scales, size, failure, saving } = props;
   const { file } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
-  const { sizing, onCopy, notice = null, children } = props;
+  const { sizing, onCopy, onSend, notice = null, children } = props;
   const { unit = 'multiple', svgAtOwnSize = false } = props;
   const t = useChromeT();
   const language = useLanguage();
@@ -185,6 +196,17 @@ export function FigureDownloadPanel<TFile extends string = never>(
             busy={saving}
             onClick={onCopy}
           />
+          {onSend !== undefined && canSendFigure('png') ? (
+            <OverlayAction
+              text={t('download.send')}
+              icon="send-message"
+              disabled={
+                picked !== undefined || size === null || !canSendFigure(format)
+              }
+              busy={saving}
+              onClick={onSend}
+            />
+          ) : null}
         </>
       }
     >
@@ -230,6 +252,17 @@ const PANEL_WIDTH = '27em';
 
 /** Wide enough for the four dots per inch on one row, `1200 dpi` last. */
 const DPI_PANEL_WIDTH = '33em';
+
+/**
+ * Whether the share sheet here takes a picture of that format.
+ * @param format - The format.
+ * @returns Whether it does.
+ */
+function canSendFigure(format: FigureFormat): boolean {
+  return format === 'svg'
+    ? canShareFile('figure.svg', FIGURE_SVG_TYPE)
+    : canShareFile('figure.png', FIGURE_PNG_TYPE);
+}
 
 function isFigureFormat(value: string): value is FigureFormat {
   return value === 'png' || value === 'svg';

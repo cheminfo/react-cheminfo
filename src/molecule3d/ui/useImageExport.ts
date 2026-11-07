@@ -12,6 +12,7 @@ import {
   captureMoleculePng,
   captureMoleculeSvg,
   exportMoleculeImage,
+  moleculeImageFile,
 } from './exportMoleculeImage.ts';
 import type { Molecule3DCapture } from './moleculeViewer3DProps.ts';
 
@@ -28,6 +29,15 @@ export interface ImageExport {
     scale: number,
     animated?: boolean,
   ) => Promise<void>;
+  /**
+   * Render the scene as the file {@link ImageExport.exportImage} saves, for
+   * the share sheet.
+   */
+  imageFile: (
+    format: FigureFormat,
+    scale: number,
+    animated?: boolean,
+  ) => Promise<File>;
   /**
    * Render the scene at `scale` and put it on the clipboard as a PNG. Call it
    * from the click itself: Safari only allows a write the click started.
@@ -77,6 +87,28 @@ export function useImageExport(
     [canvasSize, viewerRef, fileName, framesPerSecond],
   );
 
+  const imageFile = useCallback(
+    async (format: FigureFormat, scale: number, animated = false) => {
+      const viewer = viewerRef.current;
+      const size = canvasSize();
+      const file =
+        viewer === null || size === null
+          ? undefined
+          : await moleculeImageFile(viewer, {
+              format,
+              scale,
+              size,
+              fileName,
+              framesPerSecond: animated ? framesPerSecond : undefined,
+            });
+      if (file === undefined) {
+        throw new Error('There is no picture to send yet.');
+      }
+      return file;
+    },
+    [canvasSize, viewerRef, fileName, framesPerSecond],
+  );
+
   const copyImage = useCallback(
     (scale: number) => {
       const viewer = viewerRef.current;
@@ -111,5 +143,5 @@ export function useImageExport(
     [canvasSize, viewerRef],
   );
 
-  return { canvasSize, exportImage, copyImage, capture };
+  return { canvasSize, exportImage, imageFile, copyImage, capture };
 }
