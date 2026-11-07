@@ -13,6 +13,7 @@ import type {
   HostItem,
   OutputMessage,
   ResultMessage,
+  ToolSettings,
   UsedItem,
 } from './protocol.ts';
 import { CONNECT_TYPE, PROTOCOL_VERSION } from './protocol.ts';
@@ -80,6 +81,12 @@ export interface ToolConnectionOptions {
    */
   onOutput?: (message: OutputMessage) => void;
   /**
+   * Told of the tool's settings when it connects, and whenever one changes.
+   * A tool that has none tells nothing.
+   * @default undefined
+   */
+  onSettings?: (settings: ToolSettings) => void;
+  /**
    * How long a request may go unanswered, in milliseconds.
    * @default REQUEST_TIMEOUT
    */
@@ -96,6 +103,12 @@ export interface ToolConnection {
   load: (document: ToolDocument) => Promise<LoadOutcome>;
   /** The current values of some outputs; rejects with the tool's reason. */
   get: (keys: readonly string[]) => Promise<HostItem[]>;
+  /**
+   * Change some of the tool's settings; the frame and the document stay.
+   * Ignored while the tool is not connected. The new values come back through
+   * `onSettings`.
+   */
+  setSettings: (settings: ToolSettings) => void;
   /** Stop listening and close the port; what is pending is dropped. */
   close: () => void;
 }
@@ -134,7 +147,8 @@ interface Shown {
  * @returns The connection.
  */
 export function connectTool(options: ToolConnectionOptions): ToolConnection {
-  const { frame, origin, host, listen, onHello, onOutput } = options;
+  const { frame, origin, host, listen, onHello, onOutput, onSettings } =
+    options;
   const { timeout = REQUEST_TIMEOUT } = options;
   const waiting = new Map<string, Waiting>();
   let port: MessagePort | null = null;
@@ -196,6 +210,10 @@ export function connectTool(options: ToolConnectionOptions): ToolConnection {
     if (message === null) return;
     if (message.type === 'output') {
       onOutput?.(message);
+      return;
+    }
+    if (message.type === 'settings') {
+      onSettings?.(message.settings);
       return;
     }
     const entry = waiting.get(message.id);
@@ -267,6 +285,9 @@ export function connectTool(options: ToolConnectionOptions): ToolConnection {
         );
       });
     },
+    setSettings(settings) {
+      post({ type: 'settings', settings }, { answer: ignore, abandon: ignore });
+    },
     close() {
       if (closed) return;
       closed = true;
@@ -277,6 +298,11 @@ export function connectTool(options: ToolConnectionOptions): ToolConnection {
       port = null;
     },
   };
+}
+
+/** What a tool answers to `settings` is what it then says it holds. */
+function ignore(): void {
+  // Nothing to do.
 }
 
 function outcomeOf(message: ResultMessage): LoadOutcome {

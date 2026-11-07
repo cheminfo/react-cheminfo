@@ -13,6 +13,7 @@ export { figureToolDocument } from './figureDocument.ts';
 export type { FigurePage } from './answerGet.ts';
 export { answerGet } from './answerGet.ts';
 export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';
+export type { HostSettings } from './hostSettings.ts';
 export { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';
 export type { StructureValue } from './hostStructure.ts';
 export {

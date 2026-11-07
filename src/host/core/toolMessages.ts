@@ -1,7 +1,8 @@
 /**
  * What a framed tool sends its host, read as the untrusted input it is: the
- * `hello` it posts to the window, and on the port the `result` of each request
- * and the `output` it sends when a value the host takes back changes.
+ * `hello` it posts to the window, and on the port the `result` of each request,
+ * the `output` it sends when a value the host takes back changes, and the
+ * `settings` it sends when one of its own does.
  *
  * Anything that is not well formed is `null` and is ignored, as a tool ignores
  * a request it does not know: a newer tool talking, not an error.
@@ -11,6 +12,7 @@ import {
   MAX_LABEL_LENGTH,
   isRecord,
   readItems,
+  readSettings,
   readStrings,
 } from './messageValues.ts';
 import type {
@@ -19,6 +21,7 @@ import type {
   HostErrorCode,
   OutputMessage,
   ResultMessage,
+  SettingsMessage,
   ToolInput,
   ToolOutput,
   UsedItem,
@@ -77,12 +80,16 @@ export function readHello(data: unknown): ToolHello | null {
 /**
  * Read a message a tool sent through the port.
  * @param data - What the port delivered.
- * @returns The `result` or the `output`, or `null` for anything else.
+ * @returns The `result`, the `output` or the `settings`, or `null` for anything
+ * else.
  */
 export function readToolMessage(
   data: unknown,
-): ResultMessage | OutputMessage | null {
+): ResultMessage | OutputMessage | SettingsMessage | null {
   if (!isRecord(data)) return null;
+  if (data.type === 'settings') {
+    return { type: 'settings', settings: readSettings(data.settings) };
+  }
   if (data.type === 'output') {
     if (typeof data.document !== 'string' || !Array.isArray(data.items)) {
       return null;

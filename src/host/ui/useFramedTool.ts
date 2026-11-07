@@ -12,7 +12,7 @@ import type {
   ToolDocument,
 } from '../core/connectTool.ts';
 import { connectTool } from '../core/connectTool.ts';
-import type { HostItem } from '../core/protocol.ts';
+import type { HostItem, ToolSettings } from '../core/protocol.ts';
 import type { ToolHello } from '../core/toolMessages.ts';
 
 /** What {@link useFramedTool} frames, and what it hands over. */
@@ -76,6 +76,17 @@ export interface FramedTool {
   outputs: ReadonlyMap<string, HostItem>;
   /** Ask for the current value of some outputs; rejects with the tool's reason. */
   get: (keys: readonly string[]) => Promise<HostItem[]>;
+  /**
+   * What the tool says its settings are, whoever changed them last: a host's
+   * controls show these rather than what was last asked. `null` for a tool
+   * that has none, or has not said yet, so a host offers no control for them.
+   */
+  settings: ToolSettings | null;
+  /**
+   * Change some of the tool's settings, without reloading it.
+   * @param settings - The settings that change.
+   */
+  setSettings: (settings: ToolSettings) => void;
 }
 
 /**
@@ -118,6 +129,7 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
   const [link, setLink] = useState<Link | null>(null);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [held, setHeld] = useState<Held | null>(null);
+  const [said, setSaid] = useState<Said | null>(null);
 
   useEffect(() => {
     latest.current = shown;
@@ -149,6 +161,9 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
         if (message.document === latest.current?.document) {
           told.current?.(message.items);
         }
+      },
+      onSettings: (settings) => {
+        setSaid({ url, settings });
       },
     });
     connection.current = opened;
@@ -195,6 +210,10 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
     return opened.get(keys);
   }, []);
 
+  const setSettings = useCallback((settings: ToolSettings) => {
+    connection.current?.setSettings(settings);
+  }, []);
+
   const key = name === null ? null : `${url}\n${name}`;
   const current = link?.url === url ? link : null;
   return {
@@ -205,6 +224,8 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
     outcome: answer !== null && answer.key === key ? answer.outcome : null,
     outputs: held !== null && held.key === key ? held.outputs : NO_OUTPUTS,
     get,
+    settings: said?.url === url ? said.settings : null,
+    setSettings,
   };
 }
 
@@ -252,6 +273,11 @@ interface Answer {
 interface Held {
   key: string;
   outputs: ReadonlyMap<string, HostItem>;
+}
+
+interface Said {
+  url: string;
+  settings: ToolSettings;
 }
 
 function hold(

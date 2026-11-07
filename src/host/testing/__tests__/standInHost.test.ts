@@ -33,7 +33,11 @@ test('the host page is served on 127.0.0.1, carrying its setup in its address', 
 });
 
 test('the log is read off the page it was recorded in', () => {
-  const log = { hello: null, results: [{ type: 'result', id: 'l1' }] };
+  const log = {
+    hello: null,
+    results: [{ type: 'result', id: 'l1' }],
+    settings: [],
+  };
   (globalThis as unknown as { hostLog: unknown }).hostLog = log;
 
   expect(readStandInHostLog()).toBe(log);

@@ -13,8 +13,11 @@ import type { FigurePage } from './answerGet.ts';
 import { answerGet } from './answerGet.ts';
 import type { HostOutputs } from './hostOutputs.ts';
 import { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';
+import type { HostSettings } from './hostSettings.ts';
+import { applySettings, createSettingsPublisher } from './hostSettings.ts';
 import type {
   HelloMessage,
+  HostRequest,
   LoadRequest,
   ResultMessage,
   ToolInterface,
@@ -81,6 +84,11 @@ export interface HostConnectionOptions {
    */
   inputs?: FigurePage['inputs'];
   /**
+   * What a host may set while the tool is open, and where the values are read.
+   * @default undefined — the tool has no settings, and says nothing of them
+   */
+  settings?: HostSettings;
+  /**
    * How long the outputs must stay still before a change is sent, in
    * milliseconds.
    * @default OUTPUT_DELAY
@@ -103,7 +111,7 @@ export interface HostConnectionOptions {
 export function connectHost(options: HostConnectionOptions): () => void {
   const { host, listen, tool, origin, build, cite, help, load, outputs } =
     options;
-  const { inputs } = options;
+  const { inputs, settings } = options;
   const { outputDelay = OUTPUT_DELAY } = options;
   let port: MessagePort | null = null;
   let appliedDocument: string | null = null;
@@ -119,22 +127,22 @@ export function connectHost(options: HostConnectionOptions): () => void {
           outputDelay,
         );
   const stopHearing = outputs?.subscribe(() => publisher?.changed());
+  const settingsPublisher =
+    settings === undefined
+      ? null
+      : createSettingsPublisher(settings, (message) =>
+          port?.postMessage(message),
+        );
+  const stopHearingSettings = settings?.subscribe(() =>
+    settingsPublisher?.changed(),
+  );
 
   function serve(data: unknown): void {
     const request = parseRequest(data);
     if (request === null) return;
     served = served
       .then(async () => {
-        const result =
-          request.type === 'load'
-            ? await applyLoad(request)
-            : await answerGet(
-                request,
-                tool,
-                outputs,
-                inputs === undefined ? {} : { inputs },
-              );
-        port?.postMessage(result);
+        port?.postMessage(await answer(request));
       })
       // A request that failed must not stop the ones after it being served,
       // and must still be seen: it is thrown again, on its own.
@@ -143,6 +151,19 @@ export function connectHost(options: HostConnectionOptions): () => void {
           throw error;
         });
       });
+  }
+
+  function answer(request: HostRequest): Promise<ResultMessage> {
+    if (request.type === 'load') return applyLoad(request);
+    if (request.type === 'settings') {
+      return Promise.resolve(applySettings(request, settings));
+    }
+    return answerGet(
+      request,
+      tool,
+      outputs,
+      inputs === undefined ? {} : { inputs },
+    );
   }
 
   async function applyLoad(request: LoadRequest): Promise<ResultMessage> {
@@ -194,6 +215,7 @@ export function connectHost(options: HostConnectionOptions): () => void {
       serve(message.data);
     });
     port.start();
+    settingsPublisher?.connected();
   });
 
   const hello: HelloMessage = {
@@ -216,6 +238,7 @@ export function connectHost(options: HostConnectionOptions): () => void {
   return () => {
     stopListening();
     stopHearing?.();
+    stopHearingSettings?.();
     publisher?.stop();
     port?.close();
     port = null;

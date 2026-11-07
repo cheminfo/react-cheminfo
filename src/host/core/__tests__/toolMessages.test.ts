@@ -122,3 +122,12 @@ test('an output is read for its document; anything else is ignored', () => {
   expect(readToolMessage({ type: 'result', ok: true })).toBeNull();
   expect(readToolMessage({ type: 'load', id: 'x' })).toBeNull();
 });
+
+test('the settings a tool says are read as strings, and carry no id', () => {
+  expect(
+    readToolMessage({
+      type: 'settings',
+      settings: { picture: 'computed', surface: 0.7 },
+    }),
+  ).toStrictEqual({ type: 'settings', settings: { picture: 'computed' } });
+});

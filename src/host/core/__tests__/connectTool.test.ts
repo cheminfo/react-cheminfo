@@ -6,7 +6,13 @@ import type { ToolDocument, ToolWindowEvent } from '../connectTool.ts';
 import { REQUEST_TIMEOUT, connectTool } from '../connectTool.ts';
 import type { HostOutputs } from '../hostOutputs.ts';
 import { OUTPUT_DELAY } from '../hostOutputs.ts';
-import type { HostItem, OutputMessage, ToolInterface } from '../protocol.ts';
+import type { HostSettings } from '../hostSettings.ts';
+import type {
+  HostItem,
+  OutputMessage,
+  ToolInterface,
+  ToolSettings,
+} from '../protocol.ts';
 import type { ToolHello } from '../toolMessages.ts';
 
 const TOOL_ORIGIN = 'https://3d.cheminfo.org';
@@ -35,6 +41,7 @@ const BENZENE: ToolDocument = {
 interface Site {
   load?: (inputs: readonly LoadedInput[]) => void | Promise<void>;
   outputs?: HostOutputs;
+  settings?: HostSettings;
 }
 
 /**
@@ -68,6 +75,7 @@ function framePage() {
   };
   const hellos: ToolHello[] = [];
   const outputs: OutputMessage[] = [];
+  const settings: ToolSettings[] = [];
   const connection = connectTool({
     frame: () => frameWindow,
     origin: TOOL_ORIGIN,
@@ -78,6 +86,7 @@ function framePage() {
     },
     onHello: (tool) => hellos.push(tool),
     onOutput: (message) => outputs.push(message),
+    onSettings: (message) => settings.push(message),
   });
   let stopTool: (() => void) | null = null;
 
@@ -85,6 +94,7 @@ function framePage() {
     connection,
     hellos,
     outputs,
+    settings,
     /**
      * Hear a message as if it was posted to the host's window.
      * @param event - The message, its window and its origin.
@@ -111,6 +121,7 @@ function framePage() {
         build: { version: '1.2.1' },
         load: site.load ?? (() => undefined),
         ...(site.outputs === undefined ? {} : { outputs: site.outputs }),
+        ...(site.settings === undefined ? {} : { settings: site.settings }),
       });
     },
     close() {
@@ -379,6 +390,138 @@ test('a document left unanswered is dropped once the wait is over', async () => 
   vi.advanceTimersByTime(REQUEST_TIMEOUT);
 
   await expect(shown).resolves.toStrictEqual({ status: 'dropped' });
+
+  page.close();
+});
+
+/**
+ * Settings a test sets the way a site's state would, reading only what it knows.
+ * @param known - The settings the site has, and their first values.
+ * @returns The settings, and the means to change one from inside the tool.
+ */
+function siteSettings(known: Record<string, string>) {
+  const values = { ...known };
+  const listeners = new Set<() => void>();
+  function hear(): void {
+    for (const listener of listeners) listener();
+  }
+  const settings: HostSettings = {
+    read: () => ({ ...values }),
+    apply(changed) {
+      for (const name of Object.keys(values)) {
+        const value = changed[name];
+        if (value !== undefined) values[name] = value;
+      }
+      hear();
+    },
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+  return {
+    settings,
+    set(name: string, value: string) {
+      values[name] = value;
+      hear();
+    },
+    hear,
+  };
+}
+
+test('a tool says its settings when it connects, and a host changes them without a new document', async () => {
+  const page = framePage();
+  const site = siteSettings({ picture: 'localised', surface: '0.5' });
+  const loads: string[] = [];
+  page.startTool({
+    settings: site.settings,
+    load() {
+      loads.push('load');
+    },
+  });
+
+  await vi.waitFor(() => {
+    expect(page.settings).toStrictEqual([
+      { picture: 'localised', surface: '0.5' },
+    ]);
+  });
+
+  page.connection.setSettings({ surface: '0.7', nothing: 'at all' });
+
+  await vi.waitFor(() => {
+    expect(page.settings).toStrictEqual([
+      { picture: 'localised', surface: '0.5' },
+      { picture: 'localised', surface: '0.7' },
+    ]);
+  });
+
+  expect(loads).toStrictEqual([]);
+
+  page.close();
+});
+
+test('a setting changed inside the tool reaches the host once, and a repeat stays quiet', async () => {
+  const page = framePage();
+  const site = siteSettings({ picture: 'localised' });
+  page.startTool({ settings: site.settings });
+  await vi.waitFor(() => {
+    expect(page.settings).toHaveLength(1);
+  });
+
+  site.hear();
+  site.set('picture', 'computed');
+
+  await vi.waitFor(() => {
+    expect(page.settings).toStrictEqual([
+      { picture: 'localised' },
+      { picture: 'computed' },
+    ]);
+  });
+
+  page.close();
+});
+
+test('a tool reloaded in its frame says its settings again', async () => {
+  const page = framePage();
+  page.startTool({ settings: siteSettings({ surface: '0.5' }).settings });
+  await vi.waitFor(() => {
+    expect(page.settings).toHaveLength(1);
+  });
+
+  page.startTool({ settings: siteSettings({ surface: '0.85' }).settings });
+
+  await vi.waitFor(() => {
+    expect(page.settings).toStrictEqual([
+      { surface: '0.5' },
+      { surface: '0.85' },
+    ]);
+  });
+
+  page.close();
+});
+
+test('a tool with no settings says nothing of them, and a host asking changes nothing', async () => {
+  const page = framePage();
+  page.startTool();
+  await vi.waitFor(() => {
+    expect(page.hellos).toHaveLength(1);
+  });
+
+  page.connection.setSettings({ surface: '0.7' });
+  const outcome = await page.connection.load(ETHANOL);
+
+  expect(outcome.status).toBe('loaded');
+  expect(page.settings).toStrictEqual([]);
+
+  page.close();
+});
+
+test('settings asked before the tool connects are dropped, not thrown', () => {
+  const page = framePage();
+
+  expect(() => {
+    page.connection.setSettings({ surface: '0.7' });
+  }).not.toThrow();
 
   page.close();
 });

@@ -179,3 +179,19 @@ test('stopping closes the port and stops listening', () => {
 
   host.close();
 });
+
+test('a tool with no settings answers a request for them with its reason', async () => {
+  const host = startHost();
+  const port = host.connect();
+
+  await expect(
+    request(port, { type: 'settings', id: 's1', settings: { surface: '0.7' } }),
+  ).resolves.toStrictEqual({
+    type: 'result',
+    id: 's1',
+    ok: false,
+    error: { code: 'invalid', message: 'This tool has no settings to set.' },
+  });
+
+  host.close();
+});

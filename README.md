@@ -1129,6 +1129,39 @@ An input with `many: true` takes every item of its kinds, and one with
 `optional: true` may go without; the request is refused only when no input got
 anything. `load` may return a promise, and requests are served in order.
 
+A tool that would have to compute everything again if it were opened at another
+address takes **settings**: how it shows what it holds, driven from a host's
+toolbar with the frame and the document left alone. The tool owns them, and the
+host only shows what the tool says:
+
+```ts
+useHostConnection(TOOL, {
+  load,
+  settings: {
+    read: () => ({ surface: String(surface.value) }),
+    apply: ({ surface: share }) => {
+      if (isShare(share)) surface.value = Number(share);
+    },
+    subscribe: (heard) =>
+      effect(() => {
+        surface.value;
+        heard();
+      }),
+  },
+});
+
+// In the host: a tool with none leaves `settings` at null, so it offers nothing.
+const tool = useFramedTool({ url, host, document });
+tool.settings?.surface; // what the tool says, whoever changed it last
+tool.setSettings({ surface: '0.7' });
+```
+
+- **`settings` from the host** carries the names that change, each value written
+  as an address writes it. A name the tool does not know is ignored.
+- **`settings` from the tool** carries all of them, when a host connects and
+  whenever one changes — a request, or the tool's own visitor. So a control in
+  the host never goes stale.
+
 A tool hands values back through `outputs`, a store read synchronously — a
 `computed` signal does it:
 

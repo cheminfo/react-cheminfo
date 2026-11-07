@@ -4,15 +4,21 @@
  *
  * Two messages travel between the windows — `hello`, from the tool, and
  * `connect`, the host's answer carrying a private `MessagePort` — and everything
- * else goes through that port: the host's requests (`load`, `get`), the tool's
- * `result` for each, and the `output` the tool sends when a value the host
- * takes back changes. This module only spells the messages, and reads what
- * arrives as the untrusted input it is.
+ * else goes through that port: the host's requests (`load`, `get`, `settings`),
+ * the tool's `result` for each, the `output` the tool sends when a value the
+ * host takes back changes, and the `settings` it sends when one of its own
+ * changes. This module only spells the messages, and reads what arrives as the
+ * untrusted input it is.
  */
 
 import type { CitedWork } from '../../citation/core/works.ts';
 
-import { isRecord, readItems, readStrings } from './messageValues.ts';
+import {
+  isRecord,
+  readItems,
+  readSettings,
+  readStrings,
+} from './messageValues.ts';
 import type { ToolHelp } from './toolCredits.ts';
 
 export { MAX_ITEMS, MAX_LABEL_LENGTH } from './messageValues.ts';
@@ -131,8 +137,26 @@ export interface GetRequest {
   keys: string[];
 }
 
+/**
+ * What a tool's visitor could set inside it, by name, each value written as a
+ * string the way an address writes it: `{ surface: '0.7' }`.
+ */
+export type ToolSettings = Readonly<Record<string, string>>;
+
+/**
+ * `settings`: change how the tool shows what it holds. The frame stays and the
+ * document stays, so a host's toolbar can drive a tool that would have to
+ * compute everything again if it were opened at another address. A setting the
+ * tool does not know is ignored.
+ */
+export interface SettingsRequest {
+  type: 'settings';
+  id: string;
+  settings: ToolSettings;
+}
+
 /** A request the host sends through the port. */
-export type HostRequest = LoadRequest | GetRequest;
+export type HostRequest = LoadRequest | GetRequest | SettingsRequest;
 
 /** Why a request could not be served. */
 export type HostErrorCode = 'invalid' | 'unreadable' | 'no-input' | 'no-output';
@@ -178,10 +202,21 @@ export interface OutputMessage {
 }
 
 /**
+ * Sent by the tool, unasked, when it connects and whenever one of its settings
+ * changes — from a host's request, or from its visitor. It carries all of them,
+ * so a host's controls show what the tool is doing rather than what was last
+ * asked of it. A tool that has none never sends it.
+ */
+export interface SettingsMessage {
+  type: 'settings';
+  settings: ToolSettings;
+}
+
+/**
  * Read a message that arrived through the port.
  *
- * Anything that is not a well-formed `load` or `get` is `null`, and goes
- * unanswered: an unknown request is a newer host talking, not an error. An item
+ * Anything that is not a well-formed `load`, `get` or `settings` is `null`, and
+ * goes unanswered: an unknown request is a newer host talking, not an error. An item
  * without a string `kind` is dropped, a label is cut to
  * `MAX_LABEL_LENGTH`, and a `load` without `accept` takes nothing back.
  * @param data - What the port delivered.
@@ -204,6 +239,13 @@ export function parseRequest(data: unknown): HostRequest | null {
   }
   if (data.type === 'get') {
     return { type: 'get', id: data.id, keys: readStrings(data.keys) };
+  }
+  if (data.type === 'settings') {
+    return {
+      type: 'settings',
+      id: data.id,
+      settings: readSettings(data.settings),
+    };
   }
   return null;
 }

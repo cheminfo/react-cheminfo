@@ -15,7 +15,7 @@ import type { Server } from 'node:http';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
-import type { HelloMessage } from '../core/protocol.ts';
+import type { HelloMessage, ToolSettings } from '../core/protocol.ts';
 
 /** A running stand-in host. */
 export interface StandInHost {
@@ -39,6 +39,8 @@ export interface StandInHostLog {
   hello: HelloMessage | null;
   /** Every message the tool sent on the port, in order: results and outputs. */
   results: unknown[];
+  /** Every set of settings the tool said it holds, in order. */
+  settings: ToolSettings[];
 }
 
 /**
@@ -117,7 +119,7 @@ const HOST_PAGE = `<!doctype html>
 const { toolUrl, requests } = JSON.parse(new URLSearchParams(location.search).get('setup'));
 const toolOrigin = new URL(toolUrl).origin;
 const frame = document.querySelector('#tool');
-globalThis.hostLog = { hello: null, results: [] };
+globalThis.hostLog = { hello: null, results: [], settings: [] };
 globalThis.hostPort = null;
 globalThis.addEventListener('message', (event) => {
   if (event.source !== frame.contentWindow || event.origin !== toolOrigin) return;
@@ -126,7 +128,11 @@ globalThis.addEventListener('message', (event) => {
   const channel = new MessageChannel();
   globalThis.hostPort = channel.port1;
   channel.port1.onmessage = (answer) => {
-    globalThis.hostLog.results.push(answer.data);
+    if (answer.data?.type === 'settings') {
+      globalThis.hostLog.settings.push(answer.data.settings);
+    } else {
+      globalThis.hostLog.results.push(answer.data);
+    }
   };
   frame.contentWindow.postMessage(
     { type: 'cheminfo:connect', version: 1, host: { name: 'Stand-in host' } },

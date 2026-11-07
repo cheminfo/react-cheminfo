@@ -12,6 +12,7 @@ import type { FigureInput } from '../../download/core/figureInputs.ts';
 import { figureAddress } from '../../download/core/figureSource.ts';
 import { setPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import type { HostOutputs } from '../core/hostOutputs.ts';
+import type { HostSettings } from '../core/hostSettings.ts';
 import type { ToolInterface } from '../core/protocol.ts';
 import type { LoadedInput } from '../core/selectInputs.ts';
 import type { ToolHelp } from '../core/toolCredits.ts';
@@ -31,6 +32,13 @@ export interface HostHandlers {
    * @default undefined — nothing goes back
    */
   outputs?: HostOutputs;
+  /**
+   * What a host may set while the page is open, so its toolbar can drive a
+   * tool that a new address would make compute everything again. Read once,
+   * when the host connects, so it lives as long as the page.
+   * @default undefined — the tool has no settings
+   */
+  settings?: HostSettings;
   /**
    * The build that is running — `BUILD_INFO` from `react-cheminfo/build-info`
    * — so a host can record which version produced what it stores.
@@ -123,6 +131,9 @@ export function useHostConnection(
           ...(latest.current.outputs === undefined
             ? {}
             : { outputs: latest.current.outputs }),
+          ...(latest.current.settings === undefined
+            ? {}
+            : { settings: latest.current.settings }),
           inputs: async () => (await latest.current.inputs?.()) ?? [],
         });
       })

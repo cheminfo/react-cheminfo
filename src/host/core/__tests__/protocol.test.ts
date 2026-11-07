@@ -89,3 +89,30 @@ test('connect is recognised in this version only', () => {
   expect(isConnect({ type: 'cheminfo:hello', version: 1 })).toBe(false);
   expect(isConnect(null)).toBe(false);
 });
+
+test('settings are read as strings, at most as many as items, each cut to a label', () => {
+  const many = Object.fromEntries(
+    Array.from({ length: MAX_ITEMS + 5 }, (_, index) => [`s${index}`, 'x']),
+  );
+
+  expect(
+    parseRequest({
+      type: 'settings',
+      id: 's1',
+      settings: { surface: '0.7', count: 3, label: 'a'.repeat(200) },
+    }),
+  ).toStrictEqual({
+    type: 'settings',
+    id: 's1',
+    settings: { surface: '0.7', label: 'a'.repeat(MAX_LABEL_LENGTH) },
+  });
+  expect(
+    parseRequest({ type: 'settings', id: 's2', settings: 'surface' }),
+  ).toStrictEqual({ type: 'settings', id: 's2', settings: {} });
+
+  const read = parseRequest({ type: 'settings', id: 's3', settings: many });
+
+  expect(read?.type === 'settings' && Object.keys(read.settings)).toHaveLength(
+    MAX_ITEMS,
+  );
+});

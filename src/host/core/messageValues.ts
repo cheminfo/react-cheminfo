@@ -3,7 +3,7 @@
  * on either side of the frame boundary.
  */
 
-import type { HostItem } from './protocol.ts';
+import type { HostItem, ToolSettings } from './protocol.ts';
 
 /** How many items one message may carry; the rest are dropped. */
 export const MAX_ITEMS = 64;
@@ -46,6 +46,23 @@ export function readStrings(value: unknown): string[] {
     if (typeof entry === 'string') strings.push(entry);
   }
   return strings;
+}
+
+/**
+ * Read a tool's settings, keeping the strings at most {@link MAX_ITEMS} of
+ * them, each value cut to {@link MAX_LABEL_LENGTH}.
+ * @param value - The settings as they arrived.
+ * @returns The settings, or none when it is not an object.
+ */
+export function readSettings(value: unknown): ToolSettings {
+  if (!isRecord(value)) return {};
+  const settings: Array<[string, string]> = [];
+  for (const [name, setting] of Object.entries(value)) {
+    if (typeof setting !== 'string') continue;
+    settings.push([name, setting.slice(0, MAX_LABEL_LENGTH)]);
+    if (settings.length === MAX_ITEMS) break;
+  }
+  return Object.fromEntries(settings);
 }
 
 /**
