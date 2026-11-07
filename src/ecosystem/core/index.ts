@@ -3,6 +3,7 @@ export { SITE_GROUPS } from './groups.ts';
 export type { GroupedSites } from './lookup.ts';
 export {
   findSiteByHost,
+  findSiteById,
   groupedSites,
   siteById,
   siteDisplayName,

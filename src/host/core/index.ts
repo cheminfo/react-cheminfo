@@ -14,6 +14,8 @@ export {
   figureToolDocument,
   loadedFigureState,
 } from './figureDocument.ts';
+export type { FigureDestination } from './figureForward.ts';
+export { figureDestination, forwardedFigureDocument } from './figureForward.ts';
 export type { FigurePage } from './answerGet.ts';
 export { answerGet } from './answerGet.ts';
 export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';

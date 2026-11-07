@@ -61,6 +61,19 @@ export function siteById(id: SiteId): EcosystemSite {
 }
 
 /**
+ * One site of the family, by an identifier read from elsewhere — a figure, a
+ * link — which may name no site at all.
+ * @param id - The identifier.
+ * @returns The site, or `undefined` when no site carries that identifier.
+ */
+export function findSiteById(id: string): EcosystemSite | undefined {
+  for (const site of KNOWN_SITES) {
+    if (site.id === id) return site;
+  }
+  return undefined;
+}
+
+/**
  * The site's name as prose, for a page title, a card or a citation.
  *
  * An address-shaped name is written as the address it is — `3d` and `cheminfo`

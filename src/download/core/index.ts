@@ -97,6 +97,12 @@ export {
 } from './figureTarget.ts';
 export { paintedBox } from './paintedBox.ts';
 export { pngDpi, withPngDpi } from './pngDpi.ts';
+export {
+  automaticFileStem,
+  figureFileName,
+  siteFigureExtension,
+  siteFigureName,
+} from './figureFileName.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';
 
 export { drawingIn, stackDrawings } from './stackedDrawing.ts';

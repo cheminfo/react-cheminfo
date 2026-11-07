@@ -9,6 +9,7 @@
  */
 
 import { downloadBlob } from './downloadBlob.ts';
+import { figureFileName } from './figureFileName.ts';
 import { figurePng } from './figurePng.ts';
 import { defaultFigureScale } from './figureScale.ts';
 import type { FigureSvg, FigureSvgOptions } from './figureSvg.ts';
@@ -77,7 +78,9 @@ export async function figureFile(
   if (format === 'svg') {
     const figure = figureSvg(target, { background, scale });
     const markup = await withPageFigureSource(figure.markup);
-    return new File([markup], `${name}.svg`, { type: FIGURE_SVG_TYPE });
+    return new File([markup], figureFileName(name, markup), {
+      type: FIGURE_SVG_TYPE,
+    });
   }
   const figure = figureSvg(target, { background });
   const png = await figurePng(figure, scale);
@@ -118,7 +121,9 @@ export async function figureSvgFile(
   const name = sanitizeFileName(fileName, DEFAULT_FILE_NAME);
   if (format === 'svg') {
     const markup = await withPageFigureSource(figure.markup);
-    return new File([markup], `${name}.svg`, { type: FIGURE_SVG_TYPE });
+    return new File([markup], figureFileName(name, markup), {
+      type: FIGURE_SVG_TYPE,
+    });
   }
   const scale = options.scale ?? defaultFigureScale(format);
   const png = await figurePng(figure, scale);
