@@ -411,6 +411,21 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     brandAlt: '#15803d',
     mark: { plate: '#3b0764', accent: '#4ade80' },
   },
+  {
+    id: 'glassware',
+    name: { lead: 'glassware', alt: 'cheminfo', dot: true },
+    host: 'glassware.cheminfo.org',
+    tagline: 'Assemble lab glassware into a working apparatus, and draw it.',
+    group: 'practice',
+    // Cobalt glass, 11.4:1 on white and 5.6 Oklab units from the nearest lead
+    // of the family (moles).
+    brand: '#0d3b66',
+    // Phenolphthalein turning pink in the flask, the end point a first lab
+    // titrates to. The mark's pink sits at 3.5:1 on white, so the wordmark sets
+    // its second half in this darker one, at 6.0:1.
+    brandAlt: '#be185d',
+    mark: { plate: '#0d3b66', accent: '#ec4899' },
+  },
 ];
 
 /** How a link to a site is written, beyond the site itself. */

@@ -37,7 +37,8 @@ export type SiteId =
   | 'mz'
   | 'vibrations'
   | 'draw'
-  | 'tlc';
+  | 'tlc'
+  | 'glassware';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

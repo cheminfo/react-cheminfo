@@ -631,4 +631,19 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <ellipse cx="19" cy="19" rx="2.8" ry="2.4" fill="#3b0764" />
     </>
   ),
+  // A round-bottom flask in clear glass, its ground joint at the top, holding
+  // a solution in the answering colour.
+  glassware: (alt) => (
+    <>
+      <path d="M7.84 18H24.16A8.3 8.3 0 1 1 7.84 18Z" fill={alt} />
+      <path
+        d="M13.5 5.5V11.59A8.3 8.3 0 1 0 18.5 11.59V5.5"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      <rect x="12" y="3.5" width="8" height="2.6" rx="1.1" fill="#ffffff" />
+    </>
+  ),
 };

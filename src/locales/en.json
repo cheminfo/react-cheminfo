@@ -120,6 +120,7 @@
   "site.vibrations.tagline": "IR and Raman spectra computed in the browser.",
   "site.draw.tagline": "Journal-grade structures, in an SVG that keeps the chemistry.",
   "site.tlc.tagline": "Read a TLC plate, get its Rf, and weigh its eluent.",
+  "site.glassware.tagline": "Assemble lab glassware into a working apparatus, and draw it.",
   "site.molecules.tagline": "Look up a molecule, its computed properties and its sources.",
   "site.chembio.tagline": "Natural products, and the organisms they were found in.",
   "site.wikidata.tagline": "The chemistry of Wikipedia’s infoboxes, searchable by structure.",

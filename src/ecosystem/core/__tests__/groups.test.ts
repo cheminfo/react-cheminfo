@@ -55,6 +55,7 @@ test('the tools a course opens with are the ones under the basics', () => {
     'moles',
     'inorganic',
     'tlc',
+    'glassware',
   ]);
   expect(sitesInGroup('spectra').map((site) => site.id)).toStrictEqual([
     'nmrium',
