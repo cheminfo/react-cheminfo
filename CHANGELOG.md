@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.98.0](https://github.com/cheminfo/react-cheminfo/compare/v0.97.0...v0.98.0) (2026-11-07)
+
+
+### Features
+
+* draw each institution of an About as its own lockup, with its people ([9b25d62](https://github.com/cheminfo/react-cheminfo/commit/9b25d62d641b70444038b871856dd6fd311a515f))
+* let a host change a framed tool's settings without reloading it ([c532268](https://github.com/cheminfo/react-cheminfo/commit/c5322683ebfa2d2f3b70361700a4f8bc30fa2524))
+
 ## [0.97.0](https://github.com/cheminfo/react-cheminfo/compare/v0.96.0...v0.97.0) (2026-11-06)
 
 
