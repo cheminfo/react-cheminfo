@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.100.0](https://github.com/cheminfo/react-cheminfo/compare/v0.99.0...v0.100.0) (2026-11-07)
+
+
+### Features
+
+* draw HU Berlin's seal on an About, loaded only where it is shown ([1793c20](https://github.com/cheminfo/react-cheminfo/commit/1793c20af93a1ffaecd28ec51a69aaa8965ab09b))
+* pin a side panel from its header ([2c68a0f](https://github.com/cheminfo/react-cheminfo/commit/2c68a0f2ba3084d8a85a080bb5a7ff48eff51c8b))
+
+
+### Bug Fixes
+
+* keep a bare ?figure in a site's address, as a bare ?embed is kept ([39cab7e](https://github.com/cheminfo/react-cheminfo/commit/39cab7e02a87a7a1dd2cf5a7107c5e4b1c3e1480))
+* put a panel's full-screen button first on the right, so the buttons every header carries line up ([82e6cdc](https://github.com/cheminfo/react-cheminfo/commit/82e6cdc0fc513bca16cb71880e590be433982e6c))
+
 ## [0.99.0](https://github.com/cheminfo/react-cheminfo/compare/v0.98.0...v0.99.0) (2026-11-07)
 
 
