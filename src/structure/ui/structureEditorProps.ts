@@ -67,6 +67,14 @@ export interface StructureEditorProps {
    */
   help?: boolean;
   /**
+   * Say on an empty canvas how to start: draw with the toolbar, paste a
+   * molfile, a SMILES or an idCode with the platform's paste keys (⌘ V on a
+   * Mac, Ctrl V elsewhere), or drop a file when the canvas takes one. A
+   * reaction canvas shows none.
+   * @default true
+   */
+  splash?: boolean;
+  /**
    * Put a button in the corner that opens every notation of the drawing — its
    * SMILES, its molfiles, its canonical identifiers — and the picture of it,
    * ready to copy or to save. A reaction has none of those, so it is never

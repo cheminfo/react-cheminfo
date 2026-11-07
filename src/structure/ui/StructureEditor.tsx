@@ -17,6 +17,7 @@ import { EditorHelpButton } from './EditorHelpButton.tsx';
 import { EditorImportButton } from './EditorImportButton.tsx';
 import { EditorImportProblem } from './EditorImportProblem.tsx';
 import { StructureDropOverlay } from './StructureDropOverlay.tsx';
+import { StructureEditorSplash } from './StructureEditorSplash.tsx';
 import { ToolbarTooltip } from './ToolbarTooltip.tsx';
 import type { StructureEditorChange } from './editorChange.ts';
 import type { StructureEditorProps } from './structureEditorProps.ts';
@@ -40,8 +41,8 @@ const EditorCanvas = lazy(async () => {
 
 /**
  * The canvas structure editor, sized to fill its container and never to hide
- * part of its toolbar, with a tooltip on every toolbar button and a guide to
- * the keys.
+ * part of its toolbar, with a tooltip on every toolbar button, a guide to the
+ * keys, and a splash on an empty canvas saying how to start.
  * @param props - What to draw, when to reload it, and where to send it.
  * @returns The editor.
  */
@@ -56,6 +57,7 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
     minHeight = 320,
     mode = 'molecule',
     help = true,
+    splash = true,
     exportable = true,
     importable = true,
     onImport,
@@ -109,6 +111,9 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
           value={imports.idCode ?? value}
           mode={mode}
         />
+        {splash && mode === 'molecule' && drawing.empty && !drop.over ? (
+          <StructureEditorSplash importable={takesImports} />
+        ) : null}
         {help ? (
           <ToolbarTooltip containerRef={containerRef} mode={mode} />
         ) : null}

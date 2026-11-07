@@ -23,6 +23,10 @@ const BORDER = 2;
 /** Height of the toolbar as openchemlib draws it, in CSS pixels. */
 const DRAWN_HEIGHT = EDITOR_TOOLBAR_ROWS * BUTTON_SIZE + 2 * BORDER;
 
+/** Width of the toolbar as openchemlib draws it, in CSS pixels. */
+export const EDITOR_TOOLBAR_WIDTH =
+  EDITOR_TOOLBAR_COLUMNS * BUTTON_SIZE + 2 * BORDER;
+
 /** Where a button is drawn, in CSS pixels from the toolbar's top left corner. */
 export interface EditorToolbarButtonBox {
   left: number;

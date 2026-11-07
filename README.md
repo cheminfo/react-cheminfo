@@ -489,6 +489,11 @@ import { StructureEditor } from 'react-cheminfo/structure';
 - `help` (on by default) explains each toolbar button in a tooltip and puts a
   guide to the mouse and the keyboard in the corner, which F1 opens too — the
   paste and copy keys are listed there under **Anywhere**.
+- `splash` (on by default) says on an empty molecule canvas how to start: draw
+  with the toolbar, click and paste a molfile, a SMILES or an idCode, or drop a
+  file when `importable` is on. The paste keys are drawn as ⌘ V on a Mac and
+  Ctrl V elsewhere, decided as openchemlib decides which modifier it reads. It
+  lets the pointer through and goes away with the first atom.
 - The canvas sits behind `React.lazy`, so a page that never opens an editor
   never downloads openchemlib, and `react-cheminfo/structure` stays importable
   when those optional peers are absent.
