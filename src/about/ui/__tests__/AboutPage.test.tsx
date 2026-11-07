@@ -418,14 +418,16 @@ test('an institution with no drawing of its own is its name in type', () => {
       content={{
         ...SMILES,
         people: [{ name: 'Kevin Maik Jablonka' }, { name: 'Luc Patiny' }],
-        providedBy: ['hu-berlin', 'zakodium'],
+        providedBy: ['hzb', 'zakodium'],
       }}
     />,
   );
 
-  expect(html).toContain('href="https://www.hu-berlin.de"');
-  expect(html).toContain('<span>HU Berlin</span>');
-  expect(html).toContain('Humboldt-Universität zu Berlin');
+  expect(html).toContain('href="https://www.helmholtz-berlin.de"');
+  expect(html).toContain('<span>HZB</span>');
+  expect(html).toContain(
+    'Helmholtz-Zentrum Berlin für Materialien und Energie',
+  );
   expect(html).toContain('Zakodium Sàrl');
   expect(html).toContain('Lonay, Switzerland');
   expect(html).not.toContain('epfl.ch');

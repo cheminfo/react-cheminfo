@@ -1,6 +1,13 @@
 import type { CSSProperties, ReactElement } from 'react';
+import { Suspense, lazy } from 'react';
 
 import type { ProviderEntry } from '../core/providers.ts';
+
+// 24 KB compressed, for a logo a single site draws: only that page loads it.
+const HuSeal = lazy(async () => {
+  const module = await import('./HuSeal.tsx');
+  return { default: module.HuSeal };
+});
 
 /**
  * The logo an institution is drawn with under "Provided by", or its name in
@@ -18,6 +25,12 @@ export function ProviderLogo(props: { provider: ProviderEntry }): ReactElement {
       return <EpflLogo label={label} />;
     case 'fsu-jena':
       return <JenaWordMark label={label} />;
+    case 'hu-berlin':
+      return (
+        <Suspense fallback={<span>{provider.name}</span>}>
+          <HuSeal label={label} />
+        </Suspense>
+      );
     case 'unil-esc':
       return <UnilEscLockup label={label} />;
     case 'zakodium':

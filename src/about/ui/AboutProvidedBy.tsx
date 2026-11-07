@@ -163,6 +163,8 @@ const ALIGNED_TILE_STYLE = {
   boxSizing: 'border-box',
   width: 176,
   minHeight: 72,
+  // A round seal needs the height a wide mark does not: 52 px of it, inside.
+  padding: '9px 18px',
 } as const satisfies CSSProperties;
 
 const IDENTITY_STYLE = {
