@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.102.0](https://github.com/cheminfo/react-cheminfo/compare/v0.101.0...v0.102.0) (2026-11-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* FigureSource.inputs, readFigureInputs, FigureInput, MAX_FIGURE_INPUTS, FIGURE_INPUT_ENCODING, MAX_FIGURE_INPUT_BYTES, the `inputs` handler of useHostConnection, FIGURE_PARAM and isFigureAddress are removed, and figureToolDocument(svg, id) takes no tool and always hands the whole figure.
+
+### Features
+
+* carry a figure's data only in its state, and open figures the same way on every site ([0c5852a](https://github.com/cheminfo/react-cheminfo/commit/0c5852ad8d020aecb2039bbe977229825b6bd620))
+* credit react-visualizer and the Zakodium tooling ([1d1a4a1](https://github.com/cheminfo/react-cheminfo/commit/1d1a4a1bb80abb11e1836aadf0fbe62f868a1312))
+* say on an empty structure editor how to start ([96ec461](https://github.com/cheminfo/react-cheminfo/commit/96ec461da030f69b51d7a24185f87e9aaecb35eb))
+
+
+### Bug Fixes
+
+* keep the colour scale's ends beside its bar on a narrow screen ([0e7401a](https://github.com/cheminfo/react-cheminfo/commit/0e7401a76c963922d3eff4feb23d5e70eed77333))
+
 ## [0.101.0](https://github.com/cheminfo/react-cheminfo/compare/v0.100.0...v0.101.0) (2026-11-07)
 
 
