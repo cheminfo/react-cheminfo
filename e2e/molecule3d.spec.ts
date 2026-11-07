@@ -1,3 +1,4 @@
+import type { Locator } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import type { Molecule3DCamera } from '../src/molecule3d/core/camera.ts';
@@ -246,11 +247,13 @@ test('a camera a link carries is the one the reopened viewer stands at', async (
   await page.mouse.move(centreX + 12, centreY, { steps: 6 });
   await page.mouse.up();
   await expect(readout).not.toHaveText('—', { timeout: 10_000 });
-  const left = cameraOf((await readout.textContent()) ?? '');
+  const left = await settledCamera(readout);
   // The link's quarter turn was applied when the model was framed, and the drag
-  // then turned the model a little further.
+  // then turned the model a little further. How much further depends on how
+  // many of the drag's moves a software-rendered frame took in, so only that
+  // it turned is asserted.
   expect(agreement(left.rotation, QUARTER_TURN)).toBeGreaterThan(0.9);
-  expect(agreement(left.rotation, QUARTER_TURN)).toBeLessThan(0.999);
+  expect(agreement(left.rotation, QUARTER_TURN)).toBeLessThan(0.999_99);
 
   await page.getByRole('button', { name: 'Open the link' }).click();
   await expect(readout).toHaveText('—');
@@ -261,11 +264,38 @@ test('a camera a link carries is the one the reopened viewer stands at', async (
   await page.mouse.move(centreX, centreY);
   await page.mouse.wheel(0, -200);
   await expect(readout).not.toHaveText('—', { timeout: 10_000 });
-  const reopened = cameraOf((await readout.textContent()) ?? '');
+  const reopened = await settledCamera(readout);
 
   expect(agreement(reopened.rotation, left.rotation)).toBeGreaterThan(0.999);
   expect(reopened.zoom).not.toBe(left.zoom);
 });
+
+/**
+ * The camera a readout prints once it has stopped moving. The trackball applies
+ * a drag, and a wheel its zoom, over the frames that follow it, and a frame of
+ * the software renderer can outlast the viewer's settle delay, so the first
+ * report after a gesture can be part of it.
+ * @param readout - The element printing the camera.
+ * @returns The camera, once the readout has held it for a second and a half.
+ */
+async function settledCamera(readout: Locator): Promise<Molecule3DCamera> {
+  let previous = '';
+  let since = 0;
+  await expect
+    .poll(
+      async () => {
+        const text = (await readout.textContent()) ?? '';
+        if (text !== previous || text === '—') {
+          previous = text;
+          since = Date.now();
+        }
+        return Date.now() - since >= 1500;
+      },
+      { intervals: [250], timeout: 15_000 },
+    )
+    .toBe(true);
+  return cameraOf(previous);
+}
 
 /**
  * The camera a readout prints.
