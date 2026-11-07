@@ -18,5 +18,9 @@ export default defineConfig({
     // they are doing nothing wrong.
     testTimeout: 30000,
     hookTimeout: 30000,
+    // Worker threads start faster than processes, and each file still gets a
+    // module graph of its own: sharing one across files ran in half the time
+    // but let mocks and module-level caches leak from file to file.
+    pool: 'threads',
   },
 });
