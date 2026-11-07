@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.99.0](https://github.com/cheminfo/react-cheminfo/compare/v0.98.0...v0.99.0) (2026-11-07)
+
+
+### Features
+
+* carry a tool's state in its figures, and let it describe its settings for a host to draw ([865b986](https://github.com/cheminfo/react-cheminfo/commit/865b986ed0f119d2b32b9894788f1d018f6fc356))
+* send a figure to a chat, a mail or another app from the figure panel ([6ee1752](https://github.com/cheminfo/react-cheminfo/commit/6ee175218dab8cb6401d23188a364eb143864764))
+
+
+### Bug Fixes
+
+* let a picture saved from the 3D viewer say which page drew it, and carry its state ([f43da72](https://github.com/cheminfo/react-cheminfo/commit/f43da720be7220c38977279716403c2dbc474428))
+
 ## [0.98.0](https://github.com/cheminfo/react-cheminfo/compare/v0.97.0...v0.98.0) (2026-11-07)
 
 
