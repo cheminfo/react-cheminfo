@@ -1,12 +1,4 @@
-import {
-  BlobReader,
-  BlobWriter,
-  TextReader,
-  Uint8ArrayReader,
-  Uint8ArrayWriter,
-  ZipReader,
-  ZipWriter,
-} from '@zip.js/zip.js';
+import type * as ZipModule from '@zip.js/zip.js';
 
 import { toError } from '../../error/core/toError.ts';
 
@@ -36,6 +28,24 @@ export interface ArchiveFile {
 // would make the backup fail instead.
 const ZIP_OPTIONS = { useWebWorkers: false };
 
+type Zip = typeof ZipModule;
+
+let zip: Promise<Zip> | null = null;
+
+/**
+ * zip.js, fetched the first time an archive is written or read: a page that
+ * never backs anything up never downloads it. A fetch that failed is tried
+ * again on the next call.
+ * @returns The module.
+ */
+function loadZip(): Promise<Zip> {
+  zip ??= import('@zip.js/zip.js').catch((error: unknown) => {
+    zip = null;
+    throw error;
+  });
+  return zip;
+}
+
 /**
  * The name a backup is downloaded under: the site, then the day it was taken,
  * so several backups sort by date in a downloads folder.
@@ -60,10 +70,12 @@ export function backupFileName(
 export async function writeArchive(
   entries: readonly ArchiveEntry[],
 ): Promise<Blob> {
+  const library = await loadZip();
+  const { BlobWriter, ZipWriter } = library;
   const writer = new ZipWriter(new BlobWriter('application/zip'), ZIP_OPTIONS);
   for (const { path, content } of entries) {
     // eslint-disable-next-line no-await-in-loop -- entries keep their order in the archive
-    await writer.add(path, readerOf(content));
+    await writer.add(path, readerOf(library, content));
   }
   return writer.close();
 }
@@ -95,6 +107,7 @@ export async function readArchive(file: Blob): Promise<ArchiveFile[]> {
   if (!(await isArchive(file))) {
     throw new Error('This file is not a ZIP archive, so nothing was imported.');
   }
+  const { BlobReader, Uint8ArrayWriter, ZipReader } = await loadZip();
   const reader = new ZipReader(new BlobReader(file), ZIP_OPTIONS);
   try {
     const entries = await reader.getEntries();
@@ -137,9 +150,10 @@ export async function readJsonFile(file: Blob): Promise<unknown> {
 }
 
 function readerOf(
+  library: Zip,
   content: ArchiveEntry['content'],
-): TextReader | BlobReader | Uint8ArrayReader {
-  if (typeof content === 'string') return new TextReader(content);
-  if (content instanceof Blob) return new BlobReader(content);
-  return new Uint8ArrayReader(content);
+): ZipModule.TextReader | ZipModule.BlobReader | ZipModule.Uint8ArrayReader {
+  if (typeof content === 'string') return new library.TextReader(content);
+  if (content instanceof Blob) return new library.BlobReader(content);
+  return new library.Uint8ArrayReader(content);
 }
