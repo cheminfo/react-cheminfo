@@ -5,9 +5,11 @@ import { credits } from '../../credits/core/credits.ts';
 import { siteById } from '../../ecosystem/core/lookup.ts';
 import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 
+import type { AboutPerson } from './affiliations.ts';
+import { affiliationProblems } from './affiliations.ts';
 import type { ProviderEntry, ProviderId } from './providers.ts';
 import { providers } from './providers.ts';
-import type { MaintainerLine, Organisation, TeamMember } from './team.ts';
+import type { MaintainerLine, TeamMember } from './team.ts';
 import { COORDINATOR, aboutMaintainers, aboutTeam } from './team.ts';
 
 /**
@@ -76,23 +78,6 @@ export interface AboutContent {
    * @default undefined — the site's build does not publish one
    */
   build?: BuildInfo;
-}
-
-/** One person who made a site. */
-export interface AboutPerson {
-  /** Their name, as they write it. */
-  name: string;
-  /**
-   * What they contributed, in one line. `{organisation}` in it is where the
-   * link to their organisation goes.
-   * @default undefined
-   */
-  role?: string;
-  /**
-   * Where they did it, which needs `{organisation}` in the role.
-   * @default undefined
-   */
-  organisation?: Organisation;
 }
 
 /**
@@ -228,6 +213,10 @@ export function aboutProblems(content: AboutContent): string[] {
       );
     }
   }
+
+  problems.push(
+    ...affiliationProblems(content.people ?? [], content.providedBy ?? []),
+  );
 
   if (content.credits.length === 0) {
     problems.push(

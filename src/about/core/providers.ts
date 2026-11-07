@@ -63,4 +63,18 @@ export const PROVIDERS = [
     href: 'https://www.zakodium.com',
     location: 'Lonay, Switzerland',
   },
+  {
+    id: 'hu-berlin',
+    name: 'HU Berlin',
+    fullName: 'Humboldt-Universität zu Berlin',
+    href: 'https://www.hu-berlin.de',
+    location: 'Berlin, Germany',
+  },
+  {
+    id: 'hzb',
+    name: 'HZB',
+    fullName: 'Helmholtz-Zentrum Berlin für Materialien und Energie',
+    href: 'https://www.helmholtz-berlin.de',
+    location: 'Berlin, Germany',
+  },
 ] as const satisfies readonly ProviderEntry[];

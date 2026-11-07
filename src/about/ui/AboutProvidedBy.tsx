@@ -5,7 +5,8 @@ import type { Language } from '../../i18n/core/languages.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { AboutPerson } from '../core/about.ts';
+import type { AboutPerson } from '../core/affiliations.ts';
+import { affiliationRows } from '../core/affiliations.ts';
 import type { ProviderEntry } from '../core/providers.ts';
 import type { TeamMember } from '../core/team.ts';
 
@@ -22,48 +23,54 @@ export interface AboutProvidedByProps {
 }
 
 /**
- * The lockup of who provides a site: the institution's logo, then the names
- * and the institution they work at, and under it what each one contributed
- * when the site says so.
+ * Who provides a site: a lockup per institution, its logo, then the people who
+ * belong to it and where it is, and under them what each one contributed when
+ * the site says so.
  * @param props - See {@link AboutProvidedByProps}.
- * @returns The lockup.
+ * @returns The lockups.
  */
 export function AboutProvidedBy(props: AboutProvidedByProps): ReactElement {
   const { people, team, providers } = props;
   const t = useChromeT();
   const language = useLanguage();
+  const rows = affiliationRows(people, providers);
 
   return (
     <div>
-      {people.length === 0 && providers.length === 0 ? null : (
-        <div style={LOCKUP_STYLE}>
-          {providers.map((provider) => (
-            <a
-              key={provider.id}
-              href={provider.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={provider.fullName}
-              style={LOGO_TILE_STYLE}
-            >
-              <ProviderLogo provider={provider} />
-            </a>
+      {rows.length === 0 ? null : (
+        <div style={ROWS_STYLE}>
+          {rows.map(({ provider, people: members }) => (
+            <div key={provider?.id ?? 'unplaced'} style={LOCKUP_STYLE}>
+              {provider === undefined ? null : (
+                <a
+                  href={provider.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={provider.fullName}
+                  style={rows.length > 1 ? ALIGNED_TILE_STYLE : LOGO_TILE_STYLE}
+                >
+                  <ProviderLogo provider={provider} />
+                </a>
+              )}
+              <div
+                style={
+                  provider === undefined
+                    ? IDENTITY_STYLE
+                    : DIVIDED_IDENTITY_STYLE
+                }
+              >
+                {members.length === 0 ? null : (
+                  <p style={NAMES_STYLE}>{joinNames(members, t)}</p>
+                )}
+                {provider === undefined ? null : (
+                  <p style={INSTITUTION_STYLE}>
+                    {provider.fullName}
+                    <span style={LOCATION_STYLE}>{provider.location}</span>
+                  </p>
+                )}
+              </div>
+            </div>
           ))}
-          <div
-            style={
-              providers.length === 0 ? IDENTITY_STYLE : DIVIDED_IDENTITY_STYLE
-            }
-          >
-            {people.length === 0 ? null : (
-              <p style={NAMES_STYLE}>{joinNames(people, t)}</p>
-            )}
-            {providers.map((provider) => (
-              <p key={provider.id} style={INSTITUTION_STYLE}>
-                {provider.fullName}
-                <span style={LOCATION_STYLE}>{provider.location}</span>
-              </p>
-            ))}
-          </div>
         </div>
       )}
       {team.length === 0 ? null : (
@@ -125,6 +132,11 @@ function joinNames(
   });
 }
 
+const ROWS_STYLE = {
+  display: 'grid',
+  gap: 16,
+} as const satisfies CSSProperties;
+
 const LOCKUP_STYLE = {
   display: 'flex',
   flexWrap: 'wrap',
@@ -140,6 +152,17 @@ const LOGO_TILE_STYLE = {
   border: '1px solid var(--border)',
   borderRadius: 'var(--radius)',
   padding: '14px 18px',
+} as const satisfies CSSProperties;
+
+// One width and height, the widest logo's, so the rules of several rows line up.
+const ALIGNED_TILE_STYLE = {
+  ...LOGO_TILE_STYLE,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  boxSizing: 'border-box',
+  width: 176,
+  minHeight: 72,
 } as const satisfies CSSProperties;
 
 const IDENTITY_STYLE = {
