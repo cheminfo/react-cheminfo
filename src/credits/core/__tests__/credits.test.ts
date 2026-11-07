@@ -159,7 +159,7 @@ test('NMRium names both its licences, and PubChem, a source of data, none', () =
     {
       id: 'nmrium',
       name: 'NMRium',
-      href: 'https://www.nmrium.org/',
+      href: 'https://www.nmrium.com/',
       own: true,
       description:
         'displays and processes the NMR spectra, read from their original files.',

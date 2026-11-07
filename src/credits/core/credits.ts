@@ -351,7 +351,7 @@ export const CREDITS = [
     // spectra (@zakodium/nmrium-core, -core-plugins) are CC-BY-NC-SA-4.0.
     id: 'nmrium',
     name: 'NMRium',
-    href: 'https://www.nmrium.org/',
+    href: 'https://www.nmrium.com/',
     own: true,
     description:
       'displays and processes the NMR spectra, read from their original files.',

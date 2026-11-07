@@ -7,7 +7,7 @@ test('a page of a family site may be framed, with or without www', () => {
     isFamilyFrameSource('https://www.chemcalc.org/?embed=1&mf=C6H12O6'),
   ).toBe(true);
   expect(isFamilyFrameSource('https://chemcalc.org/')).toBe(true);
-  expect(isFamilyFrameSource('https://www.nmrium.org/')).toBe(true);
+  expect(isFamilyFrameSource('https://www.nmrium.com/')).toBe(true);
 });
 
 test('any https host under cheminfo.org may be framed', () => {

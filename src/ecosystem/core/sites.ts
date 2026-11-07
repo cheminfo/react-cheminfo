@@ -108,7 +108,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
   {
     id: 'nmrium',
     name: { lead: 'NMR', alt: 'ium' },
-    host: 'www.nmrium.org',
+    host: 'www.nmrium.com',
     tagline: 'Process and assign NMR spectra in the browser.',
     group: 'spectra',
     brand: '#ea580c',
