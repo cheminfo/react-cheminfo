@@ -3,6 +3,7 @@ import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import { FIGURE_PNG_TYPE } from '../../download/core/figurePng.ts';
 import { figurePixels } from '../../download/core/figureScale.ts';
 import { FIGURE_SVG_TYPE } from '../../download/core/figureSvg.ts';
+import { withPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { encodeAnimatedPng } from '../core/animatedPng.ts';
 import type { ImageSize } from '../core/exportImage.ts';
@@ -125,7 +126,8 @@ export async function moleculeImageFile(
       type: FIGURE_PNG_TYPE,
     });
   }
-  return new File([rasterSvgMarkup(dataUri, pixels)], `${base}.svg`, {
-    type: FIGURE_SVG_TYPE,
-  });
+  // As every figure the page saves: it says which page drew it, and carries
+  // what that page computed, so it opens again as it was.
+  const markup = await withPageFigureSource(rasterSvgMarkup(dataUri, pixels));
+  return new File([markup], `${base}.svg`, { type: FIGURE_SVG_TYPE });
 }
