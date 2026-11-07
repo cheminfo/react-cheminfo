@@ -402,6 +402,14 @@ export const CREDITS = [
     license: 'CC-BY-4.0',
   },
   {
+    id: 'react-visualizer',
+    name: 'react-visualizer',
+    href: 'https://www.npmjs.com/package/react-visualizer',
+    own: true,
+    description: 'writes the page a visualizer view runs in.',
+    license: 'MIT',
+  },
+  {
     id: 'nivo',
     name: 'nivo',
     href: 'https://nivo.rocks/',
@@ -562,6 +570,23 @@ export const CREDITS = [
     name: 'Vite',
     href: 'https://vite.dev/',
     description: 'builds and serves the static site.',
+    license: 'MIT',
+  },
+  {
+    id: 'eslint-config-zakodium',
+    name: 'eslint-config-zakodium',
+    href: 'https://www.npmjs.com/package/eslint-config-zakodium',
+    own: true,
+    description: 'the lint rules the code is checked against.',
+    license: 'MIT',
+  },
+  {
+    id: 'zakodium-tsconfig',
+    name: '@zakodium/tsconfig',
+    href: 'https://www.npmjs.com/package/@zakodium/tsconfig',
+    packageName: '@zakodium/tsconfig',
+    own: true,
+    description: 'the strict TypeScript settings the code is compiled with.',
     license: 'MIT',
   },
 ] as const satisfies readonly CreditEntry[];

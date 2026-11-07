@@ -115,7 +115,43 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(62);
+  expect(CREDITS).toHaveLength(65);
+});
+
+test('the Zakodium tooling is credited as ours, under its npm name', () => {
+  expect(
+    credits([
+      'react-visualizer',
+      'eslint-config-zakodium',
+      'zakodium-tsconfig',
+    ]),
+  ).toStrictEqual([
+    {
+      id: 'react-visualizer',
+      name: 'react-visualizer',
+      href: 'https://www.npmjs.com/package/react-visualizer',
+      own: true,
+      description: 'writes the page a visualizer view runs in.',
+      license: 'MIT',
+    },
+    {
+      id: 'eslint-config-zakodium',
+      name: 'eslint-config-zakodium',
+      href: 'https://www.npmjs.com/package/eslint-config-zakodium',
+      own: true,
+      description: 'the lint rules the code is checked against.',
+      license: 'MIT',
+    },
+    {
+      id: 'zakodium-tsconfig',
+      name: '@zakodium/tsconfig',
+      href: 'https://www.npmjs.com/package/@zakodium/tsconfig',
+      packageName: '@zakodium/tsconfig',
+      own: true,
+      description: 'the strict TypeScript settings the code is compiled with.',
+      license: 'MIT',
+    },
+  ]);
 });
 
 test('NMRium names both its licences, and PubChem, a source of data, none', () => {
