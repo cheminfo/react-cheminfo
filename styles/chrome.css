@@ -2156,13 +2156,14 @@ span.taxon-lineage__name {
   translate: 0 -50%;
 }
 
-/* The pin stays quiet: faint while the panel is only passing through, one
-   shade darker once it is kept. Never the brand colour, which marks where the
-   reader is. */
+/* The pin stays quiet: pale while the panel is only passing through, and the
+   ink of the header's other buttons once it is kept, so the two read apart at
+   a glance. Never the brand colour, which marks where the reader is. */
 [role='button'] .side-panel__pin .bp6-icon {
-  color: var(--text-faint);
+  color: color-mix(in oklab, var(--text-faint) 50%, var(--surface));
 }
 
+[role='button'] .side-panel__pin:hover .bp6-icon,
 [role='button'] .side-panel__pin--on .bp6-icon {
   color: var(--text-muted);
 }
