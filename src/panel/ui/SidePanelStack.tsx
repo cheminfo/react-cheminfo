@@ -55,6 +55,19 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
    * @default undefined
    */
   onFoldedPanelIdsChange?: (ids: Array<TPanel['id']>) => void;
+  /**
+   * The panels pinned, for an editor that keeps the panels placed on purpose
+   * apart from a panel opened in passing. Every header then carries a pin.
+   * @default undefined, no header carries a pin
+   */
+  pinnedPanelIds?: readonly string[];
+  /**
+   * Called when a header's pin is pressed; read only with `pinnedPanelIds`.
+   * @param id - The panel.
+   * @param pinned - Whether it is to be pinned.
+   * @default undefined
+   */
+  onPinnedChange?: (id: TPanel['id'], pinned: boolean) => void;
 }
 
 /**
@@ -70,7 +83,9 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
  * they were switched on, so a panel always comes back where it was.
  *
  * The header carries the shell's own gestures and nothing about what the panel
- * holds: the chevron that folds it away, before the title; focus, which folds
+ * holds: the chevron that folds it away, before the title; the pin, for an
+ * editor that tells the panels placed on purpose from one opened in passing;
+ * focus, which folds
  * every other panel away and unfolds them again; filling the screen with the
  * panel, where the browser can and the panel asks for it; and the cross that
  * closes it. What a panel switches on and off
@@ -94,6 +109,7 @@ export function SidePanelStack<TPanel extends PanelDescriptor>(
 ) {
   const { panels, openPanelIds, onClose, children, fillScreen } = props;
   const { foldedPanelIds, onFoldedPanelIdsChange } = props;
+  const { pinnedPanelIds, onPinnedChange } = props;
   const open = panels.filter((panel) => openPanelIds.includes(panel.id));
   const folds = usePanelFolds(
     open.map((panel) => panel.id),
@@ -124,6 +140,18 @@ export function SidePanelStack<TPanel extends PanelDescriptor>(
                 : undefined
             }
             fillScreen={fillScreen?.(panel) ?? true}
+            pin={
+              pinnedPanelIds === undefined
+                ? undefined
+                : {
+                    pinned: pinnedPanelIds.includes(panel.id),
+                    toggle: () =>
+                      onPinnedChange?.(
+                        panel.id,
+                        !pinnedPanelIds.includes(panel.id),
+                      ),
+                  }
+            }
             onClose={() => onClose(panel.id)}
           >
             {children(panel)}

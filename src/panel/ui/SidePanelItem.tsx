@@ -30,6 +30,12 @@ export interface SidePanelItemProps {
    */
   focus: { active: boolean; toggle: () => void } | undefined;
   /**
+   * Whether the panel is pinned, and the toggle; `undefined` for an editor
+   * that does not pin its panels.
+   * @default undefined
+   */
+  pin?: { pinned: boolean; toggle: () => void };
+  /**
    * Whether the header offers to fill the screen with the panel, where the
    * browser can.
    */
@@ -54,7 +60,7 @@ export interface SidePanelItemProps {
  * @returns The accordion item.
  */
 export function SidePanelItem(props: SidePanelItemProps) {
-  const { id, title, isOpen, onOpenChange, focus, fillScreen } = props;
+  const { id, title, isOpen, onOpenChange, focus, pin, fillScreen } = props;
   const { onClose, children } = props;
   const t = useChromeT();
   const panel = inSentence(title, useLanguage());
@@ -90,6 +96,25 @@ export function SidePanelItem(props: SidePanelItemProps) {
             }}
             onClick={() => onOpenChange(!isOpen)}
           />
+          {pin !== undefined && (
+            <Button
+              variant="minimal"
+              className={
+                pin.pinned
+                  ? 'side-panel__pin side-panel__pin--on'
+                  : 'side-panel__pin'
+              }
+              icon="pin"
+              aria-pressed={pin.pinned}
+              aria-label={t('panel.pin', { panel })}
+              tooltipProps={{
+                content: pin.pinned
+                  ? t('panel.unpinTooltip')
+                  : t('panel.pinTooltip'),
+              }}
+              onClick={pin.toggle}
+            />
+          )}
           {focus !== undefined && (
             <Button
               variant="minimal"

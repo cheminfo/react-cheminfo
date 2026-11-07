@@ -2156,6 +2156,17 @@ span.taxon-lineage__name {
   translate: 0 -50%;
 }
 
+/* The pin stays quiet: faint while the panel is only passing through, one
+   shade darker once it is kept. Never the brand colour, which marks where the
+   reader is. */
+[role='button'] .side-panel__pin .bp6-icon {
+  color: var(--text-faint);
+}
+
+[role='button'] .side-panel__pin--on .bp6-icon {
+  color: var(--text-muted);
+}
+
 /* ── Settings and workspaces ─────────────────────────────────────────────── */
 
 /* The workspace at the top, the sections down the left, the one picked beside

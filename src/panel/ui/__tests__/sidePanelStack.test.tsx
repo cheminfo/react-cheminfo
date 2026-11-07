@@ -261,3 +261,54 @@ test('focus reports every other panel folded', () => {
 
   expect(reported).toStrictEqual([['peaks']]);
 });
+
+/**
+ * The pin of a panel.
+ * @param title - The panel, as its header names it.
+ * @returns The button, or null where the header offers none.
+ */
+function pinButton(title: string): HTMLElement | null {
+  return host.querySelector<HTMLElement>(
+    `[aria-label="Pin the ${CSS.escape(title)} panel"]`,
+  );
+}
+
+test('no header carries a pin unless the editor pins its panels', () => {
+  mount();
+
+  expect(pinButton('spectra')).toBeNull();
+  expect(pinButton('peaks')).toBeNull();
+});
+
+test('the pin says which panels are pinned, and reports the one pressed', () => {
+  const reported: Array<[string, boolean]> = [];
+  act(() => {
+    root.render(
+      <SidePanelStack
+        panels={panels}
+        openPanelIds={['spectra', 'peaks']}
+        onClose={(id) => closed.push(id)}
+        pinnedPanelIds={['peaks']}
+        onPinnedChange={(id, pinned) => reported.push([id, pinned])}
+      >
+        {(panel) => <p>{`the ${panel.id} body`}</p>}
+      </SidePanelStack>,
+    );
+  });
+
+  expect(pinButton('spectra')?.getAttribute('aria-pressed')).toBe('false');
+  expect(pinButton('peaks')?.getAttribute('aria-pressed')).toBe('true');
+
+  act(() => pinButton('spectra')?.click());
+  act(() => pinButton('peaks')?.click());
+
+  expect(reported).toStrictEqual([
+    ['spectra', true],
+    ['peaks', false],
+  ]);
+  expect(closed).toStrictEqual([]);
+  expect(chevrons().map((button) => button.dataset.panelOpen)).toStrictEqual([
+    'true',
+    'true',
+  ]);
+});
