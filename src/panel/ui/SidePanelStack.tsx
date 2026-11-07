@@ -83,12 +83,12 @@ export interface SidePanelStackProps<TPanel extends PanelDescriptor> {
  * they were switched on, so a panel always comes back where it was.
  *
  * The header carries the shell's own gestures and nothing about what the panel
- * holds: the chevron that folds it away, before the title; the pin, for an
+ * holds: the chevron that folds it away, before the title; filling the screen
+ * with the panel, where the browser can and the panel asks for it, first on
+ * the right so the buttons every header carries line up; the pin, for an
  * editor that tells the panels placed on purpose from one opened in passing;
- * focus, which folds
- * every other panel away and unfolds them again; filling the screen with the
- * panel, where the browser can and the panel asks for it; and the cross that
- * closes it. What a panel switches on and off
+ * focus, which folds every other panel away and unfolds them again; and the
+ * cross that closes it. What a panel switches on and off
  * is a toolbar at the top of its own body, so it travels with the panel when it
  * is folded, reordered or lent to another editor, and every header in every
  * editor reads the same — which is the reason this is one component rather

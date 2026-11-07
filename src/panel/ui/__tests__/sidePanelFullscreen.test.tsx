@@ -162,3 +162,48 @@ test('the bar goes once the screen is left', () => {
 
   expect(body?.textContent).toBe('the peaks body');
 });
+
+/**
+ * The buttons of one header, in the order they are drawn.
+ * @param title - The panel, as its header names it.
+ * @returns Their labels.
+ */
+function labels(title: string): Array<string | null> {
+  return Array.from(
+    host.querySelectorAll<HTMLElement>(
+      `[aria-label$="the ${CSS.escape(title)} panel"]`,
+    ),
+    (button) => button.getAttribute('aria-label'),
+  );
+}
+
+test('the button comes first on the right, so the buttons every header carries line up', () => {
+  act(() => {
+    root.render(
+      <SidePanelStack
+        panels={panels}
+        openPanelIds={['spectra', 'peaks']}
+        onClose={() => undefined}
+        fillScreen={(panel) => panel.id === 'spectra'}
+        pinnedPanelIds={[]}
+        onPinnedChange={() => undefined}
+      >
+        {(panel) => <p>{`the ${panel.id} body`}</p>}
+      </SidePanelStack>,
+    );
+  });
+
+  expect(labels('spectra')).toStrictEqual([
+    'Fold the spectra panel',
+    'Fill the screen with the spectra panel',
+    'Pin the spectra panel',
+    'Focus on the spectra panel',
+    'Close the spectra panel',
+  ]);
+  expect(labels('peaks')).toStrictEqual([
+    'Fold the peaks panel',
+    'Pin the peaks panel',
+    'Focus on the peaks panel',
+    'Close the peaks panel',
+  ]);
+});

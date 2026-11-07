@@ -96,6 +96,17 @@ export function SidePanelItem(props: SidePanelItemProps) {
             }}
             onClick={() => onOpenChange(!isOpen)}
           />
+          {/* First on the right, as only some panels offer it, so the buttons
+              every header carries stand in the same place on each. */}
+          {canFill && (
+            <Button
+              variant="minimal"
+              icon="fullscreen"
+              aria-label={t('panel.fillScreen', { panel })}
+              tooltipProps={{ content: t('panel.fillScreenTooltip') }}
+              onClick={fill}
+            />
+          )}
           {pin !== undefined && (
             <Button
               variant="minimal"
@@ -127,15 +138,6 @@ export function SidePanelItem(props: SidePanelItemProps) {
                   : t('panel.focusTooltip'),
               }}
               onClick={focus.toggle}
-            />
-          )}
-          {canFill && (
-            <Button
-              variant="minimal"
-              icon="fullscreen"
-              aria-label={t('panel.fillScreen', { panel })}
-              tooltipProps={{ content: t('panel.fillScreenTooltip') }}
-              onClick={fill}
             />
           )}
           <Button
