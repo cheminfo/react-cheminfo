@@ -9,7 +9,11 @@ export type {
   ToolWindowEvent,
 } from './connectTool.ts';
 export { REQUEST_TIMEOUT, connectTool } from './connectTool.ts';
-export { figureToolDocument } from './figureDocument.ts';
+export {
+  FIGURE_INPUT,
+  figureToolDocument,
+  loadedFigureState,
+} from './figureDocument.ts';
 export type { FigurePage } from './answerGet.ts';
 export { answerGet } from './answerGet.ts';
 export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';
@@ -49,6 +53,7 @@ export {
   MS_JDX_SCHEMA,
 } from './msKinds.ts';
 export type {
+  ChoiceSettingField,
   GetRequest,
   HelloMessage,
   HostError,
@@ -56,11 +61,18 @@ export type {
   HostItem,
   HostRequest,
   LoadRequest,
+  NumberSettingField,
   OutputMessage,
   ResultMessage,
+  SettingsMessage,
+  SettingsRequest,
+  ToggleSettingField,
   ToolInput,
   ToolInterface,
   ToolOutput,
+  ToolSettingChoice,
+  ToolSettingField,
+  ToolSettings,
   UsedItem,
 } from './protocol.ts';
 export {
@@ -97,4 +109,5 @@ export {
 } from './toolCredits.ts';
 export { toolAboutUrl, toolPageUrl } from './toolPage.ts';
 export type { ToolHello } from './toolMessages.ts';
+export { readSettingFields } from './toolSettings.ts';
 export { readHello, readToolMessage } from './toolMessages.ts';

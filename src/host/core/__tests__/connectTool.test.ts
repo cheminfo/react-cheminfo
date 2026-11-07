@@ -11,6 +11,7 @@ import type {
   HostItem,
   OutputMessage,
   ToolInterface,
+  ToolSettingField,
   ToolSettings,
 } from '../protocol.ts';
 import type { ToolHello } from '../toolMessages.ts';
@@ -76,6 +77,7 @@ function framePage() {
   const hellos: ToolHello[] = [];
   const outputs: OutputMessage[] = [];
   const settings: ToolSettings[] = [];
+  const fields: Array<readonly ToolSettingField[]> = [];
   const connection = connectTool({
     frame: () => frameWindow,
     origin: TOOL_ORIGIN,
@@ -86,7 +88,10 @@ function framePage() {
     },
     onHello: (tool) => hellos.push(tool),
     onOutput: (message) => outputs.push(message),
-    onSettings: (message) => settings.push(message),
+    onSettings: (message, described) => {
+      settings.push(message);
+      fields.push(described);
+    },
   });
   let stopTool: (() => void) | null = null;
 
@@ -95,6 +100,7 @@ function framePage() {
     hellos,
     outputs,
     settings,
+    fields,
     /**
      * Hear a message as if it was posted to the host's window.
      * @param event - The message, its window and its origin.
@@ -512,6 +518,54 @@ test('a tool with no settings says nothing of them, and a host asking changes no
 
   expect(outcome.status).toBe('loaded');
   expect(page.settings).toStrictEqual([]);
+
+  page.close();
+});
+
+test('a tool describes its settings with their values, and a description that follows what it holds reaches the host', async () => {
+  const page = framePage();
+  const site = siteSettings({ conformer: 'c1', surface: '0' });
+  let conformers = ['c1', 'c2'];
+  const fieldsNow = (): ToolSettingField[] => [
+    {
+      key: 'conformer',
+      label: 'Conformer',
+      type: 'choice',
+      choices: conformers.map((id) => ({ value: id, label: id })),
+    },
+    { key: 'surface', label: 'Surface', type: 'toggle' },
+  ];
+  page.startTool({ settings: { ...site.settings, fields: fieldsNow } });
+
+  await vi.waitFor(() => {
+    expect(page.fields).toStrictEqual([fieldsNow()]);
+  });
+
+  conformers = ['c1', 'c2', 'c3'];
+  site.hear();
+
+  await vi.waitFor(() => {
+    expect(page.fields).toStrictEqual([
+      [
+        {
+          key: 'conformer',
+          label: 'Conformer',
+          type: 'choice',
+          choices: [
+            { value: 'c1', label: 'c1' },
+            { value: 'c2', label: 'c2' },
+          ],
+        },
+        { key: 'surface', label: 'Surface', type: 'toggle' },
+      ],
+      fieldsNow(),
+    ]);
+  });
+
+  expect(page.settings).toStrictEqual([
+    { conformer: 'c1', surface: '0' },
+    { conformer: 'c1', surface: '0' },
+  ]);
 
   page.close();
 });

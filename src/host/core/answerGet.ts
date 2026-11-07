@@ -1,8 +1,8 @@
 /**
  * A tool's answer to a `get`: the values asked for, those made on request
  * rendered then. Every picture handed back says where it came from — the site,
- * the address of the page as it stood, and what the page was drawn from that
- * the address does not hold — which opens it again.
+ * the address of the page as it stood, what the page was drawn from that the
+ * address does not hold, and what it computed — which opens it again.
  */
 
 import type { FigureInput } from '../../download/core/figureInputs.ts';
@@ -12,6 +12,7 @@ import {
   readFigureSource,
   withFigureSource,
 } from '../../download/core/figureSource.ts';
+import type { FigureState } from '../../download/core/figureState.ts';
 
 import type { HostOutputs } from './hostOutputs.ts';
 import { kindAccepts } from './kinds.ts';
@@ -35,6 +36,12 @@ export interface FigurePage {
    * @default undefined — the address is the whole page
    */
   inputs?: () => readonly FigureInput[] | Promise<readonly FigureInput[]>;
+  /**
+   * What the page computed, in the site's own format, written into every
+   * picture handed back so the site opens it again with nothing computed anew.
+   * @default undefined — the address and the inputs redraw the page
+   */
+  state?: () => FigureState | undefined | Promise<FigureState | undefined>;
 }
 
 /**
@@ -53,7 +60,7 @@ export async function answerGet(
   outputs: HostOutputs | undefined,
   page: FigurePage = {},
 ): Promise<ResultMessage> {
-  const { address = globalThis.location?.href, inputs } = page;
+  const { address = globalThis.location?.href } = page;
   const { id, keys } = request;
   const declared = new Set<string>();
   for (const output of tool.outputs) declared.add(output.key);
@@ -97,37 +104,36 @@ export async function answerGet(
     type: 'result',
     id,
     ok: true,
-    items: await withSources(items, tool.name, address, inputs),
+    items: await withSources(items, tool.name, address, page),
   };
 }
 
 /**
  * The pictures among the values, each saying where it came from unless it
- * already does. What the page was drawn from is read once, and only when a
- * picture is to carry it; a page that cannot say still hands its pictures back.
+ * already does. What the page was drawn from, and what it computed, are read
+ * once, and only when a picture is to carry them; a page that cannot say still
+ * hands its pictures back.
  * @param items - The values handed back.
  * @param site - The tool's name, as the family names the site.
  * @param address - The page's address, if there is one.
- * @param inputs - Reads what the page was drawn from, if anything.
+ * @param page - Reads what the page was drawn from and computed, if anything.
  * @returns The values.
  */
 async function withSources(
   items: HostItem[],
   site: string,
   address: string | undefined,
-  inputs: FigurePage['inputs'],
+  page: FigurePage,
 ): Promise<HostItem[]> {
   if (address === undefined || !URL.canParse(address)) return items;
   if (!items.some((item) => unsourcedSvg(item) !== undefined)) return items;
-  let carried: readonly FigureInput[] = [];
-  try {
-    carried = (await inputs?.()) ?? [];
-  } catch {
-    carried = [];
-  }
-  const href = figureAddress(address);
-  const source: FigureSource =
-    carried.length === 0 ? { site, href } : { site, href, inputs: carried };
+  const [carried, state] = await Promise.all([
+    readSafely(page.inputs),
+    readSafely(page.state),
+  ]);
+  const source: FigureSource = { site, href: figureAddress(address) };
+  if (carried !== undefined && carried.length > 0) source.inputs = carried;
+  if (state !== undefined) source.state = state;
   return Promise.all(
     items.map(async (item) => {
       const svg = unsourcedSvg(item);
@@ -139,6 +145,16 @@ async function withSources(
       };
     }),
   );
+}
+
+async function readSafely<Value>(
+  read: (() => Value | Promise<Value>) | undefined,
+): Promise<Value | undefined> {
+  try {
+    return await read?.();
+  } catch {
+    return undefined;
+  }
 }
 
 function unsourcedSvg(item: HostItem): string | undefined {

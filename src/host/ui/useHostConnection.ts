@@ -9,7 +9,9 @@ import { useEffect, useRef } from 'react';
 
 import type { CitedWork } from '../../citation/core/works.ts';
 import type { FigureInput } from '../../download/core/figureInputs.ts';
+import type { FigureSource } from '../../download/core/figureSource.ts';
 import { figureAddress } from '../../download/core/figureSource.ts';
+import type { FigureState } from '../../download/core/figureState.ts';
 import { setPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import type { HostOutputs } from '../core/hostOutputs.ts';
 import type { HostSettings } from '../core/hostSettings.ts';
@@ -65,6 +67,14 @@ export interface HostHandlers {
    * @default undefined — the address is the whole page
    */
   inputs?: () => readonly FigureInput[] | Promise<readonly FigureInput[]>;
+  /**
+   * What the page computed — the conformers of 3d, the plate of tlc — in the
+   * site's own format. Every figure the page hands back or saves carries it,
+   * so the site opens the figure again as it was, with nothing computed anew,
+   * through an input `FIGURE_INPUT` or a file dropped on the page.
+   * @default undefined — the address and the inputs redraw the page
+   */
+  state?: () => FigureState | undefined | Promise<FigureState | undefined>;
 }
 
 /** Once per page: React may mount the caller twice, the host is greeted once. */
@@ -94,11 +104,15 @@ export function useHostConnection(
   useEffect(
     () =>
       setPageFigureSource(async () => {
-        const href = figureAddress(globalThis.location.href);
+        const source: FigureSource = {
+          site: tool.name,
+          href: figureAddress(globalThis.location.href),
+        };
         const inputs = (await latest.current.inputs?.()) ?? [];
-        return inputs.length === 0
-          ? { site: tool.name, href }
-          : { site: tool.name, href, inputs };
+        if (inputs.length > 0) source.inputs = inputs;
+        const state = await latest.current.state?.();
+        if (state !== undefined) source.state = state;
+        return source;
       }),
     [tool],
   );
@@ -135,6 +149,7 @@ export function useHostConnection(
             ? {}
             : { settings: latest.current.settings }),
           inputs: async () => (await latest.current.inputs?.()) ?? [],
+          state: async () => latest.current.state?.(),
         });
       })
       .catch(() => {

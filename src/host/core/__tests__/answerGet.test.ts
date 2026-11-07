@@ -4,6 +4,7 @@ import {
   readFigureInputs,
   readFigureSource,
 } from '../../../download/core/figureSource.ts';
+import { readFigureState } from '../../../download/core/figureState.ts';
 import { answerGet } from '../answerGet.ts';
 import type { HostOutputs } from '../hostOutputs.ts';
 import type { HostItem, ResultMessage, ToolInterface } from '../protocol.ts';
@@ -138,6 +139,42 @@ test('a page that cannot say what it was drawn from still hands its picture back
     href: 'https://3d.cheminfo.org/?smiles=CCO',
   });
   await expect(readFigureInputs(svg)).resolves.toStrictEqual([]);
+});
+
+test('a picture handed back carries what the page computed, and one that cannot say is still handed back', async () => {
+  const state = { version: 1, value: { conformers: ['one', 'two'], shown: 0 } };
+  const carried = await answerGet(
+    { type: 'get', id: 'g7', keys: ['figure'] },
+    TOOL,
+    outputsDrawing(FIGURE),
+    { address: 'https://3d.cheminfo.org/?smiles=CCO', state: () => state },
+  );
+  const failing = await answerGet(
+    { type: 'get', id: 'g8', keys: ['figure'] },
+    TOOL,
+    outputsDrawing(FIGURE),
+    {
+      address: 'https://3d.cheminfo.org/?smiles=CCO',
+      state: () => Promise.reject(new Error('Nothing computed yet.')),
+    },
+  );
+
+  await expect(
+    readFigureState(svgOf(itemsOf(carried)[0]), '3d'),
+  ).resolves.toStrictEqual({
+    site: '3d',
+    href: 'https://3d.cheminfo.org/?smiles=CCO',
+    ...state,
+    edited: false,
+  });
+
+  const svg = svgOf(itemsOf(failing)[0]);
+
+  expect(readFigureSource(svg)).toStrictEqual({
+    site: '3d',
+    href: 'https://3d.cheminfo.org/?smiles=CCO',
+  });
+  await expect(readFigureState(svg, '3d')).resolves.toBeUndefined();
 });
 
 function itemsOf(result: ResultMessage): HostItem[] {

@@ -1161,6 +1161,29 @@ tool.setSettings({ surface: '0.7' });
 - **`settings` from the tool** carries all of them, when a host connects and
   whenever one changes — a request, or the tool's own visitor. So a control in
   the host never goes stale.
+- **A tool may describe its settings**, so a host draws their controls with no
+  code of its own per tool: `fields` returns a choice, a switch or a number for
+  each, and travels with the values, so a choice that follows what the tool
+  holds — the conformers on screen — follows it. `<ToolSettingControls>` draws
+  them, in one row for a toolbar or as a form for a panel:
+
+```tsx
+settings: {
+  read, apply, subscribe,
+  fields: () => [
+    { key: 'surface', label: 'Surface', type: 'toggle' },
+    { key: 'id', label: 'Conformer', type: 'choice', choices: conformerChoices.value },
+  ],
+},
+
+// In the host:
+<ToolSettingControls
+  fields={tool.settingFields}
+  values={tool.settings}
+  onChange={tool.setSettings}
+  layout="form"
+/>
+```
 
 A tool hands values back through `outputs`, a store read synchronously — a
 `computed` signal does it:
@@ -1213,6 +1236,34 @@ useHostConnection(TOOL, {
       key: 'spectra',
       value: { jdx: irSpectrumToJcamp(spectrum, mode.value) },
     })),
+});
+```
+
+- **What the page computed, the picture may carry too.** An address names what
+  to compute; a `state` is what was computed — 3d's conformers and their
+  energies, lcao's relaxed geometry, tlc's plate — in the site's own format,
+  with a `version` from 1. Every picture handed back or saved carries it as
+  gzipped JSON with a digest of the picture, and the figure opens again at
+  once, the same whatever the site computes differently since.
+- **A tool opens its own figures on `FIGURE_INPUT`**, an optional `figure`
+  input of kind `image.svg`, and reads them with `loadedFigureState`; a file
+  dropped on the page goes through `readFigureState(svg, site)`, which also
+  gives the `href` the figure records, for what the address holds. `edited`
+  says the picture was redrawn in another program since. A host hands a figure back
+  with `figureToolDocument(svg, id, tool.tool)`: the whole figure to a tool
+  that takes figures, the carried values to any other.
+- **`?figure` asks for the figure alone**, filling the frame — what a host
+  editing a figure in place frames over it. It implies `embed`, each site says
+  what its figure is, and a recorded address leaves it out.
+
+```ts
+useHostConnection(TOOL, {
+  load: async (inputs) => {
+    const figure = await loadedFigureState(inputs, TOOL.name);
+    if (figure) openState(figure.value);
+    else loadStructure(inputs);
+  },
+  state: () => ({ version: 1, value: { conformers: shownSet.value } }),
 });
 ```
 

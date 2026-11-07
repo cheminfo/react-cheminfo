@@ -8,7 +8,9 @@
  * picked of the periodic table — so the address is most of what a figure needs
  * to be changed again: a host frames the site at it, a reader opens it on its
  * own. What no address holds, a measured spectrum, the figure carries itself,
- * and a host hands it back to the site.
+ * and a host hands it back to the site. What the page computed — conformers,
+ * a relaxed geometry, a plate — it may carry as its state, so the figure opens
+ * again with nothing computed anew (`figureState.ts`).
  */
 
 import { CARD_PARAM } from '../../card/core/cardAddress.ts';
@@ -18,6 +20,7 @@ import {
 } from '../../router/core/query.ts';
 import { EMBED_PARAM, HIDE_PARAM } from '../../share/core/config.ts';
 import { escapeAttribute } from '../../share/core/escape.ts';
+import { FIGURE_PARAM } from '../../share/core/figureParam.ts';
 
 import type { FigureInput } from './figureInputs.ts';
 import {
@@ -26,10 +29,18 @@ import {
   packFigureInput,
   unpackFigureInput,
 } from './figureInputs.ts';
+import {
+  FIGURE_SOURCE_NAMESPACE,
+  attribute,
+  findSource,
+  readSourceTag,
+  sourceChildren,
+  withoutFigureSource,
+} from './figureSourceMarkup.ts';
+import type { FigureState } from './figureState.ts';
+import { stateElement } from './figureState.ts';
 
-/** The namespace the source is written in, which names it whatever its prefix. */
-export const FIGURE_SOURCE_NAMESPACE =
-  'https://www.cheminfo.org/ns/figure-source';
+export { FIGURE_SOURCE_NAMESPACE } from './figureSourceMarkup.ts';
 
 /** Where a figure came from. */
 export interface FigureSource {
@@ -43,16 +54,12 @@ export interface FigureSource {
    * @default undefined — the address is the whole page
    */
   inputs?: readonly FigureInput[];
-}
-
-/** Where the source sits in a figure, as written there. */
-interface FoundSource {
-  /** The prefix its namespace is bound to. */
-  prefix: string;
-  /** Its opening tag. */
-  tag: string;
-  /** What it holds: the values the figure was drawn from. */
-  body: string;
+  /**
+   * What the page computed, in the site's own format, so the figure opens
+   * again as it was with nothing computed anew. Only the site reads it.
+   * @default undefined — the address and the inputs redraw the page
+   */
+  state?: FigureState;
 }
 
 // What only a framing page asks for: the figure itself never depends on it.
@@ -60,9 +67,8 @@ const FRAME_PARAMS: ReadonlySet<string> = new Set([
   EMBED_PARAM,
   HIDE_PARAM,
   CARD_PARAM,
+  FIGURE_PARAM,
 ]);
-
-const SITE = /^[a-z\d]+(?:-[a-z\d]+)*$/;
 
 /**
  * Write where a figure came from into its SVG, in place of any source it
@@ -77,8 +83,8 @@ export async function withFigureSource(
   svg: string,
   source: FigureSource,
 ): Promise<string> {
-  const element = await sourceElement(source);
   const text = withoutFigureSource(svg);
+  const element = await sourceElement(source, text);
   const root = /<svg\b[^>]*>/i.exec(text);
   if (!root || root[0].endsWith('/>')) return svg;
   const after = root.index + root[0].length;
@@ -99,16 +105,7 @@ export async function withFigureSource(
  */
 export function readFigureSource(svg: string): FigureSource | undefined {
   const found = findSource(svg);
-  if (found === undefined) return undefined;
-  const site = attribute(found.tag, 'site');
-  const href = attribute(found.tag, 'href');
-  if (site === undefined || !SITE.test(site) || href === undefined) {
-    return undefined;
-  }
-  if (!URL.canParse(href) || !/^https?:$/.test(new URL(href).protocol)) {
-    return undefined;
-  }
-  return { site, href };
+  return found === undefined ? undefined : readSourceTag(found);
 }
 
 /**
@@ -120,17 +117,10 @@ export function readFigureSource(svg: string): FigureSource | undefined {
  */
 export async function readFigureInputs(svg: string): Promise<FigureInput[]> {
   const found = findSource(svg);
-  if (found === undefined || readFigureSource(svg) === undefined) return [];
-  const name = `${escapeRegExp(found.prefix)}:input`;
-  const pattern = new RegExp(
-    String.raw`<${name}\b(?<attributes>[^>]*)>(?<text>[^<]*)</${name}\s*>`,
-    'g',
-  );
-  const written = [...found.body.matchAll(pattern)].slice(0, MAX_FIGURE_INPUTS);
+  if (found === undefined || readSourceTag(found) === undefined) return [];
+  const written = sourceChildren(found, 'input').slice(0, MAX_FIGURE_INPUTS);
   const read = await Promise.all(
-    written.map((match) =>
-      readInput(match.groups?.attributes ?? '', match.groups?.text ?? ''),
-    ),
+    written.map((child) => readInput(child.tag, child.text)),
   );
   return read.filter((input) => input !== undefined);
 }
@@ -151,11 +141,16 @@ export function figureAddress(href: string): string {
   return `${url.origin}${url.pathname}${query === '' ? '' : `?${query}`}`;
 }
 
-async function sourceElement(source: FigureSource): Promise<string> {
+async function sourceElement(
+  source: FigureSource,
+  figure: string,
+): Promise<string> {
   const open = `<cheminfo:source xmlns:cheminfo="${FIGURE_SOURCE_NAMESPACE}" site="${escapeAttribute(source.site)}" href="${escapeAttribute(source.href)}"`;
-  const inputs = source.inputs ?? [];
-  if (inputs.length === 0) return `${open}/>`;
-  const written = await Promise.all(inputs.map(inputElement));
+  const written = await Promise.all((source.inputs ?? []).map(inputElement));
+  if (source.state !== undefined) {
+    written.push(await stateElement(source.state, figure));
+  }
+  if (written.length === 0) return `${open}/>`;
   return `${open}>${written.join('')}</cheminfo:source>`;
 }
 
@@ -169,10 +164,9 @@ async function inputElement(input: FigureInput): Promise<string> {
 }
 
 async function readInput(
-  attributes: string,
+  tag: string,
   text: string,
 ): Promise<FigureInput | undefined> {
-  const tag = `<input${attributes}>`;
   const kind = attribute(tag, 'kind');
   if (!kind || attribute(tag, 'encoding') !== FIGURE_INPUT_ENCODING) {
     return undefined;
@@ -191,52 +185,4 @@ async function readInput(
     ...(key === undefined ? {} : { key }),
     ...(label === undefined ? {} : { label }),
   };
-}
-
-function findSource(svg: string): FoundSource | undefined {
-  const prefix = new RegExp(
-    String.raw`xmlns:(?<prefix>[A-Za-z_][\w.-]*)\s*=\s*["']${escapeRegExp(FIGURE_SOURCE_NAMESPACE)}["']`,
-  ).exec(svg)?.groups?.prefix;
-  if (prefix === undefined) return undefined;
-  const name = `${prefix}:source`;
-  const open = new RegExp(String.raw`<${escapeRegExp(name)}\b[^>]*>`).exec(svg);
-  if (open === null) return undefined;
-  const tag = open[0];
-  if (tag.endsWith('/>')) return { prefix, tag, body: '' };
-  const start = open.index + tag.length;
-  const end = svg.indexOf(`</${name}`, start);
-  return { prefix, tag, body: end === -1 ? '' : svg.slice(start, end) };
-}
-
-function withoutFigureSource(svg: string): string {
-  return svg
-    .replace(
-      new RegExp(
-        String.raw`<cheminfo:source xmlns:cheminfo="${escapeRegExp(FIGURE_SOURCE_NAMESPACE)}"[^>]*?(?:/>|>[\s\S]*?</cheminfo:source>)`,
-      ),
-      '',
-    )
-    .replace('<metadata></metadata>', '');
-}
-
-function attribute(tag: string, name: string): string | undefined {
-  const groups = new RegExp(
-    String.raw`\s${name}\s*=\s*(?:"(?<double>[^"]*)"|'(?<single>[^']*)')`,
-  ).exec(tag)?.groups;
-  const value = groups?.double ?? groups?.single;
-  return value === undefined ? undefined : unescapeAttribute(value);
-}
-
-function unescapeAttribute(value: string): string {
-  return value
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#39;', "'")
-    .replaceAll('&apos;', "'")
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&amp;', '&');
-}
-
-function escapeRegExp(value: string): string {
-  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }

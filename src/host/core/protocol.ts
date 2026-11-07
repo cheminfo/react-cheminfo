@@ -20,8 +20,19 @@ import {
   readStrings,
 } from './messageValues.ts';
 import type { ToolHelp } from './toolCredits.ts';
+import type { SettingsRequest } from './toolSettings.ts';
 
 export { MAX_ITEMS, MAX_LABEL_LENGTH } from './messageValues.ts';
+export type {
+  ChoiceSettingField,
+  NumberSettingField,
+  SettingsMessage,
+  SettingsRequest,
+  ToggleSettingField,
+  ToolSettingChoice,
+  ToolSettingField,
+  ToolSettings,
+} from './toolSettings.ts';
 
 /** The version a tool speaks; a `connect` naming another is ignored. */
 export const PROTOCOL_VERSION = 1;
@@ -137,24 +148,6 @@ export interface GetRequest {
   keys: string[];
 }
 
-/**
- * What a tool's visitor could set inside it, by name, each value written as a
- * string the way an address writes it: `{ surface: '0.7' }`.
- */
-export type ToolSettings = Readonly<Record<string, string>>;
-
-/**
- * `settings`: change how the tool shows what it holds. The frame stays and the
- * document stays, so a host's toolbar can drive a tool that would have to
- * compute everything again if it were opened at another address. A setting the
- * tool does not know is ignored.
- */
-export interface SettingsRequest {
-  type: 'settings';
-  id: string;
-  settings: ToolSettings;
-}
-
 /** A request the host sends through the port. */
 export type HostRequest = LoadRequest | GetRequest | SettingsRequest;
 
@@ -199,17 +192,6 @@ export interface OutputMessage {
   document: string;
   /** Each with its `key`, and the `id` of the item it was made from. */
   items: HostItem[];
-}
-
-/**
- * Sent by the tool, unasked, when it connects and whenever one of its settings
- * changes — from a host's request, or from its visitor. It carries all of them,
- * so a host's controls show what the tool is doing rather than what was last
- * asked of it. A tool that has none never sends it.
- */
-export interface SettingsMessage {
-  type: 'settings';
-  settings: ToolSettings;
 }
 
 /**

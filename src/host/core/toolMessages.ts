@@ -28,6 +28,7 @@ import type {
 } from './protocol.ts';
 import { HELLO_TYPE, PROTOCOL_VERSION } from './protocol.ts';
 import { readCitedWorks, readToolHelp } from './toolCredits.ts';
+import { readSettingFields } from './toolSettings.ts';
 
 /** What a tool says of itself in `hello`. */
 export type ToolHello = HelloMessage['tool'];
@@ -88,7 +89,10 @@ export function readToolMessage(
 ): ResultMessage | OutputMessage | SettingsMessage | null {
   if (!isRecord(data)) return null;
   if (data.type === 'settings') {
-    return { type: 'settings', settings: readSettings(data.settings) };
+    const settings = readSettings(data.settings);
+    return data.fields === undefined
+      ? { type: 'settings', settings }
+      : { type: 'settings', settings, fields: readSettingFields(data.fields) };
   }
   if (data.type === 'output') {
     if (typeof data.document !== 'string' || !Array.isArray(data.items)) {

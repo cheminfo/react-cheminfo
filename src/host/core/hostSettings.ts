@@ -8,6 +8,7 @@ import type {
   ResultMessage,
   SettingsMessage,
   SettingsRequest,
+  ToolSettingField,
   ToolSettings,
 } from './protocol.ts';
 
@@ -22,6 +23,13 @@ export interface HostSettings {
   apply: (settings: ToolSettings) => void;
   /** Be told whenever they may have changed; the returned function stops it. */
   subscribe: (listener: () => void) => () => void;
+  /**
+   * How a host draws a control for each setting, read with the values, so a
+   * choice that follows what the tool holds — the conformers of the molecule
+   * on screen — reaches the host whenever it changes.
+   * @default undefined — the tool describes none
+   */
+  fields?: () => readonly ToolSettingField[];
 }
 
 /** What the connection tells the publisher. */
@@ -43,15 +51,25 @@ export function createSettingsPublisher(
   send: (message: SettingsMessage) => void,
 ): SettingsPublisher {
   let sent: string | null = null;
-  function publish(): void {
+  function message(): SettingsMessage {
     const values = settings.read();
-    sent = JSON.stringify(values);
-    send({ type: 'settings', settings: values });
+    const fields = settings.fields?.();
+    return fields === undefined
+      ? { type: 'settings', settings: values }
+      : { type: 'settings', settings: values, fields: [...fields] };
+  }
+  function publish(next = message()): void {
+    sent = JSON.stringify(next);
+    send(next);
   }
   return {
-    connected: publish,
+    connected: () => {
+      publish();
+    },
     changed() {
-      if (sent !== null && JSON.stringify(settings.read()) !== sent) publish();
+      if (sent === null) return;
+      const next = message();
+      if (JSON.stringify(next) !== sent) publish(next);
     },
   };
 }

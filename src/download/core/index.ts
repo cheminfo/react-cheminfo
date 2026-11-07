@@ -16,6 +16,8 @@ export {
   readFigureSource,
   withFigureSource,
 } from './figureSource.ts';
+export type { CarriedFigureState, FigureState } from './figureState.ts';
+export { readFigureState } from './figureState.ts';
 export type { FigureSourceReader } from './pageFigureSource.ts';
 export {
   setPageFigureSource,
