@@ -12,6 +12,14 @@
  * address and looks entirely correct in the source. `routeProblems` from
  * `react-cheminfo/core` checks the prose; this checks that it arrived.
  *
+ * It also refuses a build that ships the code it was built from: a source map,
+ * beside a bundle or inlined into one, and a source file (`.tsx`, `.jsx`,
+ * `.cts`, and a `.ts`, `.d.ts` or `.mts` that reads as code rather than as a
+ * video stream). A map or a source file hands every reader the code the site
+ * was built from, and no page shows it, so every file of the build is read for
+ * it, `assets` included. A `sourceMappingURL` naming a map the build does not
+ * carry ships nothing, and is left alone.
+ *
  * Wire it as an npm script, after the build:
  *   "check-seo": "node node_modules/react-cheminfo/bin/check-seo.mjs dist"
  *
@@ -26,10 +34,14 @@
  * Exits 1 when anything is reported, 2 when it was called wrongly, 0 otherwise.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import process from 'node:process';
 
-import { PAGE_HEAD_MARKER, withheldPhrase } from '../lib/core.js';
+import {
+  PAGE_HEAD_MARKER,
+  shippedSourceProblem,
+  withheldPhrase,
+} from '../lib/core.js';
 
 import { countOf, usageError } from './cli.mjs';
 
@@ -119,6 +131,10 @@ for (const page of pages) {
 // server's own route tests are what covers it.
 const served = deferred.length + excluded.length === pages.length;
 if (!served) checkSiteFiles();
+
+// What a build ships is everything a reader can download from it, not only its
+// pages, and a server writing the head of each page ships the rest all the same.
+checkShippedSources(root);
 
 let report = '';
 for (const problem of problems) report += `${problem}\n`;
@@ -315,6 +331,27 @@ function checkSiteFiles() {
       problems.push(
         `${page.address}: written by the build and named in no sitemap entry.`,
       );
+    }
+  }
+}
+
+/**
+ * Report every file under a path that hands out the code the site was built
+ * from. Nothing is skipped: a map hidden in `assets` or in a dot-folder is
+ * served like any other file.
+ * @param {string} path - A directory of the build.
+ */
+function checkShippedSources(path) {
+  for (const entry of readdirSync(path, { withFileTypes: true })) {
+    const next = join(path, entry.name);
+    if (entry.isDirectory()) {
+      checkShippedSources(next);
+    } else if (entry.isFile()) {
+      const problem = shippedSourceProblem(
+        relative(root, next).split(sep).join('/'),
+        () => readFileSync(next, 'utf8'),
+      );
+      if (problem !== undefined) problems.push(problem);
     }
   }
 }

@@ -10,6 +10,7 @@ import {
 import { readReactCopies } from './reactCopies.ts';
 import type { CheckDeployOptions, DeployFile, DeployProblem } from './types.ts';
 import { DEPLOY_COMPOSE_FILES } from './types.ts';
+import { readViteBuild } from './viteBuild.ts';
 
 /**
  * Every way a repository would break, or silently mis-deploy, under the
@@ -23,12 +24,14 @@ import { DEPLOY_COMPOSE_FILES } from './types.ts';
  * health probe to read, and a `build` that cannot write a bundle until the
  * tests have passed. It also has to publish that image in the first place:
  * with no `latest` to pull the script builds from source on the deploy host,
- * and the install that follows must survive a blip in the registry. It also has to hand the browser a page the browser will
- * not keep, or the next deploy leaves returning visitors on a blank one. Each
- * of those is invisible until a deploy, which is the
- * worst moment to discover it — an `env_file` without `required: false` fails
- * before a container starts, and an `IMAGE_NAME` off by a suffix pulls a
- * package that was never published.
+ * and the install that follows must survive a blip in the registry. It also
+ * has to hand the browser a page the browser will not keep, or the next deploy
+ * leaves returning visitors on a blank one, and to ship a bundle rather than
+ * its source: a source map or a bundle left unminified hands every reader the
+ * code the site was built from. Each of those is invisible until a deploy,
+ * which is the worst moment to discover it — an `env_file` without
+ * `required: false` fails before a container starts, and an `IMAGE_NAME` off
+ * by a suffix pulls a package that was never published.
  * @param files - The repository files to read, each with the path a report names it by.
  * @param options - The package this repo publishes, and what it is allowed to ship.
  * @returns Every problem, in file order and then in reading order.
@@ -94,6 +97,8 @@ export function findDeployProblems(
     byPath.get('package-lock.json'),
     problems,
   );
+
+  readViteBuild(byPath, problems);
 
   const workflow = byPath.get(DOCKER_IMAGE_WORKFLOW);
   if (workflow !== undefined || (options.requirePublishedImage ?? true)) {

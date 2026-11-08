@@ -14,3 +14,8 @@ export {
   readPublishedImage,
 } from './publishedImage.ts';
 export { DEPLOY_COMPOSE_FILES } from './types.ts';
+export {
+  isViteConfig,
+  readViteBuild,
+  viteConfigDirectories,
+} from './viteBuild.ts';

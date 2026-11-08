@@ -20,7 +20,9 @@ export type DeployProblemKind =
   | 'duplicate-react'
   | 'stray-react-major'
   | 'unpinned-react'
-  | 'conflicting-react-pin';
+  | 'conflicting-react-pin'
+  | 'shipped-source-map'
+  | 'unminified-bundle';
 
 /** One way a repository would fail, or silently mis-deploy, on the server. */
 export interface DeployProblem {

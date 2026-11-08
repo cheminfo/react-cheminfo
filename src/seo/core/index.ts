@@ -32,6 +32,7 @@ export { plainDescription, plainProse } from './plainDescription.ts';
 export type { RobotsDisallow } from './robots.ts';
 export { robotsTxt } from './robots.ts';
 export { routeProblems, withheldPhrase } from './routeProblems.ts';
+export { shippedSourceProblem } from './shippedSources.ts';
 export type { RouteField } from './routeTable.ts';
 export {
   ROUTE_FIELDS,

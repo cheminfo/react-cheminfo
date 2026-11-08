@@ -7,7 +7,10 @@
  * `env_file` that fails on a checkout with no `.env` yet, a service with no
  * health probe to read, an `.env.example` that hides a mode, a `build` that
  * bundles before the tests have run, a React that resolves twice or resolves to
- * a major the family does not run.
+ * a major the family does not run, a Vite config that writes source maps or
+ * leaves the bundle unminified. Every Vite config is read, whatever build it
+ * names: at the root, in `frontend`, and in each workspace `package.json`
+ * declares.
  *
  * Wire it as an npm script, next to check-tokens:
  *   "check-deploy": "cheminfo-check-deploy"
@@ -25,7 +28,7 @@
  * Exits 1 when anything is reported, 2 when it was called wrongly, 0 otherwise.
  */
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import process from 'node:process';
 
 import {
@@ -34,6 +37,8 @@ import {
   NGINX_CONFIG,
   PAGE_CACHE_CONFIG,
   findDeployProblems,
+  isViteConfig,
+  viteConfigDirectories,
 } from '../lib/deploy/core/index.js';
 
 import { countOf, listOption, usageError } from './cli.mjs';
@@ -88,6 +93,7 @@ for (const path of [
   PAGE_CACHE_CONFIG,
   NGINX_CONFIG,
   DOCKER_IMAGE_WORKFLOW,
+  ...viteConfigs(read('package.json')),
 ]) {
   const text = read(path);
   if (text !== undefined) files.push({ path, text });
@@ -137,6 +143,56 @@ function publishedImageName() {
   );
   if (match?.groups === undefined) return undefined;
   return `ghcr.io/${match.groups.owner}/${match.groups.repo}`;
+}
+
+/**
+ * Every Vite config the repository builds with, whatever build it names, with
+ * a `packages/*` workspace expanded to the folders under it.
+ * @param {string | undefined} packageJson - The root `package.json`, when there is one.
+ * @returns {string[]} Their paths, relative to the repository root.
+ */
+function viteConfigs(packageJson) {
+  const found = [];
+  for (const declared of viteConfigDirectories(packageJson)) {
+    const directories = declared.endsWith('/*')
+      ? folders(declared.slice(0, -2))
+      : [declared];
+    for (const directory of directories) {
+      for (const entry of entries(directory)) {
+        const path =
+          directory === '.' ? entry.name : `${directory}/${entry.name}`;
+        if (entry.isFile() && isViteConfig(path)) found.push(path);
+      }
+    }
+  }
+  return found;
+}
+
+/**
+ * The folders a `packages/*` workspace entry stands for.
+ * @param {string} parent - A folder of the repository.
+ * @returns {string[]} The folders directly under it.
+ */
+function folders(parent) {
+  const found = [];
+  for (const entry of entries(parent)) {
+    if (entry.isDirectory()) found.push(`${parent}/${entry.name}`);
+  }
+  return found;
+}
+
+/**
+ * List a folder that may not be there: a repository with no `frontend` simply
+ * has no config in it.
+ * @param {string} directory - A folder of the repository.
+ * @returns {import('node:fs').Dirent[]} What is in it, or nothing.
+ */
+function entries(directory) {
+  try {
+    return readdirSync(directory, { withFileTypes: true });
+  } catch {
+    return [];
+  }
 }
 
 /**
