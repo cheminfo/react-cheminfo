@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.103.0](https://github.com/cheminfo/react-cheminfo/compare/v0.102.0...v0.103.0) (2026-11-08)
+
+
+### Features
+
+* offer Save as on every figure site: the site's SVG first, or a .&lt;site&gt;.zip keeping its workspace, which Open reads back ([08aebf6](https://github.com/cheminfo/react-cheminfo/commit/08aebf6634d8647158dc7070be7088848bc11726))
+
+
+### Bug Fixes
+
+* link NMRium to www.nmrium.com ([7164f4a](https://github.com/cheminfo/react-cheminfo/commit/7164f4a897df86ee9aa5a96dcffec995964b5ebb))
+
 ## [0.102.0](https://github.com/cheminfo/react-cheminfo/compare/v0.101.0...v0.102.0) (2026-11-07)
 
 
