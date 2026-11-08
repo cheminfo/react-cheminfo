@@ -14,18 +14,20 @@ export interface OpenFigureButtonProps
   extends OpenFigureOptions, Omit<ButtonProps, 'onClick'> {}
 
 /**
- * Open a figure saved from the site as SVG, as it was drawn: the button, the
- * file picker it opens, and the alert of {@link useOpenFigure}.
+ * Open a figure saved from the site, as an SVG or as a document, as it was
+ * drawn: the button, the file picker it opens, and the alert of
+ * {@link useOpenFigure}.
  * @param props - What opens the figure, and the button's own props.
  * @returns The button.
  */
 export function OpenFigureButton(props: OpenFigureButtonProps): ReactElement {
-  const { site, onOpen, host, origins, ...buttonProps } = props;
+  const { site, onOpen, onWorkspace, host, origins, ...buttonProps } = props;
   const t = useChromeT();
   const input = useRef<HTMLInputElement>(null);
   const { open, dialog } = useOpenFigure({
     site,
     onOpen,
+    ...(onWorkspace === undefined ? {} : { onWorkspace }),
     ...(host === undefined ? {} : { host }),
     ...(origins === undefined ? {} : { origins }),
   });
@@ -43,7 +45,7 @@ export function OpenFigureButton(props: OpenFigureButtonProps): ReactElement {
       <input
         ref={input}
         type="file"
-        accept=".svg,image/svg+xml"
+        accept=".svg,image/svg+xml,.zip,application/zip"
         hidden
         data-testid="open-figure-input"
         onChange={(event) => {

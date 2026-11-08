@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest';
 
 import { withFigureSource } from '../../../download/core/figureSource.ts';
-import { readOpenedFigure } from '../figureOpening.ts';
+import { writeArchive } from '../../../storage/core/backupFiles.ts';
+import { writeSiteDocument } from '../../../storage/core/siteDocument.ts';
+import { readOpenedFigure, readOpenedFile } from '../figureOpening.ts';
 
 const FIGURE =
   '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20"/></svg>';
@@ -63,4 +65,75 @@ test('a picture of the site carrying no state, or any other file, is no figure t
   await expect(readOpenedFigure('not a picture', 'tlc')).resolves.toStrictEqual(
     { kind: 'none' },
   );
+});
+
+const WORKSPACE = { id: 'w1', name: 'Plate', preferences: { lanes: 4 } };
+
+test('a document of the site opens on its figure and the workspace it was saved with', async () => {
+  const svg = await withFigureSource(FIGURE, {
+    site: 'tlc',
+    href: 'https://tlc.cheminfo.org/',
+    state: STATE,
+  });
+  const document = await writeSiteDocument(
+    { data: [{ path: 'plate.tlc.svg', content: svg }], workspace: WORKSPACE },
+    { site: 'tlc' },
+  );
+
+  await expect(readOpenedFile(document, 'tlc')).resolves.toStrictEqual({
+    figure: {
+      kind: 'own',
+      state: {
+        site: 'tlc',
+        href: 'https://tlc.cheminfo.org/',
+        ...STATE,
+        edited: false,
+      },
+    },
+    workspace: WORKSPACE,
+  });
+  await expect(readOpenedFile(new Blob([svg]), 'tlc')).resolves.toStrictEqual({
+    figure: await readOpenedFigure(svg, 'tlc'),
+  });
+});
+
+test("another site's document sends its figure there, without its workspace", async () => {
+  const svg = await withFigureSource(FIGURE, {
+    site: 'lcao',
+    href: 'https://lcao.cheminfo.org/playground?smiles=C',
+    state: STATE,
+  });
+  const document = await writeSiteDocument(
+    {
+      data: [{ path: 'orbitals.lcao.svg', content: svg }],
+      workspace: WORKSPACE,
+    },
+    { site: 'lcao' },
+  );
+
+  await expect(readOpenedFile(document, 'tlc')).resolves.toStrictEqual({
+    figure: {
+      kind: 'elsewhere',
+      svg,
+      destination: {
+        site: 'lcao',
+        url: 'https://lcao.cheminfo.org/playground?smiles=C',
+      },
+    },
+  });
+});
+
+test('an archive that is no document, or a document without a figure, holds none', async () => {
+  const archive = await writeArchive([{ path: 'notes.txt', content: 'hi' }]);
+  const molfile = await writeSiteDocument(
+    { data: [{ path: 'conformer.mol', content: 'M  END' }] },
+    { site: 'tlc' },
+  );
+
+  await expect(readOpenedFile(archive, 'tlc')).resolves.toStrictEqual({
+    figure: { kind: 'none' },
+  });
+  await expect(readOpenedFile(molfile, 'tlc')).resolves.toStrictEqual({
+    figure: { kind: 'none' },
+  });
 });

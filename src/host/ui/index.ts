@@ -8,6 +8,8 @@ export type { OpenFigureButtonProps } from './OpenFigureButton.tsx';
 export { OpenFigureButton } from './OpenFigureButton.tsx';
 export type { OpenFigure, OpenFigureOptions } from './useOpenFigure.tsx';
 export { useOpenFigure } from './useOpenFigure.tsx';
+export type { SaveFigureAs, SaveFigureAsOptions } from './useSaveFigureAs.tsx';
+export { useSaveFigureAs } from './useSaveFigureAs.tsx';
 export { useSaveShortcut } from './useSaveShortcut.ts';
 export { openTool } from './openTool.ts';
 export type {

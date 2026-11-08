@@ -157,6 +157,27 @@ test("another site's document, an archive of anything else and a lost data file 
   );
 });
 
+test('a document read without naming a site says which site it belongs to, its workspace included', async () => {
+  const theirs = await writeSiteDocument(
+    {
+      data: [{ path: 'benzene.3d.svg', content: SVG }],
+      workspace: { id: 'w1', name: 'Saved', preferences: { scale: 2 } },
+    },
+    { site: '3d', date: new Date('2026-11-07T20:00:00Z') },
+  );
+
+  const read = await readSiteDocument(theirs);
+
+  expect(read.site).toBe('3d');
+  expect(read.data.map(({ path }) => path)).toStrictEqual(['benzene.3d.svg']);
+  expect(read.data[0]?.text()).toBe(SVG);
+  expect(read.workspace).toStrictEqual({
+    id: 'w1',
+    name: 'Saved',
+    preferences: { scale: 2 },
+  });
+});
+
 test('a view or a workspace that does not read costs nothing but itself', async () => {
   const archive = await writeArchive([
     {

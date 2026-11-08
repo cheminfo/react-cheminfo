@@ -51,6 +51,12 @@ export interface SaveDocumentDialogProps {
   /** The choice the dialog opens on. */
   initial: SaveDocumentChoice;
   /**
+   * Which of the view and the workspace the site can keep beside its data: a
+   * part it has no use for is not offered.
+   * @default { view: true, workspace: true }
+   */
+  parts?: { view?: boolean; workspace?: boolean };
+  /**
    * What keeping the view brings back, said under its box.
    * @default the chrome's own sentence, in the language of the page
    */
@@ -93,7 +99,8 @@ function SaveDocumentForm(
   props: Omit<SaveDocumentDialogProps, 'isOpen'>,
 ): ReactElement {
   const { formats, initial, onSave, onClose } = props;
-  const { viewDescription, workspaceDescription } = props;
+  const { viewDescription, workspaceDescription, parts = {} } = props;
+  const { view: offersView = true, workspace: offersWorkspace = true } = parts;
   const t = useChromeT();
   const nameId = useId();
   const [choice, setChoice] = useState(initial);
@@ -108,8 +115,8 @@ function SaveDocumentForm(
         onSave({
           name,
           format: format.id,
-          view: format.holdsParts && choice.view,
-          workspace: format.holdsParts && choice.workspace,
+          view: offersView && format.holdsParts && choice.view,
+          workspace: offersWorkspace && format.holdsParts && choice.workspace,
         });
       }}
     >
@@ -147,34 +154,45 @@ function SaveDocumentForm(
             />
           ))}
         </RadioGroup>
-        <FormGroup label={t('document.include')} disabled={!format.holdsParts}>
-          <Checkbox
-            checked={format.holdsParts && choice.view}
+        {offersView || offersWorkspace ? (
+          <FormGroup
+            label={t('document.include')}
             disabled={!format.holdsParts}
-            onChange={() => setChoice({ ...choice, view: !choice.view })}
-            labelElement={
-              <Part
-                label={t('document.view')}
-                description={viewDescription ?? t('document.viewDescription')}
-              />
-            }
-          />
-          <Checkbox
-            checked={format.holdsParts && choice.workspace}
-            disabled={!format.holdsParts}
-            onChange={() =>
-              setChoice({ ...choice, workspace: !choice.workspace })
-            }
-            labelElement={
-              <Part
-                label={t('document.workspace')}
-                description={
-                  workspaceDescription ?? t('document.workspaceDescription')
+          >
+            {offersView ? (
+              <Checkbox
+                checked={format.holdsParts && choice.view}
+                disabled={!format.holdsParts}
+                onChange={() => setChoice({ ...choice, view: !choice.view })}
+                labelElement={
+                  <Part
+                    label={t('document.view')}
+                    description={
+                      viewDescription ?? t('document.viewDescription')
+                    }
+                  />
                 }
               />
-            }
-          />
-        </FormGroup>
+            ) : null}
+            {offersWorkspace ? (
+              <Checkbox
+                checked={format.holdsParts && choice.workspace}
+                disabled={!format.holdsParts}
+                onChange={() =>
+                  setChoice({ ...choice, workspace: !choice.workspace })
+                }
+                labelElement={
+                  <Part
+                    label={t('document.workspace')}
+                    description={
+                      workspaceDescription ?? t('document.workspaceDescription')
+                    }
+                  />
+                }
+              />
+            ) : null}
+          </FormGroup>
+        ) : null}
       </DialogBody>
       <DialogFooter
         actions={

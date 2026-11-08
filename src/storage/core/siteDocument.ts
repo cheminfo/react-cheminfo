@@ -147,13 +147,15 @@ export async function writeSiteDocument(
  * or a workspace that does not read is left out rather than costing the data.
  * @param file - The archive.
  * @param site - The site reading it: a document of another one is refused.
+ * Left out, a document of any site is read, and says which it belongs to.
+ * @default undefined
  * @returns The document.
  * @throws {Error} When the file is no document, or another site's, or its data
  * is missing.
  */
 export async function readSiteDocument(
   file: Blob,
-  site: string,
+  site?: string,
 ): Promise<SiteDocument> {
   const files = await readArchive(file);
   const found = findManifest(files);
@@ -163,7 +165,7 @@ export async function readSiteDocument(
     );
   }
   const { manifest, folder } = found;
-  if (manifest.site !== site) {
+  if (site !== undefined && manifest.site !== site) {
     throw new Error(
       `This document was saved by ${manifest.site}, so it does not open here.`,
     );
@@ -187,14 +189,14 @@ export async function readSiteDocument(
     ? parsedJson(byPath.get(`${folder}${manifest.view}`))
     : undefined;
   return {
-    site,
+    site: manifest.site,
     ...(manifest.generator ? { generator: manifest.generator } : {}),
     ...(manifest.savedAt ? { savedAt: manifest.savedAt } : {}),
     data,
     ...(view === undefined ? {} : { view }),
     ...readWorkspacePart(byPath.get(`${folder}${manifest.workspace ?? ''}`), {
       listed: manifest.workspace !== undefined,
-      site,
+      site: manifest.site,
     }),
     attachments,
   };

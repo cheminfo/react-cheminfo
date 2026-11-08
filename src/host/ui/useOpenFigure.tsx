@@ -4,8 +4,9 @@ import { useState } from 'react';
 
 import type { CarriedFigureState } from '../../download/core/figureState.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import type { WorkspaceRecord } from '../../storage/core/workspaceFile.ts';
 import type { FigureDestination } from '../core/figureForward.ts';
-import { readOpenedFigure } from '../core/figureOpening.ts';
+import { readOpenedFile } from '../core/figureOpening.ts';
 
 import { forwardFigure } from './forwardFigure.ts';
 
@@ -19,6 +20,13 @@ export interface OpenFigureOptions {
    * @param state - The state the figure carries.
    */
   onOpen: (state: CarriedFigureState) => void | Promise<void>;
+  /**
+   * Take in the workspace a document of the site was saved with, once its
+   * figure is open: the panels and the settings it carries.
+   * @param workspace - The workspace, its preferences not yet fitted.
+   * @default undefined — a document opens on its figure alone
+   */
+  onWorkspace?: (workspace: WorkspaceRecord) => void;
   /**
    * How this page introduces itself to a site it sends a figure on to.
    * @default the page's own host
@@ -35,7 +43,8 @@ export interface OpenFigureOptions {
 /** What {@link useOpenFigure} gives a site. */
 export interface OpenFigure {
   /**
-   * Open a file, picked or dropped, as a figure.
+   * Open a file, picked or dropped, as a figure: an SVG, or a document of the
+   * site.
    * @param file - The file.
    */
   open: (file: File) => Promise<void>;
@@ -49,20 +58,26 @@ type Notice =
 
 /**
  * Open the figures a site drew from a file, picked or dropped, the same way on
- * every site of the family: a figure of the site opens as it was drawn; one of
- * another site is sent on to that site, in a new tab, once the reader agrees;
- * any other file is said to hold no figure.
+ * every site of the family: a figure of the site opens as it was drawn, and a
+ * document of the site with the workspace it was saved with; one of another
+ * site is sent on to that site, in a new tab, once the reader agrees; any
+ * other file is said to hold no figure.
  * @param options - See {@link OpenFigureOptions}.
  * @returns The opener, and the alert to render beside it.
  */
 export function useOpenFigure(options: OpenFigureOptions): OpenFigure {
-  const { site, onOpen, host = globalThis.location?.host ?? site } = options;
+  const { site, onOpen, onWorkspace } = options;
+  const { host = globalThis.location?.host ?? site } = options;
   const { origins = {} } = options;
   const t = useChromeT();
   const [notice, setNotice] = useState<Notice | null>(null);
 
   async function open(file: File): Promise<void> {
-    const opened = await readOpenedFigure(await file.text(), site, origins);
+    const { figure: opened, workspace } = await readOpenedFile(
+      file,
+      site,
+      origins,
+    );
     if (opened.kind === 'elsewhere') {
       setNotice(opened);
       return;
@@ -70,6 +85,7 @@ export function useOpenFigure(options: OpenFigureOptions): OpenFigure {
     try {
       if (opened.kind === 'none') throw new Error(file.name);
       await onOpen(opened.state);
+      if (workspace) onWorkspace?.(workspace);
       setNotice(null);
     } catch {
       setNotice({ kind: 'none', file: file.name });
