@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.104.0](https://github.com/cheminfo/react-cheminfo/compare/v0.103.0...v0.104.0) (2026-11-09)
+
+
+### Features
+
+* refuse a build that ships its source: no source map, no source file, no unminified bundle ([883d968](https://github.com/cheminfo/react-cheminfo/commit/883d9681524a878105fd67c28b14dcdcb8d0f728))
+
+
+### Bug Fixes
+
+* drop the separating line above a team list that has nothing above it ([2d1e09c](https://github.com/cheminfo/react-cheminfo/commit/2d1e09cbed5570bc75e5b1c28f645afdb455b191))
+
 ## [0.103.0](https://github.com/cheminfo/react-cheminfo/compare/v0.102.0...v0.103.0) (2026-11-08)
 
 
