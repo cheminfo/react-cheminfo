@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { Blob as NodeBlob } from 'node:buffer';
+
 import type { ReactElement } from 'react';
 import { act } from 'react';
 import type { Root } from 'react-dom/client';
@@ -25,6 +27,9 @@ let root: Root;
 
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+  // A browser has one Blob. Under jsdom on Node 22, zip.js wraps the Blob
+  // Node's `Response` returns in jsdom's, which writes it as "[object Blob]".
+  vi.stubGlobal('Blob', NodeBlob);
   downloads.length = 0;
   host = document.createElement('div');
   document.body.append(host);
