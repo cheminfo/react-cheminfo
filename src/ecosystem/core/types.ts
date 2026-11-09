@@ -38,7 +38,8 @@ export type SiteId =
   | 'vibrations'
   | 'draw'
   | 'tlc'
-  | 'glassware';
+  | 'glassware'
+  | 'write';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

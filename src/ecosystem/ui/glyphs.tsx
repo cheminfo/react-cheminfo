@@ -646,4 +646,22 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <rect x="12" y="3.5" width="8" height="2.6" rx="1.1" fill="#ffffff" />
     </>
   ),
+  // A page with its corner folded, three lines of text in the plate's ink, and
+  // the middle one marked with a highlighter in the answering colour.
+  write: (alt) => (
+    <>
+      <path d="M9 5.5H19.5L24 10V26.5H9Z" fill="#ffffff" />
+      <path
+        d="M19.5 5.5V10H24"
+        fill="none"
+        stroke="#0b3d2e"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <rect x="10.8" y="15" width="11.4" height="4" rx="1" fill={alt} />
+      <rect x="12" y="11.4" width="5.5" height="1.6" rx="0.8" fill="#0b3d2e" />
+      <rect x="12" y="16.2" width="9" height="1.6" rx="0.8" fill="#0b3d2e" />
+      <rect x="12" y="21" width="9" height="1.6" rx="0.8" fill="#0b3d2e" />
+    </>
+  ),
 };

@@ -5,13 +5,19 @@
  * a first-year student and which is for a research project. The groups are the
  * answer, and they read as a progression: the chemistry a course opens with,
  * the exercises that practise it, then the molecule itself, then what was
- * measured of it, then the work only a project needs — and last the tools that
- * are not chemistry at all.
+ * measured of it, then the work only a project needs, then the figures and the
+ * document that report it — and last the tools that are not chemistry at all.
  */
 
 /** The topics, in the order they are written. */
 export type SiteGroupId =
-  'basics' | 'practice' | 'structures' | 'spectra' | 'research' | 'computing';
+  | 'basics'
+  | 'practice'
+  | 'structures'
+  | 'spectra'
+  | 'research'
+  | 'drawing'
+  | 'computing';
 
 /** One topic the family's tools are gathered under. */
 export interface SiteGroup {
@@ -57,6 +63,11 @@ export const SITE_GROUPS: readonly SiteGroup[] = [
     id: 'research',
     label: 'Research & data',
     blurb: 'Specialised work: real datasets, and molecules nobody has made.',
+  },
+  {
+    id: 'drawing',
+    label: 'Drawing & writing',
+    blurb: 'Draw a structure or a scheme, and write the document it goes in.',
   },
   {
     id: 'computing',

@@ -389,7 +389,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     name: { lead: 'draw', alt: 'cheminfo', dot: true },
     host: 'draw.cheminfo.org',
     tagline: 'Journal-grade structures, in an SVG that keeps the chemistry.',
-    group: 'computing',
+    group: 'drawing',
     // The ink a structure is printed in.
     brand: '#1f2a44',
     // The red curly arrows are taught in, at 5.9:1 on white.
@@ -425,6 +425,21 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     // its second half in this darker one, at 6.0:1.
     brandAlt: '#be185d',
     mark: { plate: '#0d3b66', accent: '#ec4899' },
+  },
+  {
+    id: 'write',
+    name: { lead: 'write', alt: 'cheminfo', dot: true },
+    host: 'write.cheminfo.org',
+    tagline:
+      'Write documents holding structures, 3D models and plates that open again where they were made.',
+    group: 'drawing',
+    // Bottle-green ink, 12.2:1 on white and 8.5 Oklab units from the nearest
+    // lead of the family.
+    brand: '#0b3d2e',
+    // A highlighter's yellow marks the mark; the wordmark sets its second half
+    // in this darker amber, at 4.9:1 on white.
+    brandAlt: '#a16207',
+    mark: { plate: '#0b3d2e', accent: '#fde047' },
   },
 ];
 
