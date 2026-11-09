@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.109.0](https://github.com/cheminfo/react-cheminfo/compare/v0.108.0...v0.109.0) (2026-11-09)
+
+
+### Features
+
+* colour a filter capsule with its value's own colour, and keep a toggle button one size in every variant ([0d9e0bb](https://github.com/cheminfo/react-cheminfo/commit/0d9e0bbde8ea3d339de97e7c6dd65e3e9096c7ec))
+
 ## [0.108.0](https://github.com/cheminfo/react-cheminfo/compare/v0.107.0...v0.108.0) (2026-11-09)
 
 
