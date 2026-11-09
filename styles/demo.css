@@ -1,0 +1,93 @@
+/* The pointer a demo draws over a tool on a steps slide. It is large, because
+   it is read from the back of a room, it takes no click, and it carries the
+   number of the line the slide has lit, drawn like that line's own number. */
+.demo-cursor {
+  position: fixed;
+  z-index: 2147483000;
+  top: 0;
+  left: 0;
+  display: none;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.demo-cursor--shown {
+  display: block;
+}
+
+.demo-cursor-arrow {
+  position: absolute;
+  top: -3px;
+  left: -5px;
+  width: 40px;
+  height: 40px;
+  fill: var(--text);
+  filter: drop-shadow(0 2px 3px rgb(16 32 48 / 35%));
+  stroke: var(--surface);
+  stroke-linejoin: round;
+  stroke-width: 1.4px;
+  transform-origin: 5px 3px;
+  transition: transform 90ms ease;
+}
+
+.demo-cursor--pressed .demo-cursor-arrow {
+  transform: scale(0.86);
+}
+
+.demo-cursor-step {
+  position: absolute;
+  top: 30px;
+  left: 26px;
+  display: none;
+  min-width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border: 2px solid var(--surface);
+  border-radius: 15px;
+  background: var(--accent);
+  box-shadow: var(--shadow-md);
+  color: var(--surface);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.demo-cursor--labelled .demo-cursor-step {
+  display: inline-flex;
+}
+
+/* A click, marked where it lands. */
+.demo-cursor-ripple {
+  position: fixed;
+  z-index: 2147482999;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.demo-cursor-ripple::after {
+  position: absolute;
+  top: -22px;
+  left: -22px;
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: demo-cursor-ripple 600ms ease-out forwards;
+  content: '';
+}
+
+@keyframes demo-cursor-ripple {
+  from {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}

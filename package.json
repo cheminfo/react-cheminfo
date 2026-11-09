@@ -19,6 +19,7 @@
     "./card": "./lib/card.js",
     "./conformers": "./lib/conformers.js",
     "./core": "./lib/core.js",
+    "./demo": "./lib/demo.js",
     "./formula": "./lib/formula.js",
     "./host": "./lib/host.js",
     "./host-testing": "./lib/host-testing.js",

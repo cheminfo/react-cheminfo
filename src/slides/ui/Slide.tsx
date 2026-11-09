@@ -7,13 +7,14 @@ import type {
   TalkMeta,
   TalkOrigin,
 } from '../core/index.ts';
-import { demoLabel, splitDemoLinks } from '../core/index.ts';
+import { STEPS_LAYOUT, demoLabel, splitDemoLinks } from '../core/index.ts';
 
 import type { RenderSlideLink } from './DemoLink.tsx';
 import { DemoLink } from './DemoLink.tsx';
 import { EmbedSlide } from './EmbedSlide.tsx';
 import { SectionSlide } from './SectionSlide.tsx';
 import { SlideBody } from './SlideBody.tsx';
+import { StepsSlide } from './StepsSlide.tsx';
 
 /** What every layout — the generic ones and a site's own — is handed. */
 export interface SlideLayoutProps {
@@ -41,6 +42,16 @@ export interface SlideLayoutProps {
    * @default undefined — a plain anchor
    */
   renderLink?: RenderSlideLink;
+  /**
+   * The step on show, on a slide walked one step at a time.
+   * @default 0
+   */
+  step?: number;
+  /**
+   * Called with the step to show, from a click on one of the slide's steps.
+   * @default undefined — the steps are not clickable
+   */
+  onStep?: (step: number) => void;
 }
 
 /** A slide, and the layouts available to draw it. */
@@ -65,13 +76,18 @@ export interface SlideViewProps extends SlideLayoutProps {
  * @returns The slide.
  */
 export function SlideView(props: SlideViewProps): ReactElement {
-  const { layouts, ...layoutProps } = props;
+  const { layouts, step, onStep, ...layoutProps } = props;
   const { slide } = layoutProps;
 
   const Custom = layouts?.[slide.layout];
-  if (Custom !== undefined) return <Custom {...layoutProps} />;
+  if (Custom !== undefined) {
+    return <Custom {...layoutProps} step={step} onStep={onStep} />;
+  }
   if (slide.layout === 'section') return <SectionSlide body={slide.body} />;
   if (slide.layout === 'embed') return <EmbedSlide slide={slide} />;
+  if (slide.layout === STEPS_LAYOUT) {
+    return <StepsSlide {...layoutProps} step={step} onStep={onStep} />;
+  }
 
   return <GenericSlide {...layoutProps} />;
 }
@@ -79,7 +95,9 @@ export function SlideView(props: SlideViewProps): ReactElement {
 /** The layouts the player draws itself, for any deck on any site. */
 const GENERIC_LAYOUTS = new Set(['content', 'title', 'quote', 'thanks']);
 
-function GenericSlide(props: SlideLayoutProps): ReactElement {
+function GenericSlide(
+  props: Omit<SlideLayoutProps, 'onStep' | 'step'>,
+): ReactElement {
   const { slide, talkId, slideIndex, meta, renderLink, site, talkOrigin } =
     props;
   const t = useChromeT();

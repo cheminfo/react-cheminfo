@@ -28,6 +28,32 @@ export type SlideAction =
   | { kind: 'notes' }
   | null;
 
+/** Which way a key moves through the talk, one step at a time. */
+export type SlideDirection = 'next' | 'previous';
+
+/**
+ * Which way a key steps: forward or back by one, as a presenter's remote
+ * does. A slide walked through step by step takes these one step at a time,
+ * while `Home` and `End` still jump to the ends of the talk.
+ * @param key - The `key` of the keyboard event.
+ * @returns The direction, or `null` for a key that does not step.
+ */
+export function slideDirectionForKey(key: string): SlideDirection | null {
+  switch (key) {
+    case 'ArrowRight':
+    case 'ArrowDown':
+    case 'PageDown':
+    case ' ':
+      return 'next';
+    case 'ArrowLeft':
+    case 'ArrowUp':
+    case 'PageUp':
+      return 'previous';
+    default:
+      return null;
+  }
+}
+
 /**
  * The action a key press means, with every move already clamped: stepping past
  * the last slide, or back from the first, stays on the slide it is on rather
@@ -42,16 +68,12 @@ export function slideActionForKey(
   index: number,
   total: number,
 ): SlideAction {
+  const direction = slideDirectionForKey(key);
+  if (direction !== null) {
+    const step = direction === 'next' ? 1 : -1;
+    return { kind: 'go', index: clampSlideIndex(index + step, total) };
+  }
   switch (key) {
-    case 'ArrowRight':
-    case 'ArrowDown':
-    case 'PageDown':
-    case ' ':
-      return { kind: 'go', index: clampSlideIndex(index + 1, total) };
-    case 'ArrowLeft':
-    case 'ArrowUp':
-    case 'PageUp':
-      return { kind: 'go', index: clampSlideIndex(index - 1, total) };
     case 'Home':
       return { kind: 'go', index: 0 };
     case 'End':

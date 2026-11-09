@@ -739,6 +739,120 @@
   font-style: italic;
 }
 
+/* ── A procedure beside the tool doing it ─────────────────── */
+/* Half the slide says what to do, the other half does it. The list keeps
+   every line on screen, so the room sees the whole procedure and where it is
+   in it: the line on show is lit, the lines done stay readable, the lines to
+   come are faint. Its number is drawn like the badge the tool's cursor
+   carries, which is what ties a line to what the tool is doing. */
+.slide-canvas:has(.slide--steps) {
+  padding: 40px 40px 40px 72px;
+}
+
+.slide--steps {
+  display: grid;
+  height: 100%;
+  align-items: stretch;
+  gap: 40px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.slide--steps-alone {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.slide-steps-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.slide--steps .slide-content h1,
+.slide--steps .slide-content h2 {
+  margin: 0 0 0.5em;
+  font-size: 64px;
+}
+
+.slide--steps .slide-content p {
+  margin: 0 0 0.6em;
+  font-size: 34px;
+  line-height: 1.4;
+}
+
+.slide-content .slide-steps {
+  padding: 0;
+  margin: 0;
+  gap: 10px;
+  list-style: none;
+}
+
+.slide-step-button {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: var(--slide-radius);
+  background: none;
+  color: color-mix(in oklab, var(--slide-muted) 55%, var(--slide-bg));
+  cursor: pointer;
+  font: inherit;
+  font-size: 38px;
+  gap: 24px;
+  line-height: 1.35;
+  text-align: left;
+  transition:
+    background-color 240ms ease,
+    color 240ms ease;
+}
+
+.slide-step-button:disabled {
+  cursor: default;
+}
+
+.slide-step-number {
+  display: inline-flex;
+  width: 1.4em;
+  height: 1.4em;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid currentcolor;
+  border-radius: 50%;
+  font-size: 0.8em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color 240ms ease,
+    border-color 240ms ease,
+    color 240ms ease;
+}
+
+.slide-step-text {
+  padding-top: 0.05em;
+}
+
+.slide-step--done .slide-step-button {
+  color: var(--slide-muted);
+}
+
+.slide-step--current .slide-step-button {
+  background: var(--slide-accent-soft);
+  color: var(--slide-ink);
+}
+
+.slide-step--current .slide-step-number {
+  border-color: var(--slide-accent);
+  background: var(--slide-accent);
+  color: var(--slide-surface);
+}
+
+.slide-step-button:not(:disabled):hover {
+  color: var(--slide-ink);
+}
+
 .talk-list-empty {
   margin: 0;
   color: var(--slide-muted);

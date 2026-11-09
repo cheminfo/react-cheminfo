@@ -4,21 +4,21 @@ import type {
   MouseEvent,
   ReactElement,
 } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
-import { isTextEntryTarget } from '../../hooks/ui/keyTargets.ts';
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { Talk } from '../core/index.ts';
-import { clampSlideIndex, slideActionForKey } from '../core/index.ts';
 
 import type { RenderSlideLink } from './DemoLink.tsx';
 import type { SlideLayoutProps } from './Slide.tsx';
 import { SlideView } from './Slide.tsx';
 import { SlideshowBar } from './SlideshowBar.tsx';
 import { SlideScaleContext } from './slideScaleContext.ts';
+import { useSlidePosition } from './useSlidePosition.ts';
 import type { SlideshowFullscreen } from './useSlideshowFullscreen.ts';
 import { useSlideshowFullscreen } from './useSlideshowFullscreen.ts';
+import { useSlideshowKeys } from './useSlideshowKeys.ts';
 
 /** The talk being presented, and everything the site keeps a hand on. */
 export interface SlideshowProps {
@@ -101,7 +101,8 @@ const SLIDE_HEIGHT = 1080;
  * in a query parameter so a demo link can return to the exact one — and the
  * player therefore never touches history itself.
  *
- * Arrow keys, space and PageUp/PageDown navigate, `Home` and `End` jump to the
+ * Arrow keys, space and PageUp/PageDown navigate — through the steps of a
+ * steps slide first, then on to the next slide — `Home` and `End` jump to the
  * ends, `f` toggles fullscreen, `b` and `w` blank the screen to black and to
  * white the way a projector remote does, and `n` shows the presenter's notes.
  * @param props - See {@link SlideshowProps}.
@@ -124,7 +125,13 @@ export function Slideshow(props: SlideshowProps): ReactElement {
   } = props;
 
   const total = talk.slides.length;
-  const current = clampSlideIndex(index, total);
+  const [blank, setBlank] = useState<'black' | 'white' | null>(null);
+  // Any move brings a blanked screen back.
+  const unblank = useCallback(() => {
+    setBlank(null);
+  }, []);
+  const position = useSlidePosition(talk, index, onIndex, unblank);
+  const { current, step, next, previous, goTo, setStep } = position;
   const slide = talk.slides[current];
 
   const playerRef = useRef<HTMLDivElement>(null);
@@ -135,58 +142,27 @@ export function Slideshow(props: SlideshowProps): ReactElement {
       ? 1
       : Math.min(width / SLIDE_WIDTH, height / SLIDE_HEIGHT);
 
-  const [blank, setBlank] = useState<'black' | 'white' | null>(null);
   const [showNotes, setShowNotes] = useState(false);
   const { isFullscreen, toggle: toggleFullscreen } = useSlideshowFullscreen(
     playerRef,
     fullscreen,
   );
 
-  const goTo = useCallback(
-    (next: number) => {
-      setBlank(null);
-      onIndex(clampSlideIndex(next, total));
+  useSlideshowKeys(position, total, {
+    onBlank: (color) => {
+      setBlank((shown) => (shown === color ? null : color));
     },
-    [onIndex, total],
-  );
-
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent): void {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      // A player embedded in a page shares the document with its fields, and
-      // space is both "next slide" and a character.
-      if (isTextEntryTarget(event.target)) return;
-      const action = slideActionForKey(event.key, current, total);
-      if (action === null) return;
-      event.preventDefault();
-      switch (action.kind) {
-        case 'go':
-          goTo(action.index);
-          break;
-        case 'blank':
-          setBlank((shown) => (shown === action.color ? null : action.color));
-          break;
-        case 'fullscreen':
-          toggleFullscreen();
-          break;
-        case 'notes':
-          setShowNotes((shown) => !shown);
-          break;
-        default:
-          break;
-      }
-    }
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [current, total, goTo, toggleFullscreen]);
+    onFullscreen: toggleFullscreen,
+    onNotes: () => {
+      setShowNotes((shown) => !shown);
+    },
+  });
 
   function onStageClick(event: MouseEvent<HTMLDivElement>): void {
     // A demo link or a control handles its own click without also stepping on.
     const target = event.target as Element | null;
     if (target !== null && target.closest('a, button') !== null) return;
-    goTo(current + 1);
+    next();
   }
 
   const progress = total > 1 ? (current / (total - 1)) * 100 : 100;
@@ -209,6 +185,8 @@ export function Slideshow(props: SlideshowProps): ReactElement {
                 site={site}
                 talkOrigin={talkOrigin}
                 slideIndex={current}
+                step={step}
+                onStep={setStep}
                 meta={talk.meta}
                 layouts={layouts}
                 renderLink={renderLink}
@@ -236,7 +214,12 @@ export function Slideshow(props: SlideshowProps): ReactElement {
         index={current}
         total={total}
         isFullscreen={isFullscreen}
-        onIndexChange={goTo}
+        onIndexChange={(target) => {
+          // The bar's arrows step like the keys; its other moves jump.
+          if (target === current + 1) next();
+          else if (target === current - 1) previous();
+          else goTo(target);
+        }}
         onToggleFullscreen={toggleFullscreen}
         onExit={onExit}
       />

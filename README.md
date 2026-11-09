@@ -50,12 +50,14 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor        | React, ms-spectrum, jcampconverter, xy-parser    |
 | `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                        | nothing on import; xtb-wasm on the first call    |
 | `react-cheminfo/host`              | data handed over by a page that frames the tool       | nothing on import; ajv once the page is framed   |
+| `react-cheminfo/demo`              | a tool playing a steps slide's demo, with a cursor    | nothing; loaded only on a page with `?demo=`     |
 | `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
 | `react-cheminfo/playwright`        | the browser-suite configuration every site shares     | nothing; types from @playwright/test             |
 | `react-cheminfo/storage`           | work kept in the browser, workspaces, documents       | React on the backup menu; idb, @zip.js/zip.js    |
 | `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
 | `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
 | `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens         | nothing                                          |
+| `react-cheminfo/styles/demo.css`   | the demo cursor, on the family's tokens               | nothing                                          |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -1478,6 +1480,68 @@ site adds its own through `layouts`.
 
 The `embed` layout puts a **live tool** on the slide — the last bare URL of the
 body is framed — which is what our `?embed` mode exists for.
+
+### A procedure, done by the tool beside it
+
+The `steps` layout teaches a procedure: its list is on the left half, the tool
+framed live on the right, and the arrows walk the list one line at a time before
+they leave the slide. The line on show is lit, the lines done stay readable, the
+lines to come are faint; a click on a line goes to it, a click on the lit one
+plays it again.
+
+```markdown
+<!-- layout: steps -->
+
+## A reflux in one minute
+
+1. Double-click **Round-bottom flask**: it lands on the page
+2. Click **Allihn condenser**, then the ringed neck: it fits
+3. Click **Heating mantle**, then under the flask
+
+https://glassware.cheminfo.org/?embed=1&demo=reflux
+```
+
+`?demo=` names a script the **tool** owns, one step per line. It plays the step
+the slide is on through the tool's own controls, with a cursor carrying the
+line's number:
+
+```ts
+// main.tsx — decided before anything is loaded
+const name = readDemoName(location.search);
+if (name !== null) {
+  const { startDemo } = await import('./demos/startDemo.ts');
+  startDemo(name);
+}
+
+// demos/startDemo.ts
+import 'react-cheminfo/styles/demo.css';
+import { serveDemo, type Demo } from 'react-cheminfo/demo';
+
+const REFLUX: Demo = {
+  reset: emptyPage,
+  steps: [
+    (demo) => demo.doubleClick(tile('Round-bottom flask')),
+    async (demo) => {
+      await demo.click(tile('Allihn condenser'));
+      await demo.click('.joint-marks__free');
+    },
+    async (demo) => {
+      await demo.click(tile('Heating mantle'));
+      await demo.click(pointIn(flask, 0.5, 1.15));
+    },
+  ],
+};
+serveDemo('reflux', REFLUX);
+```
+
+A target is an element, a selector, a point, or a function answering one, read
+again until it is there. A step back or a jump resets the tool and replays the
+steps before at once, so every step starts from the same place. The events go
+to the tool's real handlers; a capture of the demo's pointer is taken as done,
+and while the frame is not the focused page no focus is taken, so the
+presenter's keys keep moving the slides. The slide and the tool speak four
+messages — `cheminfo:demo-step`, `-ready`, `-done`, `-failed` — which a tool's
+end-to-end suite posts to the page itself to play every demo through.
 
 The format itself is framework-free and is also exported from
 `react-cheminfo/core`, so a backend gathering the family's manifests reads them

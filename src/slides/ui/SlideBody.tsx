@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import Markdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
@@ -25,6 +25,12 @@ export interface SlideBodyProps {
    * @default undefined — a plain anchor
    */
   renderLink?: RenderSlideLink;
+  /**
+   * Whether the body is one line inside something else — a step of a list —
+   * so its paragraph is not drawn as a block of its own.
+   * @default false
+   */
+  inline?: boolean;
 }
 
 /**
@@ -41,12 +47,13 @@ export interface SlideBodyProps {
  * @returns The rendered body.
  */
 export function SlideBody(props: SlideBodyProps): ReactElement {
-  const { body, origin, renderLink } = props;
+  const { body, origin, renderLink, inline = false } = props;
 
   return (
     <Markdown
       rehypePlugins={[rehypeRaw, [rehypeSanitize, SLIDE_SANITIZE_SCHEMA]]}
       components={{
+        ...(inline ? INLINE_COMPONENTS : undefined),
         iframe({ src, title, width, height, allowFullScreen }) {
           if (src === undefined || !isFamilyFrameSource(src)) return null;
           return (
@@ -79,3 +86,9 @@ export function SlideBody(props: SlideBodyProps): ReactElement {
     </Markdown>
   );
 }
+
+const INLINE_COMPONENTS = {
+  p({ children }: { children?: ReactNode }) {
+    return children;
+  },
+};
