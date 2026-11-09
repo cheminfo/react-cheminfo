@@ -74,7 +74,7 @@ export function AboutProvidedBy(props: AboutProvidedByProps): ReactElement {
         </div>
       )}
       {team.length === 0 ? null : (
-        <ul style={ROLES_STYLE}>
+        <ul style={rows.length === 0 ? LONE_ROLES_STYLE : ROLES_STYLE}>
           {team.map((member) => (
             <li key={member.name}>
               <strong>{member.name}</strong> — {roleOf(member, t, language)}
@@ -204,4 +204,10 @@ const ROLES_STYLE = {
   paddingTop: 12,
   paddingLeft: 20,
   borderTop: '1px solid var(--border)',
+} as const satisfies CSSProperties;
+
+// A list with no lockup above it has nothing to be set apart from.
+const LONE_ROLES_STYLE = {
+  margin: 0,
+  paddingLeft: 20,
 } as const satisfies CSSProperties;

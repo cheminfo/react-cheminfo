@@ -48,3 +48,22 @@ test('a single institution draws the tile at the width of its own logo', () => {
   expect(html).toContain('École polytechnique fédérale de Lausanne<span');
   expect(html).not.toContain('width:176px');
 });
+
+test('a list with no institution and nobody above it carries no line setting it apart', () => {
+  const team = [{ name: 'Michaël Zasso', role: 'maintains the tooling' }];
+  const alone = renderToStaticMarkup(
+    <AboutProvidedBy people={[]} team={team} providers={[]} />,
+  );
+  const under = renderToStaticMarkup(
+    <AboutProvidedBy
+      people={[{ name: 'Luc Patiny' }]}
+      team={team}
+      providers={providers(['epfl'])}
+    />,
+  );
+
+  expect(alone).toContain('<strong>Michaël Zasso</strong>');
+  expect(alone).not.toContain('border-top');
+  expect(under).toContain('<ul style="margin:16px 0 0;padding-top:12px;');
+  expect(under).toContain('border-top:1px solid var(--border)');
+});
