@@ -1,6 +1,11 @@
 export type { FigureNotice } from './copyFigure.ts';
 export { copyFigure } from './copyFigure.ts';
 export { copySvg } from './copySvg.ts';
+export {
+  FIGURE_CLIPBOARD_ATTRIBUTE,
+  figureClipboardParts,
+  readClipboardFigure,
+} from './figureClipboard.ts';
 export { cropFigure } from './cropFigure.ts';
 export {
   FIGURE_STATE_ENCODING,

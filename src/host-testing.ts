@@ -36,6 +36,7 @@ export type {
 export {
   frameAsChat,
   readChatFrameLog,
+  readClipboardHtml,
   readClipboardText,
   readClipboardTypes,
   readLastHeight,

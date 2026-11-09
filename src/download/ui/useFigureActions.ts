@@ -10,6 +10,7 @@ import { figurePng } from '../core/figurePng.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 import type { FigureSvg } from '../core/figureSvg.ts';
 import { figureSvg } from '../core/figureSvg.ts';
+import { withPageFigureSource } from '../core/pageFigureSource.ts';
 
 import type { FigureRedraw } from './useFigureRedraw.tsx';
 import { useFigureSend } from './useFigureSend.ts';
@@ -90,15 +91,20 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
   function copy(): void {
     // The clipboard is written before anything is awaited, with the picture
     // still being painted: Safari only allows a write the click itself started.
-    const png =
+    const drawn =
       writeFigure === undefined
-        ? new Promise<Blob>((resolve, reject) => {
+        ? new Promise<FigureSvg>((resolve, reject) => {
             withFigure(async (box) => {
-              resolve(await figurePng(figureSvg(box, { background }), scale));
+              resolve(figureSvg(box, { background }));
             }).catch(reject);
           })
-        : writeFigure().then((figure) => figurePng(figure, scale));
-    run(copyFigure(png));
+        : writeFigure();
+    run(
+      copyFigure(
+        drawn.then((figure) => figurePng(figure, scale)),
+        drawn.then((figure) => withPageFigureSource(figure.markup)),
+      ),
+    );
   }
 
   function send(): void {

@@ -28,11 +28,6 @@ export function writeBlobToClipboard(
   blob: Blob | Promise<Blob>,
   options: WriteBlobToClipboardOptions = {},
 ): Promise<boolean> {
-  if (blob instanceof Promise) {
-    // The clipboard reports a failed image as `false`; the promise itself must
-    // not also surface as an unhandled rejection.
-    blob.catch(() => undefined);
-  }
   const type = options.type ?? ownType(blob) ?? DEFAULT_TYPE;
   return writeClipboardItem({ [type]: blob });
 }

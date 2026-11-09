@@ -15,6 +15,7 @@ import {
   formatFigurePixels,
 } from '../../download/core/figureScale.ts';
 import { FIGURE_SVG_TYPE } from '../../download/core/figureSvg.ts';
+import { withPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OVERLAY_HELP_NAME_STYLE } from '../../overlay/ui/overlayRowStyles.ts';
@@ -158,7 +159,10 @@ export function StructurePicturePane(
             // so the image is handed over as a promise rather than awaited
             // first — see `copyFigure`.
             void run(async () =>
-              (await copyFigure(png())) === 'copied'
+              (await copyFigure(
+                png(),
+                withPageFigureSource(picture.markup),
+              )) === 'copied'
                 ? t('download.hintCopied', {
                     pixels: formatFigurePixels(picture),
                   })

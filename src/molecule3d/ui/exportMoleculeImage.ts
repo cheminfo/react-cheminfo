@@ -1,10 +1,12 @@
 import { downloadBlob } from '../../download/core/downloadBlob.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
+import { figureDpi } from '../../download/core/figureDpi.ts';
 import { figureFileName } from '../../download/core/figureFileName.ts';
 import { FIGURE_PNG_TYPE } from '../../download/core/figurePng.ts';
 import { figurePixels } from '../../download/core/figureScale.ts';
 import { FIGURE_SVG_TYPE } from '../../download/core/figureSvg.ts';
 import { withPageFigureSource } from '../../download/core/pageFigureSource.ts';
+import { withPngDpi } from '../../download/core/pngDpi.ts';
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { encodeAnimatedPng } from '../core/animatedPng.ts';
 import type { ImageSize } from '../core/exportImage.ts';
@@ -69,7 +71,10 @@ export async function captureMoleculePng(
   if (dataUri === undefined) {
     throw new Error('There is no picture to copy yet.');
   }
-  return new Blob([dataUriBytes(dataUri)], { type: FIGURE_PNG_TYPE });
+  // It states its resolution, so a document places it at its size on screen.
+  return new Blob([withPngDpi(dataUriBytes(dataUri), figureDpi(scale))], {
+    type: FIGURE_PNG_TYPE,
+  });
 }
 
 /**

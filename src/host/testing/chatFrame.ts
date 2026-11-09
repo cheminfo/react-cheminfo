@@ -114,6 +114,22 @@ export function readClipboardTypes(page: Page): Promise<string[]> {
 }
 
 /**
+ * The HTML on the clipboard, as the page reads it: where a figure a site
+ * copied rides, for `readClipboardFigure` to read back.
+ * @param page - The page.
+ * @returns The HTML, or an empty string when the clipboard holds none.
+ */
+export function readClipboardHtml(page: Page): Promise<string> {
+  return page.evaluate(async () => {
+    const items = await navigator.clipboard.read();
+    const item = items.find((entry) => entry.types.includes('text/html'));
+    if (item === undefined) return '';
+    const html = await item.getType('text/html');
+    return html.text();
+  });
+}
+
+/**
  * The script of a page holding a card's frame, as a chat's page records what
  * the card tells it: into the log {@link readChatFrameLog} reads.
  */

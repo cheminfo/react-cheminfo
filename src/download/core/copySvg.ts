@@ -1,8 +1,11 @@
-import { writeClipboardItem } from '../../clipboard/core/clipboardItem.ts';
+import {
+  clipboardSupports,
+  writeClipboardItem,
+} from '../../clipboard/core/clipboardItem.ts';
 import { writeToClipboard } from '../../clipboard/core/writeToClipboard.ts';
 
 /** The type a picture is put on the clipboard as: no `charset`, which it refuses. */
-const SVG_CLIPBOARD_TYPE = 'image/svg+xml';
+export const SVG_CLIPBOARD_TYPE = 'image/svg+xml';
 
 /**
  * Put an SVG document on the clipboard, without ever throwing at the caller.
@@ -15,7 +18,7 @@ const SVG_CLIPBOARD_TYPE = 'image/svg+xml';
  * @returns Whether the clipboard now holds it, at least as text.
  */
 export async function copySvg(markup: string): Promise<boolean> {
-  if (takesSvgPicture()) {
+  if (clipboardSupports(SVG_CLIPBOARD_TYPE)) {
     const written = await writeClipboardItem({
       [SVG_CLIPBOARD_TYPE]: new Blob([markup], { type: SVG_CLIPBOARD_TYPE }),
       'text/plain': new Blob([markup], { type: 'text/plain' }),
@@ -23,18 +26,4 @@ export async function copySvg(markup: string): Promise<boolean> {
     if (written) return true;
   }
   return writeToClipboard(markup);
-}
-
-/**
- * Whether the clipboard says it takes an SVG picture. Asked before writing:
- * a write it refuses would spend the click, and the text after it would be
- * refused too in Safari.
- * @returns Whether `ClipboardItem.supports` names the SVG type.
- */
-function takesSvgPicture(): boolean {
-  if (typeof ClipboardItem === 'undefined') return false;
-  const item = ClipboardItem as { supports?: (type: string) => boolean };
-  return (
-    typeof item.supports === 'function' && item.supports(SVG_CLIPBOARD_TYPE)
-  );
 }

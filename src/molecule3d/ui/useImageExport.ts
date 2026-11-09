@@ -5,6 +5,7 @@ import type { FigureNotice } from '../../download/core/copyFigure.ts';
 import { copyFigure } from '../../download/core/copyFigure.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import type { FigurePixels } from '../../download/core/figureScale.ts';
+import { withPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
 
 import type { SceneCapture } from './exportMoleculeImage.ts';
@@ -39,8 +40,10 @@ export interface ImageExport {
     animated?: boolean,
   ) => Promise<File>;
   /**
-   * Render the scene at `scale` and put it on the clipboard as a PNG. Call it
-   * from the click itself: Safari only allows a write the click started.
+   * Render the scene at `scale` and put it on the clipboard as a PNG, beside
+   * the figure the page saves, so draw and write paste one that opens again.
+   * Call it from the click itself: Safari only allows a write the click
+   * started.
    */
   copyImage: (scale: number) => Promise<FigureNotice>;
   /** The scene rendered on request, for a page handing the picture on. */
@@ -116,7 +119,12 @@ export function useImageExport(
       if (viewer === null || size === null) {
         return Promise.reject(new Error('There is no picture to copy yet.'));
       }
-      return copyFigure(captureMoleculePng(viewer, scale, size));
+      const png = captureMoleculePng(viewer, scale, size);
+      // One render at a time: the two would otherwise share the canvas.
+      const figure = png
+        .then(() => captureMoleculeSvg(viewer, scale, size))
+        .then(withPageFigureSource);
+      return copyFigure(png, figure);
     },
     [canvasSize, viewerRef],
   );
