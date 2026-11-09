@@ -1,4 +1,4 @@
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import type { IrEditorHandle, IrPlotClick } from '../core/irEditorApi.ts';
 import type { IrPanelId } from '../core/irSidePanels.ts';
@@ -56,6 +56,13 @@ export interface IrEditorProps {
    * @default undefined
    */
   onPlotClick?: (click: IrPlotClick) => void;
+  /**
+   * The host's own actions on what it keeps — open a file, save a document —
+   * as `Toolbar.Item`s of `react-science/ui`, drawn in the header after the
+   * viewer's mark.
+   * @default undefined
+   */
+  actions?: ReactNode;
   /**
    * The handle a host drives the viewer through: take these spectra, frame this
    * wavenumber, select that one.

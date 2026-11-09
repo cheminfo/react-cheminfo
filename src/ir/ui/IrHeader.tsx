@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Header, Toolbar, useFullscreen } from 'react-science/ui';
 
 import { IrLogo } from './IrLogo.tsx';
@@ -13,10 +14,14 @@ import { useIrText } from './useIrText.ts';
  * mark is the About button, in the corner `react-mass` and `react-glycan` put
  * theirs in, so a chemist switching between the three tools looks in one place
  * for what they are in; and help then full screen close the bar, hard against
- * the right edge, in all three.
+ * the right edge, in all three. A host's own actions on what it keeps — open,
+ * save — follow the mark, as an application menu follows its icon.
+ * @param props - Component props.
+ * @param props.actions - The host's actions, as toolbar items.
  * @returns The header.
  */
-export function IrHeader() {
+export function IrHeader(props: { actions?: ReactNode }) {
+  const { actions } = props;
   const command = useIrCommandProps();
   const { isFullScreen } = useFullscreen();
   const { technique } = useIrEditorState().state.settings;
@@ -29,6 +34,7 @@ export function IrHeader() {
           icon={<IrLogo size={16} technique={technique} />}
           {...command('about')}
         />
+        {actions}
       </Toolbar>
       <Toolbar aria-label={text.viewerHelp}>
         <Toolbar.Item icon="help" {...command('documentation')} />

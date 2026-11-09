@@ -130,6 +130,8 @@ export {
   irModeTechnique,
   offersIrMode,
 } from './irTechnique.ts';
+export type { IrSpectrumRecord, IrViewerRecord } from './irViewerRecord.ts';
+export { irViewerRecord, readIrViewerRecord } from './irViewerRecord.ts';
 export type {
   LoadIrSpectraOptions,
   LoadIrSpectraResult,

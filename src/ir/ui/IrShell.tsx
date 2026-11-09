@@ -1,4 +1,4 @@
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { useId, useMemo, useState } from 'react';
 import { useFullscreen } from 'react-science/ui';
 
@@ -40,6 +40,13 @@ export interface IrShellProps {
    * @default undefined
    */
   onPlotClick?: (click: IrPlotClick) => void;
+  /**
+   * The host's own actions on what it keeps — open a file, save a document —
+   * as `Toolbar.Item`s of `react-science/ui`, drawn in the header after the
+   * viewer's mark.
+   * @default undefined
+   */
+  actions?: ReactNode;
 }
 
 /**
@@ -57,7 +64,7 @@ export interface IrShellProps {
  * @returns The screen.
  */
 export function IrShell(props: IrShellProps) {
-  const { handle, panels, onPlotClick } = props;
+  const { handle, panels, onPlotClick, actions: hostActions } = props;
 
   const { state, visibleSpectra, selectedSpectrum } = useIrEditorState();
   const actions = useIrActions();
@@ -142,7 +149,7 @@ export function IrShell(props: IrShellProps) {
           shortcuts are heard on: keys are delivered to whatever holds the caret,
           and an SVG never does. */}
       <div ref={setRoot} tabIndex={-1} style={rootStyle}>
-        <IrHeader />
+        <IrHeader actions={hostActions} />
 
         <div style={mainStyle}>
           {/* The rails are chrome of a fixed width, and a flex child shrinks by

@@ -1,4 +1,4 @@
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { RootLayout } from 'react-science/ui';
 
 import type { IrEditorHandle, IrPlotClick } from '../core/irEditorApi.ts';
@@ -54,6 +54,13 @@ export interface VibrationalEditorProps {
    */
   onPlotClick?: (click: IrPlotClick) => void;
   /**
+   * The host's own actions on what it keeps — open a file, save a document —
+   * as `Toolbar.Item`s of `react-science/ui`, drawn in the header after the
+   * viewer's mark.
+   * @default undefined
+   */
+  actions?: ReactNode;
+  /**
    * The handle a host drives the viewer through.
    * @default undefined
    */
@@ -76,6 +83,7 @@ export function VibrationalEditor(props: VibrationalEditorProps) {
     defaultPanelIds,
     panels = NO_PANELS,
     onPlotClick,
+    actions,
     ref,
   } = props;
 
@@ -94,7 +102,12 @@ export function VibrationalEditor(props: VibrationalEditorProps) {
           the backdrop white. Above the shell rather than inside it, so the shell
           can ask whether it is full screen and offer the way out. */}
       <RootLayout style={rootLayoutStyle}>
-        <IrShell handle={ref} panels={panels} onPlotClick={onPlotClick} />
+        <IrShell
+          handle={ref}
+          panels={panels}
+          onPlotClick={onPlotClick}
+          actions={actions}
+        />
       </RootLayout>
     </IrStateProvider>
   );

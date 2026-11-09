@@ -42,8 +42,10 @@ export function useIrHandle(handle: Ref<IrEditorHandle> | undefined): void {
         });
       },
       selectSpectrum: (id) => actions.selectSpectrum(id),
+      getState: () => state,
+      loadState: (next) => actions.loadState(next),
     }),
-    [state.data.spectra, actions, domain, visibleSpectra, mode],
+    [state, actions, domain, visibleSpectra, mode],
   );
 }
 

@@ -8,6 +8,7 @@
  */
 
 import type { IrDomain, IrSpectrum } from './irSpectrum.ts';
+import type { IrState, PartialIrState } from './irState.ts';
 
 /** How much room to leave either side of a band a host asks to be framed. */
 export interface ZoomToBandOptions {
@@ -47,6 +48,17 @@ export interface IrEditorHandle {
   zoomToWavenumber: (wavenumber: number, options?: ZoomToBandOptions) => void;
   /** Point the panels at one spectrum, or at none. */
   selectSpectrum: (id: string | null) => void;
+  /**
+   * Everything the viewer holds — the spectra with their bands, the window
+   * shown, how they are read — for a figure or a document to keep, written
+   * down by `irViewerRecord`.
+   */
+  getState: () => IrState;
+  /**
+   * Open a state kept before, in place of what is open: what
+   * `readIrViewerRecord` reads back. The technique stays the viewer's own.
+   */
+  loadState: (state: PartialIrState) => void;
 }
 
 /**
