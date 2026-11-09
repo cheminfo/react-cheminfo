@@ -471,35 +471,45 @@ test('the book holds exactly the stories the specs address', async ({
   expect(stories).toStrictEqual(STORY_IDS);
 });
 
-test('every story renders, with nothing thrown', async ({ page }) => {
-  // One page opens every story in turn, so the budget is per story rather than
-  // Playwright's flat 30 s: the book has grown from 26 stories to several
-  // hundred, and a cold runner is far slower than a warm laptop at each
-  // navigation. Without this the walk is killed part-way and reports the story
-  // it happened to be on as empty.
-  test.setTimeout(Math.max(60_000, STORY_IDS.length * 2_000));
+// The walk is cut into slices, each a test of its own, so the book spreads over
+// the workers instead of holding one of them for every story.
+const STORIES_PER_TEST = 50;
 
-  const problems: string[] = [];
-  page.on('pageerror', (error) => problems.push(error.message));
-  page.on('console', (message) => {
-    if (message.type() === 'error') problems.push(message.text());
+for (let start = 0; start < STORY_IDS.length; start += STORIES_PER_TEST) {
+  const slice = STORY_IDS.slice(start, start + STORIES_PER_TEST);
+
+  test(`every story renders, with nothing thrown (${start + 1}–${start + slice.length})`, async ({
+    page,
+  }) => {
+    // One page opens each story of the slice in turn, so the budget is per
+    // story rather than Playwright's flat 30 s: a cold runner is far slower
+    // than a warm laptop at each navigation. Without this the walk is killed
+    // part-way and reports the story it happened to be on as empty.
+    test.setTimeout(Math.max(60_000, slice.length * 2_000));
+
+    const problems: string[] = [];
+    page.on('pageerror', (error) => problems.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') problems.push(message.text());
+    });
+
+    /* eslint-disable no-await-in-loop -- one page walks the stories in turn */
+    for (const id of slice) {
+      const before = problems.length;
+      await openStory(page, id);
+      // Storybook writes a render failure into its own error display instead
+      // of throwing, so the listeners above would not see a story that failed
+      // to draw; the display sits in the page at all times and is only shown
+      // then.
+      await expect(page.locator('#storybook-root > *').first()).toBeVisible();
+      await expect(page.locator('#error-message')).toBeHidden();
+      if (STORIES_THAT_THROW_ON_PURPOSE.has(id)) problems.length = before;
+    }
+    /* eslint-enable no-await-in-loop */
+
+    expect(problems).toStrictEqual([]);
   });
-
-  /* eslint-disable no-await-in-loop -- one page walks the stories in turn */
-  for (const id of STORY_IDS) {
-    const before = problems.length;
-    await openStory(page, id);
-    // Storybook writes a render failure into its own error display instead of
-    // throwing, so the listeners above would not see a story that failed to
-    // draw; the display sits in the page at all times and is only shown then.
-    await expect(page.locator('#storybook-root > *').first()).toBeVisible();
-    await expect(page.locator('#error-message')).toBeHidden();
-    if (STORIES_THAT_THROW_ON_PURPOSE.has(id)) problems.length = before;
-  }
-  /* eslint-enable no-await-in-loop */
-
-  expect(problems).toStrictEqual([]);
-});
+}
 
 test('the brand toolbar retunes the colours a story reads', async ({
   page,

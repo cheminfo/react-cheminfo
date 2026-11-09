@@ -1,11 +1,25 @@
-import { afterEach, expect, test, vi } from 'vitest';
+import type * as os from 'node:os';
+
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { cheminfoPlaywrightConfig } from '../config.ts';
 
 const DEVICE = { viewport: { width: 1280, height: 720 } };
 
+const machine = vi.hoisted(() => ({ cores: 8 }));
+
+vi.mock('node:os', async (importOriginal) => ({
+  ...(await importOriginal<typeof os>()),
+  availableParallelism: () => machine.cores,
+}));
+
+beforeEach(() => {
+  vi.stubEnv('PLAYWRIGHT_WORKERS', '');
+});
+
 afterEach(() => {
   vi.unstubAllEnvs();
+  machine.cores = 8;
 });
 
 test('a site gets the family defaults and one dev server', () => {
@@ -20,7 +34,7 @@ test('a site gets the family defaults and one dev server', () => {
     fullyParallel: true,
     forbidOnly: false,
     retries: 0,
-    workers: undefined,
+    workers: 4,
     reporter: 'html',
     use: { baseURL: 'http://localhost:10919', trace: 'on-first-retry' },
     projects: [{ name: 'chromium', use: DEVICE }],
@@ -102,4 +116,59 @@ test('a site lays its own settings over the defaults', () => {
     trace: 'on-first-retry',
     permissions: ['clipboard-read'],
   });
+});
+
+test('a big machine opens no more browsers than one server can feed', () => {
+  vi.stubEnv('CI', '');
+  const options = { baseURL: 'http://localhost:10919', device: DEVICE };
+
+  machine.cores = 128;
+
+  expect(cheminfoPlaywrightConfig(options).workers).toBe(16);
+
+  machine.cores = 20;
+
+  expect(cheminfoPlaywrightConfig(options).workers).toBe(10);
+
+  machine.cores = 1;
+
+  expect(cheminfoPlaywrightConfig(options).workers).toBe(1);
+});
+
+test('PLAYWRIGHT_WORKERS sets the count, over the site and over CI', () => {
+  const options = {
+    baseURL: 'http://localhost:10919',
+    device: DEVICE,
+    overrides: { workers: 2 },
+  };
+
+  vi.stubEnv('CI', '');
+  vi.stubEnv('PLAYWRIGHT_WORKERS', '24');
+
+  expect(cheminfoPlaywrightConfig(options).workers).toBe(24);
+
+  vi.stubEnv('PLAYWRIGHT_WORKERS', ' 25% ');
+
+  expect(cheminfoPlaywrightConfig(options).workers).toBe('25%');
+
+  vi.stubEnv('CI', 'true');
+  vi.stubEnv('PLAYWRIGHT_WORKERS', '3');
+
+  expect(cheminfoPlaywrightConfig(options).workers).toBe(3);
+});
+
+test('a PLAYWRIGHT_WORKERS nobody can read leaves the default', () => {
+  vi.stubEnv('CI', '');
+  const options = { baseURL: 'http://localhost:10919', device: DEVICE };
+
+  for (const value of ['many', '0', '0%', '-2', '1.5', '']) {
+    vi.stubEnv('PLAYWRIGHT_WORKERS', value);
+
+    expect(cheminfoPlaywrightConfig(options).workers).toBe(4);
+  }
+  vi.stubEnv('PLAYWRIGHT_WORKERS', 'many');
+
+  expect(
+    cheminfoPlaywrightConfig({ ...options, overrides: { workers: 2 } }).workers,
+  ).toBe(2);
 });

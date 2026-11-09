@@ -1266,6 +1266,12 @@ export default defineConfig(
 `webServer` takes one server or several (a backend and a frontend), and
 `overrides` lays anything else over the defaults.
 
+Locally a suite opens one browser per two cores, never more than 16: every
+browser loads its pages from the one server the suite starts, so on a big
+machine more of them only time out. `PLAYWRIGHT_WORKERS` — a count, or a share
+of the cores such as `25%` — sets the number on any machine, over a site's own
+`overrides.workers` and over CI.
+
 `react-cheminfo/host-testing` serves a stand-in host for Playwright on
 `127.0.0.1`, and exports `SCIPEAKS_ETHYLBENZENE_LOAD`: the message SciPeaks'
 tool tab sends for a sample, byte for byte. visualizer-helper's tests pin the
