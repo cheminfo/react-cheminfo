@@ -820,6 +820,43 @@ SVG narrows its view box and stays a vector. A figure with nothing to take away
 comes back as it was. `paintedBox(pixels, width, height)` is the scan
 underneath, for a canvas of your own.
 
+### Copying a figure, so it opens again
+
+Copy — in `FigureDownload`, the 3D viewer's export panel and the structure
+picture pane — puts one item on the clipboard, in three renderings:
+
+| Rendering                                                                                    | Read by                    |
+| -------------------------------------------------------------------------------------------- | -------------------------- |
+| `image/png`                                                                                  | a chat, an office program  |
+| `text/html`: the PNG at the size it was drawn, carrying the figure as `data-cheminfo-figure` | a document; draw and write |
+| `image/svg+xml`, where the browser takes it                                                  | a vector editor            |
+
+The figure is the SVG the site saves, with `withPageFigureSource` writing where
+it came from and what the page showed. So draw and write paste a figure that
+opens again on its site, not a picture of one. It rides in the HTML because the
+HTML is the one rendering every browser hands a paste: Chrome lists an SVG but
+gives it to no paste event, and Firefox and Safari take none. Safari rewrites
+the HTML of a paste from another site, and keeps the attribute.
+
+A site copying a figure itself writes the same item, from the click, with both
+still promises:
+
+```ts
+copyFigure(png, withPageFigureSource(svg));
+// or beside renderings of its own
+navigator.clipboard.write([
+  new ClipboardItem({
+    ...figureClipboardParts(png, figure),
+    'text/plain': molfile,
+  }),
+]);
+```
+
+A page taking a paste reads the figure in the paste event, before its data is
+gone: `readClipboardFigure(event.clipboardData.getData('text/html'))`. In a
+Playwright spec, `readClipboardHtml(page)` from `react-cheminfo/host-testing`
+reads what a Copy left on the clipboard.
+
 ### `RangeSlider`
 
 A range picked with two handles, its two values written under the track, where
