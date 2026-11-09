@@ -5,13 +5,17 @@ import { Structure } from '../Structure.tsx';
 
 // The renderers are loaded through React.lazy, and renderToStaticMarkup is
 // synchronous: without this throwaway render it would only ever see the box
-// they load into.
+// they load into. Loading them takes several seconds when every core is busy
+// with another test file, so the wait gets 20 s rather than waitFor's 1 s.
 beforeAll(async () => {
-  await vi.waitFor(() => {
-    if (!renderToStaticMarkup(<Structure smiles="CCCC" />).includes('<svg')) {
-      throw new Error('the renderers have not been loaded yet');
-    }
-  });
+  await vi.waitFor(
+    () => {
+      if (!renderToStaticMarkup(<Structure smiles="CCCC" />).includes('<svg')) {
+        throw new Error('the renderers have not been loaded yet');
+      }
+    },
+    { timeout: 20_000 },
+  );
 });
 
 test('a structure is drawn as an svg', () => {
