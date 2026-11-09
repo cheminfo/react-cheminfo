@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.105.0](https://github.com/cheminfo/react-cheminfo/compare/v0.104.0...v0.105.0) (2026-11-09)
+
+
+### Features
+
+* add a steps slide that walks a procedure beside the tool playing it ([deba0cd](https://github.com/cheminfo/react-cheminfo/commit/deba0cd3c2aeabd0daa32aaef03c7248f735ac5e))
+* add react-cheminfo/drawing, the plane, pages, captions and file pickers draw and glassware share ([721aae4](https://github.com/cheminfo/react-cheminfo/commit/721aae4ddf43b82b212c08c631e49871f6073c84))
+* add write.cheminfo.org to the family, with draw under a new Drawing & writing topic ([c684dd9](https://github.com/cheminfo/react-cheminfo/commit/c684dd94ee21b63f977c4392437c2355321960c0))
+* carry a demo's drag from a draggable tile as the browser carries it ([fa3d39b](https://github.com/cheminfo/react-cheminfo/commit/fa3d39bbf76b6e653fe8981b52db4d2d8cfd7135))
+* frame the tool beside a title slide whose body ends with an address ([9a52363](https://github.com/cheminfo/react-cheminfo/commit/9a5236354519fa4f51ebcfa7b7a129f1f971edfc))
+* hand a 3D figure on cropped to the molecule, at most 1920 px, as JPEG ([6412942](https://github.com/cheminfo/react-cheminfo/commit/6412942fdb65fcd58e023e2c7cff87974908383d))
+* let an IR or Raman viewer give its state and open it again, as a JSON record ([e73aec1](https://github.com/cheminfo/react-cheminfo/commit/e73aec113a68de3056c142b792886b927b2aecee))
+* open one browser per two cores in a suite, 16 at most, and split the story walk across them ([68bbbb2](https://github.com/cheminfo/react-cheminfo/commit/68bbbb2003ee81553b79182f9d9d2813d140ce89))
+
 ## [0.104.0](https://github.com/cheminfo/react-cheminfo/compare/v0.103.0...v0.104.0) (2026-11-09)
 
 
