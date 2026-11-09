@@ -47,6 +47,8 @@ export { SpectrumColorSwatch } from './SpectrumColorSwatch.tsx';
 export { useConfirmOnEnter } from './useConfirmOnEnter.ts';
 export type { PanelSettings, PanelSettingsValues } from './usePanelSettings.ts';
 export { usePanelSettings } from './usePanelSettings.ts';
+export type { PreferenceSettingsOptions } from './preferenceSettings.ts';
+export { preferenceSettings } from './preferenceSettings.ts';
 export type { FilterBox } from './useFilterBox.ts';
 export { useFilterBox } from './useFilterBox.ts';
 export type { VirtualRows } from './useVirtualRows.ts';

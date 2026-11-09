@@ -54,6 +54,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
 | `react-cheminfo/playwright`        | the browser-suite configuration every site shares     | nothing; types from @playwright/test             |
 | `react-cheminfo/storage`           | work kept in the browser, workspaces, documents       | React on the backup menu; idb, @zip.js/zip.js    |
+| `react-cheminfo/drawing`           | the drawing editors' plane, pages, captions, pickers  | mf-parser; React and Blueprint on the components |
 | `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
 | `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
 | `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens         | nothing                                          |
@@ -2244,6 +2245,32 @@ double click returns the row to its default share.
 
 `<MassEditor>` and `<IrEditor>` do all of this themselves, so a site rendering
 one writes nothing.
+
+## A drawing editor's plane
+
+draw.cheminfo.org and glassware.cheminfo.org lay a drawing out the same way, and
+`react-cheminfo/drawing` holds what they share. Coordinates are in points with
+y pointing down: `Point`, `Box`, the paper as `DrawPage` and the saved figure
+as `FigureSize`.
+
+- **The plane:** `distance`, `boundsOf`, `polygonContains` and the rest of the
+  geometry, the smooth curves through vertices, and the shifts that align or
+  spread a selection (`arrangementShifts`).
+- **Pages and the camera:** `pageStops` for the grid of sheets, `frameCamera`,
+  `zoomAround` and the zoom presets.
+- **Captions:** `parseRichText` reads a caption's marks, applies the chemical
+  rules and draws a formula as `mf-parser` reads it; `writeRichText` writes it
+  back.
+- **Files:** `chooseSaveFile`, `chooseOpenFile` and `writeFile` over the File
+  System Access API. Each returns undefined where the browser has no picker, so a
+  caller keeps a download. The kinds of file are the site's, as `PickerType`.
+- **Pieces of the canvas:** the dashed selection outline and its handles, the
+  page mask, the swatch row, a full-screen stage, `usePrinting` and `useSeen`.
+
+The components draw class names the site styles. A panel's settings kept in a
+tree of preference signals are read and restored by `preferenceSettings`, from
+`react-cheminfo/ui`; pass `{ batch }` from `@preact/signals-react` so a restore
+is one change.
 
 ## Styling
 
