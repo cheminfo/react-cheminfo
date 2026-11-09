@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import type { CarriedFigureStates } from '../../download/core/figureState.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { openedFigureSvg } from '../../storage/core/documentFigure.ts';
 import type { WorkspaceRecord } from '../../storage/core/workspaceFile.ts';
 import type { FigureDestination } from '../core/figureForward.ts';
 import { readOpenedFile } from '../core/figureOpening.ts';
@@ -50,6 +51,11 @@ export interface OpenFigure {
   open: (file: File) => Promise<void>;
   /** The alert saying where a figure belongs, or why it opens nothing. */
   dialog: ReactElement;
+  /**
+   * The last figure of the site opened, as an SVG document, which
+   * `<SavedRevisionButton>` opens again in the deployment that saved it.
+   */
+  opened: string | null;
 }
 
 type Notice =
@@ -71,6 +77,7 @@ export function useOpenFigure(options: OpenFigureOptions): OpenFigure {
   const { origins = {} } = options;
   const t = useChromeT();
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [opened, setOpened] = useState<string | null>(null);
 
   async function open(file: File): Promise<void> {
     const { figure: opened, workspace } = await readOpenedFile(
@@ -87,6 +94,7 @@ export function useOpenFigure(options: OpenFigureOptions): OpenFigure {
       await onOpen(opened.state);
       if (workspace) onWorkspace?.(workspace);
       setNotice(null);
+      setOpened((await openedFigureSvg(file)) ?? null);
     } catch {
       setNotice({ kind: 'none', file: file.name });
     }
@@ -119,5 +127,5 @@ export function useOpenFigure(options: OpenFigureOptions): OpenFigure {
           })}
     </Alert>
   );
-  return { open, dialog };
+  return { open, dialog, opened };
 }

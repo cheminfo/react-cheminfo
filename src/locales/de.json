@@ -345,6 +345,8 @@
   "figure.open": "Öffnen",
   "figure.openHelp": "Eine von dieser Seite gespeicherte Abbildung öffnen, als SVG oder als Dokument, so wie sie gezeichnet wurde.",
   "figure.openOn": "Auf {host} öffnen",
+  "figure.openSaved": "Ursprüngliche Version",
+  "figure.openSavedHelp": "Diese Abbildung in einem neuen Tab öffnen, in der Version der Seite, die sie gespeichert hat.",
   "figure.drawnElsewhere": "Diese Abbildung wurde auf {host} gezeichnet und öffnet sich dort so, wie sie war.",
   "figure.notAFigure": "{file} enthält keine Abbildung dieser Website zum Öffnen.",
   "figure.close": "Schließen",

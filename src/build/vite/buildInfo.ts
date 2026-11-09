@@ -103,13 +103,27 @@ export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
  */
 export function resolveBuildInfo(root: string): BuildInfo {
   const repository = findRepositoryRoot(root);
+  const deployment = deploymentFromEnvironment();
 
   return {
     version: readVersion(repository) ?? readVersion(root) ?? UNRELEASED_VERSION,
     builtAt: buildInstant(),
     commit: readGitHead(repository) ?? commitFromEnvironment(),
     reactCheminfo: readOwnVersion(),
+    ...(deployment === undefined ? {} : { deployment }),
   };
+}
+
+/**
+ * The address Cloudflare Pages serves this deployment at, for good: the build
+ * learns it as `CF_PAGES_URL`.
+ * @returns Its origin, or `undefined` outside a Pages build.
+ */
+export function deploymentFromEnvironment(): string | undefined {
+  const url = process.env.CF_PAGES_URL;
+  if (url === undefined || !URL.canParse(url)) return undefined;
+  const { protocol, origin } = new URL(url);
+  return protocol === 'https:' ? origin : undefined;
 }
 
 /**

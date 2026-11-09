@@ -20,6 +20,7 @@ import {
 import { EMBED_PARAM, HIDE_PARAM } from '../../share/core/config.ts';
 import { escapeAttribute } from '../../share/core/escape.ts';
 
+import { figureRevision } from './figureRevision.ts';
 import {
   FIGURE_SOURCE_NAMESPACE,
   attribute,
@@ -47,6 +48,13 @@ export interface FigureSource extends FigureStates {
    * @default undefined — not said
    */
   generator?: string;
+  /**
+   * The deployment that wrote it, e.g. `https://1a2b3c4d.draw-cheminfo.pages.dev`,
+   * where it opens again as it was saved (`savedRevisionAddress`). Written by
+   * default when the page runs the figure's site on Cloudflare Pages.
+   * @default the running deployment, else undefined
+   */
+  revision?: string;
 }
 
 // What only a framing page asks for: the figure itself never depends on it.
@@ -95,7 +103,12 @@ export function readFigureSource(svg: string): FigureSource | undefined {
   const named = readSourceTag(found);
   if (named === undefined) return undefined;
   const generator = attribute(found.tag, 'generator');
-  return generator === undefined ? named : { ...named, generator };
+  const revision = attribute(found.tag, 'revision');
+  return {
+    ...named,
+    ...(generator === undefined ? {} : { generator }),
+    ...(revision === undefined ? {} : { revision }),
+  };
 }
 
 /**
@@ -118,11 +131,18 @@ async function sourceElement(
   source: FigureSource,
   figure: string,
 ): Promise<string> {
-  const generator =
-    source.generator === undefined
-      ? ''
-      : ` generator="${escapeAttribute(source.generator)}"`;
-  const open = `<cheminfo:source xmlns:cheminfo="${FIGURE_SOURCE_NAMESPACE}" site="${escapeAttribute(source.site)}" href="${escapeAttribute(source.href)}"${generator}`;
+  const revision = source.revision ?? figureRevision(source.site);
+  const attributes = [
+    `site="${escapeAttribute(source.site)}"`,
+    `href="${escapeAttribute(source.href)}"`,
+    ...(source.generator === undefined
+      ? []
+      : [`generator="${escapeAttribute(source.generator)}"`]),
+    ...(revision === undefined
+      ? []
+      : [`revision="${escapeAttribute(revision)}"`]),
+  ];
+  const open = `<cheminfo:source xmlns:cheminfo="${FIGURE_SOURCE_NAMESPACE}" ${attributes.join(' ')}`;
   const [parts, digest] = await Promise.all([
     stateElements(source),
     figureDigest(figure),

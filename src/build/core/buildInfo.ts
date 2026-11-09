@@ -23,6 +23,13 @@ export interface BuildInfo {
    * @default undefined — the build could not read it
    */
   reactCheminfo?: string;
+  /**
+   * The address this very build stays served at, which Cloudflare Pages gives
+   * every deployment, e.g. `https://1a2b3c4d.draw-cheminfo.pages.dev`. A figure
+   * records it, so it can be opened again in the build that saved it.
+   * @default undefined — the build was not deployed by Cloudflare Pages
+   */
+  deployment?: string;
 }
 
 /**

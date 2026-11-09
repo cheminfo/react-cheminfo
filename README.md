@@ -1285,6 +1285,17 @@ useHostConnection(TOOL, {
   `useOpenFigure` (`/host`): a figure of another site of the family offers to
   open on that site instead. `edited` says the picture was redrawn in another
   program since. Ctrl+S saves the site's figure through `useSaveShortcut`.
+- **A figure opens with the latest build, and in the one that saved it on
+  request.** On Cloudflare Pages every deployment keeps an address of its own,
+  and the source records it as `revision` — filled by `withFigureSource` from
+  the `build` given to `useHostConnection`, with nothing for a site to write.
+  `<OpenFigureButton>` then offers **Original version** beside itself for a
+  figure another deployment of the site saved; a site with its own opener
+  renders `<SavedRevisionButton svg site>` (`/host`) with the SVG of the file
+  it opened, which `openedFigureSvg` (`/storage`) reads out of an SVG or a
+  `.<site>.zip`. `savedRevisionAddress` (`/core`) accepts only another
+  deployment of the running site's own Pages project, never an address a file
+  chooses.
 
 ```ts
 useHostConnection(TOOL, {
@@ -2159,6 +2170,10 @@ Where each value comes from:
 
   Without them the commit is simply left out, and `GITHUB_SHA` is used when the
   environment names one.
+
+A Cloudflare Pages build also records **`deployment`**, the address that one
+deployment keeps (`CF_PAGES_URL`), which every figure the site saves names so
+it can be opened again in the build that wrote it.
 
 The same record is written to **`build-info.json`** in the build, so the whole
 family answers one question with one request each:

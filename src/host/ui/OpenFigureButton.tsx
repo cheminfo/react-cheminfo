@@ -6,6 +6,7 @@ import { useRef } from 'react';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
+import { SavedRevisionButton } from './SavedRevisionButton.tsx';
 import type { OpenFigureOptions } from './useOpenFigure.tsx';
 import { useOpenFigure } from './useOpenFigure.tsx';
 
@@ -16,7 +17,8 @@ export interface OpenFigureButtonProps
 /**
  * Open a figure saved from the site, as an SVG or as a document, as it was
  * drawn: the button, the file picker it opens, and the alert of
- * {@link useOpenFigure}.
+ * {@link useOpenFigure}. Once a figure another deployment saved is open, a
+ * second button opens it in that deployment.
  * @param props - What opens the figure, and the button's own props.
  * @returns The button.
  */
@@ -24,7 +26,7 @@ export function OpenFigureButton(props: OpenFigureButtonProps): ReactElement {
   const { site, onOpen, onWorkspace, host, origins, ...buttonProps } = props;
   const t = useChromeT();
   const input = useRef<HTMLInputElement>(null);
-  const { open, dialog } = useOpenFigure({
+  const { open, dialog, opened } = useOpenFigure({
     site,
     onOpen,
     ...(onWorkspace === undefined ? {} : { onWorkspace }),
@@ -53,6 +55,16 @@ export function OpenFigureButton(props: OpenFigureButtonProps): ReactElement {
           event.currentTarget.value = '';
           if (file !== undefined) void open(file);
         }}
+      />
+      <SavedRevisionButton
+        svg={opened}
+        site={site}
+        {...(host === undefined ? {} : { host })}
+        {...(buttonProps.size === undefined ? {} : { size: buttonProps.size })}
+        {...(buttonProps.variant === undefined
+          ? {}
+          : { variant: buttonProps.variant })}
+        {...(buttonProps.text === null ? { text: null } : {})}
       />
       {dialog}
     </>

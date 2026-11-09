@@ -345,6 +345,8 @@
   "figure.open": "Apri",
   "figure.openHelp": "Apri una figura salvata da questo sito, come SVG o come documento, così come è stata disegnata.",
   "figure.openOn": "Apri su {host}",
+  "figure.openSaved": "Versione originale",
+  "figure.openSavedHelp": "Apri questa figura in una nuova scheda, nella versione del sito che l’ha salvata.",
   "figure.drawnElsewhere": "Questa figura è stata disegnata su {host} e si apre lì così com’era.",
   "figure.notAFigure": "{file} non contiene alcuna figura di questo sito da aprire.",
   "figure.close": "Chiudi",

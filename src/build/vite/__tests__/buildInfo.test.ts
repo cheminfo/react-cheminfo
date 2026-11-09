@@ -14,6 +14,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import {
   BUILD_INFO_MODULE,
   cheminfoBuildInfo,
+  deploymentFromEnvironment,
   findRepositoryRoot,
   resolveBuildInfo,
 } from '../buildInfo.ts';
@@ -145,6 +146,30 @@ test('a truncated hash in the environment is not a commit', () => {
   vi.stubEnv('GIT_COMMIT', '');
 
   expect(commitFromEnvironment()).toBeUndefined();
+});
+
+test('a Cloudflare Pages build records the address its deployment keeps', () => {
+  const root = checkout({ 'package.json': '{"version":"1.1.1"}' });
+  vi.stubEnv('CF_PAGES_URL', 'https://1a2b3c4d.draw-cheminfo.pages.dev/');
+
+  expect(deploymentFromEnvironment()).toBe(
+    'https://1a2b3c4d.draw-cheminfo.pages.dev',
+  );
+  expect(resolveBuildInfo(root).deployment).toBe(
+    'https://1a2b3c4d.draw-cheminfo.pages.dev',
+  );
+});
+
+test('a build off Pages, or with an address that is not https, records no deployment', () => {
+  const root = checkout({ 'package.json': '{"version":"1.1.1"}' });
+  vi.stubEnv('CF_PAGES_URL', '');
+
+  expect(resolveBuildInfo(root)).not.toHaveProperty('deployment');
+
+  const deployment = 'https://1a2b3c4d.draw-cheminfo.pages.dev';
+  vi.stubEnv('CF_PAGES_URL', deployment.replace('https:', 'http:'));
+
+  expect(deploymentFromEnvironment()).toBeUndefined();
 });
 
 test('the repository root is the topmost run of package.json above the project', () => {

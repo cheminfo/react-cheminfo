@@ -40,6 +40,8 @@ export {
   sourceEnvelope,
   withHtmlSource,
 } from './sourceEnvelope.ts';
+export { figureRevision, setFigureRevision } from './figureRevision.ts';
+export { savedRevisionAddress } from './savedRevision.ts';
 export type { FigureSourceReader } from './pageFigureSource.ts';
 export {
   setPageFigureSource,

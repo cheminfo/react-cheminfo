@@ -7,6 +7,7 @@
 
 import type { CarriedFigureStates } from '../../download/core/figureState.ts';
 import { readFigureStates } from '../../download/core/figureState.ts';
+import { documentFigure } from '../../storage/core/documentFigure.ts';
 import type { SiteDocument } from '../../storage/core/siteDocument.ts';
 import { readSiteDocument } from '../../storage/core/siteDocument.ts';
 import type { WorkspaceRecord } from '../../storage/core/workspaceFile.ts';
@@ -91,9 +92,7 @@ export async function readOpenedFile(
   } catch {
     return { figure: { kind: 'none' } };
   }
-  const svg = document.data.find(({ path }) =>
-    path.toLowerCase().endsWith('.svg'),
-  );
+  const svg = documentFigure(document);
   if (!svg) return { figure: { kind: 'none' } };
   const figure = await readOpenedFigure(svg.text(), site, origins);
   return figure.kind === 'own' && document.site === site && document.preferences

@@ -8,6 +8,7 @@
 import { useEffect, useRef } from 'react';
 
 import type { CitedWork } from '../../citation/core/works.ts';
+import { setFigureRevision } from '../../download/core/figureRevision.ts';
 import type { FigureSource } from '../../download/core/figureSource.ts';
 import { figureAddress } from '../../download/core/figureSource.ts';
 import type { FigureStates } from '../../download/core/figureState.ts';
@@ -42,7 +43,8 @@ export interface HostHandlers {
   settings?: HostSettings;
   /**
    * The build that is running — `BUILD_INFO` from `react-cheminfo/build-info`
-   * — so a host can record which version produced what it stores.
+   * — so a host can record which version produced what it stores, and every
+   * figure the page saves names the deployment that saved it.
    * @default null
    */
   build?: unknown;
@@ -93,7 +95,9 @@ export function useHostConnection(
     latest.current = handlers;
   });
 
-  // Framed or not, every figure the page saves says where it came from.
+  // Framed or not, every figure the page saves says where it came from, and
+  // which deployment saved it.
+  useEffect(() => setFigureRevision(tool.name, latest.current.build), [tool]);
   useEffect(
     () =>
       setPageFigureSource(async () => {
