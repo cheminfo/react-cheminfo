@@ -42,6 +42,7 @@ function singleCapsules<TValue extends string>(
         text={capsuleText(option, formatCount)}
         selected={option.value === value}
         intent={option.intent}
+        color={option.color}
         title={option.title}
         onClick={() => onChange(option.value)}
       />,
@@ -79,6 +80,7 @@ function multipleCapsules<TValue extends string>(
         text={capsuleText(option, formatCount)}
         selected={values.includes(option.value)}
         intent={option.intent}
+        color={option.color}
         title={option.title}
         onClick={() => onChange(toggled(options, values, option.value))}
       />,

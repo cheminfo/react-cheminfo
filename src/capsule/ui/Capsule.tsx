@@ -6,7 +6,9 @@
 
 import type { Intent } from '@blueprintjs/core';
 import { Tag } from '@blueprintjs/core';
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
+
+import { readableInk } from '../../color/core/contrast.ts';
 
 /** What one capsule needs. */
 export interface CapsuleProps {
@@ -19,6 +21,11 @@ export interface CapsuleProps {
    * @default undefined — the capsule takes no intent
    */
   intent?: Intent;
+  /**
+   * A colour of the value's own, as `#rgb` or `#rrggbb`, in place of `intent`.
+   * @default undefined — the capsule is coloured by its intent
+   */
+  color?: string;
   /** What the pointer is told, or `undefined` for no title at all. */
   title: string | undefined;
   /** Called when the capsule is picked. */
@@ -31,13 +38,23 @@ export interface CapsuleProps {
  * @returns The tag.
  */
 export function Capsule(props: CapsuleProps): ReactElement {
-  const { text, selected, intent, title, onClick } = props;
+  const { text, selected, intent, color, title, onClick } = props;
+  // The colour and the ink it is read in are set inline; chrome.css tints it.
+  const style =
+    color === undefined
+      ? undefined
+      : ({
+          '--capsule': color,
+          '--capsule-ink': readableInk(color),
+        } as CSSProperties);
   return (
     <Tag
       interactive
       round
       minimal={!selected}
-      intent={intent}
+      intent={color === undefined ? intent : undefined}
+      className={color === undefined ? undefined : 'colored-capsule'}
+      style={style}
       aria-pressed={selected}
       htmlTitle={title}
       onClick={onClick}

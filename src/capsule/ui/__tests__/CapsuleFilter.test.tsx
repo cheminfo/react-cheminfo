@@ -70,6 +70,38 @@ test('a capsule keeps its semantic colour whether or not it is selected', () => 
   expect(html).toContain('bp6-intent-danger');
 });
 
+test('a capsule given a colour of its own carries it and its ink, and no intent', () => {
+  const html = renderToStaticMarkup(
+    <CapsuleFilter
+      multiple
+      options={[
+        {
+          value: 'flasks',
+          label: 'Flasks',
+          color: '#2563eb',
+          intent: 'danger',
+        },
+        { value: 'adapters', label: 'Adapters', color: '#fde047' },
+        { value: 'other', label: 'Other' },
+      ]}
+      values={['flasks']}
+      onChange={() => null}
+    />,
+  );
+  // A coloured capsule writes its style first, before aria-pressed.
+  const capsules = html.split(/<span (?=[^>]*aria-pressed)/).slice(1);
+
+  expect(capsules).toHaveLength(3);
+  expect(capsules[0]).toContain('colored-capsule');
+  expect(capsules[0]).toContain('--capsule:#2563eb;--capsule-ink:#ffffff');
+  expect(capsules[0]).not.toContain('bp6-intent-');
+  expect(capsules[0]).not.toContain('bp6-minimal');
+  expect(capsules[1]).toContain('--capsule:#fde047;--capsule-ink:#182026');
+  expect(capsules[1]).toContain('bp6-minimal');
+  expect(capsules[2]).not.toContain('colored-capsule');
+  expect(capsules[2]).not.toContain('style=');
+});
+
 test('the row is reachable by tab and says which capsule is selected', () => {
   const html = renderToStaticMarkup(
     <CapsuleFilter options={OPTIONS} value="failed" onChange={() => null} />,

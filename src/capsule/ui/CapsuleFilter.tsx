@@ -25,6 +25,14 @@ export interface CapsuleOption<TValue extends string = string> {
    */
   intent?: Intent;
   /**
+   * A colour of the value's own, as `#rgb` or `#rrggbb`, for values an
+   * intent cannot tell apart — the sections of a catalogue: a pale tint of it
+   * behind the label while the capsule is not selected, the colour itself
+   * once it is. It takes the place of `intent`.
+   * @default undefined — the capsule is coloured by its intent
+   */
+  color?: string;
+  /**
    * What the pointer is told when it rests on the capsule.
    * @default undefined
    */

@@ -398,6 +398,48 @@ math {
   --source: var(--text-muted);
 }
 
+/* ── A capsule in a colour of its own ────────────────────────────────────── */
+
+/* A filter capsule whose value has a colour an intent cannot give it reads in
+   that colour: the colour itself once selected, in the ink picked for it, and
+   a pale tint of it behind the hue darkened while not. Both are set inline;
+   the selectors match Blueprint's own, which they replace. */
+.bp6-tag.colored-capsule {
+  background-color: var(--capsule);
+  color: var(--capsule-ink);
+}
+
+.bp6-tag.colored-capsule.bp6-interactive:hover,
+.bp6-tag.colored-capsule.bp6-interactive:active {
+  background-color: color-mix(in oklab, var(--capsule) 85%, var(--text));
+}
+
+.bp6-tag.bp6-minimal.colored-capsule:not([class*='bp6-intent-']) {
+  background-color: color-mix(in oklab, var(--capsule) 14%, var(--surface));
+  color: oklch(from var(--capsule) min(l, 0.45) c h);
+}
+
+.bp6-tag.bp6-minimal.colored-capsule:not(
+    [class*='bp6-intent-']
+  ).bp6-interactive:hover,
+.bp6-tag.bp6-minimal.colored-capsule:not(
+    [class*='bp6-intent-']
+  ).bp6-interactive:active {
+  background-color: color-mix(in oklab, var(--capsule) 26%, var(--surface));
+  color: oklch(from var(--capsule) min(l, 0.4) c h);
+}
+
+/* ── A button that toggles ───────────────────────────────────────────────── */
+
+/* Blueprint borders an outlined button and leaves a solid or a minimal one
+   bare, so a toggle drawn outlined while off and solid while on changes width
+   under the pointer. A button carrying `toggle-button` keeps one box in every
+   variant: the bare ones carry a border of the same width, in no colour. */
+.bp6-button.toggle-button:not(.bp6-outlined) {
+  box-sizing: border-box;
+  border: var(--bp-surface-border-width) solid transparent;
+}
+
 a.source-badge:hover {
   background: color-mix(in oklab, var(--source) 20%, white);
   text-decoration: none;
