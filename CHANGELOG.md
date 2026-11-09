@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.107.0](https://github.com/cheminfo/react-cheminfo/compare/v0.106.0...v0.107.0) (2026-11-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* carry a figure's data, view and preferences in one envelope, the same in SVG, HTML and ZIP
+
+### Features
+
+* add the drawing's objects, pictures, captions and pages, and how they are drawn, to react-cheminfo/drawing ([6473e33](https://github.com/cheminfo/react-cheminfo/commit/6473e339ef8dfd55de2d8050ffa2ba4d7f6d0162))
+* carry a figure's data, view and preferences in one envelope, the same in SVG, HTML and ZIP ([a9c8a85](https://github.com/cheminfo/react-cheminfo/commit/a9c8a85f35a9052092bc5ae2b666e740ce2b1569))
+
 ## [0.106.0](https://github.com/cheminfo/react-cheminfo/compare/v0.105.0...v0.106.0) (2026-11-09)
 
 
