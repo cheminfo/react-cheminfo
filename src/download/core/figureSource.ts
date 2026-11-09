@@ -1,7 +1,8 @@
 /**
  * Where a figure came from, written into the figure: the site that drew it,
- * the address of the page as it stood, and the state the site opens it again
- * from (`figureState.ts`).
+ * the address of the page as it stood, the build that wrote it, and the state
+ * the site opens it again from, in its three parts — data, view and
+ * preferences (`figureState.ts`).
  *
  * The state is what makes a figure a document rather than a picture: the
  * structure and conformers of 3d, the geometry of lcao, the plate of tlc, the
@@ -21,27 +22,31 @@ import { escapeAttribute } from '../../share/core/escape.ts';
 
 import {
   FIGURE_SOURCE_NAMESPACE,
+  attribute,
   findSource,
   readSourceTag,
   withoutFigureSource,
 } from './figureSourceMarkup.ts';
-import type { FigureState } from './figureState.ts';
-import { stateElement } from './figureState.ts';
+import type { FigureStates } from './figureState.ts';
+import { figureDigest, stateElements } from './figureState.ts';
 
 export { FIGURE_SOURCE_NAMESPACE } from './figureSourceMarkup.ts';
 
-/** Where a figure came from. */
-export interface FigureSource {
+/**
+ * Where a figure came from, and the state the site opens it again from: what
+ * it is (`data`), where it stood (`view`) and the workspace it was made in
+ * (`preferences`), each in the site's own format, which only that site reads.
+ */
+export interface FigureSource extends FigureStates {
   /** The site that drew it, as the family names it, e.g. `3d`. */
   site: string;
   /** The page as it stood, e.g. `https://3d.cheminfo.org/?smiles=CCO&view=…`. */
   href: string;
   /**
-   * What the page shows, in the site's own format, so the figure opens again
-   * as it was with nothing computed anew. Only the site reads it.
-   * @default undefined — a picture the site cannot open again
+   * The build that wrote it, e.g. `draw.cheminfo.org 1.4.0`.
+   * @default undefined — not said
    */
-  state?: FigureState;
+  generator?: string;
 }
 
 // What only a framing page asks for: the figure itself never depends on it.
@@ -80,13 +85,17 @@ export async function withFigureSource(
 /**
  * Where a figure came from, as its SVG says: the site and the page. A site
  * name or an address that does not read is no source. Its state is read by
- * `readFigureState`, when it is wanted.
+ * `readFigureStates`, when it is wanted.
  * @param svg - The figure, as an SVG document.
  * @returns The source, or `undefined` when the figure names none.
  */
 export function readFigureSource(svg: string): FigureSource | undefined {
   const found = findSource(svg);
-  return found === undefined ? undefined : readSourceTag(found);
+  if (found === undefined) return undefined;
+  const named = readSourceTag(found);
+  if (named === undefined) return undefined;
+  const generator = attribute(found.tag, 'generator');
+  return generator === undefined ? named : { ...named, generator };
 }
 
 /**
@@ -109,7 +118,16 @@ async function sourceElement(
   source: FigureSource,
   figure: string,
 ): Promise<string> {
-  const open = `<cheminfo:source xmlns:cheminfo="${FIGURE_SOURCE_NAMESPACE}" site="${escapeAttribute(source.site)}" href="${escapeAttribute(source.href)}"`;
-  if (source.state === undefined) return `${open}/>`;
-  return `${open}>${await stateElement(source.state, figure)}</cheminfo:source>`;
+  const generator =
+    source.generator === undefined
+      ? ''
+      : ` generator="${escapeAttribute(source.generator)}"`;
+  const open = `<cheminfo:source xmlns:cheminfo="${FIGURE_SOURCE_NAMESPACE}" site="${escapeAttribute(source.site)}" href="${escapeAttribute(source.href)}"${generator}`;
+  const [parts, digest] = await Promise.all([
+    stateElements(source),
+    figureDigest(figure),
+  ]);
+  if (parts === '') return `${open}/>`;
+  const signed = digest === undefined ? '' : ` digest="${digest}"`;
+  return `${open}${signed}>${parts}</cheminfo:source>`;
 }

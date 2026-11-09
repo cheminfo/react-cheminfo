@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from 'vitest';
 
 import { readFigureSource } from '../../../download/core/figureSource.ts';
-import { readFigureState } from '../../../download/core/figureState.ts';
+import { readFigureStates } from '../../../download/core/figureState.ts';
 import { setPageFigureSource } from '../../../download/core/pageFigureSource.ts';
 import {
   captureMoleculeSvg,
@@ -27,7 +27,7 @@ test('a picture of the model saved as SVG is named after its site, says which pa
   forget = setPageFigureSource(() => ({
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO&id=1',
-    state: { version: 1, value: { conformers: ['one', 'two'] } },
+    data: { version: 1, value: { conformers: ['one', 'two'] } },
   }));
 
   const file = await moleculeImageFile(VIEWER, {
@@ -43,11 +43,10 @@ test('a picture of the model saved as SVG is named after its site, says which pa
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO&id=1',
   });
-  await expect(readFigureState(svg, '3d')).resolves.toStrictEqual({
+  await expect(readFigureStates(svg, '3d')).resolves.toStrictEqual({
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO&id=1',
-    version: 1,
-    value: { conformers: ['one', 'two'] },
+    data: { version: 1, value: { conformers: ['one', 'two'] } },
     edited: false,
   });
 });

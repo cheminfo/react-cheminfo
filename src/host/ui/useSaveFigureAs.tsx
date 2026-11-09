@@ -95,7 +95,7 @@ export function useSaveFigureAs(options: SaveFigureAsOptions): SaveFigureAs {
     const kept =
       choice.workspace && workspace
         ? {
-            workspace: {
+            preferences: {
               id: crypto.randomUUID(),
               name: choice.name,
               preferences: workspace(),

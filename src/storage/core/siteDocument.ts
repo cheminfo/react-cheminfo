@@ -1,4 +1,8 @@
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import {
+  SOURCE_FORMAT,
+  SOURCE_VERSION,
+} from '../../download/core/sourceEnvelope.ts';
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 import type { ArchiveEntry, ArchiveFile } from './backupFiles.ts';
@@ -6,14 +10,16 @@ import { readArchive, writeArchive } from './backupFiles.ts';
 import type { WorkspaceRecord } from './workspaceFile.ts';
 import { readWorkspaceValue, writeWorkspaceText } from './workspaceFile.ts';
 
-/** What a document's manifest says it is, in its `format` field. */
-export const DOCUMENT_FORMAT = 'cheminfo-document';
+/**
+ * What a document's manifest says it is: the family's envelope, the one every
+ * file of the family carries (`sourceEnvelope.ts`).
+ */
 
 const MANIFEST = 'manifest.json';
 const VIEW = 'view.json';
-const WORKSPACE = 'workspace.json';
+const PREFERENCES = 'preferences.json';
 const ATTACHMENTS = 'files/';
-const RESERVED: ReadonlySet<string> = new Set([MANIFEST, VIEW, WORKSPACE]);
+const RESERVED: ReadonlySet<string> = new Set([MANIFEST, VIEW, PREFERENCES]);
 
 /** What a document holds: its data, and what it may carry beside. */
 export interface SiteDocumentParts {
@@ -28,10 +34,11 @@ export interface SiteDocumentParts {
    */
   view?: unknown;
   /**
-   * The workspace it opens in: the panels and their settings.
+   * The preferences it opens with: the workspace, its panels and their
+   * settings.
    * @default undefined — the document opens in the reader's own workspace
    */
-  workspace?: WorkspaceRecord;
+  preferences?: WorkspaceRecord;
   /**
    * Files it carries beside its data, kept under `files/`.
    * @default []
@@ -67,29 +74,29 @@ export interface SiteDocument {
   data: ArchiveFile[];
   /** The view it was saved with, parsed but not checked. */
   view?: unknown;
-  /** The workspace it carries, its preferences not yet fitted. */
-  workspace?: WorkspaceRecord;
+  /** The preferences it carries, not yet fitted to the reader's. */
+  preferences?: WorkspaceRecord;
   /** The files it carries beside, their paths taken from inside `files/`. */
   attachments: ArchiveFile[];
 }
 
 /** The manifest at the root of a document. */
 interface DocumentManifest {
-  format: typeof DOCUMENT_FORMAT;
-  version: 1;
+  format: typeof SOURCE_FORMAT;
+  version: typeof SOURCE_VERSION;
   site: string;
   generator?: string;
   savedAt: string;
   data: string[];
   view?: string;
-  workspace?: string;
+  preferences?: string;
   attachments?: string[];
 }
 
 /**
  * Write a document: one ZIP archive holding the site's data files as they open
  * anywhere — an SVG stays a picture any program shows — and, when asked, the
- * view and the workspace, and the files it carries.
+ * view and the preferences, and the files it carries.
  * @param parts - What the document holds.
  * @param options - Who writes it.
  * @returns The archive.
@@ -99,7 +106,7 @@ export async function writeSiteDocument(
   parts: SiteDocumentParts,
   options: WriteSiteDocumentOptions,
 ): Promise<Blob> {
-  const { data, view, workspace, attachments = [] } = parts;
+  const { data, view, preferences, attachments = [] } = parts;
   const { site, generator, date = new Date() } = options;
   if (data.length === 0) {
     throw new Error('A document holds at least one data file.');
@@ -110,14 +117,14 @@ export async function writeSiteDocument(
     }
   }
   const manifest: DocumentManifest = {
-    format: DOCUMENT_FORMAT,
-    version: 1,
+    format: SOURCE_FORMAT,
+    version: SOURCE_VERSION,
     site,
     ...(generator ? { generator } : {}),
     savedAt: date.toISOString(),
     data: data.map(({ path }) => path),
     ...(view === undefined ? {} : { view: VIEW }),
-    ...(workspace ? { workspace: WORKSPACE } : {}),
+    ...(preferences ? { preferences: PREFERENCES } : {}),
     ...(attachments.length > 0
       ? { attachments: attachments.map(({ path }) => path) }
       : {}),
@@ -129,10 +136,10 @@ export async function writeSiteDocument(
   if (view !== undefined) {
     entries.push({ path: VIEW, content: `${JSON.stringify(view, null, 2)}\n` });
   }
-  if (workspace) {
+  if (preferences) {
     entries.push({
-      path: WORKSPACE,
-      content: writeWorkspaceText(workspace, site),
+      path: PREFERENCES,
+      content: writeWorkspaceText(preferences, site),
     });
   }
   for (const { path, content } of attachments) {
@@ -144,7 +151,7 @@ export async function writeSiteDocument(
 /**
  * Read a document back. The manifest is found wherever the archive keeps it,
  * so a document unzipped and zipped again inside a folder still opens. A view
- * or a workspace that does not read is left out rather than costing the data.
+ * or preferences that do not read are left out rather than costing the data.
  * @param file - The archive.
  * @param site - The site reading it: a document of another one is refused.
  * Left out, a document of any site is read, and says which it belongs to.
@@ -194,10 +201,13 @@ export async function readSiteDocument(
     ...(manifest.savedAt ? { savedAt: manifest.savedAt } : {}),
     data,
     ...(view === undefined ? {} : { view }),
-    ...readWorkspacePart(byPath.get(`${folder}${manifest.workspace ?? ''}`), {
-      listed: manifest.workspace !== undefined,
-      site: manifest.site,
-    }),
+    ...readPreferencesPart(
+      byPath.get(`${folder}${manifest.preferences ?? ''}`),
+      {
+        listed: manifest.preferences !== undefined,
+        site: manifest.site,
+      },
+    ),
     attachments,
   };
 }
@@ -238,30 +248,34 @@ function findManifest(
 }
 
 function readManifest(value: unknown): DocumentManifest | undefined {
-  if (!isPlainRecord(value) || value.format !== DOCUMENT_FORMAT) {
+  if (
+    !isPlainRecord(value) ||
+    value.format !== SOURCE_FORMAT ||
+    value.version !== SOURCE_VERSION
+  ) {
     return undefined;
   }
-  const { site, generator, savedAt, data, view, workspace } = value;
+  const { site, generator, savedAt, data, view, preferences } = value;
   if (typeof site !== 'string' || !Array.isArray(data)) return undefined;
   return {
-    format: DOCUMENT_FORMAT,
-    version: 1,
+    format: SOURCE_FORMAT,
+    version: SOURCE_VERSION,
     site,
     ...(typeof generator === 'string' ? { generator } : {}),
     savedAt: typeof savedAt === 'string' ? savedAt : '',
     data: data.filter((path): path is string => typeof path === 'string'),
     ...(typeof view === 'string' ? { view } : {}),
-    ...(typeof workspace === 'string' ? { workspace } : {}),
+    ...(typeof preferences === 'string' ? { preferences } : {}),
   };
 }
 
-function readWorkspacePart(
+function readPreferencesPart(
   entry: ArchiveFile | undefined,
   options: { listed: boolean; site: string },
-): { workspace?: WorkspaceRecord } {
+): { preferences?: WorkspaceRecord } {
   if (!options.listed || !entry) return {};
   try {
-    return { workspace: readWorkspaceValue(parsedJson(entry), options.site) };
+    return { preferences: readWorkspaceValue(parsedJson(entry), options.site) };
   } catch {
     return {};
   }
@@ -275,3 +289,5 @@ function parsedJson(entry: ArchiveFile | undefined): unknown {
     return undefined;
   }
 }
+
+export { SOURCE_FORMAT as DOCUMENT_FORMAT } from '../../download/core/sourceEnvelope.ts';

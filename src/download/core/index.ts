@@ -18,8 +18,28 @@ export {
   readFigureSource,
   withFigureSource,
 } from './figureSource.ts';
-export type { CarriedFigureState, FigureState } from './figureState.ts';
-export { readFigureState } from './figureState.ts';
+export type {
+  CarriedFigureStates,
+  FigureStates,
+  SiteState,
+  StatePart,
+} from './figureState.ts';
+export {
+  JSON_ENCODING,
+  READABLE_STATE_BYTES,
+  STATE_PARTS,
+  readFigureStates,
+} from './figureState.ts';
+export type { SourceEnvelope, SourceRecord } from './sourceEnvelope.ts';
+export {
+  HTML_SOURCE_ID,
+  SOURCE_FORMAT,
+  SOURCE_VERSION,
+  readHtmlSource,
+  readSourceEnvelope,
+  sourceEnvelope,
+  withHtmlSource,
+} from './sourceEnvelope.ts';
 export type { FigureSourceReader } from './pageFigureSource.ts';
 export {
   setPageFigureSource,

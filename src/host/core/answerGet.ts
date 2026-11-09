@@ -10,7 +10,7 @@ import {
   readFigureSource,
   withFigureSource,
 } from '../../download/core/figureSource.ts';
-import type { FigureState } from '../../download/core/figureState.ts';
+import type { FigureStates } from '../../download/core/figureState.ts';
 
 import type { HostOutputs } from './hostOutputs.ts';
 import { kindAccepts } from './kinds.ts';
@@ -29,11 +29,12 @@ export interface FigurePage {
    */
   address?: string;
   /**
-   * What the page computed, in the site's own format, written into every
-   * picture handed back so the site opens it again with nothing computed anew.
+   * What the page holds — its data, its view and its preferences, each in the
+   * site's own format — written into every picture handed back so the site
+   * opens it again with nothing computed anew.
    * @default undefined — the pictures cannot be opened again
    */
-  state?: () => FigureState | undefined | Promise<FigureState | undefined>;
+  states?: () => FigureStates | undefined | Promise<FigureStates | undefined>;
 }
 
 /**
@@ -119,9 +120,12 @@ async function withSources(
 ): Promise<HostItem[]> {
   if (address === undefined || !URL.canParse(address)) return items;
   if (!items.some((item) => unsourcedSvg(item) !== undefined)) return items;
-  const state = await readSafely(page.state);
-  const source: FigureSource = { site, href: figureAddress(address) };
-  if (state !== undefined) source.state = state;
+  const states = await readSafely(page.states);
+  const source: FigureSource = {
+    site,
+    href: figureAddress(address),
+    ...states,
+  };
   return Promise.all(
     items.map(async (item) => {
       const svg = unsourcedSvg(item);

@@ -134,7 +134,7 @@ test('the document holds the same figure, and the preferences as its workspace',
     'tlc-plate.tlc.svg',
   ]);
   expect(saved.data[0]?.text()).toBe(SVG);
-  expect(saved.workspace).toMatchObject({
+  expect(saved.preferences).toMatchObject({
     name: 'tlc-plate',
     preferences: { lanes: 4, scale: 'linear' },
   });
@@ -155,5 +155,5 @@ test('a site keeping no workspace saves its document with the figure alone', asy
 
   const saved = await readSiteDocument(downloads[0]?.blob ?? new Blob(), 'tlc');
 
-  expect(saved.workspace).toBeUndefined();
+  expect(saved.preferences).toBeUndefined();
 });

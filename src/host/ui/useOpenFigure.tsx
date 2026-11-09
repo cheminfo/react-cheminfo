@@ -2,7 +2,7 @@ import { Alert } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
-import type { CarriedFigureState } from '../../download/core/figureState.ts';
+import type { CarriedFigureStates } from '../../download/core/figureState.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { WorkspaceRecord } from '../../storage/core/workspaceFile.ts';
 import type { FigureDestination } from '../core/figureForward.ts';
@@ -19,7 +19,7 @@ export interface OpenFigureOptions {
    * the file holds no figure the site can open.
    * @param state - The state the figure carries.
    */
-  onOpen: (state: CarriedFigureState) => void | Promise<void>;
+  onOpen: (state: CarriedFigureStates) => void | Promise<void>;
   /**
    * Take in the workspace a document of the site was saved with, once its
    * figure is open: the panels and the settings it carries.

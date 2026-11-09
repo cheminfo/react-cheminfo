@@ -14,7 +14,7 @@ test('a figure of the site opens on the state it carries', async () => {
   const svg = await withFigureSource(FIGURE, {
     site: 'tlc',
     href: 'https://tlc.cheminfo.org/',
-    state: STATE,
+    data: STATE,
   });
 
   await expect(readOpenedFigure(svg, 'tlc')).resolves.toStrictEqual({
@@ -22,7 +22,7 @@ test('a figure of the site opens on the state it carries', async () => {
     state: {
       site: 'tlc',
       href: 'https://tlc.cheminfo.org/',
-      ...STATE,
+      data: STATE,
       edited: false,
     },
   });
@@ -32,7 +32,7 @@ test('a figure of another site belongs on that site, on the host the family know
   const svg = await withFigureSource(FIGURE, {
     site: 'lcao',
     href: 'https://lcao.cheminfo.org/playground?smiles=C',
-    state: STATE,
+    data: STATE,
   });
 
   await expect(readOpenedFigure(svg, 'tlc')).resolves.toStrictEqual({
@@ -73,10 +73,10 @@ test('a document of the site opens on its figure and the workspace it was saved 
   const svg = await withFigureSource(FIGURE, {
     site: 'tlc',
     href: 'https://tlc.cheminfo.org/',
-    state: STATE,
+    data: STATE,
   });
   const document = await writeSiteDocument(
-    { data: [{ path: 'plate.tlc.svg', content: svg }], workspace: WORKSPACE },
+    { data: [{ path: 'plate.tlc.svg', content: svg }], preferences: WORKSPACE },
     { site: 'tlc' },
   );
 
@@ -86,7 +86,7 @@ test('a document of the site opens on its figure and the workspace it was saved 
       state: {
         site: 'tlc',
         href: 'https://tlc.cheminfo.org/',
-        ...STATE,
+        data: STATE,
         edited: false,
       },
     },
@@ -101,12 +101,12 @@ test("another site's document sends its figure there, without its workspace", as
   const svg = await withFigureSource(FIGURE, {
     site: 'lcao',
     href: 'https://lcao.cheminfo.org/playground?smiles=C',
-    state: STATE,
+    data: STATE,
   });
   const document = await writeSiteDocument(
     {
       data: [{ path: 'orbitals.lcao.svg', content: svg }],
-      workspace: WORKSPACE,
+      preferences: WORKSPACE,
     },
     { site: 'lcao' },
   );

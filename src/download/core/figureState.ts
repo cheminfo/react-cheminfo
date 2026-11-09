@@ -1,14 +1,20 @@
 /**
  * What a site needs to open one of its figures again exactly as it was,
- * carried inside the figure: the conformers 3d computed, the geometry lcao
- * relaxed, the plate tlc read.
+ * carried inside the figure, in three parts every file of the family names
+ * alike:
  *
- * An address names what to compute; a state is what was computed. A figure
- * carrying its state opens again at once, with nothing computed anew, and the
- * same — whatever the site has learnt to compute differently since. The family
- * agrees on the envelope: gzipped JSON in base64, the version of the site's
- * format, and a digest of the picture it was written with. What is inside is
- * the site's own, and only that site reads it.
+ * - **data**: what the figure is — the drawing, the structure and its
+ *   conformers, the plate, the spectra. Always written when the site can open
+ *   the figure again.
+ * - **view**: where it stood — the camera, the page shown, what was selected.
+ * - **preferences**: the workspace it was made in — the panels and their
+ *   settings, how things are displayed.
+ *
+ * What is inside each part is the site's own, versioned by the site; the
+ * family agrees on the envelope. A part is written as JSON a person can read,
+ * gzipped in base64 once it is large, and the figure states a digest of the
+ * picture it was written with, so a picture redrawn in another program is
+ * known for one.
  */
 
 import {
@@ -24,27 +30,64 @@ import {
   withoutFigureSource,
 } from './figureSourceMarkup.ts';
 
-/** What a site needs to open one of its figures again, in its own format. */
-export interface FigureState {
+/** The parts a figure carries its state in, in the order they are written. */
+export const STATE_PARTS = ['data', 'view', 'preferences'] as const;
+
+/** One of the parts of a figure's state. */
+export type StatePart = (typeof STATE_PARTS)[number];
+
+/** How a part is written when it is read as it stands. */
+export const JSON_ENCODING = 'json';
+
+/**
+ * How large a part is written as JSON, in UTF-8 bytes; a larger one is
+ * gzipped, in base64.
+ */
+export const READABLE_STATE_BYTES = 32 * 1024;
+
+/** One part of a figure's state, in the site's own format. */
+export interface SiteState {
   /**
-   * The version of the site's format, a whole number from 1, so the site
-   * reads only what it knows and refuses what a newer version wrote.
+   * The version of the site's format for this part, a whole number from 1, so
+   * the site reads only what it knows and refuses what a newer version wrote.
    */
   version: number;
-  /** The state, as JSON writes it. */
+  /** The part, as JSON writes it. */
   value: unknown;
 }
 
-/** A state as a figure carries it. */
-export interface CarriedFigureState extends FigureState {
+/** What a site needs to open one of its figures again. */
+export interface FigureStates {
+  /**
+   * What the figure is.
+   * @default undefined — a picture the site cannot open again
+   */
+  data?: SiteState;
+  /**
+   * Where it stood.
+   * @default undefined — it opens on the site's own view
+   */
+  view?: SiteState;
+  /**
+   * The workspace it was made in.
+   * @default undefined — it opens in the reader's own workspace
+   */
+  preferences?: SiteState;
+}
+
+/** The state a figure carries, as it is read back. */
+export interface CarriedFigureStates extends FigureStates {
   /** The site that wrote it, as the family names it, e.g. `3d`. */
   site: string;
   /**
-   * The page as it stood when the figure was drawn, as its source names it:
-   * what the address holds — the camera, the conformer on screen — the site
-   * puts back beside the state.
+   * The page as it stood when the figure was drawn, as its source names it.
    */
   href: string;
+  /**
+   * The build that wrote it, e.g. `draw.cheminfo.org 1.4.0`.
+   * @default undefined — not said
+   */
+  generator?: string;
   /**
    * Whether the picture was changed since the state was written — redrawn in
    * another program — so the state draws something other than the picture
@@ -54,75 +97,88 @@ export interface CarriedFigureState extends FigureState {
 }
 
 /**
- * The element a figure's source carries its state in.
- * @param state - The state.
- * @param figure - The figure it is written with, without its source.
- * @returns The element's markup.
- * @throws {Error} When the version is not a whole number from 1.
+ * The elements a figure's source carries its state in.
+ * @param states - The state.
+ * @returns The elements' markup, in the order of `STATE_PARTS`.
+ * @throws {Error} When a version is not a whole number from 1.
  */
-export async function stateElement(
-  state: FigureState,
-  figure: string,
-): Promise<string> {
-  const { version, value } = state;
-  if (!Number.isSafeInteger(version) || version < 1) {
-    throw new Error(
-      `A figure's state is versioned from 1, in whole numbers, not ${version}.`,
-    );
-  }
-  const [packed, digest] = await Promise.all([
-    packFigureValue(value),
-    figureDigest(figure),
-  ]);
-  const signed = digest === undefined ? '' : ` digest="${digest}"`;
-  return `<cheminfo:state version="${version}"${signed} encoding="${FIGURE_STATE_ENCODING}">${packed}</cheminfo:state>`;
+export async function stateElements(states: FigureStates): Promise<string> {
+  const written = await Promise.all(
+    STATE_PARTS.map(async (part) => {
+      const state = states[part];
+      if (state === undefined) return '';
+      const { version, value } = state;
+      if (!Number.isSafeInteger(version) || version < 1) {
+        throw new Error(
+          `The ${part} of a figure is versioned from 1, in whole numbers, not ${version}.`,
+        );
+      }
+      const { encoding, text } = await encodeState(value);
+      return `<cheminfo:${part} version="${version}" encoding="${encoding}">${text}</cheminfo:${part}>`;
+    }),
+  );
+  return written.join('');
 }
 
 /**
- * The state a figure carries, when a site of the family wrote one. A state
- * that does not unpack, or would grow past `MAX_FIGURE_STATE_BYTES`, is none.
+ * The state a figure carries, when a site of the family wrote one. A part
+ * that does not read, or would grow past `MAX_FIGURE_STATE_BYTES`, is left
+ * out; a figure carrying none of the three carries no state.
  * @param svg - The figure, as an SVG document, from anywhere.
  * @param site - The site whose state is wanted; another site's is none.
  * @returns The state, or `undefined` when the figure carries none.
  */
-export async function readFigureState(
+export async function readFigureStates(
   svg: string,
   site?: string,
-): Promise<CarriedFigureState | undefined> {
+): Promise<CarriedFigureStates | undefined> {
   const found = findSource(svg);
   if (found === undefined) return undefined;
   const named = readSourceTag(found);
   if (named === undefined || (site !== undefined && named.site !== site)) {
     return undefined;
   }
-  const [element] = sourceChildren(found, 'state');
-  if (element === undefined) return undefined;
-  const version = Number(attribute(element.tag, 'version'));
-  if (
-    !Number.isSafeInteger(version) ||
-    version < 1 ||
-    attribute(element.tag, 'encoding') !== FIGURE_STATE_ENCODING
-  ) {
-    return undefined;
+  const decoded = await Promise.all(
+    STATE_PARTS.map(async (part) => {
+      const [element] = sourceChildren(found, part);
+      return element === undefined
+        ? undefined
+        : decodeState(element.tag, element.text);
+    }),
+  );
+  const states: FigureStates = {};
+  for (const [index, part] of STATE_PARTS.entries()) {
+    const state = decoded[index];
+    if (state !== undefined) states[part] = state;
   }
-  let value: unknown;
-  try {
-    value = await unpackFigureValue(element.text);
-  } catch {
-    return undefined;
-  }
-  const digest = attribute(element.tag, 'digest');
+  if (Object.keys(states).length === 0) return undefined;
+  const digest = attribute(found.tag, 'digest');
   const now =
     digest === undefined
       ? undefined
       : await figureDigest(withoutFigureSource(svg));
+  const generator = attribute(found.tag, 'generator');
   return {
     site: named.site,
     href: named.href,
-    version,
-    value,
+    ...(generator === undefined ? {} : { generator }),
+    ...states,
     edited: now !== undefined && now !== digest,
   };
+}
+
+/**
+ * The three parts of a state, without what the figure says around them.
+ * @param carried - The state, as a figure carries it.
+ * @returns Its parts.
+ */
+export function statesOf(carried: FigureStates): FigureStates {
+  const states: FigureStates = {};
+  for (const part of STATE_PARTS) {
+    const state = carried[part];
+    if (state !== undefined) states[part] = state;
+  }
+  return states;
 }
 
 /**
@@ -151,4 +207,51 @@ export async function figureDigest(
   let hex = '';
   for (const byte of hash) hex += byte.toString(16).padStart(2, '0');
   return hex;
+}
+
+async function encodeState(
+  value: unknown,
+): Promise<{ encoding: string; text: string }> {
+  const json = JSON.stringify(value);
+  if (new TextEncoder().encode(json).length <= READABLE_STATE_BYTES) {
+    return { encoding: JSON_ENCODING, text: escapeXmlText(json) };
+  }
+  return {
+    encoding: FIGURE_STATE_ENCODING,
+    text: await packFigureValue(value),
+  };
+}
+
+async function decodeState(
+  tag: string,
+  text: string,
+): Promise<SiteState | undefined> {
+  const version = Number(attribute(tag, 'version'));
+  if (!Number.isSafeInteger(version) || version < 1) return undefined;
+  const encoding = attribute(tag, 'encoding');
+  try {
+    if (encoding === JSON_ENCODING) {
+      return { version, value: JSON.parse(unescapeXmlText(text)) as unknown };
+    }
+    if (encoding === FIGURE_STATE_ENCODING) {
+      return { version, value: await unpackFigureValue(text) };
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
+function escapeXmlText(text: string): string {
+  return text
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
+function unescapeXmlText(text: string): string {
+  return text
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&amp;', '&');
 }

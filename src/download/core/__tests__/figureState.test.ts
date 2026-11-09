@@ -1,8 +1,7 @@
 import { expect, test } from 'vitest';
 
-import { packFigureValue } from '../figurePacking.ts';
 import { withFigureSource } from '../figureSource.ts';
-import { figureDigest, readFigureState } from '../figureState.ts';
+import { figureDigest, readFigureStates } from '../figureState.ts';
 
 const FIGURE =
   '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20" viewBox="0 0 40 20"><rect width="40" height="20"/></svg>';
@@ -19,28 +18,62 @@ const CONFORMERS = {
 const SOURCE = {
   site: '3d',
   href: 'https://3d.cheminfo.org/?smiles=CCO&id=c2',
-  state: { version: 1, value: CONFORMERS },
+  data: { version: 1, value: CONFORMERS },
 };
 
-test('a figure carries what its page computed, and opens again on exactly that', async () => {
-  const svg = await withFigureSource(FIGURE, SOURCE);
+test('a figure carries its data, view and preferences as JSON, and opens again on exactly those', async () => {
+  const svg = await withFigureSource(FIGURE, {
+    ...SOURCE,
+    generator: '3d.cheminfo.org 1.2.0',
+    view: { version: 2, value: { camera: [0, 0, 5] } },
+    preferences: { version: 1, value: { panels: ['conformers'] } },
+  });
 
   expect(svg).toMatch(
-    /<cheminfo:state version="1" digest="[\da-f]{64}" encoding="gzip\+base64">[A-Za-z\d+/=]+<\/cheminfo:state><\/cheminfo:source><\/metadata><rect/,
+    /<cheminfo:source xmlns:cheminfo="https:\/\/www\.cheminfo\.org\/ns\/source\/2" site="3d" href="[^"]+" generator="3d\.cheminfo\.org 1\.2\.0" digest="[\da-f]{64}"><cheminfo:data version="1" encoding="json">\{"smiles":"CCO",/,
   );
-  await expect(readFigureState(svg, '3d')).resolves.toStrictEqual({
+  expect(svg).toContain(
+    '<cheminfo:view version="2" encoding="json">{"camera":[0,0,5]}</cheminfo:view><cheminfo:preferences version="1" encoding="json">{"panels":["conformers"]}</cheminfo:preferences></cheminfo:source></metadata><rect',
+  );
+  await expect(readFigureStates(svg, '3d')).resolves.toStrictEqual({
     site: '3d',
     href: SOURCE.href,
-    version: 1,
-    value: CONFORMERS,
+    generator: '3d.cheminfo.org 1.2.0',
+    data: { version: 1, value: CONFORMERS },
+    view: { version: 2, value: { camera: [0, 0, 5] } },
+    preferences: { version: 1, value: { panels: ['conformers'] } },
     edited: false,
   });
-  await expect(readFigureState(svg)).resolves.toStrictEqual({
-    site: '3d',
-    href: SOURCE.href,
-    version: 1,
-    value: CONFORMERS,
-    edited: false,
+  await expect(readFigureStates(svg)).resolves.toMatchObject({
+    data: { version: 1, value: CONFORMERS },
+  });
+});
+
+test('a part with markup in it is escaped, and a large part is gzipped', async () => {
+  const marked = { note: '<b>a & b</b>' };
+  const svg = await withFigureSource(FIGURE, {
+    ...SOURCE,
+    data: { version: 1, value: marked },
+  });
+
+  expect(svg).toContain('{"note":"&lt;b&gt;a &amp; b&lt;/b&gt;"}');
+  await expect(readFigureStates(svg)).resolves.toMatchObject({
+    data: { version: 1, value: marked },
+  });
+
+  const large = {
+    spectrum: Array.from({ length: 12_000 }, (_, index) => index),
+  };
+  const packed = await withFigureSource(FIGURE, {
+    ...SOURCE,
+    data: { version: 1, value: large },
+  });
+
+  expect(packed).toMatch(
+    /<cheminfo:data version="1" encoding="gzip\+base64">[A-Za-z\d+/=]+<\/cheminfo:data>/,
+  );
+  await expect(readFigureStates(packed)).resolves.toMatchObject({
+    data: { version: 1, value: large },
   });
 });
 
@@ -51,9 +84,12 @@ test('another site’s state is none, and so is a figure that carries none', asy
     href: 'https://3d.cheminfo.org/?smiles=CCO',
   });
 
-  await expect(readFigureState(svg, 'lcao')).resolves.toBeUndefined();
-  await expect(readFigureState(addressed, '3d')).resolves.toBeUndefined();
-  await expect(readFigureState(FIGURE)).resolves.toBeUndefined();
+  expect(addressed).toContain(
+    '<cheminfo:source xmlns:cheminfo="https://www.cheminfo.org/ns/source/2" site="3d" href="https://3d.cheminfo.org/?smiles=CCO"/>',
+  );
+  await expect(readFigureStates(svg, 'lcao')).resolves.toBeUndefined();
+  await expect(readFigureStates(addressed, '3d')).resolves.toBeUndefined();
+  await expect(readFigureStates(FIGURE)).resolves.toBeUndefined();
 });
 
 test('a picture redrawn in another program is said to be edited, one only reindented is not', async () => {
@@ -66,40 +102,68 @@ test('a picture redrawn in another program is said to be edited, one only reinde
     .replace('<rect', '\n  <rect')
     .replace('</svg>', '\n</svg>\n');
 
-  await expect(readFigureState(redrawn, '3d')).resolves.toMatchObject({
+  await expect(readFigureStates(redrawn, '3d')).resolves.toMatchObject({
     edited: true,
   });
-  await expect(readFigureState(reindented, '3d')).resolves.toMatchObject({
+  await expect(readFigureStates(reindented, '3d')).resolves.toMatchObject({
     edited: false,
   });
 });
 
-test('a state that is unreadable, of an unknown version or misnamed, is none', async () => {
-  const svg = await withFigureSource(FIGURE, SOURCE);
-  const packed = await packFigureValue(CONFORMERS);
+test('a part that is unreadable, of an unknown version or encoding, is left out', async () => {
+  const svg = await withFigureSource(FIGURE, {
+    ...SOURCE,
+    view: { version: 1, value: { camera: [1, 2, 3] } },
+  });
+  const view = { version: 1, value: { camera: [1, 2, 3] } };
 
   await expect(
-    readFigureState(
-      svg.replace(/>[A-Za-z\d+/=]+<\/cheminfo:state>/, '>@@@</cheminfo:state>'),
+    readFigureStates(svg.replace('{"smiles"', '{smiles')),
+  ).resolves.toMatchObject({ view });
+  await expect(
+    readFigureStates(
+      svg.replace('<cheminfo:data version="1"', '<cheminfo:data version="0"'),
+    ),
+  ).resolves.not.toHaveProperty('data');
+  await expect(
+    readFigureStates(
+      svg.replace('<cheminfo:data version="1"', '<cheminfo:data version="1.5"'),
+    ),
+  ).resolves.not.toHaveProperty('data');
+
+  const unknown = svg.replaceAll('encoding="json"', 'encoding="zip"');
+
+  await expect(readFigureStates(unknown)).resolves.toBeUndefined();
+  await expect(
+    readFigureStates(
+      await withFigureSource(FIGURE, {
+        ...SOURCE,
+        data: {
+          version: 1,
+          value: {
+            spectrum: Array.from({ length: 12_000 }, (_, index) => index),
+          },
+        },
+      }).then((packed) =>
+        packed.replace(
+          />[A-Za-z\d+/=]+<\/cheminfo:data>/,
+          '>@@@</cheminfo:data>',
+        ),
+      ),
     ),
   ).resolves.toBeUndefined();
-  await expect(
-    readFigureState(svg.replace('version="1"', 'version="0"')),
-  ).resolves.toBeUndefined();
-  await expect(
-    readFigureState(svg.replace('version="1"', 'version="1.5"')),
-  ).resolves.toBeUndefined();
-  await expect(
-    readFigureState(svg.replace('encoding="gzip+base64"', 'encoding="zip"')),
-  ).resolves.toBeUndefined();
-  expect(svg).toContain(packed);
 });
 
-test('a state is versioned from 1, in whole numbers', async () => {
+test('every part is versioned from 1, in whole numbers', async () => {
   await expect(
-    withFigureSource(FIGURE, { ...SOURCE, state: { version: 0, value: {} } }),
+    withFigureSource(FIGURE, { ...SOURCE, data: { version: 0, value: {} } }),
   ).rejects.toThrow(
-    "A figure's state is versioned from 1, in whole numbers, not 0.",
+    'The data of a figure is versioned from 1, in whole numbers, not 0.',
+  );
+  await expect(
+    withFigureSource(FIGURE, { ...SOURCE, view: { version: 1.5, value: {} } }),
+  ).rejects.toThrow(
+    'The view of a figure is versioned from 1, in whole numbers, not 1.5.',
   );
 });
 

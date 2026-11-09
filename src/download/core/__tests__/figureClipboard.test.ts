@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 const FIGURE =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><metadata><cheminfo:source xmlns:cheminfo="https://www.cheminfo.org/ns/figure-source" site="3d" href="https://3d.cheminfo.org/?smiles=CCO&amp;view=a"/></metadata><text>Éthanol &lt; 2 "q"</text></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><metadata><cheminfo:source xmlns:cheminfo="https://www.cheminfo.org/ns/source/2" site="3d" href="https://3d.cheminfo.org/?smiles=CCO&amp;view=a"/></metadata><text>Éthanol &lt; 2 "q"</text></svg>';
 
 test('the HTML lays the PNG out at the size it states, carrying the figure', async () => {
   const png = pngOf(600, 400, 192);

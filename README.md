@@ -1255,19 +1255,31 @@ useHostConnection(TOOL, {
 - **Opening a document sends nothing back.** What the tool shows once `load`
   returns is what the host already has, so `read` must reflect a load by then.
 - **Every picture handed back says where it came from, and carries what it
-  shows.** An `image.svg` gets a `<cheminfo:source site href>` in its metadata:
-  the tool's name and the page's address as it stood, `embed`, `hide` and
-  `card` left out. Inside it, `<cheminfo:state version digest>` holds the
-  page's `state` — 3d's conformers, lcao's geometry, tlc's plate, chemcalc's
-  spectra, the periodic table's colouring — in the site's own format, gzipped
-  JSON in base64, with a digest of the picture. The state is the document: a
-  site opens the figure again from it, with nothing computed anew and the same
-  whatever the site computes differently since; the address only says where.
-  `withFigureSource`, `readFigureSource`, `readFigureState` and
+  shows.** An `image.svg` gets a `<cheminfo:source site href generator digest>`
+  in its metadata, in `https://www.cheminfo.org/ns/source/2`: the tool's name,
+  the page's address as it stood (`embed`, `hide` and `card` left out), the
+  build, and a digest of the picture. Inside it, the page's `states` in three
+  named parts, each in the site's own format and versioned by it:
+  `<cheminfo:data>` — what the figure is: 3d's conformers, lcao's geometry,
+  tlc's plate, chemcalc's spectra, the periodic table's colouring —
+  `<cheminfo:view>` — where it stood — and `<cheminfo:preferences>` — the
+  workspace it was made in. A part is JSON a person can read, gzipped in
+  base64 once it passes 32 KB. The data is the document: a site opens the
+  figure again from it, with nothing computed anew and the same whatever the
+  site computes differently since; the address only says where.
+  `withFigureSource`, `readFigureSource`, `readFigureStates` and
   `figureAddress` (`/core`) write and read it, and `cropFigure` keeps it.
+- **An HTML page and a ZIP say the same.** `withHtmlSource` writes the same
+  envelope as JSON — `{ "format": "cheminfo", "version": 2, "site", "generator",
+"href", "data", "view", "preferences" }` — in a
+  `<script type="application/json" id="cheminfo-source">` closing the page's
+  head, and `readHtmlSource` reads it back. A site's `.<site>.zip` names the
+  same format in its `manifest.json`, with `view.json` and `preferences.json`
+  beside its data. A reader takes the parts it knows and leaves the rest, so a
+  part or a field is added without breaking an older reader.
 - **One way to open a figure again, on every site.** A tool takes its own
   figures on `FIGURE_INPUT`, an optional `figure` input of kind `image.svg`,
-  and reads them with `loadedFigureState`; a host hands one back whole with
+  and reads them with `loadedFigureStates`; a host hands one back whole with
   `figureToolDocument(svg, id)`. A reader opens a saved `.<site>.svg` with
   `<OpenFigureButton site onOpen>`, or drops one on a zone calling `open` from
   `useOpenFigure` (`/host`): a figure of another site of the family offers to
@@ -1277,11 +1289,13 @@ useHostConnection(TOOL, {
 ```ts
 useHostConnection(TOOL, {
   load: async (inputs) => {
-    const figure = await loadedFigureState(inputs, TOOL.name);
-    if (figure) openState(figure.value);
+    const figure = await loadedFigureStates(inputs, TOOL.name);
+    if (figure?.data) openState(figure.data.value);
     else loadStructure(inputs);
   },
-  state: () => ({ version: 1, value: { conformers: shownSet.value } }),
+  states: () => ({
+    data: { version: 1, value: { conformers: shownSet.value } },
+  }),
 });
 ```
 

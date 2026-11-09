@@ -12,7 +12,7 @@ export { REQUEST_TIMEOUT, connectTool } from './connectTool.ts';
 export {
   FIGURE_INPUT,
   figureToolDocument,
-  loadedFigureState,
+  loadedFigureStates,
 } from './figureDocument.ts';
 export type { FigureDestination } from './figureForward.ts';
 export { figureDestination, forwardedFigureDocument } from './figureForward.ts';

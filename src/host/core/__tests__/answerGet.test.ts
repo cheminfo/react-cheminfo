@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
 import { readFigureSource } from '../../../download/core/figureSource.ts';
-import { readFigureState } from '../../../download/core/figureState.ts';
+import { readFigureStates } from '../../../download/core/figureState.ts';
 import { answerGet } from '../answerGet.ts';
 import type { HostOutputs } from '../hostOutputs.ts';
 import type { HostItem, ResultMessage, ToolInterface } from '../protocol.ts';
@@ -62,7 +62,7 @@ test('a picture that already names its source keeps it, and a page with no addre
     outputsDrawing(
       FIGURE.replace(
         '<rect',
-        '<metadata><x:source xmlns:x="https://www.cheminfo.org/ns/figure-source" site="lcao" href="https://lcao.cheminfo.org/"/></metadata><rect',
+        '<metadata><x:source xmlns:x="https://www.cheminfo.org/ns/source/2" site="lcao" href="https://lcao.cheminfo.org/"/></metadata><rect',
       ),
     ),
     { address: 'https://3d.cheminfo.org/?smiles=CCO' },
@@ -85,9 +85,9 @@ test('a picture handed back carries the state of the page, read once, and only w
   let reads = 0;
   const page = {
     address: 'https://vibrations.cheminfo.org/ir',
-    state: () => {
+    states: () => {
       reads++;
-      return state;
+      return { data: state };
     },
   };
 
@@ -111,10 +111,10 @@ test('a picture handed back carries the state of the page, read once, and only w
     site: '3d',
     href: 'https://vibrations.cheminfo.org/ir',
   });
-  await expect(readFigureState(svg, '3d')).resolves.toStrictEqual({
+  await expect(readFigureStates(svg, '3d')).resolves.toStrictEqual({
     site: '3d',
     href: 'https://vibrations.cheminfo.org/ir',
-    ...state,
+    data: state,
     edited: false,
   });
 });
@@ -125,7 +125,10 @@ test('a picture handed back carries what the page computed, and one that cannot 
     { type: 'get', id: 'g7', keys: ['figure'] },
     TOOL,
     outputsDrawing(FIGURE),
-    { address: 'https://3d.cheminfo.org/?smiles=CCO', state: () => state },
+    {
+      address: 'https://3d.cheminfo.org/?smiles=CCO',
+      states: () => ({ data: state }),
+    },
   );
   const failing = await answerGet(
     { type: 'get', id: 'g8', keys: ['figure'] },
@@ -133,16 +136,16 @@ test('a picture handed back carries what the page computed, and one that cannot 
     outputsDrawing(FIGURE),
     {
       address: 'https://3d.cheminfo.org/?smiles=CCO',
-      state: () => Promise.reject(new Error('Nothing computed yet.')),
+      states: () => Promise.reject(new Error('Nothing computed yet.')),
     },
   );
 
   await expect(
-    readFigureState(svgOf(itemsOf(carried)[0]), '3d'),
+    readFigureStates(svgOf(itemsOf(carried)[0]), '3d'),
   ).resolves.toStrictEqual({
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO',
-    ...state,
+    data: state,
     edited: false,
   });
 
@@ -152,7 +155,7 @@ test('a picture handed back carries what the page computed, and one that cannot 
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO',
   });
-  await expect(readFigureState(svg, '3d')).resolves.toBeUndefined();
+  await expect(readFigureStates(svg, '3d')).resolves.toBeUndefined();
 });
 
 function itemsOf(result: ResultMessage): HostItem[] {

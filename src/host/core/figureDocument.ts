@@ -4,8 +4,8 @@
  * it carries as it was, with nothing computed anew.
  */
 
-import type { CarriedFigureState } from '../../download/core/figureState.ts';
-import { readFigureState } from '../../download/core/figureState.ts';
+import type { CarriedFigureStates } from '../../download/core/figureState.ts';
+import { readFigureStates } from '../../download/core/figureState.ts';
 
 import type { ToolDocument } from './connectTool.ts';
 import type { ToolInput } from './protocol.ts';
@@ -35,7 +35,7 @@ export async function figureToolDocument(
   svg: string,
   document: string,
 ): Promise<ToolDocument | null> {
-  if ((await readFigureState(svg)) === undefined) return null;
+  if ((await readFigureStates(svg)) === undefined) return null;
   return {
     document,
     items: [{ key: FIGURE_INPUT.key, kind: 'image.svg', value: { svg } }],
@@ -51,13 +51,13 @@ export async function figureToolDocument(
  * @throws {Error} When the figure handed over carries no state of the tool:
  * the host is answered with that sentence, and nothing changes on screen.
  */
-export async function loadedFigureState(
+export async function loadedFigureStates(
   inputs: readonly LoadedInput[],
   site: string,
-): Promise<CarriedFigureState | undefined> {
+): Promise<CarriedFigureStates | undefined> {
   const checked = inputs.find(({ key }) => key === FIGURE_INPUT.key)?.checked;
   if (checked?.kind !== 'image.svg') return undefined;
-  const state = await readFigureState(checked.value.svg, site);
+  const state = await readFigureStates(checked.value.svg, site);
   if (state === undefined) {
     throw new Error(`That picture holds no figure of ${site} to open again.`);
   }

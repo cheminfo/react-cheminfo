@@ -5,8 +5,8 @@
  * `.<site>.zip` Save as writes, opens on its figure and its workspace.
  */
 
-import type { CarriedFigureState } from '../../download/core/figureState.ts';
-import { readFigureState } from '../../download/core/figureState.ts';
+import type { CarriedFigureStates } from '../../download/core/figureState.ts';
+import { readFigureStates } from '../../download/core/figureState.ts';
 import type { SiteDocument } from '../../storage/core/siteDocument.ts';
 import { readSiteDocument } from '../../storage/core/siteDocument.ts';
 import type { WorkspaceRecord } from '../../storage/core/workspaceFile.ts';
@@ -19,7 +19,7 @@ export type OpenedFigure =
   | {
       /** A figure of the site, with the state it opens again from. */
       kind: 'own';
-      state: CarriedFigureState;
+      state: CarriedFigureStates;
     }
   | {
       /** A figure of another site of the family, which opens there. */
@@ -46,7 +46,7 @@ export async function readOpenedFigure(
   site: string,
   origins: Readonly<Record<string, string>> = {},
 ): Promise<OpenedFigure> {
-  const state = await readFigureState(text, site);
+  const state = await readFigureStates(text, site);
   if (state !== undefined) return { kind: 'own', state };
   const destination = figureDestination(text, site, origins);
   if (destination !== undefined) {
@@ -96,8 +96,8 @@ export async function readOpenedFile(
   );
   if (!svg) return { figure: { kind: 'none' } };
   const figure = await readOpenedFigure(svg.text(), site, origins);
-  return figure.kind === 'own' && document.site === site && document.workspace
-    ? { figure, workspace: document.workspace }
+  return figure.kind === 'own' && document.site === site && document.preferences
+    ? { figure, workspace: document.preferences }
     : { figure };
 }
 

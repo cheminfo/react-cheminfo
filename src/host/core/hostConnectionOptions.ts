@@ -54,11 +54,12 @@ export interface HostConnectionOptions {
    */
   outputs?: HostOutputs;
   /**
-   * What the page shows, in the site's own format, written into every picture
-   * handed back so the site opens it again with nothing computed anew.
+   * What the page holds — its data, view and preferences, in the site's own
+   * format — written into every picture handed back so the site opens it again
+   * with nothing computed anew.
    * @default undefined — the pictures cannot be opened again
    */
-  state?: FigurePage['state'];
+  states?: FigurePage['states'];
   /**
    * What a host may set while the tool is open, and where the values are read.
    * @default undefined — the tool has no settings, and says nothing of them

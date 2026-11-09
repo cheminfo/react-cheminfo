@@ -4,7 +4,7 @@ import { withFigureSource } from '../../../download/core/figureSource.ts';
 import {
   FIGURE_INPUT,
   figureToolDocument,
-  loadedFigureState,
+  loadedFigureStates,
 } from '../figureDocument.ts';
 import type { LoadedInput } from '../selectInputs.ts';
 
@@ -17,7 +17,7 @@ test('a figure carrying its state is handed back whole, on the figure input', as
   const svg = await withFigureSource(FIGURE, {
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO',
-    state: STATE,
+    data: STATE,
   });
 
   await expect(figureToolDocument(svg, 'figure:i4')).resolves.toStrictEqual({
@@ -40,20 +40,20 @@ test('a tool reads the state of the figure a host handed over, and refuses a fig
   const svg = await withFigureSource(FIGURE, {
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO',
-    state: STATE,
+    data: STATE,
   });
 
-  await expect(loadedFigureState(handed(svg), '3d')).resolves.toStrictEqual({
+  await expect(loadedFigureStates(handed(svg), '3d')).resolves.toStrictEqual({
     site: '3d',
     href: 'https://3d.cheminfo.org/?smiles=CCO',
-    ...STATE,
+    data: STATE,
     edited: false,
   });
-  await expect(loadedFigureState([], '3d')).resolves.toBeUndefined();
-  await expect(loadedFigureState(handed(svg), 'lcao')).rejects.toThrow(
+  await expect(loadedFigureStates([], '3d')).resolves.toBeUndefined();
+  await expect(loadedFigureStates(handed(svg), 'lcao')).rejects.toThrow(
     'That picture holds no figure of lcao to open again.',
   );
-  await expect(loadedFigureState(handed(FIGURE), '3d')).rejects.toThrow(
+  await expect(loadedFigureStates(handed(FIGURE), '3d')).rejects.toThrow(
     'That picture holds no figure of 3d to open again.',
   );
 });

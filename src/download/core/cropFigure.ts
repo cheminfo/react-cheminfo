@@ -15,7 +15,7 @@ import {
 } from './croppedMarkup.ts';
 import { svgImageUrl } from './figurePng.ts';
 import { readFigureSource, withFigureSource } from './figureSource.ts';
-import { readFigureState } from './figureState.ts';
+import { readFigureStates, statesOf } from './figureState.ts';
 import type { FigureSvg } from './figureSvg.ts';
 import { paintedBox } from './paintedBox.ts';
 
@@ -47,16 +47,11 @@ export async function cropFigure(figure: FigureSvg): Promise<FigureSvg> {
     // and still carries the state it opens again from.
     const source = readFigureSource(figure.markup);
     if (!source) return cropped;
-    const carried = await readFigureState(figure.markup, source.site);
-    const markup = await withFigureSource(
-      cropped.markup,
-      carried === undefined
-        ? source
-        : {
-            ...source,
-            state: { version: carried.version, value: carried.value },
-          },
-    );
+    const carried = await readFigureStates(figure.markup, source.site);
+    const markup = await withFigureSource(cropped.markup, {
+      ...source,
+      ...(carried === undefined ? {} : statesOf(carried)),
+    });
     return { ...cropped, markup };
   } catch {
     return figure;

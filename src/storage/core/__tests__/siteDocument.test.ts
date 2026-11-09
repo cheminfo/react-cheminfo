@@ -16,7 +16,7 @@ test('a document holds its data at the root, and says what else it holds', async
     {
       data: [{ path: 'drawing.svg', content: SVG }],
       view: { zoom: 2 },
-      workspace: {
+      preferences: {
         id: 'w1',
         name: 'Teaching',
         preferences: { panels: ['glassware'] },
@@ -36,18 +36,18 @@ test('a document holds its data at the root, and says what else it holds', async
     'manifest.json',
     'drawing.svg',
     'view.json',
-    'workspace.json',
+    'preferences.json',
     'files/nmr/1h.jdx',
   ]);
   expect(JSON.parse(files[0]?.text() ?? '')).toStrictEqual({
-    format: 'cheminfo-document',
-    version: 1,
+    format: 'cheminfo',
+    version: 2,
     site: 'draw',
     generator: 'draw.cheminfo.org 1.4.0',
     savedAt: '2026-11-04T08:00:00.000Z',
     data: ['drawing.svg'],
     view: 'view.json',
-    workspace: 'workspace.json',
+    preferences: 'preferences.json',
     attachments: ['nmr/1h.jdx'],
   });
   expect(files[1]?.text()).toBe(SVG);
@@ -58,7 +58,7 @@ test('a document is read back whole', async () => {
     {
       data: [{ path: 'drawing.svg', content: SVG }],
       view: { zoom: 2, tool: 'bond' },
-      workspace: { id: 'w1', name: 'Teaching', preferences: { a: 1 } },
+      preferences: { id: 'w1', name: 'Teaching', preferences: { a: 1 } },
       attachments: [{ path: 'photo.png', content: new Uint8Array([1, 2]) }],
     },
     { site: 'draw', date: new Date('2026-11-04T08:00:00Z') },
@@ -72,7 +72,7 @@ test('a document is read back whole', async () => {
     ['drawing.svg', SVG],
   ]);
   expect(document.view).toStrictEqual({ zoom: 2, tool: 'bond' });
-  expect(document.workspace).toStrictEqual({
+  expect(document.preferences).toStrictEqual({
     id: 'w1',
     name: 'Teaching',
     preferences: { a: 1 },
@@ -92,7 +92,7 @@ test('a document of data alone carries no view and no workspace', async () => {
   const document = await readSiteDocument(archive, 'draw');
 
   expect(document.view).toBeUndefined();
-  expect(document.workspace).toBeUndefined();
+  expect(document.preferences).toBeUndefined();
   expect(document.attachments).toStrictEqual([]);
 
   const files = await readArchive(archive);
@@ -145,7 +145,8 @@ test("another site's document, an archive of anything else and a lost data file 
     {
       path: 'manifest.json',
       content: JSON.stringify({
-        format: 'cheminfo-document',
+        format: 'cheminfo',
+        version: 2,
         site: 'draw',
         data: ['drawing.svg'],
       }),
@@ -161,7 +162,7 @@ test('a document read without naming a site says which site it belongs to, its w
   const theirs = await writeSiteDocument(
     {
       data: [{ path: 'benzene.3d.svg', content: SVG }],
-      workspace: { id: 'w1', name: 'Saved', preferences: { scale: 2 } },
+      preferences: { id: 'w1', name: 'Saved', preferences: { scale: 2 } },
     },
     { site: '3d', date: new Date('2026-11-07T20:00:00Z') },
   );
@@ -171,7 +172,7 @@ test('a document read without naming a site says which site it belongs to, its w
   expect(read.site).toBe('3d');
   expect(read.data.map(({ path }) => path)).toStrictEqual(['benzene.3d.svg']);
   expect(read.data[0]?.text()).toBe(SVG);
-  expect(read.workspace).toStrictEqual({
+  expect(read.preferences).toStrictEqual({
     id: 'w1',
     name: 'Saved',
     preferences: { scale: 2 },
@@ -183,23 +184,24 @@ test('a view or a workspace that does not read costs nothing but itself', async 
     {
       path: 'manifest.json',
       content: JSON.stringify({
-        format: 'cheminfo-document',
+        format: 'cheminfo',
+        version: 2,
         site: 'draw',
         data: ['drawing.svg'],
         view: 'view.json',
-        workspace: 'workspace.json',
+        preferences: 'preferences.json',
       }),
     },
     { path: 'drawing.svg', content: SVG },
     { path: 'view.json', content: '{broken' },
-    { path: 'workspace.json', content: '{"format":"cheminfo-workspace"}' },
+    { path: 'preferences.json', content: '{"format":"cheminfo-workspace"}' },
   ]);
 
   const document = await readSiteDocument(archive, 'draw');
 
   expect(document.data).toHaveLength(1);
   expect(document.view).toBeUndefined();
-  expect(document.workspace).toBeUndefined();
+  expect(document.preferences).toBeUndefined();
 });
 
 test('a data file may not take a name the document keeps for itself', async () => {

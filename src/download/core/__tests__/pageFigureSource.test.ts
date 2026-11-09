@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
 import { readFigureSource } from '../figureSource.ts';
-import { readFigureState } from '../figureState.ts';
+import { readFigureStates } from '../figureState.ts';
 import {
   setPageFigureSource,
   withPageFigureSource,
@@ -18,7 +18,7 @@ test('a figure the page saves says where it came from while the page names a sou
   const forget = setPageFigureSource(() => ({
     site: 'vibrations',
     href: 'https://vibrations.cheminfo.org/ir',
-    state: STATE,
+    data: STATE,
   }));
   const saved = await withPageFigureSource(FIGURE);
   forget();
@@ -27,10 +27,10 @@ test('a figure the page saves says where it came from while the page names a sou
     site: 'vibrations',
     href: 'https://vibrations.cheminfo.org/ir',
   });
-  await expect(readFigureState(saved, 'vibrations')).resolves.toStrictEqual({
+  await expect(readFigureStates(saved, 'vibrations')).resolves.toStrictEqual({
     site: 'vibrations',
     href: 'https://vibrations.cheminfo.org/ir',
-    ...STATE,
+    data: STATE,
     edited: false,
   });
   await expect(withPageFigureSource(FIGURE)).resolves.toBe(FIGURE);

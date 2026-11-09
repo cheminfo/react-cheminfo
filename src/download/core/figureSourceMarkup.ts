@@ -5,8 +5,7 @@
  */
 
 /** The namespace the source is written in, which names it whatever its prefix. */
-export const FIGURE_SOURCE_NAMESPACE =
-  'https://www.cheminfo.org/ns/figure-source';
+export const FIGURE_SOURCE_NAMESPACE = 'https://www.cheminfo.org/ns/source/2';
 
 /** Where the source sits in a figure, as written there. */
 export interface FoundSource {
@@ -14,13 +13,13 @@ export interface FoundSource {
   prefix: string;
   /** Its opening tag. */
   tag: string;
-  /** What it holds: the values the figure was drawn from, and its state. */
+  /** What it holds: the parts of the figure's state. */
   body: string;
 }
 
 /** One element the source holds, as written there. */
 export interface SourceChild {
-  /** Its opening tag, with its name cut down to the local one: `<input …>`. */
+  /** Its opening tag, with its name cut down to the local one: `<data …>`. */
   tag: string;
   /** Its text. */
   text: string;
@@ -72,7 +71,7 @@ export function readSourceTag(
 /**
  * The elements of one name a source holds, in the order written.
  * @param found - The source.
- * @param name - Their local name, e.g. `input`.
+ * @param name - Their local name, e.g. `data`.
  * @returns Each one's opening tag and text.
  */
 export function sourceChildren(

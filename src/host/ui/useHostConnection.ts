@@ -10,7 +10,7 @@ import { useEffect, useRef } from 'react';
 import type { CitedWork } from '../../citation/core/works.ts';
 import type { FigureSource } from '../../download/core/figureSource.ts';
 import { figureAddress } from '../../download/core/figureSource.ts';
-import type { FigureState } from '../../download/core/figureState.ts';
+import type { FigureStates } from '../../download/core/figureState.ts';
 import { setPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import type { HostOutputs } from '../core/hostOutputs.ts';
 import type { HostSettings } from '../core/hostSettings.ts';
@@ -59,14 +59,15 @@ export interface HostHandlers {
    */
   help?: ToolHelp;
   /**
-   * What the page shows — the conformers of 3d, the plate of tlc, the spectra
-   * of chemcalc — in the site's own format. Every figure the page hands back
-   * or saves carries it, so the site opens the figure again as it was, with
-   * nothing computed anew, from a file opened or dropped on the page or from a
-   * host handing it over on `FIGURE_INPUT`.
+   * What the page holds, in the site's own format: its `data` — the
+   * conformers of 3d, the plate of tlc, the spectra of chemcalc — and, when
+   * the site keeps them, its `view` and its `preferences`. Every figure the
+   * page hands back or saves carries them, so the site opens the figure again
+   * as it was, with nothing computed anew, from a file opened or dropped on the
+   * page or from a host handing it over on `FIGURE_INPUT`.
    * @default undefined — the page's figures cannot be opened again
    */
-  state?: () => FigureState | undefined | Promise<FigureState | undefined>;
+  states?: () => FigureStates | undefined | Promise<FigureStates | undefined>;
 }
 
 /** Once per page: React may mount the caller twice, the host is greeted once. */
@@ -96,12 +97,12 @@ export function useHostConnection(
   useEffect(
     () =>
       setPageFigureSource(async () => {
+        const states = await latest.current.states?.();
         const source: FigureSource = {
           site: tool.name,
           href: figureAddress(globalThis.location.href),
+          ...states,
         };
-        const state = await latest.current.state?.();
-        if (state !== undefined) source.state = state;
         return source;
       }),
     [tool],
@@ -138,7 +139,7 @@ export function useHostConnection(
           ...(latest.current.settings === undefined
             ? {}
             : { settings: latest.current.settings }),
-          state: async () => latest.current.state?.(),
+          states: async () => latest.current.states?.(),
         });
       })
       .catch(() => {
