@@ -1167,13 +1167,19 @@ select,
   background-color: color-mix(in oklab, #cd4246 15%, transparent);
 }
 
-.click-to-copy__icon {
+/* Out of the layout until it is shown: an invisible glyph floating past a value
+   at the edge of a narrow frame would still widen the page, and the frame would
+   scroll sideways wherever a font sets the value wider. */
+.click-to-copy .click-to-copy__icon {
   position: absolute;
   top: 50%;
+  display: none;
   color: var(--text-muted);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 120ms ease;
+  transition:
+    opacity 120ms ease,
+    display 120ms allow-discrete;
 }
 
 /* The glyph is shown to a keyboard and after a copy, never on hover. In a line
@@ -1195,7 +1201,12 @@ select,
 
 .click-to-copy:focus-visible .click-to-copy__icon,
 .click-to-copy[data-copy] .click-to-copy__icon {
+  display: block;
   opacity: 1;
+
+  @starting-style {
+    opacity: 0;
+  }
 }
 
 .click-to-copy[data-copy='copied'] .click-to-copy__icon {

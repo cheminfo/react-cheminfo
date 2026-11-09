@@ -43,6 +43,20 @@ test('hovering shows the clipboard cursor and no glyph; a click copies and ticks
   await expect(icon).toHaveCSS('opacity', '0');
 });
 
+test('the glyph takes no room until it is shown, so a value at a frame’s edge widens nothing', async ({
+  page,
+}) => {
+  await openStory(page, 'clipboard-clicktocopy--default');
+  const value = page.getByRole('button', { name: 'C=CC=O' });
+  const icon = value.locator('.click-to-copy__icon');
+
+  await expect(icon).toHaveCSS('display', 'none');
+
+  await value.click();
+  await expect(value).toHaveAttribute('data-copy', 'copied');
+  await expect(icon).toHaveCSS('display', 'block');
+});
+
 test('Enter copies a focused value, as a click does', async ({ page }) => {
   await openStory(page, 'clipboard-clicktocopy--default');
   const value = page.getByRole('button', { name: 'C=CC=O' });
