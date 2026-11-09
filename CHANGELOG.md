@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.108.0](https://github.com/cheminfo/react-cheminfo/compare/v0.107.0...v0.108.0) (2026-11-09)
+
+
+### Features
+
+* open a figure in the Cloudflare Pages deployment that saved it, through an Original version button ([47c1ddb](https://github.com/cheminfo/react-cheminfo/commit/47c1ddb18d257d36598949835858d5a3342f1348))
+
+
+### Bug Fixes
+
+* keep the copy glyph out of the layout until it is shown ([93fac32](https://github.com/cheminfo/react-cheminfo/commit/93fac3275debf5c42096dfbe40a94afba5fbc531))
+
 ## [0.107.0](https://github.com/cheminfo/react-cheminfo/compare/v0.106.0...v0.107.0) (2026-11-09)
 
 
