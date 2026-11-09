@@ -16,13 +16,11 @@ import {
   HighlightPainter,
   MeasurementPicker,
   MolstarPlugin,
-  captureScene,
   clearMeasurements,
   renderMeasurements,
   setSpin,
 } from '../../molstar/core/index.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
-import type { ImageSize } from '../core/exportImage.ts';
 import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
@@ -36,6 +34,7 @@ import {
   renderMolecule,
 } from './renderMolecule.ts';
 import { clearSurface, renderSurface } from './renderSurface.ts';
+import { ScenePictures } from './scenePictures.ts';
 import type {
   Molecule3DViewerOptions,
   MoleculeStyle,
@@ -43,10 +42,11 @@ import type {
 } from './viewerTypes.ts';
 
 /**
- * One molstar canvas, and every operation the component performs on it. Every
- * method resolves to nothing once `dispose` has been called.
+ * One molstar canvas, and every operation the component performs on it — its
+ * pictures included, from {@link ScenePictures}. Every method resolves to
+ * nothing once `dispose` has been called.
  */
-export class Molecule3DViewer {
+export class Molecule3DViewer extends ScenePictures {
   readonly #plugin: MolstarPlugin;
   #picker: MeasurementPicker | undefined;
   #painter: HighlightPainter | undefined;
@@ -68,7 +68,9 @@ export class Molecule3DViewer {
       onMeasure = ignore,
       onFrameCountChange = ignore,
     } = options;
-    this.#plugin = new MolstarPlugin(container, { background });
+    const plugin = new MolstarPlugin(container, { background });
+    super(plugin);
+    this.#plugin = plugin;
     this.ready = this.#plugin.ready;
     this.frames = new MoleculeFrames(this.#plugin, onFrameCountChange);
     // Registered before any other `run`, so the picker exists by the time one runs.
@@ -167,17 +169,6 @@ export class Molecule3DViewer {
     return this.#plugin.run(() => {
       this.#picker?.setKind(kind);
     });
-  }
-
-  /**
-   * Render the scene off screen at a given size, without the selection
-   * highlights or the axes.
-   * @param size - Pixel size of the picture.
-   * @returns The PNG as a data URI; `undefined` once the viewer is disposed.
-   * @throws {Error} When the plugin has no screenshot helper.
-   */
-  captureImage(size: ImageSize): Promise<string | undefined> {
-    return this.#plugin.run((plugin) => captureScene(plugin, size));
   }
 
   /**

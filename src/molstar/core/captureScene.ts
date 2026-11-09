@@ -96,7 +96,7 @@ export async function captureFrames(
  * @returns The helper.
  * @throws {Error} When the plugin has no screenshot helper.
  */
-function pictureHelper(
+export function pictureHelper(
   plugin: PluginContext,
   size: ImageSize,
 ): ViewportScreenshotHelper {

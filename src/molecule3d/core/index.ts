@@ -16,6 +16,18 @@ export {
 } from './camera.ts';
 export type { ImageSize } from './exportImage.ts';
 export { dataUriBytes, rasterSvgMarkup } from './exportImage.ts';
+export type {
+  FigureFrame,
+  PixelBox,
+  RelativeCrop,
+  RenderedFigure,
+} from './figureFrame.ts';
+export {
+  FIGURE_IMAGE_QUALITY,
+  FIGURE_IMAGE_TYPE,
+  FIGURE_LONGEST_SIDE,
+  figureFrame,
+} from './figureFrame.ts';
 export type { Molecule3DGesture, Molecule3DGestureKey } from './gestures.ts';
 export { MOLECULE_3D_GESTURES } from './gestures.ts';
 export type {

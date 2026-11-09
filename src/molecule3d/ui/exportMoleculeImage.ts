@@ -9,11 +9,22 @@ import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { encodeAnimatedPng } from '../core/animatedPng.ts';
 import type { ImageSize } from '../core/exportImage.ts';
 import { dataUriBytes, rasterSvgMarkup } from '../core/exportImage.ts';
+import type { RenderedFigure } from '../core/figureFrame.ts';
+import { FIGURE_LONGEST_SIDE } from '../core/figureFrame.ts';
 
 /** What an export asks of a viewer: a picture of its scene. */
 export interface SceneCapture {
   /** Render the scene at that pixel size, as a `data:` URI. */
   captureImage: (size: ImageSize) => Promise<string | undefined>;
+  /**
+   * Render the part of the scene holding the molecule, from a frame of that
+   * pixel size, no larger than `longest` on its longer side, encoded as
+   * `FIGURE_IMAGE_TYPE`.
+   */
+  captureFigure: (
+    size: ImageSize,
+    longest: number,
+  ) => Promise<RenderedFigure | undefined>;
   /**
    * The frames of the scene, each rendered at that pixel size, for an animated
    * PNG.
@@ -62,10 +73,13 @@ export async function captureMoleculePng(
 }
 
 /**
- * Render the scene as an SVG holding the rendered image, as the export writes
- * it.
+ * Render the scene as a figure: an SVG holding the part of the scene with the
+ * molecule, at most `FIGURE_LONGEST_SIDE` pixels on its longer side, as a
+ * JPEG. It is what a page hands on and what a site saves, so it stays light
+ * however large the viewer is on screen.
  * @param viewer - The viewer holding the scene.
- * @param scale - Multiple of the canvas on screen it is rendered at.
+ * @param scale - Multiple of the canvas on screen it is rendered at, before
+ * the figure is held to `FIGURE_LONGEST_SIDE`.
  * @param size - Size of the canvas on screen, CSS pixels.
  * @returns The SVG markup.
  * @throws {Error} When the viewer has nothing to render.
@@ -75,12 +89,14 @@ export async function captureMoleculeSvg(
   scale: number,
   size: ImageSize,
 ): Promise<string> {
-  const pixels = figurePixels(size, scale);
-  const dataUri = await viewer.captureImage(pixels);
-  if (dataUri === undefined) {
+  const figure = await viewer.captureFigure(
+    figurePixels(size, scale),
+    FIGURE_LONGEST_SIDE,
+  );
+  if (figure === undefined) {
     throw new Error('There is no picture to copy yet.');
   }
-  return rasterSvgMarkup(dataUri, pixels);
+  return rasterSvgMarkup(figure.dataUri, figure);
 }
 
 /**

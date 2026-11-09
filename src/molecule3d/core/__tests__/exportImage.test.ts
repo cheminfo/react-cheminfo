@@ -6,7 +6,7 @@ test('an image is embedded at its own size', () => {
   expect(
     rasterSvgMarkup('data:image/png;base64,AAAA', { width: 640, height: 480 }),
   ).toBe(
-    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="640" height="480" viewBox="0 0 640 480"><image width="640" height="480" href="data:image/png;base64,AAAA" xlink:href="data:image/png;base64,AAAA"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="640" height="480" viewBox="0 0 640 480"><image width="640" height="480" xlink:href="data:image/png;base64,AAAA"/></svg>',
   );
 });
 

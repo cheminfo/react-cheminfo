@@ -10,9 +10,11 @@ import type { Molecule3DSettings, Molecule3DTools } from '../core/settings.ts';
 /** The scene on screen, rendered as a picture on request. */
 export interface Molecule3DCapture {
   /**
-   * Render the scene as an SVG document holding the rendered image: a molecule
-   * drawn by WebGL has no vector form.
-   * @param scale - Multiple of the canvas on screen it is rendered at.
+   * Render the scene as a figure: an SVG document holding the part of the
+   * scene with the molecule, at most `FIGURE_LONGEST_SIDE` pixels on its
+   * longer side, as a JPEG. A molecule drawn by WebGL has no vector form.
+   * @param scale - Multiple of the canvas on screen it is rendered at, before
+   * the figure is held to `FIGURE_LONGEST_SIDE`.
    * @returns The SVG markup.
    */
   svg: (scale: number) => Promise<string>;
