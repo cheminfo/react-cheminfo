@@ -1487,6 +1487,10 @@ site adds its own through `layouts`.
 The `embed` layout puts a **live tool** on the slide — the last bare URL of the
 body is framed — which is what our `?embed` mode exists for.
 
+A `title` slide whose body ends with a bare URL frames that address on the
+right half and keeps the title on the left, so a talk opens on the tool
+running rather than on a picture of it.
+
 ### A procedure, done by the tool beside it
 
 The `steps` layout teaches a procedure: its list is on the left half, the tool

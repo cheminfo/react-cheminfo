@@ -19,5 +19,6 @@ export { SlideshowBar } from './SlideshowBar.tsx';
 export type { TalkListProps } from './TalkList.tsx';
 export { TalkList } from './TalkList.tsx';
 export { StepsSlide } from './StepsSlide.tsx';
+export { TitleToolSlide } from './TitleToolSlide.tsx';
 export { useDemoFrame } from './useDemoFrame.ts';
 export type { SlideshowFullscreen } from './useSlideshowFullscreen.ts';

@@ -365,6 +365,35 @@
   font-size: 0.72em;
 }
 
+/* A title with the tool running beside it: the title keeps the left half,
+   smaller than alone, and the tool takes the right half, at its own size. */
+.slide-canvas:has(.slide--title-tool) {
+  padding: 40px 40px 40px 72px;
+}
+
+.slide--title-tool {
+  display: grid;
+  height: 100%;
+  align-items: stretch;
+  gap: 40px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  text-align: left;
+}
+
+.slide--title-tool .slide-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.slide--title-tool h1 {
+  font-size: 84px;
+}
+
+.slide--title-tool .slide-logos {
+  justify-content: flex-start;
+}
+
 .slide-logos {
   display: flex;
   align-items: center;

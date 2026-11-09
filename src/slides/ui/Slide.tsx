@@ -7,7 +7,12 @@ import type {
   TalkMeta,
   TalkOrigin,
 } from '../core/index.ts';
-import { STEPS_LAYOUT, demoLabel, splitDemoLinks } from '../core/index.ts';
+import {
+  STEPS_LAYOUT,
+  demoLabel,
+  splitDemoLinks,
+  splitEmbedAddress,
+} from '../core/index.ts';
 
 import type { RenderSlideLink } from './DemoLink.tsx';
 import { DemoLink } from './DemoLink.tsx';
@@ -15,6 +20,7 @@ import { EmbedSlide } from './EmbedSlide.tsx';
 import { SectionSlide } from './SectionSlide.tsx';
 import { SlideBody } from './SlideBody.tsx';
 import { StepsSlide } from './StepsSlide.tsx';
+import { TitleToolSlide } from './TitleToolSlide.tsx';
 
 /** What every layout — the generic ones and a site's own — is handed. */
 export interface SlideLayoutProps {
@@ -85,6 +91,9 @@ export function SlideView(props: SlideViewProps): ReactElement {
   }
   if (slide.layout === 'section') return <SectionSlide body={slide.body} />;
   if (slide.layout === 'embed') return <EmbedSlide slide={slide} />;
+  if (slide.layout === 'title' && splitEmbedAddress(slide.body).src !== null) {
+    return <TitleToolSlide {...layoutProps} />;
+  }
   if (slide.layout === STEPS_LAYOUT) {
     return <StepsSlide {...layoutProps} step={step} onStep={onStep} />;
   }
