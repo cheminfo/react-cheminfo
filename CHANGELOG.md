@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.106.0](https://github.com/cheminfo/react-cheminfo/compare/v0.105.0...v0.106.0) (2026-11-09)
+
+
+### Features
+
+* copy a figure with the figure itself, so draw and write paste one that opens again ([da4d286](https://github.com/cheminfo/react-cheminfo/commit/da4d286a1d758d002afe6dfc2049399f87470b7d))
+
 ## [0.105.0](https://github.com/cheminfo/react-cheminfo/compare/v0.104.0...v0.105.0) (2026-11-09)
 
 
