@@ -1,6 +1,8 @@
 export type { DemoActionOptions, DemoActions } from './demoActions.ts';
 export { createDemoActions } from './demoActions.ts';
 export type { DemoCursor } from './demoCursor.ts';
+export type { DemoDragOptions } from './demoDrag.ts';
+export { dragNative, draggableAt } from './demoDrag.ts';
 export { createDemoCursor } from './demoCursor.ts';
 export type { DemoPoint } from './demoEvents.ts';
 export {

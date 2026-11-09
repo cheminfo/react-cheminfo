@@ -59,6 +59,18 @@
   display: inline-flex;
 }
 
+/* What a drag carries: the faint copy the browser draws under the pointer,
+   which dispatched drag events never draw. */
+.demo-drag-ghost {
+  position: fixed;
+  z-index: 2147482998;
+  top: 0;
+  left: 0;
+  box-shadow: var(--shadow-lg);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
 /* A click, marked where it lands. */
 .demo-cursor-ripple {
   position: fixed;

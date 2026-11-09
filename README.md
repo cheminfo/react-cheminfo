@@ -1544,6 +1544,12 @@ const REFLUX: Demo = {
 serveDemo('reflux', REFLUX);
 ```
 
+A drag from a `draggable` element — a tile of a panel — is carried as the
+browser carries it: a faint copy of the tile travels under the cursor and is
+dropped where it is let go, with the page's own `dragstart` and `drop`
+handlers reading one `DataTransfer`. A drag from anything else is a pointer
+drag.
+
 A target is an element, a selector, a point, or a function answering one, read
 again until it is there. A step back or a jump resets the tool and replays the
 steps before at once, so every step starts from the same place. The events go

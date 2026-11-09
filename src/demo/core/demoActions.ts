@@ -1,4 +1,5 @@
 import type { DemoCursor } from './demoCursor.ts';
+import { dragNative, draggableAt } from './demoDrag.ts';
 import type { DemoPoint } from './demoEvents.ts';
 import { movePointer, pressPointer, releasePointer } from './demoEvents.ts';
 import type { DemoTarget } from './demoTargets.ts';
@@ -17,7 +18,12 @@ export interface DemoActions {
   click: (target: DemoTarget) => Promise<void>;
   /** Double-click a target. */
   doubleClick: (target: DemoTarget) => Promise<void>;
-  /** Press on one target, drag to another, and let go. */
+  /**
+   * Press on one target, drag to another, and let go. A draggable element —
+   * a tile of a panel — is carried as the browser carries it, drawn faint
+   * under the cursor and dropped where it is let go; anything else is
+   * dragged with the pointer.
+   */
   drag: (from: DemoTarget, to: DemoTarget) => Promise<void>;
   /** Click a field and type into it, after what it holds. */
   type: (target: DemoTarget, text: string) => Promise<void>;
@@ -93,6 +99,19 @@ export function createDemoActions(options: DemoActionOptions): DemoActions {
     drag: async (from, to) => {
       const start = await reach(from);
       const end = await locate(to, signal);
+      const source = draggableAt(start);
+      if (source !== null) {
+        await dragNative({
+          source,
+          start,
+          end,
+          cursor,
+          signal,
+          fast,
+          frame: () => frame(signal),
+        });
+        return;
+      }
       cursor.press(true);
       pressPointer(start, 1);
       await frame(signal);
