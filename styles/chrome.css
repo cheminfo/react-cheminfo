@@ -2732,3 +2732,110 @@ button.empty-guide__figure:focus-visible img {
   color: var(--danger);
   font-size: 0.8125rem;
 }
+
+/* A folder panel: the documents a site keeps — saved, drafted, given as
+   examples — one row each, its name over when or what. */
+.folder-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.folder-panel__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.folder-panel__heading {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.folder-panel__list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  gap: 4px;
+  list-style: none;
+}
+
+.folder-panel__item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.folder-panel__open {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  gap: 8px;
+  text-align: left;
+}
+
+.folder-panel__open:hover:not(:disabled) {
+  background: var(--surface-sunken);
+}
+
+.folder-panel__open[aria-current='true'] {
+  border-color: var(--accent);
+}
+
+.folder-panel__open:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.folder-panel__thumbnail {
+  width: 4.5rem;
+  height: 3rem;
+  flex: 0 0 auto;
+}
+
+.folder-panel__text {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.folder-panel__name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-panel__time,
+.folder-panel__note {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.folder-panel__note,
+.folder-panel__problem {
+  margin: 8px 0 0;
+}
+
+.folder-panel__problem {
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
+.folder-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

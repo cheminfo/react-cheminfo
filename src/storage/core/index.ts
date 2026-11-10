@@ -18,6 +18,16 @@ export type { StorageUsage } from './persistentStorage.ts';
 export { requestPersistentStorage, storageUsage } from './persistentStorage.ts';
 export { watchPageLeave } from './watchPageLeave.ts';
 export { createWorkspaces } from './createWorkspaces.ts';
+export type {
+  SavedDocument,
+  SavedDocuments,
+  SavedDocumentsOptions,
+} from './createSavedDocuments.ts';
+export {
+  MAX_DOCUMENT_NAME,
+  createSavedDocuments,
+  nameKey,
+} from './createSavedDocuments.ts';
 export { documentFigure, openedFigureSvg } from './documentFigure.ts';
 export type {
   SiteDocument,
