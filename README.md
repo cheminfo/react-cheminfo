@@ -30,36 +30,37 @@ would mean two Blueprint style trees in one page.
 Subpaths are **bundle boundaries, not taxonomy**: a feature gets its own door
 only when it drags a heavy dependency behind it.
 
-| Import                             | Holds                                                 | Costs                                            |
-| ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
-| `react-cheminfo/core`              | every framework-free helper — 140 value exports       | nothing                                          |
-| `react-cheminfo/formula`           | formulas: read, compared, drawn and copied            | mf-parser, react-mf; React on the components     |
-| `react-cheminfo/ui`                | every React component and hook — 60 value exports     | React                                            |
-| `react-cheminfo/vite`              | the prerender plugin and the OG card                  | nothing; React on the card                       |
-| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware             | nothing                                          |
-| `react-cheminfo/server`            | the prerendered build, served from Node               | fastify, @fastify/static; Node only              |
-| `react-cheminfo/card`              | the card an answer is shown as in a chat              | React; cheminfo-mcp-server, an optional peer     |
-| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                          | React, molstar                                   |
-| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                | React, molstar                                   |
-| `react-cheminfo/structure`         | the structure editor and renderer                     | React, react-ocl, OCL                            |
-| `react-cheminfo/conformers`        | conformer generation, ranking and refinement          | OCL                                              |
-| `react-cheminfo/slides`            | the deck format and the slideshow player              | React, react-markdown                            |
-| `react-cheminfo/spectra`           | the spectra processing settings editors               | React; types only from spectra-processor, ml-pca |
-| `react-cheminfo/ir`                | the infrared chart, band table and editor             | React, ir-spectrum, convert-to-jcamp             |
-| `react-cheminfo/raman`             | the Raman editor: the infrared one, read for Raman    | the same as `react-cheminfo/ir`                  |
-| `react-cheminfo/uvvis`             | the UV-vis editor: the infrared one, read for UV-vis  | the same, and uv-spectrum once a file is read    |
-| `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor        | React, ms-spectrum, jcampconverter, xy-parser    |
-| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                        | nothing on import; xtb-wasm on the first call    |
-| `react-cheminfo/host`              | data handed over by a page that frames the tool       | nothing on import; ajv once the page is framed   |
-| `react-cheminfo/demo`              | a tool playing a steps slide's demo, with a cursor    | nothing; loaded only on a page with `?demo=`     |
-| `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests | nothing; Node only                               |
-| `react-cheminfo/playwright`        | the browser-suite configuration every site shares     | nothing; types from @playwright/test             |
-| `react-cheminfo/storage`           | work kept in the browser, workspaces, documents       | React on the backup menu; idb, @zip.js/zip.js    |
-| `react-cheminfo/drawing`           | the drawing editors' plane, pages, captions, pickers  | mf-parser; React and Blueprint on the components |
-| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet          | nothing                                          |
-| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours     | nothing                                          |
-| `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens         | nothing                                          |
-| `react-cheminfo/styles/demo.css`   | the demo cursor, on the family's tokens               | nothing                                          |
+| Import                             | Holds                                                   | Costs                                            |
+| ---------------------------------- | ------------------------------------------------------- | ------------------------------------------------ |
+| `react-cheminfo/core`              | every framework-free helper — 140 value exports         | nothing                                          |
+| `react-cheminfo/formula`           | formulas: read, compared, drawn and copied              | mf-parser, react-mf; React on the components     |
+| `react-cheminfo/ui`                | every React component and hook — 60 value exports       | React                                            |
+| `react-cheminfo/vite`              | the prerender plugin and the OG card                    | nothing; React on the card                       |
+| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware               | nothing                                          |
+| `react-cheminfo/server`            | the prerendered build, served from Node                 | fastify, @fastify/static; Node only              |
+| `react-cheminfo/card`              | the card an answer is shown as in a chat                | React; cheminfo-mcp-server, an optional peer     |
+| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                            | React, molstar                                   |
+| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                  | React, molstar                                   |
+| `react-cheminfo/structure`         | the structure editor and renderer                       | React, react-ocl, OCL                            |
+| `react-cheminfo/conformers`        | conformer generation, ranking and refinement            | OCL                                              |
+| `react-cheminfo/slides`            | the deck format and the slideshow player                | React, react-markdown                            |
+| `react-cheminfo/spectra`           | the spectra processing settings editors                 | React; types only from spectra-processor, ml-pca |
+| `react-cheminfo/ir`                | the infrared chart, band table and editor               | React, ir-spectrum, convert-to-jcamp             |
+| `react-cheminfo/raman`             | the Raman editor: the infrared one, read for Raman      | the same as `react-cheminfo/ir`                  |
+| `react-cheminfo/uvvis`             | the UV-vis editor: the infrared one, read for UV-vis    | the same, and uv-spectrum once a file is read    |
+| `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor          | React, ms-spectrum, jcampconverter, xy-parser    |
+| `react-cheminfo/xps`               | the XPS chart, peak, fit and composition tables, editor | React, xps-analysis, ml-gsd, xy-parser           |
+| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                          | nothing on import; xtb-wasm on the first call    |
+| `react-cheminfo/host`              | data handed over by a page that frames the tool         | nothing on import; ajv once the page is framed   |
+| `react-cheminfo/demo`              | a tool playing a steps slide's demo, with a cursor      | nothing; loaded only on a page with `?demo=`     |
+| `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests   | nothing; Node only                               |
+| `react-cheminfo/playwright`        | the browser-suite configuration every site shares       | nothing; types from @playwright/test             |
+| `react-cheminfo/storage`           | work kept in the browser, workspaces, documents         | React on the backup menu; idb, @zip.js/zip.js    |
+| `react-cheminfo/drawing`           | the drawing editors' plane, pages, captions, pickers    | mf-parser; React and Blueprint on the components |
+| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet            | nothing                                          |
+| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours       | nothing                                          |
+| `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens           | nothing                                          |
+| `react-cheminfo/styles/demo.css`   | the demo cursor, on the family's tokens                 | nothing                                          |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -99,6 +100,17 @@ resolving power measured on its peak widths, else the instrument its file
 names, else the decimals its masses were written with — which then decides
 how many decimals every mass is written with. The peaks of the selected
 spectrum are labelled as the chart is zoomed.
+
+`react-cheminfo/xps` is the third of the spectrum viewers, for X-ray
+photoelectron spectra: the same shell, the same three buckets of state, the same
+chart underneath, and none of the three imports another. It reads VAMAS and
+JCAMP-DX through `xps-analysis` and two columns of text through `xy-parser`, each
+reader fetched only once the bytes turn out to need it, and picks peaks with
+`ml-gsd`. Binding energy is drawn decreasing from left to right as a reversed
+axis, never as reversed data, so every search, integration and peak pick keeps
+an ascending x. A fit is the file's: the components, regions and sensitivity
+factors CasaXPS wrote are drawn and quantified as written, and a peak is never
+mistaken for a component.
 
 `react-cheminfo/xtb` is the door a page opens only when a visitor asks for a
 better number. `refineConformers` in
@@ -173,6 +185,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                       | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `PanelRow`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
 | **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `bandsFromUvPeaks`, `uvPeaksFromBands`, `loadUvVisSpectra`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                              | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`); `UvVisEditor` (`/uvvis`)                                                                                                                                                             |
 | **Mass spectra**           | `loadMassSpectra`, `toMassSpectra`, `analyseSpectrum`, `decideResolution`, `resolutionOf`, `mzDecimalsOf`, `planPeakLabels`, `peakTableRows`, `massSpectrumToJcamp`, `massReducer` (all `/mass`)                                                                                                                                                                                                                                    | `MassEditor`, `MassChart`, `SpectraPanel`, `PeaksPanel`, `MetadataPanel`, `useMassEditor` (all `/mass`)                                                                                                                                                                                                         |
+| **X-ray photoelectron**    | `loadSpectra`, `detectFormat`, `readAnalysisBlocks`, `pickPeaks`, `assignElements`, `referenceLevels`, `applyBackground`, `shirleyBackground`, `tougaardBackground`, `integrateWindow`, `quantifyComponents`, `toBindingEnergy`, `toKineticEnergy`, `xpsReducer` (all `/xps`)                                                                                                                                                       | `XpsEditor`, `XpsChart`, `SpectraPanel`, `PeaksPanel`, `ElementsPanel`, `ComponentsPanel`, `CompositionPanel`, `useXpsEditor` (all `/xps`)                                                                                                                                                                      |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                                                                                                                | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                                       |
 | **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                                                                                                                                                                                                     | `AboutPage`                                                                                                                                                                                                                                                                                                     |
 | **Which build is running** | `formatBuiltAt`, `shortCommit`, `BuildInfo`                                                                                                                                                                                                                                                                                                                                                                                         | `AboutVersion`, `cheminfoBuildInfo` (`/vite`)                                                                                                                                                                                                                                                                   |

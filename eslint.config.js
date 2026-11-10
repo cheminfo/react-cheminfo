@@ -18,7 +18,8 @@ export default defineConfig(
   {
     // The chart is what makes the viewers built on it siblings rather than a
     // stack, so it must never learn what any of them measures: an infrared
-    // spectrum, a mass spectrum and a glycan are all drawn by the same axes.
+    // spectrum, a mass spectrum, an XPS spectrum and a glycan are all drawn by
+    // the same axes.
     files: ['src/chart/**', 'src/panel/**', 'src/download/**'],
     rules: {
       'no-restricted-imports': [
@@ -29,6 +30,7 @@ export default defineConfig(
             '**/mass/**',
             '**/structure/**',
             '**/spectra/**',
+            '**/xps/**',
           ],
         },
       ],
