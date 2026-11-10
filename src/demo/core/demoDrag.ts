@@ -28,20 +28,30 @@ export interface DemoDragOptions {
  * wrote.
  *
  * The browser draws what is dragged as a faint copy under the pointer;
- * dispatched events draw nothing, so the demo draws that copy itself. A drag
- * the room cannot see is a piece that appears from nowhere.
+ * dispatched events draw nothing, so the demo draws that copy itself — or
+ * the image the page's `dragstart` handed to `setDragImage`, as the browser
+ * would, so a page that carries the dragged thing as itself is not covered
+ * by its tile. A drag the room cannot see is a piece that appears from
+ * nowhere.
  * @param options - See {@link DemoDragOptions}.
  */
 export async function dragNative(options: DemoDragOptions): Promise<void> {
   const { source, start, end, cursor, signal, fast, frame } = options;
   const transfer = new DataTransfer();
+  let image: DragImage | undefined;
+  // A constructed transfer draws nothing, so its image is kept for the ghost.
+  transfer.setDragImage = (element, x, y) => {
+    image = { element, x, y };
+  };
   cursor.press(true);
   pressPointer(start, 1);
   fireDrag(source, 'dragstart', start, transfer);
   source.dispatchEvent(
     new PointerEvent('pointercancel', { bubbles: true, isPrimary: true }),
   );
-  const ghost = createGhost(source, start);
+  const ghost = image
+    ? createImageGhost(image, start)
+    : createGhost(source, start);
   let over: Element | null = null;
   let accepted = false;
 
@@ -127,16 +137,51 @@ function fireDrag(
   );
 }
 
+/** The image a page gave its drag, and the point of it under the pointer. */
+interface DragImage {
+  element: Element;
+  x: number;
+  y: number;
+}
+
+/** What is drawn under the demo's pointer while it drags. */
+interface Ghost {
+  move: (point: DemoPoint) => void;
+  remove: () => void;
+}
+
+/**
+ * The image the page chose for its drag, held by the point it named.
+ * @param image - The image, and its point under the pointer.
+ * @param grab - Where the drag started.
+ * @returns How to move the image, and to take it away.
+ */
+function createImageGhost(image: DragImage, grab: DemoPoint): Ghost {
+  const holder = document.createElement('div');
+  holder.className = 'demo-drag-ghost demo-drag-ghost--image';
+  holder.setAttribute('aria-hidden', 'true');
+  holder.append(image.element.cloneNode(true));
+  document.body.append(holder);
+
+  function move(point: DemoPoint): void {
+    holder.style.transform = `translate(${point.x - image.x}px, ${point.y - image.y}px)`;
+  }
+  move(grab);
+  return {
+    move,
+    remove: () => {
+      holder.remove();
+    },
+  };
+}
+
 /**
  * A faint copy of what is dragged, held where it was grabbed.
  * @param source - What is dragged.
  * @param grab - Where it was grabbed.
  * @returns How to move the copy, and to take it away.
  */
-function createGhost(
-  source: Element,
-  grab: DemoPoint,
-): { move: (point: DemoPoint) => void; remove: () => void } {
+function createGhost(source: Element, grab: DemoPoint): Ghost {
   const box = source.getBoundingClientRect();
   const offset = { x: grab.x - box.left, y: grab.y - box.top };
   const copy = source.cloneNode(true) as Element;
