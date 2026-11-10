@@ -16,7 +16,7 @@ export function arrayOf<T>(
   if (!Array.isArray(value)) return items;
   for (const item of value) {
     const parsed = parse(item);
-    if (parsed) items.push(parsed);
+    if (parsed !== undefined) items.push(parsed);
   }
   return items;
 }

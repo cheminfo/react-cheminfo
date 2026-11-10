@@ -256,7 +256,7 @@ function strokeMarkup(
     (primitive.width === style.lineWidth
       ? ''
       : ` stroke-width="${number(primitive.width)}"`) +
-    ('color' in primitive && primitive.color
+    ('color' in primitive && primitive.color && primitive.outline !== false
       ? ` stroke="${primitive.color}"`
       : '');
   if (!primitive.dash) return width;
