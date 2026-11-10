@@ -19,6 +19,8 @@ export type {
 export { DocumentationDialogFrame } from './DocumentationDialogFrame.tsx';
 export type { FilterInputProps } from './FilterInput.tsx';
 export { FilterInput } from './FilterInput.tsx';
+export type { FixedPanelRowProps } from './FixedPanelRow.tsx';
+export { FixedPanelRow } from './FixedPanelRow.tsx';
 export type { HelpLabelProps } from './HelpLabel.tsx';
 export { HelpLabel } from './HelpLabel.tsx';
 export type {
@@ -44,6 +46,8 @@ export type {
 export { SidePanelStack } from './SidePanelStack.tsx';
 export type { SpectrumColorSwatchProps } from './SpectrumColorSwatch.tsx';
 export { SpectrumColorSwatch } from './SpectrumColorSwatch.tsx';
+export type { CollapsedPanels } from './useCollapsedPanels.ts';
+export { useCollapsedPanels } from './useCollapsedPanels.ts';
 export { useConfirmOnEnter } from './useConfirmOnEnter.ts';
 export type { PanelSettings, PanelSettingsValues } from './usePanelSettings.ts';
 export { usePanelSettings } from './usePanelSettings.ts';

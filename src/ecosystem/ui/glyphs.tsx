@@ -602,6 +602,36 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // Photoemission: an X-ray, the wave, strikes an atom and drives out one of
+  // its core electrons through the broken orbit — the dot in the answering
+  // colour, whose energy the spectrum reads.
+  xps: (alt) => (
+    <>
+      <path
+        d="M0 0q1.6-2.8 3.2 0t3.2 0t3.2 0"
+        transform="translate(3 3.5) rotate(55)"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M19.11 17.78A6.5 6.5 0 1 1 15.22 13.89"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <circle cx="13" cy="20" r="2.6" fill="#ffffff" />
+      <path
+        d="M19.5 13.5 21 12"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle cx="24.5" cy="8.5" r="3.6" fill={alt} />
+    </>
+  ),
   // A ring in ink, with a pen nib drawing its last bond in the answering
   // colour: a structure being drawn by hand.
   draw: (alt) => (

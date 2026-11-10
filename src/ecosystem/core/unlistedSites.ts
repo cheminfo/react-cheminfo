@@ -32,4 +32,18 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     // the ultramarine plate at 16 px.
     mark: { plate: '#2200c4', accent: '#f97316' },
   },
+  {
+    id: 'xps',
+    name: { lead: 'xps', alt: 'cheminfo', dot: true },
+    host: 'xps.cheminfo.org',
+    tagline: 'Read, fit and predict X-ray photoelectron spectra.',
+    group: 'spectra',
+    // Plum, 7.2:1 on white and 8.7 Oklab units from the nearest lead (tex);
+    // symmetry has since taken the rose and amber once kept for this site.
+    brand: '#97297b',
+    // The green an X-ray screen glows. It sits at 1.5:1 on white, so the
+    // wordmark sets its second half in this darker green, at 5:1.
+    brandAlt: '#4d7c0f',
+    mark: { plate: '#97297b', accent: '#a3e635' },
+  },
 ];

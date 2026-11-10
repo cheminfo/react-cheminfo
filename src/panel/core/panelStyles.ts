@@ -132,6 +132,9 @@ export const panelHeaderCellStyle = {
  */
 export const panelColumnButtonStyle = {
   all: 'unset',
+  // `all: unset` puts the box back to content-box, so the padding would be
+  // added to the full width and spill past the column.
+  boxSizing: 'border-box',
   display: 'block',
   width: '100%',
   padding: '3px 4px',

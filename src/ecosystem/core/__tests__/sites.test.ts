@@ -54,6 +54,7 @@ test('the sites not linked from the others yet are named apart', () => {
   expect(UNLISTED_SITES.map((site) => site.id)).toStrictEqual([
     'molecules',
     'mz',
+    'xps',
   ] satisfies SiteId[]);
 });
 

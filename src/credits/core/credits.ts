@@ -247,6 +247,15 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'xps-analysis',
+    name: 'xps-analysis',
+    href: 'https://www.npmjs.com/package/xps-analysis',
+    own: true,
+    description:
+      'reads VAMAS files, and the regions and components CasaXPS writes into them.',
+    license: 'MIT',
+  },
+  {
     id: 'spc-parser',
     name: 'spc-parser',
     href: 'https://www.npmjs.com/package/spc-parser',
@@ -519,6 +528,20 @@ export const CREDITS = [
     name: 'ChemExper',
     href: 'https://www.chemexper.com/',
     description: 'the catalogue the compounds and their spectra come from.',
+  },
+  {
+    id: 'qm9',
+    name: 'QM9',
+    href: 'https://doi.org/10.1038/sdata.2014.22',
+    description:
+      'the small organic molecules whose core-level binding energies were computed.',
+  },
+  {
+    id: 'xps-of-polymers',
+    name: 'The XPS of Polymers Database',
+    href: 'https://www.surfacespectra.com/',
+    description:
+      'the measured polymer spectra, by G. Beamson and D. Briggs, SurfaceSpectra.',
   },
   {
     id: 'wikipedia',
