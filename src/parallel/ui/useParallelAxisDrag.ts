@@ -85,6 +85,14 @@ export function useParallelAxisDrag(
   const { layouts, onAxisOrder } = options;
   const [active, setActive] = useState<ParallelAxisDragState | null>(null);
   const originRef = useRef(0);
+  // The drag is read back on release, outside a state updater: an updater may
+  // run twice, and the drop must reach `onAxisOrder` once.
+  const dragRef = useRef<ParallelAxisDragState | null>(null);
+
+  function show(drag: ParallelAxisDragState | null): void {
+    dragRef.current = drag;
+    setActive(drag);
+  }
 
   function move(from: number, to: number): void {
     if (onAxisOrder === undefined) return;
@@ -108,26 +116,21 @@ export function useParallelAxisDrag(
         event.preventDefault();
         event.currentTarget.setPointerCapture(event.pointerId);
         originRef.current = event.clientX;
-        setActive({ from: index, dx: 0, to: index });
+        show({ from: index, dx: 0, to: index });
       },
       onPointerMove: (event) => {
-        setActive((current) => {
-          if (current?.from !== index) return current;
-          const dx = event.clientX - originRef.current;
-          return { from: index, dx, to: dropAt(index, dx) };
-        });
+        if (dragRef.current?.from !== index) return;
+        const dx = event.clientX - originRef.current;
+        show({ from: index, dx, to: dropAt(index, dx) });
       },
       onPointerUp: (event) => {
         event.currentTarget.releasePointerCapture?.(event.pointerId);
-        setActive((current) => {
-          if (current !== null && current.from === index) {
-            move(current.from, current.to);
-          }
-          return null;
-        });
+        const drag = dragRef.current;
+        show(null);
+        if (drag?.from === index) move(drag.from, drag.to);
       },
       onPointerCancel: () => {
-        setActive(null);
+        show(null);
       },
       onKeyDown: (event) => {
         const step =
