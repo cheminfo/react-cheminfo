@@ -59,8 +59,11 @@ export function SpectrumSelection(props: SpectrumSelectionProps): ReactElement {
           autoComplete="off"
           value={draft.text}
           onValueChange={(typed) => {
-            setDraft({ text: typed, held: text });
-            onChange(readIds(typed));
+            const ids = readIds(typed);
+            // Held as the settings will read once the list is handed up, so
+            // the parent's answer is not taken for a change from elsewhere.
+            setDraft({ text: typed, held: asText(ids) });
+            onChange(ids);
           }}
         />
         <span style={HELP_STYLE}>
