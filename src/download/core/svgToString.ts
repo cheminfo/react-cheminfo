@@ -70,7 +70,12 @@ export function svgToString(
       `${round(box.x)} ${round(box.y)} ${round(box.width)} ${round(box.height)}`,
     );
   } else if (!clone.hasAttribute('viewBox')) {
-    clone.setAttribute('viewBox', `0 0 ${drawnWidth} ${drawnHeight}`);
+    // Without a view box the drawing is in pixels of the size it is shown at,
+    // so that is what the view box spans, whatever size the copy opens at.
+    clone.setAttribute(
+      'viewBox',
+      `0 0 ${side(rendered.width)} ${side(rendered.height)}`,
+    );
   }
 
   return new XMLSerializer().serializeToString(clone);
