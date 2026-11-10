@@ -11,6 +11,11 @@ const MARGIN = 0.08;
 
 const METADATA = /<metadata\b[^>]*>[\s\S]*?<\/metadata\s*>/g;
 
+// A compound number: a host shows the number beside the picture, and one of
+// a neighbour would peek in at its edge.
+const LABELS =
+  /<text\b[^>]*\sdata-cheminfo-ref="[^"]*"[^>]*>[\s\S]*?<\/text\s*>/g;
+
 /**
  * The picture of a referent, or of one of its members.
  * @param svg - The figure it is drawn in, as an SVG document.
@@ -38,11 +43,12 @@ export function referentPicture(
  * it was drawn at.
  * @param svg - The figure, as an SVG document.
  * @param box - The rectangle, in the figure's units.
- * @returns The figure showing only that rectangle, without its metadata: a
- * picture, not a document; the figure itself when its root cannot be read.
+ * @returns The figure showing only that rectangle, without its metadata and
+ * its compound numbers: a picture, not a document; the figure itself when its
+ * root cannot be read.
  */
 export function cropFigureToBox(svg: string, box: ReferentBox): string {
-  const text = svg.replaceAll(METADATA, '');
+  const text = svg.replaceAll(METADATA, '').replaceAll(LABELS, '');
   const root = /<svg\b[^>]*>/i.exec(text);
   if (!root) return svg;
   const margin = MARGIN * Math.max(box.width, box.height);

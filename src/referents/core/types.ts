@@ -105,9 +105,17 @@ export interface SeriesRow {
 }
 
 /**
+ * How the members of a series are numbered: after their compound's number by
+ * the letter of their row, 5a and 5b, or each by a number of its own, as a
+ * legend under a generic structure numbers the compounds it stands for.
+ */
+export type SeriesNumbering = 'letters' | 'numbers';
+
+/**
  * The variable part of a family of compounds: a column per generic position,
  * a row per member. Its rows are lettered in their order, and every compound
- * made from it shares those letters.
+ * made from it shares those letters — or each row is a compound numbered on
+ * its own.
  */
 export interface ReferentSeries {
   /** What names it. */
@@ -116,6 +124,11 @@ export interface ReferentSeries {
   columns: string[];
   /** The rows, in the order they are lettered. */
   rows: SeriesRow[];
+  /**
+   * How its members are numbered.
+   * @default 'letters'
+   */
+  numbering?: SeriesNumbering;
 }
 
 /** What a figure numbers. */

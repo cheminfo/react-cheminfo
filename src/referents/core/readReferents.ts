@@ -75,7 +75,9 @@ function readSeries(value: unknown): ReferentSeries | undefined {
     }
     rows.push({ id: item.id, values });
   }
-  return { key: value.key, columns, rows };
+  const series: ReferentSeries = { key: value.key, columns, rows };
+  if (value.numbering === 'numbers') series.numbering = 'numbers';
+  return series;
 }
 
 function readBox(value: unknown): ReferentBox | undefined {

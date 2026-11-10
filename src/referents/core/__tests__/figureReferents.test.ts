@@ -41,6 +41,12 @@ const REFERENTS: FigureReferents = {
   ],
   series: [
     { key: 's1', columns: ['R1'], rows: [{ id: 'r1', values: { R1: 'Me' } }] },
+    {
+      key: 's2',
+      columns: ['R2'],
+      rows: [{ id: 'r1', values: { R2: 'Br' } }],
+      numbering: 'numbers',
+    },
   ],
 };
 

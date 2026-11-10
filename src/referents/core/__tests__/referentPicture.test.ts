@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 
 import { withFigureReferents } from '../figureReferents.ts';
+import { labelAttributes } from '../labels.ts';
 import { cropFigureToBox, referentPicture } from '../referentPicture.ts';
 import type { FigureReferent } from '../types.ts';
 
@@ -35,6 +36,17 @@ test('the cut-out is a picture: none of the metadata of its figure goes with it'
 
   expect(referentPicture(svg, AMIDE)).toBe(
     '<svg xmlns="http://www.w3.org/2000/svg" width="43.5pt" height="24.75pt" viewBox="96 46 58 33"><rect width="400" height="200"/></svg>',
+  );
+});
+
+test('the cut-out leaves out the compound numbers, the host shows them beside it', () => {
+  const svg = FIGURE.replace(
+    '</svg>',
+    `<text x="125" y="90"${labelAttributes({ key: 'amide' })}>1</text><text x="0" y="9">kept</text></svg>`,
+  );
+
+  expect(referentPicture(svg, AMIDE)).toBe(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="43.5pt" height="24.75pt" viewBox="96 46 58 33"><rect width="400" height="200"/><text x="0" y="9">kept</text></svg>',
   );
 });
 

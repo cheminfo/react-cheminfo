@@ -142,3 +142,69 @@ test('rows run past the alphabet as a chemist would', () => {
     'ba',
   ]);
 });
+
+const BREITFUSSINS: FigureReferent = {
+  key: 'breitfussins',
+  idCode: 'GENERIC-B',
+  series: 'legend',
+  members: [{ row: 'a', idCode: 'BREITFUSSIN-A' }, { row: 'b' }, { row: 'd' }],
+};
+const LEGEND: ReferentSeries = {
+  key: 'legend',
+  columns: ['R1'],
+  rows: [
+    { id: 'a', values: { R1: 'I' } },
+    { id: 'b', values: { R1: 'H' } },
+    { id: 'd', values: { R1: 'Br' } },
+  ],
+  numbering: 'numbers',
+};
+
+test('the members of a series numbered on their own each take a number where first cited', () => {
+  const numbering = numberReferents({
+    referents: [ALDEHYDE, BREITFUSSINS],
+    series: [LEGEND],
+    order: [
+      { key: 'breitfussins', row: 'd' },
+      { key: 'ald' },
+      { key: 'breitfussins' },
+    ],
+  });
+
+  expect(
+    ['a', 'b', 'd'].map((row) => numbering.label({ key: 'breitfussins', row })),
+  ).toStrictEqual(['3', '4', '1']);
+  expect(numbering.label({ key: 'ald' })).toBe('2');
+  // The generic structure reads the list of its members.
+  expect(numbering.label({ key: 'breitfussins' })).toBe('1, 3, 4');
+  expect(numbering.label({ key: 'breitfussins', row: 'gone' })).toBe('?');
+  expect(numbering.numberOf('breitfussins')).toBeUndefined();
+});
+
+test('a member of a series numbered on its own drawn in full reads its own number', () => {
+  const drawn: FigureReferent = { key: 'drawn', idCode: 'BREITFUSSIN-A' };
+  const numbering = numberReferents({
+    referents: [BREITFUSSINS, drawn],
+    series: [LEGEND],
+    order: [{ key: 'drawn' }, { key: 'breitfussins' }],
+  });
+
+  expect(numbering.label({ key: 'drawn' })).toBe('1');
+  expect(numbering.label({ key: 'breitfussins' })).toBe('1–3');
+});
+
+test('a member of a series numbered on its own is pinned by its key and row', () => {
+  const numbering = numberReferents(
+    {
+      referents: [ALDEHYDE, BREITFUSSINS],
+      series: [LEGEND],
+      order: [{ key: 'ald' }, { key: 'breitfussins' }],
+    },
+    { pins: { 'breitfussins/a': 1 } },
+  );
+
+  expect(numbering.label({ key: 'ald' })).toBe('2');
+  expect(
+    ['a', 'b', 'd'].map((row) => numbering.label({ key: 'breitfussins', row })),
+  ).toStrictEqual(['1', '3', '4']);
+});
