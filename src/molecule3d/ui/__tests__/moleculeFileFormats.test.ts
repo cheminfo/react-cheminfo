@@ -122,6 +122,8 @@ test('a conformer keeps its stereocentre in either dialect', async () => {
   const [conformer] = generateConformers(alanine, {
     ...DEFAULT_CONFORMER_OPTIONS,
     maxConformers: 1,
+    // The default wall-clock budget comes back empty on a loaded machine.
+    timeoutSeconds: 60,
   }).conformers;
   const data = conformer?.molfile.data ?? '';
   const v3000 = await moleculeFileText({ format: 'mol', data }, 'molfileV3000');

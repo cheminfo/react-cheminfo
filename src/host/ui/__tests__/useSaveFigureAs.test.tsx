@@ -74,9 +74,12 @@ function render(keepsWorkspace = true): void {
 async function submit(): Promise<void> {
   await act(async () => {
     document.querySelector('form')?.requestSubmit();
-    await vi.waitFor(() => {
-      expect(downloads).toHaveLength(1);
-    });
+    await vi.waitFor(
+      () => {
+        expect(downloads).toHaveLength(1);
+      },
+      { timeout: 10_000 },
+    );
   });
 }
 

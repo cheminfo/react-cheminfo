@@ -5,6 +5,7 @@ import type { ChatFrameLog } from '../chatFrame.ts';
 import {
   frameAsChat,
   readChatFrameLog,
+  readClipboardHtml,
   readClipboardText,
   readClipboardTypes,
   readLastHeight,
@@ -109,4 +110,26 @@ test('the clipboard is reset, read as text, and read as the types it holds', asy
     'text/html',
     'image/png',
   ]);
+});
+
+test('the HTML on the clipboard is read off the item holding it, or is empty', async () => {
+  const html =
+    '<img data-cheminfo-figure="e1.abc" src="data:image/png;base64,">';
+  const items = [
+    { types: ['image/png'], getType: async () => new Blob([]) },
+    {
+      types: ['text/plain', 'text/html'],
+      getType: async (type: string) =>
+        new Blob([type === 'text/html' ? html : 'C8H10N4O2']),
+    },
+  ];
+  vi.stubGlobal('navigator', { clipboard: { read: async () => items } });
+
+  await expect(readClipboardHtml(fakePage().page)).resolves.toBe(html);
+
+  vi.stubGlobal('navigator', {
+    clipboard: { read: async () => [items[0]] },
+  });
+
+  await expect(readClipboardHtml(fakePage().page)).resolves.toBe('');
 });

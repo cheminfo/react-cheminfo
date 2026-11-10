@@ -1,6 +1,14 @@
-import { expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
-import { readStandInHostLog, startStandInHost } from '../standInHost.ts';
+import {
+  readStandInHostLog,
+  sendStandInHostRequest,
+  startStandInHost,
+} from '../standInHost.ts';
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 test('the host page is served on 127.0.0.1, carrying its setup in its address', async () => {
   const host = await startStandInHost();
@@ -57,4 +65,19 @@ test('a setup carrying a whole spectrum still opens the page', async () => {
   } finally {
     await host.close();
   }
+});
+
+test('a request is sent on the port once the tool has connected, and not before', () => {
+  const request = { type: 'get', id: 'g1', keys: ['figure'] };
+  vi.stubGlobal('hostPort', null);
+
+  expect(sendStandInHostRequest(request)).toBe(false);
+
+  const sent: unknown[] = [];
+  vi.stubGlobal('hostPort', {
+    postMessage: (message: unknown) => sent.push(message),
+  });
+
+  expect(sendStandInHostRequest(request)).toBe(true);
+  expect(sent).toStrictEqual([request]);
 });
