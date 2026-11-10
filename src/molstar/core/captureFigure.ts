@@ -1,7 +1,7 @@
 /**
- * A figure of the scene: the part of it holding the molecule, rendered no
- * larger than a figure needs and encoded to travel, rather than the whole pane
- * as the viewer shows it.
+ * A figure of the scene: the part of it holding the molecule — or the whole
+ * pane as the viewer shows it — rendered no larger than a figure needs and
+ * encoded to travel.
  */
 
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
@@ -30,16 +30,31 @@ const FIGURE_PADDING = 0.04;
  */
 const FIGURE_SAMPLE_LEVEL = 2;
 
+/** The whole frame, as a crop. */
+const WHOLE_FRAME = { x: 0, y: 0, width: 1, height: 1 };
+
+/** How {@link captureFigure} frames the figure. */
+export interface CaptureFigureOptions {
+  /**
+   * Keep the whole frame, background included, exactly as the viewer shows
+   * it, rather than the part holding the molecule.
+   * @default false
+   */
+  wholeFrame?: boolean;
+}
+
 /**
  * Render the part of the scene holding the molecule, as the viewer frames it,
  * no larger than `longest` on its longer side, as a JPEG.
  *
  * A quick render finds where the molecule stands; the frame is then rendered
  * at the size that brings that part to `longest` at most, and only that part
- * is read back and encoded.
+ * is read back and encoded. With `wholeFrame`, nothing is looked for and the
+ * whole frame is kept.
  * @param plugin - The molstar context.
  * @param size - The frame asked for, in pixels: the viewer times a scale.
  * @param longest - The longest side the figure may have, in pixels.
+ * @param options - See {@link CaptureFigureOptions}.
  * @returns The figure.
  * @throws {Error} When the plugin has no screenshot helper.
  */
@@ -47,18 +62,24 @@ export async function captureFigure(
   plugin: PluginContext,
   size: ImageSize,
   longest: number,
+  options: CaptureFigureOptions = {},
 ): Promise<RenderedFigure> {
+  const { wholeFrame = false } = options;
   const helper = pictureHelper(plugin, size);
   const cropParams = helper.cropParams;
   helper.behaviors.cropParams.next({
-    auto: true,
+    auto: !wholeFrame,
     relativePadding: FIGURE_PADDING,
   });
   try {
     return await plugin.runTask(
       Task.create('Render a figure', async (runtime) => {
-        await helper.getPreview(runtime, PREVIEW_SIDE);
-        const frame = figureFrame(size, helper.relativeCrop, longest);
+        let crop = WHOLE_FRAME;
+        if (!wholeFrame) {
+          await helper.getPreview(runtime, PREVIEW_SIDE);
+          crop = helper.relativeCrop;
+        }
+        const frame = figureFrame(size, crop, longest);
         const pass = helper.imagePass;
         const { multiSample } = pass.props;
         pass.setProps({
