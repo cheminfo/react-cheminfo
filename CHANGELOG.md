@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.111.0](https://github.com/cheminfo/react-cheminfo/compare/v0.110.1...v0.111.0) (2026-11-10)
+
+
+### Features
+
+* number a series row by row, and cite several compounds as one list ([4360510](https://github.com/cheminfo/react-cheminfo/commit/43605106b294b4415d54fee44b6e479cf0f46018))
+* number the compounds a figure labels, across a document ([e7da5c6](https://github.com/cheminfo/react-cheminfo/commit/e7da5c69716f427922e950c89517e7da24f22d0f))
+
 ## [0.110.1](https://github.com/cheminfo/react-cheminfo/compare/v0.110.0...v0.110.1) (2026-11-10)
 
 
