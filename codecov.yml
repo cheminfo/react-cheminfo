@@ -1,0 +1,11 @@
+# The shared Node.js workflow runs the suite on three Node versions (its default
+# `node-version-matrix`, 22, 24 and 26) and each uploads a report. Codecov posts
+# a status after every upload, so the first one alone was compared against the
+# merged base and read as a drop on commits that change no source at all. Keep
+# this number equal to the length of that matrix.
+codecov:
+  notify:
+    after_n_builds: 3
+
+comment:
+  after_n_builds: 3
