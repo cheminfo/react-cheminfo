@@ -6,11 +6,13 @@ export {
 } from './bundledPackages.ts';
 export type { BuildInfo } from './buildInfo.ts';
 export {
+  BUILD_INFO_FILE,
   UNRELEASED_VERSION,
   buildLabel,
   buildStamp,
   buildSummary,
   formatBuiltAt,
+  readBuildInfo,
   releasedVersion,
   shortCommit,
 } from './buildInfo.ts';

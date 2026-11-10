@@ -9,6 +9,8 @@ export type {
   ToolWindowEvent,
 } from './connectTool.ts';
 export { REQUEST_TIMEOUT, connectTool } from './connectTool.ts';
+export type { Deployment } from './probeDeployment.ts';
+export { PROBE_TIMEOUT, probeDeployment } from './probeDeployment.ts';
 export {
   FIGURE_INPUT,
   figureToolDocument,

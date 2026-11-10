@@ -32,6 +32,32 @@ export interface BuildInfo {
   deployment?: string;
 }
 
+/** Where a build publishes its record, at the root of the deployment. */
+export const BUILD_INFO_FILE = 'build-info.json';
+
+/**
+ * Read a build record off what a server answered. The record is fetched, so a
+ * proxy's error page or a build that publishes none must read as no record
+ * rather than throw.
+ * @param value - The parsed answer.
+ * @returns The record, or `undefined` when this is not one.
+ */
+export function readBuildInfo(value: unknown): BuildInfo | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const { version, builtAt, commit, reactCheminfo, deployment } =
+    value as Record<string, unknown>;
+  if (typeof version !== 'string' || typeof builtAt !== 'string') {
+    return undefined;
+  }
+  return {
+    version,
+    builtAt,
+    ...(typeof commit === 'string' && { commit }),
+    ...(typeof reactCheminfo === 'string' && { reactCheminfo }),
+    ...(typeof deployment === 'string' && { deployment }),
+  };
+}
+
 /**
  * The version a build reports when the repository has never been released.
  *

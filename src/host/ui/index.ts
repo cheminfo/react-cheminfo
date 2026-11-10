@@ -1,5 +1,7 @@
 export type { FramedToolUtilitiesProps } from './FramedToolUtilities.tsx';
 export { FramedToolUtilities } from './FramedToolUtilities.tsx';
+export type { FramedToolNoticeProps } from './FramedToolNotice.tsx';
+export { FramedToolNotice } from './FramedToolNotice.tsx';
 export type { OpenToolOptions } from './openTool.ts';
 export type { ToolSettingControlsProps } from './ToolSettingControls.tsx';
 export { ToolSettingControls } from './ToolSettingControls.tsx';

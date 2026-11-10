@@ -15,7 +15,7 @@ import { dirname, join, resolve } from 'node:path';
 import type { Plugin } from 'vite';
 
 import type { BuildInfo } from '../core/buildInfo.ts';
-import { UNRELEASED_VERSION } from '../core/buildInfo.ts';
+import { BUILD_INFO_FILE, UNRELEASED_VERSION } from '../core/buildInfo.ts';
 
 import { createPackageCollector } from './bundledPackages.ts';
 import { commitFromEnvironment, readGitHead } from './gitHead.ts';
@@ -49,7 +49,7 @@ export interface BuildInfoOptions {
  * @returns The Vite plugin.
  */
 export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
-  const { fileName = 'build-info.json' } = options;
+  const { fileName = BUILD_INFO_FILE } = options;
   let root = process.cwd();
   let outDir = 'dist';
   let info: BuildInfo = resolveBuildInfo(root);

@@ -6,6 +6,7 @@ import {
   buildStamp,
   buildSummary,
   formatBuiltAt,
+  readBuildInfo,
   releasedVersion,
   shortCommit,
 } from '../buildInfo.ts';
@@ -90,4 +91,28 @@ test('the summary is the whole record in one line', () => {
 
 test('the badge dates a build to the minute, in UTC', () => {
   expect(buildStamp('2026-09-16T09:41:07Z')).toBe('2026-09-16 09:41 UTC');
+});
+
+test('a record fetched from a deployment is read field by field', () => {
+  expect(
+    readBuildInfo({
+      version: '1.1.1',
+      builtAt: '2026-11-09T21:37:02Z',
+      commit: '53cfc02cdcdea00911c7f5a85e9d0651675ce99a',
+      reactCheminfo: '0.109.0',
+      extra: true,
+    }),
+  ).toStrictEqual({
+    version: '1.1.1',
+    builtAt: '2026-11-09T21:37:02Z',
+    commit: '53cfc02cdcdea00911c7f5a85e9d0651675ce99a',
+    reactCheminfo: '0.109.0',
+  });
+});
+
+test('an answer that is not a build record reads as none', () => {
+  expect(readBuildInfo('<!doctype html>')).toBeUndefined();
+  expect(readBuildInfo(null)).toBeUndefined();
+  expect(readBuildInfo({ version: '1.0.0' })).toBeUndefined();
+  expect(readBuildInfo({ version: '1.0.0', builtAt: 7 })).toBeUndefined();
 });
