@@ -47,6 +47,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/spectra`           | the spectra processing settings editors               | React; types only from spectra-processor, ml-pca |
 | `react-cheminfo/ir`                | the infrared chart, band table and editor             | React, ir-spectrum, convert-to-jcamp             |
 | `react-cheminfo/raman`             | the Raman editor: the infrared one, read for Raman    | the same as `react-cheminfo/ir`                  |
+| `react-cheminfo/uvvis`             | the UV-vis editor: the infrared one, read for UV-vis  | the same, and uv-spectrum once a file is read    |
 | `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor        | React, ms-spectrum, jcampconverter, xy-parser    |
 | `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                        | nothing on import; xtb-wasm on the first call    |
 | `react-cheminfo/host`              | data handed over by a page that frames the tool       | nothing on import; ajv once the page is framed   |
@@ -77,8 +78,11 @@ usual reason: reading a spectrum drags the formats one may arrive in —
 `convert-to-jcamp` for writing them back out, and a JCAMP or SPC reader fetched
 only once the bytes turn out to need it. `react-cheminfo/raman` opens the same
 viewer for Raman spectra — one value axis, the Raman shift running left to
-right, the bands picked on intensity and no correlation table — so a page
-imports each technique's viewer by name while both share one shell. The chart
+right, the bands picked on intensity and no correlation table — and
+`react-cheminfo/uvvis` opens it for UV-vis spectra, read by `uv-spectrum` over
+their wavelengths in nanometres, absorbance first, with every λmax picked and no
+correlation table; so a page imports each technique's viewer by name while all
+three share one shell. The chart
 it is drawn with is **not** behind that door: scales, ticks, plot geometry, the
 zoom gestures, the label placement and the panel chrome are in `core` and `ui`,
 because a spectrum of any kind is drawn with them and the next viewer built on
@@ -167,7 +171,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                                                                                                                        | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure`, `MoleculeExport` (`/structure`)                                                                                                                                                                                                             |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                                                                                                                          | —                                                                                                                                                                                                                                                                                                               |
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                       | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `PanelRow`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
-| **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                                                                          | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`)                                                                                                                                                                                       |
+| **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `bandsFromUvPeaks`, `uvPeaksFromBands`, `loadUvVisSpectra`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                              | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`); `UvVisEditor` (`/uvvis`)                                                                                                                                                             |
 | **Mass spectra**           | `loadMassSpectra`, `toMassSpectra`, `analyseSpectrum`, `decideResolution`, `resolutionOf`, `mzDecimalsOf`, `planPeakLabels`, `peakTableRows`, `massSpectrumToJcamp`, `massReducer` (all `/mass`)                                                                                                                                                                                                                                    | `MassEditor`, `MassChart`, `SpectraPanel`, `PeaksPanel`, `MetadataPanel`, `useMassEditor` (all `/mass`)                                                                                                                                                                                                         |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                                                                                                                | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                                       |
 | **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                                                                                                                                                                                                     | `AboutPage`                                                                                                                                                                                                                                                                                                     |
@@ -1131,23 +1135,27 @@ bands come back alone:
 | `spectra.ir.peaks`    | `{ peaks }`       | the same                                                 |
 | `spectra.raman.jdx`   | `{ jdx, peaks? }` | `{ wavenumber, intensity?, strength? }`                  |
 | `spectra.raman.peaks` | `{ peaks }`       | the same                                                 |
+| `spectra.uv.jdx`      | `{ jdx, peaks? }` | `{ wavelength, absorbance?, transmittance?, strength? }` |
+| `spectra.uv.peaks`    | `{ peaks }`       | the same                                                 |
 
 - **The item names the spectrum**: its `id` is the host's reference, and the
   bands come back under it; its `label` is what the tool shows. One item is one
   spectrum: when its JCAMP-DX holds several, the bands belong to the first.
 - **A strength is a word**, `weak`, `medium` or `strong`. A `transmittance` is
-  a fraction, not a percentage; an infrared wavenumber is above zero, and a
-  Raman shift may be negative. Only `wavenumber` is required: a value left out
-  is read off the spectrum.
+  a fraction, not a percentage; an infrared wavenumber is above zero, a Raman
+  shift may be negative, and a UV-vis wavelength is in nanometres. Only the
+  position — `wavenumber`, or `wavelength` for UV-vis — is required: a value
+  left out is read off the spectrum.
 - **Absent `peaks` are not empty `peaks`.** Absent, none were ever picked and
   the tool picks its own; empty, the host kept none and the tool keeps none.
 - **What comes back replaces what the host kept**: every band of the spectrum,
   ascending, one per wavenumber.
 
 `bandsFromIrPeaks` / `bandsFromRamanPeaks` and `irPeaksFromBands` /
-`ramanPeaksFromBands` (`/ir`, the Raman pair also from `/raman`) convert
-between those bands and the viewer's. No tool declares the bare `spectra.ir` or
-`spectra.raman`: either would take a list of bands for a spectrum, and
+`ramanPeaksFromBands`, `bandsFromUvPeaks` / `uvPeaksFromBands` (`/ir`, the
+Raman pair also from `/raman` and the UV-vis pair from `/uvvis`) convert
+between those bands and the viewer's. No tool declares the bare `spectra.ir`,
+`spectra.raman` or `spectra.uv`: each would take a list of bands for a spectrum, and
 pipeline's own `spectra.ir` is a computed spectrum, not a measurement.
 
 ### A mass spectrum, and the ions found in it

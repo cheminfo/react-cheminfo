@@ -1,21 +1,28 @@
 /**
- * Everything that differs between an infrared spectrum and a Raman one.
+ * Everything that differs between an infrared spectrum, a Raman one and a
+ * UV-vis one.
  *
- * Both are vibrational spectra over wavenumbers in cm⁻¹, and the viewer reads
- * them the same way — one chart, one set of panels, one set of gestures — so
- * what is left to differ is a handful of facts: which value axes a spectrum is
- * read on, what the horizontal axis is called and which way it runs, whether the
- * correlation table has anything to say about a band, and what a written file
- * calls itself. They are gathered here for the reason `IR_MODE_RULES` gathers
- * what differs between the value axes: a component that asked which technique
- * it was drawing would be the first of many to ask, and they would come to
- * disagree.
+ * The viewer reads all three the same way — one chart, one set of panels, one
+ * set of gestures — so what is left to differ is a handful of facts: which value
+ * axes a spectrum is read on, what the horizontal axis is called, in which unit
+ * and which way it runs, whether the correlation table has anything to say
+ * about a band, and what a written file calls itself. They are gathered here for
+ * the reason `IR_MODE_RULES` gathers what differs between the value axes: a
+ * component that asked which technique it was drawing would be the first of many
+ * to ask, and they would come to disagree.
+ *
+ * The horizontal position of a point and of a band is held as `wavenumber`
+ * whatever the technique, as the Raman shift already is: for a UV-vis spectrum
+ * it is a wavelength in nanometres, and `unit` says so wherever it is written.
  */
 
 import type { IrMode } from './irSpectrum.ts';
 
-/** What was measured: the light a sample absorbs, or the light it scatters. */
-export type IrTechnique = 'infrared' | 'raman';
+/**
+ * What was measured: the infrared light a sample absorbs, the light it
+ * scatters, or the ultraviolet and visible light it absorbs.
+ */
+export type IrTechnique = 'infrared' | 'raman' | 'uvvis';
 
 /** What is true of one technique. */
 export interface IrTechniqueRules {
@@ -25,6 +32,10 @@ export interface IrTechniqueRules {
   modes: readonly IrMode[];
   /** What the horizontal axis is called. */
   xTitle: string;
+  /** The unit of the horizontal axis, as it is written after a number. */
+  unit: string;
+  /** The `##XUNITS=` a written spectrum states. */
+  jcampXUnits: string;
   /** Whether the horizontal axis runs from high at the left to low at the right. */
   reverseX: boolean;
   /** Whether the correlation table is asked what a band might be. */
@@ -34,7 +45,11 @@ export interface IrTechniqueRules {
 }
 
 /** The techniques, in the order a control would offer them. */
-export const IR_TECHNIQUES: readonly IrTechnique[] = ['infrared', 'raman'];
+export const IR_TECHNIQUES: readonly IrTechnique[] = [
+  'infrared',
+  'raman',
+  'uvvis',
+];
 
 /** How each technique behaves, every fact in one place. */
 export const IR_TECHNIQUE_RULES = {
@@ -42,6 +57,8 @@ export const IR_TECHNIQUE_RULES = {
     name: 'infrared',
     modes: ['transmittance', 'absorbance'],
     xTitle: 'wavenumber (cm⁻¹)',
+    unit: 'cm⁻¹',
+    jcampXUnits: '1/CM',
     /**
      * 4000 at the left and 400 at the right, which is how every infrared
      * spectrum has been printed since the instruments scanned that way.
@@ -55,6 +72,8 @@ export const IR_TECHNIQUE_RULES = {
     /** One axis: a Raman spectrum is the light scattered, and nothing else. */
     modes: ['intensity'],
     xTitle: 'Raman shift (cm⁻¹)',
+    unit: 'cm⁻¹',
+    jcampXUnits: '1/CM',
     /** The shift grows away from the laser line, left to right. */
     reverseX: false,
     /**
@@ -65,6 +84,22 @@ export const IR_TECHNIQUE_RULES = {
      */
     assignments: false,
     dataType: 'RAMAN SPECTRUM',
+  },
+  uvvis: {
+    name: 'UV-vis',
+    /**
+     * Absorbance first: a UV-vis spectrum is read for its maxima, and the
+     * Beer–Lambert law a chemist applies to them is written in absorbance.
+     */
+    modes: ['absorbance', 'transmittance'],
+    xTitle: 'wavelength (nm)',
+    unit: 'nm',
+    jcampXUnits: 'NANOMETERS',
+    /** The wavelength grows left to right, from the ultraviolet to the red. */
+    reverseX: false,
+    /** The table holds infrared group frequencies, which say nothing here. */
+    assignments: false,
+    dataType: 'UV/VIS SPECTRUM',
   },
 } as const satisfies Record<IrTechnique, IrTechniqueRules>;
 
@@ -103,13 +138,18 @@ export function irModeFor(technique: IrTechnique, mode?: IrMode): IrMode {
 }
 
 /**
- * The technique that reads its spectra on a value axis.
+ * The first technique, in the order of `IR_TECHNIQUES`, that reads its spectra
+ * on a value axis.
  *
- * Every axis belongs to exactly one technique, so the axis a file was written
- * on says what was measured.
+ * Absorbance and transmittance are read by both infrared and UV-vis, so this
+ * names infrared for them; it is a default for a caller that knows nothing
+ * more, and every caller that knows its technique passes it instead.
  * @param mode - The value axis.
- * @returns The technique offering it.
+ * @returns The first technique offering it.
  */
 export function irModeTechnique(mode: IrMode): IrTechnique {
-  return offersIrMode('raman', mode) ? 'raman' : 'infrared';
+  for (const technique of IR_TECHNIQUES) {
+    if (offersIrMode(technique, mode)) return technique;
+  }
+  return 'infrared';
 }

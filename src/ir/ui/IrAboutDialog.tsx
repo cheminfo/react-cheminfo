@@ -4,6 +4,7 @@ import { Prose } from '../../i18n/ui/Prose.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { irCommands } from '../core/irCommands.ts';
 import type { IrTechnique } from '../core/irTechnique.ts';
+import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 
 import { IrLogo } from './IrLogo.tsx';
 import { useIrText } from './useIrText.ts';
@@ -53,6 +54,11 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
             <p style={leadStyle}>{DOORS[technique]}</p>
             {raman ? (
               <p style={paragraphStyle}>{t('ir.raman.aboutLead')}</p>
+            ) : technique === 'uvvis' ? (
+              <p style={paragraphStyle}>
+                Draws UV-vis spectra over their wavelengths, reads them as
+                absorbance or as percent transmittance, and picks every λmax.
+              </p>
             ) : (
               <p style={paragraphStyle}>
                 Draws an infrared spectrum the way infrared is printed, reads it
@@ -72,6 +78,19 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
               </li>
               <li>
                 <Prose text={t('ir.raman.credit.jcamp')} />
+              </li>
+            </>
+          ) : technique === 'uvvis' ? (
+            <>
+              <li>
+                <strong>uv-spectrum</strong> (cheminfo, MIT) reads the JCAMP-DX,
+                SPC, PerkinElmer SP, Cary Eclipse and text files, and derives
+                the absorbance/transmittance pair.
+              </li>
+              <li>
+                <strong>ir-spectrum</strong>, <strong>common-spectrum</strong>{' '}
+                and <strong>spc-parser</strong> (cheminfo, MIT) pick the maxima
+                and read the files through.
               </li>
             </>
           ) : (
@@ -102,7 +121,7 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
             <strong>react-science</strong> and <strong>BlueprintJS</strong>
             (zakodium, Palantir) for the shell this viewer is shaped like.
           </li>
-          {raman ? null : (
+          {IR_TECHNIQUE_RULES[technique].assignments ? (
             <li>
               The <strong>correlation table</strong> is the conventional
               teaching set of group frequencies, as any introductory
@@ -110,7 +129,7 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
               rounded, generous ones: narrowing them to look precise would rule
               out assignments that are genuinely possible.
             </li>
-          )}
+          ) : null}
           <li>
             The <strong>colours</strong> are Okabe and Ito&apos;s
             colour-universal palette, so two traces stay distinguishable for a
@@ -126,6 +145,7 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
 const DOORS: Record<IrTechnique, string> = {
   infrared: 'react-cheminfo/ir',
   raman: 'react-cheminfo/raman',
+  uvvis: 'react-cheminfo/uvvis',
 };
 
 const dialogStyle = { width: 'min(680px, 92vw)' } as const;

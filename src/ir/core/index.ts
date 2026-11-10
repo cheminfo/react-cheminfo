@@ -14,7 +14,10 @@
  * differs for it is in `IR_TECHNIQUE_RULES`.
  */
 
-export type { LoadedIrSpectrum } from './analysisSpectra.ts';
+export type {
+  AbsorptionTechnique,
+  LoadedIrSpectrum,
+} from './analysisSpectra.ts';
 export { analysisSpectra } from './analysisSpectra.ts';
 export type { AssignBandsOptions, AssignedBand } from './assignBands.ts';
 export { assignBands, bandLabel, countAssigned } from './assignBands.ts';
@@ -34,8 +37,10 @@ export {
 export {
   bandsFromIrPeaks,
   bandsFromRamanPeaks,
+  bandsFromUvPeaks,
   irPeaksFromBands,
   ramanPeaksFromBands,
+  uvPeaksFromBands,
 } from './irPeaks.ts';
 export type { IrJcampReadOptions } from './fromJcamp.ts';
 export type { IrSpcReadOptions } from './fromSpc.ts';
@@ -137,6 +142,7 @@ export type {
   LoadIrSpectraResult,
 } from './loadIrSpectra.ts';
 export { loadIrSpectra } from './loadIrSpectra.ts';
+export { loadUvVisSpectra } from './loadUvVisSpectra.ts';
 export { BAND_HIT_RADIUS, nearestBandAt } from './nearestBand.ts';
 export type { PickBandsOptions } from './pickBands.ts';
 export { pickBands } from './pickBands.ts';

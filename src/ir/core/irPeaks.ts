@@ -1,10 +1,12 @@
 /**
  * The bands of a spectrum as a host writes them, and back: the peaks of the
- * host protocol's `spectra.ir.*` and `spectra.raman.*` kinds.
+ * host protocol's `spectra.ir.*`, `spectra.raman.*` and `spectra.uv.*` kinds.
  *
- * A peak differs from the band the viewer holds in two ways only: an infrared
+ * A peak differs from the band the viewer holds in two ways only: a
  * transmittance is a fraction where the viewer holds a percentage, and a
  * strength is a word (`strong`) where the viewer holds a table's letter (`S`).
+ * A UV-vis peak names its position `wavelength`, which the viewer holds as
+ * `wavenumber` whatever the technique.
  */
 
 import { xFindClosestIndex } from 'ml-spectra-processing';
@@ -12,6 +14,7 @@ import { xFindClosestIndex } from 'ml-spectra-processing';
 import type { BandStrength } from '../../host/core/bandStrength.ts';
 import type { IrPeakValue } from '../../host/core/irKinds.ts';
 import type { RamanPeakValue } from '../../host/core/ramanKinds.ts';
+import type { UvPeakValue } from '../../host/core/uvKinds.ts';
 
 import { bandAtIndex } from './handPicking.ts';
 import type { IrBand, IrBandStrength } from './irBand.ts';
@@ -56,6 +59,24 @@ export function bandsFromRamanPeaks(
 }
 
 /**
+ * The maxima a host handed over with a UV-vis spectrum, kept as
+ * {@link bandsFromIrPeaks} keeps infrared bands.
+ * @param spectrum - The spectrum they were picked on.
+ * @param peaks - The peaks, in any order.
+ * @returns The bands, ascending, one per wavelength.
+ */
+export function bandsFromUvPeaks(
+  spectrum: IrSpectrum,
+  peaks: readonly UvPeakValue[],
+): IrBand[] {
+  const positioned: Array<IrPeakValue & { wavelength: number }> = [];
+  for (const peak of peaks) {
+    positioned.push({ ...peak, wavenumber: peak.wavelength });
+  }
+  return bandsFromIrPeaks(spectrum, positioned);
+}
+
+/**
  * An infrared spectrum's bands as a host keeps them: `spectra.ir.peaks`.
  * @param bands - The bands, as the viewer holds them.
  * @returns The peaks, in the same order.
@@ -71,6 +92,19 @@ export function irPeaksFromBands(bands: readonly IrBand[]): IrPeakValue[] {
         : { transmittance: transmittance / 100 }),
       strength: WORDS[strength],
     });
+  }
+  return peaks;
+}
+
+/**
+ * A UV-vis spectrum's maxima as a host keeps them: `spectra.uv.peaks`.
+ * @param bands - The bands, as the viewer holds them.
+ * @returns The peaks, in the same order.
+ */
+export function uvPeaksFromBands(bands: readonly IrBand[]): UvPeakValue[] {
+  const peaks: UvPeakValue[] = [];
+  for (const { wavenumber, ...rest } of irPeaksFromBands(bands)) {
+    peaks.push({ wavelength: wavenumber, ...rest });
   }
   return peaks;
 }

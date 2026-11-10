@@ -8,7 +8,8 @@
  * to guess which. `##YUNITS=` states it, and `ir-spectrum` reads it back and
  * derives the other axis from it, so a spectrum written here returns carrying
  * both. A Raman spectrum is written as its intensity, under a `##DATA TYPE=`
- * that says it is Raman.
+ * that says it is Raman, and a UV-vis one over its wavelengths in nanometres,
+ * which `uv-spectrum` reads back the same way.
  *
  * The points are written as an `##PEAK TABLE=` of explicit `x y` pairs rather
  * than as a compressed `##XYDATA=` record. An XYDATA record states a first
@@ -21,6 +22,7 @@
 import { fromJSON } from 'convert-to-jcamp';
 
 import type { IrMode, IrSpectrum } from './irSpectrum.ts';
+import type { IrTechnique } from './irTechnique.ts';
 import { IR_TECHNIQUE_RULES, irModeTechnique } from './irTechnique.ts';
 
 /** The extension a written spectrum is saved under. */
@@ -44,10 +46,16 @@ export const DEFAULT_DATA_TYPE = IR_TECHNIQUE_RULES.infrared.dataType;
  * written as its intensity.
  * @param spectrum - The spectrum.
  * @param mode - The axis being read, used when the file named none.
+ * @param technique - What was measured, which names the data type and the unit
+ * of the horizontal axis. Defaults to the first technique reading `mode`.
  * @returns The block, `##TITLE=` through `##END=`.
  * @throws {Error} When the spectrum carries no value axis at all.
  */
-export function irSpectrumToJcamp(spectrum: IrSpectrum, mode: IrMode): string {
+export function irSpectrumToJcamp(
+  spectrum: IrSpectrum,
+  mode: IrMode,
+  technique?: IrTechnique,
+): string {
   const written = writtenAxis(spectrum, mode);
   const values = spectrum[written];
   if (values === undefined) {
@@ -55,7 +63,14 @@ export function irSpectrumToJcamp(spectrum: IrSpectrum, mode: IrMode): string {
   }
   return fromJSON(
     { x: spectrum.wavenumber, y: values },
-    { info: infoRecords(spectrum, written), meta: metaRecords(spectrum) },
+    {
+      info: infoRecords(
+        spectrum,
+        written,
+        technique ?? irModeTechnique(written),
+      ),
+      meta: metaRecords(spectrum),
+    },
   );
 }
 
@@ -74,21 +89,24 @@ export function irSpectrumToJcamp(spectrum: IrSpectrum, mode: IrMode): string {
  * spectrum would have written.
  * @param spectra - The spectra, in the order the list holds them.
  * @param mode - The axis being read, used for a spectrum whose file named none.
+ * @param technique - What was measured. Defaults to the first technique
+ * reading `mode`.
  * @param title - What to call the file's own outer block. Defaults to the
- * count and the technique that reads `mode`: `2 infrared spectra`.
+ * count and the technique: `2 infrared spectra`.
  * @returns The file.
  */
 export function irSpectraToJcamp(
   spectra: readonly IrSpectrum[],
   mode: IrMode,
-  title = `${spectra.length} ${IR_TECHNIQUE_RULES[irModeTechnique(mode)].name} spectra`,
+  technique: IrTechnique = irModeTechnique(mode),
+  title = `${spectra.length} ${IR_TECHNIQUE_RULES[technique].name} spectra`,
 ): string {
   const only = spectra.length === 1 ? spectra[0] : undefined;
-  if (only !== undefined) return irSpectrumToJcamp(only, mode);
+  if (only !== undefined) return irSpectrumToJcamp(only, mode, technique);
 
   const blocks: string[] = [];
   for (const spectrum of spectra) {
-    blocks.push(irSpectrumToJcamp(spectrum, mode));
+    blocks.push(irSpectrumToJcamp(spectrum, mode, technique));
   }
   return `##TITLE=${recordValue(title)}
 ##JCAMP-DX=4.24
@@ -129,21 +147,22 @@ const WRITTEN_AXES: readonly IrMode[] = [
  * The standard records of a block: what it is called, and what its axes are.
  * @param spectrum - The spectrum.
  * @param written - The axis being written.
+ * @param measured - What was measured.
  * @returns The records, as `convert-to-jcamp` takes them.
  */
 function infoRecords(
   spectrum: IrSpectrum,
   written: IrMode,
+  measured: IrTechnique,
 ): Record<string, string> {
+  const rules = IR_TECHNIQUE_RULES[measured];
   return {
     title: recordValue(spectrum.name),
-    // The technique as the file stated it, and otherwise the one the written
-    // axis belongs to, so a Raman spectrum is never written out claiming to be
+    // The technique as the file stated it, and otherwise the one being read,
+    // so a Raman or UV-vis spectrum is never written out claiming to be
     // infrared.
-    dataType:
-      technique(spectrum) ??
-      IR_TECHNIQUE_RULES[irModeTechnique(written)].dataType,
-    xUnits: '1/CM',
+    dataType: statedTechnique(spectrum) ?? rules.dataType,
+    xUnits: rules.jcampXUnits,
     yUnits: Y_UNITS[written],
   };
 }
@@ -192,7 +211,7 @@ const TECHNIQUE = 'Technique';
  * @param spectrum - The spectrum.
  * @returns The technique, or `undefined` when the file stated none.
  */
-function technique(spectrum: IrSpectrum): string | undefined {
+function statedTechnique(spectrum: IrSpectrum): string | undefined {
   for (const field of spectrum.meta?.fields ?? []) {
     if (field.label === TECHNIQUE) return recordValue(field.value);
   }

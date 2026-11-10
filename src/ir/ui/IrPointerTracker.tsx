@@ -23,6 +23,11 @@ export interface IrPointerTrackerProps {
   readout: IrReadout | null;
   /** Where the plot sits inside the SVG. */
   plot: PlotRect;
+  /**
+   * The unit of the horizontal axis, as `IR_TECHNIQUE_RULES` writes it.
+   * @default 'cm⁻¹'
+   */
+  unit?: string;
 }
 
 /**
@@ -43,12 +48,12 @@ export interface IrPointerTrackerProps {
 export function IrPointerTracker(
   props: IrPointerTrackerProps,
 ): ReactElement | null {
-  const { position, readout, plot } = props;
+  const { position, readout, plot, unit = 'cm⁻¹' } = props;
   if (position === null || readout === null) return null;
 
   const band = readout.band;
   const lines = [
-    `${formatWavenumber(readout.wavenumber)} cm⁻¹`,
+    `${formatWavenumber(readout.wavenumber)} ${unit}`,
     `${shortModeLabel(readout.mode)} ${formatIrValue(readout.value, readout.mode)}`,
   ];
   if (band !== null) {

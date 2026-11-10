@@ -59,7 +59,7 @@ export function BandsPanel(props: BandsPanelProps) {
   const { state, selectedSpectrum, assigned } = useIrEditorState();
   const actions = useIrActions();
   const { mode, pickBands, technique } = state.settings;
-  const { assignments } = IR_TECHNIQUE_RULES[technique];
+  const { assignments, unit } = IR_TECHNIQUE_RULES[technique];
   const empty = emptyMessage(selectedSpectrum, pickBands, assigned.length);
 
   function remove(band: IrBand): void {
@@ -80,7 +80,7 @@ export function BandsPanel(props: BandsPanelProps) {
           <table style={panelTableStyle}>
             <thead>
               <tr>
-                <th style={panelHeaderCellStyle}>cm⁻¹</th>
+                <th style={panelHeaderCellStyle}>{unit}</th>
                 <th style={panelHeaderCellStyle} />
                 <th style={{ ...panelHeaderCellStyle, textAlign: 'right' }}>
                   {shortModeLabel(mode)}
@@ -98,6 +98,7 @@ export function BandsPanel(props: BandsPanelProps) {
                   entry={entry}
                   mode={mode}
                   assignments={assignments}
+                  unit={unit}
                   lit={sameIrBand(entry.band, highlight)}
                   onHighlight={onHighlight}
                   onRemove={remove}

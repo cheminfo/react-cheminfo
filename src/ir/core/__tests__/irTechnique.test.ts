@@ -36,12 +36,14 @@ const raman: IrSpectrum = {
   visible: true,
 };
 
-test('infrared keeps every fact it had, Raman states its own', () => {
-  expect(IR_TECHNIQUES).toStrictEqual(['infrared', 'raman']);
+test('infrared keeps every fact it had, Raman and UV-vis state their own', () => {
+  expect(IR_TECHNIQUES).toStrictEqual(['infrared', 'raman', 'uvvis']);
   expect(IR_TECHNIQUE_RULES.infrared).toStrictEqual({
     name: 'infrared',
     modes: ['transmittance', 'absorbance'],
     xTitle: 'wavenumber (cm⁻¹)',
+    unit: 'cm⁻¹',
+    jcampXUnits: '1/CM',
     reverseX: true,
     assignments: true,
     dataType: 'INFRARED SPECTRUM',
@@ -50,15 +52,28 @@ test('infrared keeps every fact it had, Raman states its own', () => {
     name: 'Raman',
     modes: ['intensity'],
     xTitle: 'Raman shift (cm⁻¹)',
+    unit: 'cm⁻¹',
+    jcampXUnits: '1/CM',
     reverseX: false,
     assignments: false,
     dataType: 'RAMAN SPECTRUM',
+  });
+  expect(IR_TECHNIQUE_RULES.uvvis).toStrictEqual({
+    name: 'UV-vis',
+    modes: ['absorbance', 'transmittance'],
+    xTitle: 'wavelength (nm)',
+    unit: 'nm',
+    jcampXUnits: 'NANOMETERS',
+    reverseX: false,
+    assignments: false,
+    dataType: 'UV/VIS SPECTRUM',
   });
 });
 
 test('a viewer opens on the first mode its technique offers', () => {
   expect(defaultIrMode('infrared')).toBe('transmittance');
   expect(defaultIrMode('raman')).toBe('intensity');
+  expect(defaultIrMode('uvvis')).toBe('absorbance');
 });
 
 test('a mode the technique does not offer falls back to its first', () => {
@@ -69,9 +84,11 @@ test('a mode the technique does not offer falls back to its first', () => {
   expect(irModeFor('raman', 'transmittance')).toBe('intensity');
   expect(offersIrMode('raman', 'intensity')).toBe(true);
   expect(offersIrMode('raman', undefined)).toBe(false);
+  expect(irModeFor('uvvis', 'transmittance')).toBe('transmittance');
+  expect(irModeFor('uvvis', 'intensity')).toBe('absorbance');
 });
 
-test('every value axis belongs to exactly one technique', () => {
+test('UV-vis shares the infrared axes, and a mode alone names infrared', () => {
   const owners: Array<[IrMode, string[]]> = [];
   for (const mode of Object.keys(IR_MODE_RULES) as IrMode[]) {
     const offering: string[] = [];
@@ -82,8 +99,8 @@ test('every value axis belongs to exactly one technique', () => {
   }
 
   expect(owners).toStrictEqual([
-    ['transmittance', ['infrared']],
-    ['absorbance', ['infrared']],
+    ['transmittance', ['infrared', 'uvvis']],
+    ['absorbance', ['infrared', 'uvvis']],
     ['intensity', ['raman']],
   ]);
   expect(irModeTechnique('transmittance')).toBe('infrared');
@@ -98,6 +115,9 @@ test('the toggle never leaves the technique', () => {
   expect(otherIrMode('absorbance', 'infrared')).toBe('transmittance');
   // A mode foreign to the technique toggles to the technique's own first.
   expect(otherIrMode('intensity', 'infrared')).toBe('transmittance');
+  expect(otherIrMode('absorbance', 'uvvis')).toBe('transmittance');
+  expect(otherIrMode('transmittance', 'uvvis')).toBe('absorbance');
+  expect(otherIrMode('intensity', 'uvvis')).toBe('absorbance');
 });
 
 test('intensity stands up from zero and answers both drags and the wheel', () => {
@@ -147,4 +167,7 @@ test('a range is written in the order its axis is read', () => {
   expect(formatWavenumberRange(shifts, false)).toBe('150–3200 cm⁻¹');
   expect(formatWavenumberRange(shifts, true)).toBe('3200–150 cm⁻¹');
   expect(formatWavenumberRange(new Float64Array(0), false)).toBe('');
+  expect(
+    formatWavenumberRange(Float64Array.from([190, 799.6]), false, 'nm'),
+  ).toBe('190–800 nm');
 });

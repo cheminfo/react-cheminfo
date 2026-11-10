@@ -10,7 +10,7 @@ import { chartSurfaceStyle } from '../../chart/ui/chartSurface.ts';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
 import type { AssignedBand } from '../core/assignBands.ts';
 import type { IrBand } from '../core/irBand.ts';
-import { irModeFor } from '../core/irTechnique.ts';
+import { IR_TECHNIQUE_RULES, irModeFor } from '../core/irTechnique.ts';
 import { BAND_HIT_RADIUS } from '../core/nearestBand.ts';
 
 import { BandMarks } from './BandMarks.tsx';
@@ -218,6 +218,7 @@ export function IrChart(props: IrChartProps): ReactElement {
           position={pointer.position}
           readout={pointer.readout}
           plot={plot}
+          unit={IR_TECHNIQUE_RULES[technique].unit}
         />
       </svg>
     </div>

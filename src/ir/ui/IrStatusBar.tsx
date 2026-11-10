@@ -34,13 +34,13 @@ export function IrStatusBar() {
   const { spectra } = state.data;
   const { error, tool } = state.view;
   const { mode, pickBands, technique } = state.settings;
-  const { reverseX, assignments } = IR_TECHNIQUE_RULES[technique];
+  const { reverseX, assignments, unit } = IR_TECHNIQUE_RULES[technique];
   const text = useIrText(technique);
 
   const range =
     selectedSpectrum === null
       ? ''
-      : formatWavenumberRange(selectedSpectrum.wavenumber, reverseX);
+      : formatWavenumberRange(selectedSpectrum.wavenumber, reverseX, unit);
 
   return (
     <div style={barStyle}>

@@ -5,7 +5,8 @@
  *
  * The names are pipeline's (`chem.molfile.2d`, `chem.ocl.id`…), plus
  * `chem.smiles`, which pipeline lists among its future schemas, the infrared
- * kinds of `./irKinds.ts`, the Raman ones of `./ramanKinds.ts` and the mass
+ * kinds of `./irKinds.ts`, the Raman ones of `./ramanKinds.ts`, the UV-vis
+ * ones of `./uvKinds.ts` and the mass
  * spectrometry ones of `./msKinds.ts`, the reaction of `./reactionKinds.ts`,
  * and
  * the kinds a tool hands back, of `./resultKinds.ts`. A name with children is a category whose
@@ -33,6 +34,8 @@ import type { RxnValue } from './reactionKinds.ts';
 import { RXN_SCHEMA } from './reactionKinds.ts';
 import type { NameValue, SvgImageValue, TableValue } from './resultKinds.ts';
 import { NAME_SCHEMA, SVG_IMAGE_SCHEMA, TABLE_SCHEMA } from './resultKinds.ts';
+import type { UvJdxValue, UvPeaksValue } from './uvKinds.ts';
+import { UV_JDX_SCHEMA, UV_PEAKS_SCHEMA } from './uvKinds.ts';
 
 /** A molfile, V2000 or V3000. */
 export interface MolfileValue {
@@ -60,6 +63,8 @@ export type CheckedValue =
   | { kind: 'spectra.ir.peaks'; value: IrPeaksValue }
   | { kind: 'spectra.raman.jdx'; value: RamanJdxValue }
   | { kind: 'spectra.raman.peaks'; value: RamanPeaksValue }
+  | { kind: 'spectra.uv.jdx'; value: UvJdxValue }
+  | { kind: 'spectra.uv.peaks'; value: UvPeaksValue }
   | { kind: 'spectra.ms.jdx'; value: MsJdxValue }
   | { kind: 'spectra.ms.ions'; value: MsIonsValue }
   | { kind: 'spectra.ms.assignments'; value: MsAssignmentsValue }
@@ -198,6 +203,8 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'spectra.ir.peaks': ajv.compile<IrPeaksValue>(IR_PEAKS_SCHEMA),
   'spectra.raman.jdx': ajv.compile<RamanJdxValue>(RAMAN_JDX_SCHEMA),
   'spectra.raman.peaks': ajv.compile<RamanPeaksValue>(RAMAN_PEAKS_SCHEMA),
+  'spectra.uv.jdx': ajv.compile<UvJdxValue>(UV_JDX_SCHEMA),
+  'spectra.uv.peaks': ajv.compile<UvPeaksValue>(UV_PEAKS_SCHEMA),
   'spectra.ms.jdx': ajv.compile<MsJdxValue>(MS_JDX_SCHEMA),
   'spectra.ms.ions': ajv.compile<MsIonsValue>(MS_IONS_SCHEMA),
   'spectra.ms.assignments': ajv.compile<MsAssignmentsValue>(

@@ -42,6 +42,8 @@ export { MetadataPanel } from './MetadataPanel.tsx';
 export { SpectraPanel } from './SpectraPanel.tsx';
 export type { SpectrumRowProps } from './SpectrumRow.tsx';
 export { SpectrumRow } from './SpectrumRow.tsx';
+export type { UvVisEditorHandle, UvVisEditorProps } from './UvVisEditor.tsx';
+export { UvVisEditor } from './UvVisEditor.tsx';
 export type { IrEditorActions } from './irActions.ts';
 export { createIrActions } from './irActions.ts';
 export type { IrChartProps } from './irChartProps.ts';

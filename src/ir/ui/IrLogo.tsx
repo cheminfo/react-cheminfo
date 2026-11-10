@@ -23,8 +23,9 @@ export interface IrLogoProps {
  * a transmittance baseline near the top with a strong band, a medium one and a
  * weak one dropping out of it, which is what an infrared spectrum looks like at a
  * glance and what nothing else looks like. A Raman spectrum's bands stand up from
- * a baseline near the foot instead, so its mark is the same three bands rising.
- * Three elements, because that is what survives 16 pixels.
+ * a baseline near the foot instead, so its mark is the same three bands rising,
+ * and a UV-vis spectrum's mark is one broad band rising from it.
+ * Three elements at most, because that is what survives 16 pixels.
  * @param props - Component props.
  * @returns The mark, as SVG.
  */
@@ -65,4 +66,10 @@ export function IrLogo(props: IrLogoProps) {
 const MARKS: Record<IrTechnique, { baseline: string; bands: string }> = {
   infrared: { baseline: 'M1 3H15', bands: 'M3 3V13M8 3V8.5M12.5 3V6' },
   raman: { baseline: 'M1 13H15', bands: 'M3 13V3M8 13V7.5M12.5 13V10' },
+  // One broad absorption band rising out of zero absorbance: UV-vis bands are
+  // tens of nanometres wide, so a stick would say the wrong thing.
+  uvvis: {
+    baseline: 'M1 13H15',
+    bands: 'M2 12.5C5.5 12.5 5.5 3 8 3S10.5 12.5 14 12.5',
+  },
 };

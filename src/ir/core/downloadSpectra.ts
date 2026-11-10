@@ -11,6 +11,7 @@ import { downloadText } from '../../download/core/downloadText.ts';
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 
 import type { IrMode, IrSpectrum } from './irSpectrum.ts';
+import type { IrTechnique } from './irTechnique.ts';
 import {
   JCAMP_EXTENSION,
   JCAMP_MIME_TYPE,
@@ -22,10 +23,16 @@ import {
  * Download one spectrum, named after what the list calls it.
  * @param spectrum - The spectrum.
  * @param mode - The axis being read, used when the file named none.
+ * @param technique - What was measured. Defaults to the first technique
+ * reading `mode`.
  */
-export function downloadIrSpectrum(spectrum: IrSpectrum, mode: IrMode): void {
+export function downloadIrSpectrum(
+  spectrum: IrSpectrum,
+  mode: IrMode,
+  technique?: IrTechnique,
+): void {
   downloadText(
-    irSpectrumToJcamp(spectrum, mode),
+    irSpectrumToJcamp(spectrum, mode, technique),
     `${sanitizeFileName(spectrum.name, 'spectrum')}${JCAMP_EXTENSION}`,
     JCAMP_MIME_TYPE,
   );
@@ -39,18 +46,21 @@ export function downloadIrSpectrum(spectrum: IrSpectrum, mode: IrMode): void {
  * not have to work out which of their downloads `spectra.jdx` was.
  * @param spectra - The spectra, in the order the list holds them.
  * @param mode - The axis being read, used for a spectrum whose file named none.
+ * @param technique - What was measured. Defaults to the first technique
+ * reading `mode`.
  */
 export function downloadIrSpectra(
   spectra: readonly IrSpectrum[],
   mode: IrMode,
+  technique?: IrTechnique,
 ): void {
   const only = spectra.length === 1 ? spectra[0] : undefined;
   if (only !== undefined) {
-    downloadIrSpectrum(only, mode);
+    downloadIrSpectrum(only, mode, technique);
     return;
   }
   downloadText(
-    irSpectraToJcamp(spectra, mode),
+    irSpectraToJcamp(spectra, mode, technique),
     `spectra${JCAMP_EXTENSION}`,
     JCAMP_MIME_TYPE,
   );

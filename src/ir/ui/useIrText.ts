@@ -2,8 +2,8 @@
  * The words of the viewer that change with what was measured, in the language
  * the page is written in.
  *
- * Infrared's are not in the chrome's catalog: they are read from the core
- * records, so an infrared viewer reads the same in every language. Raman's are
+ * Infrared's and UV-vis's are not in the chrome's catalog: they are read from
+ * the core records, so those viewers read the same in every language. Raman's are
  * in the catalog, each key written out rather than built, so a key the catalog
  * lacks fails the type check instead of rendering raw.
  */
@@ -47,22 +47,26 @@ export interface IrText {
  */
 export function useIrText(technique: IrTechnique): IrText {
   const t = useChromeT();
-  return technique === 'raman' ? ramanText(t) : infraredText(t);
+  return technique === 'raman' ? ramanText(t) : absorptionText(t, technique);
 }
 
 /**
- * The words of an infrared viewer, from the core records.
+ * The words of an infrared or a UV-vis viewer, from the core records.
  * @param t - The chrome's formatter, for a value axis the catalog names.
+ * @param technique - Which of the two.
  * @returns The words.
  */
-function infraredText(t: Translate<ChromeKey>): IrText {
-  const { name, xTitle } = IR_TECHNIQUE_RULES.infrared;
+function absorptionText(
+  t: Translate<ChromeKey>,
+  technique: 'infrared' | 'uvvis',
+): IrText {
+  const { name, xTitle } = IR_TECHNIQUE_RULES[technique];
   const opening = `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-  const commands = irCommandsFor('infrared');
+  const commands = irCommandsFor(technique);
   return {
     xTitle,
     yTitle: (mode) => modeTitle(t, mode),
-    chart: (mode) => infraredChartLabel(opening, mode),
+    chart: (mode) => absorptionChartLabel(opening, technique, mode),
     tools: `${opening} spectrum tools`,
     viewer: `${opening} spectrum viewer`,
     viewerHelp: `${opening} spectrum viewer help`,
@@ -104,18 +108,27 @@ function modeTitle(t: Translate<ChromeKey>, mode: IrMode): string {
 }
 
 /**
- * The infrared chart's accessible name. The gestures differ by mode, so the
- * sentence does too — a label promising the wheel to a reader who cannot watch
- * it fail to do anything is worse than no label at all.
+ * The chart's accessible name. The gestures differ by mode, so the sentence
+ * does too — a label promising the wheel to a reader who cannot watch it fail
+ * to do anything is worse than no label at all.
  * @param opening - The technique's name, as a sentence opens on it.
+ * @param technique - Which axis runs which way.
  * @param mode - Which value axis is being drawn.
  * @returns The label.
  */
-function infraredChartLabel(opening: string, mode: IrMode): string {
-  const axis = `${opening} spectrum read as ${yAxisTitle(mode)}, wavenumber running from high at the left to low at the right.`;
+function absorptionChartLabel(
+  opening: string,
+  technique: 'infrared' | 'uvvis',
+  mode: IrMode,
+): string {
+  const axis =
+    technique === 'uvvis'
+      ? `${opening} spectrum read as ${yAxisTitle(mode)}, wavelength running from short at the left to long at the right.`
+      : `${opening} spectrum read as ${yAxisTitle(mode)}, wavenumber running from high at the left to low at the right.`;
+  const named = technique === 'uvvis' ? 'wavelength' : 'wavenumber';
   return boxZoomOnly(mode)
     ? `${axis} Drag a rectangle over it to zoom to that rectangle, and double click to fit everything again.`
-    : `${axis} Drag across it to zoom the wavenumber axis, drag past the baseline to take the value axis with it, turn the wheel to scale the value axis, and double click to fit everything again.`;
+    : `${axis} Drag across it to zoom the ${named} axis, drag past the baseline to take the value axis with it, turn the wheel to scale the value axis, and double click to fit everything again.`;
 }
 
 /**

@@ -68,18 +68,20 @@ export function shortModeLabel(mode: IrMode): string {
  * The range a spectrum covers, written in the order its axis is read.
  * @param wavenumbers - Its wavenumbers, ascending.
  * @param reversed - Whether the axis runs from high to low, as infrared's does.
+ * @param unit - The unit of the axis, as `IR_TECHNIQUE_RULES` writes it.
  * @returns `4000–400 cm⁻¹` on a reversed axis, `100–3200 cm⁻¹` on one that is
  * not, and an empty string for a spectrum with no point.
  */
 export function formatWavenumberRange(
   wavenumbers: Float64Array,
   reversed: boolean,
+  unit = 'cm⁻¹',
 ): string {
   const lowest = wavenumbers[0];
   const highest = wavenumbers.at(-1);
   if (lowest === undefined || highest === undefined) return '';
   const [first, last] = reversed ? [highest, lowest] : [lowest, highest];
-  return `${formatWavenumber(first)}–${formatWavenumber(last)} cm⁻¹`;
+  return `${formatWavenumber(first)}–${formatWavenumber(last)} ${unit}`;
 }
 
 /** How each value axis is written: its symbol, and its count of decimals. */

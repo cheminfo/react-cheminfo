@@ -40,6 +40,7 @@
     "./styles/*.css": "./styles/*.css",
     "./translate": "./lib/translate.js",
     "./ui": "./lib/ui.js",
+    "./uvvis": "./lib/uvvis.js",
     "./vite": "./lib/vite.js",
     "./xtb": "./lib/xtb.js"
   },
@@ -107,6 +108,7 @@
     "semver": "^7.8.5",
     "uint8-base64": "^2.1.0",
     "uqr": "^0.1.3",
+    "uv-spectrum": "^0.9.0",
     "xy-parser": "^6.0.1",
     "yaml": "^2.9.1"
   },

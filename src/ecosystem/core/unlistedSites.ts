@@ -33,6 +33,21 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#2200c4', accent: '#f97316' },
   },
   {
+    id: 'uv-vis',
+    name: { lead: 'uv-', alt: 'vis' },
+    host: 'uv-vis.cheminfo.org',
+    tagline: 'Overlay UV-vis spectra and read off every λmax.',
+    group: 'spectra',
+    // Permanganate's magenta and copper's cyan: the two coloured solutions a
+    // first UV-vis lab measures, and a pair of subtractive primaries. The
+    // violets a spectrum would suggest are inchi's, elucidation's and ChemCalc's.
+    brand: '#c026d3',
+    // The cyan of the mark sits at 1.8:1 on white, so the second half of the
+    // wordmark takes the darker cyan, at 5.4:1.
+    brandAlt: '#0e7490',
+    mark: { plate: '#c026d3', accent: '#22d3ee' },
+  },
+  {
     id: 'xps',
     name: { lead: 'xps', alt: 'cheminfo', dot: true },
     host: 'xps.cheminfo.org',

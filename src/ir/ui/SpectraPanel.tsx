@@ -80,7 +80,7 @@ export function SpectraPanel() {
             tooltip="Download every spectrum as one JCAMP-DX file"
             aria-label="Download every spectrum"
             disabled={spectra.length === 0}
-            onClick={() => downloadIrSpectra(spectra, mode)}
+            onClick={() => downloadIrSpectra(spectra, mode, technique)}
           />
         </Toolbar>
       </div>
@@ -103,7 +103,7 @@ export function SpectraPanel() {
                 actions.setSpectrumVisible(spectrum.id, !spectrum.visible)
               }
               onColor={(color) => actions.setSpectrumColor(spectrum.id, color)}
-              onDownload={() => downloadIrSpectrum(spectrum, mode)}
+              onDownload={() => downloadIrSpectrum(spectrum, mode, technique)}
               onRemove={() => actions.removeSpectrum(spectrum.id)}
               onRename={(name) => actions.renameSpectrum(spectrum.id, name)}
             />

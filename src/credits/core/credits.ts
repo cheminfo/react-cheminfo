@@ -247,6 +247,15 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'uv-spectrum',
+    name: 'uv-spectrum',
+    href: 'https://www.npmjs.com/package/uv-spectrum',
+    own: true,
+    description:
+      'reads UV-vis spectra from JCAMP-DX, SPC, PerkinElmer SP, Cary and text files.',
+    license: 'MIT',
+  },
+  {
     id: 'xps-analysis',
     name: 'xps-analysis',
     href: 'https://www.npmjs.com/package/xps-analysis',

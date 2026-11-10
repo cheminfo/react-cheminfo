@@ -1,10 +1,12 @@
 /**
- * The step every reader shares: an `ir-spectrum` `Analysis` becomes spectra.
+ * The step every reader shares: an `ir-spectrum` or `uv-spectrum` `Analysis`
+ * becomes spectra.
  *
- * All three readers hand back the same `Analysis`, and `ir-spectrum` has already
- * done the part that needs to know what the file's y axis meant — it puts an `a`
- * and a `t` variable on every spectrum whichever of the two was written. So what
- * is left here is bookkeeping: order the points, type the arrays, read the
+ * Every reader hands back the same `common-spectrum` `Analysis`, and the
+ * technique's package has already done the part that needs to know what the
+ * file's y axis meant — it puts an `a` and a `t` variable on every spectrum
+ * whichever of the two was written. So what is left here is bookkeeping: keep
+ * the blocks of the technique, order the points, type the arrays, read the
  * records, and say which axis the file itself carried.
  */
 
@@ -13,6 +15,9 @@ import type { Analysis } from 'ir-spectrum';
 import { xySortX } from 'ml-spectra-processing';
 
 import type { IrMeta, IrMode, IrOrigin } from './irSpectrum.ts';
+
+/** The techniques read from a file as absorbance and transmittance. */
+export type AbsorptionTechnique = 'infrared' | 'uvvis';
 
 /**
  * One spectrum as a reader produced it, before it is named and coloured.
@@ -63,11 +68,14 @@ export interface LoadedIrSpectrum {
  * with no data under it, is not a spectrum.
  * @param analysis - What the reader built.
  * @param origin - Where it came from: the format and the file.
+ * @param technique - Which blocks to keep: those of this technique, and those
+ * that name none.
  * @returns One entry per readable block, in the order the file wrote them.
  */
 export function analysisSpectra(
   analysis: Analysis,
   origin: IrOrigin,
+  technique: AbsorptionTechnique = 'infrared',
 ): LoadedIrSpectrum[] {
   const blocks = analysis.spectra;
   const spectra: LoadedIrSpectrum[] = [];
@@ -75,7 +83,7 @@ export function analysisSpectra(
   for (let index = 0; index < blocks.length; index++) {
     const block = blocks[index];
     if (block === undefined) continue;
-    if (!isInfrared(block)) continue;
+    if (!readsAs(block, technique)) continue;
     const wavenumbers = block.variables.x?.data;
     const absorbances = block.variables.a?.data;
     const transmittances = block.variables.t?.data;
@@ -161,6 +169,43 @@ function blockTitle(block: MeasurementXY): string | undefined {
 }
 
 /**
+ * Whether a block is a spectrum of the technique rather than something else
+ * entirely.
+ *
+ * What is said below of infrared holds for UV-vis with the lists swapped: a
+ * block silent about its type is kept, and one naming another technique is not.
+ * @param block - One spectrum of the analysis.
+ * @param technique - The technique being read.
+ * @returns Whether to read it as that technique.
+ */
+function readsAs(
+  block: MeasurementXY,
+  technique: AbsorptionTechnique,
+): boolean {
+  return technique === 'uvvis' ? isUvVis(block) : isInfrared(block);
+}
+
+/**
+ * Whether a block is a UV-vis spectrum: one whose data type names no other
+ * technique. `uv-spectrum` types what it reads from text and SPC as
+ * `UV spectrum`, and a JCAMP-DX file writes `UV/VIS SPECTRUM`, `UV-VIS` or
+ * nothing.
+ * @param block - One spectrum of the analysis.
+ * @returns Whether to read it as UV-vis.
+ */
+function isUvVis(block: MeasurementXY): boolean {
+  const dataType = block.dataType?.toUpperCase();
+  if (dataType === undefined || dataType === '') return true;
+  if (dataType.includes('UV') || dataType.includes('VIS')) return true;
+  if (dataType.includes('LINK')) return true;
+  return !NOT_UV_VIS.test(dataType);
+}
+
+/** The data types that are certainly not a UV-vis spectrum. */
+const NOT_UV_VIS =
+  /INFRARED|\bF?T?-?IR\b|RAMAN|NMR|MASS|CHROMATOGRAM|XRD|FLUORESCENCE/;
+
+/**
  * Whether a block is an infrared spectrum rather than something else entirely.
  *
  * A JCAMP `LINK` block is a container, and the real ones in the wild put a Raman
@@ -232,6 +277,9 @@ function blockMeta(block: MeasurementXY): IrMeta | null {
   const fields: IrMetaField[] = [];
 
   for (const [label, value] of Object.entries(block.meta ?? {})) {
+    // A nested record — the `header` or `properties` an SPC reader keeps — is
+    // no one line of a table, and written as one it reads `[object Object]`.
+    if (value !== null && typeof value === 'object') continue;
     const written = typeof value === 'string' ? value.trim() : String(value);
     if (written !== '') fields.push({ label, value: written });
   }

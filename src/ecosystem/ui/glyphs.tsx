@@ -602,6 +602,33 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // One broad absorption band over its baseline, with its maximum dropped to
+  // the wavelength axis in the answering colour: the λmax the tool reads off.
+  'uv-vis': (alt) => (
+    <>
+      <path
+        d="M4 25h24"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M5 24C9 24 10 7 16 7S23 24 27 24"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 11V25"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </>
+  ),
   // Photoemission: an X-ray, the wave, strikes an atom and drives out one of
   // its core electrons through the broken orbit — the dot in the answering
   // colour, whose energy the spectrum reads.

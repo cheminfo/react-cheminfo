@@ -36,6 +36,7 @@ export type SiteId =
   | 'wikidata'
   | 'mz'
   | 'vibrations'
+  | 'uv-vis'
   | 'xps'
   | 'draw'
   | 'tlc'

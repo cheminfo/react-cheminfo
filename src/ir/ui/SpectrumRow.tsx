@@ -52,6 +52,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
   const range = formatWavenumberRange(
     spectrum.wavenumber,
     IR_TECHNIQUE_RULES[technique].reverseX,
+    IR_TECHNIQUE_RULES[technique].unit,
   );
 
   return (

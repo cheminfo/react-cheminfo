@@ -18,6 +18,11 @@ export interface BandRowProps {
   mode: IrMode;
   /** Whether the row has a column for what the band could be. */
   assignments: boolean;
+  /**
+   * The unit of the band's position, as `IR_TECHNIQUE_RULES` writes it.
+   * @default 'cm⁻¹'
+   */
+  unit?: string;
   /** Whether the pointer is on this band, here or on the chart. */
   lit: boolean;
   /**
@@ -43,7 +48,15 @@ export interface BandRowProps {
  * @returns The row.
  */
 export function BandRow(props: BandRowProps) {
-  const { entry, mode, assignments, lit, onHighlight, onRemove } = props;
+  const {
+    entry,
+    mode,
+    assignments,
+    unit = 'cm⁻¹',
+    lit,
+    onHighlight,
+    onRemove,
+  } = props;
   const { band } = entry;
 
   return (
@@ -66,7 +79,7 @@ export function BandRow(props: BandRowProps) {
             variant="minimal"
             size="small"
             icon="small-cross"
-            aria-label={`Take away the band at ${formatWavenumber(band.wavenumber)} cm⁻¹`}
+            aria-label={`Take away the band at ${formatWavenumber(band.wavenumber)} ${unit}`}
             onClick={() => onRemove(band)}
           />
         </td>
