@@ -15,6 +15,7 @@ export * from './ecosystem/core/index.ts';
 export * from './error/core/index.ts';
 export * from './fetch/core/index.ts';
 export * from './format/core/index.ts';
+export * from './highlight/core/index.ts';
 export * from './i18n/core/index.ts';
 export * from './language/core/index.ts';
 export * from './moleculesClient/core/index.ts';

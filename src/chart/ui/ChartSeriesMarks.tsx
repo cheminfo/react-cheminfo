@@ -47,6 +47,8 @@ export function ChartSeriesMarks(props: ChartSeriesMarksProps): ReactElement {
   const { item, band, y, lane = SOLE_LANE } = props;
   const slots = Math.min(band.count, item.values.length);
   const muted = item.muted === true;
+  let opacity = muted ? 0.55 : 1;
+  if (item.dimmed === true) opacity = DIMMED_OPACITY;
   const grounded = item.kind === 'bar';
   const lanes = Math.max(1, lane.count);
   const wide = chartRoundPixel(band.bandWidth / lanes);
@@ -76,7 +78,7 @@ export function ChartSeriesMarks(props: ChartSeriesMarksProps): ReactElement {
   }
   if (grounded) {
     return (
-      <g data-series={item.id} fill={item.color} opacity={muted ? 0.55 : 1}>
+      <g data-series={item.id} fill={item.color} opacity={opacity}>
         {rects}
       </g>
     );
@@ -87,11 +89,15 @@ export function ChartSeriesMarks(props: ChartSeriesMarksProps): ReactElement {
       d={path}
       fill="none"
       stroke={item.color}
+      opacity={opacity}
       strokeWidth={muted ? 1 : 1.5}
       strokeDasharray={muted ? '4 3' : undefined}
     />
   );
 }
+
+/** How faint a series is while another one is being read. */
+const DIMMED_OPACITY = 0.25;
 
 /** What a series drawn on its own is told, which is that it has the slot. */
 const SOLE_LANE = { index: 0, count: 1 } as const;

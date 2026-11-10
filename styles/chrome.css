@@ -1306,6 +1306,31 @@ select,
   white-space: nowrap;
 }
 
+/* ── A highlight linking two views ───────────────────────────────────────── */
+
+/* What is pointed at — here or in the view beside it — takes a wash of the
+   brand, and what was chosen a stronger one. A mark on a figure reads the same
+   attribute in the site's own stylesheet. */
+[data-highlight='hovered']:not(tr) {
+  background-color: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+
+[data-highlight='selected']:not(tr) {
+  background-color: color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+/* A row paints its cells, which Blueprint's striped and interactive tables
+   reach from three classes deep, so the attribute repeats to stay ahead. */
+tr[data-highlight='hovered'][data-highlight][data-highlight][data-highlight]
+  > :is(td, th) {
+  background-color: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+
+tr[data-highlight='selected'][data-highlight][data-highlight][data-highlight]
+  > :is(td, th) {
+  background-color: color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
 /* ── Range slider ────────────────────────────────────────────────────────── */
 
 .range-slider {

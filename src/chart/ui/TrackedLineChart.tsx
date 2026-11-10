@@ -47,6 +47,12 @@ export interface ChartSeries {
    * @default false
    */
   muted?: boolean;
+  /**
+   * Whether it stands back while another series is being read — the one a
+   * highlight elsewhere on the page names.
+   * @default false
+   */
+  dimmed?: boolean;
 }
 
 /** Where the pointer is, and what stands under it. */

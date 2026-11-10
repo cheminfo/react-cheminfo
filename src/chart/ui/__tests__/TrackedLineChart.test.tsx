@@ -45,6 +45,15 @@ test('a muted series is drawn behind the rest, so it reads as background', () =>
   expect(html).toContain('stroke-dasharray="4 3"');
 });
 
+test('a dimmed series stands back, solid, while the one being read stays whole', () => {
+  const html = render({ series: [{ ...line(0), dimmed: true }, line(1)] });
+
+  expect(count(html, /opacity="0.25"/g)).toBe(1);
+  expect(html).toMatch(/data-series="series-0"[^>]*opacity="0.25"/);
+  expect(html).toMatch(/data-series="series-1"[^>]*opacity="1"/);
+  expect(html).not.toContain('stroke-dasharray');
+});
+
 test('sixty measurements write far fewer names than there are slots', () => {
   const categories = Array.from({ length: 60 }, (_, at) => `Measure ${at}`);
   const html = render({ categories, series: [line(0)] });
