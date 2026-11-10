@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.110.1](https://github.com/cheminfo/react-cheminfo/compare/v0.110.0...v0.110.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* draw an SVG without a viewBox over the whole PNG at any scale ([111b45b](https://github.com/cheminfo/react-cheminfo/commit/111b45bf61ffad5552d73115ca8940a99001b310))
+* draw the page's own drag image under a demo drag ([66ab816](https://github.com/cheminfo/react-cheminfo/commit/66ab816a38670f0747fa1079bc1823a62c5f317e))
+* keep the spectrum ids as typed while the parent hands them back ([d815175](https://github.com/cheminfo/react-cheminfo/commit/d81517567ab7b758dbfe86993126be6647b752fd))
+* one stroke on a path without its outline, and keep falsy items in arrayOf ([6425c7d](https://github.com/cheminfo/react-cheminfo/commit/6425c7dd9d2297d4280d6b77c20c80d9532993e9))
+* report a dropped parallel axis once, even under StrictMode ([f027678](https://github.com/cheminfo/react-cheminfo/commit/f027678cd8272824325e7521f92e942a736db44c))
+
 ## [0.110.0](https://github.com/cheminfo/react-cheminfo/compare/v0.109.0...v0.110.0) (2026-11-10)
 
 
