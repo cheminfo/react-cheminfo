@@ -6,6 +6,8 @@
  * figure.
  */
 
+import { Blob as NodeBlob, File as NodeFile } from 'node:buffer';
+
 import { act } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
@@ -137,6 +139,10 @@ test('a figure of the site opens as it was, and one saved elsewhere offers its o
 });
 
 test('a document of the site opens on its figure, then takes its workspace', async () => {
+  // A browser has one Blob. Under jsdom on Node 22, zip.js wraps the Blob
+  // Node's `Response` returns in jsdom's, which reads back as "[object Blob]".
+  vi.stubGlobal('Blob', NodeBlob);
+  vi.stubGlobal('File', NodeFile);
   const onOpen = vi.fn();
   const onWorkspace = vi.fn();
   const workspace = { id: 'w1', name: 'Plate', preferences: { lanes: 4 } };
