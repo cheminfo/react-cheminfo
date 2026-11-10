@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.110.0](https://github.com/cheminfo/react-cheminfo/compare/v0.109.0...v0.110.0) (2026-11-10)
+
+
+### Features
+
+* let a figure keep the whole frame the viewer shows, through captureFigure's wholeFrame ([f72a2ba](https://github.com/cheminfo/react-cheminfo/commit/f72a2bab040bbd8e4811d80bfdb5861b4d9ee72b))
+* link two views of a page through one highlight, pointed at or chosen ([71b24a8](https://github.com/cheminfo/react-cheminfo/commit/71b24a8ca7efa1e928c0b83dc4c75ec2b15e0782))
+* save a document in the browser under a name, in a folder panel beside the examples ([223c59e](https://github.com/cheminfo/react-cheminfo/commit/223c59e74e02c6ececac6d60f5c10e0917eb6754))
+* say why a framed tool is of no use: its site unreachable, or deployed in a version too old to answer ([79769d7](https://github.com/cheminfo/react-cheminfo/commit/79769d7f22e56b70c23c3006a80da1fd2787f0c9))
+
 ## [0.109.0](https://github.com/cheminfo/react-cheminfo/compare/v0.108.0...v0.109.0) (2026-11-09)
 
 
