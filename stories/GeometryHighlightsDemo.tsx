@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
+import type { AtomReference } from '../src/molecule3d/core/measurement.ts';
 import { MoleculeViewer3D } from '../src/molecule3d/ui/MoleculeViewer3D.tsx';
 import type { MoleculeViewer3DProps } from '../src/molecule3d/ui/moleculeViewer3DProps.ts';
 
@@ -12,7 +13,8 @@ const FIRST_CHOSEN = 3;
 /**
  * The viewer beside the rows of a geometry card. The row under the pointer or
  * holding the focus is highlighted on the model, as on the card; otherwise the
- * row last clicked is.
+ * row last clicked is. Under the rows, the atom the pointer rests on in the
+ * model, numbered from 1 as the molfile numbers it.
  * @param props - Whatever the story's controls hold.
  * @returns The viewer and the rows.
  */
@@ -21,12 +23,17 @@ export function GeometryHighlightsDemo(
 ): ReactElement {
   const [chosen, setChosen] = useState(FIRST_CHOSEN);
   const [pointed, setPointed] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<AtomReference | null>(null);
   const shown = ACETONE_GEOMETRY[pointed ?? chosen] ?? ACETONE_GEOMETRY[0];
 
   return (
     <div style={DEMO_STYLE}>
       <div style={VIEWER_STYLE}>
-        <MoleculeViewer3D {...props} highlights={shown?.highlights} />
+        <MoleculeViewer3D
+          {...props}
+          highlights={shown?.highlights}
+          onAtomHover={setHovered}
+        />
       </div>
       <div style={ROWS_STYLE} role="group" aria-label="Geometry">
         {ACETONE_GEOMETRY.map((row, index) => (
@@ -44,6 +51,9 @@ export function GeometryHighlightsDemo(
             {row.label}
           </button>
         ))}
+        <output aria-label="Atom under the pointer">
+          {hovered === null ? 'none' : `atom ${hovered.element + 1}`}
+        </output>
       </div>
     </div>
   );

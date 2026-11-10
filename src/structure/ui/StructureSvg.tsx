@@ -82,6 +82,12 @@ interface StructureSvgProps {
    */
   onAtomClick?: (atom: number) => void;
   /**
+   * Called with the index of the atom the pointer comes to rest on, and with
+   * `null` once it leaves that atom.
+   * @default undefined
+   */
+  onAtomHover?: (atom: number | null) => void;
+  /**
    * Called with the index of the bond that was clicked.
    * @default undefined
    */
@@ -102,6 +108,7 @@ export function StructureSvg(props: StructureSvgProps): ReactElement {
     atomLabels,
     atomLabelPlacement,
     onAtomClick,
+    onAtomHover,
     onBondClick,
     showCIPParity,
     atomHighlight,
@@ -161,6 +168,20 @@ export function StructureSvg(props: StructureSvgProps): ReactElement {
           ? undefined
           : (atom) => {
               onAtomClick(atom);
+            }
+      }
+      onAtomEnter={
+        onAtomHover === undefined
+          ? undefined
+          : (atom) => {
+              onAtomHover(atom);
+            }
+      }
+      onAtomLeave={
+        onAtomHover === undefined
+          ? undefined
+          : () => {
+              onAtomHover(null);
             }
       }
       onBondClick={

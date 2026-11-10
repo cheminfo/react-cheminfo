@@ -11,7 +11,6 @@
  */
 
 import { OrderedSet, SortedArray } from 'molstar/lib/mol-data/int.js';
-import type { Loci } from 'molstar/lib/mol-model/loci.js';
 import type { UnitIndex } from 'molstar/lib/mol-model/structure/structure/element/util.js';
 import type {
   ElementIndex,
@@ -29,6 +28,8 @@ import type {
   MeasurementKind,
 } from '../../molecule3d/core/measurement.ts';
 import { MEASUREMENT_ATOM_COUNTS } from '../../molecule3d/core/measurement.ts';
+
+import { atomOfLoci } from './lociAtom.ts';
 
 // Lowercased: it is a factory, not a constructor.
 const elementLoci = StructureElement.Loci;
@@ -179,7 +180,7 @@ export class MeasurementPicker {
     const atoms: AtomReference[] = [];
     for (let i = 0; i < history.length && atoms.length < needed; i++) {
       const entry = history[i];
-      const atom = entry && atomReference(structure, entry.loci);
+      const atom = entry && atomOfLoci(structure, entry.loci);
       if (atom !== undefined) atoms.push(atom);
     }
     if (atoms.length < needed) return;
@@ -207,23 +208,6 @@ export function atomReferenceOf(
     if (elements === undefined) continue;
     const index = SortedArray.indexOf(elements, element);
     if (index !== -1) return { unit, element: index };
-  }
-  return undefined;
-}
-
-function atomReference(
-  structure: Structure,
-  loci: Loci,
-): AtomReference | undefined {
-  if (!StructureElement.Loci.is(loci)) return undefined;
-  if (StructureElement.Loci.size(loci) !== 1) return undefined;
-  const entry = loci.elements[0];
-  if (entry === undefined) return undefined;
-  const units = structure.units;
-  for (let unit = 0; unit < units.length; unit++) {
-    if (units[unit]?.id === entry.unit.id) {
-      return { unit, element: OrderedSet.getAt(entry.indices, 0) };
-    }
   }
   return undefined;
 }

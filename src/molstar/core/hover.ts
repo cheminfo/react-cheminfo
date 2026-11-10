@@ -17,6 +17,11 @@ import {
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import { lociLabel } from 'molstar/lib/mol-theme/label.js';
 
+import type { AtomReference } from '../../molecule3d/core/measurement.ts';
+
+import { atomOfLoci } from './lociAtom.ts';
+import type { MoleculeStructureSource } from './measurements.ts';
+
 /**
  * Report whatever the pointer rests on.
  * @param plugin - The molstar context.
@@ -36,6 +41,33 @@ export function subscribeHover(
   return () => {
     subscription.unsubscribe();
   };
+}
+
+/**
+ * Report the atom the pointer rests on, each time it moves to another one.
+ * @param plugin - The molstar context.
+ * @param structureOf - Where the atoms on screen are found.
+ * @param listener - Called with the atom, addressed as measurements and
+ * highlights address atoms, and with `null` once the pointer leaves the atoms
+ * for a bond or the background.
+ * @returns The unsubscribe function.
+ */
+export function subscribeHoverAtom(
+  plugin: PluginContext,
+  structureOf: MoleculeStructureSource,
+  listener: (atom: AtomReference | null) => void,
+): () => void {
+  let current: AtomReference | null = null;
+  return subscribeHover(plugin, (loci) => {
+    const structure = loci === null ? undefined : structureOf(plugin);
+    const atom =
+      loci === null || structure === undefined
+        ? null
+        : (atomOfLoci(structure, loci) ?? null);
+    if (sameAtom(atom, current)) return;
+    current = atom;
+    listener(atom);
+  });
 }
 
 /** What the pointer rests on, in a line, and the loci it names. */
@@ -133,4 +165,12 @@ function stripMarkup(label: string): string {
     .replaceAll('&amp;', '&')
     .replaceAll(/\s+/g, ' ')
     .trim();
+}
+
+function sameAtom(
+  first: AtomReference | null,
+  second: AtomReference | null,
+): boolean {
+  if (first === null || second === null) return first === second;
+  return first.unit === second.unit && first.element === second.element;
 }

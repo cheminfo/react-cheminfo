@@ -26,6 +26,7 @@ import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
 import { highlightColorOf } from './highlightColor.ts';
 import { moleculeFileAtoms } from './moleculeFileFormats.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
+import { useAtomHover } from './useAtomHover.ts';
 import { useControlledState } from './useControlledState.ts';
 import { useImageExport } from './useImageExport.ts';
 import { useMoleculeScene } from './useMoleculeScene.ts';
@@ -63,6 +64,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     measurements: measurementsProp,
     onMeasurementsChange,
     highlights = NO_HIGHLIGHTS,
+    onAtomHover,
     fileName = 'molecule',
     background,
     minHeight = 320,
@@ -130,6 +132,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
       highlightColorOf(container),
     );
   }, [container, viewerRef, highlights]);
+  useAtomHover(container, viewerRef, onAtomHover);
 
   const { resetView } = useMoleculeScene({
     container,

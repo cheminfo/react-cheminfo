@@ -3,9 +3,9 @@ import type { ReactElement, ReactNode } from 'react';
 import { OverlayLayer } from '../../overlay/ui/OverlayLayer.tsx';
 import { structureSource } from '../core/structureSource.ts';
 
-import type { StructureProps } from './Structure.tsx';
 import { Structure } from './Structure.tsx';
 import { StructureExportButton } from './StructureExportButton.tsx';
+import type { StructureProps } from './structureProps.ts';
 
 /** What {@link CardStructure} draws and hands over. */
 export interface CardStructureProps extends StructureProps {

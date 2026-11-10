@@ -4,7 +4,7 @@ import type { ViewerCapability } from '../../orbital/ui/capability.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
 import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
-import type { Measurement } from '../core/measurement.ts';
+import type { AtomReference, Measurement } from '../core/measurement.ts';
 import type { Molecule3DSettings, Molecule3DTools } from '../core/settings.ts';
 
 /** The scene on screen, rendered as a picture on request. */
@@ -123,6 +123,13 @@ export interface MoleculeViewer3DProps {
    * @default [] — nothing is emphasised
    */
   highlights?: readonly Molecule3DHighlight[];
+  /**
+   * Called with the atom the pointer comes to rest on, addressed as
+   * `highlights` address atoms, and with `null` once it leaves the atoms — so
+   * a table read beside the model can light the row of that atom.
+   * @default undefined
+   */
+  onAtomHover?: (atom: AtomReference | null) => void;
   /**
    * Where the camera stands when the first molecule is framed — what a shared
    * link carries. The camera belongs to whoever is dragging it afterwards, so

@@ -46,8 +46,10 @@ export {
   atomText,
   lociText,
   subscribeHover,
+  subscribeHoverAtom,
   subscribeHoverLabel,
 } from './hover.ts';
+export { atomOfLoci } from './lociAtom.ts';
 export type { MolstarPluginOptions } from './plugin.ts';
 export { MolstarPlugin } from './plugin.ts';
 export type { FramePlayback } from './captureScene.ts';

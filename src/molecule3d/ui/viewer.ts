@@ -25,7 +25,7 @@ import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 
-import { applyCamera, resetCamera, watchCamera } from './camera.ts';
+import { applyCamera, resetCamera } from './camera.ts';
 import { MoleculeFrames } from './moleculeFrames.ts';
 import {
   MODEL_REPRESENTATION_REF,
@@ -34,7 +34,7 @@ import {
   renderMolecule,
 } from './renderMolecule.ts';
 import { clearSurface, renderSurface } from './renderSurface.ts';
-import { ScenePictures } from './scenePictures.ts';
+import { SceneWatches } from './sceneWatches.ts';
 import type {
   Molecule3DViewerOptions,
   MoleculeStyle,
@@ -43,10 +43,11 @@ import type {
 
 /**
  * One molstar canvas, and every operation the component performs on it — its
- * pictures included, from {@link ScenePictures}. Every method resolves to
- * nothing once `dispose` has been called.
+ * pictures and what it reports of the camera and the pointer included, from
+ * {@link SceneWatches}. Every method resolves to nothing once `dispose` has
+ * been called.
  */
-export class Molecule3DViewer extends ScenePictures {
+export class Molecule3DViewer extends SceneWatches {
   readonly #plugin: MolstarPlugin;
   #picker: MeasurementPicker | undefined;
   #painter: HighlightPainter | undefined;
@@ -196,16 +197,6 @@ export class Molecule3DViewer extends ScenePictures {
     return this.#plugin.run((plugin) => {
       applyCamera(plugin, camera, durationMilliseconds);
     });
-  }
-
-  /**
-   * Follow the camera, however it moves.
-   * @param listener - Called after every move.
-   * @returns A function that stops calling the listener; safe to call before
-   * the canvas exists.
-   */
-  watchCamera(listener: (camera: Molecule3DCamera | null) => void): () => void {
-    return this.#plugin.subscribe((plugin) => watchCamera(plugin, listener));
   }
 
   /**

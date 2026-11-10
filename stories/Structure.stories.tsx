@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
-import type { StructureProps } from '../src/structure/ui/Structure.tsx';
 import { Structure } from '../src/structure/ui/Structure.tsx';
+import type { StructureProps } from '../src/structure/ui/structureProps.ts';
 import { TOKEN } from '../src/tokens/core/familyTokens.ts';
 
 import {
