@@ -141,3 +141,13 @@ test('a list of UV-vis spectra is titled as UV-vis', async () => {
   expect(written.split('\n', 1)[0]).toBe('##TITLE=2 UV-vis spectra');
   expect(written.match(/##XUNITS=NANOMETERS/g)).toHaveLength(2);
 });
+
+test('a fluorescence spectrum is refused, saying it is emitted light', async () => {
+  await expect(
+    loadUvVisSpectra(read('cary-eclipse.csv'), {
+      fileName: 'cary-eclipse.csv',
+    }),
+  ).rejects.toThrow(
+    'cary-eclipse.csv is a fluorescence spectrum, light the sample emits rather than absorbs, which this viewer does not read: it reads absorbance and transmittance.',
+  );
+});
