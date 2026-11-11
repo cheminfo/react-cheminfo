@@ -9,6 +9,8 @@
  * read, so a page that never opens one never downloads it.
  */
 
+import type { MeasurementXY } from 'cheminfo-types';
+
 import { describeSource, errorMessage } from '../../error/core/index.ts';
 
 import { analysisSpectra } from './analysisSpectra.ts';
@@ -51,15 +53,33 @@ export async function loadUvVisSpectra(
   const spectra = analysisSpectra(analysis, origin, 'uvvis');
   if (spectra.length > 0) return { spectra, format };
 
-  const reflectance = analysis.spectra.some(
-    (block) => block.variables.r !== undefined,
-  );
-  throw new Error(
-    reflectance
-      ? `${describeSource(fileName)} is a reflectance spectrum, which this viewer does not read yet: it reads absorbance and transmittance.`
-      : `${describeSource(fileName)} holds no UV-vis spectrum — no block in it carries an absorbance or a transmittance over at least two points.`,
-  );
+  throw new Error(unreadReason(analysis.spectra, describeSource(fileName)));
 }
+
+/**
+ * Why a file `uv-spectrum` read gave no spectrum to draw.
+ * @param blocks - What it read.
+ * @param source - How the file is named in a sentence.
+ * @returns The message.
+ */
+function unreadReason(
+  blocks: readonly MeasurementXY[],
+  source: string,
+): string {
+  if (blocks.some((block) => block.variables.r !== undefined)) {
+    return `${source} is a reflectance spectrum, which this viewer does not read yet: it reads absorbance and transmittance.`;
+  }
+  const emitted = blocks.find((block) =>
+    EMITTED.test(block.dataType?.toUpperCase() ?? ''),
+  );
+  if (emitted !== undefined) {
+    return `${source} is a ${emitted.dataType?.toLowerCase()}, light the sample emits rather than absorbs, which this viewer does not read: it reads absorbance and transmittance.`;
+  }
+  return `${source} holds no UV-vis spectrum — no block in it carries an absorbance or a transmittance over at least two points.`;
+}
+
+/** The data types of light a sample emits. */
+const EMITTED = /FLUORESC|PHOSPHORESC|LUMINESC|EMISSION/;
 
 /**
  * What the file was written as, for the spectrum's origin. A binary file
