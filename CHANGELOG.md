@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.112.0](https://github.com/cheminfo/react-cheminfo/compare/v0.111.0...v0.112.0) (2026-11-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* keep OpenChemLib out of react-cheminfo/host
+
+### Features
+
+* add the unlisted biology site, with its colours and membrane mark ([0591d76](https://github.com/cheminfo/react-cheminfo/commit/0591d7651cc6d2933fdb21edf814ee878ce18e2f))
+* add the UV-vis editor and uv-vis.cheminfo.org as an unlisted site ([25d60b9](https://github.com/cheminfo/react-cheminfo/commit/25d60b980341727269a3d0988ef594627fabd49a))
+* add the XPS viewer as react-cheminfo/xps ([36e3175](https://github.com/cheminfo/react-cheminfo/commit/36e3175417cadd0759bef5d0a8059957d842b677))
+* add xps.cheminfo.org as an unlisted site ([12d76e7](https://github.com/cheminfo/react-cheminfo/commit/12d76e7e332794e3e4673bb28c9d2ed1be15c7e7))
+* keep OpenChemLib out of react-cheminfo/host ([1bdbca2](https://github.com/cheminfo/react-cheminfo/commit/1bdbca21e8be4a245e23dea3dfb64c179878a6b5))
+* report the atom under the pointer of Structure and MoleculeViewer3D ([fc539e3](https://github.com/cheminfo/react-cheminfo/commit/fc539e35ee1a5e91ceb791529611943a48089658))
+* show fluorescence spectra with FluorescenceEditor in react-cheminfo/uvvis ([70fb7fe](https://github.com/cheminfo/react-cheminfo/commit/70fb7fe2ad2b1e1af47a82da738a73c36c01bb07))
+
+
+### Bug Fixes
+
+* keep the spectrum viewers' controls off a printed page ([3a56f07](https://github.com/cheminfo/react-cheminfo/commit/3a56f077595ab7d1a284a6d69e827fa623d6a6f4))
+* refuse an emission spectrum in the UV-vis viewer with its own message ([a5ff014](https://github.com/cheminfo/react-cheminfo/commit/a5ff0140e9e1cc11402d3150eb89f9aab0d4c9be))
+* require uv-spectrum 0.9.1 and convert-to-jcamp 7.0.3 ([33defd6](https://github.com/cheminfo/react-cheminfo/commit/33defd64ffca576375e95646d4e76313c86ad918))
+
 ## [0.111.0](https://github.com/cheminfo/react-cheminfo/compare/v0.110.1...v0.111.0) (2026-11-10)
 
 
