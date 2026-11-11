@@ -74,7 +74,7 @@ export function BandRow(props: BandRowProps) {
       </td>
       {assignments ? <CandidatesCell entry={entry} /> : null}
       {onRemove === undefined ? null : (
-        <td style={removeCellStyle}>
+        <td className="no-print" style={removeCellStyle}>
           <Button
             variant="minimal"
             size="small"

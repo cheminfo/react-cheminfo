@@ -1791,7 +1791,8 @@ span.taxon-lineage__name {
     is a grey line nobody drew. The panes keep the shares the reader left them
     at — that is the layout being printed — and simply meet.
   */
-  .split-row > div > div:nth-child(2) {
+  .split-row > div > div:nth-child(2),
+  .side-split > div > div:nth-child(2) {
     display: none !important;
   }
 }

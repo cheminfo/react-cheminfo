@@ -83,7 +83,8 @@ export function SidePanelItem(props: SidePanelItemProps) {
       open={isOpen}
       onOpenChange={onOpenChange}
       renderToolbar={() => (
-        <>
+        // Folding, pinning and closing are nothing on paper; the title stays.
+        <div className="no-print" style={contentsStyle}>
           <Button
             variant="minimal"
             className="side-panel__fold"
@@ -147,7 +148,7 @@ export function SidePanelItem(props: SidePanelItemProps) {
             aria-label={t('panel.close', { panel })}
             onClick={onClose}
           />
-        </>
+        </div>
       )}
     >
       <FullscreenStage style={bodyStyle} onStage={onStage}>
@@ -158,6 +159,7 @@ export function SidePanelItem(props: SidePanelItemProps) {
                 <span style={fullscreenTitleStyle}>{title}</span>
                 <Button
                   variant="minimal"
+                  className="no-print"
                   icon="minimize"
                   aria-label={t('panel.leaveFullScreen')}
                   tooltipProps={{ content: t('panel.leaveFullScreenTooltip') }}
@@ -199,3 +201,6 @@ const fullscreenBarStyle: CSSProperties = {
 };
 
 const fullscreenTitleStyle: CSSProperties = { fontWeight: 'bold' };
+
+/** A wrapper that takes no box of its own, so the buttons stay the toolbar's. */
+const contentsStyle: CSSProperties = { display: 'contents' };

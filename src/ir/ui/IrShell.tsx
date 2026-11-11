@@ -149,13 +149,17 @@ export function IrShell(props: IrShellProps) {
           shortcuts are heard on: keys are delivered to whatever holds the caret,
           and an SVG never does. */}
       <div ref={setRoot} tabIndex={-1} style={rootStyle}>
-        <IrHeader actions={hostActions} />
+        {/* The viewer's controls stay off a printed page: on paper the chart,
+            and the values the panels list, are what is read. */}
+        <div className="no-print" style={contentsStyle}>
+          <IrHeader actions={hostActions} />
+        </div>
 
         <div style={mainStyle}>
           {/* The rails are chrome of a fixed width, and a flex child shrinks by
               default: in a narrow viewer the row would take the width it is
               short of out of them, and half an icon is what that looks like. */}
-          <div style={railStyle}>
+          <div className="no-print" style={railStyle}>
             <IrToolbar figure={figure} />
           </div>
 
@@ -183,7 +187,7 @@ export function IrShell(props: IrShellProps) {
 
           {/* Outside the split, so the icons stay put against the right edge
               while the panel beside them is resized or closed. */}
-          <div style={railStyle}>
+          <div className="no-print" style={railStyle}>
             <PanelRail
               panels={side.panels}
               openIds={side.shownIds}
@@ -246,3 +250,6 @@ const mainStyle = {
 } as const;
 
 const railStyle = { flex: 'none' } as const;
+
+/** A wrapper that takes no box of its own, so the layout is the header's. */
+const contentsStyle = { display: 'contents' } as const;

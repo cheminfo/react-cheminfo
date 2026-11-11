@@ -44,7 +44,7 @@ export function SpectraPanel() {
 
   return (
     <div style={panelStyle}>
-      <div style={panelToolbarStyle}>
+      <div className="no-print" style={panelToolbarStyle}>
         <Toolbar aria-label="Spectra">
           <Toolbar.Item
             icon="trash"

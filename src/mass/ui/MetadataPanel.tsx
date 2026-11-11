@@ -78,7 +78,7 @@ export function MassMetadata(props: MassMetadataProps) {
 
   return (
     <div style={panelStyle}>
-      <div style={panelToolbarStyle}>
+      <div className="no-print" style={panelToolbarStyle}>
         <Toolbar aria-label="Acquisition">
           <Toolbar.Item
             icon="align-left"

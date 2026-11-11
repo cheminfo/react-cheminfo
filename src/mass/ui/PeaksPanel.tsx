@@ -97,7 +97,7 @@ export function PeaksPanel(props: PeaksPanelProps) {
 
   return (
     <div style={panelStyle}>
-      <div style={panelToolbarStyle}>
+      <div className="no-print" style={panelToolbarStyle}>
         <Toolbar aria-label="Peaks">
           <Toolbar.Item
             icon="zoom-to-fit"

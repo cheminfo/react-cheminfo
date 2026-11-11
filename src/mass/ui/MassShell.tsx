@@ -122,10 +122,12 @@ export function MassShell(props: MassShellProps) {
           shortcuts are heard on: keys are delivered to whatever holds the caret,
           and an SVG never does. */}
       <div ref={setRoot} tabIndex={-1} style={rootStyle}>
-        <MassHeader />
+        <div className="no-print" style={contentsStyle}>
+          <MassHeader />
+        </div>
 
         <div style={mainStyle}>
-          <div style={railStyle}>
+          <div className="no-print" style={railStyle}>
             <MassToolbar figure={figure} />
           </div>
 
@@ -154,7 +156,7 @@ export function MassShell(props: MassShellProps) {
 
           {/* Outside the split, so the icons stay put against the right edge
               while the panel beside them is resized or closed. */}
-          <div style={railStyle}>
+          <div className="no-print" style={railStyle}>
             <PanelRail
               panels={side.panels}
               openIds={side.shownIds}
@@ -234,6 +236,9 @@ const mainStyle = {
  * a narrow viewer the row would take the width it is short of out of them.
  */
 const railStyle = { flex: 'none' } as const;
+
+/** A wrapper that takes no box of its own, so the layout is the header's. */
+const contentsStyle = { display: 'contents' } as const;
 
 /** The file input is opened by the toolbar, never clicked itself. */
 const hiddenStyle = { display: 'none' } as const;

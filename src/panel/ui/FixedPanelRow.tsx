@@ -33,15 +33,23 @@ export function FixedPanelRow(props: FixedPanelRowProps): ReactElement {
     return <CollapsedPanelRow view={view} panels={isOpen ? panels : null} />;
   }
   return (
-    <SplitPane
-      direction="horizontal"
-      controlledSide="end"
-      defaultSize="360px"
-      open={isOpen}
-      onOpenChange={onOpenChange}
-    >
-      {view}
-      {panels}
-    </SplitPane>
+    // `side-split` is how `chrome.css` reaches the bar to keep it off paper: it
+    // is react-science's own element and carries no class of ours. The wrapper
+    // takes no box, so the split is laid out as before.
+    <div className="side-split" style={contentsStyle}>
+      <SplitPane
+        direction="horizontal"
+        controlledSide="end"
+        defaultSize="360px"
+        open={isOpen}
+        onOpenChange={onOpenChange}
+      >
+        {view}
+        {panels}
+      </SplitPane>
+    </div>
   );
 }
+
+/** A wrapper that takes no box of its own. */
+const contentsStyle = { display: 'contents' } as const;

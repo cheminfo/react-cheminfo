@@ -88,7 +88,7 @@ export function BandsPanel(props: BandsPanelProps) {
                 {assignments ? (
                   <th style={panelHeaderCellStyle}>could be</th>
                 ) : null}
-                <th style={panelHeaderCellStyle} />
+                <th className="no-print" style={panelHeaderCellStyle} />
               </tr>
             </thead>
             <tbody>

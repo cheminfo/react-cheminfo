@@ -30,7 +30,7 @@ export function BandsToolbar() {
   );
 
   return (
-    <div style={panelToolbarStyle}>
+    <div className="no-print" style={panelToolbarStyle}>
       <Toolbar aria-label="Band actions">
         <Toolbar.Item
           icon="locate"

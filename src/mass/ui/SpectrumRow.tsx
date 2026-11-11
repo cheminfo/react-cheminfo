@@ -80,6 +80,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
       />
 
       <Button
+        className="no-print"
         variant="minimal"
         size="small"
         icon="timeline-line-chart"
@@ -98,6 +99,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
       />
 
       <Button
+        className="no-print"
         variant="minimal"
         size="small"
         icon="timeline-bar-chart"
@@ -142,6 +144,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
       )}
 
       <Button
+        className="no-print"
         variant="minimal"
         size="small"
         icon="download"
@@ -154,6 +157,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
       />
 
       <Button
+        className="no-print"
         variant="minimal"
         size="small"
         icon="cross"

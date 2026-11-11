@@ -61,6 +61,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
       data-selected={selected ? 'true' : undefined}
     >
       <Button
+        className="no-print"
         variant="minimal"
         icon={spectrum.visible ? 'eye-open' : 'eye-off'}
         tooltipProps={{ content: spectrum.visible ? 'Hide' : 'Draw' }}
@@ -89,6 +90,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
       <span style={rangeStyle}>{range}</span>
 
       <Button
+        className="no-print"
         variant="minimal"
         icon="download"
         tooltipProps={{ content: 'Download this spectrum as a JCAMP-DX file' }}
@@ -97,6 +99,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
       />
 
       <Button
+        className="no-print"
         variant="minimal"
         icon="cross"
         intent="danger"
