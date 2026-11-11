@@ -56,6 +56,7 @@ test('the sites not linked from the others yet are named apart', () => {
     'mz',
     'uv-vis',
     'xps',
+    'biology',
   ] satisfies SiteId[]);
 });
 

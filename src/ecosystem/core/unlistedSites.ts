@@ -61,4 +61,18 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     brandAlt: '#4d7c0f',
     mark: { plate: '#97297b', accent: '#a3e635' },
   },
+  {
+    id: 'biology',
+    name: { lead: 'biology', alt: 'cheminfo', dot: true },
+    host: 'biology.cheminfo.org',
+    tagline: 'Draw cells and membranes, and snap proteins into them.',
+    group: 'drawing',
+    // Eosin, the pink a cell's cytoplasm takes in the H&E stain every
+    // histology slide is read in: 4.6:1 on white, 7.1 Oklab units from
+    // molecules, the nearest pink.
+    brand: '#db2777',
+    // Haematoxylin, the blue-violet the same stain gives a nucleus, at 9.9:1.
+    brandAlt: '#3730a3',
+    mark: { plate: '#db2777', accent: '#3730a3' },
+  },
 ];

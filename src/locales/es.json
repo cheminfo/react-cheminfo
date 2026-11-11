@@ -128,6 +128,7 @@
   "site.mz.tagline": "Espectros de masas, clasificados según cómo se midieron.",
   "site.uv-vis.tagline": "Superponer espectros UV-vis y leer cada λmax.",
   "site.xps.tagline": "Leer, ajustar y predecir espectros de fotoelectrones de rayos X.",
+  "site.biology.tagline": "Dibujar células y membranas, y anclar proteínas en ellas.",
   "share.button": "Compartir",
   "share.buttonTitle": "Compartir un enlace a esta página, o incrustarla en su propio sitio",
   "share.dialogTitleFor": "Compartir o incrustar — {title}",

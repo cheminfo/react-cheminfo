@@ -38,6 +38,7 @@ export type SiteId =
   | 'vibrations'
   | 'uv-vis'
   | 'xps'
+  | 'biology'
   | 'draw'
   | 'tlc'
   | 'glassware'

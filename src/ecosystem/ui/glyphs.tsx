@@ -14,6 +14,22 @@ import type { ReactNode } from 'react';
 
 import type { SiteId } from '../core/sites.ts';
 
+// The lipid heads of biology's mark, both leaflets, left to right.
+const BILAYER_HEADS: ReadonlyArray<readonly [number, number]> = [
+  [2, 15.1],
+  [6, 13.6],
+  [10, 12.6],
+  [22, 12.6],
+  [26, 13.6],
+  [30, 15.1],
+  [2, 23.6],
+  [6, 22.1],
+  [10, 21.1],
+  [22, 21.1],
+  [26, 22.1],
+  [30, 23.6],
+];
+
 /** Every mark, keyed by site, drawn on top of its plate. */
 export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // Six tiles standing where the six atoms of a benzene ring stand: the
@@ -657,6 +673,17 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
         strokeLinecap="round"
       />
       <circle cx="24.5" cy="8.5" r="3.6" fill={alt} />
+    </>
+  ),
+  // A patch of membrane: the two leaflets of a lipid bilayer, their heads in
+  // white, bowed the way a cell's edge bows, with one protein crossing both in
+  // the answering colour.
+  biology: (alt) => (
+    <>
+      {BILAYER_HEADS.map(([cx, cy]) => (
+        <circle key={`${cx} ${cy}`} cx={cx} cy={cy} r="1.9" fill="#ffffff" />
+      ))}
+      <rect x="11.5" y="5.5" width="9" height="22" rx="4.5" fill={alt} />
     </>
   ),
   // A ring in ink, with a pen nib drawing its last bond in the answering

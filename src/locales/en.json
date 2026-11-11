@@ -128,6 +128,7 @@
   "site.mz.tagline": "Mass spectra, classified by how they were measured.",
   "site.uv-vis.tagline": "Overlay UV-vis spectra and read off every λmax.",
   "site.xps.tagline": "Read, fit and predict X-ray photoelectron spectra.",
+  "site.biology.tagline": "Draw cells and membranes, and snap proteins into them.",
   "share.button": "Share",
   "share.buttonTitle": "Share a link to this page, or embed it in your own site",
   "share.dialogTitleFor": "Share or embed — {title}",
