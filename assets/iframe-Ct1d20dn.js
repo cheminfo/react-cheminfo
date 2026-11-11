@@ -1,0 +1,1 @@
+import{t as e}from"./iframe-CoZYgP14.js";e();
