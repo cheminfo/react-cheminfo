@@ -7,7 +7,7 @@
  */
 
 import { readFigureSource } from '../../download/core/figureSource.ts';
-import { findSiteById } from '../../ecosystem/core/lookup.ts';
+import { findSiteById, isSameSite } from '../../ecosystem/core/lookup.ts';
 
 import type { ToolDocument } from './connectTool.ts';
 import { FIGURE_INPUT } from './figureDocument.ts';
@@ -40,15 +40,17 @@ export function figureDestination(
   origins: Readonly<Record<string, string>> = {},
 ): FigureDestination | undefined {
   const source = readFigureSource(svg);
-  if (source === undefined || source.site === site) return undefined;
+  if (source === undefined || isSameSite(source.site, site)) return undefined;
   const known = findSiteById(source.site);
+  const destination = known?.id ?? source.site;
   const origin =
+    origins[destination] ??
     origins[source.site] ??
     (known === undefined ? undefined : `https://${known.host}`);
   if (origin === undefined || !URL.canParse(source.href)) return undefined;
   const page = new URL(source.href);
   return {
-    site: source.site,
+    site: destination,
     url: new URL(`${page.pathname}${page.search}`, origin).href,
   };
 }

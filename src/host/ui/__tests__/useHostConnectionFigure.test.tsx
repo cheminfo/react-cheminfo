@@ -17,7 +17,7 @@ import { connectAsHost, hostWindow, loadToolPage } from './hostPage.tsx';
 import { until } from './until.ts';
 
 const TOOL: ToolInterface = {
-  name: 'tlc',
+  name: 'plate',
   inputs: [],
   outputs: [{ key: 'figure', kind: 'image.svg' }],
 };
@@ -81,9 +81,9 @@ test('a picture handed back carries the plate the page holds now', async () => {
   expect(answer?.ok).toBe(true);
   expect(answer?.items.map(({ key }) => key)).toStrictEqual(['figure']);
   await expect(
-    readFigureStates(answer?.items[0]?.value.svg ?? '', 'tlc'),
+    readFigureStates(answer?.items[0]?.value.svg ?? '', 'plate'),
   ).resolves.toStrictEqual({
-    site: 'tlc',
+    site: 'plate',
     href: `${globalThis.location.origin}/`,
     data: { version: 1, value: { lanes: 4 } },
     edited: false,

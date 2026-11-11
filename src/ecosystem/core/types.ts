@@ -41,7 +41,7 @@ export type SiteId =
   | 'biodraw'
   | 'diagram'
   | 'draw'
-  | 'tlc'
+  | 'plate'
   | 'glassware'
   | 'write';
 
@@ -81,6 +81,18 @@ export interface SiteRecord {
   name: SiteName;
   /** Where the site lives, written the way it is typed. */
   host: string;
+  /**
+   * The identifiers the site was known by before, which figures, documents and
+   * workspaces saved then still carry: each is read as this site's.
+   * @default undefined — it was never renamed
+   */
+  formerIds?: readonly string[];
+  /**
+   * The hosts it was served from before, which links and decks handed out then
+   * still name, and which now redirect here.
+   * @default undefined — it never moved
+   */
+  formerHosts?: readonly string[];
   /** One line on what the site does. */
   tagline: string;
   /**

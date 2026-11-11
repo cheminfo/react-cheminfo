@@ -24,8 +24,8 @@ import { until } from './until.ts';
 const FIGURE =
   '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20"/></svg>';
 const STATE = { version: 1, value: { plate: { lanes: 3 } } };
-const SAVED = 'https://1a2b3c4d.tlc-cheminfo.pages.dev';
-const RUNNING = 'https://9f8e7d6c.tlc-cheminfo.pages.dev';
+const SAVED = 'https://1a2b3c4d.plate-cheminfo.pages.dev';
+const RUNNING = 'https://9f8e7d6c.plate-cheminfo.pages.dev';
 
 let host: HTMLDivElement;
 let root: Root;
@@ -36,7 +36,7 @@ beforeEach(() => {
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);
-  forget = setFigureRevision('tlc', { deployment: RUNNING });
+  forget = setFigureRevision('plate', { deployment: RUNNING });
 });
 
 afterEach(() => {
@@ -60,7 +60,7 @@ function figureOf(site: string, revision?: string): Promise<string> {
 async function render(props: Partial<OpenFigureButtonProps>): Promise<void> {
   await act(async () => {
     root.render(
-      <OpenFigureButton site="tlc" onOpen={vi.fn()} host="draw" {...props} />,
+      <OpenFigureButton site="plate" onOpen={vi.fn()} host="draw" {...props} />,
     );
     await Promise.resolve();
   });
@@ -118,14 +118,14 @@ test('the button opens the file picker, for an SVG or a document', async () => {
 test('a figure of the site opens as it was, and one saved elsewhere offers its own deployment', async () => {
   const onOpen = vi.fn();
   await render({ onOpen });
-  await pick(new File([await figureOf('tlc', SAVED)], 'plate.svg'));
+  await pick(new File([await figureOf('plate', SAVED)], 'plate.svg'));
   await until(() => bodyButton('Original version') !== undefined);
 
   expect(onOpen.mock.calls).toStrictEqual([
     [
       {
-        site: 'tlc',
-        href: 'https://tlc.cheminfo.org/?embed=1',
+        site: 'plate',
+        href: 'https://plate.cheminfo.org/?embed=1',
         data: STATE,
         edited: false,
       },
@@ -148,13 +148,13 @@ test('a document of the site opens on its figure, then takes its workspace', asy
   const workspace = { id: 'w1', name: 'Plate', preferences: { lanes: 4 } };
   const document = await writeSiteDocument(
     {
-      data: [{ path: 'plate.tlc.svg', content: await figureOf('tlc') }],
+      data: [{ path: 'plate.plate.svg', content: await figureOf('plate') }],
       preferences: workspace,
     },
-    { site: 'tlc' },
+    { site: 'plate' },
   );
   await render({ onOpen, onWorkspace });
-  await pick(new File([document], 'plate.tlc.zip'));
+  await pick(new File([document], 'plate.plate.zip'));
   await until(() => onWorkspace.mock.calls.length > 0);
 
   expect(onOpen).toHaveBeenCalledOnce();
@@ -210,7 +210,7 @@ test('a file holding no figure of the site says so, and so does one the site can
   await render({
     onOpen: () => Promise.reject(new Error('This plate has no lanes.')),
   });
-  await pick(new File([await figureOf('tlc')], 'broken.svg'));
+  await pick(new File([await figureOf('plate')], 'broken.svg'));
   await until(() => alertText()?.startsWith('broken') === true);
 
   expect(alertText()).toBe('broken.svg holds no figure of this site to open.');

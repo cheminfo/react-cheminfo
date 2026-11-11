@@ -17,6 +17,8 @@
  * known for one.
  */
 
+import { isSameSite } from '../../ecosystem/core/lookup.ts';
+
 import {
   FIGURE_STATE_ENCODING,
   packFigureValue,
@@ -135,7 +137,10 @@ export async function readFigureStates(
   const found = findSource(svg);
   if (found === undefined) return undefined;
   const named = readSourceTag(found);
-  if (named === undefined || (site !== undefined && named.site !== site)) {
+  if (
+    named === undefined ||
+    (site !== undefined && !isSameSite(named.site, site))
+  ) {
     return undefined;
   }
   const decoded = await Promise.all(

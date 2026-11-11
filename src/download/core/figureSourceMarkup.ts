@@ -4,6 +4,8 @@
  * before anything trusts it.
  */
 
+import { presentSiteId } from '../../ecosystem/core/lookup.ts';
+
 /** The namespace the source is written in, which names it whatever its prefix. */
 export const FIGURE_SOURCE_NAMESPACE = 'https://www.cheminfo.org/ns/source/2';
 
@@ -65,7 +67,7 @@ export function readSourceTag(
   if (!URL.canParse(href) || !/^https?:$/.test(new URL(href).protocol)) {
     return undefined;
   }
-  return { site, href };
+  return { site: presentSiteId(site), href };
 }
 
 /**

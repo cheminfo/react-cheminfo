@@ -1,4 +1,5 @@
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import { isSameSite } from '../../ecosystem/core/lookup.ts';
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 /** What a workspace file says it is, in its `format` field. */
@@ -65,7 +66,7 @@ export function readWorkspaceValue(
   if (!isPlainRecord(value) || value.format !== WORKSPACE_FORMAT) {
     throw new Error('This file holds no workspace, so none was opened.');
   }
-  if (value.site !== site) {
+  if (typeof value.site !== 'string' || !isSameSite(value.site, site)) {
     throw new Error(
       `This workspace was made for ${String(value.site)}, so it was not opened here.`,
     );

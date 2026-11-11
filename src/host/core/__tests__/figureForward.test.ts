@@ -36,14 +36,27 @@ test('a figure of the site it was dropped on, or of none, goes nowhere', async (
 });
 
 test('the page opens on the host the family knows, whatever origin the file writes', async () => {
-  const svg = await drawnBy('tlc', 'https://evil.example/plate?lanes=3');
+  const svg = await drawnBy('plate', 'https://evil.example/?lanes=3');
 
   expect(figureDestination(svg, 'draw')?.url).toBe(
-    'https://tlc.cheminfo.org/plate?lanes=3',
+    'https://plate.cheminfo.org/?lanes=3',
   );
   expect(
-    figureDestination(svg, 'draw', { tlc: 'http://localhost:11106' })?.url,
-  ).toBe('http://localhost:11106/plate?lanes=3');
+    figureDestination(svg, 'draw', { plate: 'http://localhost:11106' })?.url,
+  ).toBe('http://localhost:11106/?lanes=3');
+});
+
+test('a figure saved under a name its site has left goes to the site it is now', async () => {
+  const svg = await drawnBy('tlc', 'https://tlc.cheminfo.org/?example=flash');
+
+  expect(figureDestination(svg, 'draw')).toStrictEqual({
+    site: 'plate',
+    url: 'https://plate.cheminfo.org/?example=flash',
+  });
+  expect(
+    figureDestination(svg, 'draw', { plate: 'http://localhost:11106' })?.url,
+  ).toBe('http://localhost:11106/?example=flash');
+  expect(figureDestination(svg, 'plate')).toBeUndefined();
 });
 
 test('the figure is handed over on the figure input, as an SVG', () => {

@@ -1289,7 +1289,7 @@ useHostConnection(TOOL, {
   build, and a digest of the picture. Inside it, the page's `states` in three
   named parts, each in the site's own format and versioned by it:
   `<cheminfo:data>` — what the figure is: 3d's conformers, lcao's geometry,
-  tlc's plate, chemcalc's spectra, the periodic table's colouring —
+  plate's lanes and spots, chemcalc's spectra, the periodic table's colouring —
   `<cheminfo:view>` — where it stood — and `<cheminfo:preferences>` — the
   workspace it was made in. A part is JSON a person can read, gzipped in
   base64 once it passes 32 KB. The data is the document: a site opens the

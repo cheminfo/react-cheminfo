@@ -1,6 +1,12 @@
 import { expect, test } from 'vitest';
 
-import { findSiteByHost, groupedSites, siteById } from '../lookup.ts';
+import {
+  findSiteByHost,
+  findSiteById,
+  groupedSites,
+  isSameSite,
+  siteById,
+} from '../lookup.ts';
 import type { SiteId } from '../sites.ts';
 import { ECOSYSTEM_SITES } from '../sites.ts';
 import { UNLISTED_SITES } from '../unlistedSites.ts';
@@ -67,4 +73,39 @@ test('a host belonging to nobody is not one of ours', () => {
   expect(findSiteByHost('cheminfo.org')).toBeUndefined();
   expect(findSiteByHost('')).toBeUndefined();
   expect(findSiteByHost(':3000')).toBeUndefined();
+});
+
+test('a renamed site is found under the identifier and the host it left', () => {
+  expect(findSiteById('tlc')?.id).toBe('plate');
+  expect(findSiteById('plate')?.host).toBe('plate.cheminfo.org');
+  expect(findSiteByHost('tlc.cheminfo.org')?.id).toBe('plate');
+  expect(findSiteByHost('www.tlc.cheminfo.org:443')?.id).toBe('plate');
+});
+
+test('what a site saved under its former identifier is still its own', () => {
+  expect(isSameSite('tlc', 'plate')).toBe(true);
+  expect(isSameSite('plate', 'plate')).toBe(true);
+  expect(isSameSite('draw', 'draw')).toBe(true);
+  // The former name belongs to the site that left it, never the other way.
+  expect(isSameSite('plate', 'tlc')).toBe(false);
+  expect(isSameSite('tlc', 'draw')).toBe(false);
+  expect(isSameSite('glassware', 'plate')).toBe(false);
+});
+
+test('no identifier or host is claimed by two sites', () => {
+  const claimed = new Map<string, string>();
+  for (const site of [...ECOSYSTEM_SITES, ...UNLISTED_SITES]) {
+    for (const name of [site.id, ...(site.formerIds ?? [])]) {
+      expect(claimed.get(`id:${name}`)).toBeUndefined();
+
+      claimed.set(`id:${name}`, site.id);
+    }
+    for (const host of [site.host, ...(site.formerHosts ?? [])]) {
+      expect(claimed.get(`host:${host}`)).toBeUndefined();
+
+      claimed.set(`host:${host}`, site.id);
+    }
+  }
+
+  expect(claimed.get('id:tlc')).toBe('plate');
 });

@@ -119,7 +119,7 @@
   "site.slides.tagline": "Put a live tool on a slide, from the link its Share button gives.",
   "site.vibrations.tagline": "IR and Raman spectra computed in the browser.",
   "site.draw.tagline": "Journal-grade structures, in an SVG that keeps the chemistry.",
-  "site.tlc.tagline": "Read a TLC plate, get its Rf, and weigh its eluent.",
+  "site.plate.tagline": "Read a TLC plate, a gel or a blot from a photograph.",
   "site.glassware.tagline": "Assemble lab glassware into a working apparatus, and draw it.",
   "site.write.tagline": "Write documents holding structures, 3D models and plates that open again where they were made.",
   "site.molecules.tagline": "Look up a molecule, its computed properties and its sources.",

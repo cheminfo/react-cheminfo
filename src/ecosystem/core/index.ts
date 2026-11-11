@@ -5,6 +5,8 @@ export {
   findSiteByHost,
   findSiteById,
   groupedSites,
+  isSameSite,
+  presentSiteId,
   siteById,
   siteDisplayName,
 } from './lookup.ts';

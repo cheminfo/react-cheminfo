@@ -3,6 +3,7 @@ import {
   SOURCE_FORMAT,
   SOURCE_VERSION,
 } from '../../download/core/sourceEnvelope.ts';
+import { isSameSite } from '../../ecosystem/core/lookup.ts';
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 import type { ArchiveEntry, ArchiveFile } from './backupFiles.ts';
@@ -172,7 +173,7 @@ export async function readSiteDocument(
     );
   }
   const { manifest, folder } = found;
-  if (site !== undefined && manifest.site !== site) {
+  if (site !== undefined && !isSameSite(manifest.site, site)) {
     throw new Error(
       `This document was saved by ${manifest.site}, so it does not open here.`,
     );

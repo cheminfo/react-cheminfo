@@ -62,15 +62,39 @@ export function siteById(id: SiteId): EcosystemSite {
 
 /**
  * One site of the family, by an identifier read from elsewhere — a figure, a
- * link — which may name no site at all.
+ * link — which may name no site at all, or a site under a name it has since
+ * left.
  * @param id - The identifier.
  * @returns The site, or `undefined` when no site carries that identifier.
  */
 export function findSiteById(id: string): EcosystemSite | undefined {
   for (const site of KNOWN_SITES) {
-    if (site.id === id) return site;
+    if (site.id === id || site.formerIds?.includes(id)) return site;
   }
   return undefined;
+}
+
+/**
+ * The identifier a site goes by now, for one read from a figure or a file,
+ * which may be one it has since left. An identifier no site carries is itself.
+ * @param id - The identifier read.
+ * @returns The site's present identifier, or `id`.
+ */
+export function presentSiteId(id: string): string {
+  return findSiteById(id)?.id ?? id;
+}
+
+/**
+ * Whether an identifier read from a figure, a document or a workspace names
+ * the site reading it, under its present identifier or one it was known by
+ * before, so what was saved before a rename still opens.
+ * @param named - The identifier the saved thing carries.
+ * @param site - The site reading it.
+ * @returns Whether they are one site.
+ */
+export function isSameSite(named: string, site: string): boolean {
+  if (named === site) return true;
+  return findSiteById(site)?.formerIds?.includes(named) ?? false;
 }
 
 /**
@@ -106,6 +130,9 @@ export function findSiteByHost(host: string): EcosystemSite | undefined {
 
   for (const site of KNOWN_SITES) {
     if (normalizeHost(site.host) === wanted) return site;
+    for (const former of site.formerHosts ?? []) {
+      if (normalizeHost(former) === wanted) return site;
+    }
   }
   return undefined;
 }

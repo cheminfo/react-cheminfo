@@ -69,3 +69,11 @@ test('another site, another format or version, and a part that does not read are
     preferences: { version: 1, value: null },
   });
 });
+
+test('an envelope saved under a name its site has left is that site', () => {
+  const envelope = { ...sourceEnvelope({ site: 'tlc' }), site: 'tlc' };
+
+  expect(readSourceEnvelope(envelope)?.site).toBe('plate');
+  expect(readSourceEnvelope(envelope, 'plate')?.site).toBe('plate');
+  expect(readSourceEnvelope(envelope, 'draw')).toBeUndefined();
+});

@@ -5,7 +5,7 @@
  * preferences (`figureState.ts`).
  *
  * The state is what makes a figure a document rather than a picture: the
- * structure and conformers of 3d, the geometry of lcao, the plate of tlc, the
+ * structure and conformers of 3d, the geometry of lcao, the lanes and spots of plate, the
  * spectra of chemcalc, the table of periodic-table, the drawing of draw. The
  * site reads it back from the file, or from a host handing the figure over
  * whole, and shows the page as it was, with nothing computed anew. The address

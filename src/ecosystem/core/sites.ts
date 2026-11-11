@@ -399,15 +399,19 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#ffffff', accent: '#c0261d', edge: '#dfe3e8' },
   },
   {
-    id: 'tlc',
-    name: { lead: 'tlc', alt: 'cheminfo', dot: true },
-    host: 'tlc.cheminfo.org',
-    tagline: 'Read a TLC plate, get its Rf, and weigh its eluent.',
+    id: 'plate',
+    name: { lead: 'plate', alt: 'cheminfo', dot: true },
+    host: 'plate.cheminfo.org',
+    formerIds: ['tlc'],
+    formerHosts: ['tlc.cheminfo.org'],
+    tagline: 'Read a TLC plate, a gel or a blot from a photograph.',
     group: 'practice',
-    // Permanganate, the violet a plate is so often stained with: 15:1 on white.
+    // Permanganate, the violet a TLC plate is so often stained with, and the
+    // violet of a Coomassie-stained gel: 15:1 on white.
     brand: '#3b0764',
-    // The glow of a fluorescent plate under a 254 nm lamp sits at 1.6:1 on
-    // white, so the wordmark sets its second half in this darker green, at 5:1.
+    // The glow of a fluorescent plate under a 254 nm lamp, and of a DNA gel
+    // stained with SYBR Green, sits at 1.6:1 on white, so the wordmark sets its
+    // second half in this darker green, at 5:1.
     brandAlt: '#15803d',
     mark: { plate: '#3b0764', accent: '#4ade80' },
   },

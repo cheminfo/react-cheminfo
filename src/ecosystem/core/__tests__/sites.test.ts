@@ -44,7 +44,7 @@ test('the family is the thirty-one sites, listed once each', () => {
     'slides',
     'vibrations',
     'draw',
-    'tlc',
+    'plate',
     'glassware',
     'write',
   ] satisfies SiteId[]);

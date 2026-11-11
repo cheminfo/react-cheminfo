@@ -47,7 +47,7 @@ afterEach(() => {
 
 function Saving(props: { keepsWorkspace: boolean }): ReactElement {
   const saveAs = useSaveFigureAs({
-    site: 'tlc',
+    site: 'plate',
     figure: async () => SVG,
     stem: () => 'tlc-plate',
     ...(props.keepsWorkspace
@@ -93,8 +93,8 @@ test('Save as offers the SVG first, and the document with its workspace, never t
   render();
 
   expect(labels()).toStrictEqual([
-    'SVG picture that opens here again .tlc.svg',
-    'Document: the same picture, with what you tick below .tlc.zip',
+    'SVG picture that opens here again .plate.svg',
+    'Document: the same picture, with what you tick below .plate.zip',
     'The workspaceIt opens with these panels and their settings.',
   ]);
   expect(document.querySelector('.input-affix input')).toHaveProperty(
@@ -112,7 +112,7 @@ test("the SVG is saved under the site's extension", async () => {
   await submit();
 
   expect(downloads.map(({ name }) => name)).toStrictEqual([
-    'tlc-plate.tlc.svg',
+    'tlc-plate.plate.svg',
   ]);
   await expect(downloads[0]?.blob.text()).resolves.toBe(SVG);
 });
@@ -128,13 +128,16 @@ test('the document holds the same figure, and the preferences as its workspace',
   await submit();
 
   expect(downloads.map(({ name }) => name)).toStrictEqual([
-    'tlc-plate.tlc.zip',
+    'tlc-plate.plate.zip',
   ]);
 
-  const saved = await readSiteDocument(downloads[0]?.blob ?? new Blob(), 'tlc');
+  const saved = await readSiteDocument(
+    downloads[0]?.blob ?? new Blob(),
+    'plate',
+  );
 
   expect(saved.data.map(({ path }) => path)).toStrictEqual([
-    'tlc-plate.tlc.svg',
+    'tlc-plate.plate.svg',
   ]);
   expect(saved.data[0]?.text()).toBe(SVG);
   expect(saved.preferences).toMatchObject({
@@ -156,7 +159,10 @@ test('a site keeping no workspace saves its document with the figure alone', asy
 
   await submit();
 
-  const saved = await readSiteDocument(downloads[0]?.blob ?? new Blob(), 'tlc');
+  const saved = await readSiteDocument(
+    downloads[0]?.blob ?? new Blob(),
+    'plate',
+  );
 
   expect(saved.preferences).toBeUndefined();
 });

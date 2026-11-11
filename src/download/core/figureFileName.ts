@@ -1,6 +1,6 @@
 /**
  * The names a site's own figure is saved under. Every site of the family that
- * changes a figure again — draw, glassware, 3d, lcao, tlc — saves it as an SVG
+ * changes a figure again — draw, glassware, 3d, lcao, plate — saves it as an SVG
  * whose extension names the site that opens it, `benzene.3d.svg`, so a file
  * says where it goes back to, and still opens in any program as an SVG.
  */

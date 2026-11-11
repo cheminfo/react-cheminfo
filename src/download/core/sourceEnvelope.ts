@@ -16,6 +16,7 @@
  * rest, so a part, or a field, is added without breaking an older reader.
  */
 
+import { isSameSite, presentSiteId } from '../../ecosystem/core/lookup.ts';
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 import type { FigureStates, SiteState } from './figureState.ts';
@@ -98,8 +99,8 @@ export function readSourceEnvelope(
   }
   const named = value.site;
   if (typeof named !== 'string' || !SITE.test(named)) return undefined;
-  if (site !== undefined && named !== site) return undefined;
-  const record: SourceRecord = { site: named };
+  if (site !== undefined && !isSameSite(named, site)) return undefined;
+  const record: SourceRecord = { site: presentSiteId(named) };
   if (typeof value.href === 'string') record.href = value.href;
   if (typeof value.generator === 'string') record.generator = value.generator;
   for (const part of STATE_PARTS) {

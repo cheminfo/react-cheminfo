@@ -98,3 +98,16 @@ test('the address a figure records drops what only a framing page asks for', () 
     figureAddress('https://periodic-table.cheminfo.org/table/Fe?embed'),
   ).toBe('https://periodic-table.cheminfo.org/table/Fe');
 });
+
+test('a figure saved under a name its site has left names the site as it is now', async () => {
+  const svg = await withFigureSource(FIGURE, {
+    site: 'tlc',
+    href: 'https://tlc.cheminfo.org/?example=flash',
+  });
+
+  expect(svg).toContain('site="tlc"');
+  expect(readFigureSource(svg)).toStrictEqual({
+    site: 'plate',
+    href: 'https://tlc.cheminfo.org/?example=flash',
+  });
+});

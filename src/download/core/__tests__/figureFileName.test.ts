@@ -15,17 +15,17 @@ test('a site’s figure ends in the site’s own extension, once', () => {
   expect(siteFigureExtension('lcao')).toBe('.lcao.svg');
   expect(siteFigureName('benzene', '3d')).toBe('benzene.3d.svg');
   expect(siteFigureName('benzene.3d.svg', '3d')).toBe('benzene.3d.svg');
-  expect(siteFigureName('a/b', 'tlc')).toBe('a-b.tlc.svg');
+  expect(siteFigureName('a/b', 'plate')).toBe('a-b.plate.svg');
   expect(siteFigureName('', 'glassware')).toBe('glassware.glassware.svg');
 });
 
 test('an SVG is named after the site it says drew it, and plainly otherwise', async () => {
   const sourced = await withFigureSource(FIGURE, {
-    site: 'tlc',
-    href: 'https://tlc.cheminfo.org/',
+    site: 'plate',
+    href: 'https://plate.cheminfo.org/',
   });
 
-  expect(figureFileName('plate', sourced)).toBe('plate.tlc.svg');
+  expect(figureFileName('plate', sourced)).toBe('plate.plate.svg');
   expect(figureFileName('plate', FIGURE)).toBe('plate.svg');
 });
 

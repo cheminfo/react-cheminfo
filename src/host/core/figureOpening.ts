@@ -7,6 +7,7 @@
 
 import type { CarriedFigureStates } from '../../download/core/figureState.ts';
 import { readFigureStates } from '../../download/core/figureState.ts';
+import { isSameSite } from '../../ecosystem/core/lookup.ts';
 import { documentFigure } from '../../storage/core/documentFigure.ts';
 import type { SiteDocument } from '../../storage/core/siteDocument.ts';
 import { readSiteDocument } from '../../storage/core/siteDocument.ts';
@@ -95,7 +96,9 @@ export async function readOpenedFile(
   const svg = documentFigure(document);
   if (!svg) return { figure: { kind: 'none' } };
   const figure = await readOpenedFigure(svg.text(), site, origins);
-  return figure.kind === 'own' && document.site === site && document.preferences
+  return figure.kind === 'own' &&
+    isSameSite(document.site, site) &&
+    document.preferences
     ? { figure, workspace: document.preferences }
     : { figure };
 }

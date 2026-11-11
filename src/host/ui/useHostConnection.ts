@@ -62,7 +62,7 @@ export interface HostHandlers {
   help?: ToolHelp;
   /**
    * What the page holds, in the site's own format: its `data` — the
-   * conformers of 3d, the plate of tlc, the spectra of chemcalc — and, when
+   * conformers of 3d, the lanes and spots of plate, the spectra of chemcalc — and, when
    * the site keeps them, its `view` and its `preferences`. Every figure the
    * page hands back or saves carries them, so the site opens the figure again
    * as it was, with nothing computed anew, from a file opened or dropped on the

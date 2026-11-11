@@ -4,6 +4,8 @@
  * cannot send the reader to an address of its choosing.
  */
 
+import { isSameSite } from '../../ecosystem/core/lookup.ts';
+
 import { figureRevision } from './figureRevision.ts';
 import { readFigureSource } from './figureSource.ts';
 
@@ -21,7 +23,8 @@ export function savedRevisionAddress(
 ): string | undefined {
   const deployment = figureRevision(site);
   const source = readFigureSource(svg);
-  if (deployment === undefined || source?.site !== site) return undefined;
+  if (deployment === undefined || source === undefined) return undefined;
+  if (!isSameSite(source.site, site)) return undefined;
   const { revision, href } = source;
   if (revision === undefined || !URL.canParse(revision)) return undefined;
   const saved = new URL(revision);
