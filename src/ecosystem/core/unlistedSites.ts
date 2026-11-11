@@ -62,9 +62,10 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#97297b', accent: '#a3e635' },
   },
   {
-    id: 'biology',
-    name: { lead: 'biology', alt: 'cheminfo', dot: true },
-    host: 'biology.cheminfo.org',
+    id: 'biodraw',
+    // The name splits on itself, biology and drawing, so it carries no domain.
+    name: { lead: 'bio', alt: 'draw', dot: false },
+    host: 'biodraw.cheminfo.org',
     tagline: 'Draw cells and membranes, and snap proteins into them.',
     group: 'drawing',
     // Eosin, the pink a cell's cytoplasm takes in the H&E stain every
@@ -74,5 +75,20 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     // Haematoxylin, the blue-violet the same stain gives a nucleus, at 9.9:1.
     brandAlt: '#3730a3',
     mark: { plate: '#db2777', accent: '#3730a3' },
+  },
+  {
+    id: 'diagram',
+    name: { lead: 'diagram', alt: 'cheminfo', dot: true },
+    host: 'diagram.cheminfo.org',
+    tagline:
+      'Draw flowcharts and block diagrams, with arrows that follow the blocks.',
+    group: 'drawing',
+    // Coral, the sticky note a block diagram is first laid out on: 5:1 on
+    // white, and 7.4 Oklab units from slides, the nearest lead.
+    brand: '#b84c59',
+    // The cyan of the arrow joining two notes answers it; the name takes the
+    // darker cyan, at 5.4:1.
+    brandAlt: '#0e7490',
+    mark: { plate: '#b84c59', accent: '#67e8f9' },
   },
 ];

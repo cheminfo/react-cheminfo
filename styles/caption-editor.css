@@ -1,0 +1,111 @@
+/* The box a caption is typed in, laid over the drawing, as `CaptionEditor`
+   draws it. It is set as the drawing will set it: `--zoom` is one point on
+   screen, so a run of its own size and a script land where the canvas puts
+   them. Placed from its anchor, it would otherwise be as narrow as the room
+   left of the canvas's edge, and wrap a caption the drawing writes on one
+   line. */
+.caption-editor {
+  position: absolute;
+  z-index: 2;
+  width: max-content;
+}
+
+.caption-editor__box {
+  min-width: 2ch;
+  padding: 0 2px;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text);
+  line-height: 1.2;
+  user-select: text;
+}
+
+/* What ProseMirror's own stylesheet sets, kept to this box so another editor
+   on the page keeps its own; two classes, to win over a page that loads it. */
+.caption-editor__text.ProseMirror {
+  position: relative;
+  min-width: 1ch;
+  font-feature-settings: 'liga' 0;
+  font-variant-ligatures: none;
+  outline: none;
+  overflow-wrap: break-word;
+  white-space: pre;
+}
+
+/* Given a width, the lines wrap inside it. */
+.caption-editor--wrapped .caption-editor__text.ProseMirror {
+  white-space: break-spaces;
+}
+
+.caption-editor__text.ProseMirror-hideselection {
+  caret-color: transparent;
+}
+
+.caption-editor__text.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+.caption-editor__text img.ProseMirror-separator {
+  display: inline !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+.caption-editor__text .caption-size {
+  font-size: calc(var(--run-size) * var(--zoom));
+}
+
+.caption-editor__text sub,
+.caption-editor__text sup,
+.caption-editor__text .caption-chemical {
+  position: relative;
+  font-size: 0.7em;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+/* The shifts of the canvas, 0.25 and 0.4 of the run, in the script's em. */
+.caption-editor__text sub,
+.caption-editor__text .caption-chemical--sub {
+  top: 0.357em;
+}
+
+.caption-editor__text sup,
+.caption-editor__text .caption-chemical--sup {
+  top: -0.571em;
+}
+
+/* The toolbar stays upright over the box, whichever way the text is turned. */
+.caption-toolbar {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-family: inherit;
+  font-size: 13px;
+  gap: 4px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.caption-toolbar__size {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.caption-toolbar__size .bp6-input-group {
+  width: 3.5rem;
+}
+
+.caption-toolbar__unit {
+  color: var(--text-muted);
+}

@@ -1,0 +1,16 @@
+/* The handles a curve is edited by, as `curveHandleMarks` draws them: white
+   rings on thin arms setting the tangent at a point, and a filled square on
+   each point the curve passes through. */
+.draw-handle {
+  fill: var(--surface);
+  stroke: var(--accent);
+}
+
+.draw-handle--point {
+  fill: var(--accent);
+}
+
+.draw-tangent {
+  stroke: var(--accent);
+  stroke-opacity: 0.7;
+}

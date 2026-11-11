@@ -14,7 +14,7 @@ import type { ReactNode } from 'react';
 
 import type { SiteId } from '../core/sites.ts';
 
-// The lipid heads of biology's mark, both leaflets, left to right.
+// The lipid heads of biodraw's mark, both leaflets, left to right.
 const BILAYER_HEADS: ReadonlyArray<readonly [number, number]> = [
   [2, 15.1],
   [6, 13.6],
@@ -678,12 +678,30 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // A patch of membrane: the two leaflets of a lipid bilayer, their heads in
   // white, bowed the way a cell's edge bows, with one protein crossing both in
   // the answering colour.
-  biology: (alt) => (
+  biodraw: (alt) => (
     <>
       {BILAYER_HEADS.map(([cx, cy]) => (
         <circle key={`${cx} ${cy}`} cx={cx} cy={cy} r="1.9" fill="#ffffff" />
       ))}
       <rect x="11.5" y="5.5" width="9" height="22" rx="4.5" fill={alt} />
+    </>
+  ),
+  // Two blocks of a flowchart, joined by an elbow arrow in the answering
+  // colour that leaves the first from below and enters the second from the
+  // side.
+  diagram: (alt) => (
+    <>
+      <rect x="3" y="4" width="15" height="9" rx="2.5" fill="#ffffff" />
+      <rect x="14" y="19" width="15" height="9" rx="2.5" fill="#ffffff" />
+      <path
+        d="M8.5 13v10.5h1.5"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M9 19.6 14 23.5 9 27.4Z" fill={alt} />
     </>
   ),
   // A ring in ink, with a pen nib drawing its last bond in the answering

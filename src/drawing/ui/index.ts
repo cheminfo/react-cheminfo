@@ -1,4 +1,5 @@
 export { ArrangeIcon } from './ArrangeIcon.tsx';
+export { curveHandleMarks } from './curveHandleMarks.tsx';
 export type { DashedOutlineProps, HandleMarkProps } from './DashedOutline.tsx';
 export { DashedOutline, HandleMark } from './DashedOutline.tsx';
 export { FigureOutline } from './FigureOutline.tsx';

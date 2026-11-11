@@ -26,11 +26,19 @@ export type { ChemicalRange } from './chemicalText.ts';
 export { chemicalRanges } from './chemicalText.ts';
 export type { CubicPiece, CurveControl } from './curves.ts';
 export {
+  bezierOf,
   cubicPoint,
   curveControls,
   curveOutline,
   curvePieces,
 } from './curves.ts';
+export type { CurveShape, CurveSpot } from './curveShape.ts';
+export {
+  curveSpotAt,
+  handSet,
+  withPointAt,
+  withoutPoint,
+} from './curveShape.ts';
 export type { PickerType } from './fileAccess.ts';
 export { chooseOpenFile, chooseSaveFile, writeFile } from './fileAccess.ts';
 export type { FontChoice } from './fonts.ts';
@@ -133,6 +141,14 @@ export {
 export type { Glyph } from './richTextMarks.ts';
 export { MAX_RUN_SIZE, readMarks } from './richTextMarks.ts';
 export { writeRichText } from './richTextWriter.ts';
+export type { CurveDragOptions, CurveHandle } from './shapeHandles.ts';
+export {
+  dragShapeHandle,
+  resetShapeVertex,
+  shapeHandleAt,
+  shapeHandles,
+  shapeLineAt,
+} from './shapeHandles.ts';
 export type { Patching } from './shared.ts';
 export { idsOf, patchOf, sharedValue } from './shared.ts';
 export type { Similarity } from './transform.ts';

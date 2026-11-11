@@ -7,6 +7,8 @@
  * they are spaced.
  */
 
+import { Bezier } from 'bezier-js';
+
 import type { Point } from './types.ts';
 import { along, unit } from './vectors.ts';
 
@@ -176,6 +178,15 @@ export function cubicPoint(
     x: a * from.x + b * control1.x + c * control2.x + d * to.x,
     y: a * from.y + b * control1.y + c * control2.y + d * to.y,
   };
+}
+
+/**
+ * The curve of a cubic piece, to follow.
+ * @param piece - The piece.
+ * @returns The curve.
+ */
+export function bezierOf(piece: CubicPiece): Bezier {
+  return new Bezier(piece.from, piece.control1, piece.control2, piece.to);
 }
 
 // The unit tangent at each vertex. At the two ends of an open curve it is the
