@@ -52,20 +52,9 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
           <IrLogo size={64} technique={technique} />
           <div>
             <p style={leadStyle}>{DOORS[technique]}</p>
-            {raman ? (
-              <p style={paragraphStyle}>{t('ir.raman.aboutLead')}</p>
-            ) : technique === 'uvvis' ? (
-              <p style={paragraphStyle}>
-                Draws UV-vis spectra over their wavelengths, reads them as
-                absorbance or as percent transmittance, and picks every λmax.
-              </p>
-            ) : (
-              <p style={paragraphStyle}>
-                Draws an infrared spectrum the way infrared is printed, reads it
-                as absorbance or as percent transmittance, picks its bands and
-                offers every functional group each band could be.
-              </p>
-            )}
+            <p style={paragraphStyle}>
+              {raman ? t('ir.raman.aboutLead') : LEADS[technique]}
+            </p>
           </div>
         </div>
 
@@ -80,12 +69,13 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
                 <Prose text={t('ir.raman.credit.jcamp')} />
               </li>
             </>
-          ) : technique === 'uvvis' ? (
+          ) : technique === 'uvvis' || technique === 'fluorescence' ? (
             <>
               <li>
                 <strong>uv-spectrum</strong> (cheminfo, MIT) reads the JCAMP-DX,
-                SPC, PerkinElmer SP, Cary Eclipse and text files, and derives
-                the absorbance/transmittance pair.
+                SPC, PerkinElmer SP, Cary Eclipse and text files, derives the
+                absorbance/transmittance pair, and tells light emitted from
+                light absorbed.
               </li>
               <li>
                 <strong>ir-spectrum</strong>, <strong>common-spectrum</strong>{' '}
@@ -146,6 +136,17 @@ const DOORS: Record<IrTechnique, string> = {
   infrared: 'react-cheminfo/ir',
   raman: 'react-cheminfo/raman',
   uvvis: 'react-cheminfo/uvvis',
+  fluorescence: 'react-cheminfo/uvvis',
+};
+
+/** What each viewer worded from the core records does, in a sentence. */
+const LEADS: Record<Exclude<IrTechnique, 'raman'>, string> = {
+  infrared:
+    'Draws an infrared spectrum the way infrared is printed, reads it as absorbance or as percent transmittance, picks its bands and offers every functional group each band could be.',
+  uvvis:
+    'Draws UV-vis spectra over their wavelengths, reads them as absorbance or as percent transmittance, and picks every λmax.',
+  fluorescence:
+    'Draws fluorescence spectra over their wavelengths, as the intensity of the light emitted, and picks every emission maximum.',
 };
 
 const dialogStyle = { width: 'min(680px, 92vw)' } as const;

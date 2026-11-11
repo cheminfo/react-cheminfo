@@ -34,12 +34,7 @@ export function bandsFromIrPeaks(
   spectrum: IrSpectrum,
   peaks: readonly IrPeakValue[],
 ): IrBand[] {
-  return bandsFromPeaks(spectrum, peaks, (peak) => ({
-    ...(peak.absorbance === undefined ? {} : { absorbance: peak.absorbance }),
-    ...(peak.transmittance === undefined
-      ? {}
-      : { transmittance: peak.transmittance * 100 }),
-  }));
+  return bandsFromPeaks(spectrum, peaks, absorptionValues);
 }
 
 /**
@@ -59,8 +54,8 @@ export function bandsFromRamanPeaks(
 }
 
 /**
- * The maxima a host handed over with a UV-vis spectrum, kept as
- * {@link bandsFromIrPeaks} keeps infrared bands.
+ * The maxima a host handed over with a UV-vis or a fluorescence spectrum, kept
+ * as {@link bandsFromIrPeaks} keeps infrared bands.
  * @param spectrum - The spectrum they were picked on.
  * @param peaks - The peaks, in any order.
  * @returns The bands, ascending, one per wavelength.
@@ -69,11 +64,14 @@ export function bandsFromUvPeaks(
   spectrum: IrSpectrum,
   peaks: readonly UvPeakValue[],
 ): IrBand[] {
-  const positioned: Array<IrPeakValue & { wavelength: number }> = [];
+  const positioned: Array<UvPeakValue & { wavenumber: number }> = [];
   for (const peak of peaks) {
     positioned.push({ ...peak, wavenumber: peak.wavelength });
   }
-  return bandsFromIrPeaks(spectrum, positioned);
+  return bandsFromPeaks(spectrum, positioned, (peak) => ({
+    ...absorptionValues(peak),
+    ...(peak.intensity === undefined ? {} : { intensity: peak.intensity }),
+  }));
 }
 
 /**
@@ -97,14 +95,24 @@ export function irPeaksFromBands(bands: readonly IrBand[]): IrPeakValue[] {
 }
 
 /**
- * A UV-vis spectrum's maxima as a host keeps them: `spectra.uv.peaks`.
+ * A UV-vis or a fluorescence spectrum's maxima as a host keeps them:
+ * `spectra.uv.peaks`.
  * @param bands - The bands, as the viewer holds them.
  * @returns The peaks, in the same order.
  */
 export function uvPeaksFromBands(bands: readonly IrBand[]): UvPeakValue[] {
   const peaks: UvPeakValue[] = [];
-  for (const { wavenumber, ...rest } of irPeaksFromBands(bands)) {
-    peaks.push({ wavelength: wavenumber, ...rest });
+  for (const band of bands) {
+    const { wavenumber, absorbance, transmittance, intensity, strength } = band;
+    peaks.push({
+      wavelength: wavenumber,
+      ...(absorbance === undefined ? {} : { absorbance }),
+      ...(transmittance === undefined
+        ? {}
+        : { transmittance: transmittance / 100 }),
+      ...(intensity === undefined ? {} : { intensity }),
+      strength: WORDS[strength],
+    });
   }
   return peaks;
 }
@@ -139,6 +147,22 @@ const LETTERS: Record<BandStrength, IrBandStrength> = {
   medium: 'm',
   strong: 'S',
 };
+
+/**
+ * What a peak a host wrote says of the light absorbed, as the viewer holds it.
+ * @param peak - The peak.
+ * @returns Its absorbance and its transmittance as a percentage, where given.
+ */
+function absorptionValues(
+  peak: Pick<IrPeakValue, 'absorbance' | 'transmittance'>,
+): Partial<IrBand> {
+  return {
+    ...(peak.absorbance === undefined ? {} : { absorbance: peak.absorbance }),
+    ...(peak.transmittance === undefined
+      ? {}
+      : { transmittance: peak.transmittance * 100 }),
+  };
+}
 
 function bandsFromPeaks<
   Peak extends { wavenumber: number; strength?: BandStrength },

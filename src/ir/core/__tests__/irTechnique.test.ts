@@ -36,8 +36,13 @@ const raman: IrSpectrum = {
   visible: true,
 };
 
-test('infrared keeps every fact it had, Raman and UV-vis state their own', () => {
-  expect(IR_TECHNIQUES).toStrictEqual(['infrared', 'raman', 'uvvis']);
+test('infrared keeps every fact it had, Raman, UV-vis and fluorescence state their own', () => {
+  expect(IR_TECHNIQUES).toStrictEqual([
+    'infrared',
+    'raman',
+    'uvvis',
+    'fluorescence',
+  ]);
   expect(IR_TECHNIQUE_RULES.infrared).toStrictEqual({
     name: 'infrared',
     modes: ['transmittance', 'absorbance'],
@@ -68,12 +73,23 @@ test('infrared keeps every fact it had, Raman and UV-vis state their own', () =>
     assignments: false,
     dataType: 'UV/VIS SPECTRUM',
   });
+  expect(IR_TECHNIQUE_RULES.fluorescence).toStrictEqual({
+    name: 'fluorescence',
+    modes: ['intensity'],
+    xTitle: 'wavelength (nm)',
+    unit: 'nm',
+    jcampXUnits: 'NANOMETERS',
+    reverseX: false,
+    assignments: false,
+    dataType: 'FLUORESCENCE SPECTRUM',
+  });
 });
 
 test('a viewer opens on the first mode its technique offers', () => {
   expect(defaultIrMode('infrared')).toBe('transmittance');
   expect(defaultIrMode('raman')).toBe('intensity');
   expect(defaultIrMode('uvvis')).toBe('absorbance');
+  expect(defaultIrMode('fluorescence')).toBe('intensity');
 });
 
 test('a mode the technique does not offer falls back to its first', () => {
@@ -101,7 +117,7 @@ test('UV-vis shares the infrared axes, and a mode alone names infrared', () => {
   expect(owners).toStrictEqual([
     ['transmittance', ['infrared', 'uvvis']],
     ['absorbance', ['infrared', 'uvvis']],
-    ['intensity', ['raman']],
+    ['intensity', ['raman', 'fluorescence']],
   ]);
   expect(irModeTechnique('transmittance')).toBe('infrared');
   expect(irModeTechnique('absorbance')).toBe('infrared');

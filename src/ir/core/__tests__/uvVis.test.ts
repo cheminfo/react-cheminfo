@@ -64,7 +64,7 @@ test('a reflectance spectrum is refused, saying why', async () => {
   await expect(
     loadUvVisSpectra(read('uv.jdx'), { fileName: 'uv.jdx' }),
   ).rejects.toThrow(
-    'uv.jdx is a reflectance spectrum, which this viewer does not read yet: it reads absorbance and transmittance.',
+    'uv.jdx is a reflectance spectrum, which this viewer does not read yet: it reads absorbance, transmittance and emitted intensity.',
   );
 });
 
@@ -124,8 +124,9 @@ test('a UV-vis spectrum is written out as one, in nanometres, and read back', as
   expect(written).toContain('##XUNITS=NANOMETERS');
   expect(written).toContain('##YUNITS=ABSORBANCE');
 
-  const { spectra } = await loadUvVisSpectra(written);
+  const { spectra, technique } = await loadUvVisSpectra(written);
 
+  expect(technique).toBe('uvvis');
   expect(spectra[0]?.wavenumber).toHaveLength(1501);
   expect(spectra[0]?.absorbance?.[0]).toBeCloseTo(0.273_79, 5);
 });
@@ -140,14 +141,4 @@ test('a list of UV-vis spectra is titled as UV-vis', async () => {
 
   expect(written.split('\n', 1)[0]).toBe('##TITLE=2 UV-vis spectra');
   expect(written.match(/##XUNITS=NANOMETERS/g)).toHaveLength(2);
-});
-
-test('a fluorescence spectrum is refused, saying it is emitted light', async () => {
-  await expect(
-    loadUvVisSpectra(read('cary-eclipse.csv'), {
-      fileName: 'cary-eclipse.csv',
-    }),
-  ).rejects.toThrow(
-    'cary-eclipse.csv is a fluorescence spectrum, light the sample emits rather than absorbs, which this viewer does not read: it reads absorbance and transmittance.',
-  );
 });

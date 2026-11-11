@@ -1,11 +1,13 @@
 /**
- * Displaying UV-vis spectra: the infrared viewer, read for UV-vis.
+ * Displaying UV-vis and fluorescence spectra: the infrared viewer, read for
+ * light absorbed and for light emitted.
  *
- * A door of its own so a page showing UV-vis spectra imports a UV-vis viewer
- * by name, and so `uv-spectrum`, which reads the files, is fetched only by a
- * page that opens one. What it opens is the same code as `react-cheminfo/ir` —
- * one shell, one set of panels — and the same spectrum model, its horizontal
- * position a wavelength in nanometres held as `wavenumber`.
+ * A door of its own so a page showing these spectra imports its viewers by
+ * name, and so `uv-spectrum`, which reads the files of both, is fetched only by
+ * a page that opens one. What it opens is the same code as
+ * `react-cheminfo/ir` — one shell, one set of panels — and the same spectrum
+ * model, its horizontal position a wavelength in nanometres held as
+ * `wavenumber`.
  */
 
 export type { LoadedIrSpectrum } from './ir/core/analysisSpectra.ts';
@@ -25,6 +27,7 @@ export type {
   LoadIrSpectraOptions,
   LoadIrSpectraResult,
 } from './ir/core/loadIrSpectra.ts';
+export type { LoadUvVisSpectraResult } from './ir/core/loadUvVisSpectra.ts';
 export { loadUvVisSpectra } from './ir/core/loadUvVisSpectra.ts';
 export {
   irSpectraToJcamp,
@@ -32,6 +35,11 @@ export {
 } from './ir/core/spectrumJcamp.ts';
 export { withBands } from './ir/core/spectrumBands.ts';
 export { toIrSpectra, toIrSpectrum } from './ir/core/toIrSpectrum.ts';
+export type {
+  FluorescenceEditorHandle,
+  FluorescenceEditorProps,
+} from './ir/ui/FluorescenceEditor.tsx';
+export { FluorescenceEditor } from './ir/ui/FluorescenceEditor.tsx';
 export type { IrHostPanel } from './ir/ui/irHostPanels.ts';
 export type {
   UvVisEditorHandle,

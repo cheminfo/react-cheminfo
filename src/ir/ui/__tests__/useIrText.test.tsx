@@ -67,3 +67,32 @@ test('the English catalog says of Raman what the core records say', () => {
 
   expect(text.command('toggleMode')).toBeUndefined();
 });
+
+test('a fluorescence viewer is worded for light emitted, over wavelengths', () => {
+  const text = textOf('fluorescence');
+
+  expect([
+    text.xTitle,
+    text.yTitle('intensity'),
+    text.tools,
+    text.viewer,
+    text.mark,
+    text.documentation,
+    text.command('about')?.title,
+    text.command('togglePicking')?.title,
+  ]).toStrictEqual([
+    'wavelength (nm)',
+    'intensity',
+    'Fluorescence spectrum tools',
+    'Fluorescence spectrum viewer',
+    'Fluorescence viewer',
+    'Using the fluorescence viewer',
+    'About the fluorescence viewer',
+    'Pick the maxima',
+  ]);
+  expect(text.chart('intensity')).toBe(
+    'Fluorescence spectrum read as intensity, wavelength running from short at the left to long at the right. Drag across it to zoom the wavelength axis, drag past the baseline to take the value axis with it, turn the wheel to scale the value axis, and double click to fit everything again.',
+  );
+  expect(text.command('toggleMode')).toBeUndefined();
+  expect(text.command('toggleAssignments')).toBeUndefined();
+});

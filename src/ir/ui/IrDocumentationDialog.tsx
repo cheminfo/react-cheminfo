@@ -10,6 +10,8 @@ import type { IrTechnique } from '../core/irTechnique.ts';
 import { irCommandsFor } from '../core/irTechniqueCommands.ts';
 
 import { IrLogo } from './IrLogo.tsx';
+import { FluorescenceGuide, UvVisGuide } from './WavelengthGuides.tsx';
+import { headingStyle, paragraphStyle } from './guideStyles.ts';
 import { useIrText } from './useIrText.ts';
 
 export interface IrDocumentationDialogProps {
@@ -67,50 +69,12 @@ export function IrDocumentationDialog(props: IrDocumentationDialogProps) {
   );
 }
 
-/**
- * What is true of reading a UV-vis spectrum here: the files `uv-spectrum`
- * reads, the axis running the usual way, and maxima rather than assignments.
- * @returns The sections.
- */
-function UvVisGuide() {
-  return (
-    <>
-      <h4 style={headingStyle}>Opening a spectrum</h4>
-      <p style={paragraphStyle}>
-        JCAMP-DX (<code>.jdx</code>, <code>.dx</code>), SPC and PerkinElmer SP (
-        <code>.spc</code>, <code>.sp</code>), Cary Eclipse CSV and two columns
-        of text are read. A file holding several spectra gives one each.
-      </p>
-
-      <h4 style={headingStyle}>Absorbance or transmittance</h4>
-      <p style={paragraphStyle}>
-        The same measurement, read the other way up — the file carries both,
-        whichever it was written in. In{' '}
-        <strong>{IR_MODE_RULES.absorbance.title}</strong> the bands stand up out
-        of zero; in <strong>{IR_MODE_RULES.transmittance.title}</strong> they
-        hang down from 100.
-      </p>
-
-      <h4 style={headingStyle}>Reading the maxima</h4>
-      <p style={paragraphStyle}>
-        Every λmax of the <em>selected</em> spectrum is picked, marked on the
-        chart and listed in the bands panel with its absorbance. With the hand
-        tool a click on the chart adds the maximum under it, and a click on a
-        mark takes it away; from then on the threshold leaves the list alone.
-      </p>
-      <p style={paragraphStyle}>
-        A maximum is reported at the sampled point it peaked on, so on a 1 nm
-        grid it is good to the nanometre and no better.
-      </p>
-    </>
-  );
-}
-
 /** The guide each technique's documentation opens on. */
 const GUIDES: Record<IrTechnique, ReactElement> = {
   infrared: <InfraredGuide />,
   raman: <RamanGuide />,
   uvvis: <UvVisGuide />,
+  fluorescence: <FluorescenceGuide />,
 };
 
 /**
@@ -229,10 +193,6 @@ function CommandRow(props: CommandRowProps) {
 }
 
 const dialogStyle = { width: 'min(760px, 92vw)' } as const;
-
-const headingStyle = { margin: '14px 0 4px' } as const;
-
-const paragraphStyle = { margin: '0 0 6px' } as const;
 
 const tableStyle = {
   width: '100%',

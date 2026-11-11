@@ -142,6 +142,7 @@ export type {
   LoadIrSpectraResult,
 } from './loadIrSpectra.ts';
 export { loadIrSpectra } from './loadIrSpectra.ts';
+export type { LoadUvVisSpectraResult } from './loadUvVisSpectra.ts';
 export { loadUvVisSpectra } from './loadUvVisSpectra.ts';
 export { BAND_HIT_RADIUS, nearestBandAt } from './nearestBand.ts';
 export type { PickBandsOptions } from './pickBands.ts';

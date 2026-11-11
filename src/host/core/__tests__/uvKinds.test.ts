@@ -85,7 +85,7 @@ test('a UV-vis maximum keeps its absorbance and transmittance, and drops what it
     checkValue('spectra.uv.jdx', {
       jdx: '##TITLE=x',
       peaks: [
-        { wavelength: 412, absorbance: 0.3, transmittance: 0.5, intensity: 9 },
+        { wavelength: 412, absorbance: 0.3, transmittance: 0.5, width: 9 },
       ],
     }),
   ).toStrictEqual({
@@ -95,6 +95,22 @@ test('a UV-vis maximum keeps its absorbance and transmittance, and drops what it
       value: {
         jdx: '##TITLE=x',
         peaks: [{ wavelength: 412, absorbance: 0.3, transmittance: 0.5 }],
+      },
+    },
+  });
+});
+
+test('a fluorescence maximum travels as a UV maximum, carrying its intensity', () => {
+  expect(
+    checkValue('spectra.uv.peaks', {
+      peaks: [{ wavelength: 520, intensity: 812.5, strength: 'strong' }],
+    }),
+  ).toStrictEqual({
+    valid: true,
+    checked: {
+      kind: 'spectra.uv.peaks',
+      value: {
+        peaks: [{ wavelength: 520, intensity: 812.5, strength: 'strong' }],
       },
     },
   });

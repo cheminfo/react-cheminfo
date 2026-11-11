@@ -5,8 +5,9 @@
  * act on — one value axis is nothing to toggle, and no assignment is nothing to
  * name — and words the rest without the absorbance and transmittance it does
  * not have. A UV-vis viewer keeps both axes and drops only the assignments, and
- * words the rest for wavelengths. Each is built from the infrared table, so a
- * command added there reaches all three.
+ * words the rest for wavelengths. A fluorescence viewer reads intensity alone,
+ * as Raman does, over wavelengths, as UV-vis does. Each is built from the
+ * infrared table, so a command added there reaches all four.
  */
 
 import type { IrCommand, IrCommandId, IrCommandTable } from './irCommands.ts';
@@ -96,11 +97,47 @@ const UVVIS_WORDING: Partial<Record<IrCommandId, Partial<IrCommand>>> = {
   },
 };
 
+/** How a fluorescence viewer words the commands it shares with infrared. */
+const FLUORESCENCE_WORDING: Partial<Record<IrCommandId, Partial<IrCommand>>> = {
+  about: { title: 'About the fluorescence viewer' },
+  documentation: {
+    description: 'How the emission maxima are read, and every gesture.',
+  },
+  readTool: {
+    description:
+      'A drag narrows the wavelength axis. Released past the baseline, it takes the intensity axis with it.',
+    gestures: [{ title: OVER_THE_CHART, shortcuts: ['Drag'] }],
+  },
+  boxTool: {
+    description:
+      'A drag zooms to exactly the rectangle it sweeps out, both axes at once — for looking into a shoulder or a weak band rather than across the spectrum.',
+  },
+  pickTool: {
+    title: 'Pick maxima by hand',
+    description:
+      'A click adds the maximum under it to the selected spectrum; a click on a marked maximum takes it away. A drag still zooms, and maxima picked by hand stay put when the threshold moves.',
+  },
+  zoomIn: {
+    description:
+      'Brings a weak emission up, scaling the intensity axis about zero.',
+    gestures: [{ title: OVER_THE_CHART, shortcuts: ['Scroll wheel'] }],
+  },
+  zoomOut: {
+    gestures: [{ title: OVER_THE_CHART, shortcuts: ['Scroll wheel'] }],
+  },
+  togglePicking: {
+    title: 'Pick the maxima',
+    description:
+      'Finds every emission maximum of the selected spectrum, marks it on the chart and lists it.',
+  },
+};
+
 /** The command table of each technique. */
 const COMMAND_TABLES: Record<IrTechnique, IrCommandTable> = {
   infrared: irCommands,
   raman: worded('raman', RAMAN_WORDING),
   uvvis: worded('uvvis', UVVIS_WORDING),
+  fluorescence: worded('fluorescence', FLUORESCENCE_WORDING),
 };
 
 /**

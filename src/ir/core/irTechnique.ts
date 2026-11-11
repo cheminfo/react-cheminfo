@@ -1,8 +1,8 @@
 /**
- * Everything that differs between an infrared spectrum, a Raman one and a
- * UV-vis one.
+ * Everything that differs between an infrared spectrum, a Raman one, a UV-vis
+ * one and a fluorescence one.
  *
- * The viewer reads all three the same way — one chart, one set of panels, one
+ * The viewer reads all four the same way — one chart, one set of panels, one
  * set of gestures — so what is left to differ is a handful of facts: which value
  * axes a spectrum is read on, what the horizontal axis is called, in which unit
  * and which way it runs, whether the correlation table has anything to say
@@ -12,17 +12,19 @@
  * to ask, and they would come to disagree.
  *
  * The horizontal position of a point and of a band is held as `wavenumber`
- * whatever the technique, as the Raman shift already is: for a UV-vis spectrum
- * it is a wavelength in nanometres, and `unit` says so wherever it is written.
+ * whatever the technique, as the Raman shift already is: for a UV-vis or a
+ * fluorescence spectrum it is a wavelength in nanometres, and `unit` says so
+ * wherever it is written.
  */
 
 import type { IrMode } from './irSpectrum.ts';
 
 /**
  * What was measured: the infrared light a sample absorbs, the light it
- * scatters, or the ultraviolet and visible light it absorbs.
+ * scatters, the ultraviolet and visible light it absorbs, or the light it
+ * emits once excited.
  */
-export type IrTechnique = 'infrared' | 'raman' | 'uvvis';
+export type IrTechnique = 'infrared' | 'raman' | 'uvvis' | 'fluorescence';
 
 /** What is true of one technique. */
 export interface IrTechniqueRules {
@@ -49,6 +51,7 @@ export const IR_TECHNIQUES: readonly IrTechnique[] = [
   'infrared',
   'raman',
   'uvvis',
+  'fluorescence',
 ];
 
 /** How each technique behaves, every fact in one place. */
@@ -100,6 +103,19 @@ export const IR_TECHNIQUE_RULES = {
     /** The table holds infrared group frequencies, which say nothing here. */
     assignments: false,
     dataType: 'UV/VIS SPECTRUM',
+  },
+  fluorescence: {
+    name: 'fluorescence',
+    /** One axis: an emission spectrum is the light the sample gives off. */
+    modes: ['intensity'],
+    xTitle: 'wavelength (nm)',
+    unit: 'nm',
+    jcampXUnits: 'NANOMETERS',
+    /** The wavelength grows left to right, as on a UV-vis spectrum. */
+    reverseX: false,
+    /** The table holds infrared group frequencies, which say nothing here. */
+    assignments: false,
+    dataType: 'FLUORESCENCE SPECTRUM',
   },
 } as const satisfies Record<IrTechnique, IrTechniqueRules>;
 

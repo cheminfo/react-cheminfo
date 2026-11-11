@@ -72,4 +72,10 @@ const MARKS: Record<IrTechnique, { baseline: string; bands: string }> = {
     baseline: 'M1 13H15',
     bands: 'M2 12.5C5.5 12.5 5.5 3 8 3S10.5 12.5 14 12.5',
   },
+  // One broad emission band whose long tail runs to the red, the shape every
+  // fluorescence spectrum shares and no absorption band does.
+  fluorescence: {
+    baseline: 'M1 13H15',
+    bands: 'M2 12.5C4 12.5 4.5 3 6.5 3S9.5 11 14 12.5',
+  },
 };

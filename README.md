@@ -30,37 +30,37 @@ would mean two Blueprint style trees in one page.
 Subpaths are **bundle boundaries, not taxonomy**: a feature gets its own door
 only when it drags a heavy dependency behind it.
 
-| Import                             | Holds                                                   | Costs                                            |
-| ---------------------------------- | ------------------------------------------------------- | ------------------------------------------------ |
-| `react-cheminfo/core`              | every framework-free helper — 140 value exports         | nothing                                          |
-| `react-cheminfo/formula`           | formulas: read, compared, drawn and copied              | mf-parser, react-mf; React on the components     |
-| `react-cheminfo/ui`                | every React component and hook — 60 value exports       | React                                            |
-| `react-cheminfo/vite`              | the prerender plugin and the OG card                    | nothing; React on the card                       |
-| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware               | nothing                                          |
-| `react-cheminfo/server`            | the prerendered build, served from Node                 | fastify, @fastify/static; Node only              |
-| `react-cheminfo/card`              | the card an answer is shown as in a chat                | React; cheminfo-mcp-server, an optional peer     |
-| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                            | React, molstar                                   |
-| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                  | React, molstar                                   |
-| `react-cheminfo/structure`         | the structure editor and renderer                       | React, react-ocl, OCL                            |
-| `react-cheminfo/conformers`        | conformer generation, ranking and refinement            | OCL                                              |
-| `react-cheminfo/slides`            | the deck format and the slideshow player                | React, react-markdown                            |
-| `react-cheminfo/spectra`           | the spectra processing settings editors                 | React; types only from spectra-processor, ml-pca |
-| `react-cheminfo/ir`                | the infrared chart, band table and editor               | React, ir-spectrum, convert-to-jcamp             |
-| `react-cheminfo/raman`             | the Raman editor: the infrared one, read for Raman      | the same as `react-cheminfo/ir`                  |
-| `react-cheminfo/uvvis`             | the UV-vis editor: the infrared one, read for UV-vis    | the same, and uv-spectrum once a file is read    |
-| `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor          | React, ms-spectrum, jcampconverter, xy-parser    |
-| `react-cheminfo/xps`               | the XPS chart, peak, fit and composition tables, editor | React, xps-analysis, ml-gsd, xy-parser           |
-| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                          | nothing on import; xtb-wasm on the first call    |
-| `react-cheminfo/host`              | data handed over by a page that frames the tool         | nothing on import; ajv once the page is framed   |
-| `react-cheminfo/demo`              | a tool playing a steps slide's demo, with a cursor      | nothing; loaded only on a page with `?demo=`     |
-| `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests   | nothing; Node only                               |
-| `react-cheminfo/playwright`        | the browser-suite configuration every site shares       | nothing; types from @playwright/test             |
-| `react-cheminfo/storage`           | work kept in the browser, workspaces, documents         | React on the backup menu; idb, @zip.js/zip.js    |
-| `react-cheminfo/drawing`           | the drawing editors' plane, pages, captions, pickers    | mf-parser; React and Blueprint on the components |
-| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet            | nothing                                          |
-| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours       | nothing                                          |
-| `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens           | nothing                                          |
-| `react-cheminfo/styles/demo.css`   | the demo cursor, on the family's tokens                 | nothing                                          |
+| Import                             | Holds                                                          | Costs                                            |
+| ---------------------------------- | -------------------------------------------------------------- | ------------------------------------------------ |
+| `react-cheminfo/core`              | every framework-free helper — 140 value exports                | nothing                                          |
+| `react-cheminfo/formula`           | formulas: read, compared, drawn and copied                     | mf-parser, react-mf; React on the components     |
+| `react-cheminfo/ui`                | every React component and hook — 60 value exports              | React                                            |
+| `react-cheminfo/vite`              | the prerender plugin and the OG card                           | nothing; React on the card                       |
+| `react-cheminfo/pages`             | the Cloudflare Pages analytics middleware                      | nothing                                          |
+| `react-cheminfo/server`            | the prerendered build, served from Node                        | fastify, @fastify/static; Node only              |
+| `react-cheminfo/card`              | the card an answer is shown as in a chat                       | React; cheminfo-mcp-server, an optional peer     |
+| `react-cheminfo/orbital`           | the 3D atomic-orbital viewer                                   | React, molstar                                   |
+| `react-cheminfo/molecule3d`        | the 3D molecule viewer and its toolbar                         | React, molstar                                   |
+| `react-cheminfo/structure`         | the structure editor and renderer                              | React, react-ocl, OCL                            |
+| `react-cheminfo/conformers`        | conformer generation, ranking and refinement                   | OCL                                              |
+| `react-cheminfo/slides`            | the deck format and the slideshow player                       | React, react-markdown                            |
+| `react-cheminfo/spectra`           | the spectra processing settings editors                        | React; types only from spectra-processor, ml-pca |
+| `react-cheminfo/ir`                | the infrared chart, band table and editor                      | React, ir-spectrum, convert-to-jcamp             |
+| `react-cheminfo/raman`             | the Raman editor: the infrared one, read for Raman             | the same as `react-cheminfo/ir`                  |
+| `react-cheminfo/uvvis`             | the UV-vis and fluorescence editors, read off the infrared one | the same, and uv-spectrum once a file is read    |
+| `react-cheminfo/mass`              | the mass spectrum chart, peak table and editor                 | React, ms-spectrum, jcampconverter, xy-parser    |
+| `react-cheminfo/xps`               | the XPS chart, peak, fit and composition tables, editor        | React, xps-analysis, ml-gsd, xy-parser           |
+| `react-cheminfo/xtb`               | GFN2-xTB as a geometry relaxer                                 | nothing on import; xtb-wasm on the first call    |
+| `react-cheminfo/host`              | data handed over by a page that frames the tool                | nothing on import; ajv once the page is framed   |
+| `react-cheminfo/demo`              | a tool playing a steps slide's demo, with a cursor             | nothing; loaded only on a page with `?demo=`     |
+| `react-cheminfo/host-testing`      | a stand-in host and SciPeaks' messages, for e2e tests          | nothing; Node only                               |
+| `react-cheminfo/playwright`        | the browser-suite configuration every site shares              | nothing; types from @playwright/test             |
+| `react-cheminfo/storage`           | work kept in the browser, workspaces, documents                | React on the backup menu; idb, @zip.js/zip.js    |
+| `react-cheminfo/drawing`           | the drawing editors' plane, pages, captions, pickers           | mf-parser; React and Blueprint on the components |
+| `react-cheminfo/styles/chrome.css` | the shared tokens and site-header stylesheet                   | nothing                                          |
+| `react-cheminfo/styles/slides.css` | the deck stylesheet, themed on the site's colours              | nothing                                          |
+| `react-cheminfo/styles/card.css`   | the card’s stylesheet, on the family’s tokens                  | nothing                                          |
+| `react-cheminfo/styles/demo.css`   | the demo cursor, on the family's tokens                        | nothing                                          |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
 every unit test of that logic therefore load no React at all — and a worker
@@ -82,8 +82,10 @@ viewer for Raman spectra — one value axis, the Raman shift running left to
 right, the bands picked on intensity and no correlation table — and
 `react-cheminfo/uvvis` opens it for UV-vis spectra, read by `uv-spectrum` over
 their wavelengths in nanometres, absorbance first, with every λmax picked and no
-correlation table; so a page imports each technique's viewer by name while all
-three share one shell. The chart
+correlation table, and for fluorescence spectra, the intensity emitted over the
+same wavelengths with every emission maximum picked; `loadUvVisSpectra` says
+which of the two a file holds. So a page imports each technique's viewer by
+name while all four share one shell. The chart
 it is drawn with is **not** behind that door: scales, ticks, plot geometry, the
 zoom gestures, the label placement and the panel chrome are in `core` and `ui`,
 because a spectrum of any kind is drawn with them and the next viewer built on
@@ -183,7 +185,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                                                                                                                                                                                       | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure`, `MoleculeExport` (`/structure`)                                                                                                                                                                                                             |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                                                                                                                                                                                         | —                                                                                                                                                                                                                                                                                                               |
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                                                                                      | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `PanelRow`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
-| **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `bandsFromUvPeaks`, `uvPeaksFromBands`, `loadUvVisSpectra`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                                                                             | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`); `UvVisEditor` (`/uvvis`)                                                                                                                                                             |
+| **Infrared and Raman**     | `loadIrSpectra`, `toIrSpectrum`, `pickBands`, `pickBandAt`, `editBandsAt`, `bandsFromIrPeaks`, `irPeaksFromBands`, `bandsFromRamanPeaks`, `ramanPeaksFromBands`, `bandsFromUvPeaks`, `uvPeaksFromBands`, `loadUvVisSpectra`, `assignBands`, `BAND_ASSIGNMENTS`, `irSpectrumToJcamp`, `IR_MODE_RULES`, `IR_TECHNIQUE_RULES`, `nearestBandAt`, `planBandLabels`, `irReducer` (all `/ir`)                                                                                                             | `IrEditor`, `IrChart`, `BandsPanel`, `SpectraPanel`, `MetadataPanel`, `useIrEditor` (all `/ir`); `RamanEditor` (`/raman`); `UvVisEditor`, `FluorescenceEditor` (`/uvvis`)                                                                                                                                       |
 | **Mass spectra**           | `loadMassSpectra`, `toMassSpectra`, `analyseSpectrum`, `decideResolution`, `resolutionOf`, `mzDecimalsOf`, `planPeakLabels`, `peakTableRows`, `massSpectrumToJcamp`, `massReducer` (all `/mass`)                                                                                                                                                                                                                                                                                                   | `MassEditor`, `MassChart`, `SpectraPanel`, `PeaksPanel`, `MetadataPanel`, `useMassEditor` (all `/mass`)                                                                                                                                                                                                         |
 | **X-ray photoelectron**    | `loadSpectra`, `detectFormat`, `readAnalysisBlocks`, `pickPeaks`, `assignElements`, `referenceLevels`, `applyBackground`, `shirleyBackground`, `tougaardBackground`, `integrateWindow`, `quantifyComponents`, `toBindingEnergy`, `toKineticEnergy`, `xpsReducer` (all `/xps`)                                                                                                                                                                                                                      | `XpsEditor`, `XpsChart`, `SpectraPanel`, `PeaksPanel`, `ElementsPanel`, `ComponentsPanel`, `CompositionPanel`, `useXpsEditor` (all `/xps`)                                                                                                                                                                      |
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                                                                                                                                                                               | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                                       |

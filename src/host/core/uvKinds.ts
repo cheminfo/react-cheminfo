@@ -10,6 +10,10 @@
  * rather than by a wavenumber. Named after the ELN's `uv` spectra; no tool
  * declares the bare `spectra.uv`: it would take a list of maxima for a
  * spectrum.
+ *
+ * A fluorescence spectrum travels as the same kinds, since the ELN files it
+ * under `uv` too: its maxima carry the intensity emitted rather than an
+ * absorbance.
  */
 
 import type { BandStrength } from './bandStrength.ts';
@@ -29,6 +33,12 @@ export interface UvPeakValue {
    * @default read off the spectrum
    */
   transmittance?: number;
+  /**
+   * The intensity emitted, for a maximum of a fluorescence spectrum, in the
+   * instrument's own units.
+   * @default read off the spectrum
+   */
+  intensity?: number;
   /**
    * How strong it is, relative to the strongest band of its spectrum.
    * @default worked out from the spectrum
@@ -66,6 +76,7 @@ const UV_PEAK_SCHEMA = {
     wavelength: { type: 'number', exclusiveMinimum: 0 },
     absorbance: { type: 'number' },
     transmittance: { type: 'number' },
+    intensity: { type: 'number' },
     strength: BAND_STRENGTH_SCHEMA,
   },
   required: ['wavelength'],

@@ -163,7 +163,7 @@ function sortedByWavenumber(
  * @param block - One spectrum of the analysis.
  * @returns The title, or `undefined` when the block carries none worth showing.
  */
-function blockTitle(block: MeasurementXY): string | undefined {
+export function blockTitle(block: MeasurementXY): string | undefined {
   const written = block.title?.split('$$', 1)[0]?.trim();
   return written === undefined || written === '' ? undefined : written;
 }
@@ -272,7 +272,7 @@ function recordedMode(block: MeasurementXY): IrMode | undefined {
  * @param block - One spectrum of the analysis.
  * @returns The table, `null` when the file carried neither a title nor a record.
  */
-function blockMeta(block: MeasurementXY): IrMeta | null {
+export function blockMeta(block: MeasurementXY): IrMeta | null {
   const title = blockTitle(block);
   const fields: IrMetaField[] = [];
 
