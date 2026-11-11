@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.113.0](https://github.com/cheminfo/react-cheminfo/compare/v0.112.0...v0.113.0) (2026-11-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename the tlc site to plate, reading what was saved under tlc as plate's
+
+### Features
+
+* add the diagram site, curve editing and react-cheminfo/caption-editor ([59cab93](https://github.com/cheminfo/react-cheminfo/commit/59cab935601948cd07e58a95f86b02c2367f5d74))
+* rename the tlc site to plate, reading what was saved under tlc as plate's ([3f6cd5a](https://github.com/cheminfo/react-cheminfo/commit/3f6cd5ab42d2d6d9f8d2564fb070d315be014b6c))
+
 ## [0.112.0](https://github.com/cheminfo/react-cheminfo/compare/v0.111.0...v0.112.0) (2026-11-11)
 
 
