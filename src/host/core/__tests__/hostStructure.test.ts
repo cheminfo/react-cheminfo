@@ -2,11 +2,8 @@ import { Molecule } from 'openchemlib';
 import { expect, test } from 'vitest';
 
 import type { LoadedInput } from '../connectHost.ts';
-import {
-  hostStructureLoader,
-  hostStructureSource,
-  readHostMolecule,
-} from '../hostStructure.ts';
+import { hostStructureLoader, readHostMolecule } from '../hostMolecule.ts';
+import { hostStructureSource } from '../hostStructure.ts';
 
 const ETHYLBENZENE = Molecule.fromSmiles('CCc1ccccc1');
 

@@ -26,9 +26,9 @@ export { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';
 export type { StructureValue } from './hostStructure.ts';
 export {
   STRUCTURE_KINDS,
-  hostStructureLoader,
+  STRUCTURE_NOTATIONS,
   hostStructureSource,
-  readHostMolecule,
+  isStructureValue,
 } from './hostStructure.ts';
 export type { BandStrength } from './bandStrength.ts';
 export { BAND_STRENGTHS, BAND_STRENGTH_SCHEMA } from './bandStrength.ts';

@@ -5,7 +5,7 @@ import {
   SCIPEAKS_ETHYLBENZENE_LOAD,
   SCIPEAKS_HOST_NAME,
 } from '../../testing/sciPeaks.ts';
-import { hostStructureLoader } from '../hostStructure.ts';
+import { hostStructureLoader } from '../hostMolecule.ts';
 
 import { request, startHost } from './fakeHost.ts';
 
