@@ -17,6 +17,7 @@ export {
   OPEN_CHEMISTRY_PAPER,
   OPEN_CHEMISTRY_WORK,
 } from './openChemistryPaper.ts';
+export { NMRIUM_PAPER, NMRIUM_WORK } from './nmriumPaper.ts';
 export { OPENCHEMLIB_PAPER, OPENCHEMLIB_WORK } from './openchemlibPaper.ts';
 export { PLATFORM_PAPER, PLATFORM_WORK } from './platformPaper.ts';
 export type {

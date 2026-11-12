@@ -37,6 +37,7 @@ export type SiteId =
   | 'mz'
   | 'vibrations'
   | 'uv-vis'
+  | 'nmr'
   | 'xps'
   | 'biodraw'
   | 'diagram'

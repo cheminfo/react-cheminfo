@@ -85,6 +85,19 @@ test('the RIS entry lists one AU line per author and ends with ER', () => {
   expect(lines.at(-1)).toBe('ER  - ');
 });
 
+test('a journal that numbers no issue writes no issue field', () => {
+  const { issue, ...unnumbered } = PAPER;
+
+  expect(issue).toBe('12');
+  expect(formatCitation(unnumbered, 'bibtex')).not.toContain('number =');
+  expect(formatCitation(unnumbered, 'bibtex')).toContain('volume = {17},');
+  expect(
+    formatCitation(unnumbered, 'ris')
+      .split('\n')
+      .filter((line) => line.startsWith('IS  -')),
+  ).toStrictEqual([]);
+});
+
 test('the DOI format is the resolvable URL', () => {
   expect(formatCitation(PAPER, 'doi')).toBe(
     'https://doi.org/10.1039/C5GC01022E',

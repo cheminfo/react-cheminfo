@@ -9,8 +9,11 @@ import { decode, encode } from 'uint8-base64';
 /** How a state is packed, as its element says. */
 export const FIGURE_STATE_ENCODING = 'gzip+base64';
 
-/** The most a state may weigh once unpacked: 16 MB, as a picture may. */
-export const MAX_FIGURE_STATE_BYTES = 16 * 1024 * 1024;
+/**
+ * The most a state may weigh once unpacked: 50 MB, enough for the processed
+ * spectra of an NMR experiment.
+ */
+export const MAX_FIGURE_STATE_BYTES = 50 * 1024 * 1024;
 
 const BASE64 = /^[A-Za-z\d+/]*={0,2}$/;
 

@@ -95,6 +95,7 @@
   "site.openbabel.tagline": "Convert a structure between any pair of chemical file formats.",
   "site.chemcalc.tagline": "Molecular formula, exact mass and isotopic distribution.",
   "site.dbe.tagline": "Count rings and double bonds from a formula or a structure.",
+  "site.nmr.tagline": "Process NMR spectra, and keep them as figures that open again.",
   "site.nmrium.tagline": "Process and assign NMR spectra in the browser.",
   "site.metabo.tagline": "Turn a batch of NMR spectra into a map of your samples.",
   "site.derepflow.tagline": "Identify the constituents of a mixture from its ¹³C spectrum.",

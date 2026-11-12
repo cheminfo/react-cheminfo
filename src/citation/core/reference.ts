@@ -21,7 +21,11 @@ export interface ArticleReference {
   journalAbbreviation: string;
   year: number;
   volume: string;
-  issue: string;
+  /**
+   * The issue, for a journal that numbers them.
+   * @default undefined
+   */
+  issue?: string;
   firstPage: string;
   lastPage: string;
   doi: string;
