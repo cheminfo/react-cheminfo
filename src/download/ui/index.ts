@@ -13,6 +13,7 @@ export type { FigureDownloadPanelProps } from './FigureDownloadPanel.tsx';
 export { FigureDownloadPanel } from './FigureDownloadPanel.tsx';
 export type { FigureSizing } from './FigureSizeRows.tsx';
 export type { FigureRenderer } from './useFigureRedraw.tsx';
+export { useDocumentFigure } from './useDocumentFigure.tsx';
 
 export type {
   FigureDownloadOptions,
