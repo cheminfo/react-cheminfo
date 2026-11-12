@@ -9,7 +9,7 @@ const xScale = chartScale(200, 400, plot.left, plot.right);
 
 test('a value inside the window is pointed at where it sits', () => {
   expect(guidePlacement(300, plot, xScale)).toStrictEqual({
-    x: 352,
+    x: 354,
     direction: null,
   });
 });
@@ -47,7 +47,7 @@ test('an axis running backwards parks on the edge of the screen, not the end of 
   const wavenumbers = chartScale(4000, 400, plot.left, plot.right);
 
   expect(guidePlacement(2200, plot, wavenumbers)).toStrictEqual({
-    x: 352,
+    x: 354,
     direction: null,
   });
   expect(guidePlacement(5000, plot, wavenumbers)).toStrictEqual({

@@ -156,9 +156,9 @@ test('an inner cell that drops its ticks pulls its title in to where they were',
     layer: 'axis',
   } as const;
 
-  expect(render(shared)).toContain('<text x="190" y="245"');
+  expect(render(shared)).toContain('<text x="190" y="248"');
   expect(render({ ...shared, showTicks: false })).toContain(
-    '<text x="190" y="223"',
+    '<text x="190" y="224"',
   );
   expect(
     render({ ...shared, showTicks: false }).match(/<text /gu),
@@ -177,7 +177,7 @@ test('a vertical axis writes its ticks to the left and its title on its side', (
 
   expect(html).toContain('class="chart-axis chart-axis-left"');
   expect(html).toContain('text-anchor="end" dominant-baseline="middle"');
-  expect(html).toContain('transform="rotate(-90 4 110)"');
+  expect(html).toContain('transform="rotate(-90 2 110)"');
   expect(html).toContain('<line x1="40" x2="40" y1="10" y2="210"');
 });
 

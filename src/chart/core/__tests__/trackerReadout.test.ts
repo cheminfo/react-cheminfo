@@ -33,16 +33,16 @@ test('it flips at the pixel where the last of it would leave the plot', () => {
 });
 
 test('a pointer near the top writes the first line under the edge, not over it', () => {
-  expect(readoutPlacement({ x: 100, y: 20 }, plot).y).toBe(21);
+  expect(readoutPlacement({ x: 100, y: 20 }, plot).y).toBe(22);
 });
 
 test('a pointer near the bottom keeps the last line inside the plot', () => {
-  expect(readoutPlacement({ x: 100, y: 228 }, plot).y).toBe(219);
+  expect(readoutPlacement({ x: 100, y: 228 }, plot).y).toBe(213);
   expect(readoutPlacement({ x: 100, y: 228 }, plot, 1).y).toBe(222);
 });
 
 test('a plot too short for both lines keeps the m/z rather than the intensity', () => {
   expect(
     readoutPlacement({ x: 64, y: 24 }, plotRect({ width: 0, height: 0 })),
-  ).toStrictEqual({ x: 58, y: 21, anchor: 'end' });
+  ).toStrictEqual({ x: 58, y: 22, anchor: 'end' });
 });

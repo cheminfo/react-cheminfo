@@ -2,7 +2,7 @@
 /**
  * What the viewer does with files it is handed and with a click on its plot.
  *
- * The chart is laid out at 600 × 400, so the plot runs from x 60 to x 584: 524
+ * The chart is laid out at 600 × 400, so the plot runs from x 64 to x 584: 520
  * user units for whatever window the test sets.
  */
 
@@ -155,20 +155,20 @@ test('a click reports the peak within reach, and nothing off one', async () => {
   );
   act(() => handle.current?.setDomain({ x: [40, 340], y: [0, 120] }));
 
-  // m/z 330 lands at 60 + 290 / 300 × 524 = 566.5; its neighbour 331 is 1.75
+  // m/z 330 lands at 64 + 290 / 300 × 520 = 566.7; its neighbour 331 is 1.73
   // pixels further on, and the click is answered by the nearer stick.
-  click(566.5);
-  // m/z 200 lands at 339.5, a long way from 215, the nearest peak.
-  click(339.5);
+  click(566.7);
+  // m/z 200 lands at 341.3, a long way from 215, the nearest peak.
+  click(341.3);
 
   expect(clicks).toStrictEqual([
     {
-      mz: expect.closeTo(329.98, 2),
+      mz: expect.closeTo(330.02, 2),
       peakMz: 330,
       spectrumId: spectra[0]?.id,
     },
     {
-      mz: expect.closeTo(200.02, 2),
+      mz: expect.closeTo(199.98, 2),
       peakMz: null,
       spectrumId: spectra[0]?.id,
     },

@@ -19,7 +19,7 @@ import type { ChartZoom } from '../useChartZoom.ts';
 import type { ProbeProps } from './probeChart.tsx';
 import { ProbeChart } from './probeChart.tsx';
 
-/** The plot every probe is laid out in: 524 user units wide from x 60, 356 tall from y 10. */
+/** The plot every probe is laid out in: 520 user units wide from x 64, 352 tall from y 10. */
 export const plot = plotRect({ width: 600, height: 400 });
 
 /** What a test hands `mount`: the probe's props bar the two the harness supplies. */

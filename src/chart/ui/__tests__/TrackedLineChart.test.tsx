@@ -17,7 +17,7 @@ test('every visible series is drawn as one path, and a hidden one is not drawn',
 test('a line is one path over the slot centres, with no element per point', () => {
   const html = render({ series: [line(0)], categories: ['a', 'b', 'c'] });
 
-  expect(html).toContain('d="M83 46.67L229 193.33L375 46.67"');
+  expect(html).toContain('d="M83 46.33L229 191.67L375 46.33"');
   expect(count(html, /<circle/g)).toBe(0);
 });
 
@@ -28,10 +28,10 @@ test('a bar series is one rect per slot, growing from the zero line', () => {
 
   expect(count(marks.slice(0, marks.indexOf('</g>')), /<rect/g)).toBe(3);
   expect(html).toContain(
-    '<rect x="24.6" y="46.67" width="116.8" height="73.33"',
+    '<rect x="24.6" y="46.33" width="116.8" height="72.67"',
   );
   expect(html).toContain(
-    '<rect x="170.6" y="120" width="116.8" height="73.33"',
+    '<rect x="170.6" y="119" width="116.8" height="72.67"',
   );
 });
 
@@ -83,7 +83,7 @@ test('a tracked slot draws the crosshair and a marker on each series', () => {
   const html = render({ series: [line(0), line(1)], trackedIndex: 1 });
 
   expect(count(html, /<circle/g)).toBe(2);
-  expect(html).toContain('d="M229 10V230"');
+  expect(html).toContain('d="M229 10V228"');
   expect(html).toContain('aria-label="Measurement b"');
 });
 

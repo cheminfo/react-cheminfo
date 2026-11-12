@@ -242,16 +242,16 @@ export const GAP = 5;
 export const PADDING = 6;
 
 /** One row of the legend. */
-export const ROW_HEIGHT = 14;
+export const ROW_HEIGHT = 16;
 
 /** Between the box and the edge of the plot. */
 export const MARGIN = 6;
 
 /** The face the names are written at. */
-export const FONT_SIZE = 11;
+export const FONT_SIZE = 12;
 
 /** About how wide one character is at that size. */
-export const CHARACTER_WIDTH = 6.1;
+export const CHARACTER_WIDTH = 6.7;
 
 /** The longest name the box is widened for; past it a name simply overruns. */
 export const MAXIMUM_CHARACTERS = 28;

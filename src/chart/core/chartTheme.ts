@@ -81,20 +81,22 @@ export const CHART_COLORS = {
 /**
  * The type sizes, in pixels.
  *
- * Small and fixed rather than inherited: the chart is a drawing, and a host
- * whose base font is 18px would push its tick labels into one another. The
- * family is deliberately not set here, so the chart still looks like the
- * application it is embedded in.
+ * Fixed rather than inherited: the chart is a drawing, and a host whose base
+ * font is 18px would push its tick labels into one another. Never below 12px,
+ * the smallest the family's 15px page is read at beside a figure: a number on
+ * an axis is something the reader came to read, not decoration. The family is
+ * deliberately not set here, so the chart still looks like the application it
+ * is embedded in.
  */
 export const CHART_FONT = {
   /** The numbers along both axes. */
-  tick: 10,
+  tick: 12,
   /** The axis titles. */
-  title: 12,
+  title: 13,
   /** The labels pinned above the peaks. */
-  label: 11,
+  label: 12,
   /** The readout the crosshair carries. */
-  readout: 11,
+  readout: 12,
 } as const;
 
 /**
@@ -107,7 +109,7 @@ export const CHART_FONT = {
  */
 export const PEAK_LABEL = {
   /** The baseline-to-baseline distance between two stacked lines. */
-  lineHeight: 11,
+  lineHeight: 13,
   /** The clear space between the top of a stick and its first line. */
   topPad: 10,
   /**

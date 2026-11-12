@@ -5,8 +5,8 @@
  * end of a zoom drag is not a click.
  *
  * The gestures are the real DOM events on the chart's own SVG, and the chart is
- * laid out at 600 × 400, so the plot is 524 user units wide from x 60: a
- * quarter of the way across is x 191, three quarters x 453.
+ * laid out at 600 × 400, so the plot is 520 user units wide from x 64: a
+ * quarter of the way across is x 194, three quarters x 454.
  */
 
 import { readFileSync } from 'node:fs';
@@ -118,9 +118,9 @@ test('a click reports the wavenumber under it and the spectrum selected', async 
   );
   act(() => handle.current?.setDomain({ x: [1000, 3000], y: [0, 100] }));
 
-  click({ x: 191, y: 188 });
+  click({ x: 194, y: 186 });
   act(() => handle.current?.selectSpectrum(null));
-  click({ x: 453, y: 188 });
+  click({ x: 454, y: 186 });
 
   // The infrared axis runs high to low, so a quarter across is 2500.
   expect(clicks).toStrictEqual([
@@ -143,13 +143,13 @@ test('a drag zooms and is not reported as a click', async () => {
   );
   act(() => handle.current?.setDomain({ x: [1000, 3000], y: [0, 100] }));
 
-  gesture({ x: 191, y: 100 }, { x: 453, y: 300 });
+  gesture({ x: 194, y: 100 }, { x: 454, y: 300 });
 
   expect(clicks).toStrictEqual([]);
 
   // The drag framed 2500 to 1500, so the same quarter of the plot now reads
   // 2250 — the gesture was a zoom, and only the click after it is reported.
-  click({ x: 191, y: 188 });
+  click({ x: 194, y: 186 });
 
   expect(clicks).toStrictEqual([
     { wavenumber: expect.closeTo(2250, 9), spectrumId: 'film' },
@@ -169,7 +169,7 @@ test('a Raman click reports the shift, read low to high', () => {
   );
   act(() => handle.current?.setDomain({ x: [1000, 3000], y: [0, 6000] }));
 
-  click({ x: 191, y: 188 });
+  click({ x: 194, y: 186 });
 
   expect(clicks).toStrictEqual([
     { wavenumber: expect.closeTo(1500, 9), spectrumId: 'calcite' },

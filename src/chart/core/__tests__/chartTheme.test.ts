@@ -58,16 +58,16 @@ test('every colour is a token a host can override, over a colour literal', () =>
 
 test('the type sizes are fixed rather than inherited', () => {
   expect(CHART_FONT).toStrictEqual({
-    tick: 10,
-    title: 12,
-    label: 11,
-    readout: 11,
+    tick: 12,
+    title: 13,
+    label: 12,
+    readout: 12,
   });
 });
 
 test('the label geometry the drawing and the declutter sweep share', () => {
   expect(PEAK_LABEL).toStrictEqual({
-    lineHeight: 11,
+    lineHeight: 13,
     topPad: 10,
     topMark: 10,
     hoverHalfWidth: 26,

@@ -39,7 +39,7 @@ function drawAxes(overrides: Partial<AxesProps> = {}): string {
 }
 
 /** The L of the two axis lines, at the margins `plotRect` keeps. */
-const AXIS_LINE = '<path d="M60 10V366H584"';
+const AXIS_LINE = '<path d="M64 10V362H584"';
 
 test('a chart on its own writes both rows of numbers and both titles', () => {
   const markup = drawAxes();
@@ -55,11 +55,11 @@ test('a chart on its own writes both rows of numbers and both titles', () => {
 test('the value title stands beside its numbers rather than at the edge', () => {
   // `0` to `50` is two characters at most, so the title comes in from the far
   // side of the gutter to sit against them; a chromatogram writing `1.5e+8` in
-  // the same 60 pixels pushes it back out to the floor.
-  expect(drawAxes()).toContain('<text x="33" y="188" transform="rotate(-90');
+  // the same 64 pixels pushes it back out to the floor.
+  expect(drawAxes()).toContain('<text x="34.1" y="186" transform="rotate(-90');
   expect(
-    drawAxes({ yDomain: [0, 2e8], yScale: chartScale(0, 2e8, 366, 10) }),
-  ).toContain('<text x="9" y="188" transform="rotate(-90');
+    drawAxes({ yDomain: [0, 2e8], yScale: chartScale(0, 2e8, 362, 10) }),
+  ).toContain('<text x="8" y="186" transform="rotate(-90');
 });
 
 test('a pane above the foot of a stack writes no numbers along the bottom', () => {

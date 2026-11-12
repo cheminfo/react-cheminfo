@@ -3,7 +3,7 @@
  * The crosshair of a band chart, followed with a real pointer.
  *
  * Three slots of 146 pixels each run from x 10, so their middles are at 83,
- * 229 and 375; the plot runs from y 10 to 230. The pointer target is laid
+ * 229 and 375; the plot runs from y 10 to 228. The pointer target is laid
  * over exactly that rectangle unless a test shrinks it, so a client point is
  * a point of the plot.
  */
@@ -61,7 +61,7 @@ function mount(trackedIndex?: number | null, shrink = 1): void {
       left: 10,
       top: 10,
       width: 438 / shrink,
-      height: 220 / shrink,
+      height: 218 / shrink,
     }) as DOMRect;
 }
 
@@ -116,7 +116,7 @@ test('a pointer over a slot reports it, with every series’ value there', () =>
       ],
     },
   ]);
-  expect(crosshair()).toBe('M229 10V230');
+  expect(crosshair()).toBe('M229 10V228');
   expect(target().getAttribute('aria-label')).toBe('Measurement b');
 });
 

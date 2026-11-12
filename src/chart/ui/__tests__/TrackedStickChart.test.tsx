@@ -95,7 +95,7 @@ test('a stick stands on the zero rule, and a span stands between its two ends', 
   // Every value here is positive, so zero is the foot of the axis and the
   // frame rules nothing across the plot; the plain stick stands on it anyway.
   expect(html).not.toContain('data-chart-rule="zero"');
-  expect(plain.from).toBe(130);
+  expect(plain.from).toBe(128);
 });
 
 test('a signed series stands on the rule the frame draws through zero', () => {

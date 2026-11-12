@@ -31,22 +31,22 @@ export const CHART_BASE_MARGINS = {
 } as const;
 
 /** Room a set of tick marks and their labels needs, outside the plot. */
-export const CHART_TICK_ROOM = { bottom: 22, left: 32 } as const;
+export const CHART_TICK_ROOM = { bottom: 24, left: 34 } as const;
 
 /** Room an axis title needs, beyond whatever its ticks already took. */
-export const CHART_TITLE_ROOM = { bottom: 18, left: 16 } as const;
+export const CHART_TITLE_ROOM = { bottom: 19, left: 17 } as const;
 
 /** How far a tick mark reaches out of the plot, in pixels. */
 export const CHART_TICK_LENGTH = 4;
 
 /** Baseline of a horizontal tick label, below the bottom of the plot. */
-export const CHART_TICK_LABEL_OFFSET = 15;
+export const CHART_TICK_LABEL_OFFSET = 16;
 
 /** How far a vertical tick label ends before the left of the plot. */
 export const CHART_TICK_LABEL_INSET = 8;
 
 /** Baseline of an axis title, past the room its ticks took. */
-export const CHART_TITLE_OFFSET = 13;
+export const CHART_TITLE_OFFSET = 14;
 
 /**
  * How much room one edge of the plot gives up.
@@ -180,7 +180,7 @@ export const CHART_TICK_MARK_STYLE = {
  */
 export const CHART_TICK_LABEL_STYLE = {
   fill: 'var(--text-muted)',
-  fontSize: 11,
+  fontSize: 12,
   fontVariantNumeric: 'tabular-nums',
   userSelect: 'none',
 } as const satisfies CSSProperties;
@@ -188,7 +188,7 @@ export const CHART_TICK_LABEL_STYLE = {
 /** What the axis measures, and any power of ten its labels were divided by. */
 export const CHART_AXIS_TITLE_STYLE = {
   fill: 'var(--text-muted)',
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: 500,
   userSelect: 'none',
 } as const satisfies CSSProperties;

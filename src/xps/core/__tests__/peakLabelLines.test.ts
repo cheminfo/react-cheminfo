@@ -48,14 +48,14 @@ test('one line stands the clear space above the peak', () => {
 
 test('two lines are stacked upwards, the last one nearest the peak', () => {
   expect(labelStackBaselines(100, 2, [0, 300])).toStrictEqual(
-    Float64Array.from([79, 90]),
+    Float64Array.from([77, 90]),
   );
 });
 
 test('a stack that would leave the plot is pushed back down whole', () => {
   const baselines = labelStackBaselines(12, 2, [0, 300]);
 
-  expect(baselines).toStrictEqual(Float64Array.from([11, 22]));
+  expect(baselines).toStrictEqual(Float64Array.from([13, 26]));
   // Pushed as one block, so the lines keep their spacing.
   expect((baselines[1] as number) - (baselines[0] as number)).toBe(
     PEAK_LABEL.lineHeight,

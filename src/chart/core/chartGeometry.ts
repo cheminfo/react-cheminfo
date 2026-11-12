@@ -64,13 +64,13 @@ export interface ChartMargin {
  * the plot, where `top` only keeps the topmost value label off the edge.
  *
  * Each of them is the furniture and no more than the furniture. `Axes` writes
- * its tick row five pixels under the plot and its title thirteen under that,
- * which puts the deepest ink of a `(min)` some thirty pixels down; what is left
- * is slack. A stack pays these four numbers once per pane — a column of three
+ * its tick row five pixels under the plot and its title sixteen under that,
+ * which puts the deepest ink of a `(min)` some thirty-five pixels down; what is
+ * left is slack. A stack pays these four numbers once per pane — a column of three
  * chromatograms over a spectrum pays `bottom` four times — and a pixel of slack
  * in here is a pixel the measurement was not drawn in, over and over.
  */
-export const MARGIN = { top: 10, right: 16, bottom: 34, left: 60 } as const;
+export const MARGIN = { top: 10, right: 16, bottom: 38, left: 64 } as const;
 
 /**
  * How much room a chart leaves under its plot when it writes no horizontal axis

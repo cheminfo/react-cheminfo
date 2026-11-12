@@ -3,7 +3,7 @@
  * the window shows it, parked dashed on an edge with an arrow when it does not,
  * and labelled on whichever side keeps the words inside the plot.
  *
- * The plot runs from x 60 to x 584, and one unit of the axis is one pixel from
+ * The plot runs from x 64 to x 584, and one unit of the axis is one pixel from
  * x 60, so a value of 100 stands at x 160.
  */
 
@@ -38,7 +38,7 @@ test('a value in the window is marked by a solid rule standing on it', () => {
   const html = draw({ value: 100 });
 
   expect(html).toBe(
-    '<svg><g pointer-events="none"><line x1="160" y1="10" x2="160" y2="366" ' +
+    '<svg><g pointer-events="none"><line x1="160" y1="10" x2="160" y2="362" ' +
       'stroke-width="1.5" style="stroke:var(--spectrum-highlight, #f97316)"></line></g></svg>',
   );
 });
@@ -47,9 +47,9 @@ test('a value left of the window is parked dashed on the left edge, pointing out
   const html = draw({ value: -100, color: 'teal' });
 
   expect(html).toContain(
-    '<line x1="60" y1="10" x2="60" y2="366" stroke-width="1.5" stroke-dasharray="4 3" style="stroke:teal">',
+    '<line x1="64" y1="10" x2="64" y2="362" stroke-width="1.5" stroke-dasharray="4 3" style="stroke:teal">',
   );
-  expect(html).toContain('<path d="M60 18L67 13L67 23Z" style="fill:teal">');
+  expect(html).toContain('<path d="M64 18L71 13L71 23Z" style="fill:teal">');
   expect(html).not.toContain('<text');
 });
 
@@ -73,6 +73,6 @@ test('on a parked guide the label clears the arrow, on the side inside the plot'
   const left = draw({ value: -5, label: 'MS2' });
   const right = draw({ value: 900, label: 'MS2' });
 
-  expect(left).toContain('<text x="71" y="18" text-anchor="start"');
+  expect(left).toContain('<text x="75" y="18" text-anchor="start"');
   expect(right).toContain('<text x="573" y="18" text-anchor="end"');
 });

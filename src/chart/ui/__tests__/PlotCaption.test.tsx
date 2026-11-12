@@ -28,19 +28,19 @@ function drawCaption(text: string, until?: number): string {
 }
 
 test('the caption sits in the top left of the plot, on the legend rows own line', () => {
-  // Six in from the plot's left edge and centred seven below its top, which is
-  // where `legendBox` puts the first row of the legend at the other corner.
-  expect(drawCaption(CAPTION)).toContain('<text x="66" y="23"');
+  // Six in from the plot's left edge and centred fourteen below its top, which
+  // is where `legendBox` puts the first row of the legend at the other corner.
+  expect(drawCaption(CAPTION)).toContain('<text x="70" y="24"');
   expect(drawCaption(CAPTION)).toContain(`>${CAPTION}</text>`);
 });
 
 test('it stops short of a legend rather than running under the box', () => {
   const markup = drawCaption(CAPTION, 300);
 
-  // 300 less the gap, the margin and the plot's own left edge leaves 229
-  // pixels, which is 37 characters at the legend's advance — 36 of the caption
+  // 300 less the gap, the margin and the plot's own left edge leaves 225
+  // pixels, which is 33 characters at the legend's advance — 32 of the caption
   // and the ellipsis saying that it goes on.
-  expect(markup).toContain('>lc-msms-run.mzML · scan 2 of 3 · 0.2…</text>');
+  expect(markup).toContain('>lc-msms-run.mzML · scan 2 of 3 ·…</text>');
 });
 
 test('a caption with room for a stub is not written at all', () => {

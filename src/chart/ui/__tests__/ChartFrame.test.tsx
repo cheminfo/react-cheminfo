@@ -25,23 +25,23 @@ const BARE = {
 
 test('a titled 800 by 400 figure gives its data the rectangle it promised', () => {
   expect(plotOf(TITLED)).toStrictEqual({
-    left: 58,
+    left: 61,
     top: 10,
     right: 788,
-    bottom: 352,
-    width: 730,
-    height: 342,
+    bottom: 349,
+    width: 727,
+    height: 339,
   });
 });
 
 test('an axis with no title hands the words back to the plot', () => {
   expect(plotOf(BARE)).toStrictEqual({
-    left: 42,
+    left: 44,
     top: 10,
     right: 788,
-    bottom: 370,
-    width: 746,
-    height: 360,
+    bottom: 368,
+    width: 744,
+    height: 358,
   });
 });
 
@@ -65,9 +65,9 @@ test('an axis with no ticks either keeps nothing back at all', () => {
 
 test('a figure measured in a collapsed panel draws nothing rather than throwing', () => {
   expect(plotOf({ ...BARE, width: 0, height: 0 })).toStrictEqual({
-    left: 42,
+    left: 44,
     top: 10,
-    right: 42,
+    right: 44,
     bottom: 10,
     width: 0,
     height: 0,

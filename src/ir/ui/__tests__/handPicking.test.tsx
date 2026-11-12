@@ -6,8 +6,8 @@
  * of each through `onChange` rather than as a click.
  *
  * The chart is laid out at 600 × 400 and framed on 3000 to 1000 cm⁻¹, so the
- * plot is 524 user units wide from x 60 and 1720 cm⁻¹ is at x 395.36; a band's
- * hit radius of 8 units is then 30.5 cm⁻¹.
+ * plot is 520 user units wide from x 64 and 1720 cm⁻¹ is at x 396.8; a band's
+ * hit radius of 8 units is then 30.8 cm⁻¹.
  */
 
 import { readFileSync } from 'node:fs';
@@ -108,12 +108,12 @@ function press(label: string): void {
 function clickAt(wavenumber: number): void {
   const chart = host.querySelector('svg[viewBox="0 0 600 400"]');
   if (chart === null) throw new Error('No chart is drawn');
-  const x = 60 + ((3000 - wavenumber) / 2000) * 524;
+  const x = 64 + ((3000 - wavenumber) / 2000) * 520;
   for (const type of ['pointerdown', 'pointermove', 'pointerup']) {
     const event = new MouseEvent(type, {
       bubbles: true,
       clientX: x,
-      clientY: 188,
+      clientY: 186,
       button: 0,
     }) as MouseEvent & { pointerId: number };
     event.pointerId = 1;

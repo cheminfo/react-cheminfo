@@ -29,7 +29,7 @@ test('the type is small and fixed, so a host font cannot crowd the axes', () => 
 });
 
 test('a stacked label is spaced by one constant both halves agree on', () => {
-  expect(PEAK_LABEL.lineHeight).toBe(11);
+  expect(PEAK_LABEL.lineHeight).toBe(13);
   expect(PEAK_LABEL.topPad).toBe(10);
   expect(XPS_PEAK_LABEL).toStrictEqual({ topMark: 8, width: 42 });
 });

@@ -366,7 +366,7 @@ const Y_TICK_SPACING = 44;
 const TICK_LABEL_GAP = 5;
 
 /** How far under the plot the horizontal title hangs, clear of the numbers. */
-const TITLE_GAP = 18;
+const TITLE_GAP = TICK_LABEL_GAP + CHART_FONT.tick + 4;
 
 /**
  * The column the rotated value title stands in when the numbers leave it no

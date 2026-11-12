@@ -115,7 +115,7 @@ function VerticalRule(props: VerticalRuleProps): ReactElement {
         x={x}
         y={frame.plot.top + 9}
         textAnchor="middle"
-        fontSize={10}
+        fontSize={12}
         fill={MUTED_INK}
       >
         {label}

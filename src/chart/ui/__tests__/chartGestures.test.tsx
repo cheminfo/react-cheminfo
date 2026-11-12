@@ -17,8 +17,8 @@ beforeEach(installProbeStubs);
 afterEach(resetProbes);
 
 test('a press that went nowhere is a click, reported in data units', () => {
-  // The plot is 524 user units wide from x 60 and 356 tall from y 10, so the
-  // middle of it is x 322, y 188 — which on this window is m/z 300 at half the
+  // The plot is 520 user units wide from x 64 and 352 tall from y 10, so the
+  // middle of it is x 324, y 186 — which on this window is m/z 300 at half the
   // base peak.
   const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
   const clicks: Array<{ x: number; y: number }> = [];
@@ -27,7 +27,7 @@ test('a press that went nowhere is a click, reported in data units', () => {
     onClick: (point) => clicks.push(point),
   });
 
-  drag({ x: 322, y: 188 }, { x: 322, y: 188 });
+  drag({ x: 324, y: 186 }, { x: 324, y: 186 });
 
   expect(clicks).toStrictEqual([{ x: 300, y: 50 }]);
   // The very window it started with, not an equal one worked out again: a click
@@ -68,7 +68,7 @@ test('a press the host refuses is never captured, and moves nothing', () => {
 });
 
 test('a select drag reports the range it swept out and leaves the window alone', () => {
-  // x 191 and x 453 are a quarter and three quarters across a 524-unit plot, so
+  // x 194 and x 454 are a quarter and three quarters across a 520-unit plot, so
   // on a window of 0 to 600 they are exactly 150 and 450.
   const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
   const ranges: Array<[number, number]> = [];
@@ -78,7 +78,7 @@ test('a select drag reports the range it swept out and leaves the window alone',
     onSelectRange: (range) => ranges.push(range),
   });
 
-  drag({ x: 191, y: 100 }, { x: 453, y: 120 });
+  drag({ x: 194, y: 100 }, { x: 454, y: 120 });
 
   expect(ranges).toStrictEqual([[150, 450]]);
   // Identity, not equality: a window rebuilt from the same four numbers would
@@ -96,7 +96,7 @@ test('a select drag made right to left reports its range low end first', () => {
     onSelectRange: (range) => ranges.push(range),
   });
 
-  drag({ x: 453, y: 120 }, { x: 191, y: 100 });
+  drag({ x: 454, y: 120 }, { x: 194, y: 100 });
 
   // A range of 450 to 150 integrates nothing at all.
   expect(ranges).toStrictEqual([[150, 450]]);
@@ -141,7 +141,7 @@ test('a near-vertical select drag reports neither a range nor a click', () => {
 
 test('a press that wobbled a couple of pixels is still a click', () => {
   // Two user units each way, which is what a press on a trackpad comes to; the
-  // release at x 322, y 188 is m/z 300 at half the base peak.
+  // release at x 324, y 186 is m/z 300 at half the base peak.
   const fitted: ChartDomain = { x: [0, 600], y: [0, 100] };
   const clicks: Array<{ x: number; y: number }> = [];
   const { drag } = mount({
@@ -149,7 +149,7 @@ test('a press that wobbled a couple of pixels is still a click', () => {
     onClick: (point) => clicks.push(point),
   });
 
-  drag({ x: 320, y: 186 }, { x: 322, y: 188 });
+  drag({ x: 322, y: 184 }, { x: 324, y: 186 });
 
   expect(clicks).toStrictEqual([{ x: 300, y: 50 }]);
   expect(zoom?.domain).toBe(fitted);
@@ -166,7 +166,7 @@ test('a select drag let go past the baseline still answers with an x range', () 
 
   // Released twenty units below the foot of the plot, which on a zoom drag is
   // how the value axis is asked for.
-  drag({ x: 191, y: 100 }, { x: 453, y: plot.bottom + 20 });
+  drag({ x: 194, y: 100 }, { x: 454, y: plot.bottom + 20 });
 
   expect(ranges).toStrictEqual([[150, 450]]);
   // Identity: the height was never taken, so nothing about the window moved.

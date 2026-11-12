@@ -34,8 +34,8 @@ const SCORES = rowMatrix(
   ]),
 );
 
-const TICK_INK = 'font-size:11px';
-const TITLE_INK = 'font-size:12px';
+const TICK_INK = 'font-size:12px';
+const TITLE_INK = 'font-size:13px';
 
 /* Six components over three groups, none of them collinear in any pair. */
 const WIDE_AXES: ScatterMatrixAxis[] = Array.from({ length: 6 }, (_, axis) => ({
@@ -63,7 +63,7 @@ test('four axes lay out sixteen cells, one per pair', () => {
 });
 
 test('a container too narrow for four readable cells falls back to three', () => {
-  const html = render({ width: 260 });
+  const html = render({ width: 263 });
 
   expect(html.match(/data-scatter-cell="/gu)).toHaveLength(9);
   expect(html).not.toContain('data-scatter-cell="3,3"');
@@ -108,7 +108,7 @@ test('the grid names each axis once along the foot and once up the side', () => 
 });
 
 test('a cell too narrow for a share writes the component name alone', () => {
-  const html = render({ width: 260 });
+  const html = render({ width: 263 });
 
   expect(html).toContain('>PC 1</text>');
   expect(html).toContain('>PC 3</text>');
