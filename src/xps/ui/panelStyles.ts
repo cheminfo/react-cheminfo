@@ -3,7 +3,7 @@
  *
  * A panel is the same three parts each time — the box it fills, a toolbar of its
  * own actions under the header, and the body that scrolls — so the shape lives
- * here rather than being copied into each of the six. The header carries shell
+ * here rather than being copied into each of the seven. The header carries shell
  * chrome only, which is why a panel's own switches are a row of their own
  * directly beneath it: they travel with the panel when it is folded away or
  * reordered, and the header stays identical across the stack.

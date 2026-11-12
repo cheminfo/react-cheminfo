@@ -9,14 +9,15 @@ import type { ActivityBarItemProps } from 'react-science/ui';
  *
  * The order is the order a surface analysis is worked through: what was loaded,
  * what the file says about how it was acquired, which peaks are in it, which
- * elements those peaks could be, what the fit decomposed them into, and what
- * that fit makes the composition.
+ * elements those peaks could be, how much of each the survey says there is,
+ * what the fit decomposed them into, and what that fit makes the composition.
  */
 export const xpsSidePanels = [
   { id: 'spectra', title: 'Spectra', icon: 'timeline-line-chart' },
   { id: 'metadata', title: 'Acquisition', icon: 'properties' },
   { id: 'peaks', title: 'Peaks', icon: 'th-list' },
   { id: 'elements', title: 'Elements', icon: 'search' },
+  { id: 'quantification', title: 'Quantification', icon: 'doughnut-chart' },
   { id: 'components', title: 'Fit', icon: 'layers' },
   { id: 'composition', title: 'Composition', icon: 'pie-chart' },
 ] as const satisfies ReadonlyArray<{

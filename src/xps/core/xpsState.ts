@@ -18,8 +18,22 @@
  * testable without the other.
  */
 
+import type { XpsSettings } from './xpsSettings.ts';
 import type { XpsPanelId, XpsSidePanelId } from './xpsSidePanels.ts';
 import type { XpsDomain, XpsSpectrum } from './xpsSpectrum.ts';
+
+// The workspace lives beside the state rather than in it, and is reached from
+// here as well, where every reader of the three buckets already looks.
+export type { EnergyAxis, XpsSettings } from './xpsSettings.ts';
+export {
+  DEFAULT_LABEL_LIMIT,
+  DEFAULT_SETTINGS,
+  MAXIMUM_LABEL_LIMIT,
+  MAXIMUM_REFERENCE_TOLERANCE,
+  isUsableTolerance,
+  mergeXpsSettings,
+  sameXpsSettings,
+} from './xpsSettings.ts';
 
 /**
  * The spectra that are open: what a saved file holds.
@@ -34,9 +48,6 @@ export interface XpsData {
   /** The spectra, in the order they were loaded. */
   spectra: XpsSpectrum[];
 }
-
-/** Which of the two axes the chart is drawn against. */
-export type EnergyAxis = 'binding' | 'kinetic';
 
 /**
  * Where you are in the viewer: the temporary preferences of the session.
@@ -62,49 +73,6 @@ export interface XpsView {
   openPanelIds: XpsPanelId[];
   /** Why the last action was refused, `null` as soon as one succeeds. */
   error: string | null;
-}
-
-/** The workspace: how every spectrum is drawn, whichever ones are open. */
-export interface XpsSettings {
-  /**
-   * Which axis the chart is drawn against. Binding energy unless somebody asks
-   * otherwise: it is what an XPS spectrum is published in, and the only axis
-   * two instruments with different sources agree on. A spectrum whose file
-   * states no source energy stays on kinetic whatever this says, since there is
-   * nothing to convert it with.
-   */
-  energyAxis: EnergyAxis;
-  /**
-   * The background subtracted under each region before an area is taken.
-   * `none` leaves the trace as measured and is what a survey scan is read on;
-   * `shirley` is what a fitted narrow scan was quantified with.
-   */
-  background: 'none' | 'linear' | 'shirley';
-  /** Whether the chart shades the regions the file defines. */
-  showRegions: boolean;
-  /** Whether the chart draws the components the file was fitted with. */
-  showComponents: boolean;
-  /** Whether the chart writes the energy of its tallest peaks beside them. */
-  showLabels: boolean;
-  /**
-   * How many labels the chart writes at most, the most intense first. A survey
-   * scan has far more peaks than a chart has room for names, so this is what
-   * keeps a zoomed-out spectrum from being written over entirely.
-   */
-  labelLimit: number;
-  /**
-   * How far in eV a reference binding energy may sit from a peak and still be
-   * offered as what that peak is. Half an eV is a charge correction; two is a
-   * chemical shift; past about three the answer stops being one element.
-   */
-  referenceTolerance: number;
-  /**
-   * Whether counts are drawn on the 0–100 scale rather than as they were
-   * measured. Two spectra acquired with different dwell times are compared by
-   * shape and never by counts, which is why this is on unless somebody turns it
-   * off.
-   */
-  normalise: boolean;
 }
 
 /** Everything the viewer knows. */
@@ -141,102 +109,6 @@ export const DEFAULT_SIDE_PANEL: XpsSidePanelId = 'spectra';
  * it.
  */
 export const DEFAULT_SIDE_PANELS: XpsSidePanelId[] = ['spectra', 'peaks'];
-
-/**
- * How many peaks a chart names before it stops.
- *
- * Fifteen is about as many energies as fit across a chart of any usual width
- * without one label sitting on the next; past that the labels stop being read
- * and start being scenery.
- */
-export const DEFAULT_LABEL_LIMIT = 15;
-
-/** The largest number of labels a gesture may ask for. */
-export const MAXIMUM_LABEL_LIMIT = 500;
-
-/** The widest window in eV a gesture may ask a reference to be found in. */
-export const MAXIMUM_REFERENCE_TOLERANCE = 20;
-
-/** The workspace a fresh viewer starts from. */
-export const DEFAULT_SETTINGS: XpsSettings = {
-  energyAxis: 'binding',
-  background: 'none',
-  showRegions: true,
-  showComponents: true,
-  showLabels: true,
-  labelLimit: DEFAULT_LABEL_LIMIT,
-  referenceTolerance: 2,
-  normalise: false,
-};
-
-/**
- * The workspace once a change has been folded into it, within what a chart can
- * carry.
- *
- * Every route into `settings` goes through here — the viewer opening, a
- * gesture, a state read back from a file — because two of these carry a number
- * a caller can get wrong in a way nothing downstream reports. A reference
- * tolerance of zero is not a narrow window but one no peak can fall in, so
- * every peak quietly stops being identified; a label limit of a million is a
- * spectrum written over entirely. A value the viewer cannot show is left as it
- * stands rather than refused, since a file written by another viewer is
- * nobody's gesture to be told off for.
- * @param current - The workspace in force.
- * @param change - The settings that change, each of them optional.
- * @returns The workspace, its bounded numbers within bounds.
- */
-export function mergeXpsSettings(
-  current: XpsSettings,
-  change: Partial<XpsSettings> = {},
-): XpsSettings {
-  const askedLimit = change.labelLimit ?? current.labelLimit;
-  const askedTolerance =
-    change.referenceTolerance ?? current.referenceTolerance;
-  return {
-    ...current,
-    ...change,
-    labelLimit: Number.isFinite(askedLimit)
-      ? Math.min(MAXIMUM_LABEL_LIMIT, Math.max(0, Math.round(askedLimit)))
-      : current.labelLimit,
-    referenceTolerance: isUsableTolerance(askedTolerance)
-      ? Math.min(MAXIMUM_REFERENCE_TOLERANCE, askedTolerance)
-      : current.referenceTolerance,
-  };
-}
-
-/**
- * Whether a tolerance is a window a peak can fall in.
- *
- * Zero and below are the values worth catching: a lookup through them answers
- * nothing while looking exactly like a lookup that found nothing.
- * @param tolerance - The window asked for, in eV.
- * @returns Whether it has a width a measurement could sit inside.
- */
-export function isUsableTolerance(tolerance: number): boolean {
-  return Number.isFinite(tolerance) && tolerance > 0;
-}
-
-/**
- * Whether two workspaces say the same thing.
- * @param current - The workspace in force.
- * @param next - The workspace asked for.
- * @returns Whether every setting already holds that value.
- */
-export function sameXpsSettings(
-  current: XpsSettings,
-  next: XpsSettings,
-): boolean {
-  return (
-    current.energyAxis === next.energyAxis &&
-    current.background === next.background &&
-    current.showRegions === next.showRegions &&
-    current.showComponents === next.showComponents &&
-    current.showLabels === next.showLabels &&
-    current.labelLimit === next.labelLimit &&
-    current.referenceTolerance === next.referenceTolerance &&
-    current.normalise === next.normalise
-  );
-}
 
 /**
  * Whether a window is one the chart can show.

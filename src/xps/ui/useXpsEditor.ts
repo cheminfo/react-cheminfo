@@ -12,7 +12,14 @@
  * open one.
  */
 
-import { useLayoutEffect, useMemo, useReducer, useRef } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 
 import type { XpsEditorActions } from '../core/xpsActions.ts';
 import { createXpsActions } from '../core/xpsActions.ts';
@@ -20,6 +27,10 @@ import type { CreateXpsStateOptions } from '../core/xpsReducer.ts';
 import { createXpsState, xpsReducer } from '../core/xpsReducer.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
 
+import {
+  DEFAULT_INSTRUMENT_STORAGE_KEY,
+  instrumentBucket,
+} from './instrumentStorage.ts';
 import type { XpsStateHandle } from './xpsStateContext.ts';
 
 /** What a viewer opens on, and who to tell when the spectra change. */
@@ -35,6 +46,13 @@ export interface UseXpsEditorOptions extends CreateXpsStateOptions {
    * @default undefined
    */
   onChange?: (spectra: XpsSpectrum[]) => void;
+  /**
+   * The key of this browser's storage the instruments are kept under between
+   * visits, with the one chosen and the background; `null` keeps them for this
+   * page only. Read when the viewer opens.
+   * @default DEFAULT_INSTRUMENT_STORAGE_KEY
+   */
+  storageKey?: string | null;
 }
 
 /** What a host page drives the viewer through. */
@@ -54,13 +72,41 @@ export interface XpsEditorApi extends XpsStateHandle {
  * @returns The state, the dispatch and the actions that change it.
  */
 export function useXpsEditor(options: UseXpsEditorOptions = {}): XpsEditorApi {
-  const { onChange, ...initial } = options;
+  const {
+    onChange,
+    storageKey = DEFAULT_INSTRUMENT_STORAGE_KEY,
+    ...initial
+  } = options;
+
+  const [bucket] = useState(() =>
+    storageKey === null ? null : instrumentBucket(storageKey),
+  );
 
   // `useReducer` rather than a `useState` holding the last state in a ref: two
   // actions dispatched from one event have to be applied one after the other
   // rather than both against what was on screen before either of them, and
   // queueing them is what a reducer already does.
-  const [state, dispatch] = useReducer(xpsReducer, initial, createXpsState);
+  const [state, dispatch] = useReducer(xpsReducer, initial, (opening) =>
+    createXpsState({
+      ...opening,
+      // What the caller states wins over what this browser kept.
+      settings: { ...bucket?.read().value, ...opening.settings },
+    }),
+  );
+
+  const { instrumentId, instruments, surveyBackground } = state.settings;
+  useEffect(() => {
+    bucket?.write({ instrumentId, instruments, surveyBackground });
+  }, [bucket, instrumentId, instruments, surveyBackground]);
+
+  // An instrument entered in another tab of the same site is here as well.
+  useEffect(
+    () =>
+      bucket?.subscribe(({ value }) => {
+        dispatch({ type: 'setSettings', settings: value });
+      }),
+    [bucket],
+  );
 
   const actions = useMemo(() => createXpsActions(dispatch), [dispatch]);
 

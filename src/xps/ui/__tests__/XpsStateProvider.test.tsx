@@ -17,7 +17,7 @@ test('a provider holding its own viewer opens it on what it was given', () => {
   );
 
   expect(markup).toBe(
-    '<span>2 open, a selected, spectra+peaks, 17 gestures</span>',
+    '<span>2 open, a selected, spectra+peaks, 18 gestures</span>',
   );
 });
 
@@ -25,7 +25,7 @@ test('a provider handed a viewer draws the shell from that one', () => {
   const markup = renderToStaticMarkup(<HostedViewer />);
 
   expect(markup).toBe(
-    '<span>1 open, a selected, components, 17 gestures</span>',
+    '<span>1 open, a selected, components, 18 gestures</span>',
   );
 });
 

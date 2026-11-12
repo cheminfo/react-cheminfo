@@ -59,8 +59,8 @@ export interface XpsEditorProps {
   pasteFromPage?: boolean;
   /**
    * The side panels open to begin with: the viewer's own — `'spectra'`,
-   * `'metadata'`, `'peaks'`, `'elements'`, `'components'`, `'composition'` — or
-   * the id of one of `panels`. An id no panel answers to is ignored. Read when
+   * `'metadata'`, `'peaks'`, `'elements'`, `'quantification'`, `'components'`,
+   * `'composition'` — or the id of one of `panels`. An id no panel answers to is ignored. Read when
    * the viewer opens, like `data`.
    * @default DEFAULT_SIDE_PANELS
    */
@@ -87,6 +87,13 @@ export interface XpsEditorProps {
    * @default undefined
    */
   ref?: Ref<XpsEditorHandle>;
+  /**
+   * The key of this browser's storage the instruments a survey is quantified
+   * with are kept under between visits; `null` keeps them for this page only.
+   * Read when the viewer opens, and unused when the host holds the state.
+   * @default DEFAULT_INSTRUMENT_STORAGE_KEY
+   */
+  storageKey?: string | null;
 }
 
 /**
@@ -117,6 +124,7 @@ export function XpsEditor(props: XpsEditorProps) {
     panels = NO_PANELS,
     actions,
     ref,
+    storageKey,
   } = props;
 
   // Held whether or not the host drives the viewer, because a hook cannot be
@@ -126,6 +134,7 @@ export function XpsEditor(props: XpsEditorProps) {
     spectra: data,
     onChange,
     panelIds: defaultPanelIds,
+    storageKey,
   });
 
   const hosted = useMemo<XpsStateHandle | null>(

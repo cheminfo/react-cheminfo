@@ -10,6 +10,7 @@
  * spectrum has since taken that place.
  */
 
+import type { XpsSurveyLine } from './surveyLines.ts';
 import type { XpsPanelId } from './xpsSidePanels.ts';
 import type { XpsDomain, XpsPeak, XpsSpectrum } from './xpsSpectrum.ts';
 import type { PartialXpsState, XpsSettings } from './xpsState.ts';
@@ -52,6 +53,11 @@ export type XpsDataAction =
    * pickings of the same trace.
    */
   | { type: 'setSpectrumPeaks'; id: string; peaks: XpsPeak[] }
+  /**
+   * Choose the lines a survey is quantified on, and their windows; `null` goes
+   * back to the ones the panel works out for itself.
+   */
+  | { type: 'setSurveyLines'; id: string; lines: XpsSurveyLine[] | null }
   /** Close every spectrum and start again from an empty chart. */
   | { type: 'clear' };
 

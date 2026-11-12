@@ -91,10 +91,11 @@ test('no two commands answer to the same key', () => {
   expect(taken.size).toBe(11);
 });
 
-test('every command the viewer offers is one of these thirteen', () => {
+test('every command the viewer offers is one of these fourteen', () => {
   expect(Object.keys(xpsCommands)).toStrictEqual([
     'about',
     'documentation',
+    'settings',
     'fullScreen',
     'zoomIn',
     'zoomOut',

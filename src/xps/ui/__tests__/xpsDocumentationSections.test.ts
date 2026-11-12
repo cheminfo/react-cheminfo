@@ -11,6 +11,7 @@ test('the documentation covers what an XPS viewer has to explain', () => {
     'backgrounds',
     'components',
     'composition',
+    'survey',
     'panels',
     'window',
   ]);

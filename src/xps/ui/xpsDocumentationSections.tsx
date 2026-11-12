@@ -9,6 +9,8 @@
 import { listStyle, paragraphStyle } from '../../panel/core/dialogStyles.ts';
 import type { DocumentationSection } from '../../panel/ui/DocumentationDialogFrame.tsx';
 
+import { surveySection } from './surveyDocumentation.tsx';
+
 /** The documentation, in the order it is read. */
 export const xpsDocumentationSections: readonly DocumentationSection[] = [
   {
@@ -157,6 +159,7 @@ export const xpsDocumentationSections: readonly DocumentationSection[] = [
       </>
     ),
   },
+  surveySection,
   {
     id: 'panels',
     title: 'The panels',
@@ -189,6 +192,11 @@ export const xpsDocumentationSections: readonly DocumentationSection[] = [
             energy up against the reference levels within the tolerance you set.
             Half an eV is a charge correction and two is a chemical shift; past
             about three the answer stops being one element.
+          </li>
+          <li>
+            <b>Quantification</b> — how much of each element a survey holds,
+            read with the sensitivity factors of the instrument you choose, and
+            the empirical formulas that ratio could be.
           </li>
           <li>
             <b>Fit</b> — the components the file was fitted with: position,

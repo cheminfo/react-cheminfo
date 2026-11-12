@@ -25,7 +25,7 @@ import { useXpsEditorState } from './xpsStateContext.ts';
  *
  * A composition is over several spectra and never over one: carbon is quantified
  * from the C 1s scan, oxygen from the O 1s, and each of them is a separate block
- * of the file. So this panel — alone among the six — is not about the selected
+ * of the file. So this panel — alone among the seven — is not about the selected
  * spectrum. It is about what is *drawn*, which is the reader's own statement of
  * which scans belong to one surface: a file holding six samples would otherwise
  * be quantified as though all six were one, and the number that came out would

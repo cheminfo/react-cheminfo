@@ -66,6 +66,11 @@ export const xpsCommands = {
     description:
       'The binding-energy convention, the backgrounds, what a component is, and every gesture.',
   },
+  settings: {
+    title: 'Instruments',
+    description:
+      'The instruments a survey is quantified for, and the sensitivity factor each gives every line. Yours are kept in this browser.',
+  },
   fullScreen: {
     title: 'Full screen',
     description:

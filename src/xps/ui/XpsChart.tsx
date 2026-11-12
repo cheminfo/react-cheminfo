@@ -69,6 +69,7 @@ export function XpsChart(props: XpsChartProps): ReactNode {
     onHighlightChange,
     onPickEnergy,
     onSelectSpectrum,
+    windows,
     isOver = false,
     isReading = false,
   } = props;
@@ -216,6 +217,7 @@ export function XpsChart(props: XpsChartProps): ReactNode {
             selectedId={selectedId}
             highlight={highlight}
             onSelectSpectrum={onSelectSpectrum}
+            windows={windows}
           />
         </g>
 

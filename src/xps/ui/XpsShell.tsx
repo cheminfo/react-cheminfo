@@ -13,6 +13,7 @@ import { XpsCanvas } from './XpsCanvas.tsx';
 import { XpsCommandProvider } from './XpsCommandProvider.tsx';
 import { XpsDocumentationDialog } from './XpsDocumentationDialog.tsx';
 import { XpsHeader } from './XpsHeader.tsx';
+import { XpsSettingsDialog } from './XpsSettingsDialog.tsx';
 import { XpsSidePanel } from './XpsSidePanel.tsx';
 import { XpsToolbar } from './XpsToolbar.tsx';
 import { useSpectrumDrop } from './useSpectrumDrop.ts';
@@ -63,6 +64,7 @@ export function XpsShell(props: XpsShellProps) {
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isDocumentationOpen, setIsDocumentationOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const taken = useMemo(
     () => spectra.map((spectrum) => spectrum.color),
@@ -101,6 +103,7 @@ export function XpsShell(props: XpsShellProps) {
   const commands = useXpsCommandHandlers({
     onAbout: () => setIsAboutOpen(true),
     onDocumentation: () => setIsDocumentationOpen(true),
+    onSettings: () => setIsSettingsOpen(true),
     onExportImage: () => setFigureOpen(!isFigureOpen),
   });
 
@@ -154,6 +157,11 @@ export function XpsShell(props: XpsShellProps) {
       <XpsDocumentationDialog
         isOpen={isDocumentationOpen}
         onClose={() => setIsDocumentationOpen(false)}
+      />
+
+      <XpsSettingsDialog
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </XpsCommandProvider>
   );

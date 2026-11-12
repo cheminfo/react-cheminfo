@@ -13,7 +13,7 @@
  */
 
 import type { XpsHighlight } from '../core/xpsHighlight.ts';
-import type { XpsDomain, XpsSpectrum } from '../core/xpsSpectrum.ts';
+import type { XpsDomain, XpsRegion, XpsSpectrum } from '../core/xpsSpectrum.ts';
 import type { XpsSettings } from '../core/xpsState.ts';
 
 export interface XpsChartProps {
@@ -51,6 +51,12 @@ export interface XpsChartProps {
    */
   onSelectSpectrum?: (id: string) => void;
   /**
+   * Windows to shade that no file defines — the ones a survey is quantified
+   * over, while the panel that sets them is open.
+   * @default undefined
+   */
+  windows?: XpsChartWindows;
+  /**
    * Whether a file is being dragged over the chart.
    * @default false
    */
@@ -60,4 +66,12 @@ export interface XpsChartProps {
    * @default false
    */
   isReading?: boolean;
+}
+
+/** Windows shaded on the chart for one spectrum, beside the ones its file defines. */
+export interface XpsChartWindows {
+  /** The photon energy of the spectrum they belong to, `null` when unstated. */
+  sourceEnergy: number | null;
+  /** The windows, in binding energy, each named above its band. */
+  regions: readonly XpsRegion[];
 }

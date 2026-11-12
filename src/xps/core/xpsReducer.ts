@@ -150,6 +150,7 @@ export function xpsReducer(state: XpsState, action: XpsAction): XpsState {
     case 'showOnly':
     case 'showEvery':
     case 'setSpectrumPeaks':
+    case 'setSurveyLines':
     case 'clear':
       return applyXpsDataAction(state, action);
 

@@ -17,7 +17,7 @@ export type { XpsHighlightProviderProps } from './XpsHighlightProvider.tsx';
 export { XpsHighlightProvider } from './XpsHighlightProvider.tsx';
 
 // The chart, which holds nothing.
-export type { XpsChartProps } from './xpsChartProps.ts';
+export type { XpsChartProps, XpsChartWindows } from './xpsChartProps.ts';
 export { XpsChart } from './XpsChart.tsx';
 export type {
   XpsPointerTrackerProps,
@@ -40,6 +40,11 @@ export { PeaksPanel } from './PeaksPanel.tsx';
 export { ElementsPanel } from './ElementsPanel.tsx';
 export { ComponentsPanel } from './ComponentsPanel.tsx';
 export { CompositionPanel } from './CompositionPanel.tsx';
+export { QuantificationPanel } from './QuantificationPanel.tsx';
+export type { XpsSettingsDialogProps } from './XpsSettingsDialog.tsx';
+export { XpsSettingsDialog } from './XpsSettingsDialog.tsx';
+export type { StoredQuantification } from './instrumentStorage.ts';
+export { DEFAULT_INSTRUMENT_STORAGE_KEY } from './instrumentStorage.ts';
 
 // The instrument around the chart.
 export type { XpsEditorProps } from './XpsEditor.tsx';

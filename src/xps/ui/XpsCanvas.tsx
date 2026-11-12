@@ -1,10 +1,17 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import { hasBindingAxis } from '../core/energyAxis.ts';
+import { findSpectrum } from '../core/spectrumGroups.ts';
+import { surveyLinesOf } from '../core/surveyElements.ts';
+import { surveyLineRegions } from '../core/surveyLines.ts';
 import { NO_HIGHLIGHT } from '../core/xpsHighlight.ts';
-import type { XpsDomain } from '../core/xpsSpectrum.ts';
+import type { XpsInstrument } from '../core/xpsInstrument.ts';
+import { findInstrument } from '../core/xpsInstrument.ts';
+import type { XpsDomain, XpsSpectrum } from '../core/xpsSpectrum.ts';
 
 import { XpsChart } from './XpsChart.tsx';
 import { XpsStatusBar } from './XpsStatusBar.tsx';
+import type { XpsChartWindows } from './xpsChartProps.ts';
 import { useLookAtEnergy, useXpsHighlight } from './xpsHighlightContext.ts';
 import { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
 
@@ -78,23 +85,37 @@ export function XpsCanvas(props: XpsCanvasProps) {
     [lookAt],
   );
 
+  const { settings, data, view } = state;
+  const { spectra } = data;
+  const { selectedId, openPanelIds, domain } = view;
+  const { instruments, instrumentId } = settings;
+  const quantifying = openPanelIds.includes('quantification');
+  const windows = useMemo(
+    () =>
+      quantifying
+        ? quantificationWindows(spectra, selectedId, instruments, instrumentId)
+        : undefined,
+    [quantifying, spectra, selectedId, instruments, instrumentId],
+  );
+
   return (
     <div style={sideStyle}>
       <div id={chartId} style={chartStyle}>
         <XpsChart
-          spectra={state.data.spectra}
-          settings={state.settings}
-          domain={state.view.domain}
-          selectedId={state.view.selectedId}
+          spectra={spectra}
+          settings={settings}
+          domain={domain}
+          selectedId={selectedId}
           highlight={highlight}
           onDomainChange={onDomainChange}
           onHighlightChange={lookAt}
           onPickEnergy={onPickEnergy}
           onSelectSpectrum={actions.selectSpectrum}
+          windows={windows}
           isOver={isOver}
           isReading={isReading}
         />
-        {state.data.spectra.length === 0 && !isReading ? (
+        {spectra.length === 0 && !isReading ? (
           <div style={inviteStyle}>
             <div style={inviteTitleStyle}>Drop a spectrum here</div>
             <div>
@@ -147,3 +168,27 @@ const inviteStyle = {
 } as const;
 
 const inviteTitleStyle = { fontSize: 15, fontWeight: 600 } as const;
+
+/**
+ * The windows the selected survey is quantified over, for the chart to shade
+ * while the quantification panel is open.
+ * @param spectra - Everything that is open.
+ * @param selectedId - The spectrum the panels act on.
+ * @param instruments - The reader's instruments.
+ * @param instrumentId - The one in force.
+ * @returns The windows, `undefined` when nothing is being quantified.
+ */
+function quantificationWindows(
+  spectra: readonly XpsSpectrum[],
+  selectedId: string | null,
+  instruments: readonly XpsInstrument[],
+  instrumentId: string,
+): XpsChartWindows | undefined {
+  const spectrum = findSpectrum(spectra, selectedId);
+  if (spectrum === null || !hasBindingAxis(spectrum)) return undefined;
+  const instrument = findInstrument(instruments, instrumentId);
+  return {
+    sourceEnergy: spectrum.sourceEnergy,
+    regions: surveyLineRegions(surveyLinesOf(spectrum, spectra, instrument)),
+  };
+}

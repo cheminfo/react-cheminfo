@@ -23,6 +23,8 @@
 
 import type { DataXY } from 'cheminfo-types';
 
+import type { XpsSurveyLine } from './surveyLines.ts';
+
 /**
  * One trace of a measurement: energy in eV against counts, x strictly
  * increasing.
@@ -245,6 +247,13 @@ export interface XpsSpectrum {
    * @default false
    */
   excludeFromDomain?: boolean;
+  /**
+   * The lines a survey is quantified on and the window of each, once somebody
+   * chose them. Until then the quantification panel works them out from the
+   * narrow scans of the same sample, so nothing is stored that was not chosen.
+   * @default undefined
+   */
+  surveyLines?: XpsSurveyLine[];
 }
 
 /** The window the chart is showing, in data units. */

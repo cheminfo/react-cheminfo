@@ -9,6 +9,7 @@
  * place.
  */
 
+import type { XpsSurveyLine } from './surveyLines.ts';
 import type { XpsAction } from './xpsAction.ts';
 import type { XpsPanelId } from './xpsSidePanels.ts';
 import type { XpsDomain, XpsPeak, XpsSpectrum } from './xpsSpectrum.ts';
@@ -73,6 +74,13 @@ export interface XpsEditorActions {
    * @param peaks - The peaks, in the order they are to be listed.
    */
   setSpectrumPeaks: (id: string, peaks: XpsPeak[]) => void;
+  /**
+   * Choose the lines a survey is quantified on, and the window of each.
+   * @param id - Its identity.
+   * @param lines - The lines, in the order the table lists them; `null` to go
+   * back to the ones the panel works out from the narrow scans.
+   */
+  setSurveyLines: (id: string, lines: XpsSurveyLine[] | null) => void;
   /**
    * Show a window of the chart, as a drag across it asks for.
    * @param domain - The window, in binding energy and in counts.
@@ -162,6 +170,9 @@ export function createXpsActions(
     },
     setSpectrumPeaks(id, peaks) {
       dispatch({ type: 'setSpectrumPeaks', id, peaks });
+    },
+    setSurveyLines(id, lines) {
+      dispatch({ type: 'setSurveyLines', id, lines });
     },
     setDomain(domain) {
       dispatch({ type: 'setDomain', domain });

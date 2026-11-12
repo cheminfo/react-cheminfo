@@ -123,6 +123,14 @@ export function applyXpsDataAction(
         'picked again',
       );
 
+    case 'setSurveyLines':
+      return changeXpsSpectrum(
+        state,
+        action.id,
+        { surveyLines: action.lines ?? undefined },
+        'given other lines to quantify',
+      );
+
     case 'showOnly': {
       if (indexOfXpsSpectrum(held, action.id) === -1) {
         return refuseXpsAction(

@@ -10,6 +10,7 @@ import { CompositionPanel } from './CompositionPanel.tsx';
 import { ElementsPanel } from './ElementsPanel.tsx';
 import { MetadataPanel } from './MetadataPanel.tsx';
 import { PeaksPanel } from './PeaksPanel.tsx';
+import { QuantificationPanel } from './QuantificationPanel.tsx';
 import { SpectraPanel } from './SpectraPanel.tsx';
 import type { XpsHostPanel } from './xpsHostPanels.ts';
 import { isXpsHostPanel, xpsStackPanels } from './xpsHostPanels.ts';
@@ -78,7 +79,7 @@ interface PanelBodyProps {
 /**
  * Whichever of the viewer's own panels an id stands for.
  *
- * None of the six takes a prop: each reads the state for itself, which is what
+ * None of the seven takes a prop: each reads the state for itself, which is what
  * lets any of them be mounted somewhere else — a report page, a test — with
  * nothing but a provider above it.
  * @param props - Component props.
@@ -91,6 +92,7 @@ function PanelBody(props: PanelBodyProps) {
   if (panelId === 'metadata') return <MetadataPanel />;
   if (panelId === 'peaks') return <PeaksPanel />;
   if (panelId === 'elements') return <ElementsPanel />;
+  if (panelId === 'quantification') return <QuantificationPanel />;
   if (panelId === 'components') return <ComponentsPanel />;
   return <CompositionPanel />;
 }

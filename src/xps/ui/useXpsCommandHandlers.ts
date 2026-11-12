@@ -19,6 +19,8 @@ export interface UseXpsCommandHandlersOptions {
   onAbout: () => void;
   /** Called when the help in the header, or the key that does the same, asks. */
   onDocumentation: () => void;
+  /** Called when the instruments are asked for, from the header or a panel. */
+  onSettings: () => void;
   /**
    * What the figure command opens and closes.
    * @default undefined — the command has no handler, and its key stays with the page
@@ -34,7 +36,7 @@ export interface UseXpsCommandHandlersOptions {
 export function useXpsCommandHandlers(
   options: UseXpsCommandHandlersOptions,
 ): XpsCommandHandlers {
-  const { onAbout, onDocumentation, onExportImage } = options;
+  const { onAbout, onDocumentation, onSettings, onExportImage } = options;
   const { state } = useXpsEditorState();
   const actions = useXpsActions();
   const { toggle: toggleFullScreen } = useFullscreen();
@@ -55,6 +57,7 @@ export function useXpsCommandHandlers(
   return {
     about: onAbout,
     documentation: onDocumentation,
+    settings: onSettings,
     fullScreen: toggleFullScreen,
     zoomIn: () => zoom(COUNTS_ZOOM_STEP),
     zoomOut: () => zoom(1 / COUNTS_ZOOM_STEP),

@@ -97,6 +97,7 @@
     "jcampconverter": "^12.5.11",
     "leven": "^4.1.0",
     "mf-finder": "^3.4.25",
+    "mf-from-atomic-ratio": "^1.2.25",
     "mf-parser": "^3.9.3",
     "ml-gsd": "^14.3.0",
     "ml-peak-shape-generator": "^5.6.0",

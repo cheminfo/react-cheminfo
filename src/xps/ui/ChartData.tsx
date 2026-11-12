@@ -11,6 +11,7 @@ import { FittedComponents } from './FittedComponents.tsx';
 import { PeakLabels } from './PeakLabels.tsx';
 import { RegionBands } from './RegionBands.tsx';
 import { SpectrumTrace } from './SpectrumTrace.tsx';
+import type { XpsChartWindows } from './xpsChartProps.ts';
 
 export interface ChartDataProps {
   /** Everything the chart holds. */
@@ -34,6 +35,12 @@ export interface ChartDataProps {
    * @default undefined
    */
   onSelectSpectrum?: (id: string) => void;
+  /**
+   * Windows to shade that no file defines, such as those a survey is
+   * quantified over.
+   * @default undefined
+   */
+  windows?: XpsChartWindows;
 }
 
 /**
@@ -65,6 +72,7 @@ export function ChartData(props: ChartDataProps): ReactElement {
     selectedId,
     highlight,
     onSelectSpectrum,
+    windows,
   } = props;
 
   const drawn: XpsSpectrum[] = [];
@@ -74,6 +82,15 @@ export function ChartData(props: ChartDataProps): ReactElement {
 
   return (
     <>
+      {windows === undefined ? null : (
+        <RegionBands
+          regions={windows.regions}
+          sourceEnergy={windows.sourceEnergy}
+          axis={axis}
+          plot={plot}
+          xScale={xScale}
+        />
+      )}
       {settings.showRegions
         ? drawn.map((spectrum) => (
             <RegionBands

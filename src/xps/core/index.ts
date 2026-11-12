@@ -126,6 +126,67 @@ export type {
 } from './quantify.ts';
 export { ASSUMED_SENSITIVITY_FACTOR, quantifyComponents } from './quantify.ts';
 
+// A survey quantified with an instrument's sensitivity factors, and the
+// formulas its composition could be.
+export type { XpsInstrument, XpsSensitivityFactor } from './xpsInstrument.ts';
+export {
+  BUILT_IN_INSTRUMENTS,
+  DEFAULT_INSTRUMENT_ID,
+  findInstrument,
+  instrumentLines,
+  isBuiltInInstrument,
+  readInstruments,
+  sensitivityFactor,
+  xpsInstruments,
+} from './xpsInstrument.ts';
+export { KRATOS_AL_KA } from './kratosAlKa.ts';
+export { SCOFIELD_AL_KA } from './scofieldAlKa.ts';
+export { expandFactorTable } from './factorTable.ts';
+export type { SensitivityFactorReading } from './instrumentEdits.ts';
+export {
+  createInstrument,
+  factorRows,
+  putInstrument,
+  readSensitivityFactors,
+  removeInstrument,
+  withFactor,
+  withFactors,
+  withoutFactor,
+} from './instrumentEdits.ts';
+export type { XpsSurveyLine } from './surveyLines.ts';
+export {
+  SURVEY_WINDOW_ABOVE,
+  SURVEY_WINDOW_BELOW,
+  VALENCE_LIMIT,
+  availableLines,
+  chooseSurveyLine,
+  lineExtent,
+  referenceEnergy,
+  surveyLine,
+  surveyLineRegions,
+} from './surveyLines.ts';
+export type { ElementListReading, SurveyLineChoice } from './surveyElements.ts';
+export {
+  chooseSurveyLines,
+  defaultSurveyElements,
+  readElementList,
+  spectrumExtent,
+  surveyLinesOf,
+} from './surveyElements.ts';
+export type {
+  QuantifySurveyOptions,
+  SurveyBackground,
+  SurveyProblem,
+  SurveyQuantity,
+} from './quantifySurvey.ts';
+export { quantifySurvey, surveyComposition } from './quantifySurvey.ts';
+export type {
+  FormulaElement,
+  FormulaProposal,
+  ProposeFormulasOptions,
+} from './proposeFormulas.ts';
+export { defaultFormulaRanges, proposeFormulas } from './proposeFormulas.ts';
+
 // What is being looked at, shared by everything drawing the same spectra.
 export type { XpsHighlight } from './xpsHighlight.ts';
 export {
