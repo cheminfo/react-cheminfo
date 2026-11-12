@@ -1,1 +1,0 @@
-import{t as e}from"./iframe-CofDYA_8.js";e();
