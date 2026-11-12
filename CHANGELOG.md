@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.115.0](https://github.com/cheminfo/react-cheminfo/compare/v0.114.0...v0.115.0) (2026-11-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* give the nmrium id to nmrium.cheminfo.org, and take www.nmrium.com out of the family
+
+### Features
+
+* give the nmrium id to nmrium.cheminfo.org, and take www.nmrium.com out of the family ([7a01a9d](https://github.com/cheminfo/react-cheminfo/commit/7a01a9d5f470559353c1df60d72f94aeb1c41188))
+* let an About leave the family's coordinator out ([5b9a075](https://github.com/cheminfo/react-cheminfo/commit/5b9a0753606b979d9db3a87918bff01d071ca6b0))
+
 ## [0.114.0](https://github.com/cheminfo/react-cheminfo/compare/v0.113.0...v0.114.0) (2026-11-12)
 
 
