@@ -99,7 +99,7 @@
   "site.metabo.tagline": "Transformer un lot de spectres RMN en une carte de vos échantillons.",
   "site.derepflow.tagline": "Identifier les constituants d'un mélange à partir de son spectre ¹³C.",
   "site.isomers.tagline": "Tous les isomères de constitution d'une formule moléculaire.",
-  "site.tex.tagline": "Des formules LaTeX rendues en SVG ou PNG depuis une URL.",
+  "site.tex.tagline": "Écrire des formules LaTeX et mhchem, et les enregistrer en SVG.",
   "site.lcao.tagline": "Combiner des orbitales atomiques en orbitales moléculaires.",
   "site.regexp.tagline": "Apprendre les expressions régulières dans un bac à sable interactif.",
   "site.pdb.tagline": "Un coup d'œil rapide sur n'importe quelle entrée de la Protein Data Bank.",

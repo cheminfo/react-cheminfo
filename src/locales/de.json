@@ -99,7 +99,7 @@
   "site.metabo.tagline": "Eine Reihe von NMR-Spektren in eine Karte Ihrer Proben verwandeln.",
   "site.derepflow.tagline": "Die Bestandteile eines Gemischs aus seinem ¹³C-Spektrum bestimmen.",
   "site.isomers.tagline": "Alle Konstitutionsisomere einer Summenformel.",
-  "site.tex.tagline": "LaTeX-Formeln, aus einer URL als SVG oder PNG gerendert.",
+  "site.tex.tagline": "LaTeX- und mhchem-Formeln schreiben und als SVG speichern.",
   "site.lcao.tagline": "Atomorbitale zu Molekülorbitalen kombinieren.",
   "site.regexp.tagline": "Reguläre Ausdrücke in einer interaktiven Spielwiese lernen.",
   "site.pdb.tagline": "Ein schneller Blick auf jeden Eintrag der Protein Data Bank.",

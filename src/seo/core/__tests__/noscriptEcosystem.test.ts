@@ -29,7 +29,7 @@ test('the family list names the sites the page chose, in the order it named them
 
   expect(block).toContain(`  <h2>Our other tools</h2>
   <ul>
-    <li><a href="https://tex.cheminfo.org/">tex.cheminfo.org</a> — LaTeX formulas rendered to SVG or PNG from a URL.</li>
+    <li><a href="https://tex.cheminfo.org/">tex.cheminfo.org</a> — Write LaTeX and mhchem formulas, and save them as SVG.</li>
     <li><a href="https://isomers.cheminfo.org/">isomers.cheminfo.org</a> — Every constitutional isomer of a molecular formula.</li>
   </ul>`);
   expect(block).not.toContain('>3d.cheminfo.org</a>');

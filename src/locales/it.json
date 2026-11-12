@@ -99,7 +99,7 @@
   "site.metabo.tagline": "Trasformare una serie di spettri NMR in una mappa dei propri campioni.",
   "site.derepflow.tagline": "Identificare i costituenti di una miscela dal suo spettro ¹³C.",
   "site.isomers.tagline": "Tutti gli isomeri costituzionali di una formula molecolare.",
-  "site.tex.tagline": "Formule LaTeX rese in SVG o PNG a partire da un URL.",
+  "site.tex.tagline": "Scrivere formule LaTeX e mhchem, e salvarle in SVG.",
   "site.lcao.tagline": "Combinare orbitali atomici in orbitali molecolari.",
   "site.regexp.tagline": "Imparare le espressioni regolari in un ambiente interattivo.",
   "site.pdb.tagline": "Uno sguardo rapido a qualsiasi voce della Protein Data Bank.",

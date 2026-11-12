@@ -144,7 +144,7 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     id: 'tex',
     name: { lead: 'tex', alt: 'cheminfo', dot: true },
     host: 'tex.cheminfo.org',
-    tagline: 'LaTeX formulas rendered to SVG or PNG from a URL.',
+    tagline: 'Write LaTeX and mhchem formulas, and save them as SVG.',
     group: 'computing',
     brand: '#a21caf',
     brandAlt: '#a16207',
