@@ -23,7 +23,10 @@ import type { PlotRect } from '../../chart/core/chartGeometry.ts';
 import type { ChartScale } from '../../chart/core/chartScale.ts';
 import { chartPixel, chartValue } from '../../chart/core/chartScale.ts';
 import { PEAK_LABEL } from '../../chart/core/chartTheme.ts';
-import { labelStackBaselines } from '../../chart/core/labelStack.ts';
+import {
+  labelStackBaselines,
+  labelStackCentre,
+} from '../../chart/core/labelStack.ts';
 
 import type { StackBox } from './labelStackBox.ts';
 import { labelStackBox } from './labelStackBox.ts';
@@ -194,17 +197,13 @@ function placeStacks(
 ): Float64Array {
   const half = PEAK_LABEL.hoverHalfWidth;
   const step = half * 2 + LABEL_SPACING;
-  // A plot too narrow to hold one whole label has no inside to slide anything
-  // back into, and the clamp would put every stack in the same place.
-  const roomy = plot.width >= half * 2;
+  const edges: [number, number] = [plot.left, plot.right];
   const centres = new Float64Array(peaks.length).fill(Number.NaN);
   const placed: number[] = [];
 
   for (const index of tallestFirst(peaks)) {
     const wanted = chartPixel(xScale, (peaks[index] as LabelledPeak).x);
-    const centre = roomy
-      ? Math.min(Math.max(wanted, plot.left + half), plot.right - half)
-      : wanted;
+    const centre = labelStackCentre(wanted, edges, half);
     if (!clearOfPlaced(placed, centre, step)) continue;
     placed.push(centre);
     centres[index] = centre;

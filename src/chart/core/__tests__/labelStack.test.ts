@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { labelStackBaselines } from '../labelStack.ts';
+import { labelStackBaselines, labelStackCentre } from '../labelStack.ts';
 
 test('the stack stands on the feature, farthest line first', () => {
   // Two lines, 11 apart, the lower one 10 above the tip.
@@ -50,4 +50,18 @@ test('no lines is not an error', () => {
   expect(labelStackBaselines(100, Number.NaN, [0, 300])).toStrictEqual(
     new Float64Array(0),
   );
+});
+
+test('a stack clear of both edges stays centred on its feature', () => {
+  expect(labelStackCentre(200, [50, 600], 21)).toBe(200);
+});
+
+test('a stack at an edge is slid back inside the plot, never further', () => {
+  expect(labelStackCentre(55, [50, 600], 21)).toBe(71);
+  expect(labelStackCentre(598, [50, 600], 21)).toBe(579);
+  expect(labelStackCentre(71, [50, 600], 21)).toBe(71);
+});
+
+test('a plot narrower than one stack leaves it on its feature', () => {
+  expect(labelStackCentre(55, [50, 80], 21)).toBe(55);
 });

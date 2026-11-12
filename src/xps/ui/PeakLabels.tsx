@@ -5,7 +5,10 @@ import type { PlotRect } from '../../chart/core/chartGeometry.ts';
 import type { ChartScale } from '../../chart/core/chartScale.ts';
 import { chartPixel, chartValue } from '../../chart/core/chartScale.ts';
 import { CHART_COLORS, CHART_FONT } from '../../chart/core/chartTheme.ts';
-import { labelStackBaselines } from '../../chart/core/labelStack.ts';
+import {
+  labelStackBaselines,
+  labelStackCentre,
+} from '../../chart/core/labelStack.ts';
 import { axisEnergy, bindingFromAxis } from '../core/energyAxis.ts';
 import { selectLabelledPeaks } from '../core/labelledPeaks.ts';
 import { normalisationFactor, normalisedScale } from '../core/normalise.ts';
@@ -118,6 +121,10 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement | null {
     () => [plot.top, plot.bottom],
     [plot.top, plot.bottom],
   );
+  const plotEdges = useMemo<[number, number]>(
+    () => [plot.left, plot.right],
+    [plot.left, plot.right],
+  );
   const stackStyle = useMemo(
     () => ({ fill: color, fontSize: CHART_FONT.label }),
     [color],
@@ -129,12 +136,14 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement | null {
   const stacks = peaks.map((peak) => {
     const lines = peakLabelLines(peak);
     const tip = chartPixel(drawnScale, peak.intensity);
+    const x = chartPixel(
+      xScale,
+      axisEnergy(peak.bindingEnergy, spectrum.sourceEnergy, axis),
+    );
     return {
       id: peak.id,
-      x: chartPixel(
-        xScale,
-        axisEnergy(peak.bindingEnergy, spectrum.sourceEnergy, axis),
-      ),
+      x,
+      labelX: labelStackCentre(x, plotEdges, XPS_PEAK_LABEL.width / 2),
       tip,
       lines,
       baselines: labelStackBaselines(tip, lines.length, plotBounds),
@@ -160,7 +169,11 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement | null {
         {stacks.map((stack) => (
           <text key={stack.id} textAnchor="middle">
             {stack.lines.map((line, index) => (
-              <tspan key={line.kind} x={stack.x} y={stack.baselines[index]}>
+              <tspan
+                key={line.kind}
+                x={stack.labelX}
+                y={stack.baselines[index]}
+              >
                 {line.text}
               </tspan>
             ))}

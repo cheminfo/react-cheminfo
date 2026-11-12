@@ -60,6 +60,31 @@ export function labelStackBaselines(
 }
 
 /**
+ * Where a stack centred over a feature is written, across the SVG.
+ *
+ * A feature standing within half a label of the plot edge would have its
+ * numbers written half over the axis, and a clip then cuts them to digits that
+ * name another energy — `538.69` reads `38.69`. So the stack is **slid back
+ * inside** the plot, by a few pixels rather than by its own width, while the
+ * mark stays on the feature and still says which one it names.
+ * @param x - Where the feature is, in pixels across the SVG.
+ * @param bounds - `[left, right]` of the plot in pixels.
+ * @param halfWidth - Half the width a stack is taken to be, in pixels.
+ * @returns The centre of the stack: `x` itself unless the stack would cross an
+ *   edge, and `x` too on a plot narrower than one stack, which has no inside to
+ *   slide it into.
+ */
+export function labelStackCentre(
+  x: number,
+  bounds: readonly [number, number],
+  halfWidth: number,
+): number {
+  const [left, right] = bounds;
+  if (right - left < halfWidth * 2) return x;
+  return Math.min(Math.max(x, left + halfWidth), right - halfWidth);
+}
+
+/**
  * Move every baseline of a stack by the same amount.
  * @param baselines - The baselines, written into.
  * @param delta - How far down to move them; zero leaves them alone.

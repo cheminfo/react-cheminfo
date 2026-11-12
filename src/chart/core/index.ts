@@ -107,7 +107,7 @@ export {
 } from './chartTheme.ts';
 export type { GuidePlacement } from './guidePlacement.ts';
 export { guidePlacement } from './guidePlacement.ts';
-export { labelStackBaselines } from './labelStack.ts';
+export { labelStackBaselines, labelStackCentre } from './labelStack.ts';
 export type {
   LegendBox,
   LegendBoxEntry,
