@@ -59,6 +59,7 @@ function memoryStore(list: SavedDocuments<string>['list']) {
       saved.push([name, data]);
       return Promise.resolve({ id: 'new', name, savedAt: 2000, data });
     },
+    update: () => Promise.resolve(undefined),
     rename: () => Promise.resolve(),
     remove: () => Promise.resolve(),
     subscribe: () => stopListening,

@@ -2402,6 +2402,11 @@ span.taxon-lineage__name {
   font-size: 0.8125rem;
 }
 
+/* Where Firefox and Safari keep nothing on disk, a word on the browsers that do. */
+.save-document-dialog__note {
+  margin: 0 0 12px;
+}
+
 /* A fixed part of a field's value — an extension, a unit — sits on the field's
    line, in the field's type: Blueprint hangs it from the top of the box. */
 .input-affix .bp6-input-left-container,
@@ -2833,6 +2838,13 @@ button.empty-guide__figure:focus-visible img {
 .folder-panel__problem {
   color: var(--danger);
   font-size: 0.75rem;
+}
+
+/* Under the folder's files: choose another folder, or stop saving there. */
+.folder-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .folder-panel__field {

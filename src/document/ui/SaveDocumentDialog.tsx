@@ -14,78 +14,28 @@ import { useId, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 
-/** A format a site saves its documents in. */
-export interface DocumentFormat {
-  /** Its identifier, e.g. `document` or `svg`. */
-  id: string;
-  /** What the dialog calls it, e.g. `Drawing, with what you choose below`. */
-  label: string;
-  /** The extension its files take, e.g. `.draw.zip`. */
-  extension: string;
-  /** Whether it can carry the view and the workspace beside the data. */
-  holdsParts: boolean;
-}
-
-/** What the visitor chose to save. */
-export interface SaveDocumentChoice {
-  /** The file's name, without its extension. */
-  name: string;
-  /** The format, by its identifier. */
-  format: string;
-  /** Keep the view with the data. */
-  view: boolean;
-  /** Keep the workspace with the data. */
-  workspace: boolean;
-}
-
-/** What {@link SaveDocumentDialog} offers. */
-export interface SaveDocumentDialogProps {
-  /** Whether the dialog is open. */
-  isOpen: boolean;
-  /** Called when the dialog is dismissed. */
-  onClose: () => void;
-  /** Called with the choice when Save is pressed. */
-  onSave: (choice: SaveDocumentChoice) => void;
-  /** The formats offered, the usual one first. */
-  formats: readonly [DocumentFormat, ...DocumentFormat[]];
-  /** The choice the dialog opens on. */
-  initial: SaveDocumentChoice;
-  /**
-   * Which of the view and the workspace the site can keep beside its data: a
-   * part it has no use for is not offered.
-   * @default { view: true, workspace: true }
-   */
-  parts?: { view?: boolean; workspace?: boolean };
-  /**
-   * What keeping the view brings back, said under its box.
-   * @default the chrome's own sentence, in the language of the page
-   */
-  viewDescription?: string;
-  /**
-   * What keeping the workspace brings back, said under its box.
-   * @default the chrome's own sentence, in the language of the page
-   */
-  workspaceDescription?: string;
-}
+import { Described } from './Described.tsx';
+import { SaveTargetGroup } from './SaveTargetGroup.tsx';
+import type { SaveDocumentDialogProps } from './saveDocumentTypes.ts';
 
 /**
- * Save as: the file's name, its format, and whether the view and the workspace
- * go into it beside the data — so the file opens on exactly the panels and the
- * settings it was saved with, or on the reader's own.
+ * Save as: the file's name, where it is kept, its format, and whether the view
+ * and the workspace go into it beside the data — so the file opens on exactly
+ * the panels and the settings it was saved with, or on the reader's own.
  * @param props - See {@link SaveDocumentDialogProps}.
  * @returns The dialog.
  */
 export function SaveDocumentDialog(
   props: SaveDocumentDialogProps,
 ): ReactElement {
-  const { isOpen, ...form } = props;
+  const { isOpen, title, ...form } = props;
   const { onClose } = form;
   const t = useChromeT();
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title={t('document.title')}
+      title={title ?? t('document.title')}
       icon="floppy-disk"
       className="save-document-dialog"
     >
@@ -96,10 +46,11 @@ export function SaveDocumentDialog(
 
 // Mounted each time the dialog opens, so it starts from the choice given.
 function SaveDocumentForm(
-  props: Omit<SaveDocumentDialogProps, 'isOpen'>,
+  props: Omit<SaveDocumentDialogProps, 'isOpen' | 'title'>,
 ): ReactElement {
-  const { formats, initial, onSave, onClose } = props;
+  const { formats, initial, onSave, onClose, targets = [] } = props;
   const { viewDescription, workspaceDescription, parts = {} } = props;
+  const { folderName, otherBrowserNote = false } = props;
   const { view: offersView = true, workspace: offersWorkspace = true } = parts;
   const t = useChromeT();
   const nameId = useId();
@@ -107,6 +58,9 @@ function SaveDocumentForm(
   const format =
     formats.find((candidate) => candidate.id === choice.format) ?? formats[0];
   const name = choice.name.trim();
+  // What is kept in this browser is the document itself, in no format.
+  const inBrowser = choice.target === 'browser';
+  const offersParts = !inBrowser && (offersView || offersWorkspace);
   return (
     <form
       onSubmit={(event) => {
@@ -117,6 +71,7 @@ function SaveDocumentForm(
           format: format.id,
           view: offersView && format.holdsParts && choice.view,
           workspace: offersWorkspace && format.holdsParts && choice.workspace,
+          ...(choice.target ? { target: choice.target } : {}),
         });
       }}
     >
@@ -129,32 +84,45 @@ function SaveDocumentForm(
             spellCheck={false}
             value={choice.name}
             onValueChange={(value) => setChoice({ ...choice, name: value })}
-            rightElement={<span>{format.extension}</span>}
+            rightElement={
+              inBrowser ? undefined : <span>{format.extension}</span>
+            }
           />
         </FormGroup>
-        <RadioGroup
-          label={t('document.format')}
-          selectedValue={format.id}
-          onChange={(event) =>
-            setChoice({ ...choice, format: event.currentTarget.value })
-          }
-        >
-          {formats.map((candidate) => (
-            <Radio
-              key={candidate.id}
-              value={candidate.id}
-              labelElement={
-                <>
-                  {candidate.label}{' '}
-                  <span className="save-document-dialog__extension">
-                    {candidate.extension}
-                  </span>
-                </>
-              }
-            />
-          ))}
-        </RadioGroup>
-        {offersView || offersWorkspace ? (
+        {targets.length > 1 || otherBrowserNote ? (
+          <SaveTargetGroup
+            targets={targets}
+            selected={choice.target ?? targets[0] ?? 'download'}
+            onSelect={(target) => setChoice({ ...choice, target })}
+            folderName={folderName}
+            otherBrowserNote={otherBrowserNote}
+          />
+        ) : null}
+        {inBrowser ? null : (
+          <RadioGroup
+            label={t('document.format')}
+            selectedValue={format.id}
+            onChange={(event) =>
+              setChoice({ ...choice, format: event.currentTarget.value })
+            }
+          >
+            {formats.map((candidate) => (
+              <Radio
+                key={candidate.id}
+                value={candidate.id}
+                labelElement={
+                  <>
+                    {candidate.label}{' '}
+                    <span className="save-document-dialog__extension">
+                      {candidate.extension}
+                    </span>
+                  </>
+                }
+              />
+            ))}
+          </RadioGroup>
+        )}
+        {offersParts ? (
           <FormGroup
             label={t('document.include')}
             disabled={!format.holdsParts}
@@ -165,7 +133,7 @@ function SaveDocumentForm(
                 disabled={!format.holdsParts}
                 onChange={() => setChoice({ ...choice, view: !choice.view })}
                 labelElement={
-                  <Part
+                  <Described
                     label={t('document.view')}
                     description={
                       viewDescription ?? t('document.viewDescription')
@@ -182,7 +150,7 @@ function SaveDocumentForm(
                   setChoice({ ...choice, workspace: !choice.workspace })
                 }
                 labelElement={
-                  <Part
+                  <Described
                     label={t('document.workspace')}
                     description={
                       workspaceDescription ?? t('document.workspaceDescription')
@@ -209,16 +177,5 @@ function SaveDocumentForm(
         }
       />
     </form>
-  );
-}
-
-function Part(props: { label: string; description: string }): ReactElement {
-  return (
-    <span className="save-document-dialog__part">
-      <span>{props.label}</span>
-      <span className="save-document-dialog__description">
-        {props.description}
-      </span>
-    </span>
   );
 }

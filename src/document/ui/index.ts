@@ -7,5 +7,5 @@ export type {
   DocumentFormat,
   SaveDocumentChoice,
   SaveDocumentDialogProps,
-} from './SaveDocumentDialog.tsx';
+} from './saveDocumentTypes.ts';
 export { SaveDocumentDialog } from './SaveDocumentDialog.tsx';

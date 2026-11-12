@@ -57,3 +57,51 @@ export type {
   WorkspacesOptions,
   WorkspacesState,
 } from './workspaceTypes.ts';
+export type {
+  DocumentSaver,
+  DocumentSaverOptions,
+  SaveChoice,
+  SaveFormat,
+  SaveOutcome,
+} from './documentSaverTypes.ts';
+export { createDocumentSaver } from './createDocumentSaver.ts';
+export type {
+  Draft,
+  DraftFile,
+  DraftStore,
+  DraftStoreOptions,
+} from './createDraftStore.ts';
+export { createDraftStore } from './createDraftStore.ts';
+export type {
+  DraftCells,
+  DraftSession,
+  DraftSessionOptions,
+  DraftStatus,
+} from './draftSessionTypes.ts';
+export { createDraftSession } from './createDraftSession.ts';
+export type { FolderEntry, SiteFolder } from './createSiteFolder.ts';
+export { createSiteFolder } from './createSiteFolder.ts';
+export type {
+  Cell,
+  DocumentFile,
+  DocumentPartsKept,
+  ReadonlyCell,
+  SaveTarget,
+  SignalTools,
+} from './documentFile.ts';
+export { SAVE_TARGETS } from './documentFile.ts';
+export type { PickerType } from './fileAccess.ts';
+export {
+  browserPicksFiles,
+  canPickFiles,
+  canPickFolders,
+  chooseFolder,
+  chooseOpenFile,
+  chooseSaveFile,
+  freeFileName,
+  hasAccess,
+  mayAccess,
+  writeFile,
+} from './fileAccess.ts';
+export type { FigureSaveFormatsOptions } from './figureSaveFormats.ts';
+export { figureSaveFormats } from './figureSaveFormats.ts';

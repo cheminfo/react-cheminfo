@@ -48,6 +48,7 @@ function memoryStore(
     list: () => Promise.resolve(documents),
     named: () => Promise.resolve(undefined),
     save: () => Promise.reject(new Error('not in this test')),
+    update: () => Promise.resolve(undefined),
     rename: () => Promise.resolve(),
     remove: () => Promise.resolve(),
     subscribe: () => stopListening,

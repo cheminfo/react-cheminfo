@@ -2,11 +2,11 @@ import { Alert } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
+import { SaveDocumentDialog } from '../../document/ui/SaveDocumentDialog.tsx';
 import type {
   DocumentFormat,
   SaveDocumentChoice,
-} from '../../document/ui/SaveDocumentDialog.tsx';
-import { SaveDocumentDialog } from '../../document/ui/SaveDocumentDialog.tsx';
+} from '../../document/ui/saveDocumentTypes.ts';
 import { downloadBlob } from '../../download/core/downloadBlob.ts';
 import {
   siteFigureExtension,

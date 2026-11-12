@@ -7,7 +7,13 @@
 import { afterEach, expect, test, vi } from 'vitest';
 
 import type { PickerType } from '../fileAccess.ts';
-import { chooseOpenFile, chooseSaveFile, writeFile } from '../fileAccess.ts';
+import {
+  chooseFolder,
+  chooseOpenFile,
+  chooseSaveFile,
+  freeFileName,
+  writeFile,
+} from '../fileAccess.ts';
 
 const TYPE: PickerType = {
   description: 'Drawing',
@@ -181,4 +187,36 @@ test('a write that fails is aborted and its error passed on', async () => {
     'disk full',
   );
   expect(stuck.steps.at(-1)).toBe('abort');
+});
+
+test('a folder is asked for read and write, and a cancel is null', async () => {
+  const folder = { kind: 'directory', name: 'Notebook' };
+  const picker = vi.fn(() => Promise.resolve(folder));
+  vi.stubGlobal('showDirectoryPicker', picker);
+
+  await expect(chooseFolder()).resolves.toBe(folder);
+  expect(picker.mock.calls).toStrictEqual([
+    [{ id: 'draw', mode: 'readwrite' }],
+  ]);
+
+  vi.stubGlobal('showDirectoryPicker', () => Promise.reject(abort()));
+
+  await expect(chooseFolder()).resolves.toBeNull();
+});
+
+test('a name a folder already holds is numbered as a download would be', async () => {
+  const held = new Set(['report.write.html', 'report (2).write.html']);
+  const folder = {
+    getFileHandle: (name: string) =>
+      held.has(name)
+        ? Promise.resolve({ name })
+        : Promise.reject(new DOMException('absent', 'NotFoundError')),
+  } as unknown as FileSystemDirectoryHandle;
+
+  await expect(freeFileName(folder, 'report', '.write.html')).resolves.toBe(
+    'report (3).write.html',
+  );
+  await expect(freeFileName(folder, 'notes', '.write.html')).resolves.toBe(
+    'notes.write.html',
+  );
 });

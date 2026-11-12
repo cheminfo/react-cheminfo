@@ -43,6 +43,14 @@ export interface SavedDocuments<TData> {
    */
   save: (name: string, data: TData) => Promise<SavedDocument<TData>>;
   /**
+   * Save a document again under the name it has now, renamed or not.
+   * @returns It, or `undefined` when it was forgotten meanwhile.
+   */
+  update: (
+    id: string,
+    data: TData,
+  ) => Promise<SavedDocument<TData> | undefined>;
+  /**
    * Give a document another name.
    * @throws {Error} When the name is not one a document can take, or another
    * document goes by it.
@@ -137,6 +145,20 @@ export function createSavedDocuments<TData>(
         data,
       };
       const db = await database.open();
+      await db.put('documents', document);
+      changed();
+      return document;
+    },
+    update: async (id, data) => {
+      const db = await database.open();
+      const row = await db.get('documents', id);
+      if (!row || typeof row.name !== 'string') return undefined;
+      const document: SavedDocument<TData> = {
+        id,
+        name: row.name,
+        savedAt: Date.now(),
+        data,
+      };
       await db.put('documents', document);
       changed();
       return document;

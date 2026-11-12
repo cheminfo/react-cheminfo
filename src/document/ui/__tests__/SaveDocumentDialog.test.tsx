@@ -4,8 +4,8 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import type { SaveDocumentChoice } from '../SaveDocumentDialog.tsx';
 import { SaveDocumentDialog } from '../SaveDocumentDialog.tsx';
+import type { SaveDocumentChoice } from '../saveDocumentTypes.ts';
 
 let host: HTMLDivElement;
 let root: Root;

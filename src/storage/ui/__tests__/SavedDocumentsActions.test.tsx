@@ -57,6 +57,7 @@ function memoryStore(
     list: () => Promise.resolve(held),
     named: () => Promise.resolve(undefined),
     save: () => Promise.reject(new Error('not in this test')),
+    update: () => Promise.resolve(undefined),
     rename: (id, name) => {
       asked.push(`rename ${id} ${name}`);
       held = held.map((document) =>

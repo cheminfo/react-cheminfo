@@ -39,8 +39,12 @@ export {
   withPointAt,
   withoutPoint,
 } from './curveShape.ts';
-export type { PickerType } from './fileAccess.ts';
-export { chooseOpenFile, chooseSaveFile, writeFile } from './fileAccess.ts';
+export type { PickerType } from '../../storage/core/fileAccess.ts';
+export {
+  chooseOpenFile,
+  chooseSaveFile,
+  writeFile,
+} from '../../storage/core/fileAccess.ts';
 export type { FontChoice } from './fonts.ts';
 export { CAPTION_FAMILIES, CAPTION_FONTS, FONTS } from './fonts.ts';
 export { formulaParts } from './formulaText.ts';

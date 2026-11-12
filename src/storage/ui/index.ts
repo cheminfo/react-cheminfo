@@ -18,3 +18,10 @@ export type { SavedDocumentsSectionProps } from './SavedDocumentsSection.tsx';
 export { SavedDocumentsSection } from './SavedDocumentsSection.tsx';
 export type { ConfirmOpen, OpenConfirmation } from './useOpenConfirmation.tsx';
 export { useOpenConfirmation } from './useOpenConfirmation.tsx';
+export type { FolderDocumentsSectionProps } from './FolderDocumentsSection.tsx';
+export { FolderDocumentsSection } from './FolderDocumentsSection.tsx';
+export type {
+  DocumentSaverControls,
+  DocumentSaverHookOptions,
+} from './useDocumentSaver.tsx';
+export { useDocumentSaver } from './useDocumentSaver.tsx';
