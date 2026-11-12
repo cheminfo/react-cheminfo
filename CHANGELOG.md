@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.115.1](https://github.com/cheminfo/react-cheminfo/compare/v0.115.0...v0.115.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* describe tex as the formula editor it now is, with no URL API ([9c23d29](https://github.com/cheminfo/react-cheminfo/commit/9c23d2952b8ad3f3eb09b7912f4be53978b6fa9d))
+
 ## [0.115.0](https://github.com/cheminfo/react-cheminfo/compare/v0.114.0...v0.115.0) (2026-11-12)
 
 
