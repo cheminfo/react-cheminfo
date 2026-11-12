@@ -9,6 +9,8 @@ import {
   MOTION_CSS,
   MOTION_STYLE,
   bubbleDelay,
+  figureMoves,
+  movingFigure,
   runTiming,
   sceneMoves,
 } from '../motion.ts';
@@ -87,4 +89,37 @@ test('the stylesheet a figure carries is the page one without comments or spare 
       "[data-motion='moving'] .glass-stands{display: inline;}}",
     ),
   ).toBe(true);
+});
+
+const STILL =
+  '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="10pt" height="10pt" data-motion="still"><style>[data-motion=\'moving\'] .glass-run{display: inline;}</style><path class="glass-run" display="none" d="M0 0"/></svg>\n';
+
+test('a figure written held still says it can move, and is set moving at its root alone', () => {
+  expect(figureMoves(STILL)).toBe(true);
+
+  const moving = movingFigure(STILL);
+
+  expect(moving).toBe(
+    STILL.replace(' data-motion="still"', ' data-motion="moving"'),
+  );
+  expect(figureMoves(moving)).toBe(true);
+  expect(movingFigure(moving)).toBe(moving);
+});
+
+test('a figure with nothing to move is left as it came', () => {
+  const plain =
+    '<svg xmlns="http://www.w3.org/2000/svg"><g data-motion="still"/></svg>';
+
+  expect(figureMoves(plain)).toBe(false);
+  expect(movingFigure(plain)).toBe(plain);
+  expect(figureMoves('<svg data-motion="spinning"/>')).toBe(false);
+  expect(figureMoves('not a figure')).toBe(false);
+});
+
+test('a root carrying a dollar sign is set moving as written', () => {
+  const svg = `<svg aria-label="$& cost" data-motion='still'/>`;
+
+  expect(movingFigure(svg)).toBe(
+    `<svg aria-label="$& cost" data-motion="moving"/>`,
+  );
 });

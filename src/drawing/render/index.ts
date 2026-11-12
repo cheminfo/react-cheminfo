@@ -47,6 +47,8 @@ export {
   MOTION_STYLE,
   RUN_FADE,
   bubbleDelay,
+  figureMoves,
+  movingFigure,
   runTiming,
   sceneMoves,
 } from './motion.ts';

@@ -6,6 +6,12 @@ export { FigureOutline } from './FigureOutline.tsx';
 export type { FullscreenStageProps } from './FullscreenStage.tsx';
 export { FullscreenStage } from './FullscreenStage.tsx';
 export { MeasuredSlider } from './MeasuredSlider.tsx';
+export {
+  FIGURE_MARK_GLYPHS,
+  movingFigureSource,
+  useFigureMoves,
+  useMovingFigureSource,
+} from './movingFigure.ts';
 export { PageMask } from './PageMask.tsx';
 export { releaseFocusOnPress } from './releaseFocusOnPress.ts';
 export { svgMarkup } from './svgMarkup.ts';
