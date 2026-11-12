@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.114.0](https://github.com/cheminfo/react-cheminfo/compare/v0.113.0...v0.114.0) (2026-11-12)
+
+
+### Features
+
+* add the nmr site, cite NMRium, and let a figure carry 50 MB of state ([bc095a0](https://github.com/cheminfo/react-cheminfo/commit/bc095a0af05b7d13d126fb4cba892f8687219f35))
+* ask on the first save where documents are kept, and keep a draft from the first change ([0d0343b](https://github.com/cheminfo/react-cheminfo/commit/0d0343baaf3bb3b43f66876387750c9bd036b5a1))
+* move figure motion into react-cheminfo/drawing ([40948c0](https://github.com/cheminfo/react-cheminfo/commit/40948c0e0835c44726c4c5185032f232b5a39b1b))
+
 ## [0.113.0](https://github.com/cheminfo/react-cheminfo/compare/v0.112.0...v0.113.0) (2026-11-11)
 
 
