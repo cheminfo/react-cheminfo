@@ -19,7 +19,6 @@ test('the family is the thirty-one sites, listed once each', () => {
     'openbabel',
     'chemcalc',
     'dbe',
-    'nmrium',
     'metabo',
     'derepflow',
     'isomers',
@@ -55,7 +54,7 @@ test('the sites not linked from the others yet are named apart', () => {
     'molecules',
     'mz',
     'uv-vis',
-    'nmr',
+    'nmrium',
     'xps',
     'biodraw',
     'diagram',
@@ -112,8 +111,6 @@ test('no site leads with a colour another one has already claimed', () => {
       const one = FAMILY[i];
       const other = FAMILY[j];
       if (one === undefined || other === undefined) continue;
-      // NMRium on the family's domain is NMRium, so it wears NMRium's colours.
-      if (one.id === 'nmrium' && other.id === 'nmr') continue;
 
       expect({
         pair: `${one.id} / ${other.id}`,

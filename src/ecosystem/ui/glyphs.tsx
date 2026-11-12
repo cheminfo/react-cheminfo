@@ -607,7 +607,6 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // One broad absorption band over its baseline, with its maximum dropped to
   // the wavelength axis in the answering colour: the λmax the tool reads off.
   // NMRium served on the family's domain draws NMRium's own symbol.
-  nmr: (accent) => nmriumGlyph(accent),
   'uv-vis': (alt) => (
     <>
       <path

@@ -59,7 +59,6 @@ test('the tools a course opens with are the ones under the basics', () => {
     'glassware',
   ]);
   expect(sitesInGroup('spectra').map((site) => site.id)).toStrictEqual([
-    'nmrium',
     'metabo',
     'derepflow',
     'elucidation',

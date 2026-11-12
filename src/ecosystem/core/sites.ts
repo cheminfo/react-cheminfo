@@ -106,16 +106,6 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#63123f', accent: '#10b981' },
   },
   {
-    id: 'nmrium',
-    name: { lead: 'NMR', alt: 'ium' },
-    host: 'www.nmrium.com',
-    tagline: 'Process and assign NMR spectra in the browser.',
-    group: 'spectra',
-    brand: '#ea580c',
-    brandAlt: '#2b143e',
-    mark: { plate: '#2b143e', accent: '#ea580c' },
-  },
-  {
     id: 'metabo',
     // Not `.cheminfo`: the second half of a one-word name is the domain the
     // site actually lives at, and this one is a sibling of NMRium rather than

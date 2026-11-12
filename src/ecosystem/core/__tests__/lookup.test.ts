@@ -65,7 +65,7 @@ test('a port and a missing or added www. are the same host', () => {
   expect(findSiteByHost('www.isomers.cheminfo.org')?.id).toBe('isomers');
   expect(findSiteByHost('chemcalc.org')?.id).toBe('chemcalc');
   expect(findSiteByHost('WWW.ChemCalc.org:443')?.id).toBe('chemcalc');
-  expect(findSiteByHost('  nmrium.com  ')?.id).toBe('nmrium');
+  expect(findSiteByHost('  NMRium.cheminfo.org  ')?.id).toBe('nmrium');
 });
 
 test('a host belonging to nobody is not one of ours', () => {

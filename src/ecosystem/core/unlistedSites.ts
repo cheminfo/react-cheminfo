@@ -48,9 +48,9 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#c026d3', accent: '#22d3ee' },
   },
   {
-    id: 'nmr',
-    // NMRium itself, served on the family's domain for the figures draw and
-    // write frame it to make, so it wears NMRium's name, mark and colours.
+    id: 'nmrium',
+    // NMRium, served on the family's domain for the figures draw and write
+    // frame it to make, so it wears NMRium's name, mark and colours.
     name: { lead: 'NMR', alt: 'ium' },
     host: 'nmrium.cheminfo.org',
     tagline: 'Process NMR spectra, and keep them as figures that open again.',
