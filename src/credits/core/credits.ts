@@ -576,6 +576,14 @@ export const CREDITS = [
       'the identifier, the names and the synonyms each compound is linked to.',
   },
   {
+    id: 'rxno',
+    name: 'Name Reaction Ontology (RXNO)',
+    href: 'https://github.com/rsc-ontologies/rxno',
+    description:
+      'the name, the other names and the definition of each named reaction.',
+    license: 'CC-BY-4.0',
+  },
+  {
     id: 'country-flag-icons',
     name: 'country-flag-icons',
     href: 'https://gitlab.com/catamphetamine/country-flag-icons',

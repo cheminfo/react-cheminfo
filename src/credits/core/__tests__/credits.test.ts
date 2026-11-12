@@ -115,7 +115,7 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(69);
+  expect(CREDITS).toHaveLength(70);
 });
 
 test('the Zakodium tooling is credited as ours, under its npm name', () => {
