@@ -67,6 +67,13 @@ export interface AboutContent {
    */
   contributors?: readonly AboutPerson[];
   /**
+   * Whether the family's coordinator is listed under the names. A site that
+   * another organisation provides, as Zakodium provides NMRium, names its own
+   * people and leaves him out.
+   * @default true
+   */
+  coordinator?: boolean;
+  /**
    * Ids into the provider registry: the institutions that provide the site,
    * drawn as logos under "Provided by".
    * @default undefined
@@ -136,7 +143,7 @@ export function resolveAbout(content: AboutContent): ResolvedAbout {
     credits: borrowed,
     cite: content.cite ?? [],
     people: content.people ?? [],
-    team: aboutTeam(named, borrowed, content.leads),
+    team: aboutTeam(named, borrowed, content.leads, content.coordinator),
     maintainers: aboutMaintainers(named, borrowed, content.leads),
     providedBy: providers(content.providedBy ?? []),
     build: content.build,

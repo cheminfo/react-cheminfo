@@ -116,6 +116,35 @@ test('Daniel Kostro is listed for react-science on a site that credits it', () =
   ]);
 });
 
+test('a site another organisation provides may leave the coordinator out', () => {
+  const about = resolveAbout({
+    ...SMILES,
+    credits: ['openchemlib', 'react-science'],
+    people: [{ name: 'Daniel Kostro' }, { name: 'Michaël Zasso' }],
+    providedBy: ['zakodium'],
+    coordinator: false,
+  });
+
+  expect(about.team).toStrictEqual([
+    {
+      name: 'Daniel Kostro',
+      family: { role: 'design', organisation: ZAKODIUM, works: [] },
+    },
+    {
+      name: 'Michaël Zasso',
+      family: {
+        role: 'tooling',
+        organisation: ZAKODIUM,
+        works: ['OpenChemLib'],
+      },
+    },
+  ]);
+  expect(about.maintainers).toStrictEqual([]);
+  expect(about.providedBy.map((provider) => provider.id)).toStrictEqual([
+    'zakodium',
+  ]);
+});
+
 test('a site made with others lists who made it, and who maintains what it runs on apart', () => {
   const about = resolveAbout({
     ...SMILES,

@@ -158,18 +158,23 @@ export function isMadeWithOthers(
  * @param named - The people and contributors the site names.
  * @param borrowed - The works the site credits.
  * @param leads - The people whose work the site is, listed first.
+ * @param coordinator - Whether the family's coordinator is listed.
  * @returns The list, in order.
  */
 export function aboutTeam(
   named: readonly AboutTeamEntry[],
   borrowed: readonly CreditEntry[],
   leads: readonly AboutTeamEntry[] = [],
+  coordinator = true,
 ): TeamMember[] {
-  if (isMadeWithOthers(named, leads)) return makers(named, leads);
+  if (isMadeWithOthers(named, leads)) {
+    return makers(named, leads, coordinator);
+  }
   const credited = new Map(borrowed.map((entry) => [entry.id, entry.name]));
   const team: TeamMember[] = [];
   for (const person of FAMILY_PEOPLE) {
     const { name, role, organisation, when, maintains = [] } = person;
+    if (!coordinator && name === COORDINATOR) continue;
     if (when !== undefined && !credited.has(when)) continue;
     const works: string[] = [];
     for (const id of maintains) {
@@ -220,14 +225,15 @@ export function aboutMaintainers(
 function makers(
   named: readonly AboutTeamEntry[],
   leads: readonly AboutTeamEntry[],
+  coordinator: boolean,
 ): TeamMember[] {
   const team: TeamMember[] = [...leads];
-  if (leads.length === 0) {
+  if (coordinator && leads.length === 0) {
     team.push({
       name: COORDINATOR,
       family: { role: 'coordinates', works: [] },
     });
-  } else if (!named.some(isCoordinatorWithRole)) {
+  } else if (coordinator && !named.some(isCoordinatorWithRole)) {
     team.push({ name: COORDINATOR, family: { role: 'interface', works: [] } });
   }
   for (const person of named) {
