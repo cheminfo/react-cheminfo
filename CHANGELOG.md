@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.118.0](https://github.com/cheminfo/react-cheminfo/compare/v0.117.0...v0.118.0) (2026-11-13)
+
+
+### Features
+
+* **host:** hand a peptide over as chem.peptide, its sequence as text ([229d28c](https://github.com/cheminfo/react-cheminfo/commit/229d28ca565bb2d50ba416101a42c5e49da325b8))
+
 ## [0.117.0](https://github.com/cheminfo/react-cheminfo/compare/v0.116.0...v0.117.0) (2026-11-13)
 
 
