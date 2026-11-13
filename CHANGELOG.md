@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.117.0](https://github.com/cheminfo/react-cheminfo/compare/v0.116.0...v0.117.0) (2026-11-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* copy, send and save a figure at one size and dpi
+
+### Features
+
+* copy, send and save a figure at one size and dpi ([2a32322](https://github.com/cheminfo/react-cheminfo/commit/2a32322ef49341b0bda9f09e60b30f4bfb4c76b8))
+
 ## [0.116.0](https://github.com/cheminfo/react-cheminfo/compare/v0.115.1...v0.116.0) (2026-11-13)
 
 
