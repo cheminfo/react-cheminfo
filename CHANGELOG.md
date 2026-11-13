@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.116.0](https://github.com/cheminfo/react-cheminfo/compare/v0.115.1...v0.116.0) (2026-11-13)
+
+
+### Features
+
+* add the peptide site ([a7aa8d2](https://github.com/cheminfo/react-cheminfo/commit/a7aa8d24fb528f9b800fc0e24623a75e711a744c))
+* **chart:** write axis numbers at 12 px, titles at 13 px and labels at 12 px ([f0e2dd5](https://github.com/cheminfo/react-cheminfo/commit/f0e2dd530f09a62fbab17379eb06fb07ca4e92b5))
+* credit the Name Reaction Ontology (RXNO) ([457965b](https://github.com/cheminfo/react-cheminfo/commit/457965b1a1fa908902b14f56eda7f74138a25c48))
+* **download:** draw a figure handed to a document again at 480 × 300 ([0e213de](https://github.com/cheminfo/react-cheminfo/commit/0e213de984663d7f08f01718f69dd188f1b5c4a1))
+* **xps:** quantify a survey with instrument sensitivity factors, and propose formulas ([dec24ed](https://github.com/cheminfo/react-cheminfo/commit/dec24ed561778a248872db3d0acd6be43294b3c3))
+
+
+### Bug Fixes
+
+* **xps:** slide a peak label at the plot edge back inside, so its energy is not clipped ([885bc2a](https://github.com/cheminfo/react-cheminfo/commit/885bc2a030af30f271b715ef895cb184fb435737))
+
 ## [0.115.1](https://github.com/cheminfo/react-cheminfo/compare/v0.115.0...v0.115.1) (2026-11-12)
 
 
