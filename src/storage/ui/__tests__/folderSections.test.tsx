@@ -51,6 +51,7 @@ function memoryStore(
     update: () => Promise.resolve(undefined),
     rename: () => Promise.resolve(),
     remove: () => Promise.resolve(),
+    restore: () => Promise.resolve(0),
     subscribe: () => stopListening,
   };
 }

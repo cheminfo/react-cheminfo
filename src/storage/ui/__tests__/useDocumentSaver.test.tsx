@@ -51,6 +51,7 @@ function makeSaver(inBrowser = false): DocumentSaver<string> {
     update: () => Promise.resolve(undefined),
     rename: () => Promise.resolve(),
     remove: () => Promise.resolve(),
+    restore: () => Promise.resolve(0),
     subscribe: () => stopNothing,
   };
   return createDocumentSaver<string>({

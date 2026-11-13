@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 
 import {
   FIGURE_COLUMN_WIDTH,
+  FIGURE_DOUBLE_COLUMN_WIDTH,
   FIGURE_LAYOUT_MAX,
   FIGURE_LAYOUT_MIN,
   figureLayoutRedraws,
@@ -18,14 +19,11 @@ test('as shown is the figure on screen, untouched', () => {
   });
 });
 
-test('the slide shapes keep the width and change the height', () => {
-  expect(figureLayoutSize('standard', SCREEN)).toStrictEqual({
-    width: 766,
-    height: 575,
-  });
-  expect(figureLayoutSize('wide', SCREEN)).toStrictEqual({
-    width: 766,
-    height: 431,
+test('two journal columns are 17.5 cm wide and keep the proportions on screen', () => {
+  expect(FIGURE_DOUBLE_COLUMN_WIDTH).toBe(Math.round((17.5 / 2.54) * 96));
+  expect(figureLayoutSize('double', SCREEN)).toStrictEqual({
+    width: 661,
+    height: 276,
   });
 });
 
@@ -37,10 +35,11 @@ test('a journal column is 8.5 cm wide and keeps the proportions on screen', () =
   });
 });
 
-test('a custom size is taken as typed, in whole pixels', () => {
-  expect(
-    figureLayoutSize('custom', SCREEN, { width: 1200.4, height: 799.6 }),
-  ).toStrictEqual({ width: 1200, height: 800 });
+test('a custom width is taken as typed, in whole pixels, and keeps the proportions', () => {
+  expect(figureLayoutSize('custom', SCREEN, 1200.4)).toStrictEqual({
+    width: 1200,
+    height: 501,
+  });
 });
 
 test('a custom size never typed falls back to the figure on screen', () => {
@@ -67,8 +66,8 @@ test('a column of a figure with no width still gets a height', () => {
 test('only a size that differs from the screen draws the figure again', () => {
   expect(figureLayoutRedraws('screen', SCREEN)).toBe(false);
   expect(figureLayoutRedraws('custom', SCREEN)).toBe(false);
-  expect(figureLayoutRedraws('wide', SCREEN)).toBe(true);
-  expect(figureLayoutRedraws('standard', { width: 400, height: 300 })).toBe(
+  expect(figureLayoutRedraws('column', SCREEN)).toBe(true);
+  expect(figureLayoutRedraws('column', { width: 321, height: 200 })).toBe(
     false,
   );
 });

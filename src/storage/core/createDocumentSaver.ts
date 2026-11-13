@@ -2,12 +2,20 @@ import { downloadBlob } from '../../download/core/downloadBlob.ts';
 import { errorMessage } from '../../error/core/toError.ts';
 import {
   readStorageText,
+  removeStorageEntry,
   writeStorageText,
 } from '../../state/core/storageEntry.ts';
 
 import { createSiteFolder } from './createSiteFolder.ts';
 import type { DocumentPartsKept, SaveTarget } from './documentFile.ts';
 import { SAVE_TARGETS } from './documentFile.ts';
+import {
+  formatOfName,
+  isKeptAs,
+  namesInBrowser,
+  namesInFolder,
+  stemOf,
+} from './documentSaverNames.ts';
 import type {
   DocumentSaver,
   DocumentSaverOptions,
@@ -57,33 +65,18 @@ export function createDocumentSaver<D>(
     return formats.find((format) => format.id === id) ?? formats[0];
   }
 
-  function formatOfName(name: string): SaveFormat<D> {
-    const matching = formats.filter((format) =>
-      name.endsWith(format.extension),
-    );
-    return (
-      matching.toSorted((a, b) => b.extension.length - a.extension.length)[0] ??
-      formats[0]
-    );
-  }
-
-  function stemOf(name: string): string {
-    const { extension } = formatOfName(name);
-    return name.endsWith(extension) ? name.slice(0, -extension.length) : name;
-  }
-
   function suggestion(): SaveChoice {
     const kept = file.peek();
     const offered = targets();
     const where = kept?.savedId ? 'browser' : kept?.handle ? 'file' : undefined;
     return {
-      name: kept ? stemOf(kept.name) : options.stem(),
+      name: kept ? stemOf(formats, kept.name) : options.stem(),
       target:
         remembered() ??
         offered.find((target) => target === where) ??
         offered[0] ??
         'download',
-      format: kept ? formatOfName(kept.name).id : formats[0].id,
+      format: kept ? formatOfName(formats, kept.name).id : formats[0].id,
       view: kept?.parts?.view ?? false,
       workspace: kept?.parts?.workspace ?? false,
     };
@@ -94,7 +87,7 @@ export function createDocumentSaver<D>(
     document: D,
     parts: DocumentPartsKept | undefined,
   ): Promise<SaveOutcome> {
-    const format = formatOfName(handle.name);
+    const format = formatOfName(formats, handle.name);
     try {
       await writeFile(handle, async () =>
         format.write(document, parts, handle.name),
@@ -121,9 +114,11 @@ export function createDocumentSaver<D>(
     const { extension } = formatOf(choice.format);
     const wanted = `${choice.name}${extension}`;
     try {
-      const name = (await isKeptAs(directory, wanted))
-        ? wanted
-        : await freeFileName(directory, choice.name, extension);
+      const name =
+        choice.replace === true ||
+        (await isKeptAs(file.peek()?.handle, directory, wanted))
+          ? wanted
+          : await freeFileName(directory, choice.name, extension);
       const handle = await directory.getFileHandle(name, { create: true });
       const outcome = await writeOver(handle, document, parts);
       folder.changed();
@@ -133,20 +128,6 @@ export function createDocumentSaver<D>(
         : { ...outcome, target: 'folder', wanted };
     } catch (error) {
       return { kind: 'failed', name: wanted, message: errorMessage(error) };
-    }
-  }
-
-  // Whether the folder's file of that name is the one the document is kept in.
-  async function isKeptAs(
-    directory: FileSystemDirectoryHandle,
-    name: string,
-  ): Promise<boolean> {
-    const handle = file.peek()?.handle;
-    if (!handle) return false;
-    try {
-      return await handle.isSameEntry(await directory.getFileHandle(name));
-    } catch {
-      return false;
     }
   }
 
@@ -222,6 +203,19 @@ export function createDocumentSaver<D>(
     folder,
     targets,
     remembered,
+    remember: (target) => {
+      if (target === undefined) removeStorageEntry(rememberedKey);
+      else writeStorageText(rememberedKey, target);
+    },
+    takenNames: (target) => {
+      const kept = file.peek();
+      if (target === 'browser') {
+        return savedDocuments
+          ? namesInBrowser(savedDocuments, kept?.savedId)
+          : Promise.resolve(new Map());
+      }
+      return namesInFolder(folder, formats, kept?.handle?.name);
+    },
     suggestion,
     save: async () => {
       const document = options.document();
@@ -237,6 +231,9 @@ export function createDocumentSaver<D>(
       }
       const target = remembered();
       if (target === undefined) return { kind: 'choose' };
+      if (target === 'folder' || target === 'browser') {
+        return { kind: 'name', target };
+      }
       return saveTo({ ...suggestion(), target });
     },
     saveTo,

@@ -20,3 +20,4 @@ export type {
   FigureDownloadState,
 } from './useFigureDownload.tsx';
 export { useFigureDownload } from './useFigureDownload.tsx';
+export { useFigureCopyShortcut } from './useFigureCopyShortcut.ts';

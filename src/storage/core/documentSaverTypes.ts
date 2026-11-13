@@ -46,7 +46,16 @@ export interface SaveChoice {
   view: boolean;
   /** Keep the workspace with the data, in a format that holds it. */
   workspace: boolean;
+  /**
+   * In the folder, write over a file already going by that name: the name
+   * dialog said so before.
+   * @default false — the name another file takes gets ` (2)`
+   */
+  replace?: boolean;
 }
+
+/** The places a new document is saved in under a name it is asked for. */
+export type NamedTarget = 'folder' | 'browser';
 
 /** What `createDocumentSaver` saves, and where it keeps it. */
 export interface DocumentSaverOptions<D> {
@@ -90,6 +99,8 @@ export type SaveOutcome =
       wanted?: string;
     }
   | { kind: 'choose' }
+  /** A new document, going where Save was told: the page asks its name. */
+  | { kind: 'name'; target: NamedTarget }
   | { kind: 'cancelled' }
   | { kind: 'empty' }
   | { kind: 'failed'; name: string; message: string };
@@ -104,13 +115,28 @@ export interface DocumentSaver<D> {
   targets: () => SaveTarget[];
   /** The place chosen before, while this browser still offers it. */
   remembered: () => SaveTarget | undefined;
+  /**
+   * Choose where Save keeps a new document, or `undefined` to ask each time.
+   * @param target - The place.
+   */
+  remember: (target: SaveTarget | undefined) => void;
+  /**
+   * The names the documents of a place go by, by their key: the files of the
+   * folder open in the panel, without their extension, or the documents
+   * saved in this browser.
+   * @param target - The place.
+   * @returns The names, for the name dialog to say what a name replaces.
+   */
+  takenNames: (target: NamedTarget) => Promise<ReadonlyMap<string, string>>;
   /** What Save as opens on: where the document is, else what was chosen. */
   suggestion: () => SaveChoice;
   /**
    * Save: over the file the document is kept in, else where the visitor
    * chose before. Call it from the key or the click that saves: a browser
    * opens its picker only while one lasts.
-   * @returns `choose` when nothing was chosen yet: the page asks where.
+   * @returns `choose` when nothing was chosen yet: the page asks where;
+   * `name` for a new document going to the folder or this browser: the page
+   * asks its name.
    */
   save: () => Promise<SaveOutcome>;
   /**

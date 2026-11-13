@@ -59,6 +59,15 @@ export interface SavedDocuments<TData> {
   /** Forget a document. */
   remove: (id: string) => Promise<void>;
   /**
+   * Take documents back from a backup, each with the name and the date it was
+   * saved under. One saved here under the same name is replaced; the others
+   * stay. A document the site no longer reads is left out.
+   * @returns How many were taken back.
+   */
+  restore: (
+    documents: ReadonlyArray<SavedDocument<unknown>>,
+  ) => Promise<number>;
+  /**
    * Be told when the documents change, in this tab or another.
    * @returns The function that stops it.
    */
@@ -180,6 +189,36 @@ export function createSavedDocuments<TData>(
       await db.delete('documents', id);
       changed();
     },
+    restore: async (incoming) => {
+      const kept = new Map<string, SavedDocument<TData>>();
+      for (const document of await list()) {
+        kept.set(nameKey(document.name), document);
+      }
+      const ids = new Set([...kept.values()].map((document) => document.id));
+      const rows: StoredDocument[] = [];
+      for (const row of incoming) {
+        const document = documentOf(row, read);
+        const name = document ? usableName(document.name) : undefined;
+        if (!document || !name) continue;
+        const holder = kept.get(nameKey(name));
+        const id =
+          holder?.id ??
+          (ids.has(document.id) ? crypto.randomUUID() : document.id);
+        const restored = { ...document, id, name };
+        kept.set(nameKey(name), restored);
+        ids.add(id);
+        rows.push(restored);
+      }
+      if (rows.length === 0) return 0;
+      const db = await database.open();
+      const transaction = db.transaction('documents', 'readwrite');
+      await Promise.all([
+        ...rows.map((row) => transaction.store.put(row)),
+        transaction.done,
+      ]);
+      changed();
+      return rows.length;
+    },
     subscribe: (listener) => {
       listeners.add(listener);
       return () => {
@@ -208,6 +247,13 @@ function checkedName(name: string): string {
     );
   }
   return trimmed;
+}
+
+function usableName(name: string): string | undefined {
+  const trimmed = name.trim();
+  return trimmed === '' || trimmed.length > MAX_DOCUMENT_NAME
+    ? undefined
+    : trimmed;
 }
 
 function documentOf<TData>(

@@ -8,17 +8,16 @@ import type { Draft } from './createDraftStore.ts';
 import { createRestoreGuard } from './createRestoreGuard.ts';
 import { createTabClaims } from './createTabClaims.ts';
 import type { DocumentFile } from './documentFile.ts';
-import { afterPaint, documentFile, draftFile } from './draftFiles.ts';
+import type { KeptDraft as Kept } from './draftFiles.ts';
+import {
+  DRAFT_LIMIT,
+  afterPaint,
+  documentFile,
+  draftFile,
+  tidyDrafts,
+} from './draftFiles.ts';
 import type { DraftSession, DraftSessionOptions } from './draftSessionTypes.ts';
 import { requestPersistentStorage } from './persistentStorage.ts';
-
-/** A document to keep, with the draft and the file it is kept in. */
-interface Kept<D> {
-  id: string;
-  document: D;
-  file: DocumentFile<D> | null;
-  createdAt: number;
-}
 
 /**
  * Keep every document a page shows as a draft while it changes, from its
@@ -38,7 +37,7 @@ export function createDraftSession<D>(
   options: DraftSessionOptions<D>,
 ): DraftSession {
   const { store, cells, status, signals, empty, isEmpty, reset } = options;
-  const { shown, limit = Infinity, keepSaved = true } = options;
+  const { shown, limit = DRAFT_LIMIT, keepSaved = true } = options;
   const scope = `${options.scope}:drafts`;
   const claims = createTabClaims(scope);
   const guard = createRestoreGuard(scope);
@@ -129,9 +128,15 @@ export function createDraftSession<D>(
       lastKept.document === document &&
       lastKept.file === file;
     if (unchanged) return;
-    const createdAt = lastKept?.id === id ? lastKept.createdAt : Date.now();
-    lastKept = { id, document, file, createdAt };
+    const before = lastKept?.id === id ? lastKept : undefined;
+    lastKept = {
+      id,
+      document,
+      file,
+      createdAt: before?.createdAt ?? Date.now(),
+    };
     autosave.schedule(lastKept);
+    if (before && before.file !== file) void autosave.flush(); // just saved
   }
 
   async function writeKept(kept: Kept<D>): Promise<void> {
@@ -148,27 +153,22 @@ export function createDraftSession<D>(
     };
     if (kept.file) draft.file = draftFile(kept.file, kept.document, keepSaved);
     await store.put(draft);
+    await tidy(kept.id);
     if (!written.has(kept.id)) {
       written.add(kept.id);
-      await forgetOldest();
       changed();
     }
     // Firefox asks the visitor, so only once there is work to keep.
     void requestPersistentStorage();
   }
 
-  async function forgetOldest(): Promise<void> {
-    if (!Number.isFinite(limit)) return;
-    const drafts = await store.list();
-    if (drafts.length <= limit) return;
-    const held = (await claims.held()) ?? new Set<string>();
-    const free = drafts.filter(
-      (draft) => draft.id !== heldId && !held.has(draft.id),
-    );
-    const extra = drafts.length - limit;
-    await Promise.all(
-      free.slice(-extra).map((draft) => store.delete(draft.id)),
-    );
+  // A document is kept once, and the oldest goes past the limit; the draft
+  // on screen and those a tab holds stay.
+  async function tidy(id: string | null): Promise<void> {
+    const stays = new Set(await claims.held());
+    if (heldId !== undefined) stays.add(heldId);
+    if (id !== null) stays.add(id);
+    if (await tidyDrafts(store, stays, limit)) changed();
   }
 
   async function reopenLastWork(): Promise<void> {
@@ -211,6 +211,8 @@ export function createDraftSession<D>(
           reopening ??= reopenLastWork();
           await reopening;
         }
+        // Copies kept before a document was kept once go too; best effort.
+        void tidy(cells.draftId.peek()).catch(() => undefined);
       } finally {
         status.settled.value = true;
       }

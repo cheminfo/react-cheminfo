@@ -223,6 +223,30 @@ test('the file a document is kept in comes back with its draft', async () => {
   });
 });
 
+test('a save writes its draft at once, so it never reads as not saved after', async () => {
+  const store = createDraftStore({ name: 'test-saved', read: readDoc });
+  const page1 = page(store);
+  await page1.session.start({ linked: false });
+  const document = { items: ['phenol'] };
+  page1.change(document);
+  await page1.session.flush();
+
+  page1.change(document, { name: 'Phenol.svg', saved: document });
+
+  // Well before the 500 ms the autosave waits for an edit.
+  await vi.waitFor(
+    async () => {
+      const [draft] = await store.list();
+
+      expect(draft?.file).toStrictEqual({
+        name: 'Phenol.svg',
+        modified: false,
+      });
+    },
+    { timeout: 200, interval: 10 },
+  );
+});
+
 test('a draft that took the page down is skipped once, then opened again', async () => {
   const store = createDraftStore({ name: 'test-crash', read: readDoc });
   await store.put({
@@ -273,6 +297,43 @@ test('past its limit, a site forgets its oldest draft no tab holds', async () =>
     'c',
     'b',
   ]);
+});
+
+test('a document opened again is kept once, as the draft on screen', async () => {
+  const store = createDraftStore({ name: 'test-once', read: readDoc });
+  await store.putMany([
+    { id: 'old', document: { items: ['a'] }, createdAt: 1, updatedAt: 1 },
+    { id: 'other', document: { items: ['b'] }, createdAt: 2, updatedAt: 2 },
+  ]);
+  const linked = page(store);
+  await linked.session.start({ linked: true });
+
+  linked.change({ items: ['a'] });
+  await linked.session.flush();
+
+  const kept = await store.list();
+
+  expect(kept.map((draft) => draft.document.items[0])).toStrictEqual([
+    'a',
+    'b',
+  ]);
+  expect(kept[0]?.id).toBe(linked.cells.draftId.value);
+});
+
+test('copies kept before go when a page starts, the most recent staying', async () => {
+  const store = createDraftStore({ name: 'test-copies', read: readDoc });
+  await store.putMany([
+    { id: 'recent', document: { items: ['a'] }, createdAt: 3, updatedAt: 3 },
+    { id: 'older', document: { items: ['a'] }, createdAt: 1, updatedAt: 1 },
+  ]);
+  const linked = page(store);
+  await linked.session.start({ linked: true });
+
+  await vi.waitFor(async () => {
+    const kept = await store.list();
+
+    expect(kept.map((draft) => draft.id)).toStrictEqual(['recent']);
+  });
 });
 
 test('a session that cannot keep drafts keeps none', async () => {

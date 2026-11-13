@@ -18,4 +18,4 @@ export { svgMarkup } from './svgMarkup.ts';
 export type { CustomColorButtonProps, SwatchRowProps } from './SwatchRow.tsx';
 export { CustomColorButton, SwatchRow } from './SwatchRow.tsx';
 export { usePrinting } from './usePrinting.ts';
-export { useSeen } from './useSeen.ts';
+export { useSeen } from '../../hooks/ui/useSeen.ts';

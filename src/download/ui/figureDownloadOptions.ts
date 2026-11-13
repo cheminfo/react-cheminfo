@@ -32,20 +32,20 @@ export interface FigureDownloadOptions {
   fileName?: string;
   /**
    * The format it opens on.
-   * @default 'png'
+   * @default 'svg'
    */
   defaultFormat?: FigureFormat;
   /**
-   * How the resolution is offered: as multiples of the figure on screen, or —
-   * for a figure drawn to the size it prints at — in dots per inch. In dots
-   * per inch an SVG keeps the size it states, and 1× is 96 dpi.
-   * @default 'multiple'
+   * How the resolution of a PNG is offered: in dots per inch, at the width the
+   * figure is taken at, as on every site of the family — or as multiples of
+   * that width. 1× is 96 dpi.
+   * @default 'dpi'
    */
   unit?: FigureResolutionUnit;
   /**
-   * The resolution a PNG opens on, as a multiple of the figure on screen:
-   * `dpiScale(600)` opens on 600 dpi. An SVG opens at 1×, the size it has on
-   * screen, and each format keeps the multiple the reader last picked for it.
+   * The resolution a PNG opens on — copied, sent or saved — as a multiple of
+   * the figure at the width picked: `dpiScale(600)` opens on 600 dpi. An SVG
+   * is stated at the width picked, whatever the resolution.
    * @default 2, or 300 dpi
    */
   defaultScale?: number;
@@ -72,14 +72,14 @@ export interface FigureDownloadOptions {
    */
   title?: string;
   /**
-   * Draws the figure at a size, for a file. When it is given the panel offers
-   * a size — as shown, 4:3, 16:9, a journal column, or typed — and a figure
-   * saved at a size other than its own is drawn again at that size, off the
-   * page, so its axes and labels are laid out for the new shape rather than
-   * stretched into it. Draw exactly what is on screen, with the same data,
-   * zoom and colours; only the box changes. A written figure has the size it
-   * states, and is offered none.
-   * @default undefined — the figure is saved at the size it has on screen
+   * Draws the figure at a size, for a file. Every figure is offered a width —
+   * as shown, one or two journal columns, or typed — and one saved at another
+   * width is scaled to it; given this, it is drawn again at that width
+   * instead, off the page, so its axes and labels keep the size they read on
+   * screen rather than shrinking with it. Draw exactly what is on screen, with
+   * the same data, zoom and colours; only the box changes. A written figure
+   * is always scaled.
+   * @default undefined — the figure is scaled to the width picked
    */
   renderFigure?: FigureRenderer;
 }

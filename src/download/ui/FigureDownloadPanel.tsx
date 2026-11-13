@@ -3,21 +3,22 @@ import type { ReactElement, ReactNode } from 'react';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
+import { OverlayGroup } from '../../overlay/ui/OverlayGroup.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
+import { overlayPanelHintStyle } from '../../overlay/ui/overlayPanelStyles.ts';
+import { useOverlaySurface } from '../../overlay/ui/overlaySurface.ts';
 import type { FigureNotice } from '../core/copyFigure.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import type { FigureResolutionUnit } from '../core/figureDpi.ts';
 import { figureLayoutSize } from '../core/figureLayout.ts';
-import { FIGURE_PNG_TYPE } from '../core/figurePng.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
-import { FIGURE_SVG_TYPE } from '../core/figureSvg.ts';
-import { canShareFile } from '../core/shareFile.ts';
 
+import { FigureQuickActions } from './FigureQuickActions.tsx';
 import type { FigureSizing } from './FigureSizeRows.tsx';
 import { FigureSizeRows } from './FigureSizeRows.tsx';
-import { hintOf } from './figureDownloadHint.ts';
+import { fileHintOf, pictureHintOf } from './figureDownloadHint.ts';
 import { resolutionHelp, scaleChoices } from './resolutionChoices.ts';
 
 /**
@@ -42,12 +43,15 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
   /** Which picture the reader is about to write. */
   format: FigureFormat;
   /**
-   * Files of another kind on offer. Nothing is painted for one, so no
-   * resolution is offered while it is picked.
+   * Files of another kind on offer, saved instead of a picture; Copy and Send
+   * still take the picture.
    * @default undefined — only pictures are offered
    */
   file?: FigureFileChoice<TFile>;
-  /** The multiple of the figure on screen it is painted at. */
+  /**
+   * The resolution of a PNG — copied, sent or saved — as a multiple of the
+   * figure at the width picked.
+   */
   scale: number;
   /** The multiples offered. */
   scales: readonly number[];
@@ -57,19 +61,12 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
    * @default 'multiple'
    */
   unit?: FigureResolutionUnit;
-  /**
-   * Whether an SVG is saved at the size it states, whatever the resolution:
-   * the resolution then paints the PNG alone, and is not offered for the SVG.
-   * @default false
-   */
-  svgAtOwnSize?: boolean;
   /** How big the figure is on the page, or `null` where there is none. */
   size: FigurePixels | null;
   /** What went wrong the last time save was pressed, if anything. */
   failure: string | null;
   /**
-   * What the last copy came to, while the choices it was made with still
-   * stand.
+   * What the last copy or send came to, said beside their buttons.
    * @default null
    */
   notice?: FigureNotice | null;
@@ -82,15 +79,16 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
   /** Called when they press save. */
   onSave: () => void;
   /**
-   * Called when they press copy, which puts a PNG at the resolution picked on
-   * the clipboard.
+   * Called when they press copy, which puts the figure on the clipboard as a
+   * PNG and, where the browser takes one, an SVG, at the width and the
+   * resolution picked.
    */
   onCopy: () => void;
   /**
-   * Called when they press send, which hands the file save would write to the
-   * share sheet of the device. The button is shown only where the browser has
-   * one that takes a picture — a phone, Safari, Chrome on a desktop — and only
-   * a picture is sent: a file of another kind is greyed.
+   * Called when they press send, which hands a PNG of the figure, at the
+   * width and the resolution picked, to the share sheet of the device, for a
+   * chat or a mail. The button is shown only where the browser has a sheet
+   * that takes a PNG — a phone, Safari, Chrome on a desktop.
    * @default undefined — nothing is offered to send
    */
   onSend?: () => void;
@@ -117,21 +115,12 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
 }
 
 /**
- * The choices behind the save glyph, and the buttons that write the file, copy
- * the picture, and send the file to another app.
- *
- * The resolution applies to both formats, and means what the reader needs it
- * to: a PNG is painted with that many more pixels, and an SVG, drawn the same,
- * opens that many times larger in the slide or the document it is dropped
- * into. Only a PNG meets the ceiling of what a browser can paint, so only its
- * choices past that ceiling are greyed.
- *
- * The sentence at the foot is the panel's own hint line rather than a row of its own: it
- * is not a setting, it is what the two settings above it currently amount to,
- * and it is the only thing here that answers the question a reader actually
- * has, which is how big the file is going to be. Saving itself is a command
- * rather than a setting, so it sits at the foot under the hairline: a button
- * filed among the settings is read as one, and a press nobody meant to make.
+ * What can be done with a figure, in three parts read top down: the width it
+ * is taken at and the resolution of its PNG, which Copy, Send and Save all
+ * use; Copy and Send; and the file, whose format is its own, with Save at the
+ * foot. Copy puts a PNG and, where the browser takes one, an SVG on the
+ * clipboard; a share sheet hands every file on as an attachment, so Send
+ * hands it the one a chat or a mail shows as a picture, a PNG.
  * @param props - See {@link FigureDownloadPanelProps}.
  * @returns The panel.
  */
@@ -142,21 +131,20 @@ export function FigureDownloadPanel<TFile extends string = never>(
   const { file } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
   const { sizing, onCopy, onSend, notice = null, children } = props;
-  const { unit = 'multiple', svgAtOwnSize = false } = props;
+  const { unit = 'multiple' } = props;
   const t = useChromeT();
   const language = useLanguage();
+  const { metrics } = useOverlaySurface();
 
   // What the file is drawn at: the figure on screen, or the shape picked.
   const drawn =
     size === null || sizing === undefined
       ? size
-      : figureLayoutSize(sizing.layout, size, sizing.custom ?? size);
+      : figureLayoutSize(sizing.layout, size, sizing.custom ?? undefined);
 
   const picked = file && file.value !== null ? file : undefined;
-  const painted = format === 'png' || rasterSvg;
-  const offerResolution =
-    picked === undefined && (format === 'png' || !svgAtOwnSize);
   const cannotWrite = picked === undefined && size === null;
+  const hint = { size: drawn, scale, unit, language };
 
   return (
     <OverlayPanel
@@ -165,81 +153,59 @@ export function FigureDownloadPanel<TFile extends string = never>(
       hint={
         picked
           ? (failure ?? picked.hint)
-          : hintOf(
-              {
-                format,
-                size: drawn,
-                scale,
-                failure,
-                notice,
-                rasterSvg,
-                unit,
-                language,
-              },
-              t,
-            )
+          : fileHintOf({ ...hint, format, failure, rasterSvg }, t)
       }
       actions={
-        <>
-          <OverlayAction
-            text={t('download.save')}
-            icon="download"
-            intent="primary"
-            disabled={cannotWrite}
-            busy={saving}
-            onClick={onSave}
-          />
-          <OverlayAction
-            text={t('clipboard.copy')}
-            icon="clipboard"
-            disabled={cannotWrite}
-            busy={saving}
-            onClick={onCopy}
-          />
-          {onSend !== undefined && canSendFigure('png') ? (
-            <OverlayAction
-              text={t('download.send')}
-              icon="send-message"
-              disabled={
-                picked !== undefined || size === null || !canSendFigure(format)
-              }
-              busy={saving}
-              onClick={onSend}
-            />
-          ) : null}
-        </>
+        <OverlayAction
+          text={t('download.save')}
+          icon="download"
+          intent="primary"
+          disabled={cannotWrite}
+          busy={saving}
+          onClick={onSave}
+        />
       }
     >
-      <OverlaySegmented<FigureFormat | TFile>
-        label={t('download.format')}
-        help={{
-          title: t('download.format'),
-          body: t('download.formatHelp'),
-        }}
-        value={file?.value ?? format}
-        options={file ? [...FORMAT_CHOICES, ...file.options] : FORMAT_CHOICES}
-        onChange={(value) => {
-          if (isFigureFormat(value)) {
-            file?.onChange(null);
-            onFormatChange(value);
-          } else {
-            file?.onChange(value);
-          }
-        }}
-      />
-      {children}
       {sizing === undefined ? null : (
         <FigureSizeRows sizing={sizing} size={size} />
       )}
-      {offerResolution ? (
-        <OverlaySegmented
-          label={t('download.resolution')}
-          help={resolutionHelp(unit, t)}
-          value={String(scale)}
-          options={scaleChoices(scales, drawn, painted, unit)}
-          onChange={(picked) => onScaleChange(Number(picked))}
+      <OverlaySegmented
+        label={t('download.resolution')}
+        help={resolutionHelp(unit, t)}
+        value={String(scale)}
+        options={scaleChoices(scales, drawn, true, unit)}
+        onChange={(next) => onScaleChange(Number(next))}
+      />
+      <p style={overlayPanelHintStyle(metrics)}>{pictureHintOf(hint, t)}</p>
+      <OverlayGroup label={t('download.copyOrSend')}>
+        <FigureQuickActions
+          disabled={size === null}
+          busy={saving}
+          notice={notice}
+          onCopy={onCopy}
+          onSend={onSend}
         />
-      ) : null}
+      </OverlayGroup>
+      <OverlayGroup label={t('download.saveAsFile')}>
+        <OverlaySegmented<FigureFormat | TFile>
+          label={t('download.format')}
+          help={{
+            title: t('download.format'),
+            body: t('download.formatHelp'),
+          }}
+          value={file?.value ?? format}
+          options={file ? [...FORMAT_CHOICES, ...file.options] : FORMAT_CHOICES}
+          onChange={(value) => {
+            if (isFigureFormat(value)) {
+              file?.onChange(null);
+              onFormatChange(value);
+            } else {
+              file?.onChange(value);
+            }
+          }}
+        />
+        {children}
+      </OverlayGroup>
     </OverlayPanel>
   );
 }
@@ -252,17 +218,6 @@ const PANEL_WIDTH = '27em';
 
 /** Wide enough for the four dots per inch on one row, `1200 dpi` last. */
 const DPI_PANEL_WIDTH = '33em';
-
-/**
- * Whether the share sheet here takes a picture of that format.
- * @param format - The format.
- * @returns Whether it does.
- */
-function canSendFigure(format: FigureFormat): boolean {
-  return format === 'svg'
-    ? canShareFile('figure.svg', FIGURE_SVG_TYPE)
-    : canShareFile('figure.png', FIGURE_PNG_TYPE);
-}
 
 function isFigureFormat(value: string): value is FigureFormat {
   return value === 'png' || value === 'svg';

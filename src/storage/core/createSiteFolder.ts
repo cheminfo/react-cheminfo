@@ -1,67 +1,17 @@
 import type { DBSchema } from 'idb';
 
+import {
+  readStorageEntry,
+  removeStorageEntry,
+  writeStorageEntry,
+} from '../../state/core/storageEntry.ts';
+
 import { chooseFolder, hasAccess, mayAccess } from './fileAccess.ts';
+import { listFiles, listFolders, searchFiles } from './folderListing.ts';
 import { openSiteDatabase } from './openSiteDatabase.ts';
+import type { SiteFolder } from './siteFolderTypes.ts';
 
-/** A file of the site's folder. */
-export interface FolderEntry {
-  /** Its name, extension included. */
-  name: string;
-  /** The file, which Save writes over once it is open. */
-  handle: FileSystemFileHandle;
-  /** When it last changed, in epoch milliseconds. */
-  modified: number;
-}
-
-/** The folder a site keeps its documents in, chosen once. */
-export interface SiteFolder {
-  /**
-   * The folder chosen before, without asking anything.
-   * @returns It, or `undefined` when none was chosen or none can be kept.
-   */
-  current: () => Promise<FileSystemDirectoryHandle | undefined>;
-  /**
-   * The folder, ready to be written: the one chosen before, asked again for
-   * its permission after a reload, else one the visitor picks now. Call it
-   * from a click or a key.
-   * @returns The folder; null when the visitor cancelled or refused;
-   * undefined when the browser keeps no folder.
-   */
-  writable: () => Promise<FileSystemDirectoryHandle | null | undefined>;
-  /**
-   * Ask for another folder, and keep it in place of the one before. Call it
-   * from a click.
-   * @returns The folder; null when the visitor cancelled; undefined when the
-   * browser keeps no folder.
-   */
-  choose: () => Promise<FileSystemDirectoryHandle | null | undefined>;
-  /**
-   * Whether the page may read the folder now, without asking.
-   * @returns False after a reload, until the visitor allows it again.
-   */
-  readable: () => Promise<boolean>;
-  /**
-   * Ask again to read the folder kept from a visit before. Call it from a
-   * click.
-   * @returns Whether the page may.
-   */
-  allow: () => Promise<boolean>;
-  /**
-   * The site's files in the folder, the most recently changed first.
-   * @param extensions - What their names end with, e.g. `['.write.html']`.
-   * @returns The files; none while the page may not read the folder.
-   */
-  list: (extensions: readonly string[]) => Promise<FolderEntry[]>;
-  /** Forget the folder: Save asks for one again. */
-  forget: () => Promise<void>;
-  /** Say the folder changed, so lists read it again. */
-  changed: () => void;
-  /**
-   * Be told when the folder or its files change.
-   * @returns The function that stops it.
-   */
-  subscribe: (listener: () => void) => () => void;
-}
+export type { FolderEntry, SiteFolder } from './siteFolderTypes.ts';
 
 interface FolderSchema extends DBSchema {
   folder: { key: string; value: FileSystemDirectoryHandle };
@@ -86,6 +36,8 @@ export function createSiteFolder(site: string): SiteFolder {
   });
   const listeners = new Set<() => void>();
   let cached: Promise<FileSystemDirectoryHandle | undefined> | undefined;
+  const pathKey = `${site}:folder-path`;
+  let opened = readPath(pathKey);
 
   function changed(): void {
     for (const listener of listeners) listener();
@@ -117,8 +69,42 @@ export function createSiteFolder(site: string): SiteFolder {
     FileSystemDirectoryHandle | null | undefined
   > {
     const handle = await chooseFolder();
-    if (handle) await keep(handle);
+    if (handle) {
+      setPath([]);
+      await keep(handle);
+    }
     return handle;
+  }
+
+  function setPath(path: readonly string[]): void {
+    opened = [...path];
+    if (opened.length === 0) removeStorageEntry(pathKey);
+    else writeStorageEntry(pathKey, opened);
+  }
+
+  // The folder open in the panel; the chosen one when the path is gone.
+  async function inside(
+    root: FileSystemDirectoryHandle,
+  ): Promise<FileSystemDirectoryHandle> {
+    let handle = root;
+    try {
+      for (const name of opened) {
+        // eslint-disable-next-line no-await-in-loop -- each folder is inside the one before
+        handle = await handle.getDirectoryHandle(name);
+      }
+      return handle;
+    } catch {
+      setPath([]);
+      return root;
+    }
+  }
+
+  async function readableHere(): Promise<
+    FileSystemDirectoryHandle | undefined
+  > {
+    const handle = await current();
+    if (!handle || !(await hasAccess(handle, 'read'))) return undefined;
+    return inside(handle);
   }
 
   return {
@@ -126,7 +112,7 @@ export function createSiteFolder(site: string): SiteFolder {
     writable: async () => {
       const handle = await current();
       if (!handle) return choose();
-      if (await mayAccess(handle, 'readwrite')) return handle;
+      if (await mayAccess(handle, 'readwrite')) return inside(handle);
       return null;
     },
     choose,
@@ -142,25 +128,38 @@ export function createSiteFolder(site: string): SiteFolder {
       return allowed;
     },
     list: async (extensions) => {
-      const handle = await current();
-      if (!handle || !(await hasAccess(handle, 'read'))) return [];
-      const files: FileSystemFileHandle[] = [];
-      for await (const entry of handle.values()) {
-        const { kind, name } = entry;
-        if (kind === 'file' && extensions.some((end) => name.endsWith(end))) {
-          files.push(entry);
-        }
+      const here = await readableHere();
+      return here ? listFiles(here, extensions) : [];
+    },
+    search: async (extensions) => {
+      const here = await readableHere();
+      return here ? searchFiles(here, extensions) : [];
+    },
+    folders: async () => {
+      const here = await readableHere();
+      return here ? listFolders(here) : [];
+    },
+    path: () => opened,
+    open: (path) => {
+      setPath(path);
+      changed();
+    },
+    createFolder: async (name) => {
+      const folderName = name.trim();
+      if (folderName === '' || /[/\\:]/u.test(folderName)) {
+        throw new Error(`“${name}” cannot name a folder`);
       }
-      const entries = await Promise.all(
-        files.map(async (file) => {
-          const { lastModified } = await file.getFile();
-          return { name: file.name, handle: file, modified: lastModified };
-        }),
-      );
-      return entries.toSorted((a, b) => b.modified - a.modified);
+      const handle = await current();
+      if (!handle || !(await mayAccess(handle, 'readwrite'))) {
+        throw new Error('the page may not write in this folder');
+      }
+      const here = await inside(handle);
+      await here.getDirectoryHandle(folderName, { create: true });
+      changed();
     },
     forget: async () => {
       cached = Promise.resolve(undefined);
+      setPath([]);
       changed();
       try {
         const db = await database.open();
@@ -185,4 +184,17 @@ function isFolder(value: unknown): value is FileSystemDirectoryHandle {
     value !== null &&
     (value as { kind?: unknown }).kind === 'directory'
   );
+}
+
+function readPath(key: string): string[] {
+  const stored = readStorageEntry(key);
+  if (!Array.isArray(stored)) return [];
+  const path: string[] = [];
+  for (const name of stored) {
+    if (typeof name !== 'string' || name === '' || name.includes('/')) {
+      return [];
+    }
+    path.push(name);
+  }
+  return path;
 }

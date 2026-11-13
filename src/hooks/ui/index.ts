@@ -27,3 +27,4 @@ export type { PollingState, UsePollingOptions } from './usePolling.ts';
 export { usePolling } from './usePolling.ts';
 export type { ElementSize } from './useResizeObserver.ts';
 export { useResizeObserver } from './useResizeObserver.ts';
+export { useSeen } from './useSeen.ts';

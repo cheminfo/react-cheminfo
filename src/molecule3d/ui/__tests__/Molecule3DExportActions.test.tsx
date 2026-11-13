@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 /**
- * What the export panel's Save and Copy do with the choices made in it: a
- * picture at the scale picked — every frame, when the scene holds several —
- * or, once Molfile is picked, the model itself, saved or copied.
+ * What the export panel's Save does with the choices made in it — a picture
+ * at the scale picked, every frame when the scene holds several, or once
+ * Molfile is picked the model itself — and Copy, which takes none of them.
  */
 
 import { act } from 'react';
@@ -62,14 +62,14 @@ test('a picture is saved, and copied, at the scale picked', async () => {
   await press('Save');
   await press('Copy');
 
-  expect(asked).toStrictEqual(['export png ×2 still', 'copy ×2']);
+  expect(asked).toStrictEqual(['export png ×3.125 still', 'copy ×3.125']);
 });
 
 test('a scene of several frames saves them all, as an animation', async () => {
   render({ frameCount: 12 });
   await press('Save');
 
-  expect(asked).toStrictEqual(['export png ×2 animated']);
+  expect(asked).toStrictEqual(['export png ×3.125 animated']);
 });
 
 test('once Molfile is picked, Save writes the model, named after the page and its dialect', async () => {
@@ -85,13 +85,12 @@ test('once Molfile is picked, Save writes the model, named after the page and it
   ).toStrictEqual(['water-v2000.mol']);
 });
 
-test('a molfile the clipboard refuses says the copy failed', async () => {
+test('with Molfile picked, Copy still copies the picture', async () => {
   render({ molfile: WATER });
   await press('Molfile');
   await press('Copy');
 
-  expect(asked).toStrictEqual([]);
-  expect(host.textContent).toContain('Copy failed');
+  expect(asked).toStrictEqual(['copy ×3.125']);
 });
 
 function render(

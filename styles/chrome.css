@@ -2739,6 +2739,20 @@ button.empty-guide__figure:focus-visible img {
   font-size: 0.8125rem;
 }
 
+/* A panel's search box, in its toolbar row: it takes the room the actions
+   leave, and the count stands at the far end. */
+.panel-search {
+  display: flex;
+  min-width: 6rem;
+  flex: 1 1 8rem;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.panel-search > .bp6-input-group {
+  flex: 1 1 auto;
+}
+
 /* A folder panel: the documents a site keeps — saved, drafted, given as
    examples — one row each, its name over when or what. */
 .folder-panel {
@@ -2753,11 +2767,34 @@ button.empty-guide__figure:focus-visible img {
   gap: 4px;
 }
 
+/* The one search over every section: it stays in view while they scroll. */
 .folder-panel__heading {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.8125rem;
   font-weight: 600;
+}
+
+/* A section opens and closes from its heading, which still reads as one. */
+.folder-panel__toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  gap: 4px;
+}
+
+.folder-panel__toggle:hover {
+  color: var(--text);
+}
+
+.folder-panel__count {
+  color: var(--text-faint);
+  font-weight: 400;
 }
 
 .folder-panel__list {
@@ -2830,6 +2867,88 @@ button.empty-guide__figure:focus-visible img {
   font-size: 0.75rem;
 }
 
+/* A draft is work the page keeps as it is done, not a document kept on
+   purpose: its row is grey and dashed, and its pill says it is not saved. */
+.folder-panel__open--draft {
+  border-style: dashed;
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+}
+
+.folder-panel__open--draft .folder-panel__name {
+  font-weight: 500;
+}
+
+.folder-panel__open--draft .folder-panel__thumbnail {
+  filter: grayscale(0.7);
+  opacity: 0.7;
+}
+
+.folder-panel__draft-status {
+  padding: 0 6px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background-color: color-mix(in oklab, var(--warning) 14%, var(--surface));
+  color: oklch(from var(--warning) min(l, 0.45) c h);
+  font-weight: 600;
+}
+
+/* The folder a section shows, and the folders it is in: each a step back up. */
+.folder-panel__crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.folder-panel__crumb-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+}
+
+.folder-panel__crumb-link:hover {
+  text-decoration: underline;
+}
+
+.folder-panel__folder-icon {
+  flex: 0 0 auto;
+  margin: 0 4px;
+  color: var(--text-muted);
+}
+
+/* Where Ctrl+S keeps a new document: each place over the line saying how. */
+.folder-panel__settings {
+  padding: 4px 0;
+}
+
+.folder-panel__choice {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.folder-panel__choice .folder-panel__note {
+  margin: 0;
+}
+
+/* An example's category: the look of its capsule at rest, at the size of the
+   line it sits on. */
+.folder-panel__category {
+  padding: 0 6px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background-color: color-mix(in oklab, var(--category) 14%, var(--surface));
+  color: oklch(from var(--category) min(l, 0.45) c h);
+  font-weight: 600;
+}
+
+.folder-panel__categories {
+  margin-bottom: 4px;
+}
+
 .folder-panel__note,
 .folder-panel__problem {
   margin: 8px 0 0;
@@ -2841,14 +2960,123 @@ button.empty-guide__figure:focus-visible img {
 }
 
 /* Under the folder's files: choose another folder, or stop saving there. */
-.folder-panel__actions {
+/* A folder's heading, and what the section does at the end of its line. */
+.folder-panel__heading-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+/* What a folder section does, small and grey at the end of its heading. */
+.folder-panel__heading-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin-left: auto;
+  gap: 10px;
+}
+
+.folder-panel__heading-action {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.folder-panel__heading-action:hover {
+  color: var(--text);
+  text-decoration: underline;
 }
 
 .folder-panel__field {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+/* What a copy made from the keyboard did. A key lights no button, so the page
+   says it once, at the bottom of the window, in the green a value copied by a
+   click flashes: it slides in, stays a moment and slides out, over everything
+   and in the way of nothing. */
+.clipboard-notice {
+  position: fixed;
+  z-index: 60;
+  bottom: 2rem;
+  left: 50%;
+  display: flex;
+  max-width: min(36rem, calc(100vw - 2rem));
+  align-items: center;
+  padding: 0.75rem 1.25rem 0.75rem 0.85rem;
+  border-radius: 999px;
+  animation: clipboard-notice-in 240ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+  background: #238551;
+  box-shadow: var(--shadow-lg);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  gap: 0.65rem;
+  line-height: 1.4;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.clipboard-notice::before {
+  display: inline-flex;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 22%);
+  content: '✓';
+  font-weight: 700;
+}
+
+.clipboard-notice--failed {
+  background: #cd4246;
+}
+
+.clipboard-notice--failed::before {
+  content: '!';
+}
+
+/* As long as `CLIPBOARD_NOTICE_LEAVE`, after which the notice is removed. */
+.clipboard-notice--leaving {
+  animation: clipboard-notice-out 200ms ease-in both;
+}
+
+@keyframes clipboard-notice-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 1.5rem) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes clipboard-notice-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, 1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clipboard-notice,
+  .clipboard-notice--leaving {
+    animation-name: none;
+  }
 }

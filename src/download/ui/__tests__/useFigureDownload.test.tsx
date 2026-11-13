@@ -47,8 +47,9 @@ afterEach(() => {
 test('opening the panel measures the figure on the page, and closing it hides it', async () => {
   await open({ targetId: 'plot' });
 
-  expect(said()).toContain('Saved 720 × 380 pixels.');
-  expect(field('format')).toBe('png');
+  expect(said()).toContain('Prints 9.5 × 5.0 cm, and stays sharp at any size.');
+  expect(field('format')).toBe('svg');
+  expect(said()).toContain('Size');
 
   await press(host.querySelector('[data-action="close"]'));
 
@@ -68,7 +69,7 @@ test('a box that is not on the page leaves nothing to save', async () => {
 test('a figure its page writes is measured once written, and one that fails leaves nothing to save', async () => {
   await open({ writeFigure: async () => WRITTEN });
 
-  expect(said()).toContain('Saved 200 × 80 pixels.');
+  expect(said()).toContain('Prints 2.6 × 1.1 cm');
 
   await open({
     writeFigure: () => Promise.reject(new Error('nothing drawn yet')),
@@ -77,73 +78,52 @@ test('a figure its page writes is measured once written, and one that fails leav
   expect(said()).toContain('There is no figure on the page to save yet.');
 });
 
-test('each format keeps the resolution picked for it, and only the PNG one is reported', async () => {
+test('one resolution serves copy, send and a PNG, and an SVG takes the width alone', async () => {
   const picked: number[] = [];
   await open({
     targetId: 'plot',
+    unit: 'multiple',
+    defaultFormat: 'png',
     onScaleChange: (scale) => picked.push(scale),
   });
+
+  expect(said()).toContain('A PNG of 720 × 380 pixels.');
+
+  await press(radio('4×'));
+
+  expect(said()).toContain('A PNG of 1440 × 760 pixels.');
 
   await press(radio('SVG'));
 
   expect(field('format')).toBe('svg');
   expect(said()).toContain('Opens at 360 × 190 pixels');
-
-  await press(radio('3×'));
-
-  expect(said()).toContain('Opens at 1080 × 570 pixels');
-
-  await press(radio('PNG'));
-
-  expect(said()).toContain('Saved 720 × 380 pixels.');
-
-  await press(radio('4×'));
-
-  expect(said()).toContain('Saved 1440 × 760 pixels.');
+  expect(said()).toContain('A PNG of 1440 × 760 pixels.');
   expect(picked).toStrictEqual([4]);
 });
 
-test('a figure with a printed size opens its SVG at that size, offering no resolution', async () => {
+test('a figure with a printed size opens its SVG at that size, the resolution kept for the PNG', async () => {
   await open({ targetId: 'plot', unit: 'dpi', defaultFormat: 'svg' });
 
   expect(said()).toContain('Prints 9.5 × 5.0 cm, and stays sharp at any size.');
-  expect(host.textContent).not.toContain('Resolution');
+  expect(said()).toContain('which prints 9.5 × 5.0 cm.');
+  expect(host.textContent).toContain('Resolution');
 });
 
-test('a figure that can be drawn again takes a shape, or a size typed one side at a time', async () => {
+test('a figure that can be drawn again takes a width, or one typed in centimetres', async () => {
   await open({ targetId: 'plot', renderFigure: () => null });
-  await pickShape('16:9');
+  await press(radio('PNG'));
 
-  expect(said()).toContain('Saved 720 × 406 pixels.');
+  expect(said()).toContain('which prints 9.5 × 5.0 cm.');
+
+  await pickShape('One column (8.5 cm)');
+
+  expect(said()).toContain('which prints 8.5 × 4.5 cm.');
 
   await pickShape('Custom');
-  const width = input('Width');
-  const height = input('Height');
+  await type(input('Width'), '17.5');
+  await leave(input('Width'));
 
-  expect([width?.value, height?.value]).toStrictEqual(['360', '190']);
-
-  await type(width, '1200');
-
-  expect(said()).toContain('Saved 720 × 380 pixels.');
-
-  await leave(width);
-
-  expect(said()).toContain('Saved 2400 × 380 pixels.');
-
-  await type(height, '50');
-  await act(async () => {
-    height?.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
-    );
-  });
-
-  expect(height?.value).toBe('120');
-  expect(said()).toContain('Saved 2400 × 240 pixels.');
-
-  await type(width, 'wide');
-  await leave(width);
-
-  expect(width?.value).toBe('1200');
+  expect(said()).toContain('which prints 17.5 × 9.2 cm.');
 });
 
 function Harness(props: FigureDownloadOptions): ReactElement {

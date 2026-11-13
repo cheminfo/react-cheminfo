@@ -30,58 +30,68 @@ test('a figure that cannot be drawn again is offered no size', () => {
   );
 });
 
-test('an SVG saved at twice opens twice as large', () => {
+test('an SVG opens at the width picked, whatever the resolution', () => {
   const html = panel({ format: 'svg', scale: 2 });
 
   expect(html).toContain(
-    'Opens at 1440 × 760 pixels, and stays sharp at any size.',
+    'Opens at 720 × 380 pixels, and stays sharp at any size.',
   );
-  expect(html).not.toMatch(/role="radio"[^>]*disabled/u);
 });
 
-test('only a PNG is held to what a browser can paint', () => {
+test('the resolution is held to what a browser can paint, since copy paints a PNG whatever the format', () => {
   const wide = { width: 5000, height: 1000 };
   const png = panel({ format: 'png', size: wide });
   const svg = panel({ format: 'svg', size: wide });
 
   expect(png).toMatch(/title="15000 × 3000 pixels" tabindex/u);
   expect(png).toMatch(/title="20000 × 4000 pixels" disabled=""/u);
-  expect(svg).not.toMatch(/role="radio"[^>]*disabled/u);
+  expect(svg).toMatch(/title="20000 × 4000 pixels" disabled=""/u);
 });
 
-test('the size picked is what the panel says it will draw', () => {
-  const html = panel({ format: 'svg', layout: 'wide', scale: 1 });
+test('the width picked is what the panel says it will write, in the proportions on screen', () => {
+  const html = panel({ format: 'svg', layout: 'double', scale: 1 });
 
   expect(html).toContain('>Size<');
-  expect(html).toContain('aria-label="Size — 16:9"');
-  expect(html).toContain('Opens at 720 × 405 pixels');
+  expect(html).toContain('aria-label="Size — Two columns (17.5 cm)"');
+  expect(html).toContain('Opens at 661 × 349 pixels');
+});
+
+test('in dots per inch a column says the size it prints at', () => {
+  const html = panel({
+    format: 'png',
+    layout: 'column',
+    unit: 'dpi',
+    scales: DPI_SCALES,
+    scale: dpiScale(300),
+  });
+
+  expect(html).toContain('which prints 8.5 × 4.5 cm.');
 });
 
 test('a PNG multiplies the size picked, not the size on screen', () => {
   const html = panel({ format: 'png', layout: 'column' });
 
-  expect(html).toContain('Saved 642 × 338 pixels.');
+  expect(html).toContain('A PNG of 642 × 338 pixels.');
 });
 
-test('a custom size shows the two sides it will be drawn at', () => {
+test('a custom width is typed in centimetres, and keeps the proportions', () => {
   const html = panel({
     format: 'svg',
     layout: 'custom',
-    custom: { width: 1200, height: 800 },
+    custom: 1200,
     scale: 1,
   });
 
-  expect(html).toContain('>Width × height<');
-  expect(html).toMatch(/aria-label="Width"[^>]*value="1200"/u);
-  expect(html).toMatch(/aria-label="Height"[^>]*value="800"/u);
-  expect(html).toContain('Opens at 1200 × 800 pixels');
+  expect(html).toContain('>Width<');
+  expect(html).toMatch(/aria-label="Width"[^>]*value="31.8"/u);
+  expect(html).toContain('Opens at 1200 × 633 pixels');
 });
 
-test('the custom sides are not offered for any other size', () => {
-  const html = panel({ format: 'svg', layout: 'standard', scale: 1 });
+test('the custom width is not offered for any other size', () => {
+  const html = panel({ format: 'svg', layout: 'column', scale: 1 });
 
   expect(html).not.toContain('aria-label="Width"');
-  expect(html).toContain('Opens at 720 × 540 pixels');
+  expect(html).toContain('Opens at 321 × 169 pixels');
 });
 
 test('copy is always offered beside save, whatever the format', () => {
@@ -98,11 +108,43 @@ test('a running save or copy keeps both buttons focusable, so Escape still close
   expect(idle).not.toContain('aria-disabled="true"');
 });
 
-test('a copy says what it put on the clipboard, whatever is saved', () => {
+test('the panel reads top down: the size, then copy or send, then the file', () => {
+  const html = panel({ format: 'png', scale: 3, layout: 'column' });
+  const order = [
+    '>Size<',
+    'Copy or send',
+    'Copy</span>',
+    'Save as a file',
+    'Format',
+    'Save</span>',
+  ].map((mark) => html.indexOf(mark));
+
+  expect(html).toContain('As a PNG, ready to paste.');
+  expect(order.every((at) => at > -1)).toBe(true);
+  expect(order.toSorted((a, b) => a - b)).toStrictEqual(order);
+});
+
+test('a copy is said beside Copy, and the foot keeps describing the file', () => {
   const html = panel({ format: 'svg', scale: 2, notice: 'copied' });
 
+  expect(html).toContain('Copied, as a PNG.');
   expect(html).toContain(
-    'Copied 1440 × 760 pixels to the clipboard, as a PNG.',
+    'Opens at 720 × 380 pixels, and stays sharp at any size.',
+  );
+});
+
+test('a copy names the SVG when the clipboard takes it too', () => {
+  vi.stubGlobal('ClipboardItem', {
+    supports(type: string): boolean {
+      return type === 'image/svg+xml';
+    },
+  });
+
+  expect(panel({ format: 'png' })).toContain(
+    'As a PNG and an SVG, ready to paste.',
+  );
+  expect(panel({ format: 'png', notice: 'copied' })).toContain(
+    'Copied, as a PNG and an SVG.',
   );
 });
 
@@ -127,30 +169,31 @@ test('a figure with a printed size is offered dots per inch', () => {
   expect(html).toContain('>1200 dpi<');
   expect(html).not.toContain('×<');
   expect(html).toMatch(/title="4800 × 2400 pixels" tabindex/u);
-  expect(html).toContain('Saved 1200 × 600 pixels, which print 10.2 × 5.1 cm.');
+  expect(html).toContain(
+    'A PNG of 1200 × 600 pixels, which prints 10.2 × 5.1 cm.',
+  );
 });
 
-test('an SVG with a printed size keeps it, and is offered no resolution', () => {
+test('an SVG says the size it prints at under the file, the resolution staying for the PNG a copy writes', () => {
   const html = panel({
     format: 'svg',
     unit: 'dpi',
-    svgAtOwnSize: true,
     scales: DPI_SCALES,
-    scale: 1,
+    scale: dpiScale(300),
     size: PRINTED,
   });
 
-  expect(html).not.toContain('>Resolution<');
+  expect(html).toContain('>Resolution<');
+  expect(html).toContain('which prints 10.2 × 5.1 cm.');
   expect(html).toContain('Prints 10.2 × 5.1 cm, and stays sharp at any size.');
 });
 
-test('an SVG kept at its own size still lets the PNG pick a resolution', () => {
-  const svg = panel({ format: 'svg', svgAtOwnSize: true, scale: 1 });
-  const png = panel({ format: 'png', svgAtOwnSize: true });
+test('the resolution comes before copy, whatever the format, and an SVG takes none of it', () => {
+  const svg = panel({ format: 'svg', scale: 3 });
+  const png = panel({ format: 'png' });
 
-  expect(svg).not.toContain('>Resolution<');
+  expect(svg.indexOf('>Resolution<')).toBeLessThan(svg.indexOf('Copy</span>'));
   expect(svg).toContain('Opens at 720 × 380 pixels');
-  expect(png).toContain('>Resolution<');
   expect(png).toContain('>2×<');
 });
 
@@ -163,15 +206,16 @@ test('send is offered only where the device has a share sheet', () => {
   expect(panel({ format: 'svg' })).not.toContain('>Send<');
 });
 
-test('a format the sheet refuses greys send rather than hiding it', () => {
+test('send takes no choice: it stands beside copy and sends a PNG whatever is picked', () => {
   stubSheet('image/svg+xml');
+  const html = panel({ format: 'svg', send: true });
 
-  expect(sendButton(panel({ format: 'png', send: true }))).not.toContain(
-    'disabled=""',
-  );
-  expect(sendButton(panel({ format: 'svg', send: true }))).toContain(
-    'disabled=""',
-  );
+  expect(sendButton(html)).not.toContain('disabled=""');
+  expect(html.indexOf('Send</span>')).toBeLessThan(html.indexOf('Format'));
+
+  stubSheet('image/png');
+
+  expect(panel({ format: 'png', send: true })).not.toContain('>Send<');
 });
 
 test('a running send keeps the button focusable, like save and copy', () => {
@@ -183,11 +227,9 @@ test('a running send keeps the button focusable, like save and copy', () => {
 });
 
 test('a send says what went', () => {
-  expect(panel({ format: 'svg', notice: 'sent' })).toContain(
-    'Sent as an SVG, which a chat app passes on as a file, untouched.',
-  );
+  expect(panel({ format: 'svg', notice: 'sent' })).toContain('Sent, as a PNG.');
   expect(panel({ format: 'png', scale: 2, notice: 'sent' })).toContain(
-    'Sent 1440 × 760 pixels, as a PNG.',
+    'Sent, as a PNG.',
   );
 });
 
@@ -231,8 +273,8 @@ interface PanelOptions {
   format: FigureFormat;
   /** The shape picked, or none when the figure cannot be drawn again. */
   layout?: FigureLayout;
-  /** The size typed for a custom shape. */
-  custom?: FigurePixels;
+  /** The width typed for a custom size, in pixels of the page. */
+  custom?: number;
   /** The multiple picked. */
   scale?: number;
   /** The figure on screen. */
@@ -245,8 +287,6 @@ interface PanelOptions {
   unit?: FigureResolutionUnit;
   /** The multiples offered. */
   scales?: readonly number[];
-  /** Whether the SVG keeps the size it states. */
-  svgAtOwnSize?: boolean;
   /** Whether the caller can send the file. */
   send?: boolean;
 }
@@ -259,7 +299,7 @@ interface PanelOptions {
 function panel(options: PanelOptions): string {
   const { format, layout, custom = null, scale = 2, size = SCREEN } = options;
   const { notice = null, saving = false } = options;
-  const { unit, scales = [1, 2, 3, 4], svgAtOwnSize, send = false } = options;
+  const { unit, scales = [1, 2, 3, 4], send = false } = options;
   return renderToStaticMarkup(
     <FigureDownloadPanel
       title="Save figure"
@@ -267,7 +307,6 @@ function panel(options: PanelOptions): string {
       scale={scale}
       scales={scales}
       unit={unit}
-      svgAtOwnSize={svgAtOwnSize}
       size={size}
       failure={null}
       notice={notice}

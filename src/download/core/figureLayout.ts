@@ -1,26 +1,24 @@
 /**
- * The shape a figure is drawn at before it is saved.
+ * The width a figure is saved at.
  *
  * A saved figure is the drawing the reader is looking at, so its proportions
- * are the proportions of the box it sits in. The resolution scales that
- * drawing — more pixels for a PNG, a larger page for an SVG — but leaves its
- * shape, and the size of its words against its axes, exactly as they were. A
- * figure for a slide or for a journal column wants another shape, and the only
- * way to give it one is to draw it again at that size, so its axes and labels
- * are laid out for the new box rather than stretched into it.
+ * are the proportions of the box it sits in, whatever width it is saved at.
+ * The width is what a document asks for — a journal column, a full page —
+ * and the resolution then says how many pixels a PNG spends on it. A drawing
+ * is scaled to that width; a chart that can be laid out again is drawn again
+ * at it, so its axes and labels keep the size they read on screen.
  */
 
 import type { FigurePixels } from './figureScale.ts';
 
-/** The shapes a figure can be drawn at for a file. */
-export type FigureLayout = 'screen' | 'standard' | 'wide' | 'column' | 'custom';
+/** The widths a figure can be saved at. */
+export type FigureLayout = 'screen' | 'column' | 'double' | 'custom';
 
-/** The shapes, in the order they are offered. */
+/** The widths, in the order they are offered. */
 export const FIGURE_LAYOUTS = [
   'screen',
-  'standard',
-  'wide',
   'column',
+  'double',
   'custom',
 ] as const satisfies readonly FigureLayout[];
 
@@ -31,6 +29,9 @@ export const FIGURE_LAYOUTS = [
  */
 export const FIGURE_COLUMN_WIDTH = 321;
 
+/** How wide a figure across a journal's two columns is: 17.5 cm. */
+export const FIGURE_DOUBLE_COLUMN_WIDTH = 661;
+
 /** The narrowest side a figure is drawn at, below which no chart has room for its axes. */
 export const FIGURE_LAYOUT_MIN = 120;
 
@@ -38,35 +39,26 @@ export const FIGURE_LAYOUT_MIN = 120;
 export const FIGURE_LAYOUT_MAX = 4096;
 
 /**
- * The size a figure is drawn at, in the shape the reader picked.
- *
- * The two slide shapes keep the width of the figure on screen and change its
- * height, since the width is what a page already gave it. The journal column
- * does the reverse: its width is fixed by the journal, and the figure keeps
- * the proportions it has on screen.
- * @param layout - The shape picked.
+ * The size a figure is saved at, at the width picked and in the proportions
+ * it has on screen.
+ * @param layout - The width picked.
  * @param screen - The figure as it is drawn on the page.
- * @param custom - The size typed in, read only for `custom`. Defaults to the
- *   figure on screen.
- * @returns The size to draw it at, in whole pixels.
+ * @param customWidth - The width typed, read only for `custom`. Defaults to
+ *   the figure on screen.
+ * @returns The size, in whole pixels.
  */
 export function figureLayoutSize(
   layout: FigureLayout,
   screen: FigurePixels,
-  custom: FigurePixels = screen,
+  customWidth: number = screen.width,
 ): FigurePixels {
   switch (layout) {
-    case 'standard':
-      return sized(screen.width, (screen.width * 3) / 4);
-    case 'wide':
-      return sized(screen.width, (screen.width * 9) / 16);
     case 'column':
-      return sized(
-        FIGURE_COLUMN_WIDTH,
-        (FIGURE_COLUMN_WIDTH * screen.height) / Math.max(screen.width, 1),
-      );
+      return keepingShape(FIGURE_COLUMN_WIDTH, screen);
+    case 'double':
+      return keepingShape(FIGURE_DOUBLE_COLUMN_WIDTH, screen);
     case 'custom':
-      return sized(custom.width, custom.height);
+      return keepingShape(customWidth, screen);
     case 'screen':
       return { width: screen.width, height: screen.height };
     default:
@@ -91,24 +83,31 @@ export function figureLayoutSide(value: number): number {
  * Whether a figure is drawn again for the file, rather than copied as it is.
  * @param layout - The shape picked.
  * @param screen - The figure as it is drawn on the page.
- * @param custom - The size typed in.
+ * @param customWidth - The width typed in.
  * @returns Whether the size differs from the one on screen.
  */
 export function figureLayoutRedraws(
   layout: FigureLayout,
   screen: FigurePixels,
-  custom?: FigurePixels,
+  customWidth?: number,
 ): boolean {
-  const drawn = figureLayoutSize(layout, screen, custom);
+  const drawn = figureLayoutSize(layout, screen, customWidth);
   return drawn.width !== screen.width || drawn.height !== screen.height;
 }
 
 /**
- * A size, both sides held to the range.
+ * A width, held to the range, and the height that keeps the figure's
+ * proportions.
  * @param width - The width asked for.
- * @param height - The height asked for.
+ * @param screen - The figure on screen.
  * @returns The size.
  */
-function sized(width: number, height: number): FigurePixels {
-  return { width: figureLayoutSide(width), height: figureLayoutSide(height) };
+function keepingShape(width: number, screen: FigurePixels): FigurePixels {
+  const side = figureLayoutSide(width);
+  return {
+    width: side,
+    height: figureLayoutSide(
+      (side * screen.height) / Math.max(screen.width, 1),
+    ),
+  };
 }

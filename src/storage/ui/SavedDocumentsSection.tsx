@@ -7,13 +7,20 @@ import { formatRelativeTime } from '../../format/core/relativeTime.ts';
 import { useAsync } from '../../hooks/ui/useAsync.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { matchesNeedle } from '../../panel/core/textFilter.ts';
 import { PanelEmpty } from '../../panel/ui/PanelMessage.tsx';
+import {
+  usePanelNeedle,
+  usePanelTally,
+} from '../../panel/ui/panelSearchContext.ts';
 import type {
   SavedDocument,
   SavedDocuments,
 } from '../core/createSavedDocuments.ts';
 
 import { DocumentNameDialog } from './DocumentNameDialog.tsx';
+import { FolderNoMatch } from './FolderSearch.tsx';
+import { FolderSection } from './FolderSection.tsx';
 import { takenNames, useStoreVersion } from './savedDocumentsState.ts';
 import type { ConfirmOpen } from './useOpenConfirmation.tsx';
 import { useOpenConfirmation } from './useOpenConfirmation.tsx';
@@ -43,7 +50,8 @@ export interface SavedDocumentsSectionProps<TData> {
 
 /**
  * The documents saved in this browser under a name, the latest first: a click
- * puts one on screen, the pencil renames it and the bin forgets it. The
+ * puts one on screen, the pencil renames it and the bin forgets it. Inside a
+ * `<PanelSearch>`, only the documents whose name holds the search are listed. The
  * documents a site keeps on its own — drafts, examples — are sections of their
  * own beside it.
  * @param props - See {@link SavedDocumentsSectionProps}.
@@ -61,20 +69,27 @@ export function SavedDocumentsSection<TData>(
   const confirmation = useOpenConfirmation(confirmOpen);
   const [renaming, setRenaming] = useState<SavedDocument<TData> | null>(null);
   const documents = listing.data?.documents ?? [];
+  const needle = usePanelNeedle();
+  const shown = documents.filter((document) =>
+    matchesNeedle(needle, document.name),
+  );
+  usePanelTally(shown.length, documents.length);
 
   return (
-    <section
-      className="folder-panel__section"
-      aria-label={t('documents.heading')}
+    <FolderSection
+      name="documents"
+      title={t('documents.heading')}
+      count={documents.length}
     >
-      <h3 className="folder-panel__heading">{t('documents.heading')}</h3>
       {listing.data?.available === false ? (
         <PanelEmpty>{t('documents.unavailable')}</PanelEmpty>
+      ) : shown.length === 0 && needle !== '' ? (
+        <FolderNoMatch />
       ) : documents.length === 0 ? (
         <PanelEmpty>{t('documents.empty')}</PanelEmpty>
       ) : (
         <ul className="folder-panel__list">
-          {documents.map((document) => {
+          {shown.map((document) => {
             const current = document.id === currentId;
             return (
               <li key={document.id} className="folder-panel__item">
@@ -145,7 +160,7 @@ export function SavedDocumentsSection<TData>(
         }}
       />
       {confirmation.alert}
-    </section>
+    </FolderSection>
   );
 }
 

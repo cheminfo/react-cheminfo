@@ -72,6 +72,7 @@ function memoryStore(
       changed();
       return Promise.resolve();
     },
+    restore: () => Promise.resolve(0),
     subscribe: (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);

@@ -37,6 +37,7 @@ const OPTIONS: FigureActionsOptions = {
   targetId: 'plot',
   format: 'svg',
   scale: 2,
+  pictureScale: 2,
   fileName: 'curve',
   redrawAt: null,
   redraw: () => Promise.reject(new Error('nothing is drawn again')),
@@ -89,12 +90,12 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test('save writes the figure read off its box, in the format picked', async () => {
+test('save writes the figure read off its box, an SVG at its own width whatever the resolution', async () => {
   await press('save', {});
 
   expect(saves).toStrictEqual([{ name: 'curve.svg', href: 'blob:stub/1' }]);
   await expect(record.blobs[0]?.text()).resolves.toMatch(
-    /<svg [^>]*width="200" height="100" viewBox="0 0 100 50"/u,
+    /<svg [^>]*width="100" height="50"/u,
   );
   expect(field('failure')).toBe('none');
 });
@@ -111,7 +112,7 @@ test('save at another size writes the copy drawn off the page', async () => {
 
   expect(asked).toStrictEqual(['plot', { width: 300, height: 200 }]);
   await expect(record.blobs[0]?.text()).resolves.toMatch(
-    /<svg [^>]*width="600" height="400" viewBox="0 0 300 200"/u,
+    /<svg [^>]*width="300" height="200"/u,
   );
 });
 
@@ -120,6 +121,30 @@ test('save of a figure its page writes saves what it wrote', async () => {
 
   expect(saves).toStrictEqual([{ name: 'curve.svg', href: 'blob:stub/1' }]);
   await expect(record.blobs[0]?.text()).resolves.toBe(WRITTEN.markup);
+});
+
+test('a figure saved at another width is stated at it, its picture kept', async () => {
+  await press('save', { writeFigure: async () => WRITTEN, sizeFactor: 2 });
+
+  await expect(record.blobs[0]?.text()).resolves.toBe(
+    '<svg width="160" height="80" viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg"><g/></svg>',
+  );
+});
+
+test('copy and send take the width picked, as save does', async () => {
+  await press('copy', { sizeFactor: 2 });
+
+  expect(record.calls.at(-1)?.canvas).toBe('400×200');
+
+  await press('send', { sizeFactor: 0.5 });
+
+  expect(record.calls.at(-1)?.canvas).toBe('100×50');
+});
+
+test('a PNG saved at another width spends the resolution picked on it', async () => {
+  await press('save', { format: 'png', sizeFactor: 2 });
+
+  expect(record.calls.at(-1)?.canvas).toBe('400×200');
 });
 
 test('with no box to read the figure off, every action says so', async () => {
@@ -139,8 +164,8 @@ test('with no box to read the figure off, every action says so', async () => {
   expect(shared).toStrictEqual([]);
 });
 
-test('copy puts the PNG at the multiple picked beside the figure read off the page', async () => {
-  await press('copy', {});
+test('copy puts the PNG at its own multiple, whatever is picked, beside the figure read off the page', async () => {
+  await press('copy', { scale: 3 });
 
   expect(field('notice')).toBe('copied');
   expect(record.calls.at(-1)?.canvas).toBe('200×100');
@@ -159,7 +184,7 @@ test('copy puts the PNG at the multiple picked beside the figure read off the pa
 });
 
 test('copy of a figure its page writes paints what it wrote', async () => {
-  await press('copy', { writeFigure: async () => WRITTEN, scale: 3 });
+  await press('copy', { writeFigure: async () => WRITTEN, pictureScale: 3 });
 
   expect(field('notice')).toBe('copied');
   expect(record.calls.at(-1)?.canvas).toBe('240×120');
@@ -169,15 +194,16 @@ test('copy of a figure its page writes paints what it wrote', async () => {
   expect(readClipboardFigure((await html?.text()) ?? '')).toBe(WRITTEN.markup);
 });
 
-test('send hands the share sheet the file save would write', async () => {
-  await press('send', {});
+test('send hands the share sheet a PNG, whatever save is set to', async () => {
+  await press('send', { format: 'svg', scale: 3 });
 
   expect(field('notice')).toBe('sent');
-  expect(shared.map((file) => file.name)).toStrictEqual(['curve.svg']);
+  expect(shared.map((file) => file.name)).toStrictEqual(['curve.png']);
+  expect(record.calls.at(-1)?.canvas).toBe('200×100');
 });
 
-test('send of a figure its page writes hands on the file in the format picked', async () => {
-  await press('send', { writeFigure: async () => WRITTEN, format: 'png' });
+test('send of a figure its page writes paints what it wrote, as a PNG', async () => {
+  await press('send', { writeFigure: async () => WRITTEN, format: 'svg' });
 
   expect(field('notice')).toBe('sent');
   expect(shared.map((file) => [file.name, file.type])).toStrictEqual([

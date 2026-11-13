@@ -12,6 +12,9 @@ import type {
 } from '../core/documentSaverTypes.ts';
 import { browserPicksFiles } from '../core/fileAccess.ts';
 
+import { saveMessage } from './saveMessages.ts';
+import { useSaveInPlace } from './useSaveInPlace.tsx';
+
 /** How {@link useDocumentSaver} tells and asks. */
 export interface DocumentSaverHookOptions {
   /** Say what a save did, in the site's status bar or toast. */
@@ -71,6 +74,7 @@ export function useDocumentSaver<D>(
   const { viewDescription, workspaceDescription } = options;
   const t = useChromeT();
   const [asking, setAsking] = useState<Asking | null>(null);
+  const inPlace = useSaveInPlace(saver, notify);
 
   function ask(first: boolean): void {
     setAsking({ initial: saver.suggestion(), first });
@@ -83,22 +87,14 @@ export function useDocumentSaver<D>(
   function report(outcome: SaveOutcome): void {
     if (outcome.kind === 'choose') {
       ask(true);
-    } else if (outcome.kind === 'empty') {
-      notify(t('saving.empty'));
-    } else if (outcome.kind === 'failed') {
-      const { name, message } = outcome;
-      notify(t('saving.failed', { name, message }), 'danger');
-    } else if (outcome.kind === 'saved') {
-      notify(savedMessage(outcome), 'success');
+      return;
     }
-  }
-
-  function savedMessage(outcome: SaveOutcome & { kind: 'saved' }): string {
-    const { name, wanted, target } = outcome;
-    if (wanted !== undefined) return t('saving.savedRenamed', { name, wanted });
-    if (target === 'browser') return t('saving.savedBrowser', { name });
-    if (target === 'download') return t('saving.downloaded', { name });
-    return t('saving.saved', { name });
+    if (outcome.kind === 'name') {
+      inPlace.ask(outcome.target);
+      return;
+    }
+    const message = saveMessage(outcome, t);
+    if (message) notify(message.text, message.intent);
   }
 
   function save(): void {
@@ -113,38 +109,41 @@ export function useDocumentSaver<D>(
 
   const holdsParts = saver.formats.some((format) => format.holdsParts);
   const dialog = (
-    <SaveDocumentDialog
-      isOpen={asking !== null}
-      title={asking?.first ? t('saving.chooseTitle') : undefined}
-      onClose={() => {
-        setAsking(null);
-      }}
-      formats={[
-        dialogFormat(saver.formats[0], t),
-        ...saver.formats.slice(1).map((format) => dialogFormat(format, t)),
-      ]}
-      initial={
-        asking?.initial ?? {
-          name: '',
-          format: saver.formats[0].id,
-          view: false,
-          workspace: false,
+    <>
+      {inPlace.dialog}
+      <SaveDocumentDialog
+        isOpen={asking !== null}
+        title={asking?.first ? t('saving.chooseTitle') : undefined}
+        onClose={() => {
+          setAsking(null);
+        }}
+        formats={[
+          dialogFormat(saver.formats[0], t),
+          ...saver.formats.slice(1).map((format) => dialogFormat(format, t)),
+        ]}
+        initial={
+          asking?.initial ?? {
+            name: '',
+            format: saver.formats[0].id,
+            view: false,
+            workspace: false,
+          }
         }
-      }
-      targets={saver.targets()}
-      folderName={asking?.folderName}
-      otherBrowserNote={!browserPicksFiles()}
-      parts={holdsParts ? parts : { view: false, workspace: false }}
-      viewDescription={viewDescription}
-      workspaceDescription={workspaceDescription}
-      onSave={(choice) => {
-        setAsking(null);
-        // Called in the click itself, so the browser still opens its picker.
-        void saver
-          .saveTo({ ...choice, target: choice.target ?? 'download' })
-          .then(report);
-      }}
-    />
+        targets={saver.targets()}
+        folderName={asking?.folderName}
+        otherBrowserNote={!browserPicksFiles()}
+        parts={holdsParts ? parts : { view: false, workspace: false }}
+        viewDescription={viewDescription}
+        workspaceDescription={workspaceDescription}
+        onSave={(choice) => {
+          setAsking(null);
+          // Called in the click itself, so the browser still opens its picker.
+          void saver
+            .saveTo({ ...choice, target: choice.target ?? 'download' })
+            .then(report);
+        }}
+      />
+    </>
   );
   return { save, saveAs, dialog };
 }

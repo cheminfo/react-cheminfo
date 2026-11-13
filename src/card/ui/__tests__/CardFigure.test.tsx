@@ -17,7 +17,7 @@ test('the figure carries its glyph column, the picture glyph last', () => {
   expect(html).toContain('class="card-figure__drawing"');
   expect(html).toContain('<svg data-testid="curve"></svg>');
   expect(html).toContain('data-testid="figure-tools"');
-  expect(html).toContain('aria-label="Copy or save the picture — PNG"');
+  expect(html).toContain('aria-label="Copy or save the picture — SVG"');
   expect(html).toContain('data-testid="card-save-figure"');
   expect(html.indexOf('>table<')).toBeLessThan(
     html.indexOf('data-testid="card-save-figure"'),
@@ -41,5 +41,5 @@ test('a grid of HTML cells fills the card and is painted as it is seen', () => {
   expect(html).toMatch(/^<div class="card-figure card-figure--fill">/);
   expect(html).toContain('class="card-figure__drawing isomer-grid"');
   expect(html).toContain('data-figure="html"');
-  expect(html).toContain('aria-label="Copy or save the isomers — PNG"');
+  expect(html).toContain('aria-label="Copy or save the isomers — SVG"');
 });

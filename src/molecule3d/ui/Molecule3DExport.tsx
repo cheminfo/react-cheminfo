@@ -7,14 +7,14 @@
 import type { ReactElement } from 'react';
 import { useCallback, useState } from 'react';
 
-import { writeToClipboard } from '../../clipboard/core/writeToClipboard.ts';
 import type { FigureNotice } from '../../download/core/copyFigure.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
-import type { FigurePixels } from '../../download/core/figureScale.ts';
 import {
-  DEFAULT_FIGURE_SCALE,
-  FIGURE_SCALES,
-} from '../../download/core/figureScale.ts';
+  DEFAULT_FIGURE_DPI,
+  FIGURE_DPIS,
+  dpiScale,
+} from '../../download/core/figureDpi.ts';
+import type { FigurePixels } from '../../download/core/figureScale.ts';
 import { FigureDownloadPanel } from '../../download/ui/FigureDownloadPanel.tsx';
 import { useFigureSend } from '../../download/ui/useFigureSend.ts';
 import { useFigureTask } from '../../download/ui/useFigureTask.ts';
@@ -47,8 +47,8 @@ export interface Molecule3DExportProps {
   /** Puts a PNG at that scale on the clipboard, and says what came of it. */
   onCopy: (scale: number) => Promise<FigureNotice>;
   /**
-   * Writes the file `onExport` saves, which the panel then hands to the share
-   * sheet of the device.
+   * Writes a file, which Send hands to the share sheet of the device: always
+   * a still PNG at the resolution picked.
    * @default undefined — nothing is offered to send
    */
   writeFile?: (
@@ -89,7 +89,7 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   const [format, setFormat] = useState<FigureFormat>('png');
   const [file, setFile] = useState<typeof MOLFILE | null>(null);
   const [version, setVersion] = useState<MoleculeFileFormat>('molfileV2000');
-  const [scale, setScale] = useState(DEFAULT_FIGURE_SCALE);
+  const [scale, setScale] = useState(DEFAULT_SCALE);
   const [frames, setFrames] = useState<FrameChoice>('all');
   const offerFrames = frameCount > 1 && file === null && format === 'png';
   const animated = offerFrames && frames === 'all';
@@ -99,8 +99,7 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   const versions = moleculeFileChoices(atoms, t);
   const writtenVersion = versions[0]?.disabled ? 'molfileV3000' : version;
 
-  // Written once picked rather than on the press: Safari only allows a
-  // clipboard write the click itself started.
+  // Written once picked, so Save has it at hand.
   const written = useAsync(
     useCallback(
       () =>
@@ -111,11 +110,6 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
     ),
   );
   const text = written.pending ? null : written.data;
-
-  async function copyMolfile(molfileText: string): Promise<FigureNotice> {
-    if (await writeToClipboard(molfileText)) return 'copied';
-    throw new Error(t('clipboard.failed'));
-  }
 
   // What the last copy came to only describes the choices it was made with.
   function changed<T>(apply: (value: T) => void): (value: T) => void {
@@ -139,15 +133,13 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
               options: MOLFILE_CHOICES,
               value: file,
               onChange: changed(setFile),
-              hint:
-                notice === 'copied'
-                  ? t('clipboard.copied')
-                  : t('molecule3d.molfileHint', { count: atoms }),
+              hint: t('molecule3d.molfileHint', { count: atoms }),
             }
           : undefined
       }
       scale={scale}
-      scales={FIGURE_SCALES}
+      scales={DPI_SCALES}
+      unit="dpi"
       size={size}
       failure={failure ?? written.failure?.message ?? null}
       notice={notice}
@@ -163,14 +155,13 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
         }
       }}
       onCopy={() => {
-        if (file === null) run(onCopy(scale));
-        else if (text) run(copyMolfile(text));
+        run(onCopy(scale));
       }}
       onSend={
         writeFile === undefined
           ? undefined
           : () => {
-              send(() => writeFile(format, scale, animated));
+              send(() => writeFile('png', scale, false));
             }
       }
     >
@@ -203,6 +194,12 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
     </FigureDownloadPanel>
   );
 }
+
+/** The dots per inch offered, as the multiples the scene is rendered at. */
+const DPI_SCALES = FIGURE_DPIS.map(dpiScale);
+
+/** The resolution the panel opens on. */
+const DEFAULT_SCALE = dpiScale(DEFAULT_FIGURE_DPI);
 
 /** What the row of formats calls a molfile; the version is a row of its own. */
 const MOLFILE = 'molfile';

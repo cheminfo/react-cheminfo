@@ -19,6 +19,9 @@ export type {
 export { DocumentationDialogFrame } from './DocumentationDialogFrame.tsx';
 export type { FilterInputProps } from './FilterInput.tsx';
 export { FilterInput } from './FilterInput.tsx';
+export { PanelCount, PanelSearch, PanelSearchField } from './PanelSearch.tsx';
+export type { PanelSearchState, PanelTally } from './panelSearchContext.ts';
+export { usePanelNeedle, usePanelTally } from './panelSearchContext.ts';
 export type { FixedPanelRowProps } from './FixedPanelRow.tsx';
 export { FixedPanelRow } from './FixedPanelRow.tsx';
 export type { HelpLabelProps } from './HelpLabel.tsx';

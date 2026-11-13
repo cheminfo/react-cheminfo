@@ -59,9 +59,9 @@ export interface DraftSessionOptions<D> {
    */
   language?: () => Language;
   /**
-   * How many drafts are kept: past it, the oldest no tab holds is forgotten.
-   * A site that lists its drafts keeps them all; one that does not keeps a few.
-   * @default Infinity
+   * How many drafts are kept: past it, a draft no tab holds is forgotten, a
+   * saved document left unchanged first, then the oldest.
+   * @default 20
    */
   limit?: number;
   /**

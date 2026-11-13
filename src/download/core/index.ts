@@ -1,5 +1,7 @@
 export type { FigureNotice } from './copyFigure.ts';
 export { copyFigure } from './copyFigure.ts';
+export type { PageFigureWriter } from './copyPageFigure.ts';
+export { copyPageFigure } from './copyPageFigure.ts';
 export { copySvg } from './copySvg.ts';
 export {
   FIGURE_CLIPBOARD_ATTRIBUTE,
@@ -48,7 +50,12 @@ export {
   withPageFigureSource,
 } from './pageFigureSource.ts';
 export type { RasterFigureSource } from './croppedMarkup.ts';
-export { croppedSvgMarkup, rasterFigureSource } from './croppedMarkup.ts';
+export {
+  croppedSvgMarkup,
+  rasterFigureSource,
+  resizedSvgFigure,
+  svgFigure,
+} from './croppedMarkup.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
 export type { DocumentFigureRedraw } from './documentFigure.ts';
 export {
@@ -81,6 +88,7 @@ export {
 export type { FigureLayout } from './figureLayout.ts';
 export {
   FIGURE_COLUMN_WIDTH,
+  FIGURE_DOUBLE_COLUMN_WIDTH,
   FIGURE_LAYOUTS,
   FIGURE_LAYOUT_MAX,
   FIGURE_LAYOUT_MIN,

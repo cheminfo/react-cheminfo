@@ -11,11 +11,7 @@ import {
 import type { FigureLayout } from '../core/figureLayout.ts';
 import { figureLayoutRedraws, figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
-import {
-  DEFAULT_FIGURE_SCALE,
-  FIGURE_SCALES,
-  defaultFigureScale,
-} from '../core/figureScale.ts';
+import { DEFAULT_FIGURE_SCALE, FIGURE_SCALES } from '../core/figureScale.ts';
 import { figureSize } from '../core/figureTarget.ts';
 
 import { FigureDownloadPanel } from './FigureDownloadPanel.tsx';
@@ -49,8 +45,9 @@ export interface FigureDownloadState {
 const DPI_SCALES = FIGURE_DPIS.map(dpiScale);
 
 /**
- * The "Save figure" panel — save as PNG or SVG, copy as PNG, or send the file
- * to another app through the device's share sheet — for a caller
+ * The figure panel — the width the figure is taken at, then copy it, send it
+ * as a PNG through the device's share sheet, or save it as PNG or SVG — for a
+ * caller
  * that brings its own trigger, such as a button in an editor's toolbar.
  * `FigureDownload` is the same panel behind the family's own glyph.
  * @param options - See {@link FigureDownloadOptions}.
@@ -60,44 +57,45 @@ export function useFigureDownload(
   options: FigureDownloadOptions,
 ): FigureDownloadState {
   const { targetId, writeFigure, fileName, background } = options;
-  const { unit = 'multiple', defaultFormat = 'png' } = options;
+  const { unit = 'dpi', defaultFormat = 'svg' } = options;
   const { title, renderFigure, onScaleChange } = options;
   const dpi = unit === 'dpi';
   const scales = options.scales ?? (dpi ? DPI_SCALES : FIGURE_SCALES);
   const defaultScale =
     options.defaultScale ??
     (dpi ? dpiScale(DEFAULT_FIGURE_DPI) : DEFAULT_FIGURE_SCALE);
-  // A figure with a printed size, or one its page wrote, keeps the size its
-  // SVG states: the resolution is then the PNG's alone.
-  const svgAtOwnSize = dpi || writeFigure !== undefined;
   const redraws = renderFigure !== undefined && writeFigure === undefined;
 
   const t = useChromeT();
   const [isOpen, setIsOpen] = useState(false);
   const [format, setFormat] = useState<FigureFormat>(defaultFormat);
-  const [picked, setPicked] = useState<Record<FigureFormat, number>>(() => ({
-    png: defaultScale,
-    svg: defaultFigureScale('svg'),
-  }));
-  const scale = format === 'svg' && svgAtOwnSize ? 1 : picked[format];
+  // The PNG's: a copy, a send and a saved PNG. An SVG takes the width alone.
+  const [resolution, setResolution] = useState(defaultScale);
   const [size, setSize] = useState<FigurePixels | null>(null);
   const opening = useRef(0);
   const [layout, setLayout] = useState<FigureLayout>('screen');
-  const [custom, setCustom] = useState<FigurePixels | null>(null);
+  const [custom, setCustom] = useState<number | null>(null);
   const { redraw, portal } = useFigureRedraw(
     redraws ? renderFigure : undefined,
   );
-  const redrawAt =
-    redraws &&
-    size !== null &&
-    figureLayoutRedraws(layout, size, custom ?? size)
-      ? figureLayoutSize(layout, size, custom ?? size)
-      : null;
+  const target =
+    size === null ? null : figureLayoutSize(layout, size, custom ?? undefined);
+  const resizes =
+    size !== null && figureLayoutRedraws(layout, size, custom ?? undefined);
+  // A chart that can be laid out again is drawn at the width picked; anything
+  // else is scaled to it.
+  const redrawAt = redraws && resizes ? target : null;
+  const sizeFactor =
+    !redraws && resizes && size !== null && target !== null && size.width > 0
+      ? target.width / size.width
+      : 1;
   const { save, copy, send, busy, failure, notice, clear } = useFigureActions({
     targetId,
     writeFigure,
     format,
-    scale,
+    scale: format === 'svg' ? 1 : resolution,
+    pictureScale: resolution,
+    sizeFactor,
     fileName,
     background,
     redrawAt,
@@ -144,34 +142,29 @@ export function useFigureDownload(
 
   const panel = (
     <FigureDownloadPanel
-      title={title ?? t('download.saveFigure')}
+      title={title ?? t('download.figure')}
       format={format}
-      scale={scale}
+      scale={resolution}
       scales={scales}
       unit={unit}
-      svgAtOwnSize={svgAtOwnSize}
       size={size}
       failure={failure}
       notice={notice}
       saving={busy}
       onFormatChange={changed(setFormat)}
       onScaleChange={changed((next: number) => {
-        setPicked((current) => ({ ...current, [format]: next }));
-        if (format === 'png') onScaleChange?.(next);
+        setResolution(next);
+        onScaleChange?.(next);
       })}
       onSave={save}
       onCopy={copy}
       onSend={send}
-      sizing={
-        redraws
-          ? {
-              layout,
-              custom,
-              onLayoutChange: changed(setLayout),
-              onCustomChange: changed(setCustom),
-            }
-          : undefined
-      }
+      sizing={{
+        layout,
+        custom,
+        onLayoutChange: changed(setLayout),
+        onCustomChange: changed(setCustom),
+      }}
     />
   );
 

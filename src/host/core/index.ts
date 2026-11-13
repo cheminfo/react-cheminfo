@@ -20,6 +20,7 @@ export type { FigureDestination } from './figureForward.ts';
 export { figureDestination, forwardedFigureDocument } from './figureForward.ts';
 export type { FigurePage } from './answerGet.ts';
 export { answerGet } from './answerGet.ts';
+export { figureOutputKey, readFigureOutput } from './figureOutput.ts';
 export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';
 export type { HostSettings } from './hostSettings.ts';
 export { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';

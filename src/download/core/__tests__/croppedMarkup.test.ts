@@ -1,7 +1,12 @@
 import { expect, test } from 'vitest';
 
 import { rasterSvgMarkup } from '../../../molecule3d/core/exportImage.ts';
-import { croppedSvgMarkup, rasterFigureSource } from '../croppedMarkup.ts';
+import {
+  croppedSvgMarkup,
+  rasterFigureSource,
+  resizedSvgFigure,
+  svgFigure,
+} from '../croppedMarkup.ts';
 
 const PNG = 'data:image/png;base64,iVBORw0KGgo=';
 
@@ -80,4 +85,52 @@ test('a letterboxed view box is not cropped', () => {
       { x: 0, y: 0, width: 10, height: 10 },
     ),
   ).toBeNull();
+});
+
+test('an SVG is sized by its width and height in pixels', () => {
+  const markup = '<svg width="120.4px" height="80" viewBox="0 0 10 5"></svg>';
+
+  expect(svgFigure(markup)).toStrictEqual({ markup, width: 121, height: 80 });
+});
+
+test('an SVG sized in other units is sized by its view box', () => {
+  const markup =
+    '<svg width="12.3ex" height="100%" viewBox="-5 -10 300 150.2"></svg>';
+
+  expect(svgFigure(markup)).toStrictEqual({ markup, width: 300, height: 151 });
+});
+
+test('an SVG stating no size in pixels is no figure to paint', () => {
+  expect(svgFigure('<svg width="12ex" height="3ex"></svg>')).toBeUndefined();
+  expect(svgFigure('<p>not an SVG</p>')).toBeUndefined();
+});
+
+test('a drawing resized keeps its picture and opens at the size asked', () => {
+  const figure = {
+    markup:
+      '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100"><rect/></svg>',
+    width: 200,
+    height: 100,
+  };
+
+  expect(resizedSvgFigure(figure, { width: 321, height: 160.5 })).toStrictEqual(
+    {
+      markup:
+        '<svg width="321" height="160.5" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><rect/></svg>',
+      width: 321,
+      height: 160.5,
+    },
+  );
+});
+
+test('a drawing with a view box of its own keeps it when resized', () => {
+  const figure = {
+    markup: '<svg viewBox="10 20 400 200" width="200" height="100"></svg>',
+    width: 200,
+    height: 100,
+  };
+
+  expect(resizedSvgFigure(figure, { width: 100, height: 50 }).markup).toBe(
+    '<svg width="100" height="50" viewBox="10 20 400 200"></svg>',
+  );
 });

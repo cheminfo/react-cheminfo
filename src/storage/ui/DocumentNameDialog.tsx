@@ -1,3 +1,4 @@
+import type { IconName } from '@blueprintjs/core';
 import {
   Button,
   Dialog,
@@ -16,8 +17,22 @@ import { MAX_DOCUMENT_NAME, nameKey } from '../core/createSavedDocuments.ts';
 export interface DocumentNameDialogProps {
   /** Whether it is open. */
   isOpen: boolean;
-  /** Whether it saves a document under the name or renames one. */
-  mode: 'save' | 'rename';
+  /**
+   * Whether it saves a document under the name, renames one, or creates a
+   * folder: saving under a taken name replaces that document, renaming or
+   * creating with one is refused.
+   */
+  mode: 'save' | 'rename' | 'create';
+  /**
+   * Its title.
+   * @default the chrome's own words for saving in this browser, renaming, or a new folder
+   */
+  title?: string;
+  /**
+   * Its icon.
+   * @default one for its mode
+   */
+  icon?: IconName;
   /** The name it opens on. */
   initialName: string;
   /**
@@ -41,15 +56,14 @@ export function DocumentNameDialog(
   props: DocumentNameDialogProps,
 ): ReactElement {
   const { isOpen, mode, initialName, taken, onSubmit, onClose } = props;
+  const { title, icon } = props;
   const t = useChromeT();
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title={
-        mode === 'save' ? t('documents.saveTitle') : t('documents.renameTitle')
-      }
-      icon={mode === 'save' ? 'add-to-folder' : 'edit'}
+      title={title ?? t(TITLES[mode])}
+      icon={icon ?? ICONS[mode]}
     >
       {isOpen ? (
         <NameForm
@@ -64,8 +78,20 @@ export function DocumentNameDialog(
   );
 }
 
+const TITLES = {
+  save: 'documents.saveTitle',
+  rename: 'documents.renameTitle',
+  create: 'folder.newFolderTitle',
+} as const;
+
+const ICONS = {
+  save: 'add-to-folder',
+  rename: 'edit',
+  create: 'folder-new',
+} as const satisfies Record<string, IconName>;
+
 function NameForm(
-  props: Omit<DocumentNameDialogProps, 'isOpen'>,
+  props: Omit<DocumentNameDialogProps, 'isOpen' | 'title' | 'icon'>,
 ): ReactElement {
   const { mode, initialName, taken, onSubmit, onClose } = props;
   const t = useChromeT();
@@ -79,7 +105,7 @@ function NameForm(
     field.current?.select();
   }, []);
   const holder = taken.get(nameKey(name));
-  const refused = mode === 'rename' && holder !== undefined;
+  const refused = mode !== 'save' && holder !== undefined;
   const empty = name.trim() === '';
 
   async function submit(): Promise<void> {
@@ -118,9 +144,11 @@ function NameForm(
           <p
             className={refused ? 'folder-panel__problem' : 'folder-panel__note'}
           >
-            {refused
-              ? t('documents.taken', { name: holder })
-              : t('documents.replaces', { name: holder })}
+            {mode === 'create'
+              ? t('folder.folderTaken', { name: holder })
+              : refused
+                ? t('documents.taken', { name: holder })
+                : t('documents.replaces', { name: holder })}
           </p>
         )}
         {failure ? <p className="folder-panel__problem">{failure}</p> : null}
@@ -136,11 +164,13 @@ function NameForm(
               disabled={empty || refused}
               title={empty ? t('documents.nameMissing') : undefined}
               text={
-                mode === 'rename'
-                  ? t('documents.rename')
-                  : holder === undefined
-                    ? t('documents.save')
-                    : t('documents.replace')
+                mode === 'create'
+                  ? t('folder.create')
+                  : mode === 'rename'
+                    ? t('documents.rename')
+                    : holder === undefined
+                      ? t('documents.save')
+                      : t('documents.replace')
               }
             />
           </>

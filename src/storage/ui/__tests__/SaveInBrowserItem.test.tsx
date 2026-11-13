@@ -62,6 +62,7 @@ function memoryStore(list: SavedDocuments<string>['list']) {
     update: () => Promise.resolve(undefined),
     rename: () => Promise.resolve(),
     remove: () => Promise.resolve(),
+    restore: () => Promise.resolve(0),
     subscribe: () => stopListening,
   };
   return { store, saved };

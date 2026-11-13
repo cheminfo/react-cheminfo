@@ -6,6 +6,15 @@ export {
   readJsonFile,
   writeArchive,
 } from './backupFiles.ts';
+export type { BackupManifest } from './backupManifest.ts';
+export { BACKUP_MANIFEST, readBackupManifest } from './backupManifest.ts';
+export type {
+  BackupDrafts,
+  RestoredBackup,
+  SiteBackup,
+  SiteBackupOptions,
+} from './siteBackup.ts';
+export { createSiteBackup } from './siteBackup.ts';
 export type { Autosave, AutosaveOptions } from './createAutosave.ts';
 export { createAutosave } from './createAutosave.ts';
 export type { RestoreGuard } from './createRestoreGuard.ts';
@@ -60,6 +69,7 @@ export type {
 export type {
   DocumentSaver,
   DocumentSaverOptions,
+  NamedTarget,
   SaveChoice,
   SaveFormat,
   SaveOutcome,
@@ -72,6 +82,7 @@ export type {
   DraftStoreOptions,
 } from './createDraftStore.ts';
 export { createDraftStore } from './createDraftStore.ts';
+export { DRAFT_LIMIT, draftsToForget, isSavedAsIs } from './draftFiles.ts';
 export type {
   DraftCells,
   DraftSession,

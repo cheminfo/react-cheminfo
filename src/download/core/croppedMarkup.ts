@@ -1,8 +1,10 @@
 /**
- * The markup half of a figure crop, which needs no browser: reading the image
- * an SVG holds, and narrowing a drawing's view box to a part of it.
+ * The markup half of a figure crop, which needs no browser: reading the size
+ * of an SVG and the image it holds, and narrowing a drawing's view box to a
+ * part of it.
  */
 
+import type { FigurePixels } from './figureScale.ts';
 import type { FigureSvg } from './figureSvg.ts';
 import type { SvgBox } from './svgBounds.ts';
 
@@ -59,6 +61,22 @@ export function rasterFigureSource(markup: string): RasterFigureSource | null {
 }
 
 /**
+ * An SVG document as a figure that can be painted: its markup and the size it
+ * states, in pixels — its `width` and `height` when they are pixels, its view
+ * box otherwise.
+ * @param markup - The SVG document.
+ * @returns The figure, or `undefined` when the SVG states no size in pixels.
+ */
+export function svgFigure(markup: string): FigureSvg | undefined {
+  const root = rootTag(markup);
+  const view = viewBoxOf(attribute(root, 'viewBox'));
+  const width = pixels(attribute(root, 'width')) ?? view?.width;
+  const height = pixels(attribute(root, 'height')) ?? view?.height;
+  if (width === undefined || height === undefined) return undefined;
+  return { markup, width: Math.ceil(width), height: Math.ceil(height) };
+}
+
+/**
  * A drawing showing only part of itself: its view box narrowed to that part,
  * and its size to the part's.
  * @param figure - The drawing.
@@ -105,6 +123,38 @@ export function croppedSvgMarkup(
 }
 
 /**
+ * A drawing stated at another size: the same picture, its view box kept, so
+ * it opens — and a PNG of it prints — at that size.
+ * @param figure - The drawing.
+ * @param size - The size it is stated at, in pixels.
+ * @returns The resized figure.
+ */
+export function resizedSvgFigure(
+  figure: FigureSvg,
+  size: FigurePixels,
+): FigureSvg {
+  const root = rootTag(figure.markup);
+  const view = viewBoxOf(attribute(root, 'viewBox')) ?? {
+    x: 0,
+    y: 0,
+    width: figure.width,
+    height: figure.height,
+  };
+  const width = rounded(size.width);
+  const height = rounded(size.height);
+  const box = [view.x, view.y, view.width, view.height]
+    .map((value) => rounded(value))
+    .join(' ');
+  const fixed = root
+    .replaceAll(SIZE_ATTRIBUTES, '')
+    .replace(
+      /^<svg/i,
+      `<svg width="${width}" height="${height}" viewBox="${box}"`,
+    );
+  return { markup: figure.markup.replace(root, () => fixed), width, height };
+}
+
+/**
  * A number as SVG writes it: at most two decimals.
  * @param value - The number.
  * @returns The rounded number.
@@ -139,4 +189,10 @@ function viewBoxOf(value: string | undefined): SvgBox | undefined {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined;
   if (!width || !height || !(width > 0) || !(height > 0)) return undefined;
   return { x, y, width, height };
+}
+
+function pixels(value: string | undefined): number | undefined {
+  const match = /^\s*(?<number>[\d.]+)\s*(?:px)?\s*$/.exec(value ?? '');
+  const number = Number(match?.groups?.number);
+  return number > 0 ? number : undefined;
 }

@@ -110,6 +110,7 @@ function memoryDocuments(): SavedDocuments<string> & {
     },
     rename: () => Promise.resolve(),
     remove: () => Promise.resolve(),
+    restore: () => Promise.resolve(0),
     subscribe: () => stopNothing,
   };
 }

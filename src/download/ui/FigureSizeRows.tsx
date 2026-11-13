@@ -1,45 +1,46 @@
 import type { ReactElement } from 'react';
 
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
+import { formatFigureCentimetres } from '../core/figureDpi.ts';
 import type { FigureLayout } from '../core/figureLayout.ts';
 import { FIGURE_LAYOUTS, figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
-import { formatFigurePixels } from '../core/figureScale.ts';
 
-import { FigureSizeField } from './FigureSizeField.tsx';
+import { FigureWidthField } from './FigureWidthField.tsx';
 
-/** The shape a figure is saved at, and what changes it. */
+/** The width a figure is saved at, and what changes it. */
 export interface FigureSizing {
-  /** The shape picked. */
+  /** The width picked. */
   layout: FigureLayout;
   /**
-   * The size typed for `custom`, or `null` before anything was typed, when it
-   * starts from the figure on screen.
+   * The width typed for `custom`, in pixels of the page, or `null` before
+   * anything was typed, when it starts from the figure on screen.
    */
-  custom: FigurePixels | null;
-  /** Called with the shape picked. */
+  custom: number | null;
+  /** Called with the width picked. */
   onLayoutChange: (layout: FigureLayout) => void;
-  /** Called with the size typed. */
-  onCustomChange: (size: FigurePixels) => void;
+  /** Called with the width typed, in pixels of the page. */
+  onCustomChange: (width: number) => void;
 }
 
 /** What {@link FigureSizeRows} needs. */
 export interface FigureSizeRowsProps {
-  /** The shape and what changes it. */
+  /** The width and what changes it. */
   sizing: FigureSizing;
   /** How big the figure is on the page, or `null` where there is none. */
   size: FigurePixels | null;
 }
 
 /**
- * The shape the figure is drawn at, and the two sides of a custom one.
+ * The width the figure is saved at, and the box a custom one is typed into.
  *
- * Each shape says the pixels it would produce, so choosing `16:9` for a figure
- * already close to it is visibly a choice that changes little.
+ * Each width says the size it prints at, so picking one column for a figure
+ * already that wide is visibly a choice that changes little.
  * @param props - See {@link FigureSizeRowsProps}.
  * @returns The rows.
  */
@@ -47,16 +48,24 @@ export function FigureSizeRows(props: FigureSizeRowsProps): ReactElement {
   const { sizing, size } = props;
   const { layout, custom, onLayoutChange, onCustomChange } = sizing;
   const t = useChromeT();
+  const language = useLanguage();
 
   const options: Array<OverlayOption<FigureLayout>> = [];
-  for (const shape of FIGURE_LAYOUTS) {
+  for (const width of FIGURE_LAYOUTS) {
+    const printed =
+      size === null
+        ? undefined
+        : formatFigureCentimetres(
+            figureLayoutSize(width, size, custom ?? undefined),
+            language,
+          );
     options.push({
-      value: shape,
-      label: layoutLabel(shape, t),
+      value: width,
+      label: layoutLabel(width, t),
       title:
-        size === null
+        printed === undefined
           ? undefined
-          : formatFigurePixels(figureLayoutSize(shape, size, custom ?? size)),
+          : `${printed.width} × ${printed.height} cm`,
     });
   }
 
@@ -71,11 +80,9 @@ export function FigureSizeRows(props: FigureSizeRowsProps): ReactElement {
         onChange={onLayoutChange}
       />
       {layout === 'custom' && size !== null ? (
-        <FigureSizeField
-          label={t('download.customSize')}
-          widthLabel={t('download.width')}
-          heightLabel={t('download.height')}
-          value={figureLayoutSize('custom', size, custom ?? size)}
+        <FigureWidthField
+          label={t('download.width')}
+          value={figureLayoutSize('custom', size, custom ?? undefined).width}
           onChange={onCustomChange}
         />
       ) : null}
@@ -84,20 +91,17 @@ export function FigureSizeRows(props: FigureSizeRowsProps): ReactElement {
 }
 
 /**
- * What a shape reads in the picker. A ratio is written as a ratio in every
- * language.
- * @param layout - The shape.
+ * What a width reads in the picker.
+ * @param layout - The width.
  * @param t - The chrome's formatter.
  * @returns Its label.
  */
 function layoutLabel(layout: FigureLayout, t: Translate<ChromeKey>): string {
   switch (layout) {
-    case 'standard':
-      return '4:3';
-    case 'wide':
-      return '16:9';
     case 'column':
       return t('download.sizeColumn');
+    case 'double':
+      return t('download.sizeDouble');
     case 'custom':
       return t('download.sizeCustom');
     case 'screen':

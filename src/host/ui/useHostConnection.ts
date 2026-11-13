@@ -13,6 +13,8 @@ import type { FigureSource } from '../../download/core/figureSource.ts';
 import { figureAddress } from '../../download/core/figureSource.ts';
 import type { FigureStates } from '../../download/core/figureState.ts';
 import { setPageFigureSource } from '../../download/core/pageFigureSource.ts';
+import { useFigureCopyShortcut } from '../../download/ui/useFigureCopyShortcut.ts';
+import { figureOutputKey, readFigureOutput } from '../core/figureOutput.ts';
 import type { HostOutputs } from '../core/hostOutputs.ts';
 import type { HostSettings } from '../core/hostSettings.ts';
 import type { ToolInterface } from '../core/protocol.ts';
@@ -70,6 +72,13 @@ export interface HostHandlers {
    * @default undefined — the page's figures cannot be opened again
    */
   states?: () => FigureStates | undefined | Promise<FigureStates | undefined>;
+  /**
+   * Whether Ctrl+C, with no text selected, copies the figure the tool hands
+   * back — its `image.svg` output — as a host would take it. A site with a
+   * clipboard of its own, copying what is selected on a canvas, says `false`.
+   * @default true
+   */
+  copyShortcut?: boolean;
 }
 
 /** Once per page: React may mount the caller twice, the host is greeted once. */
@@ -77,7 +86,9 @@ let started = false;
 
 /**
  * Introduce the tool to its parent frame, or to the window that opened it, and
- * serve that host for the life of the page.
+ * serve that host for the life of the page. Framed or not, Ctrl+C with no text
+ * selected copies the figure the tool hands back, as a host would take it —
+ * see {@link HostHandlers.copyShortcut}.
  *
  * Call it after the hook that applies the address: effects run in order, so
  * the address has been applied by the time the host is greeted, and a host's
@@ -94,6 +105,14 @@ export function useHostConnection(
   useEffect(() => {
     latest.current = handlers;
   });
+
+  const { outputs, copyShortcut = true } = handlers;
+  const figureKey = figureOutputKey(tool);
+  useFigureCopyShortcut(
+    copyShortcut && outputs !== undefined && figureKey !== undefined
+      ? () => readFigureOutput(outputs, figureKey)
+      : null,
+  );
 
   // Framed or not, every figure the page saves says where it came from, and
   // which deployment saved it.

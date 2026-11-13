@@ -1,14 +1,29 @@
 import { Button } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { formatRelativeTime } from '../../format/core/relativeTime.ts';
 import { useAsync } from '../../hooks/ui/useAsync.ts';
-import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { matchesNeedle } from '../../panel/core/textFilter.ts';
 import { PanelEmpty } from '../../panel/ui/PanelMessage.tsx';
-import type { FolderEntry, SiteFolder } from '../core/createSiteFolder.ts';
+import {
+  usePanelNeedle,
+  usePanelTally,
+} from '../../panel/ui/panelSearchContext.ts';
+import { nameKey } from '../core/createSavedDocuments.ts';
+import type { FolderEntry, SiteFolder } from '../core/siteFolderTypes.ts';
 
+import { DocumentNameDialog } from './DocumentNameDialog.tsx';
+import {
+  FolderCrumbs,
+  FolderFileRow,
+  HeadingAction,
+  SubfolderRow,
+} from './FolderRows.tsx';
+import { FolderNoMatch } from './FolderSearch.tsx';
+import { FolderSection } from './FolderSection.tsx';
+import { folderPathLabel } from './saveMessages.ts';
+import { useFolderVersion } from './useFolderLabel.ts';
 import type { ConfirmOpen } from './useOpenConfirmation.tsx';
 import { useOpenConfirmation } from './useOpenConfirmation.tsx';
 
@@ -33,10 +48,13 @@ export interface FolderDocumentsSectionProps {
 }
 
 /**
- * The site's files in the folder its documents are saved in, the latest
- * first: a click opens one, and Save writes over it. After a reload the
- * browser asks once before the page reads the folder again. Nothing is shown
- * while no folder was chosen.
+ * The folder the site's documents are saved in: its name and the folders open
+ * inside it as a breadcrumb, then the folders inside, then the site's files,
+ * the latest first. A click on a folder opens it, and Save then writes new
+ * documents there; a click on a file opens it, and Save writes over it. After
+ * a reload the browser asks once before the page reads the folder again.
+ * Nothing is shown while no folder was chosen. Inside a `<PanelSearch>`, the
+ * files of every folder below are searched, each saying where it is.
  * @param props - See {@link FolderDocumentsSectionProps}.
  * @returns The section, or nothing.
  */
@@ -45,117 +63,154 @@ export function FolderDocumentsSection(
 ): ReactElement | null {
   const { folder, extensions, currentName = null, onOpen, confirmOpen } = props;
   const t = useChromeT();
-  const language = useLanguage();
   const version = useFolderVersion(folder);
+  const needle = usePanelNeedle();
+  const deep = needle !== '';
   // A site passes its extensions inline: the list is read again only when they change.
   const kinds = extensions.join('\n');
   const load = useCallback(
-    () => readFolder(folder, kinds.split('\n')),
-    [folder, kinds],
+    () => readFolder(folder, kinds.split('\n'), deep),
+    [folder, kinds, deep],
   );
   const listing = useAsync(load, version);
   const confirmation = useOpenConfirmation(confirmOpen);
+  const [creating, setCreating] = useState(false);
   const data = listing.data;
-  if (!data?.name) return null;
-  const { name, readable, entries } = data;
+  const allFiles = data?.root ? data.entries : [];
+  const allFolders = data?.root ? data.folders : [];
+  const files = allFiles.filter((entry) => matchesNeedle(needle, entry.name));
+  const folders = allFolders.filter((name) => matchesNeedle(needle, name));
+  usePanelTally(
+    files.length + folders.length,
+    allFiles.length + allFolders.length,
+  );
+  if (!data?.root) return null;
+  const { root, readable, path } = data;
+  const label = folderPathLabel(root, path);
 
   return (
-    <section
-      className="folder-panel__section"
-      aria-label={t('folder.heading', { folder: name })}
+    <FolderSection
+      name="folder"
+      title={t('folder.heading', { folder: label })}
+      heading={(toggle) => (
+        <FolderCrumbs
+          root={root}
+          path={path}
+          onOpen={folder.open}
+          toggle={toggle}
+          actions={
+            <>
+              {readable ? (
+                <HeadingAction
+                  text={t('folder.newFolder')}
+                  onClick={() => {
+                    setCreating(true);
+                  }}
+                />
+              ) : null}
+              <HeadingAction
+                text={t('folder.choose')}
+                onClick={() => {
+                  void folder.choose();
+                }}
+              />
+              <HeadingAction
+                text={t('folder.forget')}
+                onClick={() => {
+                  void folder.forget();
+                }}
+              />
+            </>
+          }
+        />
+      )}
     >
-      <h3 className="folder-panel__heading">
-        {t('folder.heading', { folder: name })}
-      </h3>
       {!readable ? (
         <Button
           size="small"
           icon="folder-open"
-          text={t('folder.allow', { folder: name })}
+          text={t('folder.allow', { folder: root })}
           onClick={() => {
             void folder.allow();
           }}
         />
-      ) : entries.length === 0 ? (
-        <PanelEmpty>{t('folder.empty')}</PanelEmpty>
+      ) : files.length + folders.length === 0 ? (
+        deep ? (
+          <FolderNoMatch />
+        ) : (
+          <PanelEmpty>{t('folder.empty')}</PanelEmpty>
+        )
       ) : (
         <ul className="folder-panel__list">
-          {entries.map((entry) => (
-            <li key={entry.name} className="folder-panel__item">
-              <button
-                type="button"
-                className="folder-panel__open"
-                aria-current={entry.name === currentName ? 'true' : undefined}
-                title={t('documents.openTooltip')}
-                onClick={() => {
-                  confirmation.open(() => {
-                    void openEntry(entry, onOpen);
-                  });
-                }}
-              >
-                <span className="folder-panel__text">
-                  <span className="folder-panel__name">{entry.name}</span>
-                  <span className="folder-panel__time">
-                    {entry.name === currentName
-                      ? t('documents.onScreen')
-                      : t('documents.savedAgo', {
-                          time: formatRelativeTime(entry.modified, {
-                            locale: language,
-                          }),
-                        })}
-                  </span>
-                </span>
-              </button>
-            </li>
+          {folders.map((name) => (
+            <SubfolderRow
+              key={`folder:${name}`}
+              name={name}
+              onOpen={() => {
+                folder.open([...path, name]);
+              }}
+            />
+          ))}
+          {files.map((entry) => (
+            <FolderFileRow
+              key={[...(entry.path ?? []), entry.name].join('/')}
+              entry={entry}
+              root={root}
+              path={path}
+              current={entry.name === currentName && !entry.path?.length}
+              onOpen={() => {
+                confirmation.open(() => {
+                  void openEntry(entry, onOpen);
+                });
+              }}
+            />
           ))}
         </ul>
       )}
-      <div className="folder-panel__actions no-print">
-        <Button
-          variant="minimal"
-          size="small"
-          icon="folder-new"
-          text={t('folder.choose')}
-          onClick={() => {
-            void folder.choose();
-          }}
-        />
-        <Button
-          variant="minimal"
-          size="small"
-          icon="cross"
-          text={t('folder.forget')}
-          onClick={() => {
-            void folder.forget();
-          }}
-        />
-      </div>
+      <DocumentNameDialog
+        isOpen={creating}
+        mode="create"
+        initialName=""
+        taken={namesOf(allFolders)}
+        onSubmit={(name) => folder.createFolder(name)}
+        onClose={() => {
+          setCreating(false);
+        }}
+      />
       {confirmation.alert}
-    </section>
+    </FolderSection>
   );
 }
 
-function useFolderVersion(folder: SiteFolder): number {
-  const [version, setVersion] = useState(0);
-  useEffect(
-    () =>
-      folder.subscribe(() => {
-        setVersion((previous) => previous + 1);
-      }),
-    [folder],
-  );
-  return version;
+function namesOf(names: readonly string[]): ReadonlyMap<string, string> {
+  const map = new Map<string, string>();
+  for (const name of names) map.set(nameKey(name), name);
+  return map;
 }
 
 async function readFolder(
   folder: SiteFolder,
   extensions: readonly string[],
-): Promise<{ name?: string; readable: boolean; entries: FolderEntry[] }> {
+  deep: boolean,
+): Promise<{
+  root?: string;
+  readable: boolean;
+  path: readonly string[];
+  folders: string[];
+  entries: FolderEntry[];
+}> {
   const handle = await folder.current();
-  if (!handle) return { readable: false, entries: [] };
+  const path = folder.path();
+  if (!handle) return { readable: false, path, folders: [], entries: [] };
   const readable = await folder.readable();
-  const entries = readable ? await folder.list(extensions) : [];
-  return { name: handle.name, readable, entries };
+  if (!readable) {
+    return { root: handle.name, readable, path, folders: [], entries: [] };
+  }
+  const [folders, entries] = await Promise.all([
+    deep ? Promise.resolve([]) : folder.folders(),
+    deep ? folder.search(extensions) : folder.list(extensions),
+  ]);
+  return { root: handle.name, readable, path: folder.path(), folders, entries };
 }
 
 async function openEntry(
