@@ -130,6 +130,7 @@
   "site.xps.tagline": "Read, fit and predict X-ray photoelectron spectra.",
   "site.biodraw.tagline": "Draw cells and membranes, and snap proteins into them.",
   "site.diagram.tagline": "Draw flowcharts and block diagrams, with arrows that follow the blocks.",
+  "site.peptide.tagline": "Learn peptide synthesis, from protecting groups to the solid phase.",
   "share.button": "Share",
   "share.buttonTitle": "Share a link to this page, or embed it in your own site",
   "share.dialogTitleFor": "Share or embed — {title}",

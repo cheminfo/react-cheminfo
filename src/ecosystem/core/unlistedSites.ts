@@ -103,4 +103,20 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     brandAlt: '#0e7490',
     mark: { plate: '#b84c59', accent: '#67e8f9' },
   },
+  {
+    id: 'peptide',
+    name: { lead: 'peptide', alt: 'cheminfo', dot: true },
+    host: 'peptide.cheminfo.org',
+    tagline:
+      'Learn peptide synthesis, from protecting groups to the solid phase.',
+    group: 'practice',
+    // Ruhemann's purple, the colour ninhydrin turns a free amine on a resin
+    // bead: 8.5:1 on white, and 7.3 Oklab units from spectroscopy, the
+    // nearest lead.
+    brand: '#563d8f',
+    // The resin bead the chain grows on is teal in the mark; the name takes
+    // the darker teal, at 5.5:1.
+    brandAlt: '#0f766e',
+    mark: { plate: '#563d8f', accent: '#2dd4bf' },
+  },
 ];

@@ -40,6 +40,7 @@ export type SiteId =
   | 'xps'
   | 'biodraw'
   | 'diagram'
+  | 'peptide'
   | 'draw'
   | 'plate'
   | 'glassware'

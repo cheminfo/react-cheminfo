@@ -691,6 +691,28 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <path d="M9 19.6 14 23.5 9 27.4Z" fill={alt} />
     </>
   ),
+  // A peptide chain grown from a resin bead: the backbone in white, its
+  // carbonyls pointing up and down in turn, and the bead of the solid phase
+  // in the answering colour.
+  peptide: (alt) => (
+    <>
+      <path
+        d="M11.6 19.4 15.8 12.6 20.2 19.4 24.4 12.6 28 18.2"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14.4 11V5.4M17.2 11V5.4M18.8 21v5.6M21.6 21v5.6"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle cx="7.2" cy="21.8" r="4.8" fill={alt} />
+    </>
+  ),
   // A ring in ink, with a pen nib drawing its last bond in the answering
   // colour: a structure being drawn by hand.
   draw: (alt) => (
