@@ -8,7 +8,7 @@
  * kinds of `./irKinds.ts`, the Raman ones of `./ramanKinds.ts`, the UV-vis
  * ones of `./uvKinds.ts` and the mass
  * spectrometry ones of `./msKinds.ts`, the reaction of `./reactionKinds.ts`,
- * and
+ * the peptide of `./peptideKinds.ts`, and
  * the kinds a tool hands back, of `./resultKinds.ts`. A name with children is a category whose
  * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
  * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
@@ -27,6 +27,8 @@ import {
   MS_IONS_SCHEMA,
   MS_JDX_SCHEMA,
 } from './msKinds.ts';
+import type { PeptideValue } from './peptideKinds.ts';
+import { PEPTIDE_SCHEMA } from './peptideKinds.ts';
 import type { HostItem } from './protocol.ts';
 import type { RamanJdxValue, RamanPeaksValue } from './ramanKinds.ts';
 import { RAMAN_JDX_SCHEMA, RAMAN_PEAKS_SCHEMA } from './ramanKinds.ts';
@@ -59,6 +61,7 @@ export type CheckedValue =
   | { kind: 'chem.ocl.id'; value: OclIdValue }
   | { kind: 'chem.smiles'; value: SmilesValue }
   | { kind: 'chem.rxn'; value: RxnValue }
+  | { kind: 'chem.peptide'; value: PeptideValue }
   | { kind: 'spectra.ir.jdx'; value: IrJdxValue }
   | { kind: 'spectra.ir.peaks'; value: IrPeaksValue }
   | { kind: 'spectra.raman.jdx'; value: RamanJdxValue }
@@ -197,6 +200,7 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'chem.ocl.id': ajv.compile(OCL_ID_SCHEMA),
   'chem.smiles': ajv.compile(SMILES_SCHEMA),
   'chem.rxn': ajv.compile<RxnValue>(RXN_SCHEMA),
+  'chem.peptide': ajv.compile<PeptideValue>(PEPTIDE_SCHEMA),
   // Written as plain schemas rather than `JSONSchemaType`, which would demand
   // `nullable` on every optional field and so let a `null` band through.
   'spectra.ir.jdx': ajv.compile<IrJdxValue>(IR_JDX_SCHEMA),

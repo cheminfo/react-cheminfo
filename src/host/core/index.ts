@@ -97,6 +97,8 @@ export type {
 export { RAMAN_JDX_SCHEMA, RAMAN_PEAKS_SCHEMA } from './ramanKinds.ts';
 export type { UvJdxValue, UvPeakValue, UvPeaksValue } from './uvKinds.ts';
 export { UV_JDX_SCHEMA, UV_PEAKS_SCHEMA } from './uvKinds.ts';
+export type { PeptideValue } from './peptideKinds.ts';
+export { PEPTIDE_KINDS, PEPTIDE_SCHEMA } from './peptideKinds.ts';
 export type { RxnValue } from './reactionKinds.ts';
 export { REACTION_KINDS, RXN_SCHEMA } from './reactionKinds.ts';
 export type {

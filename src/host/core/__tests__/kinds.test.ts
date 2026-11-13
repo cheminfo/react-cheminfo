@@ -65,6 +65,23 @@ test('a reaction travels as its RXN file, under its own name', () => {
   });
 });
 
+test('a peptide travels as its sequence, or the file holding it', () => {
+  expect(isKnownKind('chem.peptide')).toBe(true);
+  expect(
+    checkValue('chem.peptide', { sequence: '>sp|P01019\nDRVYIHPF\n', id: 7 }),
+  ).toStrictEqual({
+    valid: true,
+    checked: {
+      kind: 'chem.peptide',
+      value: { sequence: '>sp|P01019\nDRVYIHPF\n' },
+    },
+  });
+  expect(checkValue('chem.peptide', { sequence: '' })).toStrictEqual({
+    valid: false,
+    errors: ['/sequence: must NOT have fewer than 1 characters'],
+  });
+});
+
 test('a picture, a name and a table are kinds a host reads back', () => {
   expect(checkValue('image.svg', { svg: '<svg/>', width: 3 })).toStrictEqual({
     valid: true,

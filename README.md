@@ -1177,6 +1177,13 @@ between those bands and the viewer's. No tool declares the bare `spectra.ir`,
 `spectra.raman` or `spectra.uv`: each would take a list of bands for a spectrum, and
 pipeline's own `spectra.ir` is a computed spectrum, not a measurement.
 
+### A peptide
+
+A peptide or a protein travels as `chem.peptide`, `{ sequence }`: the text the
+host holds, which the tool reads itself — `BocGlyAlaOBn`, `H-Val-Leu-OH`,
+`DRVYIHPF`, `ASP ARG VAL`, or the whole text of a FASTA or PDB file. A host
+never converts it first. `PEPTIDE_KINDS` is the input's list.
+
 ### A mass spectrum, and the ions found in it
 
 A mass spectrum travels as its JCAMP-DX alone: a tool picks its peaks again.
