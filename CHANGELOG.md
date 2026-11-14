@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.122.0](https://github.com/cheminfo/react-cheminfo/compare/v0.121.0...v0.122.0) (2026-11-14)
+
+
+### Features
+
+* add the plot site record ([c1a20bd](https://github.com/cheminfo/react-cheminfo/commit/c1a20bd9399f188ca4913c183d1adb515c7bf840))
+
 ## [0.121.0](https://github.com/cheminfo/react-cheminfo/compare/v0.120.0...v0.121.0) (2026-11-14)
 
 
