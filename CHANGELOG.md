@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.120.0](https://github.com/cheminfo/react-cheminfo/compare/v0.119.0...v0.120.0) (2026-11-14)
+
+
+### Features
+
+* **orbital:** hand out the orbital on screen as a picture, through onCapture ([cb54df6](https://github.com/cheminfo/react-cheminfo/commit/cb54df68cfd96e956bd4979c076d0b83245b1281))
+
 ## [0.119.0](https://github.com/cheminfo/react-cheminfo/compare/v0.118.0...v0.119.0) (2026-11-14)
 
 
