@@ -564,6 +564,31 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <rect x="22" y="12" width="4" height="14" rx="1" fill="#ffffff" />
     </>
   ),
+  // A calibration line on the two axes of a plot: three measured points in
+  // white, scattered about the straight line fitted through them, which
+  // carries the answering colour.
+  plot: (alt) => (
+    <>
+      <path
+        d="M6 5v21h21"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 22.5 26 8"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="18.6" r="2.6" fill="#ffffff" />
+      <circle cx="17.5" cy="16.4" r="2.6" fill="#ffffff" />
+      <circle cx="23" cy="9.6" r="2.6" fill="#ffffff" />
+    </>
+  ),
   // An infobox: the structure at its top, a ring, and two rows of data under
   // it. The second row carries the answering colour, the blue of a link. Both
   // rows and the gap between them fall on whole pixels at 16 px.

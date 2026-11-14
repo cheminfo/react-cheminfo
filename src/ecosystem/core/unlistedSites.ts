@@ -33,6 +33,22 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#2200c4', accent: '#f97316' },
   },
   {
+    id: 'plot',
+    name: { lead: 'plot', alt: 'cheminfo', dot: true },
+    host: 'plot.cheminfo.org',
+    tagline:
+      'Plot tables and spectra as charts sized and styled for a journal.',
+    group: 'drawing',
+    // The blue of the pen a curve is drawn with: 7.9:1 on white, and 10.1
+    // Oklab units from isomers and mz, the nearest leads.
+    brand: '#0024fc',
+    // The orange of millimetre paper's grid answers it, at 5:1 for the name.
+    brandAlt: '#b45309',
+    // The mark's line takes a brighter amber, so it stands apart from the
+    // blue plate at 16 px.
+    mark: { plate: '#0024fc', accent: '#fbbf24' },
+  },
+  {
     id: 'uv-vis',
     name: { lead: 'uv-', alt: 'vis' },
     host: 'uv-vis.cheminfo.org',

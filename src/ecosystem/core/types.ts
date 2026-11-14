@@ -34,6 +34,7 @@ export type SiteId =
   | 'chembio'
   | 'wikidata'
   | 'mz'
+  | 'plot'
   | 'vibrations'
   | 'uv-vis'
   | 'nmrium'
