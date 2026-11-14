@@ -2,6 +2,8 @@
  * A caption written as SVG text, its scripts lowered and raised with `dy`.
  */
 
+import { labelAttributes } from '../../referents/core/labels.ts';
+
 import { lineLayout, scriptShift, spanSize } from './captionRuns.ts';
 import { captionTransform } from './captions.ts';
 import { escapeAttribute, escapeText, number } from './markup.ts';
@@ -18,6 +20,7 @@ import type { CaptionPrimitive } from './primitives.ts';
  * @returns The markup.
  */
 export function captionMarkup(caption: CaptionPrimitive, ink: string): string {
+  if (caption.label) return labelMarkup(caption, ink);
   const lines: string[] = [];
   const metrics = metricsOf(caption.family);
   for (const [index, line] of caption.lines.entries()) {
@@ -48,4 +51,18 @@ export function captionMarkup(caption: CaptionPrimitive, ink: string): string {
   return transform
     ? `<g transform="${transform}">${lines.join('')}</g>`
     : lines.join('');
+}
+
+// A number is one text element holding nothing but its characters, bold, so
+// a document writing its own number over it keeps its weight and its place.
+function labelMarkup(caption: CaptionPrimitive, ink: string): string {
+  const line = caption.lines[0] ?? [];
+  const metrics = metricsOf(caption.family);
+  const layout = lineLayout(line, caption.size, metrics, caption.anchor);
+  const text = line.map((span) => span.text).join('');
+  const y = caption.baselines[0] ?? caption.y;
+  const mention = caption.label ? labelAttributes(caption.label) : '';
+  const element = `<text x="${number(caption.x + layout.offset)}" y="${number(y)}" text-anchor="${layout.anchor}" font-size="${number(caption.size)}" font-family="${escapeAttribute(caption.family)}" font-weight="bold" fill="${ink}" stroke="none"${mention}>${escapeText(text)}</text>`;
+  const transform = captionTransform(caption);
+  return transform ? `<g transform="${transform}">${element}</g>` : element;
 }

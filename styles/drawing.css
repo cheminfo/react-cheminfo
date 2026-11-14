@@ -14,3 +14,86 @@
   stroke: var(--accent);
   stroke-opacity: 0.7;
 }
+
+/* The frame `DashedOutline` draws around what is selected, hovered, or held
+   in a group, whose own frame is then the one that counts. */
+.draw-frame {
+  fill: none;
+  stroke: var(--accent);
+}
+
+.draw-frame--hover {
+  stroke: var(--text-muted);
+}
+
+.draw-frame--grouped {
+  stroke: var(--border-strong);
+}
+
+/* What `PageMask` hides around a page shown alone, and its edge. */
+.draw-page-mask {
+  fill: var(--surface-sunken);
+  pointer-events: none;
+}
+
+.draw-page-edge {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--border-strong);
+  vector-effect: non-scaling-stroke;
+}
+
+/* The edge `FigureOutline` draws around a figure of a set size: what lies
+   outside it is cut. */
+.draw-figure-outline {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--border-strong);
+  vector-effect: non-scaling-stroke;
+}
+
+/* A row of round swatches, as `SwatchRow` draws it, the colour in hand
+   ringed in the accent. */
+.color-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.color-row--clip {
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.color-row__swatch {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.color-row__swatch[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 3px var(--accent);
+}
+
+/* Short of room, a clipped row drops colours from the end of the palette
+   before anything else: they wrap onto a second line that is never shown.
+   The padding keeps the ring of the colour in hand inside the clip. */
+.color-row__swatches {
+  display: flex;
+  min-width: 0;
+  height: 24px;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: center;
+  padding: 3px;
+  margin: -3px 0 -3px -3px;
+  gap: 4px;
+  overflow: hidden;
+}

@@ -91,7 +91,7 @@ test('a row may start with a none, end with a custom button, and keep to one lin
 
   expect(
     html.startsWith(
-      '<div class="color-row" role="group" aria-label="Fill"><span class="none">None</span><div class="color-row__swatches"><button',
+      '<div class="color-row color-row--clip" role="group" aria-label="Fill"><span class="none">None</span><div class="color-row__swatches"><button',
     ),
   ).toBe(true);
   expect(

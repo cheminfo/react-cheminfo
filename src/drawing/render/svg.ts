@@ -13,6 +13,8 @@ import type { Box, FigureSize } from '../core/types.ts';
 
 import { primitivesBounds } from './bounds.ts';
 import { captionMarkup } from './captionMarkup.ts';
+import { dashCap } from './dashes.ts';
+import { gradientDefs, gradientFill } from './gradients.ts';
 import { escapeAttribute, escapeText, number } from './markup.ts';
 import { RUN_FADE, bubbleDelay, runTiming } from './motion.ts';
 import { figureBox } from './pageGrid.ts';
@@ -84,7 +86,7 @@ export function sceneBody(scene: Scene, options: SvgOptions): string {
       );
     }
   }
-  return `${backgroundMarkup(scene, options)}<g fill="none" stroke="${style.color}" stroke-width="${number(style.lineWidth)}" stroke-linecap="round" stroke-linejoin="round" font-family="${escapeAttribute(style.fontFamily)}">${parts.join('')}</g>`;
+  return `${backgroundMarkup(scene, options)}${gradientDefs(scene)}<g fill="none" stroke="${style.color}" stroke-width="${number(style.lineWidth)}" stroke-linecap="round" stroke-linejoin="round" font-family="${escapeAttribute(style.fontFamily)}">${parts.join('')}</g>`;
 }
 
 /**
@@ -260,7 +262,7 @@ function strokeMarkup(
       ? ` stroke="${primitive.color}"`
       : '');
   if (!primitive.dash) return width;
-  return `${width} stroke-dasharray="${primitive.dash.map((value) => number(value)).join(' ')}" stroke-linecap="butt"`;
+  return `${width} stroke-dasharray="${primitive.dash.map((value) => number(value)).join(' ')}" stroke-linecap="${dashCap(primitive)}"`;
 }
 
 // A fill is written as a colour and an opacity, never as `#rrggbbaa`, which
@@ -268,6 +270,9 @@ function strokeMarkup(
 function fillMarkup(primitive: PathPrimitive): string {
   const stroke = primitive.outline === false ? ' stroke="none"' : '';
   if (!primitive.fill) return stroke;
+  if (primitive.gradient) {
+    return ` fill="${escapeAttribute(gradientFill(primitive.gradient))}"${stroke}`;
+  }
   const { hex, opacity } = splitColor(primitive.fill);
   const alpha = opacity < 1 ? ` fill-opacity="${number(opacity)}"` : '';
   return ` fill="${hex}"${alpha}${stroke}`;

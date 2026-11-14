@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
 import type { CubicPiece } from '../curves.ts';
-import { curveOutline, curvePieces } from '../curves.ts';
+import { bezierOf, cubicPoint, curveOutline, curvePieces } from '../curves.ts';
 import type { Point } from '../types.ts';
 
 const ARC: Point[] = [
@@ -97,4 +97,26 @@ test('the outline follows every piece through each point, and a closed one ends 
   expect(closed).toHaveLength(65);
   expect(closed.at(-1)).toStrictEqual({ x: 0, y: 0 });
   expect(curveOutline([{ x: 4, y: 5 }], false)).toStrictEqual([{ x: 4, y: 5 }]);
+});
+
+test('a point of a cubic is where bezier-js puts it', () => {
+  const piece = {
+    from: { x: 0, y: 0 },
+    control1: { x: 10, y: 30 },
+    control2: { x: 40, y: -20 },
+    to: { x: 50, y: 10 },
+  };
+  for (const t of [0, 0.25, 0.5, 0.9, 1]) {
+    const point = cubicPoint(
+      piece.from,
+      piece.control1,
+      piece.control2,
+      piece.to,
+      t,
+    );
+    const expected = bezierOf(piece).compute(t);
+
+    expect(point.x).toBeCloseTo(expected.x, 12);
+    expect(point.y).toBeCloseTo(expected.y, 12);
+  }
 });

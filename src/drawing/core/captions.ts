@@ -6,6 +6,8 @@
 import { CAPTION_FAMILIES } from './fonts.ts';
 import { roundCoordinate } from './geometry.ts';
 import { nextId } from './ids.ts';
+import type { LabelReferent } from './labelReferent.ts';
+import { parseLabelReferent } from './labelReferent.ts';
 import type { DrawingObject } from './objects.ts';
 import { isColor } from './palette.ts';
 import { normalizeDegrees } from './pictures.ts';
@@ -15,6 +17,12 @@ import { isFiniteNumber, isRecord } from './values.ts';
 
 /** How the lines of a caption line up on its anchor. */
 export type TextAlign = 'left' | 'center' | 'right';
+
+/**
+ * Where a caption's anchor sits on its height: on its first baseline, or on
+ * the top or the bottom of its lines, which then grow away from it.
+ */
+export type TextVerticalAlign = 'baseline' | 'top' | 'bottom';
 
 /**
  * A caption: reaction conditions, a compound number, a note.
@@ -32,7 +40,7 @@ export interface DrawText {
   id: string;
   /** The anchor: where the first baseline starts, is centred or ends. */
   x: number;
-  /** The baseline of the first line, in points. */
+  /** The anchor's height: the first baseline, or see `verticalAlign`. */
   y: number;
   /** What is written; lines are separated by `\n`. */
   text: string;
@@ -41,6 +49,12 @@ export interface DrawText {
    * @default 'center'
    */
   align?: TextAlign;
+  /**
+   * Where the anchor sits on the caption's height. The conditions over a
+   * reaction arrow sit on it by their bottom, those under it by their top.
+   * @default 'baseline'
+   */
+  verticalAlign?: TextVerticalAlign;
   /**
    * The font size, in points.
    * @default the caption size of the drawing's style
@@ -67,6 +81,13 @@ export interface DrawText {
    * @default the drawing's ink
    */
   color?: string;
+  /**
+   * The compound it labels, when it is a compound's number: its text is then
+   * the number the drawing gives it, set bold, and a document it is placed in
+   * writes its own.
+   * @default undefined — a caption
+   */
+  referent?: LabelReferent;
 }
 
 /** The longest caption, marks included: several paragraphs. */
@@ -79,7 +100,10 @@ export const CAPTION_SIZE_LIMITS = { min: 1, max: MAX_RUN_SIZE } as const;
 export type TextPatch = Partial<Omit<DrawText, 'type' | 'id'>>;
 
 /** How a new caption is set, beyond what the drawing's style says. */
-export type TextLayout = Pick<DrawText, 'align' | 'family' | 'chemical'>;
+export type TextLayout = Pick<
+  DrawText,
+  'align' | 'verticalAlign' | 'family' | 'chemical'
+>;
 
 /**
  * Write a caption.
@@ -106,6 +130,9 @@ export function addText<D extends { objects: DrawingObject[] }>(
     text,
   };
   if (layout.align && layout.align !== 'center') caption.align = layout.align;
+  if (layout.verticalAlign && layout.verticalAlign !== 'baseline') {
+    caption.verticalAlign = layout.verticalAlign;
+  }
   if (layout.family) caption.family = layout.family;
   if (layout.chemical === false) caption.chemical = false;
   return { ...document, objects: [...document.objects, caption] };
@@ -135,6 +162,9 @@ export function updateText<D extends { objects: DrawingObject[] }>(
     const next: DrawText = { ...(caption as DrawText), ...patch };
     if (next.text.trim() === '') continue;
     if (next.align === 'center') delete next.align;
+    if (next.verticalAlign === 'baseline' || next.verticalAlign === undefined) {
+      delete next.verticalAlign;
+    }
     if (next.chemical === true) delete next.chemical;
     if (next.size === undefined) delete next.size;
     else next.size = clampCaptionSize(next.size);
@@ -166,13 +196,16 @@ export function clampCaptionSize(size: number): number {
  */
 export function parseText(value: unknown): DrawText | undefined {
   if (!isRecord(value)) return undefined;
-  const { id, x, y, text, align, size, family, chemical, rotation, color } =
-    value;
+  const { id, x, y, text, align, verticalAlign } = value;
+  const { size, family, chemical, rotation, color } = value;
   if (typeof id !== 'string' || typeof text !== 'string') return undefined;
   if (!isFiniteNumber(x) || !isFiniteNumber(y)) return undefined;
   if (text.trim() === '' || text.length > MAX_TEXT) return undefined;
   const caption: DrawText = { type: 'text', id, x, y, text };
   if (align === 'left' || align === 'right') caption.align = align;
+  if (verticalAlign === 'top' || verticalAlign === 'bottom') {
+    caption.verticalAlign = verticalAlign;
+  }
   if (
     isFiniteNumber(size) &&
     size >= CAPTION_SIZE_LIMITS.min &&
@@ -188,5 +221,7 @@ export function parseText(value: unknown): DrawText | undefined {
     caption.rotation = normalizeDegrees(rotation);
   }
   if (isColor(color)) caption.color = color;
+  const referent = parseLabelReferent(value.referent);
+  if (referent) caption.referent = referent;
   return caption;
 }

@@ -13,6 +13,7 @@ import {
   captionCorners,
   captionPrimitive,
   captionTransform,
+  labelPrimitive,
 } from '../captions.ts';
 import type { DrawingStyle } from '../style.ts';
 
@@ -204,4 +205,46 @@ test('a reach widens the box a caption is hit by, half on each side', () => {
   expect(captionContains(upright, { x: 12, y: 0 }, 0)).toBe(false);
   expect(captionContains(upright, { x: 12, y: 0 }, 2)).toBe(true);
   expect(captionContains(upright, { x: 5, y: 4.5 }, 2)).toBe(false);
+});
+
+test('a caption sits on its anchor by its first baseline, its top or its bottom', () => {
+  const at = {
+    type: 'text',
+    id: 't3',
+    x: 0,
+    y: 0,
+    text: 'a',
+    size: 10,
+  } as const;
+
+  expect(captionPrimitive(at, STYLE).baselines).toStrictEqual([0]);
+  expect(
+    captionPrimitive({ ...at, verticalAlign: 'top' }, STYLE).baselines,
+  ).toStrictEqual([9]);
+  expect(
+    captionPrimitive({ ...at, verticalAlign: 'bottom' }, STYLE).baselines,
+  ).toStrictEqual([-3]);
+});
+
+test('a compound number is one bold line, written with the compound it names', () => {
+  const number: DrawText = {
+    type: 'text',
+    id: 't4',
+    x: 0,
+    y: 0,
+    text: '3\n',
+    size: 10,
+    referent: { key: 'c1', molecule: 'm1' },
+  };
+  const primitive = captionPrimitive(number, STYLE);
+
+  expect(primitive.lines).toStrictEqual([[{ text: '3', bold: true }]]);
+  expect(primitive.label).toStrictEqual({ key: 'c1' });
+  expect(captionMarkup(primitive, '#000000')).toBe(
+    '<text x="0" y="0" text-anchor="middle" font-size="10" font-family="Arial, Helvetica, sans-serif" font-weight="bold" fill="#000000" stroke="none" data-cheminfo-ref="c1">3</text>',
+  );
+  expect(labelPrimitive(number, undefined, STYLE).label).toBeUndefined();
+  expect(
+    labelPrimitive(number, { key: 'c1', row: 'r2' }, STYLE).label,
+  ).toStrictEqual({ key: 'c1', row: 'r2' });
 });

@@ -5,7 +5,13 @@
 
 import { expect, test } from 'vitest';
 
-import { PALETTE, isColor, joinColor, splitColor } from '../palette.ts';
+import {
+  PALETTE,
+  isColor,
+  joinColor,
+  shadeOf,
+  splitColor,
+} from '../palette.ts';
 
 test('the palette is the eight of Okabe and Ito, black first', () => {
   expect(PALETTE.map((color) => color.value)).toStrictEqual([
@@ -51,4 +57,11 @@ test('a colour joined is opaque at full opacity, and carries its alpha below it'
     hex: '#0072b2',
     opacity: 0.25,
   });
+});
+
+test('a fill shades into itself half as bright, a dark one into white', () => {
+  expect(shadeOf('#56b4e9')).toBe('#2b5a75');
+  expect(shadeOf('#56b4e980')).toBe('#2b5a7580');
+  expect(shadeOf('#202020')).toBe('#ffffff');
+  expect(shadeOf('#20202080')).toBe('#ffffff80');
 });

@@ -62,3 +62,26 @@ export function joinColor(hex: string, opacity: number): string {
   const alpha = Math.round(Math.max(0, opacity) * 255);
   return `${base}${alpha.toString(16).padStart(2, '0')}`;
 }
+
+/**
+ * The colour a fill first blends into: the fill in shadow, half as bright,
+ * or white for a fill already too dark to shade.
+ * @param fill - The fill, `#rrggbb` or `#rrggbbaa`.
+ * @returns The colour, with the fill's opacity.
+ */
+export function shadeOf(fill: string): string {
+  const { hex, opacity } = splitColor(fill);
+  const channels = [1, 3, 5].map((start) =>
+    Number.parseInt(hex.slice(start, start + 2), 16),
+  );
+  const brightest = Math.max(...channels);
+  if (brightest < 64) return joinColor('#ffffff', opacity);
+  const shaded = channels
+    .map((channel) =>
+      Math.round(channel / 2)
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('');
+  return joinColor(`#${shaded}`, opacity);
+}

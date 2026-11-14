@@ -13,7 +13,13 @@ export {
   zoomOfShare,
   zoomShare,
 } from './camera.ts';
-export type { DrawText, TextAlign, TextLayout, TextPatch } from './captions.ts';
+export type {
+  DrawText,
+  TextAlign,
+  TextLayout,
+  TextPatch,
+  TextVerticalAlign,
+} from './captions.ts';
 export {
   CAPTION_SIZE_LIMITS,
   MAX_TEXT,
@@ -23,6 +29,8 @@ export {
   updateText,
 } from './captions.ts';
 export type { ChemicalRange } from './chemicalText.ts';
+export type { DashPattern, LineDash } from './dashes.ts';
+export { LINE_DASHES, isLineDash } from './dashes.ts';
 export { chemicalRanges } from './chemicalText.ts';
 export type { CubicPiece, CurveControl } from './curves.ts';
 export {
@@ -110,7 +118,9 @@ export {
 } from './pages.ts';
 export type { PageDirection, PageStops, PageStopsInput } from './pageStops.ts';
 export { NO_STOPS, pageStops, pagesInOrder } from './pageStops.ts';
-export { PALETTE, isColor, joinColor, splitColor } from './palette.ts';
+export type { LabelReferent } from './labelReferent.ts';
+export { isReferentKey, parseLabelReferent } from './labelReferent.ts';
+export { PALETTE, isColor, joinColor, shadeOf, splitColor } from './palette.ts';
 export type { DrawPicture, PicturePatch, TurnedBox } from './pictures.ts';
 export {
   MAX_PICTURE_SOURCE,

@@ -58,7 +58,11 @@ export function SwatchRow(props: SwatchRowProps): ReactElement {
     />
   ));
   return (
-    <div className="color-row" role="group" aria-label={label}>
+    <div
+      className={clip ? 'color-row color-row--clip' : 'color-row'}
+      role="group"
+      aria-label={label}
+    >
       {leading}
       {clip ? <div className="color-row__swatches">{swatches}</div> : swatches}
       {custom}

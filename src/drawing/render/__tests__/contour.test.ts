@@ -5,7 +5,7 @@
 
 import { expect, test } from 'vitest';
 
-import { cubicPoint } from '../../core/curves.ts';
+import { bezierOf } from '../../core/curves.ts';
 import type { Point } from '../../core/types.ts';
 import type { Contour } from '../contour.ts';
 import {
@@ -59,7 +59,12 @@ test('an arc first goes to where it starts, then stays on the circle', () => {
   let from: Point = { x: 10, y: 0 };
   for (const piece of pieces) {
     for (const t of [0.25, 0.5, 0.75]) {
-      const point = cubicPoint(from, piece.c1, piece.c2, piece.to, t);
+      const point = bezierOf({
+        from,
+        control1: piece.c1,
+        control2: piece.c2,
+        to: piece.to,
+      }).compute(t);
 
       expect(Math.hypot(point.x, point.y)).toBeCloseTo(10, 2);
     }

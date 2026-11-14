@@ -85,3 +85,39 @@ test('a caption read from a file keeps what it may carry', () => {
   expect(parseText({ id: 't1', x: 1, y: 2, text: '' })).toBeUndefined();
   expect(parseText([])).toBeUndefined();
 });
+
+test('a caption keeps how it sits on its anchor, and drops the baseline it means by default', () => {
+  const base = { type: 'text', id: 't5', x: 0, y: 0, text: 'Δ' } as const;
+  const written = addText(drawing(), { x: 0, y: 0 }, 'Δ', {
+    verticalAlign: 'bottom',
+  });
+
+  expect(written.objects[1]).toStrictEqual({
+    ...base,
+    verticalAlign: 'bottom',
+  });
+  expect(
+    updateText(written, 't5', { verticalAlign: 'baseline' }).objects[1],
+  ).toStrictEqual(base);
+  expect(parseText({ ...base, verticalAlign: 'top' })).toStrictEqual({
+    ...base,
+    verticalAlign: 'top',
+  });
+  expect(parseText({ ...base, verticalAlign: 'middle' })).toStrictEqual(base);
+  expect(parseText({ ...base, verticalAlign: 'baseline' })).toStrictEqual(base);
+});
+
+test('a compound number keeps the compound it names, read only when its key fits', () => {
+  const base = { type: 'text', id: 't1', x: 0, y: 0, text: '3' } as const;
+
+  expect(
+    parseText({ ...base, referent: { key: 'c_1-a', molecule: 'm2' } }),
+  ).toStrictEqual({ ...base, referent: { key: 'c_1-a', molecule: 'm2' } });
+  expect(
+    parseText({ ...base, referent: { key: 'c1', molecule: '' } }),
+  ).toStrictEqual({ ...base, referent: { key: 'c1' } });
+  expect(parseText({ ...base, referent: { key: 'a key' } })).toStrictEqual(
+    base,
+  );
+  expect(parseText({ ...base, referent: 'c1' })).toStrictEqual(base);
+});

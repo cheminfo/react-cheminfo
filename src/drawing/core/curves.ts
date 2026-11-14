@@ -143,11 +143,12 @@ export function curveOutline(
   const first = pieces[0];
   if (!first) return [...points];
   const outline: Point[] = [first.from];
-  for (const { from, control1, control2, to } of pieces) {
-    for (let step = 1; step <= PIECE_STEPS; step++) {
-      outline.push(
-        cubicPoint(from, control1, control2, to, step / PIECE_STEPS),
-      );
+  for (const piece of pieces) {
+    const lookup = bezierOf(piece).getLUT(PIECE_STEPS);
+    // The first point of each piece is the last of the one before it.
+    for (let step = 1; step < lookup.length; step++) {
+      const { x, y } = lookup[step] as Point;
+      outline.push({ x, y });
     }
   }
   return outline;

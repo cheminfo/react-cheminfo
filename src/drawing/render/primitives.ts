@@ -2,9 +2,11 @@
  * What a drawing is drawn with: lines, polygons, paths, dots, text, captions and images, each in its owner's item of the scene.
  */
 
+import type { ReferentMention } from '../../referents/core/types.ts';
 import type { Span } from '../core/richText.ts';
 import type { Box, Point } from '../core/types.ts';
 
+import type { GradientPaint } from './gradients.ts';
 import type { ImagePrimitive } from './pictures.ts';
 
 /** A straight stroke. */
@@ -22,6 +24,11 @@ export interface LinePrimitive {
    * @default undefined — solid
    */
   dash?: readonly number[];
+  /**
+   * How its dashes end: round for the dots of a dotted line.
+   * @default undefined — square ends
+   */
+  cap?: 'round';
 }
 
 /** A filled polygon: the body of a wedge, an arrowhead. */
@@ -48,10 +55,20 @@ export interface PathPrimitive {
    */
   dash?: readonly number[];
   /**
+   * How its dashes end: round for the dots of a dotted line.
+   * @default undefined — square ends
+   */
+  cap?: 'round';
+  /**
    * What fills a closed path, `#rrggbb` or `#rrggbbaa`.
    * @default undefined — not filled
    */
   fill?: string;
+  /**
+   * The gradient the fill blends along, laid out on the page.
+   * @default undefined — filled flat
+   */
+  gradient?: GradientPaint;
   /**
    * False for a filled path drawn without its outline.
    * @default true
@@ -151,6 +168,12 @@ export interface CaptionPrimitive {
   widths: number[];
   /** The clockwise turn about `x`, `y`, in degrees. */
   rotation: number;
+  /**
+   * The compound, or the member of a series, it is the number of: its one
+   * line is the number, which a document writes over.
+   * @default undefined — a caption
+   */
+  label?: ReferentMention;
 }
 
 /** Anything a drawing is rendered into. */

@@ -13,6 +13,7 @@ export {
   captionCorners,
   captionPrimitive,
   captionTransform,
+  labelPrimitive,
 } from './captions.ts';
 export type { Contour, Segment } from './contour.ts';
 export {
@@ -22,6 +23,22 @@ export {
   isCubic,
   sampleContour,
 } from './contour.ts';
+export type { StrokeDash } from './dashes.ts';
+export { dashCap, dashPattern, strokeDash, withDash } from './dashes.ts';
+export type {
+  GradientPaint,
+  GradientStop,
+  LinearPaint,
+  RadialPaint,
+} from './gradients.ts';
+export {
+  gradientDefs,
+  gradientFill,
+  gradientId,
+  gradientMarkup,
+  radialTransform,
+  sceneGradients,
+} from './gradients.ts';
 export {
   ellipsePath,
   escapeAttribute,

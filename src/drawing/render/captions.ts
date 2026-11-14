@@ -2,6 +2,7 @@
  * A caption as it is drawn: its lines, laid out, and the frame it turns in.
  */
 
+import type { ReferentMention } from '../../referents/core/types.ts';
 import type { DrawText } from '../core/captions.ts';
 import type { Span } from '../core/richText.ts';
 import { parseRichText } from '../core/richText.ts';
@@ -20,6 +21,12 @@ const LINE_HEIGHT = 1.2;
 /** How far a line reaches below its baseline, relative to its largest size. */
 const DESCENT = 0.25;
 
+/** How far a line's box reaches above its baseline, relative to its size. */
+const BOX_ASCENT = 0.9;
+
+/** How far a line's box reaches below its baseline, relative to its size. */
+const BOX_DESCENT = 0.3;
+
 /**
  * The primitive of a caption.
  * @param text - The caption.
@@ -30,37 +37,32 @@ export function captionPrimitive(
   text: DrawText,
   style: DrawingStyle,
 ): CaptionPrimitive {
-  const size = text.size ?? style.captionSize;
-  const lines = parseRichText(text.text, text.chemical ?? true);
-  const align = text.align ?? 'center';
-  const family = text.family ?? style.captionFamily;
-  const anchor =
-    align === 'left' ? 'start' : align === 'right' ? 'end' : 'middle';
-  const metrics = metricsOf(family);
-  const sizes = lines.map((line) => largestSize(line, size));
-  const baselines: number[] = [];
-  let baseline = text.y;
-  for (const [index, lineSize] of sizes.entries()) {
-    if (index > 0) {
-      baseline +=
-        DESCENT * (sizes[index - 1] as number) +
-        (LINE_HEIGHT - DESCENT) * lineSize;
-    }
-    baselines.push(baseline);
+  if (text.referent) {
+    return labelPrimitive(text, { key: text.referent.key }, style);
   }
-  return {
-    kind: 'caption',
-    x: text.x,
-    y: text.y,
-    anchor,
-    size,
-    family,
-    baselines,
-    sizes,
-    lines,
-    widths: lines.map((line) => lineLayout(line, size, metrics, anchor).width),
-    rotation: text.rotation ?? 0,
-  };
+  return layoutCaption(
+    text,
+    parseRichText(text.text, text.chemical ?? true),
+    style,
+  );
+}
+
+/**
+ * The primitive of a number: one line, bold, set as written.
+ * @param text - Where and how it is set; its text is the number.
+ * @param mention - The compound, or the member, it is the number of; none
+ * for a letter of a series whose structure is not numbered.
+ * @param style - The drawing style, for its font and its size.
+ * @returns The caption primitive.
+ */
+export function labelPrimitive(
+  text: DrawText,
+  mention: ReferentMention | undefined,
+  style: DrawingStyle,
+): CaptionPrimitive {
+  const line = text.text.replaceAll('\n', ' ').trim();
+  const caption = layoutCaption(text, [[{ text: line, bold: true }]], style);
+  return mention ? { ...caption, label: mention } : caption;
 }
 
 /**
@@ -119,6 +121,48 @@ export function captionContains(
   );
 }
 
+// A caption laid out from its lines: their sizes, baselines and anchor.
+function layoutCaption(
+  text: DrawText,
+  lines: Span[][],
+  style: DrawingStyle,
+): CaptionPrimitive {
+  const size = text.size ?? style.captionSize;
+  const align = text.align ?? 'center';
+  const family = text.family ?? style.captionFamily;
+  const anchor =
+    align === 'left' ? 'start' : align === 'right' ? 'end' : 'middle';
+  const metrics = metricsOf(family);
+  const sizes = lines.map((line) => largestSize(line, size));
+  const baselines: number[] = [];
+  let baseline = text.y;
+  for (const [index, lineSize] of sizes.entries()) {
+    if (index > 0) {
+      baseline +=
+        DESCENT * (sizes[index - 1] as number) +
+        (LINE_HEIGHT - DESCENT) * lineSize;
+    }
+    baselines.push(baseline);
+  }
+  const shift = anchorShift(text, baselines, sizes, size);
+  for (let index = 0; index < baselines.length; index++) {
+    baselines[index] = (baselines[index] as number) + shift;
+  }
+  return {
+    kind: 'caption',
+    x: text.x,
+    y: text.y,
+    anchor,
+    size,
+    family,
+    baselines,
+    sizes,
+    lines,
+    widths: lines.map((line) => lineLayout(line, size, metrics, anchor).width),
+    rotation: text.rotation ?? 0,
+  };
+}
+
 // The box the lines of a caption take before it is turned.
 function uprightBox(caption: CaptionPrimitive): Box {
   let left = caption.x;
@@ -133,10 +177,27 @@ function uprightBox(caption: CaptionPrimitive): Box {
     else if (caption.anchor === 'end') start -= width;
     left = Math.min(left, start);
     right = Math.max(right, start + width);
-    top = Math.min(top, baseline - size * 0.9);
-    bottom = Math.max(bottom, baseline + size * 0.3);
+    top = Math.min(top, baseline - size * BOX_ASCENT);
+    bottom = Math.max(bottom, baseline + size * BOX_DESCENT);
   }
   return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
+// How far the lines move down so the anchor sits where the caption says: on
+// the first baseline, on the top of the first line, or on the bottom of the
+// last.
+function anchorShift(
+  text: DrawText,
+  baselines: readonly number[],
+  sizes: readonly number[],
+  size: number,
+): number {
+  if (text.verticalAlign === 'top') return BOX_ASCENT * (sizes[0] ?? size);
+  if (text.verticalAlign !== 'bottom') return 0;
+  const last = baselines.length - 1;
+  return (
+    text.y - (baselines[last] ?? text.y) - BOX_DESCENT * (sizes[last] ?? size)
+  );
 }
 
 // The largest size a line is set in, scripts aside: what its height follows.

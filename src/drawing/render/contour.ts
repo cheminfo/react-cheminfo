@@ -4,7 +4,7 @@
  * a turned or mirrored piece is moved by moving points and nothing else.
  */
 
-import { cubicPoint } from '../core/curves.ts';
+import { bezierOf } from '../core/curves.ts';
 import { boundsOf } from '../core/geometry.ts';
 import type { Box, Point } from '../core/types.ts';
 /** A straight piece of an outline. */
@@ -207,8 +207,13 @@ export function sampleContour(contour: Contour, steps = 8): Point[] {
   for (const segment of contour.segments) {
     if (isCubic(segment)) {
       const { c1, c2, to } = segment;
-      for (let index = 1; index <= steps; index++) {
-        points.push(cubicPoint(from, c1, c2, to, index / steps));
+      const lookup = bezierOf({ from, control1: c1, control2: c2, to }).getLUT(
+        steps,
+      );
+      // The first point of each curve is the end of the piece before it.
+      for (let index = 1; index < lookup.length; index++) {
+        const { x, y } = lookup[index] as Point;
+        points.push({ x, y });
       }
     } else {
       points.push(segment.to);
