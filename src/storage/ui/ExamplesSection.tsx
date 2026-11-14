@@ -30,10 +30,12 @@ export interface FolderExample {
    */
   keywords?: string;
   /**
-   * The `id` of the {@link ExampleCategory} it belongs to.
+   * The `id` of the {@link ExampleCategory} it belongs to, or the ids of all
+   * of them when it belongs to several: it then carries a pill for each, in
+   * that order, and each of their capsules lists it.
    * @default undefined — no pill, and only the "All" capsule lists it
    */
-  category?: string;
+  category?: string | readonly string[];
 }
 
 /**
@@ -92,7 +94,7 @@ export interface ExamplesSectionProps<TExample extends FolderExample> {
 /**
  * The documents a site comes with, in a folder panel: a click shows one in
  * place of what is on screen, and the `+`, where the view holds several,
- * adds it. Given categories, each row carries its own as a coloured pill, and
+ * adds it. Given categories, each row carries its own as coloured pills, and
  * a row of capsules above the list keeps only some of them. Inside a
  * `<PanelSearch>`, only the examples whose name, description, keywords or
  * category hold the search are listed, and the capsules count those.
@@ -116,33 +118,33 @@ export function ExamplesSection<TExample extends FolderExample>(
   const listed = new Set<string>();
   const counts = new Map<string, number>();
   const found: TExample[] = [];
+  const pills = new Map<TExample, ExampleCategory[]>();
   for (const example of examples) {
-    const category =
-      example.category === undefined
-        ? undefined
-        : categories.get(example.category);
-    if (category) listed.add(category.id);
+    const own = categoriesOf(example, categories);
+    pills.set(example, own);
+    for (const category of own) listed.add(category.id);
     if (
       !matchesNeedle(
         needle,
         example.name,
         example.description,
         example.keywords,
-        category?.label,
+        ...own.map((category) => category.label),
       )
     ) {
       continue;
     }
     found.push(example);
-    if (category) counts.set(category.id, (counts.get(category.id) ?? 0) + 1);
+    for (const category of own) {
+      counts.set(category.id, (counts.get(category.id) ?? 0) + 1);
+    }
   }
   const kept = selected.filter((id) => listed.has(id));
   const shown =
     kept.length === 0
       ? found
-      : found.filter(
-          (example) =>
-            example.category !== undefined && kept.includes(example.category),
+      : found.filter((example) =>
+          pills.get(example)?.some((category) => kept.includes(category.id)),
         );
   usePanelTally(shown.length, examples.length);
   return (
@@ -187,13 +189,9 @@ export function ExamplesSection<TExample extends FolderExample>(
               <span className="folder-panel__text">
                 <span className="folder-panel__name">{example.name}</span>
                 <span className="folder-panel__time">
-                  <CategoryPill
-                    category={
-                      example.category === undefined
-                        ? undefined
-                        : categories.get(example.category)
-                    }
-                  />
+                  {pills.get(example)?.map((category) => (
+                    <CategoryPill key={category.id} category={category} />
+                  ))}
                   {example.description}
                 </span>
               </span>
@@ -219,11 +217,23 @@ export function ExamplesSection<TExample extends FolderExample>(
   );
 }
 
-function CategoryPill(props: {
-  category: ExampleCategory | undefined;
-}): ReactElement | null {
+function categoriesOf(
+  example: FolderExample,
+  categories: ReadonlyMap<string, ExampleCategory>,
+): ExampleCategory[] {
+  const { category: named } = example;
+  if (named === undefined) return [];
+  const ids = typeof named === 'string' ? [named] : named;
+  const own: ExampleCategory[] = [];
+  for (const id of ids) {
+    const category = categories.get(id);
+    if (category && !own.includes(category)) own.push(category);
+  }
+  return own;
+}
+
+function CategoryPill(props: { category: ExampleCategory }): ReactElement {
   const { category } = props;
-  if (category === undefined) return null;
   return (
     <span
       className="folder-panel__category"

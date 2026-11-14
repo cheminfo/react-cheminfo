@@ -131,6 +131,48 @@ test('a capsule keeps only its examples, and All brings them all back', () => {
   expect(rowTexts()).toHaveLength(4);
 });
 
+test('an example of several categories has a pill for each, and each capsule lists it', () => {
+  act(() => {
+    root.render(
+      <ExamplesSection
+        examples={[
+          ...EXAMPLES,
+          {
+            id: 'osmosis',
+            name: 'Osmosis',
+            description: 'Membranes',
+            category: ['chemistry', 'biology', 'chemistry'],
+          },
+        ]}
+        categories={CATEGORIES}
+        onOpen={vi.fn()}
+      />,
+    );
+  });
+
+  expect(rowTexts()[4]).toBe('OsmosisChemistryBiologyMembranes');
+  expect(
+    [...host.querySelectorAll('[aria-pressed]')].map(
+      (element) => element.textContent,
+    ),
+  ).toStrictEqual(['All (5)', 'Chemistry (3)', 'Physics (1)', 'Biology (1)']);
+
+  act(() => {
+    capsule('Biology (1)').click();
+  });
+
+  expect(rowTexts()).toStrictEqual(['OsmosisChemistryBiologyMembranes']);
+
+  act(() => {
+    capsule('Physics (1)').click();
+  });
+
+  expect(rowTexts()).toStrictEqual([
+    'SnellPhysicsOptics',
+    'OsmosisChemistryBiologyMembranes',
+  ]);
+});
+
 test('without categories there are no pills and no capsules', () => {
   act(() => {
     root.render(<ExamplesSection examples={EXAMPLES} onOpen={vi.fn()} />);
