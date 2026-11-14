@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.119.0](https://github.com/cheminfo/react-cheminfo/compare/v0.118.0...v0.119.0) (2026-11-14)
+
+
+### Features
+
+* **storage:** list an example under several categories ([306ba6f](https://github.com/cheminfo/react-cheminfo/commit/306ba6f960eaaa37461f4188299ff625ebb12807))
+
 ## [0.118.0](https://github.com/cheminfo/react-cheminfo/compare/v0.117.0...v0.118.0) (2026-11-13)
 
 
