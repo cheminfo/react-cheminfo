@@ -11,6 +11,7 @@
 
 export type { AtomicOrbitalViewerProps } from './AtomicOrbitalViewer.tsx';
 export { AtomicOrbitalViewer } from './AtomicOrbitalViewer.tsx';
+export type { Molecule3DCapture } from '../../molecule3d/ui/moleculeViewer3DProps.ts';
 export type { ViewerCapability } from './capability.ts';
 export { probeViewerCapability } from './capability.ts';
 export type { RadialPlotProps, RadialPlotUnit } from './RadialPlot.tsx';

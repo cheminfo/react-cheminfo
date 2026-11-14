@@ -20,6 +20,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { Suspense, lazy, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import type { Molecule3DCapture } from '../../molecule3d/ui/moleculeViewer3DProps.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ResolutionLimits } from '../core/atomicGrid.ts';
 import type { PhasePalette } from '../core/palette.ts';
@@ -96,6 +97,13 @@ export interface AtomicOrbitalViewerProps {
    * @default undefined
    */
   onNodeRadii?: (radii: number[]) => void;
+  /**
+   * Called with the means to picture the orbital on screen once its canvas is
+   * mounted, and with `null` once it is gone — what a site hands a page that
+   * frames it, so draw and write can insert the orbital as a figure.
+   * @default undefined
+   */
+  onCapture?: (capture: Molecule3DCapture | null) => void;
   /**
    * What to show while molstar is downloading.
    * @default 'Loading the 3D viewer…'

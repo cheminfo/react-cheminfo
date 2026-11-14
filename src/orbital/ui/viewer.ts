@@ -93,7 +93,7 @@ export class OrbitalViewer {
     contour: OrbitalContour,
     style?: VolumeStyle,
   ): Promise<number | undefined> {
-    return this.#run((plugin) =>
+    return this.run((plugin) =>
       renderSampledVolume(plugin, field, contour, style),
     );
   }
@@ -108,7 +108,7 @@ export class OrbitalViewer {
    * frame; `undefined` once the viewer has been disposed.
    */
   showAxes(reach: number, style?: AxesStyle): Promise<number | undefined> {
-    return this.#run((plugin) => renderOrbitalAxes(plugin, reach, style));
+    return this.run((plugin) => renderOrbitalAxes(plugin, reach, style));
   }
 
   /**
@@ -116,7 +116,7 @@ export class OrbitalViewer {
    * @returns Nothing, once the axes are gone.
    */
   hideAxes(): Promise<void> {
-    return this.#run((plugin) => {
+    return this.run((plugin) => {
       clearOrbitalAxes(plugin);
     });
   }
@@ -126,7 +126,7 @@ export class OrbitalViewer {
    * @returns Nothing, once the surfaces are gone.
    */
   hideOrbital(): Promise<void> {
-    return this.#run((plugin) => {
+    return this.run((plugin) => {
       clearSampledVolume(plugin);
     });
   }
@@ -143,7 +143,7 @@ export class OrbitalViewer {
     orbitalRadius?: number,
     durationMs = DEFAULT_CAMERA_DURATION,
   ): Promise<void> {
-    return this.#run((plugin) => {
+    return this.run((plugin) => {
       frameOrbital(plugin, orbitalRadius, durationMs);
       this.#fittedRadius = orbitalRadius ?? null;
     });
@@ -169,7 +169,7 @@ export class OrbitalViewer {
     if (fitted === null || orbitalRadius === undefined) {
       return this.frame(orbitalRadius, durationMs);
     }
-    return this.#run((plugin) => {
+    return this.run((plugin) => {
       refitOrbital(plugin, fitted, orbitalRadius, durationMs);
       this.#fittedRadius = orbitalRadius;
     });
@@ -195,7 +195,7 @@ export class OrbitalViewer {
    * @returns Nothing, once the spin has been switched.
    */
   setSpin(spinning: boolean, speed = DEFAULT_SPIN_SPEED): Promise<void> {
-    return this.#run((plugin) => {
+    return this.run((plugin) => {
       setSpin(plugin, spinning, speed);
     });
   }
@@ -232,7 +232,7 @@ export class OrbitalViewer {
    * @param action - What to run once the canvas is ready.
    * @returns What `action` returned, or `undefined` when disposed.
    */
-  #run<Result>(
+  run<Result>(
     action: (plugin: PluginContext) => Result | Promise<Result>,
   ): Promise<Result | undefined> {
     return this.#serial.run(async () => {
