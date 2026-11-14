@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.121.0](https://github.com/cheminfo/react-cheminfo/compare/v0.120.0...v0.121.0) (2026-11-14)
+
+
+### Features
+
+* **drawing:** add caption alignment, dashes, gradients and compound numbers ([6065a52](https://github.com/cheminfo/react-cheminfo/commit/6065a52e13c11f5ede67abdfbb662a1acdbf0a89))
+
 ## [0.120.0](https://github.com/cheminfo/react-cheminfo/compare/v0.119.0...v0.120.0) (2026-11-14)
 
 
