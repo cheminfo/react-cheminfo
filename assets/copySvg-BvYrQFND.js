@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{a as t,n,r,t as i}from"./writeToClipboard-BdDspRGP.js";async function a(e){return r(`image/svg+xml`)&&await t({"image/svg+xml":new Blob([e],{type:`image/svg+xml`}),"text/plain":new Blob([e],{type:`text/plain`})})?!0:n(e)}var o;function s(){return(s=e((()=>{i(),o=`image/svg+xml`})))()}export{a as n,s as r,o as t};
