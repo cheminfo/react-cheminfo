@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.125.0](https://github.com/cheminfo/react-cheminfo/compare/v0.124.0...v0.125.0) (2026-11-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* make NMRium a page of nmr.cheminfo.org
+
+### Features
+
+* make NMRium a page of nmr.cheminfo.org ([50b7296](https://github.com/cheminfo/react-cheminfo/commit/50b7296325c1ca55031c2b05edc567c6ea28910f))
+
 ## [0.124.0](https://github.com/cheminfo/react-cheminfo/compare/v0.123.0...v0.124.0) (2026-11-15)
 
 
