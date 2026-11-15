@@ -769,6 +769,7 @@
   "molecule3d.gesture.clip": "Couper autour du centre",
   "molecule3d.gesture.centreAtom": "Le centrer",
   "molecule3d.gesture.centreMolecule": "Centrer la molécule",
+  "molecule3d.gesture.removeMeasurement": "Retirer la mesure sous le pointeur",
   "molecule3d.input.drag": "Glisser",
   "molecule3d.input.plus": "+",
   "molecule3d.input.plusDrag": "+ glisser",

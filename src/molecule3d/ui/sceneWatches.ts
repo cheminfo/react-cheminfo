@@ -4,9 +4,12 @@
  */
 
 import type { MolstarPlugin } from '../../molstar/core/index.ts';
-import { subscribeHoverAtom } from '../../molstar/core/index.ts';
+import {
+  subscribeHoverAtom,
+  subscribeHoverMeasurement,
+} from '../../molstar/core/index.ts';
 import type { Molecule3DCamera } from '../core/camera.ts';
-import type { AtomReference } from '../core/measurement.ts';
+import type { AtomReference, Measurement } from '../core/measurement.ts';
 
 import { watchCamera } from './camera.ts';
 import { moleculeStructure } from './renderMolecule.ts';
@@ -48,6 +51,21 @@ export class SceneWatches extends ScenePictures {
   watchHoverAtom(listener: (atom: AtomReference | null) => void): () => void {
     return this.#plugin.subscribe((plugin) =>
       subscribeHoverAtom(plugin, moleculeStructure, listener),
+    );
+  }
+
+  /**
+   * Follow the measurement under the pointer: its dashed line or its arc.
+   * @param listener - Called with the measurement each time the pointer rests
+   * on another one, and with `null` once it leaves them.
+   * @returns A function that stops calling the listener; safe to call before
+   * the canvas exists.
+   */
+  watchHoverMeasurement(
+    listener: (measurement: Measurement | null) => void,
+  ): () => void {
+    return this.#plugin.subscribe((plugin) =>
+      subscribeHoverMeasurement(plugin, moleculeStructure, listener),
     );
   }
 }

@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
 import type { AtomReference, Measurement } from '../measurement.ts';
-import { sameMeasurements } from '../measurement.ts';
+import { removeMeasurement, sameMeasurements } from '../measurement.ts';
 
 const C_O: Measurement = { kind: 'distance', atoms: atoms(1, 2) };
 const C_C_O: Measurement = { kind: 'angle', atoms: atoms(0, 1, 2) };
@@ -29,6 +29,30 @@ test('another kind, other atoms, another order or another count differ', () => {
   expect(sameMeasurements([C_O, C_C_O], [C_C_O, C_O])).toBe(false);
   expect(sameMeasurements([C_O], [C_O, C_C_O])).toBe(false);
   expect(sameMeasurements([C_O], [])).toBe(false);
+});
+
+test('removing a measurement takes out the first one over the same atoms, read either way', () => {
+  const O_C: Measurement = { kind: 'distance', atoms: atoms(2, 1) };
+  const list = [C_O, C_C_O, O_C];
+
+  expect(removeMeasurement(list, C_O)).toStrictEqual([C_C_O, O_C]);
+  expect(removeMeasurement(list, O_C)).toStrictEqual([C_C_O, O_C]);
+  expect(
+    removeMeasurement(list, { kind: 'angle', atoms: atoms(2, 1, 0) }),
+  ).toStrictEqual([C_O, O_C]);
+  expect(list).toStrictEqual([C_O, C_C_O, O_C]);
+});
+
+test('removing a measurement the list lacks returns the list itself', () => {
+  const list = [C_O, C_C_O];
+
+  expect(removeMeasurement(list, { kind: 'angle', atoms: atoms(1, 2) })).toBe(
+    list,
+  );
+  expect(
+    removeMeasurement(list, { kind: 'distance', atoms: atoms(0, 2) }),
+  ).toBe(list);
+  expect(removeMeasurement([], C_O)).toStrictEqual([]);
 });
 
 function atom(element: number): AtomReference {

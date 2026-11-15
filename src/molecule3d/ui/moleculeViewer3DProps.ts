@@ -107,7 +107,8 @@ export interface MoleculeViewer3DProps {
    */
   measurements?: readonly Measurement[];
   /**
-   * Called with the whole list after a measurement is added or cleared.
+   * Called with the whole list after a measurement is added, removed — the
+   * reader points at one and presses Backspace or Delete — or cleared.
    * @default undefined
    */
   onMeasurementsChange?: (measurements: readonly Measurement[]) => void;

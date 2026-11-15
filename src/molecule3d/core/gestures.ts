@@ -1,6 +1,7 @@
 /**
  * What the mouse and the keyboard do on the molecule canvas: molstar's default
- * trackball and focus bindings, which the viewer keeps.
+ * trackball and focus bindings, which the viewer keeps, and the removal of a
+ * measurement, which the viewer adds.
  */
 
 /** A key, drawn as a key cap. */
@@ -44,6 +45,11 @@ export const MOLECULE_3D_GESTURES: readonly Molecule3DGesture[] = [
     id: 'centreMolecule',
     input: ['Click the background'],
     action: 'Centre on the molecule',
+  },
+  {
+    id: 'removeMeasurement',
+    input: [{ key: 'Backspace' }, 'or', { key: 'Delete' }],
+    action: 'Remove the measurement under the pointer',
   },
 ];
 

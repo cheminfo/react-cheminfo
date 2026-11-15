@@ -45,6 +45,7 @@ export {
   MEASUREMENT_ATOM_COUNTS,
   MEASUREMENT_KINDS,
   MEASUREMENT_LABELS,
+  removeMeasurement,
   sameMeasurements,
 } from './measurement.ts';
 export type { Molecule3DFile } from './file.ts';

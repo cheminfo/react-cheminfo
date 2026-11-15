@@ -103,6 +103,45 @@ test('a measurement from the picker comes and goes alone: the model stays built,
   expect(inkOutside(relit, lit)).toBe(0);
 });
 
+test('Backspace over a measurement removes it, and only while the pointer is on it', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const { canvas, accent } = await openViewer(page);
+  const away = await cornerOf(canvas);
+  await page.mouse.move(away.x, away.y);
+  const before = await settledScene(page, canvas);
+  const cores = inkCores(await inkOf(page, before, accent), 6);
+  const top = cores[0];
+  const bottom = cores.at(-1);
+  if (top === undefined || bottom === undefined) {
+    throw new Error('no atom is lit');
+  }
+  const remove = page.getByRole('button', { name: 'Remove all measurements' });
+  await page.getByRole('button', { name: 'Distance', exact: true }).click();
+  await page.mouse.click(before.left + top.x, before.top + top.y);
+  await page.mouse.click(before.left + bottom.x, before.top + bottom.y);
+  await expect(remove).toBeEnabled();
+
+  await page.mouse.move(away.x, away.y);
+  await page.keyboard.press('Backspace');
+  await expect(remove).toBeEnabled();
+
+  // Only the dashes are picked, not the gaps nor the label over the middle:
+  // the pointer walks along the line, and as molstar picks on the frame after
+  // a move, each point is tried twice.
+  let attempt = 0;
+  await expect(async () => {
+    const fraction = 0.15 + 0.05 * (Math.floor(attempt++ / 2) % 15);
+    await page.mouse.move(
+      before.left + top.x + fraction * (bottom.x - top.x),
+      before.top + top.y + fraction * (bottom.y - top.y),
+    );
+    await page.keyboard.press('Backspace');
+    await expect(remove).toBeDisabled({ timeout: 500 });
+  }).toPass({ intervals: [150], timeout: 40_000 });
+});
+
 /**
  * Open the highlights story and wait for its lit model.
  * @param page - The page to open it in.

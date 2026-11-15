@@ -7,13 +7,13 @@
  */
 
 import type { CSSProperties, ReactElement } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { DEFAULT_SPIN_SPEED } from '../../molstar/core/index.ts';
 import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
-import type { Measurement, MeasurementKind } from '../core/measurement.ts';
+import type { MeasurementKind } from '../core/measurement.ts';
 import {
   normalizeMolecule3DSettings,
   resolveMolecule3DTools,
@@ -29,6 +29,10 @@ import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
 import { useAtomHover } from './useAtomHover.ts';
 import { useControlledState } from './useControlledState.ts';
 import { useImageExport } from './useImageExport.ts';
+import {
+  useMeasurementList,
+  useMeasurementRemoval,
+} from './useMeasurements.ts';
 import { useMoleculeScene } from './useMoleculeScene.ts';
 import { useMoleculeViewer } from './useMoleculeViewer.ts';
 import { usePolarSurfaceArea } from './usePolarSurfaceArea.ts';
@@ -86,9 +90,12 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     defaultSpinning,
     onSpinningChange,
   );
-  const [measurements, setMeasurements] = useControlledState<
-    readonly Measurement[]
-  >(measurementsProp, NO_MEASUREMENTS, onMeasurementsChange);
+  const {
+    measurements,
+    add: addMeasurement,
+    remove: removeMeasurement,
+    clear: clearMeasurements,
+  } = useMeasurementList(measurementsProp, onMeasurementsChange);
   const [measureKind, setMeasureKind] = useState<MeasurementKind | null>(null);
   const [frameCount, setFrameCount] = useState(0);
   const polarSurfaceArea = usePolarSurfaceArea(
@@ -99,19 +106,16 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
   // A callback ref: the element arriving is what creates the viewer, and every
   // effect keyed on it runs again, in order, after the viewer exists.
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
-  // The viewer is created once, so what its callbacks read is kept fresh here.
-  const latest = useRef({ measurements, setMeasurements });
-  useEffect(() => {
-    latest.current = { measurements, setMeasurements };
-  });
   const viewerRef = useMoleculeViewer(container, {
     background,
-    onMeasure: (measurement) => {
-      const current = latest.current;
-      current.setMeasurements([...current.measurements, measurement]);
-    },
+    onMeasure: addMeasurement,
     onFrameCountChange: setFrameCount,
   });
+  useMeasurementRemoval(
+    container,
+    viewerRef,
+    tools.measure && molfile !== null ? removeMeasurement : undefined,
+  );
 
   useEffect(() => {
     void viewerRef.current?.setSpin(spinning, spinSpeed);
@@ -174,9 +178,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
                 measureKind={measureKind}
                 onMeasureKindChange={setMeasureKind}
                 measurementCount={measurements.length}
-                onClearMeasurements={() => {
-                  setMeasurements(NO_MEASUREMENTS);
-                }}
+                onClearMeasurements={clearMeasurements}
                 spinning={spinning}
                 onSpinningChange={setSpinning}
                 showSurface={settings.showSurface}
@@ -216,8 +218,6 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     </Molecule3DStage>
   );
 }
-
-const NO_MEASUREMENTS: readonly Measurement[] = [];
 
 const NO_HIGHLIGHTS: readonly Molecule3DHighlight[] = [];
 

@@ -56,6 +56,10 @@ export type { FramePlayback } from './captureScene.ts';
 export type { CaptureFigureOptions } from './captureFigure.ts';
 export { captureFigure } from './captureFigure.ts';
 export { captureFrames, captureScene } from './captureScene.ts';
+export {
+  measurementOfLoci,
+  subscribeHoverMeasurement,
+} from './measurementLoci.ts';
 export type { MoleculeStructureSource } from './measurements.ts';
 export {
   MeasurementPicker,

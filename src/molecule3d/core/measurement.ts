@@ -69,6 +69,32 @@ export function sameMeasurements(
 }
 
 /**
+ * The list without one measurement: the first of the same kind over the same
+ * atoms, read in either direction, since `A–B` and `B–A` are one distance.
+ * @param measurements - The list.
+ * @param measurement - What to take out.
+ * @returns A new list without it, or `measurements` itself when it holds no
+ * such measurement.
+ */
+export function removeMeasurement(
+  measurements: readonly Measurement[],
+  measurement: Measurement,
+): readonly Measurement[] {
+  const reversed = measurement.atoms.toReversed();
+  for (let index = 0; index < measurements.length; index++) {
+    const candidate = measurements[index];
+    if (
+      candidate?.kind === measurement.kind &&
+      (sameAtoms(candidate.atoms, measurement.atoms) ||
+        sameAtoms(candidate.atoms, reversed))
+    ) {
+      return measurements.toSpliced(index, 1);
+    }
+  }
+  return measurements;
+}
+
+/**
  * Whether two lists name the same atoms in the same order.
  * @param first - One list.
  * @param second - The other.

@@ -27,6 +27,7 @@ test('every gesture is listed with what it does, the roll included', () => {
     'Shift + scroll Clip around the centre',
     'Click an atom Centre on it',
     'Click the background Centre on the molecule',
+    'Backspace or Delete Remove the measurement under the pointer',
   ]);
-  expect(html.match(/<kbd class="bp6-key">/g)).toHaveLength(6);
+  expect(html.match(/<kbd class="bp6-key">/g)).toHaveLength(8);
 });
