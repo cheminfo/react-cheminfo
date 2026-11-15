@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.124.0](https://github.com/cheminfo/react-cheminfo/compare/v0.123.0...v0.124.0) (2026-11-15)
+
+
+### Features
+
+* list ten new sites, under two new topics: Physics and Structure from spectra ([03a9f69](https://github.com/cheminfo/react-cheminfo/commit/03a9f69d92ea0492c78172ecefa0ac9c57196cb1))
+
+
+### Bug Fixes
+
+* keep nmrium.cheminfo.org unlisted ([88b06a0](https://github.com/cheminfo/react-cheminfo/commit/88b06a05ce7a80138c24fc7173a9648502fb01b3))
+
 ## [0.123.0](https://github.com/cheminfo/react-cheminfo/compare/v0.122.0...v0.123.0) (2026-11-15)
 
 
