@@ -5,14 +5,16 @@ import { SITE_GROUPS } from '../groups.ts';
 import { groupedSites, sitesInGroup } from '../lookup.ts';
 import { ECOSYSTEM_SITES } from '../sites.ts';
 
-test('the family is gathered under seven topics, in a deliberate order', () => {
+test('the family is gathered under nine topics, in a deliberate order', () => {
   const ids = SITE_GROUPS.map((group) => group.id);
 
   expect(ids).toStrictEqual([
     'basics',
     'practice',
+    'physics',
     'structures',
     'spectra',
+    'identification',
     'research',
     'drawing',
     'computing',
@@ -57,17 +59,31 @@ test('the tools a course opens with are the ones under the basics', () => {
     'inorganic',
     'plate',
     'glassware',
+    'peptide',
+  ]);
+  expect(sitesInGroup('physics').map((site) => site.id)).toStrictEqual([
+    'optics',
+    'circuits',
+    'mechanics',
   ]);
   expect(sitesInGroup('spectra').map((site) => site.id)).toStrictEqual([
     'metabo',
+    'vibrations',
+    'uv-vis',
+    'nmrium',
+    'xps',
+  ]);
+  expect(sitesInGroup('identification').map((site) => site.id)).toStrictEqual([
     'derepflow',
     'elucidation',
     'spectroscopy',
-    'vibrations',
   ]);
   expect(sitesInGroup('drawing').map((site) => site.id)).toStrictEqual([
     'draw',
     'write',
+    'plot',
+    'biodraw',
+    'diagram',
   ]);
   expect(sitesInGroup('computing').map((site) => site.id)).toStrictEqual([
     'learn',

@@ -46,15 +46,7 @@ test('the family is the thirty-one sites, listed once each', () => {
     'plate',
     'glassware',
     'write',
-  ] satisfies SiteId[]);
-});
-
-test('the sites not linked from the others yet are named apart', () => {
-  expect(UNLISTED_SITES.map((site) => site.id)).toStrictEqual([
-    'molecules',
-    'mz',
     'plot',
-    'ml',
     'uv-vis',
     'nmrium',
     'xps',
@@ -64,6 +56,14 @@ test('the sites not linked from the others yet are named apart', () => {
     'optics',
     'circuits',
     'mechanics',
+  ] satisfies SiteId[]);
+});
+
+test('the sites not linked from the others yet are named apart', () => {
+  expect(UNLISTED_SITES.map((site) => site.id)).toStrictEqual([
+    'molecules',
+    'mz',
+    'ml',
   ] satisfies SiteId[]);
 });
 

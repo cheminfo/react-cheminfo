@@ -13,8 +13,10 @@
 export type SiteGroupId =
   | 'basics'
   | 'practice'
+  | 'physics'
   | 'structures'
   | 'spectra'
+  | 'identification'
   | 'research'
   | 'drawing'
   | 'computing';
@@ -50,6 +52,11 @@ export const SITE_GROUPS: readonly SiteGroup[] = [
       'Where a first course is worked through, one graded series at a time.',
   },
   {
+    id: 'physics',
+    label: 'Physics',
+    blurb: 'The physics a chemistry course leans on, set up on a bench.',
+  },
+  {
     id: 'structures',
     label: 'Structures & notation',
     blurb: 'Draw a molecule, convert it between notations, see it in space.',
@@ -57,7 +64,12 @@ export const SITE_GROUPS: readonly SiteGroup[] = [
   {
     id: 'spectra',
     label: 'Spectra',
-    blurb: 'Process a measurement, and work back to the structure behind it.',
+    blurb: 'Open a measurement, process it, and set it beside others.',
+  },
+  {
+    id: 'identification',
+    label: 'Structure from spectra',
+    blurb: 'Work back from a spectrum to the structure behind it.',
   },
   {
     id: 'research',
