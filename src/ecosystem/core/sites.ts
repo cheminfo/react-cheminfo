@@ -468,18 +468,6 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#c026d3', accent: '#22d3ee' },
   },
   {
-    id: 'nmrium',
-    // NMRium, served on the family's domain for the figures draw and write
-    // frame it to make, so it wears NMRium's name, mark and colours.
-    name: { lead: 'NMR', alt: 'ium' },
-    host: 'nmrium.cheminfo.org',
-    tagline: 'Process NMR spectra, and keep them as figures that open again.',
-    group: 'spectra',
-    brand: '#ea580c',
-    brandAlt: '#2b143e',
-    mark: { plate: '#2b143e', accent: '#ea580c' },
-  },
-  {
     id: 'xps',
     name: { lead: 'xps', alt: 'cheminfo', dot: true },
     host: 'xps.cheminfo.org',

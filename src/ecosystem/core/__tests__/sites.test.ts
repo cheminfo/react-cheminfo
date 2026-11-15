@@ -48,7 +48,6 @@ test('the family is the thirty-one sites, listed once each', () => {
     'write',
     'plot',
     'uv-vis',
-    'nmrium',
     'xps',
     'biodraw',
     'diagram',
@@ -64,6 +63,7 @@ test('the sites not linked from the others yet are named apart', () => {
     'molecules',
     'mz',
     'ml',
+    'nmrium',
   ] satisfies SiteId[]);
 });
 
