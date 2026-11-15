@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.122.0](https://github.com/cheminfo/react-cheminfo/compare/v0.121.0...v0.122.0) (2026-11-15)
+
+
+### Features
+
+* add the optics, circuits and mechanics sites, with a shared undo history and panel state ([18d6d90](https://github.com/cheminfo/react-cheminfo/commit/18d6d90b4d5e076dc625a5ded9c2dca563699519))
+* add the plot site record ([c1a20bd](https://github.com/cheminfo/react-cheminfo/commit/c1a20bd9399f188ca4913c183d1adb515c7bf840))
+
 ## [0.121.0](https://github.com/cheminfo/react-cheminfo/compare/v0.120.0...v0.121.0) (2026-11-14)
 
 
