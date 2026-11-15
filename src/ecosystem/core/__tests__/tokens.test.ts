@@ -28,12 +28,12 @@ test('a site whose answering colour is already readable carries one form', () =>
 });
 
 test('a mark that gives the plate the answering colour still reads right', () => {
-  // NMRium's mark is its own logo: the plate is the plum, and the orange it
+  // DerepFlow's mark stands on the slate its name answers in, and the cyan it
   // leads with is the accent on top of it.
-  expect(siteTokensCss('nmrium')).toBe(
+  expect(siteTokensCss('derepflow')).toBe(
     `:root {
-  --brand: #ea580c;
-  --brand-alt: #2b143e;
+  --brand: #127ba3;
+  --brand-alt: #1e293b;
   --accent: var(--brand);
 }
 `,

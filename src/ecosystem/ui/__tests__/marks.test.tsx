@@ -6,6 +6,7 @@ import { OUTSIDE_SITE } from '../../core/__tests__/outsideSite.ts';
 import { siteById } from '../../core/lookup.ts';
 import { ECOSYSTEM_SITES } from '../../core/sites.ts';
 import { SiteMark } from '../marks.tsx';
+import { NMRIUM_MARK } from '../nmriumMark.tsx';
 
 test('a mark is drawn from the site itself or from its identifier alike', () => {
   const byId = renderToStaticMarkup(<SiteMark siteId="pdb" />);
@@ -15,6 +16,16 @@ test('a mark is drawn from the site itself or from its identifier alike', () => 
   expect(byId).toContain('width="28" height="28"');
   expect(byId).toContain('fill="#2563eb"');
   expect(byId).toContain('fill="#fbbf24"');
+});
+
+test('NMRium keeps its own mark, though it is a page of nmr', () => {
+  const html = renderToStaticMarkup(<SiteMark {...NMRIUM_MARK} size={36} />);
+
+  expect(html).toContain('width="36" height="36"');
+  // The plum plate, and the orange half of NMRium's symbol on it.
+  expect(html).toContain('fill="#2b143e"');
+  expect(html).toContain('fill="#ea580c"');
+  expect(html).not.toBe(renderToStaticMarkup(<SiteMark siteId="nmr" />));
 });
 
 test('a mark with neither the site nor its identifier says so', () => {

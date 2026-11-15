@@ -454,15 +454,19 @@ on a plate of the site's own colour so every mark of the family still reads as
 one row, and carrying the site's answering colour on exactly one element —
 which is what stops it collapsing into a flat shape at 16 px.
 
-**NMRium** keeps its artwork whole: the symbol is the one from `Logo.tsx` of the
-NMRium sources, in its orange, on the plum its logo sets the rest of the
-wordmark in. **ChemCalc** is the one mark that is ours — its logo is an atom
-that is unreadable small, so the tile draws what the tool returns, an isotopic
-pattern, in ChemCalc's own indigo and teal.
+**ChemCalc** is the one mark that is ours — its logo is an atom that is
+unreadable small, so the tile draws what the tool returns, an isotopic pattern,
+in ChemCalc's own indigo and teal.
+
+**NMRium** is not a site of the family but a page of nmr.cheminfo.org, so its
+mark is `NMRIUM_MARK` rather than a record: `<SiteMark {...NMRIUM_MARK} />`
+draws the symbol from `Logo.tsx` of the NMRium sources whole, in its orange, on
+the plum its logo sets the rest of the wordmark in. It is for what names NMRium
+itself, such as the entries of draw and write that open that page.
 
 The colours a name is set in are the site's own and are not retuned to reach the
-4.5:1 of body text: ChemCalc's teal and NMRium's orange both land just under it,
-which is why a name is set bold, where 3:1 is the threshold.
+4.5:1 of body text: ChemCalc's teal lands just under it, which is why a name is
+set bold, where 3:1 is the threshold.
 
 ### `StructureEditor`
 

@@ -70,6 +70,7 @@ test('the tools a course opens with are the ones under the basics', () => {
     'metabo',
     'vibrations',
     'uv-vis',
+    'nmr',
     'xps',
   ]);
   expect(sitesInGroup('identification').map((site) => site.id)).toStrictEqual([

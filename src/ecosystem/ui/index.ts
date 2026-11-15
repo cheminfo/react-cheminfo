@@ -6,6 +6,7 @@ export type { EcosystemMenuProps } from './EcosystemMenu.tsx';
 export { EcosystemMenu } from './EcosystemMenu.tsx';
 export type { SiteMarkProps } from './marks.tsx';
 export { SiteMark } from './marks.tsx';
+export { NMRIUM_MARK } from './nmriumMark.tsx';
 export type { SiteThemeProps } from './SiteTheme.tsx';
 export { SiteTheme } from './SiteTheme.tsx';
 export type { SiteTileProps } from './SiteTile.tsx';

@@ -468,6 +468,25 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#c026d3', accent: '#22d3ee' },
   },
   {
+    id: 'nmr',
+    name: { lead: 'nmr', alt: 'cheminfo', dot: true },
+    host: 'nmr.cheminfo.org',
+    // What nmrium.cheminfo.org saved is read as this site's, and opens on its
+    // NMRium page, /nmrium.
+    formerIds: ['nmrium'],
+    formerHosts: ['nmrium.cheminfo.org'],
+    tagline:
+      'Process NMR spectra in NMRium, draw pulse sequences, and learn how a spectrum arises.',
+    group: 'spectra',
+    // A deep wine, 9.7:1 on white and 6.2 Oklab units from the nearest lead of
+    // the family (symmetry).
+    brand: '#831843',
+    // The radio-frequency pulse of the mark, in a blue the wordmark sets its
+    // second half in at 6.7:1.
+    brandAlt: '#1d4ed8',
+    mark: { plate: '#831843', accent: '#60a5fa' },
+  },
+  {
     id: 'xps',
     name: { lead: 'xps', alt: 'cheminfo', dot: true },
     host: 'xps.cheminfo.org',

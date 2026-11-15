@@ -5,6 +5,7 @@ import {
   findSiteById,
   groupedSites,
   isSameSite,
+  presentSiteId,
   siteById,
 } from '../lookup.ts';
 import type { SiteId } from '../sites.ts';
@@ -65,7 +66,7 @@ test('a port and a missing or added www. are the same host', () => {
   expect(findSiteByHost('www.isomers.cheminfo.org')?.id).toBe('isomers');
   expect(findSiteByHost('chemcalc.org')?.id).toBe('chemcalc');
   expect(findSiteByHost('WWW.ChemCalc.org:443')?.id).toBe('chemcalc');
-  expect(findSiteByHost('  NMRium.cheminfo.org  ')?.id).toBe('nmrium');
+  expect(findSiteByHost('  NMR.cheminfo.org  ')?.id).toBe('nmr');
 });
 
 test('a host belonging to nobody is not one of ours', () => {
@@ -92,6 +93,14 @@ test('what a site saved under its former identifier is still its own', () => {
   expect(isSameSite('glassware', 'plate')).toBe(false);
 });
 
+test('what nmrium.cheminfo.org saved opens on nmr.cheminfo.org', () => {
+  expect(findSiteById('nmrium')?.id).toBe('nmr');
+  expect(findSiteByHost('www.NMRium.cheminfo.org:443')?.id).toBe('nmr');
+  expect(presentSiteId('nmrium')).toBe('nmr');
+  expect(isSameSite('nmrium', 'nmr')).toBe(true);
+  expect(isSameSite('nmr', 'nmrium')).toBe(false);
+});
+
 test('no identifier or host is claimed by two sites', () => {
   const claimed = new Map<string, string>();
   for (const site of [...ECOSYSTEM_SITES, ...UNLISTED_SITES]) {
@@ -108,4 +117,6 @@ test('no identifier or host is claimed by two sites', () => {
   }
 
   expect(claimed.get('id:tlc')).toBe('plate');
+  expect(claimed.get('id:nmrium')).toBe('nmr');
+  expect(claimed.get('host:nmrium.cheminfo.org')).toBe('nmr');
 });

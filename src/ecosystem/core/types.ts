@@ -38,7 +38,6 @@ export type SiteId =
   | 'ml'
   | 'vibrations'
   | 'uv-vis'
-  | 'nmrium'
   | 'xps'
   | 'biodraw'
   | 'diagram'
@@ -49,7 +48,8 @@ export type SiteId =
   | 'draw'
   | 'plate'
   | 'glassware'
-  | 'write';
+  | 'write'
+  | 'nmr';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {
