@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.123.0](https://github.com/cheminfo/react-cheminfo/compare/v0.122.0...v0.123.0) (2026-11-15)
+
+
+### Features
+
+* **host:** send data to the sites that announce what they receive ([6d10c12](https://github.com/cheminfo/react-cheminfo/commit/6d10c123827a08c80a16ecd292619d22a86fdc47))
+
 ## [0.122.0](https://github.com/cheminfo/react-cheminfo/compare/v0.121.0...v0.122.0) (2026-11-15)
 
 
