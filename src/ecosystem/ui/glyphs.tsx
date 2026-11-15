@@ -807,6 +807,62 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <rect x="12" y="21" width="9" height="1.6" rx="0.8" fill="#0b3d2e" />
     </>
   ),
+  // A converging lens on its bench: the lens in white, and two rays of a
+  // parallel beam it brings to its focus in the answering colour.
+  optics: (alt) => (
+    <>
+      <path
+        d="M13 4C17.2 8.5 17.2 23.5 13 28C8.8 23.5 8.8 8.5 13 4Z"
+        fill="#ffffff"
+      />
+      <path
+        d="M3 10.5H9.6M3 21.5H9.6M16.4 10.5 27 16 16.4 21.5"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
+  // A circuit as its schematic is drawn: the loop and its resistor in white,
+  // and the current running round it in the answering colour.
+  circuits: (alt) => (
+    <>
+      <path
+        d="M6 16V7H10.5L12.5 4.5 15.5 9.5 18.5 4.5 20.5 7H26V25H6V16"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 21 18 25 14 29"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
+  // A block on an inclined plane, the first problem of mechanics: the slope
+  // in white, and the block in the answering colour.
+  mechanics: (alt) => (
+    <>
+      <path d="M3.5 26.5H28.5V9.8Z" fill="#ffffff" />
+      <rect
+        x="8.89"
+        y="9.57"
+        width="9"
+        height="9"
+        rx="1.4"
+        fill={alt}
+        transform="rotate(-33.74 13.39 18.57)"
+      />
+    </>
+  ),
 };
 
 /**

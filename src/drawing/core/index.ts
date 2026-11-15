@@ -170,3 +170,5 @@ export { pointMap } from './transform.ts';
 export type { Box, DrawPage, FigureSize, Point } from './types.ts';
 export { arrayOf, isFiniteNumber, isRecord } from './values.ts';
 export { along, leftOf, turnAbout, unit } from './vectors.ts';
+export type { UndoHistory, UndoHistoryOptions } from './undoHistory.ts';
+export { createUndoHistory } from './undoHistory.ts';

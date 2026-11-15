@@ -135,4 +135,50 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     brandAlt: '#0f766e',
     mark: { plate: '#563d8f', accent: '#2dd4bf' },
   },
+  {
+    id: 'optics',
+    name: { lead: 'optics', alt: 'cheminfo', dot: true },
+    host: 'optics.cheminfo.org',
+    tagline:
+      'Set lenses and mirrors on a bench, and follow the light to its image.',
+    group: 'practice',
+    // The blue of a lens seen edge on: 7.9:1 on white, and 6.6 Oklab units
+    // from 3d, the nearest lead.
+    brand: '#2c518e',
+    // The red of a laser beam answers it, at 6.5:1; the mark draws its rays
+    // in the paler red.
+    brandAlt: '#b91c1c',
+    mark: { plate: '#2c518e', accent: '#fca5a5' },
+  },
+  {
+    id: 'circuits',
+    name: { lead: 'circuits', alt: 'cheminfo', dot: true },
+    host: 'circuits.cheminfo.org',
+    tagline:
+      'Wire batteries, bulbs and resistors, and read what the meters show.',
+    group: 'practice',
+    // Copper, what every wire is drawn in: 5.8:1 on white, and 6.2 Oklab
+    // units from inorganic and from slides, the nearest leads.
+    brand: '#a84811',
+    // The blue of a current answers it, at 5.9:1; the mark draws the current
+    // in the paler blue.
+    brandAlt: '#0369a1',
+    mark: { plate: '#a84811', accent: '#7dd3fc' },
+  },
+  {
+    id: 'mechanics',
+    name: { lead: 'mechanics', alt: 'cheminfo', dot: true },
+    host: 'mechanics.cheminfo.org',
+    tagline:
+      'Put a block on a slope or over a pulley, and see the forces add up.',
+    group: 'practice',
+    // Brass, the weights of a mechanics lab: 5.5:1 on white, and 6.7 Oklab
+    // units from osiris, the nearest lead.
+    brand: '#7b672e',
+    // Violet answers it, 31 Oklab units away so the two halves of the name
+    // never read as one, at 7:1; the mark draws the block in the paler
+    // violet.
+    brandAlt: '#7e22ce',
+    mark: { plate: '#7b672e', accent: '#d8b4fe' },
+  },
 ];

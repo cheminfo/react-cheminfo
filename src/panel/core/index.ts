@@ -10,6 +10,12 @@
  */
 
 export { listStyle, paragraphStyle } from './dialogStyles.ts';
+export type {
+  PanelState,
+  PanelStateCells,
+  PanelStateOptions,
+} from './createPanelState.ts';
+export { createPanelState } from './createPanelState.ts';
 export { isEditingField } from './isEditingField.ts';
 export type { PanelLayout, PanelStatus } from './panelLayout.ts';
 export {

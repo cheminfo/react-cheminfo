@@ -32,6 +32,8 @@ export type {
   PanelMessageProps,
 } from './PanelMessage.tsx';
 export { PanelEmpty, PanelMessage } from './PanelMessage.tsx';
+export type { PanelFrameProps } from './PanelFrame.tsx';
+export { PanelFrame } from './PanelFrame.tsx';
 export type { PanelRowProps } from './PanelRow.tsx';
 export { PanelRow } from './PanelRow.tsx';
 export type { PanelRailProps, RailPanel } from './PanelRail.tsx';
