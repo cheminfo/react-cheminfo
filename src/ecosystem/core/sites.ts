@@ -8,6 +8,7 @@ export type {
   SiteId,
   SiteMarkColors,
   SiteName,
+  SiteReceiver,
   SiteRecord,
 } from './types.ts';
 

@@ -6,6 +6,7 @@ export {
   findSiteById,
   groupedSites,
   isSameSite,
+  knownSites,
   presentSiteId,
   siteById,
   siteDisplayName,
@@ -17,6 +18,7 @@ export type {
   SiteId,
   SiteMarkColors,
   SiteName,
+  SiteReceiver,
   SiteRecord,
   SiteUrlOptions,
 } from './sites.ts';

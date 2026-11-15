@@ -127,6 +127,7 @@
   "site.wikidata.tagline": "The chemistry of Wikipedia’s infoboxes, searchable by structure.",
   "site.mz.tagline": "Mass spectra, classified by how they were measured.",
   "site.plot.tagline": "Plot tables and spectra as charts sized and styled for a journal.",
+  "site.ml.tagline": "Machine learning on spectra, in the browser.",
   "site.uv-vis.tagline": "Overlay UV-vis spectra and read off every λmax.",
   "site.xps.tagline": "Read, fit and predict X-ray photoelectron spectra.",
   "site.biodraw.tagline": "Draw cells and membranes, and snap proteins into them.",
@@ -1058,5 +1059,9 @@
   "folder.create": "Create",
   "folder.folderTaken": "A folder is already named {name} here: choose another name.",
   "folder.openFolder": "Open the folder {folder}",
-  "folder.found": "In {path}"
+  "folder.found": "In {path}",
+  "send.label": "Send to",
+  "send.heading": "Send {what} to",
+  "send.none": "Nothing on this page can be sent to another tool yet.",
+  "send.blocked": "The browser blocked the new tab: allow pop-ups for this site, then send again."
 }

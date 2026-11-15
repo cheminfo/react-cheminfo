@@ -127,6 +127,7 @@
   "site.wikidata.tagline": "La chimie des infobox de Wikipédia, interrogeable par structure.",
   "site.mz.tagline": "Des spectres de masse, classés selon la façon dont ils ont été mesurés.",
   "site.plot.tagline": "Tracer des tableaux et des spectres en graphiques aux dimensions et au style d’une revue.",
+  "site.ml.tagline": "Apprentissage automatique sur des spectres, dans le navigateur.",
   "site.uv-vis.tagline": "Superposer des spectres UV-visible et relever chaque λmax.",
   "site.xps.tagline": "Lire, ajuster et prédire des spectres de photoélectrons X.",
   "site.biodraw.tagline": "Dessiner cellules et membranes, et y ancrer des protéines.",
@@ -1058,5 +1059,9 @@
   "folder.create": "Créer",
   "folder.folderTaken": "Un dossier s’appelle déjà {name} ici : choisissez un autre nom.",
   "folder.openFolder": "Ouvrir le dossier {folder}",
-  "folder.found": "Dans {path}"
+  "folder.found": "Dans {path}",
+  "send.label": "Envoyer vers",
+  "send.heading": "Envoyer {what} vers",
+  "send.none": "Rien sur cette page ne peut encore être envoyé à un autre outil.",
+  "send.blocked": "Le navigateur a bloqué le nouvel onglet : autorisez les fenêtres pour ce site, puis envoyez à nouveau."
 }

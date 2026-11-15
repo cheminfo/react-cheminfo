@@ -127,6 +127,7 @@
   "site.wikidata.tagline": "La química de las fichas de Wikipedia, con búsqueda por estructura.",
   "site.mz.tagline": "Espectros de masas, clasificados según cómo se midieron.",
   "site.plot.tagline": "Trazar tablas y espectros como gráficos con el tamaño y el estilo de una revista.",
+  "site.ml.tagline": "Aprendizaje automático sobre espectros, en el navegador.",
   "site.uv-vis.tagline": "Superponer espectros UV-vis y leer cada λmax.",
   "site.xps.tagline": "Leer, ajustar y predecir espectros de fotoelectrones de rayos X.",
   "site.biodraw.tagline": "Dibujar células y membranas, y anclar proteínas en ellas.",
@@ -1058,5 +1059,9 @@
   "folder.create": "Crear",
   "folder.folderTaken": "Aquí ya hay una carpeta llamada {name}: elija otro nombre.",
   "folder.openFolder": "Abrir la carpeta {folder}",
-  "folder.found": "En {path}"
+  "folder.found": "En {path}",
+  "send.label": "Enviar a",
+  "send.heading": "Enviar {what} a",
+  "send.none": "Nada de esta página puede enviarse todavía a otra herramienta.",
+  "send.blocked": "El navegador bloqueó la nueva pestaña: permita las ventanas emergentes para este sitio y vuelva a enviar."
 }

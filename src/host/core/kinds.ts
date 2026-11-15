@@ -8,7 +8,8 @@
  * kinds of `./irKinds.ts`, the Raman ones of `./ramanKinds.ts`, the UV-vis
  * ones of `./uvKinds.ts` and the mass
  * spectrometry ones of `./msKinds.ts`, the reaction of `./reactionKinds.ts`,
- * the peptide of `./peptideKinds.ts`, and
+ * the peptide of `./peptideKinds.ts`, the set of spectra of
+ * `./datasetKinds.ts`, and
  * the kinds a tool hands back, of `./resultKinds.ts`. A name with children is a category whose
  * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
  * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
@@ -19,8 +20,14 @@
 import type { JSONSchemaType, ValidateFunction } from 'ajv';
 import { Ajv } from 'ajv';
 
+import type { SpectraDatasetValue } from './datasetKinds.ts';
+import {
+  NUMBER_ARRAY_KEYWORD,
+  SPECTRA_DATASET_SCHEMA,
+} from './datasetKinds.ts';
 import type { IrJdxValue, IrPeaksValue } from './irKinds.ts';
 import { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
+import { kindAccepts } from './kindAccepts.ts';
 import type { MsAssignmentsValue, MsIonsValue, MsJdxValue } from './msKinds.ts';
 import {
   MS_ASSIGNMENTS_SCHEMA,
@@ -73,7 +80,10 @@ export type CheckedValue =
   | { kind: 'spectra.ms.assignments'; value: MsAssignmentsValue }
   | { kind: 'image.svg'; value: SvgImageValue }
   | { kind: 'chem.name'; value: NameValue }
-  | { kind: 'data.table'; value: TableValue };
+  | { kind: 'data.table'; value: TableValue }
+  | { kind: 'data.spectra'; value: SpectraDatasetValue };
+
+export { kindAccepts } from './kindAccepts.ts';
 
 /** The name of a kind there is a schema for: one a tool reads, or one it hands back. */
 export type KnownKind = CheckedValue['kind'];
@@ -87,22 +97,6 @@ type ValueOf<K extends KnownKind> = CheckedOf<K>['value'];
 /** What checking a value gave. */
 export type CheckOutcome =
   { valid: true; checked: CheckedValue } | { valid: false; errors: string[] };
-
-/**
- * Whether a kind falls under another: the same name, or a name under it on a
- * segment boundary. A list (`…[]`) never stands for one value, nor one value
- * for a list.
- * @param accepted - The kind a tool declares, e.g. `'chem.molfile'`.
- * @param offered - The kind an item carries, e.g. `'chem.molfile.2d'`.
- * @returns `true` when an item of `offered` can be read as `accepted`.
- */
-export function kindAccepts(accepted: string, offered: string): boolean {
-  const list = accepted.endsWith('[]');
-  if (offered.endsWith('[]') !== list) return false;
-  const base = list ? accepted.slice(0, -2) : accepted;
-  const name = list ? offered.slice(0, -2) : offered;
-  return name === base || name.startsWith(`${base}.`);
-}
 
 /**
  * Whether there is a schema for a kind.
@@ -194,6 +188,7 @@ const SMILES_SCHEMA: JSONSchemaType<SmilesValue> = {
 // `removeAdditional` strips what `additionalProperties: false` would refuse;
 // a table's cell is a string, a number or null, which is a union of types.
 const ajv = new Ajv({ removeAdditional: true, allowUnionTypes: true });
+ajv.addKeyword(NUMBER_ARRAY_KEYWORD);
 
 const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'chem.molfile': ajv.compile(MOLFILE_SCHEMA),
@@ -217,4 +212,5 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'image.svg': ajv.compile<SvgImageValue>(SVG_IMAGE_SCHEMA),
   'chem.name': ajv.compile<NameValue>(NAME_SCHEMA),
   'data.table': ajv.compile<TableValue>(TABLE_SCHEMA),
+  'data.spectra': ajv.compile<SpectraDatasetValue>(SPECTRA_DATASET_SCHEMA),
 };

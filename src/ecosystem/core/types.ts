@@ -35,6 +35,7 @@ export type SiteId =
   | 'wikidata'
   | 'mz'
   | 'plot'
+  | 'ml'
   | 'vibrations'
   | 'uv-vis'
   | 'nmrium'
@@ -124,6 +125,29 @@ export interface EcosystemSite extends SiteRecord {
    * in the menu and in the footer.
    */
   group: SiteGroupId;
+  /**
+   * What the site takes from another site of the family, which is what a Send
+   * menu offers to send it.
+   * @default undefined — no site sends it anything
+   */
+  receives?: readonly SiteReceiver[];
+}
+
+/**
+ * One way a site takes data from another: the kinds its tool's input accepts,
+ * and what it does with them. It mirrors one input the site's own `TOOL`
+ * announces in its `hello`, which a sender cannot read before opening it.
+ */
+export interface SiteReceiver {
+  /** The kinds it accepts, in order of preference, as its input names them. */
+  kinds: readonly string[];
+  /** What it does with them, in a few words, as the Send menu says it. */
+  does: string;
+  /**
+   * The page it is opened on.
+   * @default '/'
+   */
+  page?: string;
 }
 
 /** The colours a site's mark is drawn in. */

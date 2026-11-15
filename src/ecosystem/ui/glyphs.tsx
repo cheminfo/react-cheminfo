@@ -589,6 +589,22 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <circle cx="23" cy="9.6" r="2.6" fill="#ffffff" />
     </>
   ),
+  // A clustering tree, what the site draws, joining three samples, which
+  // take the answering colour.
+  ml: (alt) => (
+    <>
+      <path
+        d="M8 22V14H16V22M12 14V7.5H24V22"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.6"
+        strokeLinejoin="round"
+      />
+      <circle cx="8" cy="24" r="2.7" fill={alt} />
+      <circle cx="16" cy="24" r="2.7" fill={alt} />
+      <circle cx="24" cy="24" r="2.7" fill={alt} />
+    </>
+  ),
   // An infobox: the structure at its top, a ring, and two rows of data under
   // it. The second row carries the answering colour, the blue of a link. Both
   // rows and the gap between them fall on whole pixels at 16 px.

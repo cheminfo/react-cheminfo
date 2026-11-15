@@ -49,6 +49,25 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#0024fc', accent: '#fbbf24' },
   },
   {
+    id: 'ml',
+    name: { lead: 'ml', alt: 'cheminfo', dot: true },
+    host: 'ml.cheminfo.org',
+    tagline: 'Machine learning on spectra, in the browser.',
+    group: 'spectra',
+    // A purple plate for the statistics, and the teal of the second half
+    // answers it at 5.4:1 on white.
+    brand: '#6a3d9a',
+    brandAlt: '#00796b',
+    // The samples at the foot of the clustering tree take an amber.
+    mark: { plate: '#6a3d9a', accent: '#ffb000' },
+    receives: [
+      {
+        kinds: ['data.spectra', 'data.table'],
+        does: 'Compare the spectra with PCA, OPLS and clustering',
+      },
+    ],
+  },
+  {
     id: 'uv-vis',
     name: { lead: 'uv-', alt: 'vis' },
     host: 'uv-vis.cheminfo.org',

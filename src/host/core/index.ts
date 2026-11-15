@@ -33,6 +33,14 @@ export {
 } from './hostStructure.ts';
 export type { BandStrength } from './bandStrength.ts';
 export { BAND_STRENGTHS, BAND_STRENGTH_SCHEMA } from './bandStrength.ts';
+export type {
+  DatasetAxisValue,
+  DatasetColumnValue,
+  DatasetSpectrumValue,
+  MetaValue,
+  SpectraDatasetValue,
+} from './datasetKinds.ts';
+export { SPECTRA_DATASET_SCHEMA } from './datasetKinds.ts';
 export type { IrJdxValue, IrPeakValue, IrPeaksValue } from './irKinds.ts';
 export { IR_JDX_SCHEMA, IR_PEAKS_SCHEMA } from './irKinds.ts';
 export type {
@@ -44,7 +52,8 @@ export type {
   OclIdValue,
   SmilesValue,
 } from './kinds.ts';
-export { checkValue, isKnownKind, kindAccepts, readOutput } from './kinds.ts';
+export { checkValue, isKnownKind, readOutput } from './kinds.ts';
+export { kindAccepts } from './kindAccepts.ts';
 export type {
   MsAssignmentValue,
   MsAssignmentsValue,
@@ -120,3 +129,5 @@ export { toolAboutUrl, toolPageUrl } from './toolPage.ts';
 export type { ToolHello } from './toolMessages.ts';
 export { readSettingFields } from './toolSettings.ts';
 export { readHello, readToolMessage } from './toolMessages.ts';
+export type { SendOffer, SendTarget } from './sendTargets.ts';
+export { sendTargets } from './sendTargets.ts';

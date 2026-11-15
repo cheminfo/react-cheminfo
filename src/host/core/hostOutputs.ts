@@ -12,7 +12,7 @@
  * and never sent unasked.
  */
 
-import { kindAccepts } from './kinds.ts';
+import { kindAccepts } from './kindAccepts.ts';
 import type { HostItem, OutputMessage } from './protocol.ts';
 
 /** Where a tool's outputs are read, and how their changes are heard. */

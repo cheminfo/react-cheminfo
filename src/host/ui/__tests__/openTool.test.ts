@@ -145,3 +145,75 @@ test('a tab that never greets is let go once the tool has had its time', () => {
 
   expect(received).toStrictEqual([]);
 });
+
+test('a document built once the tab is open is handed over when it is ready', async () => {
+  const { opened, startTool } = tab();
+  vi.stubGlobal(
+    'open',
+    vi.fn(() => opened),
+  );
+  const removed = vi.spyOn(globalThis, 'removeEventListener');
+  const loaded: unknown[] = [];
+  const ready: { resolve?: (document: typeof ETHANOL) => void } = {};
+  const promise = new Promise<typeof ETHANOL>((resolve) => {
+    ready.resolve = resolve;
+  });
+
+  expect(openTool({ url: FRAMED, host: 'draw', document: () => promise })).toBe(
+    true,
+  );
+
+  const stop = startTool((value) => {
+    loaded.push(value);
+  });
+  ready.resolve?.(ETHANOL);
+  await until(() => removed.mock.calls.some(([type]) => type === 'message'));
+  stop();
+
+  expect(loaded).toStrictEqual([{ smiles: 'CCO' }]);
+});
+
+test('a document that cannot be built is reported, and the tab let go', async () => {
+  const { opened } = tab();
+  vi.stubGlobal(
+    'open',
+    vi.fn(() => opened),
+  );
+  const errors: string[] = [];
+
+  openTool({
+    url: FRAMED,
+    host: 'draw',
+    document: () => Promise.reject(new Error('No spectrum is open.')),
+    onError: (message) => errors.push(message),
+  });
+  await until(() => errors.length > 0);
+
+  expect(errors).toStrictEqual(['No spectrum is open.']);
+});
+
+test('a document the tool refuses is reported with its reason', async () => {
+  const { opened, startTool } = tab();
+  vi.stubGlobal(
+    'open',
+    vi.fn(() => opened),
+  );
+  const errors: string[] = [];
+
+  openTool({
+    url: FRAMED,
+    host: 'draw',
+    document: {
+      document: 'draw:table',
+      items: [{ kind: 'data.table', value: { columns: [], rows: [] } }],
+    },
+    onError: (message) => errors.push(message),
+  });
+  const stop = startTool(() => undefined);
+  await until(() => errors.length > 0);
+  stop();
+
+  expect(errors).toStrictEqual([
+    'No item is a chem.smiles, so 3d loaded nothing.',
+  ]);
+});

@@ -54,6 +54,7 @@ test('the sites not linked from the others yet are named apart', () => {
     'molecules',
     'mz',
     'plot',
+    'ml',
     'uv-vis',
     'nmrium',
     'xps',

@@ -127,6 +127,7 @@
   "site.wikidata.tagline": "La chimica delle infobox di Wikipedia, ricercabile per struttura.",
   "site.mz.tagline": "Spettri di massa, classificati in base a come sono stati misurati.",
   "site.plot.tagline": "Tracciare tabelle e spettri come grafici con le dimensioni e lo stile di una rivista.",
+  "site.ml.tagline": "Apprendimento automatico sugli spettri, nel browser.",
   "site.uv-vis.tagline": "Sovrapporre spettri UV-vis e leggere ogni λmax.",
   "site.xps.tagline": "Leggere, adattare e prevedere spettri fotoelettronici a raggi X.",
   "site.biodraw.tagline": "Disegnare cellule e membrane, e ancorarvi delle proteine.",
@@ -1058,5 +1059,9 @@
   "folder.create": "Crea",
   "folder.folderTaken": "Qui c’è già una cartella chiamata {name}: scegli un altro nome.",
   "folder.openFolder": "Apri la cartella {folder}",
-  "folder.found": "In {path}"
+  "folder.found": "In {path}",
+  "send.label": "Invia a",
+  "send.heading": "Invia {what} a",
+  "send.none": "Nulla di questa pagina può ancora essere inviato a un altro strumento.",
+  "send.blocked": "Il browser ha bloccato la nuova scheda: consenti i pop-up per questo sito, poi invia di nuovo."
 }

@@ -17,6 +17,8 @@ export type { SaveFigureAs, SaveFigureAsOptions } from './useSaveFigureAs.tsx';
 export { useSaveFigureAs } from './useSaveFigureAs.tsx';
 export { useSaveShortcut } from './useSaveShortcut.ts';
 export { openTool } from './openTool.ts';
+export type { SendItemOffer, SendToButtonProps } from './SendToButton.tsx';
+export { SendToButton } from './SendToButton.tsx';
 export type {
   FramedTool,
   FramedToolOptions,

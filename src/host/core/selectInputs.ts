@@ -3,8 +3,9 @@
  * host is answered with when the request loads nothing.
  */
 
+import { kindAccepts } from './kindAccepts.ts';
 import type { CheckedValue, KnownKind } from './kinds.ts';
-import { checkValue, isKnownKind, kindAccepts } from './kinds.ts';
+import { checkValue, isKnownKind } from './kinds.ts';
 import type {
   HostError,
   HostItem,

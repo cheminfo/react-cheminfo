@@ -10,6 +10,15 @@ const KNOWN_SITES: readonly EcosystemSite[] = [
   ...UNLISTED_SITES,
 ];
 
+/**
+ * Every site of the family, listed in the menu or not yet: what a lookup
+ * searches, and what a Send menu picks the sites that take its data from.
+ * @returns The listed sites, then the unlisted ones, in declaration order.
+ */
+export function knownSites(): readonly EcosystemSite[] {
+  return KNOWN_SITES;
+}
+
 /** One topic and the sites written under it. */
 export interface GroupedSites {
   /** The topic. */

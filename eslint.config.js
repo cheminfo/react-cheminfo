@@ -16,6 +16,13 @@ export default defineConfig(
   typescript,
   react,
   {
+    rules: {
+      // No options, so it cannot be limited to arrays of objects; over a
+      // Float64Array `for … of` costs 4x on V8 and up to 20x on JavaScriptCore.
+      '@typescript-eslint/prefer-for-of': 'off',
+    },
+  },
+  {
     // The chart is what makes the viewers built on it siblings rather than a
     // stack, so it must never learn what any of them measures: an infrared
     // spectrum, a mass spectrum, an XPS spectrum and a glycan are all drawn by

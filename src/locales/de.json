@@ -127,6 +127,7 @@
   "site.wikidata.tagline": "Die Chemie der Wikipedia-Infoboxen, nach Struktur durchsuchbar.",
   "site.mz.tagline": "Massenspektren, danach geordnet, wie sie gemessen wurden.",
   "site.plot.tagline": "Tabellen und Spektren als Diagramme zeichnen, in Größe und Stil einer Zeitschrift.",
+  "site.ml.tagline": "Maschinelles Lernen auf Spektren, im Browser.",
   "site.uv-vis.tagline": "UV-Vis-Spektren überlagern und jedes λmax ablesen.",
   "site.xps.tagline": "Röntgenphotoelektronenspektren lesen, anpassen und vorhersagen.",
   "site.biodraw.tagline": "Zellen und Membranen zeichnen und Proteine darin verankern.",
@@ -1058,5 +1059,9 @@
   "folder.create": "Erstellen",
   "folder.folderTaken": "Hier heißt bereits ein Ordner {name}: Wählen Sie einen anderen Namen.",
   "folder.openFolder": "Den Ordner {folder} öffnen",
-  "folder.found": "In {path}"
+  "folder.found": "In {path}",
+  "send.label": "Senden an",
+  "send.heading": "{what} senden an",
+  "send.none": "Von dieser Seite lässt sich noch nichts an ein anderes Werkzeug senden.",
+  "send.blocked": "Der Browser hat den neuen Tab blockiert: Pop-ups für diese Seite erlauben, dann erneut senden."
 }

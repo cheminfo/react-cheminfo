@@ -13,7 +13,7 @@ import {
 import type { FigureStates } from '../../download/core/figureState.ts';
 
 import type { HostOutputs } from './hostOutputs.ts';
-import { kindAccepts } from './kinds.ts';
+import { kindAccepts } from './kindAccepts.ts';
 import type {
   GetRequest,
   HostItem,
