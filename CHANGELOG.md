@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.130.0](https://github.com/cheminfo/react-cheminfo/compare/v0.129.0...v0.130.0) (2026-11-16)
+
+
+### Features
+
+* let a click on a mass peak label report that peak ([8ae90b3](https://github.com/cheminfo/react-cheminfo/commit/8ae90b36b5da8f61f3accf1f39715b4eb43cd0e1))
+
 ## [0.129.0](https://github.com/cheminfo/react-cheminfo/compare/v0.128.0...v0.129.0) (2026-11-16)
 
 
