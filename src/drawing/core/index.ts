@@ -72,6 +72,44 @@ export {
   signedArea,
   snapAngle,
 } from './geometry.ts';
+export {
+  GRAPHIC_TOOLS,
+  clickedGraphic,
+  draggedGraphic,
+  isSketchTool,
+  sketchStep,
+} from './graphicTools.ts';
+export type { GraphicTool, SketchStep, SketchTool } from './graphicTools.ts';
+export {
+  newGraphic,
+  patchedGraphic,
+  scaleGraphic,
+  shiftGraphic,
+  transformGraphic,
+} from './graphicEdits.ts';
+export type { GradientKind, GraphicGradient } from './graphicGradients.ts';
+export {
+  gradientAngle,
+  gradientCentre,
+  movedGradientCentre,
+  parseGradient,
+} from './graphicGradients.ts';
+export { distanceToGraphic } from './graphicOutline.ts';
+export type {
+  DrawBoxGraphic,
+  DrawGraphic,
+  DrawPathGraphic,
+  GraphicPatch,
+  GraphicStyle,
+  NewGraphic,
+} from './graphics.ts';
+export {
+  boxTurn,
+  graphicCorners,
+  isBoxGraphic,
+  isClosedGraphic,
+  mapPath,
+} from './graphics.ts';
 export { createIdAllocator, identified, nextId } from './ids.ts';
 export { localPaper, paperFor } from './localPaper.ts';
 export { MIXED, MIXED_VALUE } from './mixed.ts';
@@ -94,6 +132,7 @@ export {
   updateObject,
   withObjectsOf,
 } from './objects.ts';
+export { parseGraphic } from './parseGraphic.ts';
 export type { Orientation } from './pages.ts';
 export {
   A4,

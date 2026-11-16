@@ -39,6 +39,8 @@ export {
   radialTransform,
   sceneGradients,
 } from './gradients.ts';
+export { gradientPaint } from './graphicPaint.ts';
+export { graphicPath, graphicPrimitive } from './graphics.ts';
 export {
   ellipsePath,
   escapeAttribute,
@@ -79,6 +81,7 @@ export {
 } from './pageGrid.ts';
 export type { ImagePrimitive } from './pictures.ts';
 export { imageCorners, imageTransform, picturePrimitive } from './pictures.ts';
+export { mapContour, polygonContour, roundedRect } from './outlines.ts';
 export type {
   CaptionPrimitive,
   DotPrimitive,

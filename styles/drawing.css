@@ -97,3 +97,85 @@
   gap: 4px;
   overflow: hidden;
 }
+
+/* A dash pattern, as `DashSelect` draws it in its menu and on its button. */
+.dash-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-sample {
+  display: block;
+  flex: none;
+}
+
+/* The ways a fill blends, as `GradientKindRow` draws them: each a tile
+   painted in the colours in use. */
+.gradient-kinds {
+  display: flex;
+  gap: 6px;
+}
+
+.gradient-kind {
+  width: 30px;
+  height: 22px;
+  padding: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.gradient-kind > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gradient-kind[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 3px var(--accent);
+}
+
+/* Eight arrows, or nine points, round the middle of a shape, as
+   `DirectionGrid` and `CentreGrid` draw them. */
+.point-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 22px);
+  gap: 1px;
+}
+
+.point-grid > .bp6-button {
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0;
+}
+
+.gradient-direction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The degrees beside the arrows: a few digits, never the rest of the row. */
+.gradient-direction__degrees {
+  width: 3.75rem;
+}
+
+/* The width and the height of a picture or a shape, side by side, as
+   `BoxSizeFields` draws them. */
+.size-fields {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Objects selected together that differ on a setting: its select reads
+   "Mixed", and a value or a switch says "mixed", greyed. */
+.mixed-select select,
+.mixed-value {
+  color: var(--text-faint);
+  font-style: italic;
+}

@@ -13,6 +13,14 @@ export {
   sendStandInHostRequest,
   startStandInHost,
 } from './host/testing/standInHost.ts';
+export type { StandInTool, ToolLog } from './host/testing/standInTool.ts';
+export {
+  readToolLog,
+  standInTool,
+  switchedFrame,
+  toolFrame,
+  toolFrameAt,
+} from './host/testing/standInTool.ts';
 export {
   SCIPEAKS_ETHYLBENZENE_LOAD,
   SCIPEAKS_ETHYLBENZENE_MOLFILE,

@@ -62,7 +62,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/styles/slides.css`         | the deck stylesheet, themed on the site's colours              | nothing                                          |
 | `react-cheminfo/styles/card.css`           | the card’s stylesheet, on the family’s tokens                  | nothing                                          |
 | `react-cheminfo/styles/demo.css`           | the demo cursor, on the family's tokens                        | nothing                                          |
-| `react-cheminfo/styles/drawing.css`        | the handles a drawing's curves are edited by                   | nothing                                          |
+| `react-cheminfo/styles/drawing.css`        | the handles a drawing's curves are edited by, its shape fields | nothing                                          |
 | `react-cheminfo/styles/caption-editor.css` | the caption editor and its toolbar                             | nothing                                          |
 
 A backend serving an RIS endpoint, a prerender script writing a sitemap, and
@@ -2371,14 +2371,28 @@ as `FigureSize`.
   `shapeHandleAt`, `shapeLineAt` and `dragShapeHandle` find and drag a point or
   a control point, kept in line with its opposite, with Alt for a corner and
   shift for 15° steps; `curveHandleMarks` draws the squares and rings.
+- **Shapes:** a `DrawGraphic` is a line, a polyline, a curve, a polygon, a
+  rectangle or an ellipse, in plain JSON. `parseGraphic` reads one from a file;
+  `newGraphic` names one, `patchedGraphic` changes it, and `shiftGraphic`,
+  `scaleGraphic` and `transformGraphic` move it. The eight `GRAPHIC_TOOLS` make
+  one with `clickedGraphic` and `draggedGraphic`, or corner by corner through
+  `sketchStep`; `distanceToGraphic` says what the pointer is on.
+  `graphicPrimitive` draws one, filled flat or along its `gradientPaint`, and on
+  screen `<PathView>` draws the path under `<GradientDefs>`.
+- **An Object panel's fields:** `<GraphicFields>` sets the size, line, dashes,
+  corners, curve and fill of the shapes selected, and hands each change to the
+  site as a `Patching<GraphicPatch, DrawGraphic>`. The fields it is built from
+  serve any object: `SharedNumberInput`, `SharedSwitch`, `ChoiceField`,
+  `MixedSelect`, `FontSelect`, `DashSelect` and `BoxSizeFields` say "Mixed"
+  while the objects selected differ.
 - **Files:** `chooseSaveFile`, `chooseOpenFile` and `writeFile` over the File
   System Access API. Each returns undefined where the browser has no picker, so a
   caller keeps a download. The kinds of file are the site's, as `PickerType`.
 - **Pieces of the canvas:** the dashed selection outline and its handles, the
   page mask, the swatch row, a full-screen stage, `usePrinting` and `useSeen`.
 
-The components draw class names the site styles; the curve handles are
-coloured by `react-cheminfo/styles/drawing.css`. A panel's settings kept in a
+The components draw class names the site styles; the curve handles and the
+fields are styled by `react-cheminfo/styles/drawing.css`. A panel's settings kept in a
 tree of preference signals are read and restored by `preferenceSettings`, from
 `react-cheminfo/ui`; pass `{ batch }` from `@preact/signals-react` so a restore
 is one change.
