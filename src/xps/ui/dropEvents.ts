@@ -1,5 +1,6 @@
 /**
- * What a drag and a paste actually carry, and whether the viewer should take it.
+ * What a drag and a paste actually carry, and whether the viewer should take
+ * it — and, for a Paste button, what the clipboard holds.
  *
  * Kept apart from the hook because these are the decisions rather than the
  * plumbing: a paste into the tolerance box is being typed, a drag of selected
@@ -49,4 +50,18 @@ export function takePaste(
   if (text.trim() === '') return;
   event.preventDefault();
   readText(text);
+}
+
+/**
+ * The clipboard's text, for a Paste button: what a paste with the keys would
+ * have carried, read without one.
+ * @returns The text.
+ */
+export async function readClipboardText(): Promise<string> {
+  const clipboard = (globalThis.navigator as Partial<Navigator> | undefined)
+    ?.clipboard;
+  if (clipboard === undefined) {
+    throw new Error('This browser lets no page read the clipboard.');
+  }
+  return clipboard.readText();
 }

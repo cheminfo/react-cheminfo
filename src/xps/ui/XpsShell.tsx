@@ -1,10 +1,11 @@
-import type { ReactNode, Ref } from 'react';
-import { useCallback, useId, useMemo, useState } from 'react';
+import type { ChangeEvent, ReactNode, Ref } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { useFigureDownload } from '../../download/ui/useFigureDownload.tsx';
 import { FixedPanelRow } from '../../panel/ui/FixedPanelRow.tsx';
 import { PanelRail } from '../../panel/ui/PanelRail.tsx';
+import { XPS_FILE_ACCEPT } from '../core/detectFormat.ts';
 import type { XpsEditorHandle } from '../core/xpsEditorApi.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
 
@@ -16,6 +17,7 @@ import { XpsHeader } from './XpsHeader.tsx';
 import { XpsSettingsDialog } from './XpsSettingsDialog.tsx';
 import { XpsSidePanel } from './XpsSidePanel.tsx';
 import { XpsToolbar } from './XpsToolbar.tsx';
+import { readClipboardText } from './dropEvents.ts';
 import { useSpectrumDrop } from './useSpectrumDrop.ts';
 import { useXpsCommandHandlers } from './useXpsCommandHandlers.ts';
 import { useXpsEditorHandle } from './useXpsEditorHandle.ts';
@@ -40,6 +42,11 @@ export interface XpsShellProps {
    * @default undefined
    */
   actions?: ReactNode;
+  /**
+   * What the empty chart shows in place of its own invitation.
+   * @default undefined — the chart's own invitation
+   */
+  guide?: ReactNode;
 }
 
 /**
@@ -53,14 +60,12 @@ export interface XpsShellProps {
  * @returns The screen.
  */
 export function XpsShell(props: XpsShellProps) {
-  const { pasteFromPage, handle, panels, actions: hostActions } = props;
+  const { pasteFromPage, handle, panels, actions: hostActions, guide } = props;
 
   const { state } = useXpsEditorState();
   const actions = useXpsActions();
   const { spectra } = state.data;
   const side = useXpsSide(panels);
-
-  useXpsEditorHandle(handle);
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isDocumentationOpen, setIsDocumentationOpen] = useState(false);
@@ -76,6 +81,15 @@ export function XpsShell(props: XpsShellProps) {
     onError: actions.setError,
     pasteFromPage,
   });
+
+  // The ways in a guide's buttons reuse: the drop's own reader behind both.
+  const fileInput = useRef<HTMLInputElement>(null);
+  const openFiles = useCallback(() => fileInput.current?.click(), []);
+  const { read, readText, isOver, isReading } = drop;
+  const paste = useCallback(async () => {
+    readText(await readClipboardText());
+  }, [readText]);
+  useXpsEditorHandle(handle, { openFiles, paste });
 
   // The root is held as state rather than in a ref because the keys are bound
   // to it from an effect: a ref filled in during the commit would leave the
@@ -130,8 +144,9 @@ export function XpsShell(props: XpsShellProps) {
             view={
               <XpsCanvas
                 chartId={chartId}
-                isOver={drop.isOver}
-                isReading={drop.isReading}
+                isOver={isOver}
+                isReading={isReading}
+                guide={guide}
               />
             }
             panels={<XpsSidePanel panels={panels} side={side} />}
@@ -147,6 +162,21 @@ export function XpsShell(props: XpsShellProps) {
             />
           </div>
         </div>
+
+        <input
+          ref={fileInput}
+          type="file"
+          multiple
+          hidden
+          accept={XPS_FILE_ACCEPT}
+          data-testid="xps-editor-file"
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            const chosen = [...(event.currentTarget.files ?? [])];
+            // Emptied so that choosing the same file again is still a change.
+            event.currentTarget.value = '';
+            read(chosen);
+          }}
+        />
       </div>
 
       <XpsAboutDialog

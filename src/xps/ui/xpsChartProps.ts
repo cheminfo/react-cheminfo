@@ -12,6 +12,7 @@
  * test.
  */
 
+import type { ChartSize } from '../../chart/core/chartGeometry.ts';
 import type { XpsHighlight } from '../core/xpsHighlight.ts';
 import type { XpsDomain, XpsRegion, XpsSpectrum } from '../core/xpsSpectrum.ts';
 import type { XpsSettings } from '../core/xpsState.ts';
@@ -66,6 +67,14 @@ export interface XpsChartProps {
    * @default false
    */
   isReading?: boolean;
+  /**
+   * The size to draw at, in CSS pixels, instead of the box the chart is put in
+   * — for a chart drawn where nothing is laid out, as a figure written to a
+   * file by `renderToStaticMarkup`, which would otherwise come out at the
+   * smallest plot there is.
+   * @default undefined — the box the chart is put in, measured
+   */
+  size?: ChartSize;
 }
 
 /** Windows shaded on the chart for one spectrum, beside the ones its file defines. */

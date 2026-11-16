@@ -2553,18 +2553,14 @@ span.taxon-lineage__name {
 /*
   What a tool shows while it holds nothing: `<EmptyGuide>`. Grey on purpose, so
   it reads as the empty space saying how to start and never as content. The
-  pointer goes through it to the tool, except on a link or a figure that can be
-  clicked, so a first stroke can start on the words.
+  pointer goes through it to the tool, except on what can be clicked or typed
+  in, so a first stroke can start on the words.
 */
 .empty-guide {
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  padding: 12px 20px;
   color: var(--text-muted);
   container-type: size;
   font-size: 12.5px;
-  gap: 10px;
   inset: 0;
   line-height: 1.4;
   overflow: hidden;
@@ -2574,13 +2570,38 @@ span.taxon-lineage__name {
   animation: empty-guide-in 240ms ease-out 120ms both;
 }
 
+/* Laid out inside the box that is measured, so a small box can tighten it. */
+.empty-guide__body {
+  display: flex;
+  height: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  padding: 12px 20px;
+  gap: 10px;
+}
+
 .empty-guide a,
 .empty-guide button {
   color: inherit;
-  pointer-events: auto;
   text-decoration: underline;
   text-decoration-color: var(--border-strong);
   text-underline-offset: 2px;
+}
+
+/* Whatever can be clicked or typed in takes the pointer: a link, a button, a
+   capsule or a tab drawn as one, a field and the label that ticks a box. */
+.empty-guide a,
+.empty-guide button,
+.empty-guide label,
+.empty-guide input,
+.empty-guide select,
+.empty-guide textarea,
+.empty-guide [role='button'],
+.empty-guide [role='checkbox'],
+.empty-guide [role='radio'],
+.empty-guide [role='switch'],
+.empty-guide [role='tab'] {
+  pointer-events: auto;
 }
 
 .empty-guide a:hover,
@@ -2740,12 +2761,79 @@ button.empty-guide__figure:focus-visible img {
   animation: empty-guide-in 400ms ease-out both;
 }
 
-/* On a narrow or a short view the words take the whole of it: a picture the
-   size of a stamp shows nothing, and leaves its caption floating. */
+/* A small view — half an editor, a short window — keeps its figures: the help
+   says each section's title and its first line, the buttons shrink, and the
+   figures take what is left, never less than a third of the height. */
 @container (max-width: 640px) or (max-height: 520px) {
+  .empty-guide__body {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 6px;
+    line-height: 1.35;
+  }
+
+  /* One row of sections, as many as the width holds: a section that would
+     wrap is left out whole rather than cut through a line. */
+  .empty-guide__help {
+    min-height: 0;
+    flex: 0 1 auto;
+    gap: 0 16px;
+    grid-auto-rows: 0;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    grid-template-rows: auto;
+    overflow: hidden;
+  }
+
+  .empty-guide__title {
+    margin-bottom: 1px;
+    font-size: 12px;
+  }
+
+  .empty-guide__section > :nth-child(n + 3),
+  .empty-guide__help .shortcut-list__row:nth-child(n + 4) {
+    display: none;
+  }
+
+  .empty-guide__section p {
+    margin: 0;
+  }
+
+  .empty-guide__start {
+    gap: 6px 10px;
+  }
+
+  .empty-guide button.empty-guide__action {
+    min-height: 34px;
+    padding: 0 14px;
+    font-size: 13.5px;
+    gap: 6px;
+  }
+
+  .empty-guide__figures-title {
+    font-size: 13px;
+  }
+
+  .empty-guide__figures:not(:empty) {
+    min-height: 33cqh;
+  }
+
+  .empty-guide__stack {
+    gap: 6px;
+  }
+}
+
+/* A phone-sized view takes the words alone: a picture the size of a stamp
+   shows nothing, and leaves its caption floating. */
+@container (max-width: 440px) or (max-height: 300px) {
   .empty-guide__figures,
   .empty-guide__figures-title {
     display: none;
+  }
+
+  /* With no figures to make room for, every section is said. */
+  .empty-guide__help {
+    gap: 4px 16px;
+    grid-auto-rows: auto;
   }
 
   /* First, or a help taller than the view would push the buttons out of it. */

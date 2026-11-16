@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react';
-import { useCallback, useId, useMemo, useRef } from 'react';
+import { useId, useMemo, useRef } from 'react';
 
 import { MARGIN, plotRect } from '../../chart/core/chartGeometry.ts';
-import { chartScale, chartValue } from '../../chart/core/chartScale.ts';
-import type { ChartPoint } from '../../chart/core/svgPoint.ts';
+import { chartScale } from '../../chart/core/chartScale.ts';
 import { Axes } from '../../chart/ui/Axes.tsx';
 import { AxisGuide } from '../../chart/ui/AxisGuide.tsx';
 import { SelectionRect } from '../../chart/ui/SelectionRect.tsx';
-import { useChartPointer } from '../../chart/ui/useChartPointer.ts';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
 import {
   axisEnergy,
@@ -17,17 +15,15 @@ import {
   countsTitle,
   isAxisReversed,
 } from '../core/energyAxis.ts';
-import type { NearestPeak } from '../core/nearestPeak.ts';
-import { nearestPeakEnergy, sameNearestPeak } from '../core/nearestPeak.ts';
 import { fullDomain } from '../core/xpsDomain.ts';
 import { NO_HIGHLIGHT } from '../core/xpsHighlight.ts';
 import type { XpsDomain } from '../core/xpsSpectrum.ts';
 
 import { ChartData } from './ChartData.tsx';
 import { DropOverlay } from './DropOverlay.tsx';
-import type { XpsReadout } from './XpsPointerTracker.tsx';
 import { XpsPointerTracker } from './XpsPointerTracker.tsx';
 import { useXpsGestures } from './useXpsGestures.ts';
+import { useXpsReadout } from './useXpsReadout.ts';
 import type { XpsChartProps } from './xpsChartProps.ts';
 
 /**
@@ -72,15 +68,14 @@ export function XpsChart(props: XpsChartProps): ReactNode {
     windows,
     isOver = false,
     isReading = false,
+    size,
   } = props;
 
   const [containerRef, measured] = useChartSize<HTMLDivElement>();
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const { width, height } = size ?? measured;
 
-  const plot = useMemo(
-    () => plotRect({ width: measured.width, height: measured.height }),
-    [measured.width, measured.height],
-  );
+  const plot = useMemo(() => plotRect({ width, height }), [width, height]);
   // Read back off the plot rather than off the measurement, so a chart briefly
   // laid out at nothing still draws its axes inside a box that holds them.
   const frameWidth = plot.right + MARGIN.right;
@@ -125,42 +120,14 @@ export function XpsChart(props: XpsChartProps): ReactNode {
     onPickEnergy,
   });
 
-  const read = useCallback(
-    (point: ChartPoint): XpsReadout => ({
-      energy: chartValue(xScale, point.x),
-      counts: chartValue(yScale, point.y),
-      peak: nearestPeakEnergy(spectra, axis, xScale, point.x),
-    }),
-    [xScale, yScale, spectra, axis],
-  );
-  // Only a change of peak is reported, starting from none: the pointer coming
-  // onto the plot over no peak says nothing, so a guide a panel put on the
-  // chart stays until the pointer actually reaches a peak.
-  const reportedPeak = useRef<NearestPeak | null>(null);
-  const onReadout = useCallback(
-    (readout: XpsReadout | null) => {
-      const found = readout?.peak ?? null;
-      if (sameNearestPeak(reportedPeak.current, found)) return;
-      reportedPeak.current = found;
-      onHighlightChange?.(
-        found === null
-          ? NO_HIGHLIGHT
-          : {
-              spectrumId: found.spectrumId,
-              peakId: found.peak.id,
-              componentId: null,
-              bindingEnergy: found.peak.bindingEnergy,
-            },
-      );
-    },
-    [onHighlightChange],
-  );
-  const pointer = useChartPointer<XpsReadout>({
+  const pointer = useXpsReadout({
     svgRef,
     plot,
-    read,
-    sameReadout: samePeakReadout,
-    onReadout,
+    spectra,
+    axis,
+    xScale,
+    yScale,
+    onHighlightChange,
   });
 
   const guideEnergy =
@@ -233,17 +200,6 @@ export function XpsChart(props: XpsChartProps): ReactNode {
       </svg>
     </div>
   );
-}
-
-/**
- * Whether two readings are about the same peak, which is all the rest of the
- * viewer hears about: the energy under the crosshair changes on every pixel.
- * @param current - The reading last reported.
- * @param next - The reading now.
- * @returns Whether nothing needs reporting.
- */
-function samePeakReadout(current: XpsReadout, next: XpsReadout): boolean {
-  return sameNearestPeak(current.peak, next.peak);
 }
 
 /**

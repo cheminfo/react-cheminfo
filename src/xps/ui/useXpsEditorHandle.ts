@@ -23,11 +23,19 @@ import { ENERGY_WINDOW } from '../core/xpsEditorApi.ts';
 
 import { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
 
+/** The ways in the viewer's screen owns: its file picker and its paste. */
+export type XpsEntryPoints = Pick<XpsEditorHandle, 'openFiles' | 'paste'>;
+
 /**
  * Fill in the handle a host drives the viewer through.
  * @param handle - Where to put it, `undefined` when the host asked for none.
+ * @param entry - The file picker and the paste, stable for the viewer's life.
  */
-export function useXpsEditorHandle(handle: Ref<XpsEditorHandle> | undefined) {
+export function useXpsEditorHandle(
+  handle: Ref<XpsEditorHandle> | undefined,
+  entry: XpsEntryPoints,
+) {
+  const { openFiles, paste } = entry;
   const { state } = useXpsEditorState();
   const actions = useXpsActions();
 
@@ -48,6 +56,8 @@ export function useXpsEditorHandle(handle: Ref<XpsEditorHandle> | undefined) {
         actions.addSpectra(spectra);
       },
       clear: actions.clear,
+      openFiles,
+      paste,
       zoomToEnergy(bindingEnergy, options) {
         const current = live.current;
         const half = options?.halfWidth ?? ENERGY_WINDOW;
@@ -70,6 +80,6 @@ export function useXpsEditorHandle(handle: Ref<XpsEditorHandle> | undefined) {
       },
       getState: () => live.current,
     }),
-    [actions],
+    [actions, openFiles, paste],
   );
 }

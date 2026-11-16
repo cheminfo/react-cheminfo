@@ -90,6 +90,7 @@ export { looksLikeSmarts, readStructure } from './readStructure.ts';
 export type { StructureError } from './structureError.ts';
 export { structureError } from './structureError.ts';
 export type {
+  StructureDepictorOptions,
   StructurePicture,
   StructurePictureOptions,
 } from './structurePicture.ts';

@@ -93,10 +93,13 @@ export interface EmptyGuideProps {
 /**
  * What a tool shows while it holds nothing: the space that is empty anyway says
  * how to start. It comes in grey over the tool, lets the pointer through to it
- * everywhere but on a button, a link or a figure that can be clicked, and the
- * site stops rendering it at the first stroke.
+ * everywhere but on what can be clicked or typed in — a button, a link, a
+ * figure that can be clicked, a capsule, a field — and the site stops
+ * rendering it at the first stroke.
  *
  * Fill the absolute box of the tool's view with it: the parent is positioned.
+ * A small box keeps the figures and says each section's title and first line;
+ * a phone-sized one drops the figures.
  * @param props - See {@link EmptyGuideProps}.
  * @returns The guide.
  */
@@ -111,19 +114,23 @@ export function EmptyGuide(props: EmptyGuideProps): ReactElement {
     figures = [],
     figuresTitle,
   } = props;
+  // The body is what the guide's size is asked about: an element cannot query
+  // its own container, so the outer box measures and the body is laid out.
   return (
     <div className="empty-guide no-print" data-testid="empty-guide">
-      {help ? <div className="empty-guide__help">{help}</div> : null}
-      {links && links.length > 0 ? (
-        <GuideLinks links={links} title={linksTitle} />
-      ) : null}
-      {actions.length > 0 || figuresTitle ? (
-        <GuideStart actions={actions} figuresTitle={figuresTitle} />
-      ) : null}
-      <GuideFigures figures={figures} />
-      {hints.length > 0 ? (
-        <GuideHint hints={hints} interval={hintInterval} />
-      ) : null}
+      <div className="empty-guide__body">
+        {help ? <div className="empty-guide__help">{help}</div> : null}
+        {links && links.length > 0 ? (
+          <GuideLinks links={links} title={linksTitle} />
+        ) : null}
+        {actions.length > 0 || figuresTitle ? (
+          <GuideStart actions={actions} figuresTitle={figuresTitle} />
+        ) : null}
+        <GuideFigures figures={figures} />
+        {hints.length > 0 ? (
+          <GuideHint hints={hints} interval={hintInterval} />
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -5,9 +5,9 @@
  * OpenChemLib paints its editor into a 2D canvas context, which jsdom does not
  * have, so the real one throws at mount. The stand-in keeps the part the
  * editor around it depends on: the props it was mounted with, recorded in
- * `canvasLog.ts`, and an `onChange` called with the event react-ocl passes —
- * read off a real OpenChemLib molecule or reaction, so every notation in it is
- * genuine.
+ * `canvasLog.ts`, the attribute OpenChemLib marks its editor's element with,
+ * and an `onChange` called with the event react-ocl passes — read off a real
+ * OpenChemLib molecule or reaction, so every notation in it is genuine.
  */
 
 import type { Molecule as MoleculeType } from 'openchemlib';
@@ -43,7 +43,13 @@ export function CanvasMoleculeEditor(
   useEffect(() => {
     canvas.draw = (smiles) => onChange(moleculeEvent(smiles));
   });
-  return <canvas data-testid="canvas-editor" data-mode="molecule" />;
+  return (
+    <canvas
+      data-testid="canvas-editor"
+      data-mode="molecule"
+      data-openchemlib-canvas-editor="true"
+    />
+  );
 }
 
 /**
@@ -59,7 +65,13 @@ export function CanvasReactionEditor(
   useEffect(() => {
     canvas.draw = (smiles) => onChange(reactionEvent(smiles));
   });
-  return <canvas data-testid="canvas-editor" data-mode="reaction" />;
+  return (
+    <canvas
+      data-testid="canvas-editor"
+      data-mode="reaction"
+      data-openchemlib-canvas-editor="true"
+    />
+  );
 }
 
 // Read once per mount, as the real editor reads its value only then.

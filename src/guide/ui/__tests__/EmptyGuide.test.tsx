@@ -144,7 +144,7 @@ test('a guide with nothing to say draws no empty line for it', () => {
   const html = renderToStaticMarkup(<EmptyGuide />);
 
   expect(html).toBe(
-    '<div class="empty-guide no-print" data-testid="empty-guide"><div class="empty-guide__figures"></div></div>',
+    '<div class="empty-guide no-print" data-testid="empty-guide"><div class="empty-guide__body"><div class="empty-guide__figures"></div></div></div>',
   );
 });
 

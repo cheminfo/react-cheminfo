@@ -60,6 +60,22 @@ export interface XpsEditorHandle {
   /** Close every spectrum and start again from an empty chart. */
   clear: () => void;
   /**
+   * Open the viewer's file picker; what is chosen is read as a drop is,
+   * joining what is open. A browser opens a picker only for a click, so call
+   * it from one — an "Import data…" button of a guide.
+   */
+  openFiles: () => void;
+  /**
+   * Read the clipboard's text as a paste into the viewer is read, joining what
+   * is open; what cannot be read is said in the status bar, as for a paste.
+   * Call it from a click, which is when a browser lets a page read the
+   * clipboard.
+   * @returns Resolves once the text is handed to the reader, and rejects when
+   * the browser refuses to read the clipboard, so the caller can suggest the
+   * paste keys instead.
+   */
+  paste: () => Promise<void>;
+  /**
    * Frame a binding energy on the chart, keeping the counts axis where it was.
    *
    * The height is deliberately not refitted to what falls inside the new

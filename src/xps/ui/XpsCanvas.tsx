@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react';
 import { useCallback, useMemo } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { hasBindingAxis } from '../core/energyAxis.ts';
 import { findSpectrum } from '../core/spectrumGroups.ts';
 import { surveyLinesOf } from '../core/surveyElements.ts';
@@ -32,6 +34,13 @@ export interface XpsCanvasProps {
    * @default false
    */
   isReading?: boolean;
+  /**
+   * What the empty chart shows in place of its own invitation to drop a
+   * spectrum: the site's `<EmptyGuide>`, over the whole chart. Gone while a
+   * file is dragged over the chart or read, and once anything is open.
+   * @default undefined — the chart's own invitation
+   */
+  guide?: ReactNode;
 }
 
 /**
@@ -46,12 +55,13 @@ export interface XpsCanvasProps {
  * The empty chart says what to do with it rather than showing an axis from 0 to
  * 1 and leaving the question open: the two ways in are a file and a paste, and
  * neither is discoverable from a blank plot. The invitation goes as soon as
- * anything is open, since from then on the axes are the answer.
+ * anything is open, since from then on the axes are the answer. A site with a
+ * guide of its own passes it as `guide`, and it is drawn instead.
  * @param props - Component props.
  * @returns The canvas side of the split.
  */
 export function XpsCanvas(props: XpsCanvasProps) {
-  const { isOver = false, isReading = false, chartId } = props;
+  const { isOver = false, isReading = false, chartId, guide } = props;
   const { state } = useXpsEditorState();
   const actions = useXpsActions();
   const highlight = useXpsHighlight();
@@ -90,6 +100,7 @@ export function XpsCanvas(props: XpsCanvasProps) {
   const { selectedId, openPanelIds, domain } = view;
   const { instruments, instrumentId } = settings;
   const quantifying = openPanelIds.includes('quantification');
+  const empty = spectra.length === 0 && !isReading;
   const windows = useMemo(
     () =>
       quantifying
@@ -115,7 +126,10 @@ export function XpsCanvas(props: XpsCanvasProps) {
           isOver={isOver}
           isReading={isReading}
         />
-        {spectra.length === 0 && !isReading ? (
+        {empty && guide !== undefined && !isOver ? (
+          <div style={guideStyle}>{guide}</div>
+        ) : null}
+        {empty && guide === undefined ? (
           <div style={inviteStyle}>
             <div style={inviteTitleStyle}>Drop a spectrum here</div>
             <div>
@@ -168,6 +182,15 @@ const inviteStyle = {
 } as const;
 
 const inviteTitleStyle = { fontSize: 15, fontWeight: 600 } as const;
+
+// Instead of the plot: faint figures over an empty frame of axes read as data
+// drawn on it. The pointer goes through to the chart, which takes the drop.
+const guideStyle = {
+  position: 'absolute',
+  inset: 0,
+  background: TOKEN.surface,
+  pointerEvents: 'none',
+} as const;
 
 /**
  * The windows the selected survey is quantified over, for the chart to shade

@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { CanvasEditorInputFormat } from 'react-ocl';
 
 import type { StructureTransfer } from '../core/structureTransfer.ts';
@@ -74,6 +74,16 @@ export interface StructureEditorProps {
    * @default true
    */
   splash?: boolean;
+  /**
+   * What an empty canvas shows in place of the splash: the site's
+   * `<EmptyGuide>`, drawn beside the toolbar and under the buttons in the
+   * corner. The pointer goes through it to the canvas except on its own
+   * buttons, links and figures; it goes at the press that starts a stroke, and
+   * comes back whenever the canvas is empty again. Shown whatever `splash`
+   * says. A reaction canvas shows none.
+   * @default undefined — the splash, when `splash` is on
+   */
+  guide?: ReactNode;
   /**
    * Put a button in the corner that opens every notation of the drawing — its
    * SMILES, its molfiles, its canonical identifiers — and the picture of it,

@@ -69,6 +69,15 @@ const EXTENSIONS = new Map<string, XpsFormat>([
   ['xy', 'text'],
 ]);
 
+/**
+ * The extensions the readers know, as a file picker's `accept`: what the
+ * picker offers first, while a file it does not name is still read by its
+ * content.
+ */
+export const XPS_FILE_ACCEPT = [...EXTENSIONS.keys()]
+  .map((extension) => `.${extension}`)
+  .join(',');
+
 /** The one decoder the header is read through, kept rather than rebuilt. */
 const DECODER = new TextDecoder();
 

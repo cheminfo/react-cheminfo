@@ -83,6 +83,12 @@ export interface SpectrumDrop {
    * @param files - The files to read.
    */
   read: (files: FileList | readonly File[]) => void;
+  /**
+   * Read text as a paste is read — two columns of numbers, a VAMAS or a JCAMP
+   * file as text. Stable for the life of the viewer.
+   * @param text - The text.
+   */
+  readText: (text: string) => void;
 }
 
 /** The `ref` to put on the viewer's root, and what that root is doing. */
@@ -238,5 +244,5 @@ export function useSpectrumDrop(
     };
   }, [pasteFromPage, read, readText]);
 
-  return [attach, { isOver, isReading, read }];
+  return [attach, { isOver, isReading, read, readText }];
 }

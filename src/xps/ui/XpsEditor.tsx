@@ -82,6 +82,14 @@ export interface XpsEditorProps {
    */
   actions?: ReactNode;
   /**
+   * What the empty chart shows in place of its own invitation to drop a
+   * spectrum: the site's `<EmptyGuide>`, whose "Import data…" and "Paste"
+   * buttons call the handle's `openFiles` and `paste`. Gone while a file is
+   * dragged over the chart or read, and once anything is open.
+   * @default undefined — the chart's own invitation
+   */
+  guide?: ReactNode;
+  /**
    * The handle a host drives the viewer through: take these spectra, frame this
    * energy, tell me what is open.
    * @default undefined
@@ -123,6 +131,7 @@ export function XpsEditor(props: XpsEditorProps) {
     defaultPanelIds,
     panels = NO_PANELS,
     actions,
+    guide,
     ref,
     storageKey,
   } = props;
@@ -162,6 +171,7 @@ export function XpsEditor(props: XpsEditorProps) {
             handle={ref}
             panels={panels}
             actions={actions}
+            guide={guide}
           />
         </RootLayout>
       </XpsHighlightProvider>

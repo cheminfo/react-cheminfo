@@ -78,3 +78,42 @@ test('the chart alone draws on binding energy, backwards', async () => {
   expect(markup).toContain('>C 1s</text>');
   expect(markup).toContain('>O 1s</text>');
 });
+
+test("an empty viewer shows the site's guide in place of its own invitation", () => {
+  const guided = renderToStaticMarkup(
+    <XpsEditor guide={<p data-testid="site-guide">Import data</p>} />,
+  );
+  const plain = renderToStaticMarkup(<XpsEditor />);
+
+  expect(guided).toContain('<p data-testid="site-guide">Import data</p>');
+  expect(guided).not.toContain('Drop a spectrum here');
+  expect(plain).toContain('Drop a spectrum here');
+  expect(plain).not.toContain('site-guide');
+});
+
+test('a viewer holding a spectrum shows no guide', async () => {
+  const markup = renderToStaticMarkup(
+    <XpsEditor
+      data={await vamasFixture('cellulose_fitted_following_briggs')}
+      guide={<p data-testid="site-guide">Import data</p>}
+    />,
+  );
+
+  expect(markup).not.toContain('site-guide');
+  expect(markup).not.toContain('Drop a spectrum here');
+});
+
+test('a chart given a size draws at it where nothing is laid out', async () => {
+  const markup = renderToStaticMarkup(
+    <XpsChart
+      spectra={await vamasFixture('cellulose_fitted_following_briggs')}
+      settings={DEFAULT_SETTINGS}
+      domain={null}
+      onDomainChange={() => undefined}
+      size={{ width: 640, height: 400 }}
+    />,
+  );
+
+  expect(markup).toContain('width="640" height="400" viewBox="0 0 640 400"');
+  expect(tickX(markup, '1000')).toBeLessThan(tickX(markup, '0'));
+});

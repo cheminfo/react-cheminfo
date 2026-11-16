@@ -17,10 +17,12 @@ import { EditorHelpButton } from './EditorHelpButton.tsx';
 import { EditorImportButton } from './EditorImportButton.tsx';
 import { EditorImportProblem } from './EditorImportProblem.tsx';
 import { StructureDropOverlay } from './StructureDropOverlay.tsx';
+import { StructureEditorGuide } from './StructureEditorGuide.tsx';
 import { StructureEditorSplash } from './StructureEditorSplash.tsx';
 import { ToolbarTooltip } from './ToolbarTooltip.tsx';
 import type { StructureEditorChange } from './editorChange.ts';
 import type { StructureEditorProps } from './structureEditorProps.ts';
+import { useCanvasPress } from './useCanvasPress.ts';
 import { useDebouncedChange } from './useDebouncedChange.ts';
 import { useEditorStructure } from './useEditorStructure.ts';
 import { useStructureDrop } from './useStructureDrop.ts';
@@ -42,7 +44,8 @@ const EditorCanvas = lazy(async () => {
 /**
  * The canvas structure editor, sized to fill its container and never to hide
  * part of its toolbar, with a tooltip on every toolbar button, a guide to the
- * keys, and a splash on an empty canvas saying how to start.
+ * keys, and a splash on an empty canvas saying how to start — or the site's own
+ * guide in its place.
  * @param props - What to draw, when to reload it, and where to send it.
  * @returns The editor.
  */
@@ -61,6 +64,7 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
     exportable = true,
     importable = true,
     onImport,
+    guide,
     className,
     style,
   } = props;
@@ -86,6 +90,9 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
   });
   const takesImports = importable && mode === 'molecule';
   const drop = useStructureDrop(takesImports ? imports.load : undefined);
+  const press = useCanvasPress();
+  const empty = mode === 'molecule' && drawing.empty && !drop.over;
+  const guided = guide !== undefined && empty;
 
   return (
     <div
@@ -96,6 +103,7 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
           : `structure-editor ${className}`
       }
       style={{ ...ROOT_STYLE, minHeight, ...style }}
+      onPointerDownCapture={guided ? press.onPointerDownCapture : undefined}
       {...drop.targetProps}
     >
       <Suspense
@@ -111,7 +119,10 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
           value={imports.idCode ?? value}
           mode={mode}
         />
-        {splash && mode === 'molecule' && drawing.empty && !drop.over ? (
+        {guided && !press.pressed ? (
+          <StructureEditorGuide>{guide}</StructureEditorGuide>
+        ) : null}
+        {splash && guide === undefined && empty ? (
           <StructureEditorSplash importable={takesImports} />
         ) : null}
         {help ? (
