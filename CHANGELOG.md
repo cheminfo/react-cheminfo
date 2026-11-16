@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.127.0](https://github.com/cheminfo/react-cheminfo/compare/v0.126.0...v0.127.0) (2026-11-16)
+
+
+### Features
+
+* share draw's shapes, their Object fields, and the views framing a sibling site ([9f400de](https://github.com/cheminfo/react-cheminfo/commit/9f400dede2a7b6068120cb6845e857628a4271ec))
+
 ## [0.126.0](https://github.com/cheminfo/react-cheminfo/compare/v0.125.0...v0.126.0) (2026-11-16)
 
 
