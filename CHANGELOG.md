@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.128.0](https://github.com/cheminfo/react-cheminfo/compare/v0.127.0...v0.128.0) (2026-11-16)
+
+
+### Features
+
+* let a hint ladder run without a fixed length ([fe7ed8f](https://github.com/cheminfo/react-cheminfo/commit/fe7ed8fa44f10001899f248ccfa4f62f874594ac))
+* let an exercise switch the band assignments off in the IR editor ([5eaf4c3](https://github.com/cheminfo/react-cheminfo/commit/5eaf4c33f4fb62eb9665c7e785eae97710977a82))
+* zoom, pan, frame, group and transform every canvas the same way ([1132cac](https://github.com/cheminfo/react-cheminfo/commit/1132cac50df1b8a7df1133e6d176f63928812718))
+
 ## [0.127.0](https://github.com/cheminfo/react-cheminfo/compare/v0.126.0...v0.127.0) (2026-11-16)
 
 
