@@ -14,6 +14,7 @@
 import type { ReactNode } from 'react';
 
 import type { ZoomDragMode } from '../../chart/core/chartDomain.ts';
+import type { HoveredPeak } from '../core/labelStackBox.ts';
 import type { MassDomain, MassSpectrum } from '../core/massSpectrum.ts';
 import type { NearestPeak } from '../core/nearestPeak.ts';
 
@@ -93,6 +94,13 @@ export interface MassChartProps {
    * @default undefined
    */
   onPlotClick?: (mz: number, peak: NearestPeak | null) => void;
+  /**
+   * Told which labelled peak was clicked, by its label. The labels then show a
+   * hand, and a press on one is never a click on the plot: a host that wants the
+   * m/z a reader can see written passes this rather than `onPlotClick`.
+   * @default undefined
+   */
+  onPeakLabelClick?: (peak: HoveredPeak) => void;
   /**
    * What a drag across the plot asks for: the m/z axis alone, or exactly the
    * rectangle it sweeps out.

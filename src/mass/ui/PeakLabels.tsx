@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactElement } from 'react';
+import type { CSSProperties, PointerEvent, ReactElement } from 'react';
 import { useMemo } from 'react';
 
 import type { PlotRect } from '../../chart/core/chartGeometry.ts';
@@ -13,6 +13,7 @@ import {
 import type { HoveredPeak } from '../core/labelStackBox.ts';
 import type { MassSpectrum } from '../core/massSpectrum.ts';
 import type { PeakLabelLineKind } from '../core/peakLabelLines.ts';
+import type { PeakLabelPlan } from '../core/peakLabelPlan.ts';
 import { planPeakLabels } from '../core/peakLabelPlan.ts';
 
 export interface PeakLabelsProps {
@@ -76,6 +77,12 @@ export interface PeakLabelsProps {
    * @default undefined
    */
   onHover?: (peak: HoveredPeak | null) => void;
+  /**
+   * Called with the peak whose stack was clicked. The stack then shows a hand,
+   * and a press on it is its own: it starts no drag and is no click on the plot.
+   * @default undefined
+   */
+  onClick?: (peak: HoveredPeak) => void;
 }
 
 /**
@@ -96,9 +103,9 @@ export interface PeakLabelsProps {
  * around each glyph, where a filled box would hide the very data it is about.
  *
  * The numbers take no pointer event; the room they occupy does, as one
- * transparent rectangle per stack, and only when somebody asked for it — so a
- * stack can be interrogated without becoming a control, while the crosshair
- * underneath goes on following the pointer.
+ * transparent rectangle per stack, and only when somebody asked for it — to be
+ * told which stack the pointer rests on, or which one was clicked — while the
+ * crosshair underneath goes on following the pointer.
  * @param props - Component props.
  * @returns The marks and the labels, as SVG.
  */
@@ -116,6 +123,7 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement {
     color = CHART_COLORS.labelText,
     intensityScale = 1,
     onHover,
+    onClick,
   } = props;
 
   const plans = useMemo(
@@ -195,7 +203,7 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement {
           </text>
         ))}
       </g>
-      {onHover === undefined
+      {onHover === undefined && onClick === undefined
         ? null
         : written.map((plan) => (
             <rect
@@ -205,24 +213,48 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement {
               width={plan.box.width}
               height={plan.box.height}
               fill="transparent"
-              onPointerEnter={() =>
-                onHover({
-                  key: plan.key,
-                  mz: plan.peak.x,
-                  intensity: plan.peak.y,
-                  charge: plan.peak.charge,
-                  x: plan.labelX,
-                  // A card hangs off the edge of the stack facing away from the
-                  // stick, so it never covers the peak it is about.
-                  y: below ? plan.box.y + plan.box.height : plan.box.y,
-                })
-              }
-              onPointerLeave={() => onHover(null)}
+              {...(onHover === undefined
+                ? {}
+                : {
+                    onPointerEnter: () => onHover(hoveredPeak(plan, below)),
+                    onPointerLeave: () => onHover(null),
+                  })}
+              {...(onClick === undefined
+                ? {}
+                : {
+                    style: CLICKABLE_STACK,
+                    // Kept from the chart, which would capture the pointer for a
+                    // drag and take the click with it.
+                    onPointerDown: (event: PointerEvent) =>
+                      event.stopPropagation(),
+                    onClick: () => onClick(hoveredPeak(plan, below)),
+                  })}
             />
           ))}
     </g>
   );
 }
+
+/**
+ * The peak a stack is about, as the pointer reports it.
+ * @param plan - The stack.
+ * @param below - Whether the stacks hang under the sticks.
+ * @returns The peak, anchored at the edge of the stack facing away from the
+ * stick, so a card hanging off it never covers the peak it is about.
+ */
+function hoveredPeak(plan: PeakLabelPlan, below: boolean): HoveredPeak {
+  return {
+    key: plan.key,
+    mz: plan.peak.x,
+    intensity: plan.peak.y,
+    charge: plan.peak.charge,
+    x: plan.labelX,
+    y: below ? plan.box.y + plan.box.height : plan.box.y,
+  };
+}
+
+/** A stack that can be clicked says so. */
+const CLICKABLE_STACK: CSSProperties = { cursor: 'pointer' };
 
 /**
  * How each line of a stack is set.

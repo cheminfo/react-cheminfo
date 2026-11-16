@@ -50,6 +50,7 @@ export function MassChart(props: MassChartProps): ReactElement {
     domain = null,
     onDomainChange,
     onPlotClick,
+    onPeakLabelClick,
     drag = 'xAxis',
     answersKeys = true,
     emphasisedId = null,
@@ -196,6 +197,9 @@ export function MassChart(props: MassChartProps): ReactElement {
             showCharges={showCharges}
             mzDecimals={labelDecimals}
             {...(annotationLabels === undefined ? {} : { annotationLabels })}
+            {...(onPeakLabelClick === undefined
+              ? {}
+              : { onClick: onPeakLabelClick })}
             color={spectra.length > 1 ? labelled.color : undefined}
           />
         ) : null}
