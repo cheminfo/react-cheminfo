@@ -796,6 +796,24 @@ a.source-badge:hover {
   line-height: 1.45;
 }
 
+/* What a link opens on: one choice to a line, what it hands out under its
+   label, and the example picker under the radio it belongs to. */
+.share-opens-on .bp6-control.bp6-radio {
+  margin-bottom: 6px;
+}
+
+.share-opens-on__note {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.share-opens-on__under {
+  margin: -2px 0 10px 26px;
+}
+
 /* The live page, laid out at the screen picked and scaled into the pane. */
 .share-preview {
   display: flex;

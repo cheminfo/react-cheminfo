@@ -1,4 +1,5 @@
 import { EMBED_PARAM } from './config.ts';
+import { fromBase64Url, pipeBytes, toBase64Url } from './linkBytes.ts';
 import { firstValues, parseQuery, serializeQuery } from './query.ts';
 
 /** The query parameter a sealed link carries, and the only one it carries. */
@@ -44,7 +45,7 @@ const keys = new Map<string, Promise<SealKeys>>();
  */
 export async function sealQuery(query: string): Promise<string> {
   const plain = new TextEncoder().encode(query);
-  const packed = await transform(plain, new CompressionStream('deflate-raw'));
+  const packed = await pipeBytes(plain, new CompressionStream('deflate-raw'));
   const compressed = packed.length < plain.length;
   const body = compressed ? packed : plain;
   const message = new Uint8Array(1 + body.length);
@@ -93,7 +94,7 @@ export async function unsealQuery(token: string): Promise<UnsealResult> {
   try {
     const plain =
       flags === COMPRESSED
-        ? await transform(body, new DecompressionStream('deflate-raw'))
+        ? await pipeBytes(body, new DecompressionStream('deflate-raw'))
         : body;
     const query = new TextDecoder('utf-8', { fatal: true }).decode(plain);
     return { ok: true, query };
@@ -196,38 +197,4 @@ function sameBytes(left: Uint8Array, right: Uint8Array): boolean {
     difference |= (left[index] ?? 0) ^ (right[index] ?? 0);
   }
   return difference === 0;
-}
-
-async function transform(
-  bytes: Uint8Array<ArrayBuffer>,
-  stream: CompressionStream | DecompressionStream,
-): Promise<Uint8Array<ArrayBuffer>> {
-  const source = new ReadableStream<Uint8Array<ArrayBuffer>>({
-    start(controller) {
-      controller.enqueue(bytes);
-      controller.close();
-    },
-  });
-  const output = await new Response(source.pipeThrough(stream)).arrayBuffer();
-  return new Uint8Array(output);
-}
-
-function toBase64Url(bytes: Uint8Array): string {
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCodePoint(byte);
-  return btoa(binary)
-    .replaceAll('+', '-')
-    .replaceAll('/', '_')
-    .replace(/[=]+$/, '');
-}
-
-function fromBase64Url(text: string): Uint8Array<ArrayBuffer> | null {
-  if (!/^[\w-]*$/.test(text) || text.length % 4 === 1) return null;
-  const base64 = text.replaceAll('-', '+').replaceAll('_', '/');
-  const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index++) {
-    bytes[index] = binary.codePointAt(index) ?? 0;
-  }
-  return bytes;
 }

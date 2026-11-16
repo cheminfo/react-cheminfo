@@ -19,8 +19,33 @@ export {
   sharePreviewSize,
 } from './devices.ts';
 export { escapeAttribute, escapeText } from './escape.ts';
+export type { ExampleMark } from './exampleMark.ts';
+export { createExampleMark } from './exampleMark.ts';
 export type { KeySetParamOptions } from './keySetParam.ts';
 export { keySetParam } from './keySetParam.ts';
+export {
+  MAX_LINK_TOKEN,
+  packLinkValue,
+  packLinkValueIfFits,
+  unpackLinkValue,
+} from './linkValue.ts';
+export type {
+  OpensOnAddresses,
+  OpensOnChoice,
+  OpensOnLinks,
+  OpensOnTarget,
+  ScreenLink,
+  ShareAddress,
+  ShareExample,
+  ShareOnScreen,
+} from './opensOn.ts';
+export {
+  EXAMPLE_PARAM,
+  carriedScreen,
+  defaultOpensOn,
+  opensOnAddress,
+  opensOnLinks,
+} from './opensOn.ts';
 export type { PageShareConfig } from './pageShareConfig.ts';
 export { createPageShareConfig } from './pageShareConfig.ts';
 export type { ShareRegion } from './regions.ts';
