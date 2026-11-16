@@ -134,7 +134,7 @@
   "site.uv-vis.tagline": "Sovrapporre spettri UV-vis e leggere ogni λmax.",
   "site.nmr.tagline": "Elaborare spettri NMR in NMRium, disegnare sequenze di impulsi e capire come nasce uno spettro.",
   "site.xps.tagline": "Leggere, adattare e prevedere spettri fotoelettronici a raggi X.",
-  "site.biodraw.tagline": "Disegnare cellule e membrane, e ancorarvi delle proteine.",
+  "site.cell.tagline": "Disegnare cellule e membrane, e ancorarvi delle proteine.",
   "site.diagram.tagline": "Disegnare diagrammi di flusso e a blocchi, con frecce che seguono i blocchi.",
   "site.peptide.tagline": "Imparare la sintesi dei peptidi, dai gruppi protettivi alla fase solida.",
   "site.optics.tagline": "Disporre lenti e specchi su un banco, e seguire la luce fino all'immagine.",

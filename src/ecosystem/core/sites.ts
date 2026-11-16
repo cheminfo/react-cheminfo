@@ -501,10 +501,12 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#97297b', accent: '#a3e635' },
   },
   {
-    id: 'biodraw',
-    // The name splits on itself, biology and drawing, so it carries no domain.
-    name: { lead: 'bio', alt: 'draw', dot: false },
-    host: 'biodraw.cheminfo.org',
+    id: 'cell',
+    name: { lead: 'cell', alt: 'cheminfo', dot: true },
+    host: 'cell.cheminfo.org',
+    // What biodraw.cheminfo.org saved is read as this site's.
+    formerIds: ['biodraw'],
+    formerHosts: ['biodraw.cheminfo.org'],
     tagline: 'Draw cells and membranes, and snap proteins into them.',
     group: 'drawing',
     // Eosin, the pink a cell's cytoplasm takes in the H&E stain every

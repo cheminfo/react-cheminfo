@@ -82,7 +82,7 @@ test('the tools a course opens with are the ones under the basics', () => {
     'draw',
     'write',
     'plot',
-    'biodraw',
+    'cell',
     'diagram',
   ]);
   expect(sitesInGroup('computing').map((site) => site.id)).toStrictEqual([

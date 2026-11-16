@@ -134,7 +134,7 @@
   "site.uv-vis.tagline": "Overlay UV-vis spectra and read off every λmax.",
   "site.nmr.tagline": "Process NMR spectra in NMRium, draw pulse sequences, and learn how a spectrum arises.",
   "site.xps.tagline": "Read, fit and predict X-ray photoelectron spectra.",
-  "site.biodraw.tagline": "Draw cells and membranes, and snap proteins into them.",
+  "site.cell.tagline": "Draw cells and membranes, and snap proteins into them.",
   "site.diagram.tagline": "Draw flowcharts and block diagrams, with arrows that follow the blocks.",
   "site.peptide.tagline": "Learn peptide synthesis, from protecting groups to the solid phase.",
   "site.optics.tagline": "Set lenses and mirrors on a bench, and follow the light to its image.",

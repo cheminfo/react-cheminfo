@@ -134,7 +134,7 @@
   "site.uv-vis.tagline": "Superposer des spectres UV-visible et relever chaque λmax.",
   "site.nmr.tagline": "Traiter des spectres RMN dans NMRium, dessiner des séquences d'impulsions, et comprendre comment naît un spectre.",
   "site.xps.tagline": "Lire, ajuster et prédire des spectres de photoélectrons X.",
-  "site.biodraw.tagline": "Dessiner cellules et membranes, et y ancrer des protéines.",
+  "site.cell.tagline": "Dessiner cellules et membranes, et y ancrer des protéines.",
   "site.diagram.tagline": "Dessiner des logigrammes et des schémas-blocs, avec des flèches qui suivent les blocs.",
   "site.peptide.tagline": "Apprendre la synthèse peptidique, des groupes protecteurs à la phase solide.",
   "site.optics.tagline": "Placer lentilles et miroirs sur un banc, et suivre la lumière jusqu'à l'image.",

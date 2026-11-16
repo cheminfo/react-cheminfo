@@ -39,7 +39,7 @@ export type SiteId =
   | 'vibrations'
   | 'uv-vis'
   | 'xps'
-  | 'biodraw'
+  | 'cell'
   | 'diagram'
   | 'peptide'
   | 'optics'

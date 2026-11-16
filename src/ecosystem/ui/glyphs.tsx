@@ -14,7 +14,7 @@ import type { ReactNode } from 'react';
 
 import type { SiteId } from '../core/sites.ts';
 
-// The lipid heads of biodraw's mark, both leaflets, left to right.
+// The lipid heads of cell's mark, both leaflets, left to right.
 const BILAYER_HEADS: ReadonlyArray<readonly [number, number]> = [
   [2, 15.1],
   [6, 13.6],
@@ -705,7 +705,7 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // A patch of membrane: the two leaflets of a lipid bilayer, their heads in
   // white, bowed the way a cell's edge bows, with one protein crossing both in
   // the answering colour.
-  biodraw: (alt) => (
+  cell: (alt) => (
     <>
       {BILAYER_HEADS.map(([cx, cy]) => (
         <circle key={`${cx} ${cy}`} cx={cx} cy={cy} r="1.9" fill="#ffffff" />
