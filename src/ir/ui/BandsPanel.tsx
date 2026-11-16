@@ -2,6 +2,7 @@ import {
   panelBodyStyle,
   panelEmptyStyle,
   panelHeaderCellStyle,
+  panelScrollAreaStyle,
   panelStyle,
   panelTableStyle,
 } from '../../panel/core/panelStyles.ts';
@@ -48,18 +49,18 @@ export interface BandsPanelProps {
  * list found automatically again. Once edited it is the spectrum's as picked
  * by hand, and the threshold no longer moves it.
  *
- * For a technique the correlation table does not cover — Raman — the column of
- * candidates and the button naming them are left out, and the table is the
- * bands themselves.
+ * For a technique the correlation table does not cover — Raman — or a host that
+ * switched the table off — an exercise — the column of candidates and the
+ * button naming them are left out, and the table is the bands themselves.
  * @param props - Component props.
  * @returns The panel.
  */
 export function BandsPanel(props: BandsPanelProps) {
   const { highlight = null, onHighlight } = props;
-  const { state, selectedSpectrum, assigned } = useIrEditorState();
+  const { state, selectedSpectrum, assigned, assignments } = useIrEditorState();
   const actions = useIrActions();
   const { mode, pickBands, technique } = state.settings;
-  const { assignments, unit } = IR_TECHNIQUE_RULES[technique];
+  const { unit } = IR_TECHNIQUE_RULES[technique];
   const empty = emptyMessage(selectedSpectrum, pickBands, assigned.length);
 
   function remove(band: IrBand): void {
@@ -75,8 +76,10 @@ export function BandsPanel(props: BandsPanelProps) {
     <div style={panelStyle}>
       <BandsToolbar />
 
-      <div style={panelBodyStyle}>
-        {empty === null ? (
+      {/* The table scrolls in a box with no padding: a padded one keeps a
+          strip above the sticky heading where the rows show through. */}
+      {empty === null ? (
+        <div style={panelScrollAreaStyle}>
           <table style={panelTableStyle}>
             <thead>
               <tr>
@@ -106,10 +109,12 @@ export function BandsPanel(props: BandsPanelProps) {
               ))}
             </tbody>
           </table>
-        ) : (
+        </div>
+      ) : (
+        <div style={panelBodyStyle}>
           <p style={panelEmptyStyle}>{empty}</p>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

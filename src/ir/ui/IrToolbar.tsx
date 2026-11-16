@@ -41,7 +41,7 @@ export interface IrToolbarProps {
  */
 export function IrToolbar(props: IrToolbarProps) {
   const { figure } = props;
-  const { state, selectedSpectrum } = useIrEditorState();
+  const { state, selectedSpectrum, assignments } = useIrEditorState();
   const command = useIrCommandProps();
   const { spectra } = state.data;
   const { domain, tool } = state.view;
@@ -113,7 +113,7 @@ export function IrToolbar(props: IrToolbarProps) {
         {...command('togglePicking')}
         disabled={selectedSpectrum === null}
       />
-      {irCommandOffered(technique, 'toggleAssignments') ? (
+      {assignments ? (
         <Toolbar.Item
           icon="label"
           active={showAssignments}

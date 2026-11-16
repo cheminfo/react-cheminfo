@@ -76,6 +76,18 @@ test('the bands are picked, listed, and offered what they might be', async () =>
   expect(markup).toMatch(/\d+ bands, \d+ assigned/);
 });
 
+test('an exercise lists the bands without saying what they could be', async () => {
+  const markup = renderToStaticMarkup(
+    <IrEditor data={await fiveBands()} assignments={false} />,
+  );
+
+  expect(markup).toContain('1708');
+  expect(markup).not.toContain('ketone C=O stretch');
+  expect(markup).not.toContain('could be');
+  expect(markup).not.toContain('Name the assignments');
+  expect(markup).not.toContain('assigned');
+});
+
 test('opening in absorbance names that axis instead', async () => {
   const markup = renderToStaticMarkup(
     <IrEditor data={await fiveBands()} mode="absorbance" />,

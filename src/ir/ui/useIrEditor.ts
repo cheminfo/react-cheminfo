@@ -31,6 +31,13 @@ export interface UseIrEditorOptions extends CreateIrStateOptions {
    * @default undefined
    */
   onChange?: (spectra: IrSpectrum[]) => void;
+  /**
+   * Whether the correlation table is asked what each band could be. An
+   * exercise switches it off, so the reading of the bands is the student's.
+   * A technique the table does not cover is never asked, whatever this says.
+   * @default true
+   */
+  assignments?: boolean;
 }
 
 /** What a component drives the viewer through. */
@@ -47,6 +54,11 @@ export interface IrEditorApi {
    * without a candidate for a technique the correlation table does not cover.
    */
   assigned: AssignedBand[];
+  /**
+   * Whether the bands are offered what they could be: the technique is one the
+   * correlation table covers, and the host has not switched it off.
+   */
+  assignments: boolean;
   /** Everything to do. */
   actions: IrEditorActions;
 }
@@ -57,7 +69,7 @@ export interface IrEditorApi {
  * @returns The state, what follows from it, and everything to do.
  */
 export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
-  const { onChange, ...initial } = options;
+  const { onChange, assignments: allowed = true, ...initial } = options;
 
   const [state, dispatch] = useReducer(irReducer, initial, createIrState);
   const actions = useMemo(() => createIrActions(dispatch), [dispatch]);
@@ -93,7 +105,7 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
   // Assigning is a walk of thirty ranges per band, which is nothing beside the
   // picking — so it is a memo of its own, and moving the tolerance does not
   // re-pick. A technique the table does not cover is matched against no table.
-  const { assignments } = IR_TECHNIQUE_RULES[technique];
+  const assignments = allowed && IR_TECHNIQUE_RULES[technique].assignments;
   const assigned = useMemo(
     () =>
       assignBands(bands, {
@@ -115,8 +127,15 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
   }, [spectra, onChange]);
 
   return useMemo(
-    () => ({ state, visibleSpectra, selectedSpectrum, assigned, actions }),
-    [state, visibleSpectra, selectedSpectrum, assigned, actions],
+    () => ({
+      state,
+      visibleSpectra,
+      selectedSpectrum,
+      assigned,
+      assignments,
+      actions,
+    }),
+    [state, visibleSpectra, selectedSpectrum, assigned, assignments, actions],
   );
 }
 

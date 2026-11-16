@@ -28,6 +28,13 @@ export interface IrEditorProps {
    */
   onChange?: (spectra: IrSpectrum[]) => void;
   /**
+   * Whether the Bands panel says what each band could be. An exercise switches
+   * it off, so the reading of the bands is the student's; the table's ranges
+   * can still be offered to look up, in a panel of the host's.
+   * @default true
+   */
+  assignments?: boolean;
+  /**
    * Which value axis to open in: transmittance or absorbance. Intensity, which
    * infrared does not offer, opens transmittance instead.
    * @default 'transmittance'

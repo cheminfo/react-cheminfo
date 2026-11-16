@@ -29,12 +29,12 @@ import { useIrText } from './useIrText.ts';
  * @returns The status bar.
  */
 export function IrStatusBar() {
-  const { state, visibleSpectra, selectedSpectrum, assigned } =
+  const { state, visibleSpectra, selectedSpectrum, assigned, assignments } =
     useIrEditorState();
   const { spectra } = state.data;
   const { error, tool } = state.view;
   const { mode, pickBands, technique } = state.settings;
-  const { reverseX, assignments, unit } = IR_TECHNIQUE_RULES[technique];
+  const { reverseX, unit } = IR_TECHNIQUE_RULES[technique];
   const text = useIrText(technique);
 
   const range =

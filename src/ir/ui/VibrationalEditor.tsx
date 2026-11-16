@@ -29,6 +29,13 @@ export interface VibrationalEditorProps {
    */
   onChange?: (spectra: IrSpectrum[]) => void;
   /**
+   * Whether the Bands panel says what each band could be. An exercise switches
+   * it off, so the reading of the bands is the student's; the table's ranges
+   * can still be offered to look up, in a panel of the host's.
+   * @default true
+   */
+  assignments?: boolean;
+  /**
    * Which value axis to open in; one the technique does not offer opens its
    * first instead.
    * @default the technique's first
@@ -79,6 +86,7 @@ export function VibrationalEditor(props: VibrationalEditorProps) {
     technique,
     data = NO_SPECTRA,
     onChange,
+    assignments,
     mode,
     defaultPanelIds,
     panels = NO_PANELS,
@@ -92,6 +100,7 @@ export function VibrationalEditor(props: VibrationalEditorProps) {
     settings: { technique, ...(mode === undefined ? {} : { mode }) },
     panelIds: defaultPanelIds,
     onChange,
+    assignments,
   });
 
   return (

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { Button, Toolbar } from 'react-science/ui';
 
 import { panelToolbarStyle } from '../../panel/core/panelStyles.ts';
-import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
 
 import { bandsToTsv } from './bandsTsv.ts';
 import { useIrCommandProps } from './irCommandContext.tsx';
@@ -16,12 +15,11 @@ import { useIrActions, useIrEditorState } from './irStateContext.ts';
  * @returns The row.
  */
 export function BandsToolbar() {
-  const { state, selectedSpectrum, assigned } = useIrEditorState();
+  const { state, selectedSpectrum, assigned, assignments } = useIrEditorState();
   const actions = useIrActions();
   const command = useIrCommandProps();
   const { tool } = state.view;
-  const { mode, pickBands, showAssignments, technique } = state.settings;
-  const { assignments } = IR_TECHNIQUE_RULES[technique];
+  const { mode, pickBands, showAssignments } = state.settings;
   const byHand = selectedSpectrum?.bandsByHand === true;
 
   const tsv = useMemo(

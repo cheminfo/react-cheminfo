@@ -66,7 +66,8 @@ export interface IrShellProps {
 export function IrShell(props: IrShellProps) {
   const { handle, panels, onPlotClick, actions: hostActions } = props;
 
-  const { state, visibleSpectra, selectedSpectrum } = useIrEditorState();
+  const { state, visibleSpectra, selectedSpectrum, assignments } =
+    useIrEditorState();
   const actions = useIrActions();
   const { toggle: toggleFullScreen } = useFullscreen();
   const { tool } = state.view;
@@ -114,7 +115,7 @@ export function IrShell(props: IrShellProps) {
         ? () => actions.setSettings({ mode: otherIrMode(mode, technique) })
         : undefined,
       togglePicking: () => actions.setSettings({ pickBands: !pickBands }),
-      toggleAssignments: irCommandOffered(technique, 'toggleAssignments')
+      toggleAssignments: assignments
         ? () => actions.setSettings({ showAssignments: !showAssignments })
         : undefined,
       exportImage: () => setFigureOpen(!isFigureOpen),
@@ -127,6 +128,7 @@ export function IrShell(props: IrShellProps) {
       technique,
       pickBands,
       showAssignments,
+      assignments,
       zoomIn,
       zoomOut,
       toggleFullScreen,
