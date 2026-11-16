@@ -32,10 +32,18 @@ export interface ExerciseActionsProps {
    */
   hintsRevealed?: number;
   /**
-   * How many hints the exercise has, for the button's count.
+   * How many hints the exercise has, for the button's count. `null` for a
+   * ladder that has no fixed length — each hint chosen from what the answer
+   * holds when it is asked for — so the button carries no count and
+   * `hintDisabled` alone says when there is nothing more to say.
    * @default 0
    */
-  hintCount?: number;
+  hintCount?: number | null;
+  /**
+   * Whether no further hint can be given now, beyond the count being reached.
+   * @default false
+   */
+  hintDisabled?: boolean;
   /**
    * Shows or hides the sample answer. Never gated behind anything: getting
    * stuck and reading the answer is part of how the intuition is built.
@@ -84,6 +92,7 @@ export function ExerciseActions(props: ExerciseActionsProps): ReactElement {
     onRevealHint,
     hintsRevealed = 0,
     hintCount = 0,
+    hintDisabled = false,
     onToggleSolution,
     showSolution = false,
     onReset,
@@ -106,11 +115,17 @@ export function ExerciseActions(props: ExerciseActionsProps): ReactElement {
       {onRevealHint !== undefined && (
         <Button
           icon="lightbulb"
-          text={t('pedagogy.revealHintCount', {
-            revealed: Math.min(hintsRevealed, hintCount),
-            total: hintCount,
-          })}
-          disabled={hintsRevealed >= hintCount}
+          text={
+            hintCount === null
+              ? t('pedagogy.revealHint')
+              : t('pedagogy.revealHintCount', {
+                  revealed: Math.min(hintsRevealed, hintCount),
+                  total: hintCount,
+                })
+          }
+          disabled={
+            hintDisabled || (hintCount !== null && hintsRevealed >= hintCount)
+          }
           onClick={onRevealHint}
         />
       )}

@@ -70,3 +70,21 @@ test('checking is dead while there is nothing to grade', () => {
 
   expect(html).toContain('disabled=""');
 });
+
+test('a ladder with no fixed length offers a hint without a count', () => {
+  const html = renderToStaticMarkup(
+    <ExerciseActions onRevealHint={noop} hintsRevealed={3} hintCount={null} />,
+  );
+
+  expect(html).toContain('>Reveal hint<');
+  expect(html).not.toContain('(3/');
+  expect(html).not.toContain('disabled=""');
+});
+
+test('a ladder with no fixed length is closed when it has nothing to say', () => {
+  const html = renderToStaticMarkup(
+    <ExerciseActions onRevealHint={noop} hintCount={null} hintDisabled />,
+  );
+
+  expect(html).toContain('disabled=""');
+});
