@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.126.0](https://github.com/cheminfo/react-cheminfo/compare/v0.125.0...v0.126.0) (2026-11-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename biodraw.cheminfo.org to cell.cheminfo.org
+
+### Features
+
+* **molecule3d:** remove the measurement under the pointer with Backspace or Delete ([007ef1d](https://github.com/cheminfo/react-cheminfo/commit/007ef1d1b2179c4dd035e68f8d52e1b63ab03f71))
+* rename biodraw.cheminfo.org to cell.cheminfo.org ([7acdc00](https://github.com/cheminfo/react-cheminfo/commit/7acdc00a4526188480bdd81b8cc83bb708c5ae46))
+
 ## [0.125.0](https://github.com/cheminfo/react-cheminfo/compare/v0.124.0...v0.125.0) (2026-11-15)
 
 
