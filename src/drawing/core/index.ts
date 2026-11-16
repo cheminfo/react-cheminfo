@@ -8,7 +8,9 @@ export {
   ZOOM_RANGE,
   fillCamera,
   frameCamera,
+  pannedCamera,
   visibleBox,
+  wheelZoomFactor,
   zoomAround,
   zoomOfShare,
   zoomShare,
@@ -204,8 +206,34 @@ export {
 } from './shapeHandles.ts';
 export type { Patching } from './shared.ts';
 export { idsOf, patchOf, sharedValue } from './shared.ts';
+export type { DrawGroup } from './groups.ts';
+export {
+  expandToGroups,
+  leafMembers,
+  outermostUnits,
+  parentsOf,
+  reconcileGroups,
+  withGroup,
+  withoutGroups,
+} from './groups.ts';
+export { parseGroups, renumberGroups } from './groupFiles.ts';
+export type { FrameHandle } from './selectionFrame.ts';
+export {
+  ROTATE_HANDLE_GAP,
+  frameCorners,
+  frameCursor,
+  frameHandleAt,
+  frameHandles,
+  frameTransform,
+  framedBox,
+} from './selectionFrame.ts';
 export type { Similarity } from './transform.ts';
-export { pointMap } from './transform.ts';
+export {
+  mapCurve,
+  pointMap,
+  transformCaption,
+  transformPicture,
+} from './transform.ts';
 export type { Box, DrawPage, FigureSize, Point } from './types.ts';
 export { arrayOf, isFiniteNumber, isRecord } from './values.ts';
 export { along, leftOf, turnAbout, unit } from './vectors.ts';

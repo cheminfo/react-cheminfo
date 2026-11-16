@@ -135,6 +135,51 @@ export function zoomAround(
   };
 }
 
+/**
+ * How much a turn of the wheel zooms: a smooth exponential of the distance it
+ * scrolls, so a trackpad's many small steps and a mouse's few large ones zoom
+ * alike. A wheel that counts in lines or in pages is turned into pixels first.
+ * @param wheel - The wheel's `deltaY` and `deltaMode`.
+ * @param wheel.deltaY - How far it scrolls down, in its unit.
+ * @param wheel.deltaMode - Its unit: 0 pixels, 1 lines, 2 pages.
+ * @param pageHeight - The height of the view, in pixels: a page's worth.
+ * @returns The factor: above 1 zooms in.
+ */
+export function wheelZoomFactor(
+  wheel: { deltaY: number; deltaMode: number },
+  pageHeight: number,
+): number {
+  const { deltaY, deltaMode } = wheel;
+  const pixels =
+    deltaMode === 1
+      ? deltaY * WHEEL_LINE
+      : deltaMode === 2
+        ? deltaY * pageHeight
+        : deltaY;
+  return Math.exp(-pixels * WHEEL_ZOOM_RATE);
+}
+
+/**
+ * The camera dragged by the pointer: the drawing follows the pointer.
+ * @param camera - The camera.
+ * @param dx - How far the pointer went right, in screen pixels.
+ * @param dy - How far it went down, in screen pixels.
+ * @returns The camera, moved.
+ */
+export function pannedCamera(camera: Camera, dx: number, dy: number): Camera {
+  return {
+    ...camera,
+    x: camera.x - dx / camera.zoom,
+    y: camera.y - dy / camera.zoom,
+  };
+}
+
+/** Pixels per line of a wheel that counts in lines, as Firefox's does. */
+const WHEEL_LINE = 16;
+
+/** How much closer each pixel the wheel scrolls up brings the view. */
+const WHEEL_ZOOM_RATE = 0.002;
+
 function clampZoom(zoom: number): number {
   return Math.min(
     ZOOM_RANGE.max * PIXELS_PER_POINT,

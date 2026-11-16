@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import type { CurveShape } from '../../core/curveShape.ts';
-import { curveHandleMarks } from '../curveHandleMarks.tsx';
+import { curveHandleMarks, pointHandleMarks } from '../curveHandleMarks.tsx';
 
 const ARC: CurveShape = {
   points: [
@@ -46,5 +46,17 @@ test('a mark keeps its size on screen and carries the name it is given', () => {
   );
   expect(markup).toContain(
     '<circle data-handle="1-before" class="draw-handle" cx="6" cy="-10" r="2" stroke-width="0.75"></circle>',
+  );
+});
+
+test('the corners of a path being drawn are squares alone, with no tangent', () => {
+  const markup = renderToStaticMarkup(
+    <svg>{pointHandleMarks(ARC.points, 2)}</svg>,
+  );
+
+  expect(markup.match(/<rect /g)).toHaveLength(3);
+  expect(markup).not.toContain('<circle');
+  expect(markup).toContain(
+    '<g data-vertex="0"><rect class="draw-handle draw-handle--point" x="-7" y="-7" width="14" height="14" stroke-width="3"></rect></g>',
   );
 });

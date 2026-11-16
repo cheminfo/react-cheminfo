@@ -1,12 +1,19 @@
 export { ArrangeIcon } from './ArrangeIcon.tsx';
 export type { BoxSizeFieldsProps } from './BoxSizeFields.tsx';
 export { BoxSizeFields } from './BoxSizeFields.tsx';
-export { curveHandleMarks } from './curveHandleMarks.tsx';
+export { curveHandleMarks, pointHandleMarks } from './curveHandleMarks.tsx';
+export type {
+  CanvasNavigation,
+  CanvasNavigationOptions,
+} from './useCanvasNavigation.ts';
+export { useCanvasNavigation } from './useCanvasNavigation.ts';
 export type { DashedOutlineProps, HandleMarkProps } from './DashedOutline.tsx';
 export { DashedOutline, HandleMark } from './DashedOutline.tsx';
 export type { DashSelectProps } from './DashSelect.tsx';
 export { DashSelect } from './DashSelect.tsx';
 export { FigureOutline } from './FigureOutline.tsx';
+export type { FrameMarksProps } from './FrameMarks.tsx';
+export { FrameMarks } from './FrameMarks.tsx';
 export type { FullscreenStageProps } from './FullscreenStage.tsx';
 export { FullscreenStage } from './FullscreenStage.tsx';
 export { GradientDefs } from './GradientDefs.tsx';

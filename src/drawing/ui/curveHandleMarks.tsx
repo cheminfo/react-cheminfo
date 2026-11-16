@@ -26,7 +26,6 @@ export function curveHandleMarks(
   named: (handle: CurveHandle) => string | undefined = () => undefined,
 ): ReactElement[] {
   const resolved = curveControls(shape.points, shape.closed, shape.controls);
-  const size = POINT_SIZE * pixel;
   const arm = (key: string, from: Point, to: Point) => (
     <line
       key={key}
@@ -63,17 +62,51 @@ export function curveHandleMarks(
         {after ? arm('after-arm', point, after) : null}
         {before ? ring({ vertex, part: 'before' }, before) : null}
         {after ? ring({ vertex, part: 'after' }, after) : null}
-        <rect
-          data-handle={named({ vertex, part: 'point' })}
-          className="draw-handle draw-handle--point"
-          x={point.x - size / 2}
-          y={point.y - size / 2}
-          width={size}
-          height={size}
-          strokeWidth={pixel * 1.5}
-        />
+        {pointSquare(point, pixel, named({ vertex, part: 'point' }))}
       </g>,
     );
   }
   return marks;
+}
+
+/**
+ * The squares on the points of a path, without its tangents: the corners of
+ * a polyline or a polygon being drawn, as {@link curveHandleMarks} draws its
+ * points.
+ * @param points - The points.
+ * @param pixel - Points per screen pixel, so marks keep their size.
+ * @returns One square per point.
+ */
+export function pointHandleMarks(
+  points: readonly Point[],
+  pixel: number,
+): ReactElement[] {
+  const marks: ReactElement[] = [];
+  for (let vertex = 0; vertex < points.length; vertex++) {
+    marks.push(
+      <g key={vertex} data-vertex={vertex}>
+        {pointSquare(points[vertex] as Point, pixel, undefined)}
+      </g>,
+    );
+  }
+  return marks;
+}
+
+function pointSquare(
+  point: Point,
+  pixel: number,
+  name: string | undefined,
+): ReactElement {
+  const size = POINT_SIZE * pixel;
+  return (
+    <rect
+      data-handle={name}
+      className="draw-handle draw-handle--point"
+      x={point.x - size / 2}
+      y={point.y - size / 2}
+      width={size}
+      height={size}
+      strokeWidth={pixel * 1.5}
+    />
+  );
 }

@@ -4,7 +4,9 @@ import {
   PIXELS_PER_POINT,
   fillCamera,
   frameCamera,
+  pannedCamera,
   visibleBox,
+  wheelZoomFactor,
   zoomAround,
   zoomOfShare,
   zoomShare,
@@ -74,5 +76,30 @@ test('the box a camera shows is the size of the view, about its point', () => {
     y: 10,
     width: 50,
     height: 20,
+  });
+});
+
+test('the wheel zooms by the distance it scrolls, whatever unit it counts in', () => {
+  expect(wheelZoomFactor({ deltaY: 0, deltaMode: 0 }, 600)).toBe(1);
+  expect(wheelZoomFactor({ deltaY: -100, deltaMode: 0 }, 600)).toBeCloseTo(
+    Math.exp(0.2),
+    12,
+  );
+  // Three lines of 16 pixels, and a page the height of the view.
+  expect(wheelZoomFactor({ deltaY: 3, deltaMode: 1 }, 600)).toBeCloseTo(
+    Math.exp(-0.096),
+    12,
+  );
+  expect(wheelZoomFactor({ deltaY: 1, deltaMode: 2 }, 600)).toBeCloseTo(
+    Math.exp(-1.2),
+    12,
+  );
+});
+
+test('a pan moves the drawing with the pointer, at the zoom of the view', () => {
+  expect(pannedCamera({ x: 10, y: 20, zoom: 2 }, 40, -10)).toStrictEqual({
+    x: -10,
+    y: 25,
+    zoom: 2,
   });
 });

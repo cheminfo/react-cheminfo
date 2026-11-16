@@ -11,6 +11,7 @@ import { curveOutline } from './curves.ts';
 import type { LineDash } from './dashes.ts';
 import { boxCorners } from './geometry.ts';
 import type { GraphicGradient } from './graphicGradients.ts';
+import { mapCurve } from './transform.ts';
 import type { Box, Point } from './types.ts';
 import { turnAbout } from './vectors.ts';
 
@@ -201,16 +202,5 @@ export function mapPath(
   graphic: DrawPathGraphic,
   map: (point: Point) => Point,
 ): DrawPathGraphic {
-  const moved: DrawPathGraphic = {
-    ...graphic,
-    points: graphic.points.map(map),
-  };
-  if (graphic.controls) {
-    moved.controls = graphic.controls.map((control) =>
-      control
-        ? { before: map(control.before), after: map(control.after) }
-        : null,
-    );
-  }
-  return moved;
+  return mapCurve(graphic, map);
 }
