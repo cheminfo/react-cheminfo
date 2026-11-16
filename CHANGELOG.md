@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.129.0](https://github.com/cheminfo/react-cheminfo/compare/v0.128.0...v0.129.0) (2026-11-16)
+
+
+### Features
+
+* let the Share dialog open on any example, whatever is on screen ([5bd952f](https://github.com/cheminfo/react-cheminfo/commit/5bd952fb489d304f5399833bcc91623c3af68d1d))
+
 ## [0.128.0](https://github.com/cheminfo/react-cheminfo/compare/v0.127.0...v0.128.0) (2026-11-16)
 
 
