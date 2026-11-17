@@ -59,6 +59,7 @@ export function OverlayInfo(props: OverlayInfoProps): ReactElement {
 
   return (
     <PopoverNext
+      isOpen={open}
       placement={placement}
       onInteraction={(next) => setOpen(next)}
       content={<div style={explanationStyle(metrics)}>{children}</div>}

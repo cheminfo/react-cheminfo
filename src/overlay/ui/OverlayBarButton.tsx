@@ -51,6 +51,7 @@ export function OverlayBarButton(props: OverlayBarButtonProps): ReactElement {
 
   return (
     <PopoverNext
+      isOpen={open}
       placement={POPOVER_PLACEMENTS[placement]}
       onInteraction={(next) => setOpen(next)}
       content={
