@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.131.0](https://github.com/cheminfo/react-cheminfo/compare/v0.130.0...v0.131.0) (2026-11-17)
+
+
+### Features
+
+* spin a rotor in its own plane while its piece runs ([6354ff4](https://github.com/cheminfo/react-cheminfo/commit/6354ff4ef8710f737164b96a41694cb5f1653e03))
+
+
+### Bug Fixes
+
+* mark an overlay button open while its panel shows ([197c59f](https://github.com/cheminfo/react-cheminfo/commit/197c59fb3db471baa323e941d5cedd89de82a67a))
+
 ## [0.130.0](https://github.com/cheminfo/react-cheminfo/compare/v0.129.0...v0.130.0) (2026-11-16)
 
 
