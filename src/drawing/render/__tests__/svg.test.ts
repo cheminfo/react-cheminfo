@@ -131,6 +131,22 @@ test('a stir bar turns as a whole; a paddle turns alone under its shaft', () => 
   );
 });
 
+test('a rotor spins as one group in its place, the rest of its piece still', () => {
+  const pump: SceneItem = {
+    owner: { kind: 'glass', id: 'g3' },
+    primitives: [
+      { kind: 'path', d: 'M0 0', width: 0.6, extent: [] },
+      { kind: 'path', d: 'M1 1', width: 0.6, extent: [], spins: 'clockwise' },
+      { kind: 'path', d: 'M2 2', width: 0.6, extent: [], spins: 'clockwise' },
+      { kind: 'path', d: 'M3 3', width: 0.6, extent: [] },
+    ],
+  };
+
+  expect(sceneBody(sceneOf(pump), { style: STYLE })).toBe(
+    `${OPEN}<g cd:glass="g3"><path d="M0 0"/><g class="glass-spinning"><path d="M1 1"/><path d="M2 2"/></g><path d="M3 3"/></g></g>`,
+  );
+});
+
 test('a sheet shows what reaches it, over a background filling it edge to edge', () => {
   const blank: SceneItem = {
     owner: { kind: 'mark', id: 'm1' },

@@ -93,6 +93,14 @@ export interface PathPrimitive {
    */
   turns?: true;
   /**
+   * The way it spins in its own plane while its piece runs, with the
+   * primitives drawn next to it that spin the same way, about the middle of
+   * their box: a rotor seen face on, drawn whole about its axle. Set moving
+   * it spins; a file holds it still.
+   * @default undefined — it does not spin
+   */
+  spins?: Spin;
+  /**
    * The run of a bubble carried by running water, of one rising through a
    * boiling liquid, of a falling drop: the screen moves it along the path,
    * given from where it is drawn, a whole run every `duration` seconds,
@@ -103,6 +111,9 @@ export interface PathPrimitive {
    */
   flow?: { path: string; begin: number; duration: number; still?: boolean };
 }
+
+/** The way a rotor spins, as it is drawn. */
+export type Spin = 'clockwise' | 'anticlockwise';
 
 /** A filled dot: an unpaired electron, half a lone pair. */
 export interface DotPrimitive {

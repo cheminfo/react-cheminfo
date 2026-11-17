@@ -93,6 +93,24 @@ export const MOTION_CSS = `/* A bubble rises from where it is drawn, three of it
   }
 }
 
+/* A rotor seen face on, spinning in its plane about the middle of its box,
+   clockwise, or the other way when it spins back. */
+[data-motion='moving'] .glass-spinning {
+  animation: glass-spin 1.2s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+[data-motion='moving'] .glass-spinning-back {
+  animation-direction: reverse;
+}
+
+@keyframes glass-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* A figure carries each bubble running along water, and each drop falling, as
    a run that only shows moving (written hidden, for a program that reads no
    style), and the ones drawn where they stand as a still copy that only shows
@@ -107,7 +125,8 @@ export const MOTION_CSS = `/* A bubble rises from where it is drawn, three of it
 
 @media print, (prefers-reduced-motion: reduce) {
   .glass-bubble,
-  .glass-turning {
+  .glass-turning,
+  .glass-spinning {
     animation: none;
   }
 
@@ -155,7 +174,8 @@ export function runTiming(flow: NonNullable<PathPrimitive['flow']>): {
 }
 
 /**
- * Whether a scene has anything that moves: a bubble, a run, a turning piece.
+ * Whether a scene has anything that moves: a bubble, a run, a turning piece,
+ * a spinning rotor.
  * @param scene - The scene.
  * @returns True when a figure of it can be set moving.
  */
@@ -165,7 +185,9 @@ export function sceneMoves(scene: Scene): boolean {
     for (const primitive of item.primitives) {
       if (
         primitive.kind === 'path' &&
-        (primitive.flow !== undefined || primitive.bubble !== undefined)
+        (primitive.flow !== undefined ||
+          primitive.bubble !== undefined ||
+          primitive.spins !== undefined)
       ) {
         return true;
       }

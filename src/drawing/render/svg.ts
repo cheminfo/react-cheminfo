@@ -26,6 +26,7 @@ import type {
   Scene,
   SceneItem,
 } from './primitives.ts';
+import { spinClass, spinRuns } from './spinning.ts';
 import type { DrawingStyle } from './style.ts';
 
 /** The namespace of the attributes a drawing writes. */
@@ -172,8 +173,13 @@ function itemMarkup(item: SceneItem, options: SvgOptions): string {
   const ink = item.color ? ` stroke="${hex}"` : '';
   const faded = opacity < 1 ? ` opacity="${number(opacity)}"` : '';
   const markup = (primitives: readonly Primitive[]) =>
-    primitives
-      .map((primitive) => primitiveMarkup(primitive, style, hex))
+    spinRuns(primitives)
+      .map(({ spins, primitives: run }) => {
+        const inner = run.map((one) => primitiveMarkup(one, style, hex));
+        return spins
+          ? `<g class="${spinClass(spins)}">${inner.join('')}</g>`
+          : inner.join('');
+      })
       .join('');
   // A piece whose paddle alone turns keeps the rest still.
   if (item.turning !== undefined && item.primitives.some(turnsAlone)) {

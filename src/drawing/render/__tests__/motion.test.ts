@@ -42,7 +42,7 @@ test('a run keeps its own clock, repeated for ever', () => {
   ).toStrictEqual({ begin: '1.23s', dur: '0.30s', repeatCount: 'indefinite' });
 });
 
-test('a scene moves when a piece turns, a bubble rises or something runs', () => {
+test('a scene moves when a piece turns, a bubble rises, something runs or a rotor spins', () => {
   const owner = { kind: 'glass', id: 'g1' };
 
   expect(sceneMoves(sceneOf())).toBe(false);
@@ -69,6 +69,18 @@ test('a scene moves when a piece turns, a bubble rises or something runs', () =>
       ),
     ),
   ).toBe(true);
+  expect(
+    sceneMoves(sceneOf({ owner, primitives: [path({ spins: 'clockwise' })] })),
+  ).toBe(true);
+});
+
+test('a rotor spins about the middle of its box, either way, and never where less motion is asked for', () => {
+  expect(MOTION_STYLE).toContain(
+    "[data-motion='moving'] .glass-spinning{animation: glass-spin 1.2s linear infinite;transform-box: fill-box;transform-origin: center;}[data-motion='moving'] .glass-spinning-back{animation-direction: reverse;}@keyframes glass-spin{to{transform: rotate(360deg);}}",
+  );
+  expect(MOTION_STYLE).toContain(
+    '{.glass-bubble,.glass-turning,.glass-spinning{animation: none;}',
+  );
 });
 
 test('the stylesheet a figure carries is the page one without comments or spare spaces', () => {
@@ -82,7 +94,7 @@ test('the stylesheet a figure carries is the page one without comments or spare 
     ),
   ).toBe(true);
   expect(MOTION_STYLE).toContain(
-    '@media print,(prefers-reduced-motion: reduce){.glass-bubble,.glass-turning{animation: none;}',
+    '@media print,(prefers-reduced-motion: reduce){.glass-bubble,.glass-turning,.glass-spinning{animation: none;}',
   );
   expect(
     MOTION_STYLE.endsWith(

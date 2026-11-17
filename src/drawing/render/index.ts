@@ -92,8 +92,11 @@ export type {
   Scene,
   SceneItem,
   SceneOwner,
+  Spin,
   TextPrimitive,
 } from './primitives.ts';
+export type { SpinRun } from './spinning.ts';
+export { spinClass, spinRuns } from './spinning.ts';
 export type { DrawingStyle } from './style.ts';
 export type { MoleculeGroup, SvgOptions } from './svg.ts';
 export {
