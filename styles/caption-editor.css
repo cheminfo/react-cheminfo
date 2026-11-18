@@ -92,8 +92,16 @@
   font-family: inherit;
   font-size: 13px;
   gap: 4px;
-  transform: translateX(-50%);
+  /* Centred over its caption, then moved back inside the figure when the
+     caption sits near an edge (`useToolbarInView`). */
+  transform: translateX(calc(-50% + var(--caption-toolbar-shift, 0px)));
   white-space: nowrap;
+}
+
+/* With no room above the caption, the bar goes under it. */
+.caption-toolbar[data-below] {
+  top: calc(100% + 4px);
+  bottom: auto;
 }
 
 .caption-toolbar__size {
@@ -108,4 +116,10 @@
 
 .caption-toolbar__unit {
   color: var(--text-muted);
+}
+
+/* The tick keeps the caption: it stands apart from the styles. */
+.caption-toolbar__done {
+  padding-left: 4px;
+  border-left: 1px solid var(--border);
 }

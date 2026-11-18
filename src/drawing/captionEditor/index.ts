@@ -20,3 +20,5 @@ export {
 } from './captionSchema.ts';
 export type { CaptionToolbarProps } from './CaptionToolbar.tsx';
 export { CaptionToolbar } from './CaptionToolbar.tsx';
+export type { ToolbarFit } from './toolbarInView.ts';
+export { toolbarFit, useToolbarInView } from './toolbarInView.ts';

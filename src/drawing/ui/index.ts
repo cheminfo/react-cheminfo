@@ -48,13 +48,23 @@ export {
   useFigureMoves,
   useMovingFigureSource,
 } from './movingFigure.ts';
+export type { PageChange, PageFieldProps } from './PageField.tsx';
+export { PageField } from './PageField.tsx';
+export { PageGrid } from './PageGrid.tsx';
 export { PageMask } from './PageMask.tsx';
+export { FigureSideInput, PageSideInput } from './PageSideInput.tsx';
+export { PageToolbar } from './PageToolbar.tsx';
 export type { LineWidthStyle } from './pathProps.ts';
 export { fillProps, strokeProps } from './pathProps.ts';
 export { PathView } from './PathView.tsx';
+export type { PrintSheetsProps } from './PrintSheets.tsx';
+export { PrintSheets } from './PrintSheets.tsx';
 export { releaseFocusOnPress } from './releaseFocusOnPress.ts';
 export { svgMarkup } from './svgMarkup.ts';
 export type { CustomColorButtonProps, SwatchRowProps } from './SwatchRow.tsx';
 export { CustomColorButton, SwatchRow } from './SwatchRow.tsx';
+export { TextToolGlyph, TextToolIcon } from './TextToolIcon.tsx';
 export { usePrinting } from './usePrinting.ts';
+export type { ZoomControlProps } from './ZoomControl.tsx';
+export { ZoomControl } from './ZoomControl.tsx';
 export { useSeen } from '../../hooks/ui/useSeen.ts';

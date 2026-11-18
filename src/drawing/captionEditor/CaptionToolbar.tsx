@@ -83,13 +83,15 @@ export interface CaptionToolbarProps {
   onAlign: (align: TextAlign) => void;
   /** Set the caption in another font. */
   onFamily: (family: string) => void;
+  /** Keep the caption and close its box, as ⌘Enter does. */
+  onDone: () => void;
 }
 
 /**
  * The styles of a caption being typed, over the box it is typed in: bold,
  * italic, subscript, superscript and the size of the selection, then the
- * automatic formulas, the font and the alignment of the whole caption. Its
- * buttons leave the keys with the text.
+ * automatic formulas, the font and the alignment of the whole caption, and
+ * last the tick that keeps it. Its buttons leave the keys with the text.
  * @param props - The styles of the selection, and how to change them.
  * @returns The toolbar.
  */
@@ -105,6 +107,7 @@ export function CaptionToolbar(props: CaptionToolbarProps): ReactElement {
     onChemical,
     onAlign,
     onFamily,
+    onDone,
   } = props;
   return (
     <div
@@ -207,6 +210,19 @@ export function CaptionToolbar(props: CaptionToolbarProps): ReactElement {
           />
         ))}
       </ButtonGroup>
+      <Button
+        className="caption-toolbar__done"
+        size="small"
+        variant="minimal"
+        intent="primary"
+        icon="tick"
+        aria-label="Done"
+        title={`Done (${shortcutText([MOD_KEY, 'Enter'])}, or click elsewhere). Escape drops the change.`}
+        onMouseDown={(event) => {
+          event.preventDefault();
+        }}
+        onClick={onDone}
+      />
     </div>
   );
 }

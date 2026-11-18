@@ -8,7 +8,7 @@ import { placedPage } from '../core/pages.ts';
 import type { Box, DrawPage, FigureSize } from '../core/types.ts';
 
 import { primitivesBounds } from './bounds.ts';
-import type { Scene, SceneItem } from './primitives.ts';
+import type { Scene } from './primitives.ts';
 
 /** The most sheets a drawing goes on: past them, the rest does not print. */
 export const MAX_SHEETS = 200;
@@ -23,6 +23,20 @@ const MAX_LINES = 200;
 interface Tile {
   column: number;
   row: number;
+}
+
+/**
+ * What the page lines mean for printing, said under the page setup.
+ * @param sheets - How many sheets hold something; null when the lines are
+ * hidden.
+ * @returns The line.
+ */
+export function pagesLine(sheets: number | null): string {
+  if (sheets === null) return 'The whole drawing prints on one page.';
+  if (sheets >= MAX_SHEETS) return `Only the first ${MAX_SHEETS} pages print.`;
+  const printed =
+    sheets === 1 ? 'One page prints' : `${sheets} pages print, one sheet each`;
+  return `Drag objects across the lines. ${printed}.`;
 }
 
 /**
@@ -48,7 +62,12 @@ export function paddedBox(scene: Scene, padding = 4) {
  * @returns The sheets, in points.
  */
 export function pageSheets(scene: Scene, page: DrawPage): Box[] {
-  return sheetsHolding(scene.items, placedPage(page, paddedBox(scene)));
+  const boxes: Box[] = [];
+  for (const item of scene.items) {
+    const box = primitivesBounds(item.primitives);
+    if (box) boxes.push(box);
+  }
+  return boxSheets(boxes, placedPage(page, paddedBox(scene)));
 }
 
 /**
@@ -71,21 +90,20 @@ export function figureBox(scene: Scene, figure?: FigureSize): Box {
 }
 
 /**
- * The sheets of a grid that hold something, in reading order; the first sheet
- * of the grid when nothing is drawn.
- * @param items - What is drawn.
- * @param page - The sheet, with its place.
+ * The sheets of a paper's grid that hold something, for an editor that knows
+ * its drawing as boxes rather than as a scene: the sheets any box reaches into,
+ * in reading order, and the first of the grid when there is none.
+ * @param boxes - What is drawn, one box per item, in points.
+ * @param page - The paper, with its place: `placedPage` over the drawing.
  * @returns The sheets, in points, at most {@link MAX_SHEETS}.
  */
-function sheetsHolding(
-  items: readonly SceneItem[],
+export function boxSheets(
+  boxes: readonly Box[],
   page: Required<DrawPage>,
 ): Box[] {
   const { x, y, width, height } = page;
   const tiles = new Map<string, Tile>();
-  for (const item of items) {
-    const box = primitivesBounds(item.primitives);
-    if (!box) continue;
+  for (const box of boxes) {
     const columns = span(box.x, box.width, x, width);
     const rows = span(box.y, box.height, y, height);
     for (let row = rows.first; row <= rows.last; row++) {

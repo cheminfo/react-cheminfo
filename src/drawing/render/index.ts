@@ -73,10 +73,12 @@ export {
 } from './motion.ts';
 export {
   MAX_SHEETS,
+  boxSheets,
   enclosingBox,
   figureBox,
   paddedBox,
   pageSheets,
+  pagesLine,
   sheetLines,
 } from './pageGrid.ts';
 export type { ImagePrimitive } from './pictures.ts';

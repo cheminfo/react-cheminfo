@@ -14,15 +14,16 @@ import { captionKeys, captionSelectionStyle } from './captionCommands.ts';
 import type { CaptionEditorProps } from './captionEditorProps.ts';
 import { captionPreview, setCaptionChemical } from './captionPreview.ts';
 import { captionDocument, captionText } from './captionSchema.ts';
+import { useToolbarInView } from './toolbarInView.ts';
 
 /**
  * The box a caption is typed in, laid over a drawing where the caption goes,
  * in its font and size, with what it will look like: bold, italic, scripts,
  * sizes, and the digits and charges the chemical rules set. Its toolbar also
  * turns those rules off, and sets the font and the alignment. It opens
- * focused with everything selected; ⌘Enter or a click elsewhere keeps it,
- * Enter starts a line, Escape drops the change. A caption aligned anew keeps
- * its place on screen. `react-cheminfo/styles/caption-editor.css` draws it.
+ * focused with everything selected; the tick, ⌘Enter or a click elsewhere
+ * keeps it, Enter starts a line, Escape drops the change. A caption aligned
+ * anew keeps its place on screen. `react-cheminfo/styles/caption-editor.css` draws it.
  * @param props - The caption, and where it is laid.
  * @returns The box and its toolbar.
  */
@@ -40,6 +41,7 @@ export function CaptionEditor(props: CaptionEditorProps): ReactElement {
   const host = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
   const closed = useRef(false);
+  useToolbarInView(frame);
   // Seeded once: what is typed never comes back into the box as a new state.
   const [opened] = useState(() => {
     const plugins = captionKeys(base);
@@ -192,6 +194,9 @@ export function CaptionEditor(props: CaptionEditorProps): ReactElement {
         onChemical={setChemical}
         onAlign={realign}
         onFamily={setFamily}
+        onDone={() => {
+          close(true);
+        }}
       />
       <div
         ref={host}

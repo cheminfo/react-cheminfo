@@ -27,6 +27,9 @@ export const ZOOM_PRESETS: readonly number[] = [
   0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 8, 16,
 ];
 
+/** How much one press of `+` zooms in, and of `-` zooms out. */
+export const ZOOM_STEP = 1.25;
+
 /** How close the view starts on an empty page: a bond is 36 px long. */
 export const START_CAMERA: Camera = { x: 0, y: 0, zoom: 2.5 };
 

@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 /**
  * The box a caption is typed in: it opens on its anchor, keeps the caption
- * on Ctrl+Enter, drops it on Escape, and hands back what its toolbar set.
+ * on Ctrl+Enter or its tick, drops it on Escape, and hands back what its
+ * toolbar set.
  */
 
 import { act } from 'react';
@@ -111,6 +112,21 @@ test('Escape drops the change, and Ctrl+Enter keeps the caption as written', () 
   root = createRoot(host);
   const kept = open(() => true);
   press('Enter', true);
+
+  expect(kept.kept).toStrictEqual([
+    {
+      text: 'H_2O **and** CO2',
+      align: 'center',
+      family: 'Arial, Helvetica, sans-serif',
+      chemical: true,
+    },
+  ]);
+  expect(kept.closes()).toBe(1);
+});
+
+test('the tick keeps the caption, as Ctrl+Enter does', () => {
+  const kept = open(() => true);
+  click('Done');
 
   expect(kept.kept).toStrictEqual([
     {

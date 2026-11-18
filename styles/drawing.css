@@ -30,6 +30,21 @@
   stroke: var(--border-strong);
 }
 
+/* The lines `PageGrid` draws between the sheets of a drawing, and the number
+   each sheet prints under. */
+.draw-sheet {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--border-strong);
+  stroke-dasharray: 6 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.draw-sheet__number {
+  fill: var(--text-faint);
+  pointer-events: none;
+}
+
 /* What `PageMask` hides around a page shown alone, and its edge. */
 .draw-page-mask {
   fill: var(--surface-sunken);
@@ -178,4 +193,89 @@
 .mixed-value {
   color: var(--text-faint);
   font-style: italic;
+}
+
+/* `ZoomControl`, at the right of an editor's status bar. */
+.zoom-control {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Blueprint's slider is 40px tall for its labels; without them the 16px handle
+   is the whole of it, and the status bar keeps its height. */
+.zoom-control .bp6-slider {
+  width: 120px;
+  min-width: 120px;
+  height: 16px;
+}
+
+/* As wide at 25 % as at 1600 %, so what stands beside it does not move. */
+.zoom-control .zoom-control__level {
+  min-width: 92px;
+}
+
+@media (width < 640px) {
+  .zoom-control .bp6-slider {
+    display: none;
+  }
+}
+
+/* `PageField`: the orientation, then a page's width × height in centimetres. */
+.page-field__orientation {
+  margin-top: 4px;
+}
+
+.page-field__size {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  gap: 6px;
+}
+
+.page-field__size .bp6-input-group {
+  width: 5rem;
+}
+
+.page-field__unit {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+/* `PrintSheets`: on paper the editor gives way to the figure it holds, at the
+   size it was laid out at and shrunk only when it would not fit the page. */
+.draw-print {
+  display: none;
+}
+
+@media print {
+  .draw-print {
+    display: flex;
+    justify-content: center;
+  }
+
+  .draw-print__figure {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100vh;
+  }
+
+  /* A grid of sheets: the paper is the sheet, so each one fills a sheet of
+     paper and nothing is shrunk. */
+  .draw-print--sheets {
+    display: block;
+  }
+
+  .draw-print--sheets .draw-print__figure {
+    display: block;
+    max-width: none;
+    max-height: none;
+    break-after: page;
+  }
+
+  .draw-print--sheets .draw-print__figure:last-child {
+    break-after: auto;
+  }
 }

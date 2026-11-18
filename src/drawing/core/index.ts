@@ -6,6 +6,7 @@ export {
   START_CAMERA,
   ZOOM_PRESETS,
   ZOOM_RANGE,
+  ZOOM_STEP,
   fillCamera,
   frameCamera,
   pannedCamera,
