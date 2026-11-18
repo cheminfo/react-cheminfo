@@ -1238,6 +1238,22 @@ travels as a list of ions, and comes back as the peak each was found at:
 - **What comes back replaces what was sent before**, so an ion no longer found
   is simply absent.
 
+### A record before it is published
+
+A dataset about to be published on Zenodo travels as `data.zenodo.record`,
+`{ metadata, files }`: the metadata as Zenodo stores it — `title`, and
+optionally `description` (HTML), `publication_date`, `creators`, `keywords`,
+`version` and `license` — and every file as it would be uploaded,
+`{ key, size, content }`. zenodo-submit.cheminfo.org hands one to
+fair.cheminfo.org's `/preview` with `openTool`, so a record is seen as it will
+be published before it is uploaded.
+
+- **A file's `content` is a `Blob`**, which a port hands over by reference: a
+  record of several gigabytes crosses at once, and the tool reads a file only
+  when it needs it.
+- **The schema takes any `content`**, since JSON Schema cannot name a `Blob`:
+  the tool checks `instanceof Blob` itself, and refuses the record otherwise.
+
 An input with `many: true` takes every item of its kinds, and one with
 `optional: true` may go without; the request is refused only when no input got
 anything. `load` may return a promise, and requests are served in order.

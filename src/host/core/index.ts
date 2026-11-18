@@ -111,6 +111,13 @@ export { PEPTIDE_KINDS, PEPTIDE_SCHEMA } from './peptideKinds.ts';
 export type { RxnValue } from './reactionKinds.ts';
 export { REACTION_KINDS, RXN_SCHEMA } from './reactionKinds.ts';
 export type {
+  ZenodoCreatorValue,
+  ZenodoFileValue,
+  ZenodoMetadataValue,
+  ZenodoRecordValue,
+} from './recordKinds.ts';
+export { ZENODO_RECORD_SCHEMA } from './recordKinds.ts';
+export type {
   NameValue,
   SvgImageValue,
   TableCell,

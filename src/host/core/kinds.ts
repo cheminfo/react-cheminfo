@@ -9,7 +9,8 @@
  * ones of `./uvKinds.ts` and the mass
  * spectrometry ones of `./msKinds.ts`, the reaction of `./reactionKinds.ts`,
  * the peptide of `./peptideKinds.ts`, the set of spectra of
- * `./datasetKinds.ts`, and
+ * `./datasetKinds.ts`, the record about to be published on Zenodo of
+ * `./recordKinds.ts`, and
  * the kinds a tool hands back, of `./resultKinds.ts`. A name with children is a category whose
  * schema every child satisfies, so `chem.molfile` reads `chem.molfile.2d` and
  * `chem.molfile.3d.h.energy` alike; the fields a tool does not read are
@@ -41,6 +42,8 @@ import type { RamanJdxValue, RamanPeaksValue } from './ramanKinds.ts';
 import { RAMAN_JDX_SCHEMA, RAMAN_PEAKS_SCHEMA } from './ramanKinds.ts';
 import type { RxnValue } from './reactionKinds.ts';
 import { RXN_SCHEMA } from './reactionKinds.ts';
+import type { ZenodoRecordValue } from './recordKinds.ts';
+import { ZENODO_RECORD_SCHEMA } from './recordKinds.ts';
 import type { NameValue, SvgImageValue, TableValue } from './resultKinds.ts';
 import { NAME_SCHEMA, SVG_IMAGE_SCHEMA, TABLE_SCHEMA } from './resultKinds.ts';
 import type { UvJdxValue, UvPeaksValue } from './uvKinds.ts';
@@ -81,7 +84,8 @@ export type CheckedValue =
   | { kind: 'image.svg'; value: SvgImageValue }
   | { kind: 'chem.name'; value: NameValue }
   | { kind: 'data.table'; value: TableValue }
-  | { kind: 'data.spectra'; value: SpectraDatasetValue };
+  | { kind: 'data.spectra'; value: SpectraDatasetValue }
+  | { kind: 'data.zenodo.record'; value: ZenodoRecordValue };
 
 export { kindAccepts } from './kindAccepts.ts';
 
@@ -213,4 +217,5 @@ const VALIDATORS: { [K in KnownKind]: ValidateFunction<ValueOf<K>> } = {
   'chem.name': ajv.compile<NameValue>(NAME_SCHEMA),
   'data.table': ajv.compile<TableValue>(TABLE_SCHEMA),
   'data.spectra': ajv.compile<SpectraDatasetValue>(SPECTRA_DATASET_SCHEMA),
+  'data.zenodo.record': ajv.compile<ZenodoRecordValue>(ZENODO_RECORD_SCHEMA),
 };
