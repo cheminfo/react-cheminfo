@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.134.1](https://github.com/cheminfo/react-cheminfo/compare/v0.134.0...v0.134.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* answer a bundle the build does not have with a 404 nothing keeps ([d660b59](https://github.com/cheminfo/react-cheminfo/commit/d660b59565bb92d52b651ac4f8ea035d6514272b))
+
 ## [0.134.0](https://github.com/cheminfo/react-cheminfo/compare/v0.133.0...v0.134.0) (2026-11-18)
 
 
