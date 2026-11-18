@@ -1,10 +1,8 @@
+import { crystalCellAtoms } from './cellAtoms.ts';
 import { keptPairs, writtenTwice } from './cellBonds.ts';
-import type { CrystalSite, CrystalStructure } from './cif/types.ts';
+import type { CrystalStructure } from './cif/types.ts';
 import { bondGraph, walkComponents } from './components.ts';
 import { covalentBondLimit } from './covalentRadii.ts';
-import { chooseDisorder, isDummy } from './disorder.ts';
-import type { ExpandedAtom } from './expand.ts';
-import { expandSite } from './expand.ts';
 import type { MoleculeContext } from './moleculeOf.ts';
 import { buildMolecule } from './moleculeOf.ts';
 import type {
@@ -13,9 +11,7 @@ import type {
   CrystalMoleculesOptions,
   CrystalNetwork,
 } from './moleculeTypes.ts';
-import { structureOperations } from './operations.ts';
 import { findPeriodicBonds } from './periodicBonds.ts';
-import { createLattice } from './symmetry/lattice.ts';
 import { isIdentity } from './symmetry/operation.ts';
 import type { CrystalOperation } from './symmetry/types.ts';
 import {
@@ -65,23 +61,17 @@ export function crystalMolecules(
   options: CrystalMoleculesOptions = {},
 ): CrystalMolecules {
   const { bondLimit = covalentBondLimit, maxAtoms = 100_000 } = options;
-  const operations = structureOperations(structure);
-  const lattice = createLattice(structure.cell);
-  const { sites } = structure;
-  const expanded = expandSites(sites, operations, maxAtoms);
-  if (expanded.count > maxAtoms) {
+  const cell = crystalCellAtoms(structure, { maxAtoms });
+  if (cell.tooLarge) {
     return {
       molecules: [],
       networks: [],
-      cellAtoms: expanded.count,
+      cellAtoms: cell.count,
       tooLarge: true,
     };
   }
-  const kept = chooseDisorder(sites, expanded.atoms, lattice);
-  const atoms: ExpandedAtom[] = [];
-  for (const atom of expanded.atoms) {
-    if (kept[atom.siteIndex] === 1) atoms.push(atom);
-  }
+  const { lattice, operations, atoms } = cell;
+  const { sites } = structure;
   const pairs = findPeriodicBonds(atoms, lattice, bondLimit, {
     samePlace: SAME_ATOM_DISTANCE,
   });
@@ -126,33 +116,6 @@ export function crystalMolecules(
     cellAtoms -= removed[index] ?? 0;
   }
   return { molecules, networks, cellAtoms, tooLarge: false };
-}
-
-/**
- * Every atom of the cell the sites that are not dummies make, counted past the cap.
- * @param sites - The asymmetric unit.
- * @param operations - The full coset list.
- * @param maxAtoms - The most atoms kept.
- * @returns The atoms, and how many the cell holds.
- */
-function expandSites(
-  sites: readonly CrystalSite[],
-  operations: ReadonlyArray<CrystalOperation<3>>,
-  maxAtoms: number,
-): { atoms: ExpandedAtom[]; count: number } {
-  const atoms: ExpandedAtom[] = [];
-  let count = 0;
-  for (let index = 0; index < sites.length; index++) {
-    const site = sites[index] as CrystalSite;
-    if (isDummy(site)) continue;
-    const images = expandSite(site, index, operations);
-    count += images.length;
-    if (count > maxAtoms) continue;
-    for (let image = 0; image < images.length; image++) {
-      atoms.push(images[image] as ExpandedAtom);
-    }
-  }
-  return { atoms, count };
 }
 
 function identityIndexOf(

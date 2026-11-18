@@ -1085,5 +1085,19 @@
   "send.label": "Send to",
   "send.heading": "Send {what} to",
   "send.none": "Nothing on this page can be sent to another tool yet.",
-  "send.blocked": "The browser blocked the new tab: allow pop-ups for this site, then send again."
+  "send.blocked": "The browser blocked the new tab: allow pop-ups for this site, then send again.",
+  "crystal3d.draw": "Draw",
+  "crystal3d.cells": "Cells",
+  "crystal3d.packing.molecules": "Whole molecules",
+  "crystal3d.packing.moleculesHelp": "Each molecule whole, in the cell its centre falls in.",
+  "crystal3d.packing.cell": "Atoms in the cell",
+  "crystal3d.packing.cellHelp": "Every atom inside the cell, cut where its walls cut it.",
+  "crystal3d.unitCell": "Unit cell",
+  "crystal3d.unitCellHelp": "The box of the unit cell.",
+  "crystal3d.caption.molecules": "{count, plural, one {# molecule} other {# molecules}} per cell",
+  "crystal3d.caption.atoms": "{count, plural, one {# atom} other {# atoms}} per cell",
+  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {cell} other {cells}}",
+  "crystal3d.caption.cellsCapped": "{count}×{count}×{count} cells, as {asked}×{asked}×{asked} would hold too many atoms",
+  "crystal3d.unreadable": "That file could not be read",
+  "crystal3d.tooLarge": "This cell holds {count, number} atoms, more than the viewer draws."
 }

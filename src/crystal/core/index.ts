@@ -1,3 +1,5 @@
+export type { CellAtoms, CellAtomsOptions } from './cellAtoms.ts';
+export { crystalCellAtoms } from './cellAtoms.ts';
 export * from './cif/index.ts';
 export type { BondGraph, PeriodicComponent } from './components.ts';
 export {

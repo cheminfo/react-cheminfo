@@ -1085,5 +1085,19 @@
   "send.label": "Senden an",
   "send.heading": "{what} senden an",
   "send.none": "Von dieser Seite lässt sich noch nichts an ein anderes Werkzeug senden.",
-  "send.blocked": "Der Browser hat den neuen Tab blockiert: Pop-ups für diese Seite erlauben, dann erneut senden."
+  "send.blocked": "Der Browser hat den neuen Tab blockiert: Pop-ups für diese Seite erlauben, dann erneut senden.",
+  "crystal3d.draw": "Zeichnen",
+  "crystal3d.cells": "Zellen",
+  "crystal3d.packing.molecules": "Ganze Moleküle",
+  "crystal3d.packing.moleculesHelp": "Jedes Molekül ganz, in der Zelle, in die sein Zentrum fällt.",
+  "crystal3d.packing.cell": "Atome der Zelle",
+  "crystal3d.packing.cellHelp": "Jedes Atom innerhalb der Zelle, dort geschnitten, wo ihre Wände es schneiden.",
+  "crystal3d.unitCell": "Elementarzelle",
+  "crystal3d.unitCellHelp": "Der Rahmen der Elementarzelle.",
+  "crystal3d.caption.molecules": "{count, plural, one {# Molekül} other {# Moleküle}} pro Zelle",
+  "crystal3d.caption.atoms": "{count, plural, one {# Atom} other {# Atome}} pro Zelle",
+  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {Zelle} other {Zellen}}",
+  "crystal3d.caption.cellsCapped": "{count}×{count}×{count} Zellen, da {asked}×{asked}×{asked} zu viele Atome enthielten",
+  "crystal3d.unreadable": "Diese Datei konnte nicht gelesen werden",
+  "crystal3d.tooLarge": "Diese Zelle enthält {count, number} Atome, mehr als der Betrachter zeichnet."
 }

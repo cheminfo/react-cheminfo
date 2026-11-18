@@ -1085,5 +1085,19 @@
   "send.label": "Envoyer vers",
   "send.heading": "Envoyer {what} vers",
   "send.none": "Rien sur cette page ne peut encore être envoyé à un autre outil.",
-  "send.blocked": "Le navigateur a bloqué le nouvel onglet : autorisez les fenêtres pour ce site, puis envoyez à nouveau."
+  "send.blocked": "Le navigateur a bloqué le nouvel onglet : autorisez les fenêtres pour ce site, puis envoyez à nouveau.",
+  "crystal3d.draw": "Dessiner",
+  "crystal3d.cells": "Mailles",
+  "crystal3d.packing.molecules": "Molécules entières",
+  "crystal3d.packing.moleculesHelp": "Chaque molécule entière, dans la maille où tombe son centre.",
+  "crystal3d.packing.cell": "Atomes de la maille",
+  "crystal3d.packing.cellHelp": "Chaque atome à l'intérieur de la maille, coupé là où ses faces le coupent.",
+  "crystal3d.unitCell": "Maille",
+  "crystal3d.unitCellHelp": "Le contour de la maille élémentaire.",
+  "crystal3d.caption.molecules": "{count, plural, one {# molécule} other {# molécules}} par maille",
+  "crystal3d.caption.atoms": "{count, plural, one {# atome} other {# atomes}} par maille",
+  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {maille} other {mailles}}",
+  "crystal3d.caption.cellsCapped": "{count}×{count}×{count} mailles, car {asked}×{asked}×{asked} contiendraient trop d'atomes",
+  "crystal3d.unreadable": "Ce fichier n'a pas pu être lu",
+  "crystal3d.tooLarge": "Cette maille contient {count, number} atomes, plus que la visionneuse n'en dessine."
 }

@@ -11,18 +11,17 @@ import { useEffect, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { DEFAULT_SPIN_SPEED } from '../../molstar/core/index.ts';
+import { MolstarToolbar } from '../../molstar/ui/MolstarToolbar.tsx';
+import { useMolstarTools } from '../../molstar/ui/useMolstarTools.ts';
 import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
-import type { MeasurementKind } from '../core/measurement.ts';
 import {
   normalizeMolecule3DSettings,
   resolveMolecule3DTools,
 } from '../core/settings.ts';
 
-import { Molecule3DExport } from './Molecule3DExport.tsx';
 import { Molecule3DOptions } from './Molecule3DOptions.tsx';
 import { Molecule3DStage } from './Molecule3DStage.tsx';
-import { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
 import { highlightColorOf } from './highlightColor.ts';
 import { moleculeFileAtoms } from './moleculeFileFormats.ts';
 import type { MoleculeViewer3DProps } from './moleculeViewer3DProps.ts';
@@ -85,18 +84,12 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     initialSettings,
     onSettingsChange,
   );
-  const [spinning, setSpinning] = useControlledState(
-    spinningProp,
-    defaultSpinning,
-    onSpinningChange,
-  );
   const {
     measurements,
     add: addMeasurement,
     remove: removeMeasurement,
     clear: clearMeasurements,
   } = useMeasurementList(measurementsProp, onMeasurementsChange);
-  const [measureKind, setMeasureKind] = useState<MeasurementKind | null>(null);
   const [frameCount, setFrameCount] = useState(0);
   const polarSurfaceArea = usePolarSurfaceArea(
     molfile,
@@ -117,17 +110,17 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     tools.measure && molfile !== null ? removeMeasurement : undefined,
   );
 
-  useEffect(() => {
-    void viewerRef.current?.setSpin(spinning, spinSpeed);
-  }, [container, viewerRef, spinning, spinSpeed]);
+  const controls = useMolstarTools(viewerRef, container, {
+    spinning: spinningProp,
+    defaultSpinning,
+    onSpinningChange,
+    spinSpeed,
+  });
+  const { spinning } = controls;
 
   useEffect(() => {
     void viewerRef.current?.frames.play(playing, framesPerSecond);
   }, [container, viewerRef, playing, framesPerSecond]);
-
-  useEffect(() => {
-    void viewerRef.current?.setMeasureKind(measureKind);
-  }, [container, viewerRef, measureKind]);
 
   // Kept out of the scene: a new highlight repaints the model, never redraws it.
   useEffect(() => {
@@ -150,8 +143,13 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
     camera: props,
   });
 
-  const { canvasSize, exportImage, imageFile, copyImage, capture } =
-    useImageExport(container, viewerRef, fileName, framesPerSecond);
+  const imageExport = useImageExport(
+    container,
+    viewerRef,
+    fileName,
+    framesPerSecond,
+  );
+  const { capture } = imageExport;
 
   useEffect(() => {
     if (onCapture === undefined || container === null) return;
@@ -171,47 +169,35 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
             data-testid="molecule3d"
           />
           {molfile !== null && (
-            <div style={OVERLAY_STYLE}>
-              <Molecule3DToolbar
-                tools={tools}
-                fullscreen={fullscreen}
-                measureKind={measureKind}
-                onMeasureKindChange={setMeasureKind}
-                measurementCount={measurements.length}
-                onClearMeasurements={clearMeasurements}
-                spinning={spinning}
-                onSpinningChange={setSpinning}
-                showSurface={settings.showSurface}
-                onShowSurfaceChange={(showSurface) => {
-                  setSettings({ ...settings, showSurface });
-                }}
-                onResetView={resetView}
-                options={
-                  <Molecule3DOptions
-                    settings={settings}
-                    onChange={setSettings}
-                    polarSurfaceArea={polarSurfaceArea}
-                    defaults={initialSettings}
-                  />
-                }
-                exportLabel={
-                  moleculeFileAtoms(molfile, frameCount) > 0
-                    ? t('molecule3d.exportImageOrMolfile')
-                    : undefined
-                }
-                exportPanel={
-                  <Molecule3DExport
-                    getSize={canvasSize}
-                    onExport={exportImage}
-                    onCopy={copyImage}
-                    writeFile={imageFile}
-                    frameCount={frameCount}
-                    molfile={molfile}
-                    fileName={fileName}
-                  />
-                }
-              />
-            </div>
+            <MolstarToolbar
+              controls={controls}
+              tools={tools}
+              fullscreen={fullscreen}
+              measurementCount={measurements.length}
+              onClearMeasurements={clearMeasurements}
+              showSurface={settings.showSurface}
+              onShowSurfaceChange={(showSurface) => {
+                setSettings({ ...settings, showSurface });
+              }}
+              onResetView={resetView}
+              options={
+                <Molecule3DOptions
+                  settings={settings}
+                  onChange={setSettings}
+                  polarSurfaceArea={polarSurfaceArea}
+                  defaults={initialSettings}
+                />
+              }
+              exportLabel={
+                moleculeFileAtoms(molfile, frameCount) > 0
+                  ? t('molecule3d.exportImageOrMolfile')
+                  : undefined
+              }
+              imageExport={imageExport}
+              frameCount={frameCount}
+              molfile={molfile}
+              fileName={fileName}
+            />
           )}
         </>
       )}
@@ -231,15 +217,3 @@ const STAGE_STYLE: CSSProperties = {
 
 /** molstar inserts its canvas here, which therefore has a size of its own. */
 const CANVAS_STYLE: CSSProperties = { position: 'absolute', inset: 0 };
-
-const OVERLAY_STYLE: CSSProperties = {
-  position: 'absolute',
-  top: 8,
-  bottom: 8,
-  left: 8,
-  zIndex: 2,
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: 8,
-  pointerEvents: 'none',
-};

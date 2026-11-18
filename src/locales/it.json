@@ -1085,5 +1085,19 @@
   "send.label": "Invia a",
   "send.heading": "Invia {what} a",
   "send.none": "Nulla di questa pagina può ancora essere inviato a un altro strumento.",
-  "send.blocked": "Il browser ha bloccato la nuova scheda: consenti i pop-up per questo sito, poi invia di nuovo."
+  "send.blocked": "Il browser ha bloccato la nuova scheda: consenti i pop-up per questo sito, poi invia di nuovo.",
+  "crystal3d.draw": "Disegna",
+  "crystal3d.cells": "Celle",
+  "crystal3d.packing.molecules": "Molecole intere",
+  "crystal3d.packing.moleculesHelp": "Ogni molecola intera, nella cella in cui cade il suo centro.",
+  "crystal3d.packing.cell": "Atomi della cella",
+  "crystal3d.packing.cellHelp": "Ogni atomo dentro la cella, tagliato dove lo tagliano le sue pareti.",
+  "crystal3d.unitCell": "Cella elementare",
+  "crystal3d.unitCellHelp": "Il contorno della cella elementare.",
+  "crystal3d.caption.molecules": "{count, plural, one {# molecola} other {# molecole}} per cella",
+  "crystal3d.caption.atoms": "{count, plural, one {# atomo} other {# atomi}} per cella",
+  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {cella} other {celle}}",
+  "crystal3d.caption.cellsCapped": "{count}×{count}×{count} celle, perché {asked}×{asked}×{asked} conterrebbero troppi atomi",
+  "crystal3d.unreadable": "Non è stato possibile leggere quel file",
+  "crystal3d.tooLarge": "Questa cella contiene {count, number} atomi, più di quanti il visualizzatore ne disegni."
 }

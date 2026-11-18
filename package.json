@@ -21,6 +21,7 @@
     "./conformers": "./lib/conformers.js",
     "./core": "./lib/core.js",
     "./crystal": "./lib/crystal.js",
+    "./crystal3d": "./lib/crystal3d.js",
     "./demo": "./lib/demo.js",
     "./drawing": "./lib/drawing.js",
     "./formula": "./lib/formula.js",

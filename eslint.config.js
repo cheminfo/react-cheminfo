@@ -76,6 +76,16 @@ export default defineConfig(
     },
   },
   {
+    // A helper named `expect…` asserts on behalf of the test calling it.
+    files: ['**/*.test.{ts,tsx}'],
+    rules: {
+      'vitest/expect-expect': [
+        'error',
+        { assertFunctionNames: ['expect', 'expect*'] },
+      ],
+    },
+  },
+  {
     // The `./core` entry point must stay React-free.
     files: ['src/*/core/**'],
     rules: {

@@ -1085,5 +1085,19 @@
   "send.label": "Enviar a",
   "send.heading": "Enviar {what} a",
   "send.none": "Nada de esta página puede enviarse todavía a otra herramienta.",
-  "send.blocked": "El navegador bloqueó la nueva pestaña: permita las ventanas emergentes para este sitio y vuelva a enviar."
+  "send.blocked": "El navegador bloqueó la nueva pestaña: permita las ventanas emergentes para este sitio y vuelva a enviar.",
+  "crystal3d.draw": "Dibujar",
+  "crystal3d.cells": "Celdas",
+  "crystal3d.packing.molecules": "Moléculas enteras",
+  "crystal3d.packing.moleculesHelp": "Cada molécula entera, en la celda donde cae su centro.",
+  "crystal3d.packing.cell": "Átomos de la celda",
+  "crystal3d.packing.cellHelp": "Cada átomo dentro de la celda, cortado donde lo cortan sus caras.",
+  "crystal3d.unitCell": "Celda unidad",
+  "crystal3d.unitCellHelp": "El contorno de la celda unidad.",
+  "crystal3d.caption.molecules": "{count, plural, one {# molécula} other {# moléculas}} por celda",
+  "crystal3d.caption.atoms": "{count, plural, one {# átomo} other {# átomos}} por celda",
+  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {celda} other {celdas}}",
+  "crystal3d.caption.cellsCapped": "{count}×{count}×{count} celdas, ya que {asked}×{asked}×{asked} contendrían demasiados átomos",
+  "crystal3d.unreadable": "Ese archivo no se ha podido leer",
+  "crystal3d.tooLarge": "Esta celda contiene {count, number} átomos, más de los que dibuja el visor."
 }
