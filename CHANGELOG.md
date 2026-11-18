@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.135.0](https://github.com/cheminfo/react-cheminfo/compare/v0.134.1...v0.135.0) (2026-11-18)
+
+
+### Features
+
+* read a CIF into its symmetry-independent molecules ([5e77e6d](https://github.com/cheminfo/react-cheminfo/commit/5e77e6dadda7e814f07f93d84b6f8275665bf836))
+
 ## [0.134.1](https://github.com/cheminfo/react-cheminfo/compare/v0.134.0...v0.134.1) (2026-11-18)
 
 
