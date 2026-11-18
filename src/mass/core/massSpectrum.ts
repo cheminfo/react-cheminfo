@@ -181,6 +181,15 @@ export interface MassSpectrum {
    */
   excludeFromDomain?: boolean;
   /**
+   * How many times taller than measured the spectrum is drawn, so one spectrum
+   * can be brought up against another while the axis stays shared. It scales
+   * about the baseline, the fit covers the heights as drawn, and the labels
+   * still write the measured intensities. A value that is not a positive
+   * number draws it as measured.
+   * @default 1
+   */
+  verticalScale?: number;
+  /**
    * How finely the spectrum resolves masses, as it was decided when it was read.
    *
    * Left out by a host that built the spectrum itself, and then worked out from

@@ -11,6 +11,7 @@
 import { xMaxValue } from 'ml-spectra-processing';
 
 import type { MassDomain, MassSpectrum, MassTrace } from './massSpectrum.ts';
+import { verticalScaleOf } from './verticalScale.ts';
 
 /**
  * How much air is left either side of the outermost peak, as a fraction.
@@ -191,10 +192,13 @@ function traceExtent(
   let extent: TraceExtent | null = null;
   for (const spectrum of spectra) {
     if (!includeExcluded && spectrum.excludeFromDomain) continue;
+    const scale = verticalScaleOf(spectrum);
     if (spectrum.showProfile && spectrum.profile !== null) {
-      extent = widen(extent, spectrum.profile);
+      extent = widen(extent, spectrum.profile, scale);
     }
-    if (spectrum.showCentroid) extent = widen(extent, spectrum.centroid);
+    if (spectrum.showCentroid) {
+      extent = widen(extent, spectrum.centroid, scale);
+    }
   }
   return extent;
 }
@@ -207,17 +211,19 @@ function traceExtent(
  * hundred thousand points of a profile to learn what index zero already says.
  * @param extent - What has been covered so far, `null` for nothing.
  * @param trace - The trace to cover as well.
+ * @param scale - How many times taller than measured it is drawn.
  * @returns The grown extent, unchanged when the trace holds no point.
  */
 function widen(
   extent: TraceExtent | null,
   trace: MassTrace,
+  scale: number,
 ): TraceExtent | null {
   const { x, y } = trace;
   if (x.length === 0 || y.length === 0) return extent;
   const first = x[0] as number;
   const last = x.at(-1) as number;
-  const tallest = xMaxValue(y);
+  const tallest = xMaxValue(y) * scale;
   if (extent === null) {
     return { xMinimum: first, xMaximum: last, yMaximum: tallest };
   }

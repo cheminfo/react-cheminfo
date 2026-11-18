@@ -112,6 +112,7 @@ export type {
   MassTrace,
 } from './massSpectrum.ts';
 export { isSpectrumDrawn } from './massSpectrum.ts';
+export { spectrumYScale, verticalScaleOf } from './verticalScale.ts';
 export type {
   CreateMassStateOptions,
   MassData,

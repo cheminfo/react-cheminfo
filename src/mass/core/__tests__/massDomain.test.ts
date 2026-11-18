@@ -134,6 +134,32 @@ test('a previewed distribution is left out of the fit as it is out of the window
   expect(fittedTo([measured, preview])).toBe(fittedTo([measured]));
 });
 
+test('a spectrum drawn taller is covered at the height it is drawn', () => {
+  const measured = centroided('a', [100, 200], [10, 50]);
+  const scaled = centroided('b', [150], [40]);
+  scaled.verticalScale = 3;
+
+  expect(fullDomain([measured, scaled])).toStrictEqual({
+    x: [98, 202],
+    y: [0, 144],
+  });
+});
+
+test('a scale that is no positive number draws the spectrum as measured', () => {
+  const spectrum = centroided('a', [100, 200], [10, 50]);
+  spectrum.verticalScale = -2;
+
+  expect(fullDomain([spectrum]).y).toStrictEqual([0, 60]);
+});
+
+test('scaling a spectrum is no new fit', () => {
+  const spectrum = centroided('a', [100, 200], [10, 50]);
+  const before = fittedTo([spectrum]);
+  spectrum.verticalScale = 4;
+
+  expect(fittedTo([spectrum])).toBe(before);
+});
+
 /**
  * A centroided spectrum, which is what most files hand over.
  * @param id - Its identity.

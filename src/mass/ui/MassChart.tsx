@@ -8,13 +8,17 @@ import { AxisGuide } from '../../chart/ui/AxisGuide.tsx';
 import { SelectionRect } from '../../chart/ui/SelectionRect.tsx';
 import { chartSurfaceStyle } from '../../chart/ui/chartSurface.ts';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
-import type { MassSpectrum } from '../core/massSpectrum.ts';
 import { DEFAULT_LABEL_LIMIT } from '../core/massState.ts';
 import { mzDecimalsOf } from '../core/resolutionOf.ts';
 
 import { MassPointerTracker } from './MassPointerTracker.tsx';
 import { PeakLabels } from './PeakLabels.tsx';
 import { SpectrumTrace } from './SpectrumTrace.tsx';
+import {
+  emphasisedLast,
+  labelledSpectrum,
+  spectrumYScales,
+} from './massChartLayers.ts';
 import type { MassChartProps } from './massChartProps.ts';
 import { useMassPointer } from './useMassPointer.ts';
 import { useMassZoom } from './useMassZoom.ts';
@@ -120,6 +124,11 @@ export function MassChart(props: MassChartProps): ReactElement {
     () => emphasisedLast(spectra, emphasisedId),
     [spectra, emphasisedId],
   );
+  // Built once per window: the traces memoise their paths on their scale.
+  const yScales = useMemo(
+    () => spectrumYScales(spectra, yScale),
+    [spectra, yScale],
+  );
 
   // The crosshair reads every drawn spectrum, so it is written to what they
   // resolve together; the labels are of one spectrum, and written to its own.
@@ -178,7 +187,7 @@ export function MassChart(props: MassChartProps): ReactElement {
               spectrum={spectrum}
               plot={plot}
               xScale={xScale}
-              yScale={yScale}
+              yScale={yScales.get(spectrum.id) ?? yScale}
               strokeWidth={
                 spectrum.id === emphasisedId ? EMPHASISED_WIDTH : undefined
               }
@@ -192,7 +201,7 @@ export function MassChart(props: MassChartProps): ReactElement {
             spectrum={labelled}
             plot={plot}
             xScale={xScale}
-            yScale={yScale}
+            yScale={yScales.get(labelled.id) ?? yScale}
             limit={labelLimit}
             showCharges={showCharges}
             mzDecimals={labelDecimals}
@@ -214,46 +223,6 @@ export function MassChart(props: MassChartProps): ReactElement {
       </svg>
     </div>
   );
-}
-
-/**
- * The one spectrum whose peaks are labelled.
- * @param spectra - What the chart draws.
- * @param labelledId - The identity asked for, `null` for none, absent to let the
- * chart take the first.
- * @returns The spectrum, or `null` when none answers.
- */
-function labelledSpectrum(
-  spectra: readonly MassSpectrum[],
-  labelledId: string | null | undefined,
-): MassSpectrum | null {
-  if (labelledId === undefined) return spectra[0] ?? null;
-  if (labelledId === null) return null;
-  for (const spectrum of spectra) {
-    if (spectrum.id === labelledId) return spectrum;
-  }
-  return null;
-}
-
-/**
- * The traces in painting order, with the emphasised one last — last is in
- * front, and in front is what lets a trace crossing a dozen others be followed.
- * @param spectra - The traces, in the order they were opened.
- * @param emphasisedId - Identity of the one to raise, `null` for none.
- * @returns The order to paint in — the array itself when nothing moves.
- */
-function emphasisedLast(
-  spectra: readonly MassSpectrum[],
-  emphasisedId: string | null,
-): readonly MassSpectrum[] {
-  if (emphasisedId === null) return spectra;
-  const at = spectra.findIndex((spectrum) => spectrum.id === emphasisedId);
-  if (at === -1 || at === spectra.length - 1) return spectra;
-  return [
-    ...spectra.slice(0, at),
-    ...spectra.slice(at + 1),
-    spectra[at] as MassSpectrum,
-  ];
 }
 
 /** What the chart is, and what can be done to it, for whoever cannot see it. */
