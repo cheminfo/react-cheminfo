@@ -21,6 +21,12 @@ export interface EmptyGuideFigure {
    * @default undefined — no tooltip
    */
   title?: string;
+  /**
+   * Its name, a short line under it: a reader picks an example by what it is
+   * called as much as by how it looks.
+   * @default undefined — no line
+   */
+  label?: string;
 }
 
 /** Figures one above the other, taking one place in the row between them. */
@@ -72,12 +78,17 @@ function stackKey(entry: EmptyGuideFigureStack): string {
 }
 
 function GuideFigure(props: { figure: EmptyGuideFigure }): ReactElement {
-  const { src, alt, share = 1, onSelect, title } = props.figure;
-  const image = <img src={src} alt={alt} draggable={false} />;
+  const { src, alt, share = 1, onSelect, title, label } = props.figure;
+  const content = (
+    <>
+      <img src={src} alt={alt} draggable={false} />
+      {label ? <span className="empty-guide__label">{label}</span> : null}
+    </>
+  );
   if (!onSelect) {
     return (
       <figure className="empty-guide__figure" style={{ flexGrow: share }}>
-        {image}
+        {content}
       </figure>
     );
   }
@@ -89,7 +100,7 @@ function GuideFigure(props: { figure: EmptyGuideFigure }): ReactElement {
       title={title}
       onClick={onSelect}
     >
-      {image}
+      {content}
     </button>
   );
 }

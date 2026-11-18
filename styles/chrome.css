@@ -2742,6 +2742,34 @@ button.empty-guide__figure:focus-visible img {
   opacity: 1;
 }
 
+/* A figure's name, one line under it, read before the faint picture is. */
+.empty-guide__label {
+  overflow: hidden;
+  flex: none;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A named figure sits on its name, whatever room is left above it. */
+.empty-guide__figure:has(> .empty-guide__label) img {
+  object-position: 50% 100%;
+}
+
+/* A name is not a link: the figure it names is what is clicked. */
+.empty-guide button.empty-guide__figure {
+  text-decoration: none;
+}
+
+button.empty-guide__figure:hover .empty-guide__label,
+button.empty-guide__figure:focus-visible .empty-guide__label {
+  color: var(--accent);
+}
+
 .empty-guide__hint {
   display: flex;
   flex: none;
@@ -2819,6 +2847,11 @@ button.empty-guide__figure:focus-visible img {
 
   .empty-guide__stack {
     gap: 6px;
+  }
+
+  .empty-guide__label {
+    margin-top: 2px;
+    font-size: 12px;
   }
 }
 

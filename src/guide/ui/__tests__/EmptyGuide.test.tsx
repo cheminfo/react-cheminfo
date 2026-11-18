@@ -114,6 +114,31 @@ test('a figure is a button only when a click on it does something', () => {
   expect(clicked).not.toContain('<figure');
 });
 
+test('a figure says its name on a line under the picture', () => {
+  const html = renderToStaticMarkup(
+    <EmptyGuide
+      figures={[
+        { src: '/a.svg', alt: 'A bulb lit by a battery', label: 'One bulb' },
+        {
+          src: '/b.svg',
+          alt: 'A capacitor charged',
+          label: 'Charge a capacitor',
+          onSelect: () => undefined,
+        },
+        { src: '/c.svg', alt: 'A plate' },
+      ]}
+    />,
+  );
+
+  expect(html).toContain(
+    '<figure class="empty-guide__figure" style="flex-grow:1"><img src="/a.svg" alt="A bulb lit by a battery" draggable="false"/><span class="empty-guide__label">One bulb</span></figure>',
+  );
+  expect(html).toContain(
+    '<img src="/b.svg" alt="A capacitor charged" draggable="false"/><span class="empty-guide__label">Charge a capacitor</span></button>',
+  );
+  expect(html.match(/empty-guide__label/g)).toHaveLength(2);
+});
+
 test('figures in a stack take one place in the row, in the order given', () => {
   const html = renderToStaticMarkup(
     <EmptyGuide
