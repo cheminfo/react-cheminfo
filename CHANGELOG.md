@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.132.0](https://github.com/cheminfo/react-cheminfo/compare/v0.131.0...v0.132.0) (2026-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* xtb-wasm ^2 is required; ConformerSet.warnings is now logs (LogLine[]), RelaxedGeometry.warnings is gone and RelaxerOptions takes a logger.
+
+### Features
+
+* report what a run logs through a logger, shown by LogBadge ([3463ccd](https://github.com/cheminfo/react-cheminfo/commit/3463ccd401789ed93378c37ebd91f481b5283b8d))
+
 ## [0.131.0](https://github.com/cheminfo/react-cheminfo/compare/v0.130.0...v0.131.0) (2026-11-17)
 
 
