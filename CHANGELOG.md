@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.134.0](https://github.com/cheminfo/react-cheminfo/compare/v0.133.0...v0.134.0) (2026-11-18)
+
+
+### Features
+
+* add the data.zenodo.record kind ([ccd1936](https://github.com/cheminfo/react-cheminfo/commit/ccd19364d967dbd97db2ad2e290bd871764f425b))
+
 ## [0.133.0](https://github.com/cheminfo/react-cheminfo/compare/v0.132.0...v0.133.0) (2026-11-18)
 
 
