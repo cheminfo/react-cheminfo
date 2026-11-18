@@ -26,7 +26,7 @@ test('continuing a kept generator gives the set of one larger run', () => {
   expect(ids(extended)).toStrictEqual([1, 2, 3, 4, 5, 6]);
   expect(extended.produced).toBe(single.produced);
   expect(extended.conformers).toStrictEqual(single.conformers);
-  expect(extended.warnings).toStrictEqual(single.warnings);
+  expect(extended.logs).toStrictEqual(single.logs);
 });
 
 test('continuing after another molecule rebuilds the generator and replays it', () => {

@@ -55,7 +55,7 @@ test('a conformer produced after the deadline is dropped, not minimised', () => 
 
   expect(set.stoppedBy).toBe('timeout');
   expect(set.conformers).toStrictEqual([]);
-  expect(set.warnings).toStrictEqual([]);
+  expect(set.logs).toStrictEqual([]);
   expect(set.elapsedMilliseconds).toBe(18_000);
 });
 
@@ -67,7 +67,7 @@ test('a budget of zero seconds stops before the first conformer', () => {
 
   expect(set.stoppedBy).toBe('timeout');
   expect(set.conformers).toStrictEqual([]);
-  expect(set.warnings).toStrictEqual([]);
+  expect(set.logs).toStrictEqual([]);
   expect(set.potentialConformerCount).toBe(3);
 });
 

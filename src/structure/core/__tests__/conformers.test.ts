@@ -19,7 +19,7 @@ test('butane stops on the conformer count and numbers the set from one', () => {
   expect(set.stoppedBy).toBe('count');
   expect(set.potentialConformerCount).toBe(3);
   expect(set.minimisation).toBe('MMFF94s+');
-  expect(set.warnings).toStrictEqual([]);
+  expect(set.logs).toStrictEqual([]);
 });
 
 test('every conformer molfile carries the hydrogen-saturated atom count', () => {
@@ -185,11 +185,16 @@ test('a dropped conformer does not renumber the warnings that follow it', () => 
     );
 
     expect(ids(set.conformers)).toStrictEqual([1, 2, 3]);
-    expect(set.warnings).toStrictEqual([
-      `The 1st conformer produced could not be minimised with MMFF94 (${BORON}), so its energy is unknown.`,
-      'The 2nd conformer produced was dropped: the generator placed some of its atoms at non-finite coordinates.',
-      `The 3rd conformer produced could not be minimised with MMFF94 (${BORON}), so its energy is unknown.`,
-      `The 4th conformer produced could not be minimised with MMFF94 (${BORON}), so its energy is unknown.`,
+    expect(set.logs).toStrictEqual([
+      unminimised('1st'),
+      {
+        levelLabel: 'error',
+        message:
+          'It was dropped: the generator placed some of its atoms at non-finite coordinates.',
+        meta: { source: '2nd conformer produced' },
+      },
+      unminimised('3rd'),
+      unminimised('4th'),
     ]);
   } finally {
     spy.mockRestore();
@@ -205,9 +210,7 @@ test('a conformer MMFF94 cannot type is kept, without an energy', () => {
   expect(set.conformers).toHaveLength(1);
   expect(set.conformers[0]?.energy).toBeNull();
   expect(set.conformers[0]?.relativeEnergy).toBeNull();
-  expect(set.warnings).toStrictEqual([
-    `The 1st conformer produced could not be minimised with MMFF94 (${BORON}), so its energy is unknown.`,
-  ]);
+  expect(set.logs).toStrictEqual([unminimised('1st')]);
 });
 
 test('an empty structure is refused with a sentence, not a stack trace', () => {
@@ -275,4 +278,13 @@ function ids(conformers: ReadonlyArray<{ id: number }>): number[] {
   const result: number[] = [];
   for (const conformer of conformers) result.push(conformer.id);
   return result;
+}
+
+// What a conformer MMFF94 cannot type leaves in the set's log.
+function unminimised(rank: string) {
+  return {
+    levelLabel: 'warn',
+    message: `It could not be minimised with MMFF94 (${BORON}), so its energy is unknown.`,
+    meta: { source: `${rank} conformer produced` },
+  };
 }

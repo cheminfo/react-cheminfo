@@ -1,3 +1,5 @@
+import type { LightLogger } from 'cheminfo-types';
+import { FifoLogger } from 'fifo-logger';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import type { RelaxableGeometry } from '../../../structure/core/geometryRelaxer.ts';
@@ -61,7 +63,6 @@ test('hartrees become kcal/mol, which is the unit a force-field energy is alread
       energy: { total: -5.07, scc: -5.1, repulsion: 0.03, dispersion: -0.0001 },
       cycles: 7,
       converged: true,
-      warnings: [],
       elapsedMs: 5,
     },
   ]);
@@ -74,7 +75,6 @@ test('hartrees become kcal/mol, which is the unit a force-field energy is alread
   expect(result?.dispersionEnergy).toBeCloseTo(-0.062_750_947, 8);
   expect(result?.cycles).toBe(7);
   expect(result?.converged).toBe(true);
-  expect(result?.warnings).toStrictEqual([]);
 });
 
 test('a method with no dispersion term keeps its null rather than reporting zero', async () => {
@@ -85,7 +85,6 @@ test('a method with no dispersion term keeps its null rather than reporting zero
       energy: { total: -5, scc: null, repulsion: null, dispersion: null },
       cycles: 1,
       converged: true,
-      warnings: [],
       elapsedMs: 1,
     },
   ]);
@@ -118,6 +117,7 @@ test('charge, spin, the cycle budget and the instance cap reach xtb-wasm', async
     maxWorkers: 2,
     onSettled,
     signal: controller.signal,
+    logger: undefined,
   });
 
   // With nothing chosen, the cycle budget is left to xtb-wasm's own default.
@@ -126,6 +126,67 @@ test('charge, spin, the cycle budget and the instance cap reach xtb-wasm', async
   expect(relaxGeometries.mock.calls[1]?.[0]).toStrictEqual([
     { geometry: water, settings: { charge: 0, unpairedElectrons: 0 } },
   ]);
+});
+
+test("the caller's logger reaches the pool, which tags each structure", async () => {
+  withWorkers();
+  relaxGeometries.mockResolvedValue([]);
+  const logger = new FifoLogger();
+
+  await xtbRelaxer()([water, water], { logger });
+
+  expect(relaxGeometries.mock.calls[0]?.[1]?.logger).toBe(logger);
+});
+
+test('on this thread each structure logs under its own index', async () => {
+  let call = 0;
+  relaxGeometryInProcess.mockImplementation(
+    async (request: unknown, options: { logger: LightLogger }) => {
+      if (call++ === 1) {
+        options.logger.warn('The geometry did not converge.');
+        options.logger.info({ cycles: 250 }, 'The cycle budget ran out.');
+        options.logger.error(new Error('The SCF wobbled.'));
+      }
+      return {
+        coordinates: (request as { geometry: RelaxableGeometry }).geometry
+          .coordinates,
+        energy: { total: -1, scc: null, repulsion: null, dispersion: null },
+        cycles: 2,
+        converged: call !== 2,
+        elapsedMs: 1,
+      };
+    },
+  );
+  const logger = new FifoLogger();
+
+  await xtbRelaxer()([water, water], { logger });
+
+  expect(
+    logger
+      .getLogs()
+      .map((entry) => [entry.levelLabel, entry.message, entry.meta]),
+  ).toStrictEqual([
+    ['warn', 'The geometry did not converge.', { structure: 1 }],
+    ['info', 'The cycle budget ran out.', { structure: 1, cycles: 250 }],
+    ['error', 'The SCF wobbled.', { structure: 1 }],
+  ]);
+});
+
+test('without a logger nothing is tagged, and nothing fails', async () => {
+  relaxGeometryInProcess.mockImplementation(
+    async (request: unknown, options: { logger?: LightLogger }) => ({
+      coordinates: (request as { geometry: RelaxableGeometry }).geometry
+        .coordinates,
+      energy: { total: -1, scc: null, repulsion: null, dispersion: null },
+      cycles: 2,
+      converged: options.logger === undefined,
+      elapsedMs: 1,
+    }),
+  );
+
+  const results = await xtbRelaxer()([water]);
+
+  expect(results[0]?.converged).toBe(true);
 });
 
 test('without Worker the structures run in turn on this thread', async () => {
@@ -138,7 +199,6 @@ test('without Worker the structures run in turn on this thread', async () => {
     energy: { total: -1, scc: null, repulsion: null, dispersion: null },
     cycles: 2,
     converged: true,
-    warnings: [],
     elapsedMs: 1,
   }));
   const onSettled = vi.fn();
@@ -165,7 +225,6 @@ test('an abort before the next structure gives the run up', async () => {
       energy: { total: -1, scc: null, repulsion: null, dispersion: null },
       cycles: 1,
       converged: true,
-      warnings: [],
       elapsedMs: 1,
     };
   });

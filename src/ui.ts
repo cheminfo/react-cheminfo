@@ -22,6 +22,7 @@ export * from './highlight/ui/index.ts';
 export * from './hooks/ui/index.ts';
 export * from './i18n/ui/index.ts';
 export * from './language/ui/index.ts';
+export * from './log/ui/index.ts';
 export * from './moleculesSources/ui/index.ts';
 export * from './moleculesToken/ui/index.ts';
 export * from './number/ui/index.ts';

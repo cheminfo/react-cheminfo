@@ -1,3 +1,5 @@
+import type { LightLogger } from 'cheminfo-types';
+
 /**
  * A geometry a relaxer is handed: element symbols plus flat Cartesian
  * coordinates in ångström, `x,y,z` per atom.
@@ -33,12 +35,18 @@ export interface RelaxedGeometry {
   cycles: number;
   /** Whether the optimizer met its convergence criteria. */
   converged: boolean;
-  /** Plain sentences about anything the caller should know. */
-  warnings: string[];
 }
 
-/** How a relaxation run is watched and cancelled. */
+/** How a relaxation run is watched, cancelled and heard from. */
 export interface RelaxerOptions {
+  /**
+   * Receives what the relaxer has to say: `error` for something dropped while
+   * the rest went on, `warn` for what changes how a result must be read, `info`
+   * for context. An entry about one structure carries `structure`, its index
+   * in the batch; one without it is about the whole batch.
+   * @default nothing is reported
+   */
+  logger?: LightLogger;
   /**
    * Called as each structure finishes, so a caller can show progress over a
    * batch that runs for seconds.

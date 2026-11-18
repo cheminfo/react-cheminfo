@@ -1,6 +1,8 @@
+import { FifoLogger } from 'fifo-logger';
 import { Molecule } from 'openchemlib';
 
 import { ordinal } from '../../format/core/words.ts';
+import type { LogLine } from '../../log/core/logGroups.ts';
 
 import type { RefinedMinimum } from './conformerRefineRank.ts';
 import {
@@ -20,6 +22,7 @@ import {
   writeRelaxedCoordinates,
 } from './moleculeCoordinates.ts';
 import { toMolfileExport } from './molfileExport.ts';
+import { relaxerLogLines } from './relaxerLogLines.ts';
 
 /** What refining one conformer produced, on top of its force-field numbers. */
 export interface ConformerRefinement {
@@ -70,8 +73,11 @@ export interface ConformerSetRefinement {
   reordered: number;
 }
 
-/** How a refinement pass is tuned, watched and cancelled. */
-export interface RefineConformersOptions extends RelaxerOptions {
+/** How a refinement is tuned and watched; what it logs is kept on the set. */
+export interface RefineConformersOptions extends Omit<
+  RelaxerOptions,
+  'logger'
+> {
   /**
    * Name of the method, for the label the UI shows.
    * @default 'GFN2-xTB'
@@ -155,11 +161,13 @@ export async function refineConformers(
     });
   }
 
+  const relaxerLog = new FifoLogger({ level: 'info' });
   const relaxed = await relax(
     prepared.map((entry) => entry.geometry),
     {
       onSettled: options.onSettled,
       signal: options.signal,
+      logger: relaxerLog,
     },
   );
   if (relaxed.length !== set.conformers.length) {
@@ -170,7 +178,9 @@ export async function refineConformers(
 
   const tolerance =
     options.sameEnergyTolerance ?? REFINED_SAME_ENERGY_TOLERANCE;
-  const warnings = [...set.warnings];
+  const own: LogLine[] = [];
+  // Each structure's label, `null` for one merged away with its messages.
+  const sources = new Array<string | null>(prepared.length).fill(null);
   const kept: Conformer[] = [];
   const minima: RefinedMinimum[] = [];
   let merged = 0;
@@ -188,13 +198,14 @@ export async function refineConformers(
       merged++;
       continue;
     }
-    for (const warning of result.warnings) {
-      warnings.push(`The ${ordinal(conformer.id)} conformer: ${warning}`);
-    }
+    const source = `${ordinal(conformer.id)} conformer`;
+    sources[index] = source;
     if (!result.converged) {
-      warnings.push(
-        `The ${ordinal(conformer.id)} conformer did not reach a ${method} minimum in ${result.cycles} cycles, so its refined energy is an upper bound.`,
-      );
+      own.push({
+        levelLabel: 'warn',
+        message: `It did not reach a ${method} minimum in ${result.cycles} cycles, so its refined energy is an upper bound.`,
+        meta: { source },
+      });
     }
     kept.push({
       ...conformer,
@@ -214,15 +225,20 @@ export async function refineConformers(
   }
 
   if (merged > 0) {
-    warnings.push(
-      `${merged} conformer(s) relaxed into a ${method} minimum the set already held, so they were dropped.`,
-    );
+    own.push({
+      levelLabel: 'info',
+      message: `${merged} conformer(s) relaxed into a ${method} minimum the set already held, so they were dropped.`,
+    });
   }
   const ranked = rankByRefinedEnergy(kept);
   return {
     ...set,
     conformers: ranked.conformers,
-    warnings,
+    logs: [
+      ...set.logs,
+      ...relaxerLogLines(relaxerLog.getLogs(), sources),
+      ...own,
+    ],
     rankedBy: REFINED_RANKING,
     refinement: {
       method,

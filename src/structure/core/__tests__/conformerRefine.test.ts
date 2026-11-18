@@ -146,9 +146,13 @@ test('two conformers that relax into one minimum are merged, and the set says so
 
   expect(refined.conformers).toHaveLength(1);
   expect(refined.refinement?.merged).toBe(2);
-  expect(refined.warnings).toContain(
-    '2 conformer(s) relaxed into a GFN2-xTB minimum the set already held, so they were dropped.',
-  );
+  expect(refined.logs).toStrictEqual([
+    {
+      levelLabel: 'info',
+      message:
+        '2 conformer(s) relaxed into a GFN2-xTB minimum the set already held, so they were dropped.',
+    },
+  ]);
 });
 
 test('an unconverged conformer is kept, with a warning that its energy is an upper bound', async () => {
@@ -159,19 +163,68 @@ test('an unconverged conformer is kept, with a warning that its energy is an upp
 
   expect(refined.conformers).toHaveLength(1);
   expect(refined.conformers[0]?.refinement?.converged).toBe(false);
-  expect(refined.warnings).toStrictEqual([
-    'The 1st conformer did not reach a GFN2-xTB minimum in 250 cycles, so its refined energy is an upper bound.',
+  expect(refined.logs).toStrictEqual([
+    {
+      levelLabel: 'warn',
+      message:
+        'It did not reach a GFN2-xTB minimum in 250 cycles, so its refined energy is an upper bound.',
+      meta: { source: '1st conformer' },
+    },
   ]);
 });
 
-test('a warning the relaxer reports is attributed to its conformer', async () => {
+test('what the relaxer logs is kept on the set, under its conformer', async () => {
   const refined = await refineConformers(
-    butaneSet(1),
-    relaxerReturning(() => ({ energy: -1, warnings: ['occ ran open-shell.'] })),
+    butaneSet(3),
+    async (geometries, options) => {
+      options?.logger?.warn({ structure: 0 }, 'occ ran open-shell.');
+      options?.logger?.info({ structure: 1 }, 'about a conformer merged away');
+      options?.logger?.info('The batch ran on 2 instances.');
+      return geometries.map((geometry, index) =>
+        relaxed({
+          // The second lands on the first, and is merged with its messages.
+          energy: index === 1 ? -42 : -42 - index,
+          coordinates:
+            (index === 1 ? geometries[0] : geometry)?.coordinates ??
+            new Float64Array(0),
+        }),
+      );
+    },
   );
 
-  expect(refined.warnings).toStrictEqual([
-    'The 1st conformer: occ ran open-shell.',
+  expect(refined.refinement?.merged).toBe(1);
+  expect(refined.logs).toStrictEqual([
+    {
+      levelLabel: 'warn',
+      message: 'occ ran open-shell.',
+      meta: { source: '1st conformer' },
+    },
+    { levelLabel: 'info', message: 'The batch ran on 2 instances.', meta: {} },
+    {
+      levelLabel: 'info',
+      message:
+        '1 conformer(s) relaxed into a GFN2-xTB minimum the set already held, so they were dropped.',
+    },
+  ]);
+});
+
+test('in a batch of one, an entry naming no structure is about that one', async () => {
+  const refined = await refineConformers(
+    butaneSet(1),
+    async (geometries, options) => {
+      options?.logger?.warn('occ ran open-shell.');
+      return geometries.map((geometry) =>
+        relaxed({ energy: -1, coordinates: geometry.coordinates }),
+      );
+    },
+  );
+
+  expect(refined.logs).toStrictEqual([
+    {
+      levelLabel: 'warn',
+      message: 'occ ran open-shell.',
+      meta: { source: '1st conformer' },
+    },
   ]);
 });
 
@@ -184,7 +237,7 @@ test('the dispersion term travels through when the method reports one', async ()
   expect(refined.conformers[0]?.refinement?.dispersionEnergy).toBe(-0.25);
 });
 
-test('a method name of the caller reaches the set and the warnings', async () => {
+test('a method name of the caller reaches the set and its log', async () => {
   const refined = await refineConformers(
     butaneSet(1),
     relaxerReturning(() => ({ energy: -1, converged: false, cycles: 7 })),
@@ -192,7 +245,7 @@ test('a method name of the caller reaches the set and the warnings', async () =>
   );
 
   expect(refined.refinement?.method).toBe('PM6');
-  expect(refined.warnings[0]).toContain('a PM6 minimum in 7 cycles');
+  expect(refined.logs[0]?.message).toContain('a PM6 minimum in 7 cycles');
 });
 
 test('progress and cancellation are handed to the relaxer', async () => {
@@ -325,7 +378,6 @@ function relaxed(
     dispersionEnergy: null,
     cycles: 3,
     converged: true,
-    warnings: [],
     ...fields,
   };
 }

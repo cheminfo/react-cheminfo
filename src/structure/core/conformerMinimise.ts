@@ -2,6 +2,7 @@ import type { Molecule } from 'openchemlib';
 import { ForceFieldMMFF94 } from 'openchemlib';
 
 import { ordinal } from '../../format/core/words.ts';
+import type { LogLine } from '../../log/core/logGroups.ts';
 
 import type { ConformerOptions } from './conformerOptions.ts';
 
@@ -13,19 +14,20 @@ import type { ConformerOptions } from './conformerOptions.ts';
  * than an exception. A non-zero return code from `minimise()` is *not* a
  * failure: ethyne returns 2 with a perfect geometry.
  *
- * Warnings count the conformers the generator handed back, kept or not, so one
- * number never means two things — a row number would, once one is dropped.
+ * A warning names its conformer by the count of conformers the generator
+ * handed back, kept or not, so one number never means two things — a row
+ * number would, once one is dropped.
  * @param conformer - The conformer to relax. Mutated.
  * @param options - Force field and iteration budget.
  * @param produced - 1-based position of the conformer in the generator's output.
- * @param warnings - Receives one sentence when the energy is unknown.
+ * @param logs - Receives one warning when the energy is unknown.
  * @returns Total energy in kcal/mol, or `null` when none was computed.
  */
 export function minimiseConformer(
   conformer: Molecule,
   options: ConformerOptions,
   produced: number,
-  warnings: string[],
+  logs: LogLine[],
 ): number | null {
   const algorithm = options.minimisation;
   if (algorithm === 'none') return null;
@@ -35,18 +37,42 @@ export function minimiseConformer(
     forceField.minimise({ maxIts: options.maxIterations });
     energy = forceField.getTotalEnergy();
   } catch (error) {
-    warnings.push(
-      `The ${ordinal(produced)} conformer produced could not be minimised with ${algorithm} (${readable(error)}), so its energy is unknown.`,
+    logs.push(
+      producedWarning(
+        produced,
+        `It could not be minimised with ${algorithm} (${readable(error)}), so its energy is unknown.`,
+      ),
     );
     return null;
   }
   if (!Number.isFinite(energy)) {
-    warnings.push(
-      `The ${ordinal(produced)} conformer produced minimised to a non-finite ${algorithm} energy, so its energy is unknown.`,
+    logs.push(
+      producedWarning(
+        produced,
+        `It minimised to a non-finite ${algorithm} energy, so its energy is unknown.`,
+      ),
     );
     return null;
   }
   return energy;
+}
+
+/**
+ * The label of a conformer as the generator handed it back, which a message
+ * about it is shown under.
+ * @param produced - 1-based position of the conformer in the generator's output.
+ * @returns E.g. `3rd conformer produced`.
+ */
+export function producedSource(produced: number): string {
+  return `${ordinal(produced)} conformer produced`;
+}
+
+function producedWarning(produced: number, message: string): LogLine {
+  return {
+    levelLabel: 'warn',
+    message,
+    meta: { source: producedSource(produced) },
+  };
 }
 
 /** What {@link rankByEnergy} reads and rewrites on a conformer. */

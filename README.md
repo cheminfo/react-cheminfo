@@ -185,6 +185,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Widgets**                | `CREDITS`, `credits`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `ErrorBoundary`, `CollapsibleSection`, `CapsuleFilter`, `HelpTooltip`, `CreditsList`                                                                                                                                                                                                                            |
 | **Hooks & state**          | `createWorkerChannel`, `persistBucket`, `persistSignalBucket`                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `useDebouncedValue`, `useContainerSize`, `useListKeyboardNavigation`, `useDisclosure`                                                                                                                                                                                                                           |
 | **Requests**               | `fetchJson`, `ApiError`, `readApiError`, `keySetParam`, `readHiddenParts`, `formatHiddenParts`, `fitDescription`, `DESCRIPTION_MIN`, `DESCRIPTION_MAX`, `openingRoute`, `anchorHref`                                                                                                                                                                                                                                                                                                                                  | `useAsync` (signal, `pending`)                                                                                                                                                                                                                                                                                  |
+| **What a run logged**      | `LogLine`, `groupLogEntries`, `logMessages`, `plainLogLines`, `logIntent`, `worstLogLevel`                                                                                                                                                                                                                                                                                                                                                                                                                            | `<LogBadge>`, `<LogCallouts>`, `<LogGroupList>`, `useLogEntries`, `logIcon`                                                                                                                                                                                                                                     |
 | **Chemistry**              | `atomicOrbitalsOf`, `configurationOf`, `classifyMolfile`, `readStructure`, `toMolfileExport`                                                                                                                                                                                                                                                                                                                                                                                                                          | `AtomicOrbitalViewer` (`/orbital`), `StructureEditor`, `Structure`, `MoleculeExport` (`/structure`)                                                                                                                                                                                                             |
 | **Conformers**             | `generateConformers`, `continueConformers`, `refineConformers`, `conformerShape`, `isSameMinimum`, `rankByEnergy`, `minimiseConformer`, `DEFAULT_CONFORMER_OPTIONS`, `CONFORMER_STRATEGIES` (all `/conformers`); `GeometryRelaxer`, `readRelaxableGeometry`, `centredRmsd`                                                                                                                                                                                                                                            | —                                                                                                                                                                                                                                                                                                               |
 | **Spectrum charts**        | `chartScale`, `chartAxisScale`, `plotRect`, `zoomDomain`, `zoomSelection`, `labelStackBaselines`, `layoutAnnotationBoxes`, `profilePath`, `stickPath`, `guidePlacement`, `readoutPlacement`, `stackCapacity`, `nextSpectrumColor`, `panelStyles`, `statusBar`                                                                                                                                                                                                                                                         | `Axes`, `AxisGuide`, `ChartTracker`, `ChartStack`, `SelectionRect`, `TraceLegend`, `PlotCaption`, `useChartZoom`, `useChartPointer`, `useChartSize`, `SidePanelStack`, `PanelRail`, `PanelRow`, `Section`, `FilterInput`, `AboutDialogFrame`, `DocumentationDialogFrame`, `FigureDownload`, `useFigureDownload` |
@@ -1052,6 +1053,34 @@ const included = useMemo(
 - **The card is a render prop**, because what belongs in it is the caller's
   subject — a formula through `react-mf`, a structure, a name — and a readout of
   strings cannot hold any of that.
+
+### What a run logged: `LogBadge` and `LogCallouts`
+
+A library reports what is not fatal through an optional `logger` (any
+`LightLogger` from `cheminfo-types`): `error` for something dropped while the
+rest went on, `warn` for what changes how a result must be read, `info` for
+context. A site gives each result a `FifoLogger` of its own, so a new run
+replaces only its own messages, and keeps the lines with the result:
+
+```tsx
+import { FifoLogger } from 'fifo-logger';
+import { plainLogLines } from 'react-cheminfo/core';
+import { LogBadge, LogCallouts } from 'react-cheminfo/ui';
+
+const logger = new FifoLogger();
+const result = await engine.compute(request, { logger });
+keep({ result, logs: plainLogLines(logger.getLogs()) });
+
+<LogBadge entries={entry.logs} />; // beside a chart: one button, opened on hover
+<LogCallouts entries={entry.logs} />; // inline, in a panel
+```
+
+Each distinct message is shown once with its count, the worst first, through
+the shared prose marks (`` `code` ``, `{{CO2}}`). A string `title` in the meta
+heads it and a string `source` (a file, a line, the 3rd conformer) labels it.
+A caveat that is always true is a plain `LogLine` passed beside the logged
+ones. `logMessages(lines)` gives the sentences an MCP answer carries, and
+`useLogEntries(logger)` follows a logger while a long run is still logging.
 
 ## A graded series, and the shell around it
 

@@ -8,6 +8,8 @@ import type {
   RelaxerOptions,
 } from '../../structure/core/geometryRelaxer.ts';
 
+import { taggedLogger } from './taggedLogger.ts';
+
 /**
  * kcal/mol per hartree, CODATA 2018. Every energy a relaxer reports is in
  * kcal/mol, so it can be read against a force-field energy without the reader
@@ -73,6 +75,7 @@ export function xtbRelaxer(options: XtbRelaxerOptions = {}): GeometryRelaxer {
           maxWorkers: options.maxWorkers,
           onSettled: runOptions.onSettled,
           signal: runOptions.signal,
+          logger: runOptions.logger,
         })
       : await relaxHere(xtb, requests, runOptions);
     const relaxed: RelaxedGeometry[] = [];
@@ -86,7 +89,6 @@ export function xtbRelaxer(options: XtbRelaxerOptions = {}): GeometryRelaxer {
             : result.energy.dispersion * KCAL_PER_MOL_PER_HARTREE,
         cycles: result.cycles,
         converged: result.converged,
-        warnings: result.warnings,
       });
     }
     return relaxed;
@@ -118,7 +120,8 @@ export async function disposeXtbRelaxer(): Promise<void> {
  * Relax one structure after another on this thread, for want of a pool.
  * @param xtb - The loaded `xtb-wasm` module.
  * @param requests - The structures to relax, with their settings.
- * @param runOptions - Progress and cancellation.
+ * @param runOptions - Progress, cancellation, and the logger each structure's
+ * messages go to under its index, as the pool would have logged them.
  * @returns One `xtb-wasm` result per request, in request order.
  * @throws {Error} When the run is cancelled, or when occ fails.
  */
@@ -127,15 +130,22 @@ async function relaxHere(
   requests: ReadonlyArray<Parameters<XtbModule['relaxGeometryInProcess']>[0]>,
   runOptions: RelaxerOptions,
 ): Promise<Array<Awaited<ReturnType<XtbModule['relaxGeometryInProcess']>>>> {
+  const { logger, signal, onSettled } = runOptions;
   const results = [];
   for (const [index, request] of requests.entries()) {
-    if (runOptions.signal?.aborted === true) {
+    if (signal?.aborted === true) {
       throw new Error('calculation cancelled');
     }
+    const options = {
+      logger:
+        logger === undefined
+          ? undefined
+          : taggedLogger(logger, { structure: index }),
+    };
     /* eslint-disable-next-line no-await-in-loop -- there is one thread: the
        whole point of this path is that the structures run in turn. */
-    results.push(await xtb.relaxGeometryInProcess(request));
-    runOptions.onSettled?.(index + 1, requests.length);
+    results.push(await xtb.relaxGeometryInProcess(request, options));
+    onSettled?.(index + 1, requests.length);
   }
   return results;
 }

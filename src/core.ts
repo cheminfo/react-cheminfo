@@ -18,6 +18,7 @@ export * from './format/core/index.ts';
 export * from './highlight/core/index.ts';
 export * from './i18n/core/index.ts';
 export * from './language/core/index.ts';
+export * from './log/core/index.ts';
 export * from './moleculesClient/core/index.ts';
 export * from './moleculesSources/core/index.ts';
 export * from './moleculesToken/core/index.ts';

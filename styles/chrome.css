@@ -1778,6 +1778,40 @@ span.taxon-lineage__name {
   color: var(--accent);
 }
 
+/* ── What a logger collected ────────────────────────────────────────────── */
+
+/*
+  `<LogCallouts>` and the popover of `<LogBadge>`: one callout per message,
+  worst first, close enough to read as one list.
+*/
+.log-callouts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.log-badge__popover .log-callouts {
+  max-width: 460px;
+  padding: 8px;
+}
+
+.log-callouts__count {
+  margin-left: 0.4em;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Where a message comes from — a file, a line — read before the message. */
+.log-callouts__source {
+  margin-right: 0.4em;
+  font-weight: 600;
+}
+
+.log-callouts__more {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 /* ── The splitter ───────────────────────────────────────────────────────── */
 
 /*

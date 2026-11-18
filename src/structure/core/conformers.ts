@@ -1,8 +1,12 @@
 import type { Molecule } from 'openchemlib';
 
-import { ordinal } from '../../format/core/words.ts';
+import type { LogLine } from '../../log/core/logGroups.ts';
 
-import { minimiseConformer, rankByEnergy } from './conformerMinimise.ts';
+import {
+  minimiseConformer,
+  producedSource,
+  rankByEnergy,
+} from './conformerMinimise.ts';
 import { isKeptMinimum, minimisedShapes } from './conformerMinimum.ts';
 import type {
   ConformerOptions,
@@ -62,8 +66,12 @@ export interface ConformerSet {
   stoppedBy: StopReason;
   /** Wall-clock duration of the run, initialisation and continuations included. */
   elapsedMilliseconds: number;
-  /** Plain sentences about conformers that were dropped or left unminimised. */
-  warnings: string[];
+  /**
+   * What the run has to say: conformers dropped (`error`), left without an
+   * energy (`warn`), merged by a refinement (`info`). Plain, so the set can be
+   * posted from a worker and saved in a figure with them.
+   */
+  logs: LogLine[];
   /** The force field that was asked for, echoed so a reader knows what the energies mean. */
   minimisation: MinimisationAlgorithm;
   /** Conformers the generator handed back, dropped ones included: where a continuation resumes. */
@@ -109,7 +117,7 @@ export type ConformerLimits = Pick<
  * @param molecule - Structure to embed. Not mutated.
  * @param options - Strategy, limits, seed and force field.
  * @param now - Clock used for the time budget, injectable for tests.
- * @returns Every conformer kept, most stable first, with relative energies and any warnings.
+ * @returns Every conformer kept, most stable first, with relative energies and what the run logged.
  * @throws {Error} When the structure is empty or OpenChemLib refuses to initialise it.
  */
 export function generateConformers(
@@ -162,7 +170,7 @@ interface Accumulator {
   conformers: Conformer[];
   /** Shape of each conformer, `null` for one without an energy. */
   shapes: Array<ConformerShape | null>;
-  warnings: string[];
+  logs: LogLine[];
 }
 
 function runConformers(
@@ -197,7 +205,7 @@ function runConformers(
   const into: Accumulator = {
     conformers,
     shapes: minimisedShapes(conformers),
-    warnings: previous === null ? [] : [...previous.warnings],
+    logs: previous === null ? [] : [...previous.logs],
   };
   const budget = Math.max(options.timeoutSeconds * 1000, 0);
   const stoppedBy = collect(
@@ -214,7 +222,7 @@ function runConformers(
     potentialConformerCount,
     stoppedBy,
     elapsedMilliseconds: (previous?.elapsedMilliseconds ?? 0) + now() - start,
-    warnings: into.warnings,
+    logs: into.logs,
     minimisation: options.minimisation,
     produced: session.produced,
     options,
@@ -245,16 +253,19 @@ function collect(
     }
     session.produced++;
     if (!hasFiniteCoordinates(conformer)) {
-      into.warnings.push(
-        `The ${ordinal(session.produced)} conformer produced was dropped: the generator placed some of its atoms at non-finite coordinates.`,
-      );
+      into.logs.push({
+        levelLabel: 'error',
+        message:
+          'It was dropped: the generator placed some of its atoms at non-finite coordinates.',
+        meta: { source: producedSource(session.produced) },
+      });
       continue;
     }
     const energy = minimiseConformer(
       conformer,
       options,
       session.produced,
-      into.warnings,
+      into.logs,
     );
     const shape = energy === null ? null : conformerShape(conformer);
     if (

@@ -91,6 +91,7 @@
     "countries-and-timezones": "^3.11.0",
     "crc-32": "^1.2.2",
     "fast-deep-equal": "^3.1.3",
+    "fifo-logger": "^2.0.1",
     "idb": "^8.0.4",
     "intl-messageformat": "^11.2.15",
     "ir-spectrum": "^4.2.0",
@@ -164,7 +165,7 @@
     "typescript": "^6.0.3",
     "vite": "^8.2.1",
     "vitest": "^4.1.12",
-    "xtb-wasm": "^1.1.1"
+    "xtb-wasm": "^2.0.0"
   },
   "peerDependencies": {
     "@blueprintjs/core": "^6.18.0",
@@ -182,7 +183,7 @@
     "react-science": "^20.6.2 || ^21.0.0 || ^22.0.0 || ^23.0.0 || ^24.0.0",
     "spectra-processor": "^5.0.0",
     "vite": "^7.0.0 || ^8.0.0",
-    "xtb-wasm": "^1.1.1"
+    "xtb-wasm": "^2.0.0"
   },
   "repository": {
     "type": "git",
