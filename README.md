@@ -43,6 +43,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/molecule3d`                | the 3D molecule viewer and its toolbar                         | React, molstar                                   |
 | `react-cheminfo/structure`                 | the structure editor and renderer                              | React, react-ocl, OCL                            |
 | `react-cheminfo/conformers`                | conformer generation, ranking and refinement                   | OCL                                              |
+| `react-cheminfo/crystal`                   | a CIF read, expanded by its space group, cut into molecules    | cif-to-json; Node and browser                    |
 | `react-cheminfo/slides`                    | the deck format and the slideshow player                       | React, react-markdown                            |
 | `react-cheminfo/spectra`                   | the spectra processing settings editors                        | React; types only from spectra-processor, ml-pca |
 | `react-cheminfo/ir`                        | the infrared chart, band table and editor                      | React, ir-spectrum, convert-to-jcamp             |
@@ -124,6 +125,18 @@ framework-free `GeometryRelaxer` contract — which `react-cheminfo/core` owns,
 so the code choosing a relaxer loads neither openchemlib nor WebAssembly; `xtbRelaxer` from this subpath is the implementation, and it
 `import()`s `xtb-wasm` on the **first call**, so a site that offers refinement as
 an action still ships nothing extra to a visitor who never clicks it.
+
+`react-cheminfo/crystal` reads a crystal structure and cuts its cell into
+molecules, in the browser or in a Node batch over a whole database: `readCif`
+reads a CIF — the asymmetric unit with its disorder groups, and the bond
+distances and torsion angles the authors reported — `structureOperations`
+finds the space group's operations in the file or in the 230 groups it names,
+and `crystalMolecules` returns each crystallographically independent molecule
+once and whole, in Cartesian coordinates with its bonds, and reports a salt, a
+mineral or a framework as the network it is. Bonds follow openchemlib's rule —
+covalent radii plus 0.45 Å — with metals bonded too, and the cell is searched
+on a grid, so a cell of thousands of atoms costs milliseconds. It loads neither
+React nor openchemlib nor molstar.
 
 `react-cheminfo/storage` is what a site needs so a crash loses nothing:
 `openSiteDatabase` opens IndexedDB through `idb` and turns a blocked upgrade or
