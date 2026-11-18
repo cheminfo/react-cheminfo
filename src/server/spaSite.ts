@@ -119,6 +119,15 @@ export async function spaSite(
     if (pathname === `/${INDEX}`) return sendPage(request, reply, `/${search}`);
     const file = buildFile(files, pathname);
     if (file !== undefined) return reply.sendFile(file);
+    // A page answered here would be kept by a CDN under the bundle's name, and
+    // every page naming that bundle would then come up blank.
+    if (isHashedBundle(pathname)) {
+      return reply
+        .code(404)
+        .header('cache-control', 'no-store')
+        .type('text/plain; charset=utf-8')
+        .send('Not in this build.');
+    }
     return sendPage(request, reply, request.url);
   };
   fastify.get('/', { schema: HIDDEN }, answer);

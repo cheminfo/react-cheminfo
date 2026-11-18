@@ -154,6 +154,16 @@ test('the files of the build are served, bundles kept for a year', async () => {
   expect(icon.headers['cache-control']).toBe('no-cache');
 });
 
+test('a bundle the build does not have is a 404 nothing keeps, never the page', async () => {
+  const app = await site();
+  const missing = await app.inject({ url: '/assets/index-z9y8.js' });
+
+  expect(missing.statusCode).toBe(404);
+  expect(missing.headers['cache-control']).toBe('no-store');
+  expect(missing.headers['content-type']).toBe('text/plain; charset=utf-8');
+  expect(missing.body).toBe('Not in this build.');
+});
+
 test('the API keeps its routes and its own 404, and only GET is a page', async () => {
   const app = await site();
   const tools = await app.inject({ url: '/v1/tools' });
