@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.133.0](https://github.com/cheminfo/react-cheminfo/compare/v0.132.0...v0.133.0) (2026-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* share the zoom bar, page setup, page lines, printing by page and the text icon of every editor
+
+### Features
+
+* draw each mass spectrum at its own vertical scale ([8fa551b](https://github.com/cheminfo/react-cheminfo/commit/8fa551befc1908785e0d3b5012d5045697f9b2fb))
+* name an empty guide's figure on a line under it ([82f79b8](https://github.com/cheminfo/react-cheminfo/commit/82f79b81077fb1267967dbd073cbe5b97cbaf4a1))
+* share the zoom bar, page setup, page lines, printing by page and the text icon of every editor ([d4ca445](https://github.com/cheminfo/react-cheminfo/commit/d4ca44503127e7fc973fee533ace6de7da6d751f))
+* show the empty-page guide in the structure editor and the XPS viewer, fitted to smaller tools ([c03368b](https://github.com/cheminfo/react-cheminfo/commit/c03368b40987b55cf8ddb78d33f36e35b3666b7b))
+
 ## [0.132.0](https://github.com/cheminfo/react-cheminfo/compare/v0.131.0...v0.132.0) (2026-11-18)
 
 
