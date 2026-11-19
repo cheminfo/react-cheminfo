@@ -14,6 +14,8 @@ import { SVG_CLIPBOARD_TYPE } from '../core/copySvg.ts';
 import { FIGURE_PNG_TYPE } from '../core/figurePng.ts';
 import { canShareFile } from '../core/shareFile.ts';
 
+import type { FigureFileCopy } from './FigureDownloadPanel.tsx';
+
 /** What {@link FigureQuickActions} needs. */
 export interface FigureQuickActionsProps {
   /** Whether there is a figure to copy or send. */
@@ -22,7 +24,12 @@ export interface FigureQuickActionsProps {
   busy: boolean;
   /** What the last copy or send came to. */
   notice: FigureNotice | null;
-  /** Copies the figure. */
+  /**
+   * What Copy says while it takes a file rather than the picture.
+   * @default undefined — Copy takes the picture
+   */
+  fileCopy?: FigureFileCopy;
+  /** Copies the figure, or the file picked when `fileCopy` is given. */
   onCopy: () => void;
   /**
    * Sends a PNG of the figure through the share sheet.
@@ -32,9 +39,9 @@ export interface FigureQuickActionsProps {
 }
 
 /**
- * Copy and Send, which take the size picked and none of the file's choices,
- * and the words beside them: what a copy puts on the clipboard, or what the
- * last copy or send did. A row of its own rather than two panel rows, since a
+ * Copy and Send, which take the size picked, and the words beside them: what a
+ * copy puts on the clipboard, or what the last copy or send did. Copy takes the
+ * file picked instead of the picture when that file says what it copies. A row of its own rather than two panel rows, since a
  * button needs no name column beside it.
  * @param props - See {@link FigureQuickActionsProps}.
  * @returns The buttons and their words.
@@ -42,7 +49,7 @@ export interface FigureQuickActionsProps {
 export function FigureQuickActions(
   props: FigureQuickActionsProps,
 ): ReactElement {
-  const { disabled, busy, notice, onCopy, onSend } = props;
+  const { disabled, busy, notice, fileCopy, onCopy, onSend } = props;
   const t = useChromeT();
   const { metrics } = useOverlaySurface();
   const button = (text: string, icon: IconName, onClick: () => void) => (
@@ -63,7 +70,7 @@ export function FigureQuickActions(
         ? button(t('download.send'), 'send-message', onSend)
         : null}
       <span style={noteStyle(metrics)}>
-        {quickNote(notice, clipboardSupports(SVG_CLIPBOARD_TYPE), t)}
+        {quickNote(notice, clipboardSupports(SVG_CLIPBOARD_TYPE), t, fileCopy)}
       </span>
     </div>
   );
@@ -86,7 +93,12 @@ function quickNote(
   notice: FigureNotice | null,
   svg: boolean,
   t: Translate<ChromeKey>,
+  fileCopy: FigureFileCopy | undefined,
 ): string {
+  if (fileCopy !== undefined) {
+    if (notice === null) return fileCopy.ready;
+    if (notice === 'copied') return fileCopy.copied;
+  }
   if (notice === 'copyUnsupported') return t('download.copyUnsupported');
   if (notice === 'copied') {
     return t(svg ? 'download.copiedPngSvg' : 'download.copiedPng');

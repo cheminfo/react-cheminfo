@@ -717,6 +717,8 @@
   "molecule3d.exportImageOrMolfile": "Esporta l'immagine o il molfile",
   "molecule3d.molfileHint": "Il modello sullo schermo, con le sue coordinate 3D.",
   "molecule3d.molfileVersion": "Versione",
+  "molecule3d.copyMolfile": "Come molfile {version}, pronto da incollare.",
+  "molecule3d.copiedMolfile": "Copiato, come molfile {version}.",
   "molecule3d.molfileV2000TooLarge": "V2000 contiene al massimo 999 atomi: usi V3000.",
   "molecule3d.frames": "Fotogrammi",
   "molecule3d.framesHelp": "Un PNG animato contiene tutti i fotogrammi e li riproduce in ciclo. I browser lo riproducono; un programma che non può mostra il primo fotogramma.",

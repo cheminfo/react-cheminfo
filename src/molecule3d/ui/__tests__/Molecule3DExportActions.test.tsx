@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 /**
- * What the export panel's Save does with the choices made in it — a picture
- * at the scale picked, every frame when the scene holds several, or once
- * Molfile is picked the model itself — and Copy, which takes none of them.
+ * What the export panel's Save and Copy do with the choices made in it — a
+ * picture at the scale picked, every frame when the scene holds several, or
+ * once Molfile is picked the model itself, in the dialect picked.
  */
 
 import { act } from 'react';
@@ -53,6 +53,7 @@ afterEach(() => {
     root.unmount();
   });
   host.remove();
+  Reflect.deleteProperty(navigator, 'clipboard');
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -85,13 +86,63 @@ test('once Molfile is picked, Save writes the model, named after the page and it
   ).toStrictEqual(['water-v2000.mol']);
 });
 
-test('with Molfile picked, Copy still copies the picture', async () => {
+test('with Molfile picked, Copy puts the molfile on the clipboard, in the dialect picked', async () => {
+  const copied: string[] = [];
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: {
+      writeText: async (text: string) => {
+        copied.push(text);
+      },
+    },
+  });
   render({ molfile: WATER });
-  await press('Molfile');
-  await press('Copy');
 
-  expect(asked).toStrictEqual(['copy ×3.125']);
+  await press('Molfile');
+  await until(copyIsReady);
+
+  expect(host.textContent).toContain('As a V2000 molfile, ready to paste.');
+
+  await press('Copy');
+  await until(() => {
+    expect(host.textContent).toContain('Copied, as a V2000 molfile.');
+  });
+
+  await press('V3000');
+  await until(copyIsReady);
+  await press('Copy');
+  await until(() => {
+    expect(host.textContent).toContain('Copied, as a V3000 molfile.');
+  });
+
+  expect(asked).toStrictEqual([]);
+  expect(copied).toHaveLength(2);
+  expect(copied[0]).toContain(' V2000');
+  expect(copied[1]).toContain('M  V30 BEGIN ATOM');
 });
+
+/**
+ * Copy is held back while the molfile picked is being written, which a V3000
+ * of a V2000 file is through openchemlib, loaded on demand.
+ */
+function copyIsReady(): void {
+  const copy = [...host.querySelectorAll('button')].find(
+    (candidate) => candidate.textContent === 'Copy',
+  );
+
+  expect(copy?.getAttribute('aria-disabled')).toBeNull();
+}
+
+/**
+ * Wait until what the panel does on its own after a press has happened.
+ * @param check - The expectation, retried until it holds.
+ */
+async function until(check: () => void): Promise<void> {
+  // React commits on its own while the expectation is retried.
+  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
+  await vi.waitFor(check, { timeout: 10_000 });
+  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+}
 
 function render(
   props: {

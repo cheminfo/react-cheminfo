@@ -34,6 +34,20 @@ export interface FigureFileChoice<TFile extends string> {
   onChange: (value: TFile | null) => void;
   /** The line at the foot of the panel while one is picked. */
   hint: string;
+  /**
+   * What Copy says while one is picked, for a file Copy takes in place of the
+   * picture, such as a molfile pasted into an editor.
+   * @default undefined — Copy takes the picture whatever is picked
+   */
+  copy?: FigureFileCopy;
+}
+
+/** What Copy says while it takes a file rather than the picture. */
+export interface FigureFileCopy {
+  /** Said beside Copy before it is pressed. */
+  ready: string;
+  /** Said once it has copied. */
+  copied: string;
 }
 
 /** What {@link FigureDownloadPanel} is drawn from. */
@@ -43,8 +57,9 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
   /** Which picture the reader is about to write. */
   format: FigureFormat;
   /**
-   * Files of another kind on offer, saved instead of a picture; Copy and Send
-   * still take the picture.
+   * Files of another kind on offer, saved instead of a picture, and copied
+   * instead of it when the choice says what Copy takes; Send still takes the
+   * picture.
    * @default undefined — only pictures are offered
    */
   file?: FigureFileChoice<TFile>;
@@ -81,7 +96,7 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
   /**
    * Called when they press copy, which puts the figure on the clipboard as a
    * PNG and, where the browser takes one, an SVG, at the width and the
-   * resolution picked.
+   * resolution picked — or the file picked, when its choice has a `copy`.
    */
   onCopy: () => void;
   /**
@@ -179,9 +194,10 @@ export function FigureDownloadPanel<TFile extends string = never>(
       <p style={overlayPanelHintStyle(metrics)}>{pictureHintOf(hint, t)}</p>
       <OverlayGroup label={t('download.copyOrSend')}>
         <FigureQuickActions
-          disabled={size === null}
+          disabled={size === null && picked?.copy === undefined}
           busy={saving}
           notice={notice}
+          fileCopy={picked?.copy}
           onCopy={onCopy}
           onSend={onSend}
         />

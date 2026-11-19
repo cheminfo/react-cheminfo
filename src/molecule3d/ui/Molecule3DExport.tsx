@@ -7,6 +7,7 @@
 import type { ReactElement } from 'react';
 import { useCallback, useState } from 'react';
 
+import { writeToClipboard } from '../../clipboard/core/writeToClipboard.ts';
 import type { FigureNotice } from '../../download/core/copyFigure.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import {
@@ -99,7 +100,8 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   const versions = moleculeFileChoices(atoms, t);
   const writtenVersion = versions[0]?.disabled ? 'molfileV3000' : version;
 
-  // Written once picked, so Save has it at hand.
+  // Written once picked rather than on the press: Safari only allows a
+  // clipboard write the click itself started, and Save has it at hand too.
   const written = useAsync(
     useCallback(
       () =>
@@ -110,6 +112,12 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
     ),
   );
   const text = written.pending ? null : written.data;
+  const versionLabel = writtenVersion === 'molfileV3000' ? 'V3000' : 'V2000';
+
+  async function copyMolfile(molfileText: string): Promise<FigureNotice> {
+    if (await writeToClipboard(molfileText)) return 'copied';
+    throw new Error(t('clipboard.failed'));
+  }
 
   // What the last copy came to only describes the choices it was made with.
   function changed<T>(apply: (value: T) => void): (value: T) => void {
@@ -134,6 +142,12 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
               value: file,
               onChange: changed(setFile),
               hint: t('molecule3d.molfileHint', { count: atoms }),
+              copy: {
+                ready: t('molecule3d.copyMolfile', { version: versionLabel }),
+                copied: t('molecule3d.copiedMolfile', {
+                  version: versionLabel,
+                }),
+              },
             }
           : undefined
       }
@@ -155,7 +169,8 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
         }
       }}
       onCopy={() => {
-        run(onCopy(scale));
+        if (file === null) run(onCopy(scale));
+        else if (text) run(copyMolfile(text));
       }}
       onSend={
         writeFile === undefined
