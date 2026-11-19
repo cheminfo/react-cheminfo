@@ -96,12 +96,19 @@ test('a highlight outlasts the hover, and the measuring tools work over it', asy
     throw new Error('no atom is lit');
   }
 
+  const readout = page.getByRole('status', { name: 'Atom under the pointer' });
+  await expect(readout).toHaveText('none');
+
   // molstar reads the pointer off a picking buffer it draws when first asked,
-  // so the pointer is nudged until the atom under it is marked.
-  let hovered = on;
+  // so the pointer is nudged until the atom under it is reported.
   await expect(async () => {
     await page.mouse.move(on.left + top.x + 1, on.top + top.y);
     await page.mouse.move(on.left + top.x, on.top + top.y);
+    await expect(readout).toHaveText(/^atom \d+$/u, { timeout: 1000 });
+  }).toPass({ timeout: 20_000 });
+  // Reported, then drawn: the scene is read once the mark is on it.
+  let hovered = on;
+  await expect(async () => {
     hovered = await settledScene(page, canvas);
     expect(await largestDifference(page, hovered, on)).toBeGreaterThan(100);
   }).toPass({ timeout: 20_000 });
@@ -113,10 +120,14 @@ test('a highlight outlasts the hover, and the measuring tools work over it', asy
   const box = await canvas.boundingBox();
   if (box === null) throw new Error('the viewer drew no canvas');
   await page.mouse.move(box.x + box.width - 4, box.y + box.height - 4);
-  const left = await settledScene(page, canvas);
+  await expect(readout).toHaveText('none');
 
-  // The mark goes with the pointer, and the highlight is all that is left.
-  expect(await largestDifference(page, left, on)).toBeLessThan(32);
+  // The mark goes with the pointer, and the highlight is all that is left —
+  // once the scene has been drawn again after the pointer left.
+  await expect(async () => {
+    const left = await settledScene(page, canvas);
+    expect(await largestDifference(page, left, on)).toBeLessThan(32);
+  }).toPass({ timeout: 20_000 });
 
   await page.getByRole('button', { name: 'Distance', exact: true }).click();
   await page.mouse.click(on.left + top.x, on.top + top.y);

@@ -6,9 +6,20 @@ on:
       - main
   pull_request:
 
+# A newer push to the same pull request makes the run in progress moot.
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    # A whole shard takes a few minutes; anything near this is a hang.
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -17,13 +28,13 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx playwright install --with-deps chromium webkit
-      - run: npm run test-e2e
+      - run: npm run test-e2e -- --shard=${{ matrix.shard }}/3
         env:
           CI: true
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: |
             playwright-report
             test-results

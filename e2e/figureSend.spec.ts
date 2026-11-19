@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { announcedPng, openFigurePanel } from './figurePanel.ts';
 import { openStory } from './story.ts';
 
 // The embedded viewer, whose bar carries the glyph that saves the figure.
@@ -12,6 +13,8 @@ interface SharedFile {
   type: string;
   /** Its first bytes: hexadecimal for a PNG, text for anything else. */
   head: string;
+  /** The size a PNG states in its header, `null` for anything else. */
+  size: { width: number; height: number } | null;
   /** Whether the press was still fresh when the sheet was asked for. */
   fresh: boolean | null;
 }
@@ -48,14 +51,18 @@ async function standInSheet(page: Page, refusals = 0): Promise<void> {
         }
         const files = await Promise.all(
           (data.files ?? []).map(async (file) => {
-            const bytes = new Uint8Array(await file.slice(0, 8).arrayBuffer());
-            const head =
-              file.type === 'image/png'
-                ? [...bytes]
-                    .map((byte) => byte.toString(16).padStart(2, '0'))
-                    .join('')
-                : await file.slice(0, 200).text();
-            return { name: file.name, type: file.type, head, fresh };
+            const png = file.type === 'image/png';
+            const bytes = new Uint8Array(await file.slice(0, 24).arrayBuffer());
+            const head = png
+              ? [...bytes.subarray(0, 8)]
+                  .map((byte) => byte.toString(16).padStart(2, '0'))
+                  .join('')
+              : await file.slice(0, 200).text();
+            const header = new DataView(bytes.buffer);
+            const size = png
+              ? { width: header.getUint32(16), height: header.getUint32(20) }
+              : null;
+            return { name: file.name, type: file.type, head, size, fresh };
           }),
         );
         shared.push(...files);
@@ -73,13 +80,10 @@ async function sharedFiles(page: Page): Promise<SharedFile[]> {
 async function openPanel(page: Page): Promise<void> {
   await openStory(page, IRIS);
   await expect(page.locator('.chart-frame')).toHaveCount(1);
-  await page
-    .getByRole('button', { name: 'Save this figure — PNG', exact: true })
-    .click();
-  await expect(
-    page.getByRole('group', { name: 'Save figure', exact: true }),
-  ).toHaveCount(1);
+  await openFigurePanel(page);
 }
+
+const SENT = 'Sent, as a PNG.';
 
 const SEND = { name: 'Send', exact: true } as const;
 
@@ -105,12 +109,37 @@ test('send hands the PNG save would write to the share sheet', async ({
 }) => {
   await standInSheet(page);
   await openPanel(page);
+  await page.getByRole('radio', { name: 'PNG', exact: true }).click();
+  await page.getByRole('radio', { name: '600 dpi', exact: true }).click();
+  const announced = await announcedPng(page);
 
   await page.getByRole('button', SEND).click();
 
+  await expect(page.getByText(SENT, { exact: true })).toBeVisible();
+  const files = await sharedFiles(page);
+  expect(files).toHaveLength(1);
+  expect(files[0]).toMatchObject({
+    name: 'projection-map.png',
+    type: 'image/png',
+    head: '89504e470d0a1a0a',
+    size: announced,
+  });
+});
+
+test('send hands over a PNG while the file to save is an SVG', async ({
+  page,
+}) => {
+  await standInSheet(page);
+  await openPanel(page);
+  // A share sheet hands every file on as an attachment, and only a PNG is
+  // shown as a picture in a chat or a mail.
   await expect(
-    page.getByText(/^Sent \d+ × \d+ pixels, as a PNG\.$/u),
-  ).toBeVisible();
+    page.getByRole('radio', { name: 'SVG', exact: true }),
+  ).toBeChecked();
+
+  await page.getByRole('button', SEND).click();
+
+  await expect(page.getByText(SENT, { exact: true })).toBeVisible();
   const files = await sharedFiles(page);
   expect(files).toHaveLength(1);
   expect(files[0]).toMatchObject({
@@ -118,29 +147,6 @@ test('send hands the PNG save would write to the share sheet', async ({
     type: 'image/png',
     head: '89504e470d0a1a0a',
   });
-});
-
-test('send hands over the SVG, with a type the sheet accepts', async ({
-  page,
-}) => {
-  await standInSheet(page);
-  await openPanel(page);
-  await page.getByRole('radio', { name: 'SVG' }).click();
-
-  await page.getByRole('button', SEND).click();
-
-  await expect(
-    page.getByText(
-      'Sent as an SVG, which a chat app passes on as a file, untouched.',
-    ),
-  ).toBeVisible();
-  const files = await sharedFiles(page);
-  expect(files).toHaveLength(1);
-  expect(files[0]).toMatchObject({
-    name: 'projection-map.svg',
-    type: 'image/svg+xml',
-  });
-  expect(files[0]?.head).toMatch(/^<\?xml[^>]*\?>\s*<svg\b/u);
 });
 
 test('a press gone stale keeps the file, and the next press shares it while fresh', async ({
@@ -159,9 +165,7 @@ test('a press gone stale keeps the file, and the next press shares it while fres
 
   await page.getByRole('button', SEND).click();
 
-  await expect(
-    page.getByText(/^Sent \d+ × \d+ pixels, as a PNG\.$/u),
-  ).toBeVisible();
+  await expect(page.getByText(SENT, { exact: true })).toBeVisible();
   const files = await sharedFiles(page);
   expect(files).toHaveLength(1);
   // The kept file goes inside the press itself, which is what an older

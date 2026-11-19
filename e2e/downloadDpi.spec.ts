@@ -5,6 +5,7 @@ import { expect, test } from '@playwright/test';
 
 import { pngDpi } from '../src/download/core/pngDpi.ts';
 
+import { openFigurePanel, pickPng } from './figurePanel.ts';
 import { openStory } from './story.ts';
 
 // A ring the page writes itself, drawn to print 2 × 1 inches.
@@ -17,7 +18,7 @@ const ON_THE_PAGE = 'download-printed-figure--on-the-page';
 const IRIS = 'projection-pcaviewer--iris';
 
 /**
- * Open the panel, press save, and read back the file the browser wrote.
+ * Press save, and read back the file the browser wrote.
  * @param page - The page showing the figure.
  * @returns The file's name and bytes.
  */
@@ -45,15 +46,20 @@ test('a figure with a printed size is saved at the dots per inch picked, and say
   page,
 }) => {
   await openStory(page, WRITTEN);
-  await page.getByRole('button', { name: 'Save this figure — PNG' }).click();
+  await openFigurePanel(page);
   await expect(
-    page.getByText('Saved 600 × 300 pixels, which print 5.1 × 2.5 cm.'),
+    page.getByText('A PNG of 600 × 300 pixels, which prints 5.1 × 2.5 cm.', {
+      exact: true,
+    }),
   ).toBeVisible();
 
-  await page.getByRole('radio', { name: '600 dpi' }).click();
+  await page.getByRole('radio', { name: '600 dpi', exact: true }).click();
   await expect(
-    page.getByText('Saved 1200 × 600 pixels, which print 5.1 × 2.5 cm.'),
+    page.getByText('A PNG of 1200 × 600 pixels, which prints 5.1 × 2.5 cm.', {
+      exact: true,
+    }),
   ).toBeVisible();
+  await pickPng(page);
   const { name, file } = await saved(page);
 
   expect(name).toBe('benzene.png');
@@ -61,17 +67,19 @@ test('a figure with a printed size is saved at the dots per inch picked, and say
   expect(pngDpi(file)).toBe(600);
 });
 
-test('a written SVG is saved as written, and is offered no resolution', async ({
+test('a written SVG is saved as written, whatever the dots per inch', async ({
   page,
 }) => {
   await openStory(page, WRITTEN);
-  await page.getByRole('button', { name: 'Save this figure — PNG' }).click();
-  await page.getByRole('radio', { name: 'SVG' }).click();
-
-  await expect(page.getByRole('radio', { name: '300 dpi' })).toHaveCount(0);
+  await openFigurePanel(page);
   await expect(
-    page.getByText('Prints 5.1 × 2.5 cm, and stays sharp at any size.'),
+    page.getByText('Prints 5.1 × 2.5 cm, and stays sharp at any size.', {
+      exact: true,
+    }),
   ).toBeVisible();
+
+  // The dots per inch are the PNG's; the SVG keeps the size it states.
+  await page.getByRole('radio', { name: '1200 dpi', exact: true }).click();
   const { name, file } = await saved(page);
 
   expect(name).toBe('benzene.svg');
@@ -84,28 +92,33 @@ test('a figure read off the page is offered dots per inch too', async ({
   page,
 }) => {
   await openStory(page, ON_THE_PAGE);
-  await page.getByRole('button', { name: 'Save this figure — PNG' }).click();
-  await page.getByRole('radio', { name: '150 dpi' }).click();
+  await openFigurePanel(page);
+  await page.getByRole('radio', { name: '150 dpi', exact: true }).click();
+  await pickPng(page);
   const { file } = await saved(page);
 
   expect(pngSize(file)).toStrictEqual({ width: 300, height: 150 });
   expect(pngDpi(file)).toBe(150);
 });
 
-test('a PNG saved at a multiple states the dots per inch it has at screen size', async ({
+test('a figure with no printed size of its own opens on 300 dpi, which its PNG states', async ({
   page,
 }) => {
   await openStory(page, IRIS);
   await expect(page.locator('.chart-frame')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Save this figure — PNG' }).click();
+  await openFigurePanel(page);
+  await expect(
+    page.getByRole('radio', { name: '300 dpi', exact: true }),
+  ).toBeChecked();
+  await pickPng(page);
   const { file } = await saved(page);
 
-  expect(pngDpi(file)).toBe(192);
+  expect(pngDpi(file)).toBe(300);
 });
 
 test('the four dots per inch fit inside the panel', async ({ page }) => {
   await openStory(page, WRITTEN);
-  await page.getByRole('button', { name: 'Save this figure — PNG' }).click();
+  await openFigurePanel(page);
   // The popover opens from four fifths of its size, and a box measured on the
   // way is a box the panel does not end up with.
   await expect
@@ -117,7 +130,7 @@ test('the four dots per inch fit inside the panel', async ({ page }) => {
     )
     .toMatch(/^(?:none|matrix\(1, 0, 0, 1, 0, 0\))$/u);
   const panel = await page
-    .getByRole('group', { name: 'Save figure' })
+    .getByRole('group', { name: 'Figure', exact: true })
     .boundingBox();
   const last = await page
     .getByRole('radio', { name: '1200 dpi' })

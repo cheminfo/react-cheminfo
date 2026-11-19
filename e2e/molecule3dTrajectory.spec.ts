@@ -40,10 +40,10 @@ test('a file of several frames plays, and saves as an animated PNG of every fram
   await expect(
     panel.getByRole('radio', { name: 'All 20, animated' }),
   ).toBeChecked();
-  // The animation is under test, not the resolution: at 1× there are a quarter
-  // of the pixels to render in software and to encode, which keeps the save
-  // well inside the wait on CI, where the default 2× outlasted it.
-  await panel.getByRole('radio', { name: '1×' }).click();
+  // The animation is under test, not the resolution: at 150 dpi there are a
+  // quarter of the pixels of the default 300 to render in software and to
+  // encode, which keeps the save inside the wait on CI.
+  await panel.getByRole('radio', { name: '150 dpi', exact: true }).click();
 
   const [download] = await Promise.all([
     page.waitForEvent('download', { timeout: 90_000 }),

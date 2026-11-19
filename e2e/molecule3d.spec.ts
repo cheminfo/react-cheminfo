@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import type { Locator } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
@@ -122,13 +124,12 @@ test('a hidden surface says why its options are greyed, and a copy is offered', 
   await page.getByRole('button', { name: 'Export image' }).click();
   const panel = page.locator(PANEL).filter({ hasText: 'Export image' });
   // Headless Chromium paints WebGL in software: the surface takes 15–30 s at
-  // 2× and about 4 s at 1× on an idle machine, many times that beside the
-  // other 3D specs. The trajectory's export is given as long.
-  await panel.getByRole('radio', { name: '1×' }).click();
-  await panel.getByRole('button', { name: 'Copy' }).click();
-  await expect(panel).toContainText('to the clipboard, as a PNG.', {
-    timeout: 90_000,
-  });
+  // 300 dpi on an idle machine, many times that beside the other 3D specs, so
+  // the copy is taken at the lowest resolution offered. The trajectory's
+  // export is given as long.
+  await panel.getByRole('radio', { name: '150 dpi', exact: true }).click();
+  await panel.getByRole('button', { name: 'Copy', exact: true }).click();
+  await expect(panel).toContainText('Copied, as a PNG', { timeout: 90_000 });
   await panel.screenshot({ path: 'test-results/molecule3d-copy.png' });
 });
 
@@ -141,28 +142,55 @@ test('the model on screen is copied or saved as a molfile of either dialect', as
 
   await page.getByRole('button', { name: 'Export image or molfile' }).click();
   const panel = page.locator(PANEL).filter({ hasText: 'Export image' });
-  await expect(panel.getByRole('radio', { name: '2×' })).toBeVisible();
+  await expect(
+    panel.getByRole('radio', { name: '300 dpi', exact: true }),
+  ).toBeChecked();
 
-  await panel.getByRole('radio', { name: 'Molfile' }).click();
-  // Nothing is painted for a molfile, so no resolution is offered.
-  await expect(panel.getByRole('radio', { name: '2×' })).toHaveCount(0);
+  await panel.getByRole('radio', { name: 'Molfile', exact: true }).click();
   await expect(panel).toContainText(
     'The model on screen, with its 3D coordinates.',
   );
-  await panel.getByRole('radio', { name: 'V3000' }).click();
+  await panel.getByRole('radio', { name: 'V3000', exact: true }).click();
+  await expect(panel).toContainText('As a V3000 molfile, ready to paste.');
   await panel.screenshot({ path: 'test-results/molecule3d-molfile.png' });
-  await panel.getByRole('button', { name: 'Copy' }).click();
-  await expect(panel).toContainText('Copied');
-  const v3000 = await page.evaluate(() => navigator.clipboard.readText());
-  expect(v3000).toContain('V3000');
-  expect(v3000).toContain('M  V30 BEGIN ATOM');
+  // Copy is held back while the V3000 is being written.
+  const copy = panel.getByRole('button', { name: 'Copy', exact: true });
+  await expect(copy).not.toHaveAttribute('aria-disabled', 'true');
+  await copy.click();
+  await expect(panel).toContainText('Copied, as a V3000 molfile.');
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toContain('V3000');
+  expect(copied).toContain('M  V30 BEGIN ATOM');
 
-  await panel.getByRole('radio', { name: 'V2000' }).click();
-  const downloading = page.waitForEvent('download');
-  await panel.getByRole('button', { name: 'Save' }).click();
-  const download = await downloading;
-  expect(download.suggestedFilename()).toMatch(/-v2000\.mol$/);
+  const v3000 = await savedMolfile(panel);
+  expect(v3000.name).toMatch(/-v3000\.mol$/u);
+  expect(v3000.text).toContain('V3000');
+  expect(v3000.text).toContain('M  V30 BEGIN ATOM');
+
+  await panel.getByRole('radio', { name: 'V2000', exact: true }).click();
+  const v2000 = await savedMolfile(panel);
+  expect(v2000.name).toMatch(/-v2000\.mol$/u);
+  expect(v2000.text).toContain('V2000');
+  expect(v2000.text).not.toContain('M  V30');
 });
+
+/**
+ * Press Save in the export panel, and read back the molfile the browser wrote.
+ * @param panel - The open export panel.
+ * @returns The file's name and text.
+ */
+async function savedMolfile(
+  panel: Locator,
+): Promise<{ name: string; text: string }> {
+  const [download] = await Promise.all([
+    panel.page().waitForEvent('download'),
+    panel.getByRole('button', { name: 'Save', exact: true }).click(),
+  ]);
+  return {
+    name: download.suggestedFilename(),
+    text: await readFile(await download.path(), 'utf8'),
+  };
+}
 
 test('the canvas fills the screen with its toolbars, their menus included', async ({
   page,

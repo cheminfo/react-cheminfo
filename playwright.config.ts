@@ -1,17 +1,25 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Must match the port the `dev` script starts Storybook on.
-const DEV_PORT = 10815;
+// Must match the port the `dev` script starts Storybook on, so a Storybook
+// already running there is the one the specs are run against.
+const PORT = 10815;
+
+const CI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  forbidOnly: CI,
+  // One retry absorbs a hiccup of the machine; a test that fails twice is
+  // broken, and retrying it again only delays saying so.
+  retries: CI ? 1 : 0,
+  // A GitHub runner has four cores, and the 3D specs paint WebGL in software
+  // on several threads each: two workers keep them from starving one another.
+  workers: CI ? 2 : undefined,
+  // The list is what the job's log shows; the report is uploaded beside it.
+  reporter: CI ? [['list'], ['html', { open: 'never' }]] : 'html',
   use: {
-    baseURL: `http://localhost:${DEV_PORT}`,
+    baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
     // The citation entries write to the clipboard, which is the behaviour under
     // test — without this the copy rejects and only the failure path is covered.
@@ -36,12 +44,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    // `--ci` keeps Storybook from opening a browser and from phoning home.
-    command: 'npm run dev -- --ci',
-    url: `http://localhost:${DEV_PORT}`,
-    reuseExistingServer: !process.env.CI,
-    // Storybook builds its index before it answers, which a plain Vite server
-    // does not, so the stock minute is not enough on a cold CI runner.
-    timeout: 180_000,
+    // The built book, served as files. The dev server compiles each story on
+    // its first visit, which on a cold runner outlasts the waits of the specs
+    // that visit it first.
+    command: `npm run build-storybook -- --quiet --disable-telemetry && npx vite preview --outDir storybook-static --port ${PORT} --strictPort`,
+    url: `http://localhost:${PORT}`,
+    reuseExistingServer: !CI,
+    timeout: 300_000,
   },
 });

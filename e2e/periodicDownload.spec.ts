@@ -5,6 +5,7 @@ import { expect, test } from '@playwright/test';
 
 import { PERIODIC_ELEMENTS } from '../src/periodic/core/elements.ts';
 
+import { openFigurePanel } from './figurePanel.ts';
 import { openStory } from './story.ts';
 
 // The property map with its strips, its corner and its key, and a bar above
@@ -15,15 +16,6 @@ const STORY = 'periodic-periodictable--download';
 const PNG_SIGNATURE = '89504e470d0a1a0a';
 const PNG_WIDTH_AT = 16;
 const PNG_HEIGHT_AT = 20;
-
-async function openSavePanel(page: Page): Promise<void> {
-  await page
-    .getByRole('button', { name: 'Save this figure — PNG', exact: true })
-    .click();
-  await expect(
-    page.getByRole('group', { name: 'Save figure', exact: true }),
-  ).toHaveCount(1);
-}
 
 async function save(page: Page): Promise<Download> {
   const [download] = await Promise.all([
@@ -37,8 +29,10 @@ test('the table is saved as an SVG holding every cell, its strips and its key', 
   page,
 }) => {
   await openStory(page, STORY);
-  await openSavePanel(page);
-  await page.getByRole('radio', { name: 'SVG' }).click();
+  await openFigurePanel(page);
+  await expect(
+    page.getByRole('radio', { name: 'SVG', exact: true }),
+  ).toBeChecked();
 
   const download = await save(page);
   expect(download.suggestedFilename()).toBe('electronegativity.svg');
@@ -59,24 +53,29 @@ test('the table is saved as an SVG holding every cell, its strips and its key', 
   expect(file).not.toContain('Save this figure');
 });
 
-test('the table is saved as a PNG twice the size it has on screen', async ({
+test('the table is saved as a PNG of the size it has on screen, at 300 dpi', async ({
   page,
 }) => {
   await openStory(page, STORY);
   const box = await page.locator('#periodic-figure').boundingBox();
   expect(box).not.toBeNull();
 
-  await openSavePanel(page);
+  await openFigurePanel(page);
+  await page.getByRole('radio', { name: 'PNG', exact: true }).click();
+  await expect(
+    page.getByRole('radio', { name: '300 dpi', exact: true }),
+  ).toBeChecked();
   const download = await save(page);
   const file = readFileSync(await download.path());
 
+  // 300 dpi paints each CSS pixel, a 96th of an inch, as 300 / 96 pixels.
   expect(file.subarray(0, 8).toString('hex')).toBe(PNG_SIGNATURE);
   expect({
     width: file.readUInt32BE(PNG_WIDTH_AT),
     height: file.readUInt32BE(PNG_HEIGHT_AT),
   }).toStrictEqual({
-    width: Math.round(box?.width ?? 0) * 2,
-    height: Math.round(box?.height ?? 0) * 2,
+    width: Math.round((Math.round(box?.width ?? 0) * 300) / 96),
+    height: Math.round((Math.round(box?.height ?? 0) * 300) / 96),
   });
 });
 
