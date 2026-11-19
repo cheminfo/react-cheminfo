@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.136.0](https://github.com/cheminfo/react-cheminfo/compare/v0.135.0...v0.136.0) (2026-11-19)
+
+
+### Features
+
+* add the crystal3d viewer and a shared molstar toolbar ([1878274](https://github.com/cheminfo/react-cheminfo/commit/18782749419f3d2fdcaaa374a5f38768a579b43b))
+
+
+### Bug Fixes
+
+* finish the crystal3d viewer ([d819e3d](https://github.com/cheminfo/react-cheminfo/commit/d819e3d2e8b6539c0cefda0d7a3307e264460ae1))
+
 ## [0.135.0](https://github.com/cheminfo/react-cheminfo/compare/v0.134.1...v0.135.0) (2026-11-18)
 
 
