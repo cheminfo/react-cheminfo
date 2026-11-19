@@ -49,6 +49,8 @@ export {
   setPageFigureSource,
   withPageFigureSource,
 } from './pageFigureSource.ts';
+export type { SvgSize } from './svgMarkup.ts';
+export { svgSizeInPoints } from './svgMarkup.ts';
 export type { RasterFigureSource } from './croppedMarkup.ts';
 export {
   croppedSvgMarkup,
@@ -57,6 +59,7 @@ export {
   svgFigure,
 } from './croppedMarkup.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
+export { blobDataUrl, svgDataUrl, svgOfDataUrl } from './dataUrl.ts';
 export type { DocumentFigureRedraw } from './documentFigure.ts';
 export {
   DOCUMENT_FIGURE_SIZE,

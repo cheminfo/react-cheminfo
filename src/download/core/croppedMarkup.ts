@@ -7,6 +7,7 @@
 import type { FigurePixels } from './figureScale.ts';
 import type { FigureSvg } from './figureSvg.ts';
 import type { SvgBox } from './svgBounds.ts';
+import { svgAttribute, svgRootTag, svgViewBox } from './svgMarkup.ts';
 
 /** An SVG whose only element is one image. */
 const ONLY_IMAGE =
@@ -36,14 +37,14 @@ export function rasterFigureSource(markup: string): RasterFigureSource | null {
   if (image === undefined || /\s(?:x|y|transform)\s*=/.test(image)) {
     return null;
   }
-  const root = rootTag(markup);
-  const width = Number(attribute(image, 'width'));
-  const height = Number(attribute(image, 'height'));
+  const root = svgRootTag(markup);
+  const width = Number(svgAttribute(image, 'width'));
+  const height = Number(svgAttribute(image, 'height'));
   if (!(width > 0 && height > 0)) return null;
   const sameSize =
-    Number(attribute(root, 'width')) === width &&
-    Number(attribute(root, 'height')) === height;
-  const view = attribute(root, 'viewBox');
+    Number(svgAttribute(root, 'width')) === width &&
+    Number(svgAttribute(root, 'height')) === height;
+  const view = svgAttribute(root, 'viewBox');
   const sameView =
     view === undefined ||
     view
@@ -52,7 +53,7 @@ export function rasterFigureSource(markup: string): RasterFigureSource | null {
       .map(Number)
       .join(' ') === `0 0 ${width} ${height}`;
   const source = (
-    attribute(image, 'href') ?? attribute(image, 'xlink:href')
+    svgAttribute(image, 'href') ?? svgAttribute(image, 'xlink:href')
   )?.replaceAll('&amp;', '&');
   if (!sameSize || !sameView || !source?.startsWith('data:image/')) {
     return null;
@@ -68,10 +69,10 @@ export function rasterFigureSource(markup: string): RasterFigureSource | null {
  * @returns The figure, or `undefined` when the SVG states no size in pixels.
  */
 export function svgFigure(markup: string): FigureSvg | undefined {
-  const root = rootTag(markup);
-  const view = viewBoxOf(attribute(root, 'viewBox'));
-  const width = pixels(attribute(root, 'width')) ?? view?.width;
-  const height = pixels(attribute(root, 'height')) ?? view?.height;
+  const root = svgRootTag(markup);
+  const view = svgViewBox(svgAttribute(root, 'viewBox'));
+  const width = pixels(svgAttribute(root, 'width')) ?? view?.width;
+  const height = pixels(svgAttribute(root, 'height')) ?? view?.height;
   if (width === undefined || height === undefined) return undefined;
   return { markup, width: Math.ceil(width), height: Math.ceil(height) };
 }
@@ -89,8 +90,8 @@ export function croppedSvgMarkup(
   figure: FigureSvg,
   box: SvgBox,
 ): FigureSvg | null {
-  const root = rootTag(figure.markup);
-  const view = viewBoxOf(attribute(root, 'viewBox')) ?? {
+  const root = svgRootTag(figure.markup);
+  const view = svgViewBox(svgAttribute(root, 'viewBox')) ?? {
     x: 0,
     y: 0,
     width: figure.width,
@@ -133,8 +134,8 @@ export function resizedSvgFigure(
   figure: FigureSvg,
   size: FigurePixels,
 ): FigureSvg {
-  const root = rootTag(figure.markup);
-  const view = viewBoxOf(attribute(root, 'viewBox')) ?? {
+  const root = svgRootTag(figure.markup);
+  const view = svgViewBox(svgAttribute(root, 'viewBox')) ?? {
     x: 0,
     y: 0,
     width: figure.width,
@@ -162,33 +163,6 @@ export function resizedSvgFigure(
 export function rounded(value: number): number {
   const result = Math.round(value * 100) / 100;
   return Object.is(result, -0) ? 0 : result;
-}
-
-function rootTag(markup: string): string {
-  return /<svg\b[^>]*>/i.exec(markup)?.[0] ?? '';
-}
-
-function attribute(tag: string, name: string): string | undefined {
-  const pattern = new RegExp(
-    String.raw`\s${name}\s*=\s*(?:"(?<double>[^"]*)"|'(?<single>[^']*)')`,
-  );
-  const groups = pattern.exec(tag)?.groups;
-  return groups?.double ?? groups?.single;
-}
-
-function viewBoxOf(value: string | undefined): SvgBox | undefined {
-  if (value === undefined) return undefined;
-  const parts = value
-    .trim()
-    .split(/[\s,]+/)
-    .map(Number);
-  const [x, y, width, height] = parts;
-  if (parts.length !== 4 || x === undefined || y === undefined) {
-    return undefined;
-  }
-  if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined;
-  if (!width || !height || !(width > 0) || !(height > 0)) return undefined;
-  return { x, y, width, height };
 }
 
 function pixels(value: string | undefined): number | undefined {

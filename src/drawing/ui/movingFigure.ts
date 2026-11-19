@@ -7,6 +7,7 @@
 
 import { useCallback } from 'react';
 
+import { svgDataUrl, svgOfDataUrl } from '../../download/core/dataUrl.ts';
 import { useAsync } from '../../hooks/ui/useAsync.ts';
 import { figureMoves, movingFigure } from '../render/motion.ts';
 
@@ -101,32 +102,7 @@ export function movingFigureSource(src: string): Promise<string | undefined> {
 }
 
 async function makeMoving(src: string): Promise<string | undefined> {
-  if (!src.startsWith('data:image/svg+xml')) return undefined;
-  try {
-    const response = await fetch(src);
-    if (!response.ok) return undefined;
-    const svg = await response.text();
-    if (!figureMoves(svg)) return undefined;
-    return await dataUrl(
-      new Blob([movingFigure(svg)], { type: 'image/svg+xml' }),
-    );
-  } catch {
-    // A picture that cannot be read is shown as it is, still.
-    return undefined;
-  }
-}
-
-function dataUrl(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => {
-      const { result } = reader;
-      if (typeof result === 'string') resolve(result);
-      else reject(new Error('The figure could not be read.'));
-    });
-    reader.addEventListener('error', () => {
-      reject(reader.error ?? new Error('The figure could not be read.'));
-    });
-    reader.readAsDataURL(blob);
-  });
+  const svg = svgOfDataUrl(src);
+  if (svg === undefined || !figureMoves(svg)) return undefined;
+  return svgDataUrl(movingFigure(svg));
 }
