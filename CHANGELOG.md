@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.137.0](https://github.com/cheminfo/react-cheminfo/compare/v0.136.0...v0.137.0) (2026-11-19)
+
+
+### Features
+
+* choose which bonds a crystal draws: all, all but those to a metal, or none ([e1b00f9](https://github.com/cheminfo/react-cheminfo/commit/e1b00f9975b43e85bf67564cf9c54012ca3b6329))
+* read the size an SVG asks for, and write and read pictures as data URLs ([6c2c13c](https://github.com/cheminfo/react-cheminfo/commit/6c2c13c4ade43c0c7c9e73d7ed5c550da95acbb9))
+
 ## [0.136.0](https://github.com/cheminfo/react-cheminfo/compare/v0.135.0...v0.136.0) (2026-11-19)
 
 
