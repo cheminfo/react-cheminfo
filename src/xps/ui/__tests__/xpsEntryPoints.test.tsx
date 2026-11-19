@@ -59,13 +59,16 @@ function picker(): HTMLInputElement {
   return input;
 }
 
-/** Wait for the reader, which reads a file or a paste asynchronously. */
-async function settled(): Promise<void> {
-  await act(async () => {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 50);
-    });
-  });
+/**
+ * Wait for the reader, which reads a file or a paste asynchronously, until it
+ * has done what is expected: a busy machine outlasts any fixed wait.
+ * @param check - The expectation, retried until it holds.
+ */
+async function settled(check: () => void): Promise<void> {
+  // The reader finishes after the event, as in a page, so React commits on its
+  // own while the expectation is retried.
+  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
+  await vi.waitFor(check, { timeout: 10_000 });
 }
 
 function spectrumNames(): string[] {
@@ -102,7 +105,9 @@ test('a file chosen in the picker is read as a drop is', async () => {
   act(() => {
     input.dispatchEvent(new Event('change', { bubbles: true }));
   });
-  await settled();
+  await settled(() => {
+    expect(viewer().getState().data.spectra).toHaveLength(4);
+  });
 
   expect(viewer().getState().data.spectra).toHaveLength(4);
   expect(input.value).toBe('');
@@ -116,7 +121,9 @@ test('paste reads the clipboard as a paste into the viewer is read', async () =>
   });
 
   await act(() => viewer().paste());
-  await settled();
+  await settled(() => {
+    expect(spectrumNames()).toStrictEqual(['Pasted spectrum']);
+  });
 
   expect(spectrumNames()).toStrictEqual(['Pasted spectrum']);
 });
@@ -127,7 +134,9 @@ test('paste says in the status bar what the clipboard does not hold', async () =
   });
 
   await act(() => viewer().paste());
-  await settled();
+  await settled(() => {
+    expect(viewer().getState().view.error).toMatch(/not a spectrum/);
+  });
 
   expect(spectrumNames()).toStrictEqual([]);
   expect(viewer().getState().view.error).toMatch(/not a spectrum/);

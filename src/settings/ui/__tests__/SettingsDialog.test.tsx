@@ -161,10 +161,14 @@ test('Apply and save asks a name for a workspace of the site, and saves under it
     field.form?.requestSubmit();
   });
 
-  expect(workspaces.getState().active).toMatchObject({
-    name: 'Printing',
-    source: 'user',
+  // The workspace is saved after the submit, as the dialog closes after it.
+  await vi.waitFor(() => {
+    expect(workspaces.getState().active).toMatchObject({
+      name: 'Printing',
+      source: 'user',
+    });
   });
+
   expect(workspaces.getState().modified).toBe(false);
   expect(bucket.resolution.value).toBe(1200);
 

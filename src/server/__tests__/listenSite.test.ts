@@ -1,7 +1,7 @@
 import { createServer } from 'node:net';
 
 import { fastify } from 'fastify';
-import { afterEach, expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import { healthRoute } from '../healthRoute.ts';
 import { listenSite } from '../listenSite.ts';
@@ -125,10 +125,15 @@ test('a tool server is built from its configuration and listens where it says', 
   expect(app.server.listening).toBe(false);
 });
 
-async function waitFor(condition: () => boolean, tries = 100): Promise<void> {
-  if (condition() || tries === 0) return;
-  await new Promise((done) => {
-    setTimeout(done, 10);
-  });
-  return waitFor(condition, tries - 1);
+/**
+ * Wait until what the server does on its own, after a signal, has happened.
+ * @param condition - Whether it has.
+ */
+async function waitFor(condition: () => boolean): Promise<void> {
+  await vi.waitFor(
+    () => {
+      expect(condition()).toBe(true);
+    },
+    { timeout: 5000 },
+  );
 }

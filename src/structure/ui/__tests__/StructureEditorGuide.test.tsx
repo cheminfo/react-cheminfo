@@ -78,12 +78,19 @@ function press(clientX: number): () => Promise<void> {
     );
   });
   return async () => {
-    await act(async () => {
-      globalThis.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }));
-      await new Promise((resolve) => {
-        setTimeout(resolve, 10);
+    // The release is acted on in a task of its own, once the editor has heard
+    // it too: that task is run here rather than waited for.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      await act(async () => {
+        globalThis.dispatchEvent(
+          new MouseEvent('pointerup', { bubbles: true }),
+        );
+        await vi.runOnlyPendingTimersAsync();
       });
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   };
 }
 
