@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
+import type { GroupedSites } from '../core/lookup.ts';
 import { groupedSites } from '../core/lookup.ts';
 import type { SiteId } from '../core/sites.ts';
 
@@ -32,6 +33,18 @@ interface SiteGroupGridProps {
    * @default false
    */
   newTab?: boolean;
+  /**
+   * The sites shown, such as those a search found; a topic holding none of
+   * them is left out.
+   * @default undefined — every site
+   */
+  only?: ReadonlySet<SiteId>;
+  /**
+   * The site lit while the pointer is on no tile, such as the one Enter opens
+   * from a search. Only a grid that lights its tiles shows it.
+   * @default undefined
+   */
+  pointed?: SiteId;
 }
 
 /**
@@ -41,19 +54,20 @@ interface SiteGroupGridProps {
  * @returns The grid of topics.
  */
 export function SiteGroupGrid(props: SiteGroupGridProps): ReactElement {
-  const { currentSiteId, lit = false, newTab = false } = props;
+  const { currentSiteId, lit = false, newTab = false, only, pointed } = props;
   const [hovered, setHovered] = useState<SiteId | null>(null);
+  const shown = hovered ?? pointed;
 
   return (
     <div style={TOPICS_STYLE}>
-      {groupedSites().map(({ group, sites }) => (
+      {shownGroups(only).map(({ group, sites }) => (
         <SiteGroupSection key={group.id} group={group}>
           {sites.map((site) => (
             <SiteTile
               key={site.id}
               site={site}
               isCurrent={site.id === currentSiteId}
-              isHovered={lit && hovered === site.id}
+              isHovered={lit && shown === site.id}
               onHover={lit ? setHovered : undefined}
               newTab={newTab}
             />
@@ -62,4 +76,15 @@ export function SiteGroupGrid(props: SiteGroupGridProps): ReactElement {
       ))}
     </div>
   );
+}
+
+function shownGroups(only: ReadonlySet<SiteId> | undefined): GroupedSites[] {
+  const grouped = groupedSites();
+  if (only === undefined) return grouped;
+  const shown: GroupedSites[] = [];
+  for (const { group, sites } of grouped) {
+    const kept = sites.filter((site) => only.has(site.id));
+    if (kept.length > 0) shown.push({ group, sites: kept });
+  }
+  return shown;
 }

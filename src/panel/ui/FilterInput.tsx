@@ -17,6 +17,17 @@ export interface FilterInputProps {
    * @default false
    */
   autoFocus?: boolean;
+  /**
+   * What a screen reader calls the box.
+   * @default undefined — the placeholder names it
+   */
+  ariaLabel?: string;
+  /**
+   * Called when Enter is pressed in the box, to open the entry the filter
+   * leads to.
+   * @default undefined — Enter does nothing
+   */
+  onEnter?: () => void;
 }
 
 /**
@@ -36,6 +47,7 @@ export interface FilterInputProps {
  */
 export function FilterInput(props: FilterInputProps) {
   const { value, onValueChange, placeholder, autoFocus = false } = props;
+  const { ariaLabel, onEnter } = props;
   const t = useChromeT();
 
   return (
@@ -45,6 +57,7 @@ export function FilterInput(props: FilterInputProps) {
       size="small"
       value={value}
       placeholder={placeholder}
+      aria-label={ariaLabel}
       spellCheck={false}
       autoCapitalize="off"
       autoCorrect="off"
@@ -58,6 +71,17 @@ export function FilterInput(props: FilterInputProps) {
         ) : undefined
       }
       onValueChange={onValueChange}
+      onKeyDown={
+        onEnter === undefined
+          ? undefined
+          : (event) => {
+              if (event.key !== 'Enter' || event.nativeEvent.isComposing) {
+                return;
+              }
+              event.preventDefault();
+              onEnter();
+            }
+      }
     />
   );
 }

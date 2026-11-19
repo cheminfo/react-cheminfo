@@ -12,6 +12,7 @@ import { SiteFooter } from '../../chrome/ui/SiteFooter.tsx';
 import { SiteHeader } from '../../chrome/ui/SiteHeader.tsx';
 import { useCompactHeader } from '../../chrome/ui/useCompactHeader.ts';
 import { CiteButton } from '../../citation/ui/CiteButton.tsx';
+import { isEcosystemHome } from '../../ecosystem/core/home.ts';
 import { EcosystemButton } from '../../ecosystem/ui/EcosystemButton.tsx';
 import { SiteTheme } from '../../ecosystem/ui/SiteTheme.tsx';
 import type { ShareParamCodecs } from '../../share/core/index.ts';
@@ -131,6 +132,7 @@ function ShellActions<Codecs extends ShareParamCodecs, Tab extends string>(
 ): ReactNode {
   const {
     siteId,
+    site,
     about = false,
     cite,
     ecosystem = true,
@@ -161,7 +163,11 @@ function ShellActions<Codecs extends ShareParamCodecs, Tab extends string>(
       )}
       {fill(actionsAfterCite, compact)}
       {ecosystem ? (
-        <EcosystemButton currentSiteId={siteId} compact={compact} />
+        <EcosystemButton
+          currentSiteId={siteId}
+          atHome={isEcosystemHome(site?.host)}
+          compact={compact}
+        />
       ) : null}
       {fill(actions, compact)}
       {fill(language, compact)}

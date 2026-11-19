@@ -59,7 +59,10 @@ test('the row layout writes the names only, and still links every site', () => {
 
 test('the menu carries the same links, for the visitor who opens it', () => {
   const html = renderToStaticMarkup(<EcosystemMenu currentSiteId="tex" />);
+  const siteLinks = ECOSYSTEM_SITES.length - 1;
 
-  expect(html.match(/<a /g)).toHaveLength(ECOSYSTEM_SITES.length - 1);
+  // One per site but the one the visitor is on, and one to the entrance.
+  expect(html.match(/<a /g)).toHaveLength(siteLinks + 1);
+  expect(html).toContain('href="https://www.cheminfo.org/"');
   expect(html).toContain('target="_blank"');
 });

@@ -16,6 +16,12 @@ export interface EcosystemButtonProps extends HeaderButtonProps {
    */
   currentSiteId?: SiteId;
   /**
+   * Whether the button sits on the family's entrance, www.cheminfo.org, which
+   * its menu then does not link back to.
+   * @default false
+   */
+  atHome?: boolean;
+  /**
    * Text of the button. In a compact bar it is not written, but it stays what
    * the pointer and a screen reader are told.
    * @default the chrome's own word for it, in the language of the page
@@ -35,7 +41,7 @@ export interface EcosystemButtonProps extends HeaderButtonProps {
  * @returns The button and its menu.
  */
 export function EcosystemButton(props: EcosystemButtonProps): ReactElement {
-  const { currentSiteId, label, className, ...rest } = props;
+  const { currentSiteId, atHome, label, className, ...rest } = props;
   const t = useChromeT();
 
   return (
@@ -44,7 +50,7 @@ export function EcosystemButton(props: EcosystemButtonProps): ReactElement {
       className={joinClassNames('ecosystem-button', className)}
       icon="grid-view"
       label={label ?? t('ecosystem.tools')}
-      menu={<EcosystemMenu currentSiteId={currentSiteId} />}
+      menu={<EcosystemMenu currentSiteId={currentSiteId} atHome={atHome} />}
     />
   );
 }
