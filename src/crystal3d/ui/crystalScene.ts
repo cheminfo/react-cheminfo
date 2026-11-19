@@ -9,6 +9,7 @@
 
 import type { Molecule3DCamera } from '../../molecule3d/core/camera.ts';
 import type { Molecule3DCapture } from '../../molecule3d/ui/moleculeViewer3DProps.ts';
+import type { CrystalBonds } from '../core/crystalView.ts';
 import type { ElementStyle } from '../core/primitives.ts';
 import type {
   CellRepeat,
@@ -75,6 +76,11 @@ export interface CrystalScene {
    * @default 'ball-and-stick'
    */
   readonly representation?: 'ball-and-stick' | 'spacefill';
+  /**
+   * Which bonds are drawn; changing it leaves the camera where it is.
+   * @default 'all'
+   */
+  readonly bonds?: CrystalBonds;
   /**
    * An operation waiting to be applied.
    * @default null

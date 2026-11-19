@@ -9,8 +9,12 @@
 import type { Structure } from 'molstar/lib/mol-model/structure.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import { PluginStateObject } from 'molstar/lib/mol-plugin-state/objects.js';
+import { StateTransforms } from 'molstar/lib/mol-plugin-state/transforms.js';
 import type { Representation } from 'molstar/lib/mol-repr/representation.js';
+import type { BallAndStickParams } from 'molstar/lib/mol-repr/structure/representation/ball-and-stick.js';
+import type { ParamDefinition } from 'molstar/lib/mol-util/param-definition.js';
 
+import type { CrystalBonds } from '../core/crystalView.ts';
 import { toXyzText } from '../core/structureText.ts';
 import type { ViewerAtom } from '../core/types.ts';
 
@@ -27,6 +31,11 @@ export interface StructureStyle {
    * @default 0.25
    */
   sizeFactor?: number;
+  /**
+   * Which bonds the balls and sticks draw.
+   * @default 'all'
+   */
+  bonds?: CrystalBonds;
 }
 
 /**
@@ -43,7 +52,11 @@ export async function renderStructure(
 ): Promise<void> {
   await clearStructure(plugin);
   if (atoms.length === 0) return;
-  const { representation = 'ball-and-stick', sizeFactor = 0.25 } = style;
+  const {
+    representation = 'ball-and-stick',
+    sizeFactor = 0.25,
+    bonds = 'all',
+  } = style;
 
   const data = await plugin.builders.data.rawData(
     { data: toXyzText(atoms) },
@@ -79,6 +92,7 @@ export async function renderStructure(
               sizeFactor,
               sizeAspectRatio: 2 / 3,
               aromaticBonds: false,
+              ...bondParams(bonds),
             },
             color: 'element-symbol',
             colorParams: {
@@ -87,6 +101,51 @@ export async function renderStructure(
           },
     );
   representationRefs.set(plugin, drawn.ref);
+}
+
+/**
+ * Draw other bonds between the atoms on screen, in place: the camera, the
+ * measurements and an operation half applied all stay where they are.
+ * @param plugin - The molstar context.
+ * @param bonds - Which bonds are drawn.
+ */
+export async function setStructureBonds(
+  plugin: PluginContext,
+  bonds: CrystalBonds,
+): Promise<void> {
+  const ref = representationRefs.get(plugin);
+  if (ref === undefined) return;
+  await plugin
+    .build()
+    .to(ref)
+    .update(StateTransforms.Representation.StructureRepresentation3D, (old) =>
+      old.type.name === 'ball-and-stick'
+        ? {
+            ...old,
+            type: {
+              ...old.type,
+              params: { ...old.type.params, ...bondParams(bonds) },
+            },
+          }
+        : old,
+    )
+    .commit();
+}
+
+/**
+ * The ball-and-stick parameters that draw these bonds. A metal's bonds are
+ * molstar's metal coordination, which it draws dashed.
+ * @param bonds - Which bonds are drawn.
+ * @returns The parameters to merge into the representation's own.
+ */
+export function bondParams(bonds: CrystalBonds): BondParams {
+  return {
+    visuals:
+      bonds === 'none'
+        ? ['element-sphere']
+        : ['element-sphere', 'intra-bond', 'inter-bond'],
+    excludeTypes: bonds === 'noMetal' ? ['metal-coordination'] : [],
+  };
 }
 
 /**
@@ -133,6 +192,12 @@ export function crystalStructure(plugin: PluginContext): Structure | undefined {
   if (!PluginStateObject.Molecule.Structure.is(object)) return undefined;
   return object.data;
 }
+
+/** The ball-and-stick parameters that say which bonds are drawn. */
+type BondParams = Pick<
+  ParamDefinition.Values<BallAndStickParams>,
+  'visuals' | 'excludeTypes'
+>;
 
 /** Deleting this ref deletes the model and the representation under it. */
 const STRUCTURE_DATA_REF = 'crystal3d-structure-data';

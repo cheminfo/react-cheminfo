@@ -93,7 +93,7 @@ type CrystalDrawingProps = Required<
 
 function CrystalDrawing(props: CrystalDrawingProps): ReactElement {
   const { cell, name, settings, onSettingsChange, ...viewer } = props;
-  const { packing, cells, unitCell } = settings;
+  const { packing, cells, unitCell, bonds } = settings;
   const view = useMemo(
     () => crystalView(cell.atoms, cell.lattice, { packing, cells, bondLimit }),
     [cell, packing, cells],
@@ -103,8 +103,9 @@ function CrystalDrawing(props: CrystalDrawingProps): ReactElement {
       atoms: view.atoms,
       cell: unitCell ? cell.lattice.cell : null,
       repeat: [view.cells, view.cells, view.cells],
+      bonds,
     }),
-    [view, unitCell, cell],
+    [view, unitCell, cell, bonds],
   );
   const caption = useCrystalCaption(name, view, cells);
   return (
@@ -118,6 +119,10 @@ function CrystalDrawing(props: CrystalDrawingProps): ReactElement {
         unitCell={unitCell}
         onUnitCellChange={(next) => {
           onSettingsChange({ ...settings, unitCell: next });
+        }}
+        bonds={bonds}
+        onBondsChange={(next) => {
+          onSettingsChange({ ...settings, bonds: next });
         }}
         cells={cells}
         onCellsChange={(next) => {

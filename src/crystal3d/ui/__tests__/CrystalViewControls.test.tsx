@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 /**
  * The chips under a crystal say how it is drawn, and a press asks for the
- * change: the packing, the box of the cell, and the cells along each axis.
+ * change: the packing, the box of the cell, the bonds, and the cells along
+ * each axis.
  */
 
 import { act } from 'react';
@@ -40,6 +41,8 @@ function renderControls() {
         onPackingChange={(packing) => asked.push(`packing ${packing}`)}
         unitCell
         onUnitCellChange={(unitCell) => asked.push(`unit cell ${unitCell}`)}
+        bonds="all"
+        onBondsChange={(bonds) => asked.push(`bonds ${bonds}`)}
         cells={1}
         onCellsChange={(cells) => asked.push(`cells ${cells}`)}
       />,
@@ -64,17 +67,26 @@ test('the chips in force are pressed, and the others are not', () => {
   expect(pressed.map((button) => button.textContent)).toStrictEqual([
     'Whole molecules',
     'Unit cell',
+    'All',
     '1×1×1',
   ]);
 });
 
-test('a press asks for the packing, the box and the cells it names', () => {
+test('a press asks for the packing, the box, the bonds and the cells it names', () => {
   renderControls();
   press('Atoms in the cell');
   press('Unit cell');
+  press('No metal bonds');
+  press('None');
   press('3×3×3');
 
-  expect(asked).toStrictEqual(['packing cell', 'unit cell false', 'cells 3']);
+  expect(asked).toStrictEqual([
+    'packing cell',
+    'unit cell false',
+    'bonds noMetal',
+    'bonds none',
+    'cells 3',
+  ]);
 });
 
 function Caption(props: { molecules: number; cells: number; asked: number }) {

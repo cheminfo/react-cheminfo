@@ -9,6 +9,7 @@
  */
 
 import { clearMeasurements } from '../../molstar/core/index.ts';
+import type { CrystalBonds } from '../core/crystalView.ts';
 import { mergeDrawings, withoutDrawings } from '../core/drawingSet.ts';
 import type {
   CellRepeat,
@@ -29,6 +30,7 @@ import { CrystalViewerPlugin } from './plugin.ts';
 import type { CellStyle } from './renderCell.ts';
 import type { ElementLayerStyle } from './renderElements.ts';
 import type { StructureStyle } from './renderStructure.ts';
+import { setStructureBonds } from './renderStructure.ts';
 import { drawCell, drawElements, drawStructure } from './sceneParts.ts';
 
 /**
@@ -53,6 +55,7 @@ export function createCrystalViewer(
 export class CrystalViewer extends CrystalViewerPlugin {
   #drawings: readonly SymmetryDrawing[] = [];
   #elementStyle: ElementLayerStyle = {};
+  #bonds: CrystalBonds = 'all';
 
   /**
    * The symmetry elements drawn right now, in drawing order.
@@ -66,18 +69,31 @@ export class CrystalViewer extends CrystalViewerPlugin {
    * Replace the atoms on screen.
    * @param atoms - The whole scene, expanded and repeated already, in Cartesian
    *   ångström. An empty list clears them.
-   * @param style - See {@link StructureStyle}.
+   * @param style - See {@link StructureStyle}; its bonds are the ones last
+   *   set by {@link CrystalViewer.setBonds}.
    * @returns Resolves once the atoms are drawn.
    */
   showStructure(
     atoms: readonly ViewerAtom[],
-    style?: StructureStyle,
+    style?: Omit<StructureStyle, 'bonds'>,
   ): Promise<void> {
     // A measurement names atoms of the structure it was taken on.
     return this.run(async (plugin) => {
       await clearMeasurements(plugin);
-      await drawStructure(plugin, atoms, style);
+      await drawStructure(plugin, atoms, { ...style, bonds: this.#bonds });
     });
+  }
+
+  /**
+   * Draw other bonds, on the atoms on screen and on every later structure. The
+   * atoms are not drawn again, so the camera stays where it is.
+   * @param bonds - Which bonds are drawn.
+   * @returns Resolves once they are drawn.
+   */
+  setBonds(bonds: CrystalBonds): Promise<void> {
+    if (bonds === this.#bonds) return Promise.resolve();
+    this.#bonds = bonds;
+    return this.run((plugin) => setStructureBonds(plugin, bonds));
   }
 
   /**

@@ -27,6 +27,20 @@ export const CRYSTAL_PACKINGS: readonly CrystalPacking[] = [
   'cell',
 ];
 
+/**
+ * Which bonds are drawn: every one, all but those to a metal atom (molstar
+ * draws those dashed, and a coordination network of them hides the rest), or
+ * none.
+ */
+export type CrystalBonds = 'all' | 'noMetal' | 'none';
+
+/** Every choice of bonds, in the order a control offers them. */
+export const CRYSTAL_BONDS: readonly CrystalBonds[] = [
+  'all',
+  'noMetal',
+  'none',
+];
+
 /** The cells along each axis a control offers, and a link may ask for. */
 export const CELL_COUNT_RANGE = { minimum: 1, maximum: 4 } as const;
 
@@ -104,6 +118,8 @@ export interface CrystalViewSettings {
   readonly cells: number;
   /** Whether the box of the unit cell is drawn. */
   readonly unitCell: boolean;
+  /** Which bonds are drawn. */
+  readonly bonds: CrystalBonds;
 }
 
 /** One cell, its molecules whole, inside its box. */
@@ -111,4 +127,5 @@ export const DEFAULT_CRYSTAL_VIEW_SETTINGS: CrystalViewSettings = {
   packing: 'molecules',
   cells: 1,
   unitCell: true,
+  bonds: 'all',
 };

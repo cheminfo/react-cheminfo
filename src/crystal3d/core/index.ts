@@ -119,6 +119,7 @@ export {
   repeatedAtomCount,
 } from './cellStack.ts';
 export type {
+  CrystalBonds,
   CrystalPacking,
   CrystalView,
   CrystalViewOptions,
@@ -126,6 +127,7 @@ export type {
 } from './crystalView.ts';
 export {
   CELL_COUNT_RANGE,
+  CRYSTAL_BONDS,
   CRYSTAL_PACKINGS,
   DEFAULT_CRYSTAL_VIEW_SETTINGS,
   crystalView,

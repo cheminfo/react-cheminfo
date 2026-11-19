@@ -1,13 +1,18 @@
 /**
  * How a crystal is drawn: whole molecules or the atoms the cell cuts, whether
- * the box of the cell is drawn, and how many cells along each axis.
+ * the box of the cell is drawn, which bonds, and how many cells along each
+ * axis.
  */
 
 import type { ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { CrystalPacking } from '../core/crystalView.ts';
-import { CELL_COUNT_RANGE, CRYSTAL_PACKINGS } from '../core/crystalView.ts';
+import type { CrystalBonds, CrystalPacking } from '../core/crystalView.ts';
+import {
+  CELL_COUNT_RANGE,
+  CRYSTAL_BONDS,
+  CRYSTAL_PACKINGS,
+} from '../core/crystalView.ts';
 
 /** Props of {@link CrystalViewControls}. */
 export interface CrystalViewControlsProps {
@@ -17,13 +22,16 @@ export interface CrystalViewControlsProps {
   /** Whether the box of the unit cell is drawn. */
   unitCell: boolean;
   onUnitCellChange: (unitCell: boolean) => void;
+  /** Which bonds are drawn. */
+  bonds: CrystalBonds;
+  onBondsChange: (bonds: CrystalBonds) => void;
   /** Cells along each axis. */
   cells: number;
   onCellsChange: (cells: number) => void;
 }
 
 /**
- * The two rows of chips under a crystal.
+ * The rows of chips under a crystal.
  * @param props - See {@link CrystalViewControlsProps}.
  * @returns The chip bar.
  */
@@ -35,6 +43,8 @@ export function CrystalViewControls(
     onPackingChange,
     unitCell,
     onUnitCellChange,
+    bonds,
+    onBondsChange,
     cells,
     onCellsChange,
   } = props;
@@ -69,6 +79,25 @@ export function CrystalViewControls(
           >
             {t('crystal3d.unitCell')}
           </button>
+        </div>
+      </div>
+      <div className="chip-row">
+        <div className="chip-row__label">{t('crystal3d.bonds')}</div>
+        <div className="chip-row__chips">
+          {CRYSTAL_BONDS.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className="chip"
+              aria-pressed={bonds === value}
+              title={t(`crystal3d.bonds.${value}Help`)}
+              onClick={() => {
+                onBondsChange(value);
+              }}
+            >
+              {t(`crystal3d.bonds.${value}`)}
+            </button>
+          ))}
         </div>
       </div>
       <div className="chip-row">

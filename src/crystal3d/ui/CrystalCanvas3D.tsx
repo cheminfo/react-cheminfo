@@ -83,6 +83,7 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
     cell = null,
     repeat,
     representation,
+    bonds = 'all',
     elements,
     labels,
     elementStyle,
@@ -201,6 +202,14 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
     drawing.current = work.catch(() => undefined);
     void report(failure, work);
   }, [container, background, atoms, cell, repeat, representation]);
+
+  // Declared after the structure, so a new viewer draws its first structure
+  // with these bonds; a later change redraws the bonds alone.
+  useEffect(() => {
+    const viewer = held.current;
+    if (viewer === null) return;
+    void report(failure, viewer.setBonds(bonds));
+  }, [container, background, bonds]);
 
   // Once the structure above is on screen, so they are drawn on the atoms they
   // name.
