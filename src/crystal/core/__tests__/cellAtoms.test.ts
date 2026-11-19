@@ -17,7 +17,7 @@ test('diamond: the eight atoms of the face-centred cell', () => {
   const cell = crystalCellAtoms(crystalFile('9008564.cif'));
 
   expect(cell.atoms).toHaveLength(8);
-  expect(cell.lattice.cell.a).toBeCloseTo(3.56, 2);
+  expect(cell.lattice.cell.a).toBeCloseTo(3.5668, 4);
 });
 
 test('a cell above the cap is counted and not returned', () => {

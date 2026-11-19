@@ -101,8 +101,9 @@ export function spacedLabels(
  * A corner is as far from the structure as the element gets, so the names of
  * ten planes through one cell end up spread round its edges rather than piled
  * on the atoms in the middle.
- * @param drawing
- * @param sizes
+ * @param drawing - The mirror or glide plane.
+ * @param sizes - The resolved sizes, for the gap off the face.
+ * @returns The label's position, Cartesian ångström.
  */
 function planeLabelPoint(
   drawing: GlideDrawing | MirrorDrawing,

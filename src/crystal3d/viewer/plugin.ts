@@ -92,7 +92,10 @@ export class CrystalViewerPlugin implements SceneCapture {
     }
   }
 
-  /** Whether {@link dispose} has been called. */
+  /**
+   * Whether {@link dispose} has been called.
+   * @returns True once the viewer is disposed.
+   */
   get disposed(): boolean {
     return this.#plugin.disposed;
   }
@@ -113,6 +116,7 @@ export class CrystalViewerPlugin implements SceneCapture {
    * @param durationMs - Transition length; 0 jumps.
    * @param orientation - Where to look from, from `sceneOrientation`. Left out,
    *   the camera keeps the direction it is already pointing.
+   * @returns Resolves once the camera has been told where to go.
    */
   resetCamera(
     durationMs = DEFAULT_CAMERA_DURATION,
@@ -134,6 +138,7 @@ export class CrystalViewerPlugin implements SceneCapture {
   /**
    * Put the camera back where {@link readCamera} found it.
    * @param camera - Where to stand.
+   * @returns Resolves once the camera stands there.
    */
   applyCamera(camera: Molecule3DCamera): Promise<void> {
     return this.run((plugin) => {
@@ -169,6 +174,7 @@ export class CrystalViewerPlugin implements SceneCapture {
    * @param radius - Radius of the ball to fit, ångström.
    * @param durationMs - Transition length; 0 jumps.
    * @param orientation - Where to look from; the current direction when absent.
+   * @returns Resolves once the camera has been told where to go.
    */
   focus(
     centre: Point3,
@@ -186,6 +192,7 @@ export class CrystalViewerPlugin implements SceneCapture {
    * showing that a molecule maps onto itself is a different button.
    * @param spinning - Whether the scene should keep turning.
    * @param speed - molstar's own spin unit.
+   * @returns Resolves once the spin is set.
    */
   setSpin(spinning: boolean, speed = 1): Promise<void> {
     return this.run((plugin) => {
@@ -212,6 +219,7 @@ export class CrystalViewerPlugin implements SceneCapture {
   /**
    * Make clicks on atoms build a measurement, or give them back to the camera.
    * @param kind - The measurement to build, or `null`.
+   * @returns Resolves once clicks build that measurement.
    */
   setMeasureKind(kind: MeasurementKind | null): Promise<void> {
     return this.run(() => {
@@ -222,6 +230,7 @@ export class CrystalViewerPlugin implements SceneCapture {
   /**
    * Draw exactly these measurements over the atoms on screen.
    * @param measurements - Replaces whatever is drawn; empty clears them.
+   * @returns Resolves once they are drawn.
    */
   showMeasurements(measurements: readonly Measurement[]): Promise<void> {
     return this.run(async (plugin) => {

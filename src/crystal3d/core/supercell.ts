@@ -18,7 +18,7 @@ import { addVectors } from './vec3.ts';
  * @param cell - The six cell parameters.
  * @param repeat - Cells along a, b and c; anything below 1 counts as 1.
  * @returns The atoms of every cell, the original ones first.
- * @throws When the three angles describe no cell.
+ * @throws {RangeError} When the three angles describe no cell.
  */
 export function supercellAtoms(
   atoms: readonly ViewerAtom[],

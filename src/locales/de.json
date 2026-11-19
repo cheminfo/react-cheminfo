@@ -1094,10 +1094,14 @@
   "crystal3d.packing.cellHelp": "Jedes Atom innerhalb der Zelle, dort geschnitten, wo ihre Wände es schneiden.",
   "crystal3d.unitCell": "Elementarzelle",
   "crystal3d.unitCellHelp": "Der Rahmen der Elementarzelle.",
-  "crystal3d.caption.molecules": "{count, plural, one {# Molekül} other {# Moleküle}} pro Zelle",
-  "crystal3d.caption.atoms": "{count, plural, one {# Atom} other {# Atome}} pro Zelle",
-  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {Zelle} other {Zellen}}",
+  "crystal3d.caption.molecules.one": "1 Molekül pro Zelle",
+  "crystal3d.caption.molecules.other": "{count} Moleküle pro Zelle",
+  "crystal3d.caption.atoms.one": "1 Atom pro Zelle",
+  "crystal3d.caption.atoms.other": "{count} Atome pro Zelle",
+  "crystal3d.caption.cells.one": "1×1×1 Zelle",
+  "crystal3d.caption.cells.other": "{count}×{count}×{count} Zellen",
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} Zellen, da {asked}×{asked}×{asked} zu viele Atome enthielten",
   "crystal3d.unreadable": "Diese Datei konnte nicht gelesen werden",
-  "crystal3d.tooLarge": "Diese Zelle enthält {count, number} Atome, mehr als der Betrachter zeichnet."
+  "crystal3d.tooLarge": "Diese Zelle enthält {count} Atome, mehr als der Betrachter zeichnet.",
+  "crystal3d.unsupported": "Kein 3D auf diesem Rechner"
 }

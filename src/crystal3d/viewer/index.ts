@@ -4,7 +4,6 @@
  */
 
 export type { PlayOptions } from './animate.ts';
-export { bondLimit } from './bondRule.ts';
 export { DEFAULT_CAMERA_DURATION } from './camera.ts';
 export type { CrystalViewerOptions } from './plugin.ts';
 export { CrystalViewerPlugin } from './plugin.ts';

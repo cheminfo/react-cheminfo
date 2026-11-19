@@ -27,7 +27,7 @@ export interface CellEdge {
  * one `src/symmetry/core` uses and the one every CIF consumer assumes.
  * @param cell - The six cell parameters.
  * @returns The three edge vectors, in ångström.
- * @throws When the three angles describe no cell.
+ * @throws {RangeError} When the three angles describe no cell.
  */
 export function cellAxes(cell: UnitCell): [Vec3, Vec3, Vec3] {
   const matrix = cartesianMatrix(cell);
@@ -80,7 +80,7 @@ export function latticeShifts(
  * @param cell - The six cell parameters.
  * @param repeat - Cells along a, b and c.
  * @returns Twelve edges per cell.
- * @throws When the three angles describe no cell.
+ * @throws {RangeError} When the three angles describe no cell.
  */
 export function cellEdges(
   cell: UnitCell,
@@ -104,7 +104,7 @@ export function cellEdges(
  * @param cell - The six cell parameters.
  * @param reach - How far along each edge, as a fraction of it.
  * @returns Three points, for a, b and c in that order.
- * @throws When the three angles describe no cell.
+ * @throws {RangeError} When the three angles describe no cell.
  */
 export function cellAxisLabelPoints(
   cell: UnitCell,
@@ -116,7 +116,8 @@ export function cellAxisLabelPoints(
 
 /**
  * Each count, rounded down and never below one.
- * @param repeat
+ * @param repeat - Cells along a, b and c.
+ * @returns The counts, whole and at least one.
  */
 export function clampRepeat(repeat: CellRepeat): CellRepeat {
   return [

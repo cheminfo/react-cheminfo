@@ -119,9 +119,10 @@ export function faceCorners(drawing: GlideDrawing | MirrorDrawing): Point3[] {
 
 /**
  * The square a mirror or a glide plane is drawn as.
- * @param point
- * @param normal
- * @param size
+ * @param point - Its centre, Cartesian ångström.
+ * @param normal - The plane's normal, Cartesian.
+ * @param size - The side of the square, ångström.
+ * @returns The plate primitive.
  */
 function plate(point: Point3, normal: Point3, size: number): MeshPrimitive {
   const { major, minor } = planeFrame(normal);

@@ -1094,10 +1094,14 @@
   "crystal3d.packing.cellHelp": "Cada átomo dentro de la celda, cortado donde lo cortan sus caras.",
   "crystal3d.unitCell": "Celda unidad",
   "crystal3d.unitCellHelp": "El contorno de la celda unidad.",
-  "crystal3d.caption.molecules": "{count, plural, one {# molécula} other {# moléculas}} por celda",
-  "crystal3d.caption.atoms": "{count, plural, one {# átomo} other {# átomos}} por celda",
-  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {celda} other {celdas}}",
+  "crystal3d.caption.molecules.one": "1 molécula por celda",
+  "crystal3d.caption.molecules.other": "{count} moléculas por celda",
+  "crystal3d.caption.atoms.one": "1 átomo por celda",
+  "crystal3d.caption.atoms.other": "{count} átomos por celda",
+  "crystal3d.caption.cells.one": "1×1×1 celda",
+  "crystal3d.caption.cells.other": "{count}×{count}×{count} celdas",
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} celdas, ya que {asked}×{asked}×{asked} contendrían demasiados átomos",
   "crystal3d.unreadable": "Ese archivo no se ha podido leer",
-  "crystal3d.tooLarge": "Esta celda contiene {count, number} átomos, más de los que dibuja el visor."
+  "crystal3d.tooLarge": "Esta celda contiene {count} átomos, más de los que dibuja el visor.",
+  "crystal3d.unsupported": "Sin 3D en este equipo"
 }

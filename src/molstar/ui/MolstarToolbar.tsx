@@ -3,7 +3,7 @@
  * spin, export, full screen and help, then the measuring tools.
  *
  * It is `Molecule3DToolbar` placed in the top-left corner of the stage and fed
- * from {@link useMolstarTools} and `useImageExport`, so a site drawing its own
+ * from `useMolstarTools` and `useImageExport`, so a site drawing its own
  * scene — orbitals, a crystal — gets the controls `<MoleculeViewer3D>` has
  * without wiring them a second time.
  */
@@ -27,7 +27,7 @@ export interface MolstarToolbarProps extends Omit<
   | 'onSpinningChange'
   | 'exportPanel'
 > {
-  /** The state {@link useMolstarTools} keeps. */
+  /** The state `useMolstarTools` keeps. */
   controls: MolstarTools;
   /**
    * The pictures the export tool saves and copies; the tool is left out

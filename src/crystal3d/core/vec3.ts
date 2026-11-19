@@ -3,8 +3,9 @@ export type Vec3 = readonly [number, number, number];
 
 /**
  * a + b.
- * @param a
- * @param b
+ * @param a - The first vector.
+ * @param b - The vector added to it.
+ * @returns The sum.
  */
 export function addVectors(a: Vec3, b: Vec3): Vec3 {
   return [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -12,8 +13,9 @@ export function addVectors(a: Vec3, b: Vec3): Vec3 {
 
 /**
  * a − b.
- * @param a
- * @param b
+ * @param a - The vector subtracted from.
+ * @param b - The vector subtracted.
+ * @returns The difference.
  */
 export function subtractVectors(a: Vec3, b: Vec3): Vec3 {
   return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -21,8 +23,9 @@ export function subtractVectors(a: Vec3, b: Vec3): Vec3 {
 
 /**
  * a · factor.
- * @param a
- * @param factor
+ * @param a - The vector.
+ * @param factor - The scalar it is multiplied by.
+ * @returns The scaled vector.
  */
 export function scaleVector(a: Vec3, factor: number): Vec3 {
   return [a[0] * factor, a[1] * factor, a[2] * factor];
@@ -30,8 +33,9 @@ export function scaleVector(a: Vec3, factor: number): Vec3 {
 
 /**
  * a · b.
- * @param a
- * @param b
+ * @param a - The first vector.
+ * @param b - The second vector.
+ * @returns The dot product.
  */
 export function dotProduct(a: Vec3, b: Vec3): number {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -39,8 +43,9 @@ export function dotProduct(a: Vec3, b: Vec3): number {
 
 /**
  * a × b.
- * @param a
- * @param b
+ * @param a - The first vector.
+ * @param b - The second vector.
+ * @returns The cross product, right-handed.
  */
 export function crossProduct(a: Vec3, b: Vec3): Vec3 {
   return [
@@ -52,7 +57,8 @@ export function crossProduct(a: Vec3, b: Vec3): Vec3 {
 
 /**
  * |a|.
- * @param a
+ * @param a - The vector.
+ * @returns Its Euclidean length.
  */
 export function vectorNorm(a: Vec3): number {
   return Math.hypot(a[0], a[1], a[2]);
@@ -60,8 +66,9 @@ export function vectorNorm(a: Vec3): number {
 
 /**
  * |a − b|.
- * @param a
- * @param b
+ * @param a - The first point.
+ * @param b - The second point.
+ * @returns The distance between them.
  */
 export function vectorDistance(a: Vec3, b: Vec3): number {
   const dx = a[0] - b[0];
@@ -72,9 +79,10 @@ export function vectorDistance(a: Vec3, b: Vec3): number {
 
 /**
  * a / |a|.
- * @param a
- * @param minimumNorm
- * @throws When `a` is shorter than `minimumNorm`, which has no direction.
+ * @param a - The vector.
+ * @param minimumNorm - The length under which `a` counts as zero.
+ * @returns The unit vector along `a`.
+ * @throws {RangeError} When `a` is shorter than `minimumNorm`, which has no direction.
  */
 export function normalizeVector(a: Vec3, minimumNorm = 1e-9): Vec3 {
   const norm = vectorNorm(a);
@@ -87,9 +95,10 @@ export function normalizeVector(a: Vec3, minimumNorm = 1e-9): Vec3 {
 /**
  * Whether two unit vectors describe the same **axis**, which is a direction
  * without a sense: `û` and `−û` are one axis.
- * @param a
- * @param b
- * @param parallel - `|û · v̂|` above which they are the same. @default 1 - 1e-4
+ * @param a - The first unit vector.
+ * @param b - The second unit vector.
+ * @param parallel - `|û · v̂|` above which they are the same; `1 - 1e-4` by default.
+ * @returns Whether they lie on one axis.
  */
 export function sameAxis(a: Vec3, b: Vec3, parallel = 1 - 1e-4): boolean {
   return Math.abs(dotProduct(a, b)) >= parallel;
@@ -97,8 +106,9 @@ export function sameAxis(a: Vec3, b: Vec3, parallel = 1 - 1e-4): boolean {
 
 /**
  * Whether every point lies on one straight line through the first two.
- * @param points
- * @param tolerance
+ * @param points - The points, Cartesian ångström.
+ * @param tolerance - The distance, in ångström, a point may stray from the line.
+ * @returns Whether they are collinear; true for fewer than three points.
  */
 export function collinear(points: readonly Vec3[], tolerance = 1e-6): boolean {
   if (points.length < 3) return true;

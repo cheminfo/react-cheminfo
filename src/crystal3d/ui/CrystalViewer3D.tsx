@@ -103,7 +103,12 @@ export function CrystalViewer3D(props: CrystalViewer3DProps): ReactElement {
 
   if (!capability.supported) {
     return (
-      <Callout intent="warning" icon="desktop" compact>
+      <Callout
+        intent="warning"
+        icon="desktop"
+        title={t('crystal3d.unsupported')}
+        compact
+      >
         {t.or(`viewer.capability.${capability.reason}`, capability.message)}{' '}
         {unsupportedNote}
       </Callout>

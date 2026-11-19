@@ -69,8 +69,9 @@ export function normalToFractional(
 
 /**
  * `A v`.
- * @param matrix
- * @param point
+ * @param matrix - The 3×3 matrix, as its rows.
+ * @param point - The vector it is applied to.
+ * @returns The image.
  */
 function applyMatrix(
   matrix: ReadonlyArray<readonly number[]>,
@@ -89,8 +90,9 @@ function applyMatrix(
 
 /**
  * `Aᵀ v`, which is `A v` with the two indices swapped.
- * @param matrix
- * @param point
+ * @param matrix - The 3×3 matrix, as its rows.
+ * @param point - The vector its transpose is applied to.
+ * @returns The image.
  */
 function applyTransposed(
   matrix: ReadonlyArray<readonly number[]>,

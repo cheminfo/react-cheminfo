@@ -42,7 +42,8 @@ export interface CellStyle {
  * @param cell - The six cell parameters, or `null` to draw none.
  * @param repeat - Cells along a, b and c.
  * @param style - See {@link CellStyle}.
- * @throws When the canvas is not ready, or the angles describe no cell.
+ * @throws {Error} When the canvas is not ready.
+ * @throws {RangeError} When the angles describe no cell.
  */
 export async function renderUnitCell(
   plugin: PluginContext,

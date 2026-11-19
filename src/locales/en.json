@@ -1094,10 +1094,14 @@
   "crystal3d.packing.cellHelp": "Every atom inside the cell, cut where its walls cut it.",
   "crystal3d.unitCell": "Unit cell",
   "crystal3d.unitCellHelp": "The box of the unit cell.",
-  "crystal3d.caption.molecules": "{count, plural, one {# molecule} other {# molecules}} per cell",
-  "crystal3d.caption.atoms": "{count, plural, one {# atom} other {# atoms}} per cell",
-  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {cell} other {cells}}",
+  "crystal3d.caption.molecules.one": "1 molecule per cell",
+  "crystal3d.caption.molecules.other": "{count} molecules per cell",
+  "crystal3d.caption.atoms.one": "1 atom per cell",
+  "crystal3d.caption.atoms.other": "{count} atoms per cell",
+  "crystal3d.caption.cells.one": "1×1×1 cell",
+  "crystal3d.caption.cells.other": "{count}×{count}×{count} cells",
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} cells, as {asked}×{asked}×{asked} would hold too many atoms",
   "crystal3d.unreadable": "That file could not be read",
-  "crystal3d.tooLarge": "This cell holds {count, number} atoms, more than the viewer draws."
+  "crystal3d.tooLarge": "This cell holds {count} atoms, more than the viewer draws.",
+  "crystal3d.unsupported": "No 3D on this machine"
 }

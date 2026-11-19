@@ -49,7 +49,7 @@ export interface ShapeLayerStyle {
  * @param name - What the layer is called in a picking label.
  * @param groups - The items; an empty list clears the layer.
  * @param style - See {@link ShapeLayerStyle}.
- * @throws When the canvas is not initialised yet.
+ * @throws {Error} When the canvas is not initialised yet.
  */
 export async function renderShapeLayer(
   plugin: PluginContext,

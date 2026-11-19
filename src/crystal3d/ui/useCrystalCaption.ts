@@ -22,11 +22,17 @@ export function useCrystalCaption(
   const parts = [
     name,
     view.molecules > 0
-      ? t('crystal3d.caption.molecules', { count: view.molecules })
-      : t('crystal3d.caption.atoms', { count: view.atomsPerCell }),
+      ? view.molecules === 1
+        ? t('crystal3d.caption.molecules.one')
+        : t('crystal3d.caption.molecules.other', { count: view.molecules })
+      : view.atomsPerCell === 1
+        ? t('crystal3d.caption.atoms.one')
+        : t('crystal3d.caption.atoms.other', { count: view.atomsPerCell }),
     view.cells < asked
       ? t('crystal3d.caption.cellsCapped', { count: view.cells, asked })
-      : t('crystal3d.caption.cells', { count: view.cells }),
+      : view.cells === 1
+        ? t('crystal3d.caption.cells.one')
+        : t('crystal3d.caption.cells.other', { count: view.cells }),
   ];
   return parts.filter((part) => part !== '').join(' · ');
 }

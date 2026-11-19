@@ -39,8 +39,9 @@ const OTHER_PLANE: SymmetryDrawing = {
 
 /**
  * How much of its length a rod draws, seen from `eye`.
- * @param eye
- * @param direction
+ * @param eye - The unit direction the camera sits along.
+ * @param direction - The rod's unit direction.
+ * @returns The fraction of its length on screen.
  */
 function rodLength(eye: Point3, direction: Point3): number {
   return Math.sqrt(1 - dotProduct(eye, direction) ** 2);
@@ -186,7 +187,8 @@ test('a drawing with no direction at all is skipped', () => {
 
 /**
  * A cell edge, as a direction.
- * @param vector
+ * @param vector - The edge vector.
+ * @returns It normalised.
  */
 function unit(vector: Point3): Point3 {
   const length = vectorNorm(vector);

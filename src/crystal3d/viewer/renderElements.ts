@@ -58,7 +58,7 @@ export interface ElementLayerStyle {
  * @param style - See {@link ElementLayerStyle}.
  * @returns The groups that were drawn, so a caller can measure them without
  *   building them a second time.
- * @throws When the canvas is not initialised yet.
+ * @throws {Error} When the canvas is not initialised yet.
  */
 export async function renderSymmetryElements(
   plugin: PluginContext,

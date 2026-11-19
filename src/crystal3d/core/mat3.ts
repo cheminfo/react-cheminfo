@@ -19,8 +19,9 @@ export const INVERSION_MATRIX: Mat3 = [
 
 /**
  * a · b, so that `applyMatrix(multiplyMatrices(a, b), v)` is a applied after b.
- * @param a
- * @param b
+ * @param a - The matrix applied last.
+ * @param b - The matrix applied first.
+ * @returns The product.
  */
 export function multiplyMatrices(a: Mat3, b: Mat3): Mat3 {
   return [multiplyRow(a[0], b), multiplyRow(a[1], b), multiplyRow(a[2], b)];
@@ -28,8 +29,9 @@ export function multiplyMatrices(a: Mat3, b: Mat3): Mat3 {
 
 /**
  * M · v.
- * @param matrix
- * @param vector
+ * @param matrix - The matrix.
+ * @param vector - The vector it is applied to.
+ * @returns The transformed vector.
  */
 export function applyMatrix(matrix: Mat3, vector: Vec3): Vec3 {
   return [
@@ -47,7 +49,8 @@ export function applyMatrix(matrix: Mat3, vector: Vec3): Vec3 {
 
 /**
  * Mᵀ, which is M⁻¹ for the orthogonal matrix of any symmetry operation.
- * @param matrix
+ * @param matrix - The matrix.
+ * @returns Its transpose.
  */
 export function transposeMatrix(matrix: Mat3): Mat3 {
   return [
@@ -59,7 +62,8 @@ export function transposeMatrix(matrix: Mat3): Mat3 {
 
 /**
  * det M: +1 for a proper operation, −1 for an improper one.
- * @param matrix
+ * @param matrix - The matrix.
+ * @returns Its determinant.
  */
 export function matrixDeterminant(matrix: Mat3): number {
   return (
@@ -71,7 +75,8 @@ export function matrixDeterminant(matrix: Mat3): number {
 
 /**
  * tr M, which is `±1 + 2cos θ` for a symmetry operation.
- * @param matrix
+ * @param matrix - The matrix.
+ * @returns Its trace.
  */
 export function matrixTrace(matrix: Mat3): number {
   return matrix[0][0] + matrix[1][1] + matrix[2][2];
@@ -79,8 +84,9 @@ export function matrixTrace(matrix: Mat3): number {
 
 /**
  * M · factor.
- * @param matrix
- * @param factor
+ * @param matrix - The matrix.
+ * @param factor - The scalar every entry is multiplied by.
+ * @returns The scaled matrix.
  */
 export function scaleMatrix(matrix: Mat3, factor: number): Mat3 {
   return [
@@ -92,8 +98,9 @@ export function scaleMatrix(matrix: Mat3, factor: number): Mat3 {
 
 /**
  * ‖a − b‖_F, the distance two operation matrices are compared with.
- * @param a
- * @param b
+ * @param a - The first matrix.
+ * @param b - The second matrix.
+ * @returns The Frobenius norm of their difference.
  */
 export function matrixDistance(a: Mat3, b: Mat3): number {
   let sum = 0;
@@ -111,8 +118,9 @@ export function matrixDistance(a: Mat3, b: Mat3): number {
 /**
  * The rotation by `angle` radians about the unit vector `axis`, right-handed,
  * from Rodrigues' formula `R = cos θ I + sin θ [n̂]ₓ + (1 − cos θ) n̂ n̂ᵀ`.
- * @param axis
- * @param angle
+ * @param axis - The unit vector rotated about.
+ * @param angle - The angle, in radians.
+ * @returns The rotation matrix.
  */
 export function rotationMatrix(axis: Vec3, angle: number): Mat3 {
   const [x, y, z] = axis;
@@ -128,7 +136,8 @@ export function rotationMatrix(axis: Vec3, angle: number): Mat3 {
 
 /**
  * The reflection `I − 2 n̂ n̂ᵀ` in the plane through the origin with unit normal `normal`.
- * @param normal
+ * @param normal - The unit normal of the mirror plane.
+ * @returns The reflection matrix.
  */
 export function reflectionMatrix(normal: Vec3): Mat3 {
   const [x, y, z] = normal;
@@ -141,8 +150,9 @@ export function reflectionMatrix(normal: Vec3): Mat3 {
 
 /**
  * One row of a · b.
- * @param row
- * @param b
+ * @param row - The row of a.
+ * @param b - The right-hand matrix.
+ * @returns That row of the product.
  */
 function multiplyRow(row: Vec3, b: Mat3): Vec3 {
   return [

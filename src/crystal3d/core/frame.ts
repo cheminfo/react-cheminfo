@@ -30,7 +30,7 @@ export interface PlaneFrame {
  * The frame of the plane with this normal.
  * @param normal - The plane normal; need not be normalised.
  * @returns The unit normal and two unit directions in the plane.
- * @throws When the normal is too short to have a direction.
+ * @throws {RangeError} When the normal is too short to have a direction.
  */
 export function planeFrame(normal: Vec3): PlaneFrame {
   const unit = normalizeVector(normal);
@@ -45,7 +45,7 @@ export function planeFrame(normal: Vec3): PlaneFrame {
  * one case where projecting out the direction would leave nothing to normalise.
  * @param direction - Any non-zero vector; need not be normalised.
  * @returns A unit vector orthogonal to it.
- * @throws When the direction is too short to have one.
+ * @throws {RangeError} When the direction is too short to have one.
  */
 export function perpendicularTo(direction: Vec3): Vec3 {
   const unit = normalizeVector(direction);

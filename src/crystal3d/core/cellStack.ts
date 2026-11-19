@@ -45,6 +45,7 @@ export function repeatCell(cell: UnitCell, cells: number): UnitCell {
  * How many atoms the stack holds, without building it.
  * @param atomsPerCell - Atoms in one cell, after the symmetry has filled it.
  * @param cells - Cells along each axis.
+ * @returns Atoms in the whole stack.
  */
 export function repeatedAtomCount(atomsPerCell: number, cells: number): number {
   const count = wholeCells(cells);
@@ -77,7 +78,8 @@ export function largestRepeatThatFits(
 
 /**
  * Whole cells, one at the least.
- * @param cells
+ * @param cells - Cells along each axis, as asked for.
+ * @returns The count rounded to a whole number, 1 when it is not finite.
  */
 function wholeCells(cells: number): number {
   if (!Number.isFinite(cells)) return 1;

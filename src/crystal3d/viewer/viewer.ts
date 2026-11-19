@@ -54,7 +54,10 @@ export class CrystalViewer extends CrystalViewerPlugin {
   #drawings: readonly SymmetryDrawing[] = [];
   #elementStyle: ElementLayerStyle = {};
 
-  /** The symmetry elements drawn right now, in drawing order. */
+  /**
+   * The symmetry elements drawn right now, in drawing order.
+   * @returns The drawings on screen.
+   */
   get elements(): readonly SymmetryDrawing[] {
     return this.#drawings;
   }
@@ -64,6 +67,7 @@ export class CrystalViewer extends CrystalViewerPlugin {
    * @param atoms - The whole scene, expanded and repeated already, in Cartesian
    *   ångström. An empty list clears them.
    * @param style - See {@link StructureStyle}.
+   * @returns Resolves once the atoms are drawn.
    */
   showStructure(
     atoms: readonly ViewerAtom[],
@@ -76,7 +80,10 @@ export class CrystalViewer extends CrystalViewerPlugin {
     });
   }
 
-  /** Remove the atoms, leaving the cell and the elements in place. */
+  /**
+   * Remove the atoms, leaving the cell and the elements in place.
+   * @returns Resolves once the atoms are gone.
+   */
   hideStructure(): Promise<void> {
     return this.run(async (plugin) => {
       await clearMeasurements(plugin);
@@ -89,6 +96,7 @@ export class CrystalViewer extends CrystalViewerPlugin {
    * @param cell - The six cell parameters, or `null` to draw none.
    * @param repeat - Cells along a, b and c.
    * @param style - See {@link CellStyle}.
+   * @returns Resolves once the cell is drawn.
    */
   showCell(
     cell: UnitCell | null,
@@ -98,7 +106,10 @@ export class CrystalViewer extends CrystalViewerPlugin {
     return this.run((plugin) => drawCell(plugin, cell, repeat, style));
   }
 
-  /** Remove the cell. */
+  /**
+   * Remove the cell.
+   * @returns Resolves once the cell is gone.
+   */
   hideCell(): Promise<void> {
     return this.run((plugin) => drawCell(plugin, null));
   }
@@ -107,6 +118,7 @@ export class CrystalViewer extends CrystalViewerPlugin {
    * Replace every drawn symmetry element.
    * @param drawings - The elements; an empty list clears them.
    * @param style - See {@link ElementLayerStyle}; kept for later edits.
+   * @returns Resolves once the elements are drawn.
    */
   showElements(
     drawings: readonly SymmetryDrawing[],
@@ -120,6 +132,7 @@ export class CrystalViewer extends CrystalViewerPlugin {
   /**
    * Draw these elements as well, replacing any already drawn under the same id.
    * @param drawings - What to add.
+   * @returns Resolves once the elements are drawn.
    */
   addElements(drawings: readonly SymmetryDrawing[]): Promise<void> {
     this.#drawings = mergeDrawings(this.#drawings, drawings);
@@ -129,13 +142,17 @@ export class CrystalViewer extends CrystalViewerPlugin {
   /**
    * Stop drawing these elements, leaving the rest alone.
    * @param ids - The ids to remove; an id that is not drawn is ignored.
+   * @returns Resolves once the rest are redrawn.
    */
   removeElements(ids: readonly string[]): Promise<void> {
     this.#drawings = withoutDrawings(this.#drawings, ids);
     return this.#redrawElements();
   }
 
-  /** Remove every symmetry element. */
+  /**
+   * Remove every symmetry element.
+   * @returns Resolves once they are gone.
+   */
   hideElements(): Promise<void> {
     this.#drawings = [];
     return this.#redrawElements();
@@ -148,6 +165,7 @@ export class CrystalViewer extends CrystalViewerPlugin {
    * would prove nothing.
    * @param operation - What to apply.
    * @param options - See {@link PlayOptions}.
+   * @returns Resolves once the operation has been applied in full.
    */
   playOperation(
     operation: ViewerOperation,
@@ -160,6 +178,7 @@ export class CrystalViewer extends CrystalViewerPlugin {
    * Hold the structure part-way through an operation, for a slider.
    * @param operation - What is being applied.
    * @param fraction - How far through, 0 to 1.
+   * @returns Resolves once the structure is held there.
    */
   setOperationFraction(
     operation: ViewerOperation,
@@ -170,7 +189,10 @@ export class CrystalViewer extends CrystalViewerPlugin {
     });
   }
 
-  /** Put the structure back where it started. */
+  /**
+   * Put the structure back where it started.
+   * @returns Resolves once the structure is back.
+   */
   resetOperation(): Promise<void> {
     return this.run((plugin) => {
       resetOperation(plugin);

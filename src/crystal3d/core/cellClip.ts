@@ -136,7 +136,8 @@ function stepAlong(origin: Vec3, direction: Vec3, distance: number): Vec3 {
 
 /**
  * The eight corners of the box, in the order {@link CUBE_EDGES} indexes.
- * @param cells
+ * @param cells - How many cells the box spans along each axis.
+ * @returns The corners, in cell fractions.
  */
 function cubeCorners(cells: number): Vec3[] {
   const corners: Vec3[] = [];
@@ -168,8 +169,9 @@ const CUBE_EDGES: ReadonlyArray<readonly [number, number]> = [
 
 /**
  * The same corners, walked round the plane rather than found in cube order.
- * @param points
- * @param normal
+ * @param points - The corners, Cartesian ångström.
+ * @param normal - The plane's normal, Cartesian.
+ * @returns The corners, in order around the plane.
  */
 function orderAroundPlane(points: readonly Point3[], normal: Point3): Point3[] {
   const { major, minor } = planeFrame(normal);
@@ -192,7 +194,8 @@ function orderAroundPlane(points: readonly Point3[], normal: Point3): Point3[] {
 
 /**
  * A corner the plane passes through is found once per edge that meets it.
- * @param points
+ * @param points - The corners found, Cartesian ångström.
+ * @returns Each corner once.
  */
 function dedupe(points: readonly Point3[]): Point3[] {
   const kept: Point3[] = [];

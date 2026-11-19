@@ -1094,10 +1094,14 @@
   "crystal3d.packing.cellHelp": "Ogni atomo dentro la cella, tagliato dove lo tagliano le sue pareti.",
   "crystal3d.unitCell": "Cella elementare",
   "crystal3d.unitCellHelp": "Il contorno della cella elementare.",
-  "crystal3d.caption.molecules": "{count, plural, one {# molecola} other {# molecole}} per cella",
-  "crystal3d.caption.atoms": "{count, plural, one {# atomo} other {# atomi}} per cella",
-  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {cella} other {celle}}",
+  "crystal3d.caption.molecules.one": "1 molecola per cella",
+  "crystal3d.caption.molecules.other": "{count} molecole per cella",
+  "crystal3d.caption.atoms.one": "1 atomo per cella",
+  "crystal3d.caption.atoms.other": "{count} atomi per cella",
+  "crystal3d.caption.cells.one": "1×1×1 cella",
+  "crystal3d.caption.cells.other": "{count}×{count}×{count} celle",
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} celle, perché {asked}×{asked}×{asked} conterrebbero troppi atomi",
   "crystal3d.unreadable": "Non è stato possibile leggere quel file",
-  "crystal3d.tooLarge": "Questa cella contiene {count, number} atomi, più di quanti il visualizzatore ne disegni."
+  "crystal3d.tooLarge": "Questa cella contiene {count} atomi, più di quanti il visualizzatore ne disegni.",
+  "crystal3d.unsupported": "Niente 3D su questo computer"
 }

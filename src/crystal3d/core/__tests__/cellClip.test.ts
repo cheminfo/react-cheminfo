@@ -161,7 +161,9 @@ test('the c axis of a triclinic cell is trimmed to the ab faces', () => {
 
 /**
  * The two ends, so a segment is asserted the same way a polygon is.
- * @param segment
+ * @param segment - The clipped line, or `null` when it missed the box.
+ * @returns Its start and its end.
+ * @throws {Error} When the line missed the box.
  */
 function segmentPoints(
   segment: { readonly start: Point3; readonly end: Point3 } | null,
@@ -175,8 +177,8 @@ function segmentPoints(
 /**
  * Every corner, in order, to nine decimals — `cos(90°)` is 6e-17 rather than
  * zero, so a right-angled cell is never bit-exact.
- * @param actual
- * @param expected
+ * @param actual - The corners computed.
+ * @param expected - The corners they must match.
  */
 function expectPoints(
   actual: readonly Point3[],

@@ -27,7 +27,7 @@ import { clearShapeLayer, storeLayer } from './layerRegistry.ts';
  * @param items - The lines; an empty list clears the layer.
  * @param colour - What a line with no colour of its own is written in,
  *   `#rrggbb`.
- * @throws When the canvas is not initialised yet.
+ * @throws {Error} When the canvas is not initialised yet.
  */
 export async function renderTextLayer(
   plugin: PluginContext,

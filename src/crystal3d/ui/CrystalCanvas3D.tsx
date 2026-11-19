@@ -323,9 +323,9 @@ function useMeasurementsOf(atoms: readonly ViewerAtom[]): {
 
 /**
  * Report a failure as one sentence, and clear it once the next draw works.
- * @param listener
- * @param listener.current
- * @param work
+ * @param listener - The ref holding the page's failure callback.
+ * @param listener.current - The callback, given the message or `null`.
+ * @param work - The draw whose outcome is reported.
  */
 async function report(
   listener: { current?: (message: string | null) => void },

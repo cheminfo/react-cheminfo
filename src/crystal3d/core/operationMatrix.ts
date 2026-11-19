@@ -119,9 +119,10 @@ export const ROTATION_PHASE = 0.6;
 
 /**
  * Rotate rigidly, then pass through the plane or the centre.
- * @param operation
- * @param t
- * @param improper
+ * @param operation - The improper rotation or rotoinversion.
+ * @param t - How far through, from 0 to 1.
+ * @param improper - The reflection or inversion that follows the turn.
+ * @returns The 4×4 matrix, column-major.
  */
 function twoPhase(
   operation: Extract<
@@ -152,8 +153,9 @@ function twoPhase(
 
 /**
  * The rotation of `operation` carried `t` of the way round.
- * @param operation
- * @param t
+ * @param operation - An operation with an axis.
+ * @param t - How far round, from 0 to 1.
+ * @returns The rotation matrix.
  */
 function turn(
   operation: Extract<
@@ -170,9 +172,10 @@ function turn(
 
 /**
  * `2πk/n`, the angle one application turns through.
- * @param operation
- * @param operation.order
- * @param operation.power
+ * @param operation - An operation with an axis.
+ * @param operation.order - n, the order of the axis.
+ * @param operation.power - k, how many times it is applied; 1 by default.
+ * @returns The angle, in radians.
  */
 function angleOf(operation: { order: number; power?: number }): number {
   return (2 * Math.PI * (operation.power ?? 1)) / operation.order;
@@ -180,7 +183,8 @@ function angleOf(operation: { order: number; power?: number }): number {
 
 /**
  * `I − 2 n̂ n̂ᵀ`, from a normal the caller need not have normalised.
- * @param normal
+ * @param normal - The mirror's normal, Cartesian.
+ * @returns The reflection matrix.
  */
 function mirrorOf(normal: Point3): Mat3 {
   return reflectionMatrix(normalizeVector(normal));
@@ -188,9 +192,10 @@ function mirrorOf(normal: Point3): Mat3 {
 
 /**
  * `(1 − t) a + t b`, component by component.
- * @param a
- * @param b
- * @param t
+ * @param a - The matrix at t = 0.
+ * @param b - The matrix at t = 1.
+ * @param t - How far from a towards b.
+ * @returns The blended matrix.
  */
 function blend(a: Mat3, b: Mat3, t: number): Mat3 {
   return [
@@ -210,9 +215,10 @@ function blendRow(a: Vec3, b: Vec3, t: number): Vec3 {
 
 /**
  * `x ↦ L(x − p) + p + w`, written as one affine matrix.
- * @param linear
- * @param fixed
- * @param shift
+ * @param linear - L, the linear part.
+ * @param fixed - p, the point L keeps in place.
+ * @param shift - w, the translation added after.
+ * @returns The 4×4 matrix, column-major.
  */
 function aboutPoint(linear: Mat3, fixed: Point3, shift: Point3): Matrix4 {
   return affineMatrix(
@@ -223,8 +229,9 @@ function aboutPoint(linear: Mat3, fixed: Point3, shift: Point3): Matrix4 {
 
 /**
  * The 3×3 and the translation, laid out the way a GPU reads them.
- * @param linear
- * @param translation
+ * @param linear - The linear part.
+ * @param translation - The translation, ångström.
+ * @returns The 4×4 matrix, column-major.
  */
 function affineMatrix(linear: Mat3, translation: Point3): Matrix4 {
   return [

@@ -47,8 +47,8 @@ export interface ElementGroup {
  * Turn the drawings into groups, in the order they were given.
  * @param drawings - The elements to draw.
  * @param options - Sizes, and whether the labels are drawn.
- * @param options.style
- * @param options.labels
+ * @param options.style - Sizes of the shapes, over the defaults.
+ * @param options.labels - Whether the labels are drawn; true by default.
  * @returns One group per drawing.
  */
 export function elementGroups(

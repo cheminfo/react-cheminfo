@@ -1094,10 +1094,14 @@
   "crystal3d.packing.cellHelp": "Chaque atome à l'intérieur de la maille, coupé là où ses faces le coupent.",
   "crystal3d.unitCell": "Maille",
   "crystal3d.unitCellHelp": "Le contour de la maille élémentaire.",
-  "crystal3d.caption.molecules": "{count, plural, one {# molécule} other {# molécules}} par maille",
-  "crystal3d.caption.atoms": "{count, plural, one {# atome} other {# atomes}} par maille",
-  "crystal3d.caption.cells": "{count}×{count}×{count} {count, plural, one {maille} other {mailles}}",
+  "crystal3d.caption.molecules.one": "1 molécule par maille",
+  "crystal3d.caption.molecules.other": "{count} molécules par maille",
+  "crystal3d.caption.atoms.one": "1 atome par maille",
+  "crystal3d.caption.atoms.other": "{count} atomes par maille",
+  "crystal3d.caption.cells.one": "1×1×1 maille",
+  "crystal3d.caption.cells.other": "{count}×{count}×{count} mailles",
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} mailles, car {asked}×{asked}×{asked} contiendraient trop d'atomes",
   "crystal3d.unreadable": "Ce fichier n'a pas pu être lu",
-  "crystal3d.tooLarge": "Cette maille contient {count, number} atomes, plus que la visionneuse n'en dessine."
+  "crystal3d.tooLarge": "Cette maille contient {count} atomes, plus que la visionneuse n'en dessine.",
+  "crystal3d.unsupported": "Pas de 3D sur cette machine"
 }

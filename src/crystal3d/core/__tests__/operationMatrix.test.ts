@@ -212,8 +212,9 @@ test('only a proper rotation and a screw have a rigid path from the identity', (
 
 /**
  * `matrix · point`, reading the sixteen numbers as column-major.
- * @param matrix
- * @param point
+ * @param matrix - The 4×4 affine matrix.
+ * @param point - The point it moves, ångström.
+ * @returns The image of the point.
  */
 function apply(matrix: Matrix4, point: Point3): Point3 {
   const image: [number, number, number] = [0, 0, 0];

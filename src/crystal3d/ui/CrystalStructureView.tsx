@@ -2,7 +2,7 @@
  * A crystal from its CIF: read, its cell filled by the space group, drawn in
  * 3D with the chips that say how, and a line saying what is on screen.
  *
- * Reached through `React.lazy` from {@link CrystalStructureViewer}: it bonds
+ * Reached through `React.lazy` from `CrystalStructureViewer`: it bonds
  * atoms by the rule molstar draws bonds with, so what the packing completes is
  * what the viewer joins, and that rule is a molstar module.
  */
@@ -16,8 +16,8 @@ import { crystalCellAtoms } from '../../crystal/core/cellAtoms.ts';
 import { readCif } from '../../crystal/core/cif/read.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { useControlledState } from '../../molecule3d/ui/useControlledState.ts';
+import { bondLimit } from '../../molstar/bonds/index.ts';
 import { crystalView } from '../core/crystalView.ts';
-import { bondLimit } from '../viewer/bondRule.ts';
 
 import { CrystalViewControls } from './CrystalViewControls.tsx';
 import { CrystalViewer3D } from './CrystalViewer3D.tsx';

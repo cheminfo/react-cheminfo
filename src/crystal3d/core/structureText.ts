@@ -15,7 +15,7 @@ import type { ViewerAtom } from './types.ts';
  * @param comment - The second line of the file, which molstar keeps as the
  *   model's comment.
  * @returns The file text, ending in a newline.
- * @throws When there are no atoms: molstar reads a count of zero as the end of
+ * @throws {Error} When there are no atoms: molstar reads a count of zero as the end of
  *   the file and returns a model with no atoms rather than an error.
  */
 export function toXyzText(
@@ -35,7 +35,8 @@ export function toXyzText(
 
 /**
  * Six decimals is a thousandth of the shortest bond, and reads as a number.
- * @param value
+ * @param value - A coordinate, ångström.
+ * @returns It with six decimals, never `-0.000000`.
  */
 function format(value: number): string {
   return (value === 0 ? 0 : value).toFixed(6);

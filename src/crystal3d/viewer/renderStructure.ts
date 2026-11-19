@@ -34,7 +34,7 @@ export interface StructureStyle {
  * @param plugin - The molstar context.
  * @param atoms - The whole scene, Cartesian ångström; an empty list clears it.
  * @param style - See {@link StructureStyle}.
- * @throws When molstar parses the file to no atoms at all.
+ * @throws {Error} When molstar parses the file to no atoms at all.
  */
 export async function renderStructure(
   plugin: PluginContext,

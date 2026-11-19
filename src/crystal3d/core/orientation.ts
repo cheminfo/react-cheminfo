@@ -99,7 +99,7 @@ export function principalAxisOf(
  *   a edge, so the same cell always opens the same way round. Left out, one is
  *   chosen from the axis alone.
  * @returns Where the camera sits, and which way is up.
- * @throws When the axis is too short to have a direction.
+ * @throws {RangeError} When the axis is too short to have a direction.
  */
 export function threeQuarterView(
   axis: Point3,
@@ -127,7 +127,8 @@ export function threeQuarterView(
 
 /**
  * Whichever way up leaves the axis pointing towards the top of the screen.
- * @param unit
+ * @param unit - The axis, normalised.
+ * @returns The axis or its opposite.
  */
 function upwards(unit: Point3): Point3 {
   const [x, y, z] = unit;
@@ -139,8 +140,9 @@ function upwards(unit: Point3): Point3 {
 
 /**
  * The direction the azimuth is measured from, at right angles to the axis.
- * @param up
- * @param reference
+ * @param up - The axis, normalised and pointing up.
+ * @param reference - The direction to measure from, or `undefined` to pick one.
+ * @returns A unit vector at right angles to `up`.
  */
 function azimuthFrom(up: Point3, reference: Point3 | undefined): Point3 {
   if (reference === undefined) return perpendicularTo(up);
@@ -153,8 +155,9 @@ function azimuthFrom(up: Point3, reference: Point3 | undefined): Point3 {
 
 /**
  * The part of a vector at right angles to a unit direction.
- * @param vector
- * @param unit
+ * @param vector - The vector.
+ * @param unit - The direction projected out, normalised.
+ * @returns That part, normalised.
  */
 function rejectFrom(vector: Point3, unit: Point3): Point3 {
   return normalizeVector(
@@ -164,9 +167,10 @@ function rejectFrom(vector: Point3, unit: Point3): Point3 {
 
 /**
  * Turn a vector about a unit axis it is already at right angles to.
- * @param vector
- * @param unit
- * @param angle
+ * @param vector - The vector turned.
+ * @param unit - The axis, normalised.
+ * @param angle - The angle, in radians, right-handed.
+ * @returns The turned vector.
  */
 function rollAbout(vector: Point3, unit: Point3, angle: number): Point3 {
   return addVectors(
@@ -177,7 +181,8 @@ function rollAbout(vector: Point3, unit: Point3, angle: number): Point3 {
 
 /**
  * Whether a vector is long enough to say which way it points.
- * @param vector
+ * @param vector - The vector.
+ * @returns Whether its length is above the floor.
  */
 function hasDirection(vector: Point3): boolean {
   return vectorNorm(vector) > DIRECTION_FLOOR;

@@ -124,7 +124,8 @@ export function applyCamera(
 
 /**
  * The sphere a camera is measured against: every part drawn, framed.
- * @param plugin
+ * @param plugin - The molstar context whose scene is measured.
+ * @returns The centre and framed radius, or `null` while nothing is drawn.
  */
 function sceneReference(plugin: PluginContext): CameraReference | null {
   const union = unionSphere([...(extents.get(plugin)?.values() ?? [])]);
