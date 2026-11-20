@@ -69,3 +69,47 @@ test('the level reads the share of the printed size, and fit is a button of its 
 
   expect(fitted).toBe(1);
 });
+
+test('a view that stops short ends the menu there, and a fitted one marks no zoom', () => {
+  act(() => {
+    root.render(
+      <ZoomControl
+        zoom={4 * PIXELS_PER_POINT}
+        max={4}
+        fitted
+        fitLabel="Fit in the panel"
+        onZoomShare={() => {
+          // Not used by this test.
+        }}
+        onFit={() => {
+          // Not used by this test.
+        }}
+      />,
+    );
+  });
+  const fit = host.querySelector('button[aria-label="Fit in the panel"]');
+
+  expect(fit?.classList.contains('bp6-active')).toBe(true);
+
+  const level = host.querySelector('button[aria-label="Zoom level"]');
+  act(() => {
+    level?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
+  const items = [...document.querySelectorAll('[role="menuitem"]')];
+
+  expect(items.map((item) => item.textContent)).toStrictEqual([
+    '25 %',
+    '50 %',
+    '75 %',
+    '100 %',
+    '150 %',
+    '200 %',
+    '300 %',
+    '400 %',
+  ]);
+  expect(document.querySelector('[role="menuitem"].bp6-active')).toBeNull();
+
+  const slider = host.querySelector('[aria-label="Zoom"]');
+
+  expect(slider?.getAttribute('aria-valuemax')).toBe(String(Math.log2(4)));
+});

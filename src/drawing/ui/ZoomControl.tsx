@@ -26,13 +26,32 @@ export interface ZoomControlProps {
    * @default 'Brings the whole drawing back into view.'
    */
   fitDescription?: string;
+  /**
+   * The fit button's name, for assistive technology.
+   * @default 'Fit the drawing in view'
+   */
+  fitLabel?: string;
+  /**
+   * The closest the view goes, as a share of the printed size: the end of
+   * the slider, and the last zoom the menu offers. A view drawn as layers too
+   * large for a graphics card stops short of the editors' 1600 %.
+   * @default ZOOM_RANGE.max
+   */
+  max?: number;
+  /**
+   * Whether the view fits now and follows its frame: the fit button shows it
+   * on, and no zoom of the menu is marked as the one chosen.
+   * @default false
+   */
+  fitted?: boolean;
 }
 
 /**
  * The zoom at the right of an editor's status bar, the same in every editor of
  * the family: a slider from 25 % to 1600 % of the printed size, running on the
  * logarithm so each step is the same factor; the value, which opens a menu of
- * the usual zooms; and zoom to fit, on `f`.
+ * the usual zooms; and zoom to fit, on `f`. A view that cannot go as close
+ * ends both earlier, through `max`.
  * @param props - See {@link ZoomControlProps}.
  * @returns The control.
  */
@@ -42,17 +61,22 @@ export function ZoomControl(props: ZoomControlProps): ReactElement {
     onZoomShare,
     onFit,
     fitDescription = 'Brings the whole drawing back into view.',
+    fitLabel = 'Fit the drawing in view',
+    fitted = false,
   } = props;
   const share = zoomShare(zoom);
+  const max = Math.min(ZOOM_RANGE.max, props.max ?? ZOOM_RANGE.max);
+  const low = Math.log2(ZOOM_RANGE.min);
+  const high = Math.log2(Math.max(ZOOM_RANGE.min, max));
   return (
     <span className="zoom-control">
       <MeasuredSlider
-        min={Math.log2(ZOOM_RANGE.min)}
-        max={Math.log2(ZOOM_RANGE.max)}
-        initialValue={Math.log2(ZOOM_RANGE.min)}
+        min={low}
+        max={high}
+        initialValue={low}
         stepSize={0.01}
         labelRenderer={false}
-        value={Math.log2(share)}
+        value={Math.min(high, Math.max(low, Math.log2(share)))}
         onChange={(value) => {
           onZoomShare(2 ** value);
         }}
@@ -62,11 +86,11 @@ export function ZoomControl(props: ZoomControlProps): ReactElement {
         placement="top-end"
         content={
           <Menu aria-label="Zoom">
-            {ZOOM_PRESETS.map((preset) => (
+            {ZOOM_PRESETS.filter((preset) => preset <= max).map((preset) => (
               <MenuItem
                 key={preset}
                 text={formatPercent(preset, 0)}
-                active={Math.abs(preset - share) < 0.005}
+                active={!fitted && Math.abs(preset - share) < 0.005}
                 onClick={() => {
                   onZoomShare(preset);
                 }}
@@ -103,7 +127,8 @@ export function ZoomControl(props: ZoomControlProps): ReactElement {
           variant="minimal"
           size="small"
           icon="zoom-to-fit"
-          aria-label="Fit the drawing in view"
+          aria-label={fitLabel}
+          active={fitted}
           onClick={onFit}
         />
       </Tooltip>
