@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.138.0](https://github.com/cheminfo/react-cheminfo/compare/v0.137.0...v0.138.0) (2026-11-20)
+
+
+### Features
+
+* let a figure carry texts a document quotes ([256584e](https://github.com/cheminfo/react-cheminfo/commit/256584e76465061e03608bcb38280b735806943f))
+* let a piece swirl, as on a running orbital shaker ([ca564aa](https://github.com/cheminfo/react-cheminfo/commit/ca564aae40645b5a168f2bd323cd0b23bc030b93))
+
 ## [0.137.0](https://github.com/cheminfo/react-cheminfo/compare/v0.136.0...v0.137.0) (2026-11-19)
 
 
