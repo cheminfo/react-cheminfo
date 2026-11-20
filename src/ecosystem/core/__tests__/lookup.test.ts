@@ -40,6 +40,17 @@ test('a site no menu lists yet is still found by its identifier and its host', (
   expect(findSiteByHost('mz.cheminfo.org')?.id).toBe('mz');
 });
 
+test('fair is one of the family, found by its identifier and its host', () => {
+  const fair = siteById('fair');
+
+  expect(fair.host).toBe('fair.cheminfo.org');
+  expect(fair.tagline).toBe(
+    'Explore published chemistry datasets: compounds, spectra and documents.',
+  );
+  expect(findSiteByHost('www.fair.cheminfo.org')?.id).toBe('fair');
+  expect(ECOSYSTEM_SITES.some((site) => site.id === 'fair')).toBe(false);
+});
+
 test('a site no menu lists yet is under no topic', () => {
   const listed = new Set<SiteId>();
   for (const { sites } of groupedSites()) {

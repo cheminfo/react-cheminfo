@@ -25,6 +25,7 @@ export type SiteId =
   | 'periodic-table'
   | 'database'
   | 'molecules'
+  | 'fair'
   | 'symmetry'
   | 'osiris'
   | 'atoms'

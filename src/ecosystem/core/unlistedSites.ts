@@ -51,4 +51,19 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
       },
     ],
   },
+  {
+    id: 'fair',
+    name: { lead: 'fair', alt: 'cheminfo', dot: true },
+    host: 'fair.cheminfo.org',
+    tagline:
+      'Explore published chemistry datasets: compounds, spectra and documents.',
+    group: 'research',
+    // A deep olive leads at 7.08:1 on white, darker than metabo's olive so the
+    // two read apart, and an ocean blue answers at 5.93:1.
+    brand: '#3f6212',
+    brandAlt: '#0369a1',
+    // The mark takes the light form of that blue, 4.24:1 on the olive plate:
+    // the dark form sits at 1.19:1 there and vanishes at 16 px.
+    mark: { plate: '#3f6212', accent: '#7dd3fc' },
+  },
 ];

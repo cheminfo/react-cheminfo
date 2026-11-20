@@ -64,6 +64,7 @@ test('the sites not linked from the others yet are named apart', () => {
     'molecules',
     'mz',
     'ml',
+    'fair',
   ] satisfies SiteId[]);
 });
 

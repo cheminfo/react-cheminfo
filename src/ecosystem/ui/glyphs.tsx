@@ -428,6 +428,20 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       <circle cx="24.6" cy="11.6" r="3.6" fill={alt} />
     </>
   ),
+  // An archive box, with a spectrum peak rising out of it in the answering
+  // colour: data kept, and data read back. The handle is cut out of the box,
+  // so the plate shows through it whatever colour the plate is drawn in.
+  fair: (alt) => (
+    <>
+      <path d="M7 16C11 16 13 5 16 5C19 5 21 16 25 16Z" fill={alt} />
+      <rect x="5" y="15" width="22" height="4.5" rx="1.5" fill="#ffffff" />
+      <path
+        d="M8.5 20.5H23.5A1.5 1.5 0 0 1 25 22V26A1.5 1.5 0 0 1 23.5 27.5H8.5A1.5 1.5 0 0 1 7 26V22A1.5 1.5 0 0 1 8.5 20.5ZM13.95 22.6A0.95 0.95 0 0 0 13.95 24.5H18.05A0.95 0.95 0 0 0 18.05 22.6Z"
+        fill="#ffffff"
+        fillRule="evenodd"
+      />
+    </>
+  ),
   // A tetrahedron seen from slightly above, four balls at its corners: the
   // first shape a chemist meets symmetry in. The apex carries the answering
   // colour, which is also the C3 axis every base triangle turns about.

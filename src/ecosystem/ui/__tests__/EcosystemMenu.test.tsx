@@ -57,6 +57,21 @@ test('a search nothing answers says so, and lists no topic', () => {
   expect(topics()).toStrictEqual([]);
 });
 
+test('a site the family does not list is never offered, not even searched for', () => {
+  expect(renderToStaticMarkup(<EcosystemMenu />)).not.toContain(
+    'fair.cheminfo.org',
+  );
+
+  render();
+  search('fair');
+
+  expect(siteLinks()).not.toContain('https://fair.cheminfo.org/');
+
+  search('published chemistry datasets');
+
+  expect(siteLinks()).toStrictEqual([]);
+});
+
 test('Enter opens the best site in a tab of its own', () => {
   const open = vi.spyOn(globalThis, 'open').mockImplementation(() => null);
   render();

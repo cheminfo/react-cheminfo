@@ -78,6 +78,16 @@ test('a site no menu lists yet draws its mark from its identifier', () => {
   expect(molecules).toContain('fill="#5eead4"');
 });
 
+test('fair draws its archive box on its olive plate, the peak in light blue', () => {
+  const fair = renderToStaticMarkup(<SiteMark siteId="fair" />);
+
+  expect(fair).toContain('fill="#3f6212"');
+  expect(fair).toContain('fill="#7dd3fc"');
+  // The handle is cut out of the box rather than painted in the page's brand.
+  expect(fair).toContain('fill-rule="evenodd"');
+  expect(fair).not.toContain('var(--brand)');
+});
+
 test('chembio and wikidata draw the marks they brought with them', () => {
   const chembio = renderToStaticMarkup(<SiteMark siteId="chembio" />);
   const wikidata = renderToStaticMarkup(<SiteMark siteId="wikidata" />);
