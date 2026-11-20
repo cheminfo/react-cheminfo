@@ -16,8 +16,8 @@ import {
   MEASUREMENT_KINDS,
   MEASUREMENT_LABELS,
 } from '../core/measurement.ts';
-import type { Molecule3DTools } from '../core/settings.ts';
-import { resolveMolecule3DTools } from '../core/settings.ts';
+import type { Molecule3DTools } from '../core/tools.ts';
+import { resolveMolecule3DTools } from '../core/tools.ts';
 
 import { Molecule3DHelp } from './Molecule3DHelp.tsx';
 import {

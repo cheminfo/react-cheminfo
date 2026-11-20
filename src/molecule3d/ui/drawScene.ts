@@ -1,5 +1,6 @@
 import type { Molecule3DFile } from '../core/file.ts';
 import type { Measurement } from '../core/measurement.ts';
+import { showsPartialBonds } from '../core/partialBondMode.ts';
 import type { Molecule3DSettings } from '../core/settings.ts';
 import { normalizeMolecule3DSettings } from '../core/settings.ts';
 
@@ -10,6 +11,7 @@ export type SceneViewer = Pick<
   Molecule3DViewer,
   | 'showMolecule'
   | 'hideMolecule'
+  | 'showPartialBonds'
   | 'showSurface'
   | 'showMeasurements'
   | 'resetCamera'
@@ -17,8 +19,9 @@ export type SceneViewer = Pick<
 >;
 
 /**
- * Draw the whole scene. `showMolecule` empties it, so the surface and the
- * measurements are added after the model, and the camera is framed last.
+ * Draw the whole scene. `showMolecule` empties it, so the partial bonds, the
+ * surface and the measurements are added after the model, and the camera is
+ * framed last. Spacefill draws no bonds, and so no partial ones either.
  * @param viewer - The viewer holding the canvas.
  * @param molfile - What to draw, or `null` to empty the scene.
  * @param settings - How to draw it.
@@ -44,6 +47,16 @@ export async function drawScene(
     representation: safe.representation,
     sizeFactor: safe.sizeFactor,
   });
+  if (
+    safe.representation !== 'spacefill' &&
+    showsPartialBonds(safe.partialBonds, molfile.format)
+  ) {
+    await viewer.showPartialBonds({
+      representation: safe.representation,
+      sizeFactor: safe.sizeFactor,
+      lengths: safe.partialBondLengths,
+    });
+  }
   if (safe.showSurface) {
     await viewer.showSurface({
       alpha: safe.surfaceAlpha,

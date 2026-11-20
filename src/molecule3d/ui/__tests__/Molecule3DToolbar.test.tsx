@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
-import type { Molecule3DTools } from '../../core/settings.ts';
+import type { Molecule3DTools } from '../../core/tools.ts';
 import type { Molecule3DFullscreen } from '../Molecule3DToolbar.tsx';
 import { Molecule3DToolbar } from '../Molecule3DToolbar.tsx';
 

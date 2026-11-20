@@ -1,4 +1,4 @@
-import type { Molecule3DTools } from '../../molecule3d/core/settings.ts';
+import type { Molecule3DTools } from '../../molecule3d/core/tools.ts';
 import type { CrystalViewSettings } from '../core/crystalView.ts';
 
 import type { CrystalViewHandle } from './crystalScene.ts';

@@ -20,6 +20,7 @@ function render(sizeFactor: number, showSurface = true): string {
         showSurface,
       }}
       defaults={DEFAULT_MOLECULE_3D_SETTINGS}
+      format="mol"
       polarSurfaceArea={null}
       onChange={() => undefined}
     />,

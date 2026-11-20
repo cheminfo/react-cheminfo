@@ -199,11 +199,14 @@ test('another file naming the same molecule is drawn, its measurements kept, the
 
   expect(calls).toStrictEqual([
     'model stretch ball-and-stick',
+    'partial bonds with lengths',
     'measurements distance 1-2',
     'frame',
     'model bend ball-and-stick',
+    'partial bonds with lengths',
     'measurements distance 1-2',
     'model propane ball-and-stick',
+    'partial bonds with lengths',
     'measurements none',
     'frame',
   ]);

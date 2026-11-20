@@ -41,6 +41,25 @@ export interface MoleculeStyle {
   sizeFactor?: number;
 }
 
+/** How to draw the partial bonds, sized after the model they are drawn over. */
+export interface PartialBondStyle {
+  /**
+   * The representation of the model.
+   * @default 'ball-and-stick'
+   */
+  representation?: RepresentationId;
+  /**
+   * The model's radius multiplier.
+   * @default 1
+   */
+  sizeFactor?: number;
+  /**
+   * Whether each is labelled with its length.
+   * @default true
+   */
+  lengths?: boolean;
+}
+
 /** How to draw the molecular surface. */
 export interface SurfaceStyle {
   /**

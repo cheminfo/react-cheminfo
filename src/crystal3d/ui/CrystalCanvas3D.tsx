@@ -14,7 +14,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Molecule3DCamera } from '../../molecule3d/core/camera.ts';
 import type { Measurement } from '../../molecule3d/core/measurement.ts';
-import type { Molecule3DTools } from '../../molecule3d/core/settings.ts';
+import type { Molecule3DTools } from '../../molecule3d/core/tools.ts';
 import { Molecule3DStage } from '../../molecule3d/ui/Molecule3DStage.tsx';
 import { useImageExport } from '../../molecule3d/ui/useImageExport.ts';
 import { MolstarToolbar } from '../../molstar/ui/MolstarToolbar.tsx';

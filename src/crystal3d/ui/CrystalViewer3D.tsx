@@ -20,7 +20,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { Suspense, lazy, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { Molecule3DTools } from '../../molecule3d/core/settings.ts';
+import type { Molecule3DTools } from '../../molecule3d/core/tools.ts';
 // Deep import on purpose: the probe imports nothing, while a barrel would pull
 // molstar in — which is exactly what asking first exists to avoid.
 import { probeViewerCapability } from '../../orbital/ui/capability.ts';

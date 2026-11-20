@@ -1,7 +1,7 @@
 /**
  * The display options of the molecule viewer, shown in the toolbar's popover:
- * the representation, the size, and the surface's opacity, solvent probe and
- * colours, with a button returning them all to the defaults.
+ * the representation, the size, the partial bonds, and the surface's opacity,
+ * solvent probe and colours, with a button returning them all to the defaults.
  */
 
 import { Button, SegmentedControl, Slider } from '@blueprintjs/core';
@@ -9,6 +9,7 @@ import type { CSSProperties, ReactElement } from 'react';
 
 import { formatDecimal } from '../../format/core/numbers.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DSettings } from '../core/settings.ts';
 import {
   MOLECULE_3D_RANGES,
@@ -19,6 +20,7 @@ import {
   sameMolecule3DSettings,
 } from '../core/settings.ts';
 
+import { Molecule3DPartialBonds } from './Molecule3DPartialBonds.tsx';
 import { Molecule3DSurfaceColors } from './Molecule3DSurfaceColors.tsx';
 
 /** Props of {@link Molecule3DOptions}. */
@@ -29,6 +31,8 @@ export interface Molecule3DOptionsProps {
   polarSurfaceArea: number | null;
   /** What the reset button returns to; `showSurface` is left as it is. */
   defaults: Molecule3DSettings;
+  /** The format of the file on screen, which decides the partial bonds' `auto`. */
+  format: Molecule3DFile['format'];
 }
 
 /**
@@ -37,7 +41,7 @@ export interface Molecule3DOptionsProps {
  * @returns The panel.
  */
 export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
-  const { settings, onChange, polarSurfaceArea, defaults } = props;
+  const { settings, onChange, polarSurfaceArea, defaults, format } = props;
   const t = useChromeT();
   const reset = resetMolecule3DSettings(settings, defaults);
   const atDefaults = sameMolecule3DSettings(settings, reset);
@@ -73,6 +77,13 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
             onChange({ ...settings, sizeFactor });
           }}
         />
+        <div style={FULL_ROW_STYLE}>
+          <Molecule3DPartialBonds
+            settings={settings}
+            onChange={onChange}
+            format={format}
+          />
+        </div>
         {settings.showSurface ? null : (
           <span style={SURFACE_OFF_STYLE} data-testid="molecule3d-surface-off">
             {t('molecule3d.surfaceOff')}
@@ -193,6 +204,8 @@ const GRID_STYLE: CSSProperties = {
 };
 
 const LABEL_STYLE: CSSProperties = { fontSize: 12 };
+
+const FULL_ROW_STYLE: CSSProperties = { gridColumn: '1 / -1' };
 
 /** Spans the grid, between the size and the surface rows it explains. */
 const SURFACE_OFF_STYLE: CSSProperties = {

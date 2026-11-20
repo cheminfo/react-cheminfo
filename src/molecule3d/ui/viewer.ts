@@ -33,11 +33,13 @@ import {
   moleculeStructure,
   renderMolecule,
 } from './renderMolecule.ts';
+import { renderPartialBonds } from './renderPartialBonds.ts';
 import { clearSurface, renderSurface } from './renderSurface.ts';
 import { SceneWatches } from './sceneWatches.ts';
 import type {
   Molecule3DViewerOptions,
   MoleculeStyle,
+  PartialBondStyle,
   SurfaceStyle,
 } from './viewerTypes.ts';
 
@@ -115,6 +117,16 @@ export class Molecule3DViewer extends SceneWatches {
         return 0;
       }),
     );
+  }
+
+  /**
+   * Draw the partial bonds of the current molecule, dashed: pairs a little too
+   * far apart to be bonded. Another molecule takes them away with it.
+   * @param style - See {@link PartialBondStyle}.
+   * @returns Nothing; resolves once they are on screen.
+   */
+  showPartialBonds(style?: PartialBondStyle): Promise<void> {
+    return this.#plugin.run((plugin) => renderPartialBonds(plugin, style));
   }
 
   /**

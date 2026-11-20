@@ -44,6 +44,9 @@ const SPACEFILL_SCALE = 4;
 /** Sticks take the factor as a radius in ångström; 0.3 Å is licorice. */
 const STICK_SCALE = 1.2;
 
+/** molstar's van der Waals radius of carbon, which sizes a C–C bond, Å. */
+const CARBON_VDW_RADIUS = 1.7;
+
 /**
  * Replace the displayed molecule. Everything already on screen goes first.
  * @param plugin - The molstar context.
@@ -124,6 +127,23 @@ export function moleculeStructure(
   const object = plugin.state.data.cells.get(MOLECULE_STRUCTURE_REF)?.obj;
   if (!PluginStateObject.Molecule.Structure.is(object)) return undefined;
   return object.data;
+}
+
+/**
+ * The radius molstar gives a C–C bond of the model, so what is drawn beside
+ * the bonds can be sized after them.
+ * @param representation - Which representation.
+ * @param sizeFactor - The settings' radius multiplier.
+ * @returns The radius in ångström; 0 for spacefill, which draws no bonds.
+ */
+export function bondRadius(
+  representation: RepresentationId,
+  sizeFactor: number,
+): number {
+  const factor = sizeFactor * NATURAL_SIZE_FACTOR;
+  if (representation === 'spacefill') return 0;
+  if (representation === 'stick') return factor * STICK_SCALE;
+  return factor * BALL_AND_STICK_ASPECT_RATIO * CARBON_VDW_RADIUS;
 }
 
 /**

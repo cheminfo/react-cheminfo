@@ -25,7 +25,8 @@ export interface StandInOptions {
 
 /**
  * A drawer over a viewer that writes down what it is asked, in order: the
- * model and its style, the surface, the measurements and the camera moves.
+ * model and its style, the partial bonds, the surface, the measurements and
+ * the camera moves.
  * @param options - See {@link StandInOptions}.
  * @returns The drawer, the calls its viewer received, and `fail`, whose
  * `measurements` count makes that many measurement draws fail from now on.
@@ -43,6 +44,11 @@ export function standIn(options: StandInOptions = {}) {
     },
     hideMolecule: async () => {
       calls.push('empty');
+    },
+    showPartialBonds: async (style) => {
+      calls.push(
+        `partial bonds${style?.lengths === false ? '' : ' with lengths'}`,
+      );
     },
     showSurface: async () => {
       calls.push('surface');

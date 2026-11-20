@@ -1,7 +1,10 @@
 /**
- * The display settings of the 3D molecule viewer and the toolbar it carries,
- * free of React and molstar so a site can persist and validate them.
+ * The display settings of the 3D molecule viewer, free of React and molstar so
+ * a site can persist and validate them.
  */
+
+import type { PartialBondMode } from './partialBondMode.ts';
+import { isPartialBondMode } from './partialBondMode.ts';
 
 /** Ways the model can be drawn, in the order the picker offers them. */
 export const REPRESENTATIONS = [
@@ -51,6 +54,14 @@ export interface Molecule3DSettings {
   surfaceColoring: SurfaceColoringId;
   /** Surface colour in `uniform` mode, `#rrggbb`. */
   surfaceColor: string;
+  /**
+   * Whether the partial bonds are drawn dashed: pairs a little too far apart
+   * to be bonded, as the forming and breaking bonds of a transition state.
+   * `auto` draws them for an XYZ file, whose bonds are guessed from distances.
+   */
+  partialBonds: PartialBondMode;
+  /** Whether each partial bond is labelled with its length. */
+  partialBondLengths: boolean;
 }
 
 /**
@@ -74,6 +85,8 @@ export const DEFAULT_MOLECULE_3D_SETTINGS: Molecule3DSettings = {
   surfaceColoring: 'uniform',
   // A scene colour: WebGL cannot read a CSS custom property.
   surfaceColor: '#94a3b8', // tokens-ok
+  partialBonds: 'auto',
+  partialBondLengths: true,
 };
 
 /** The span, and the slider step, of every numeric setting. */
@@ -82,42 +95,6 @@ export const MOLECULE_3D_RANGES = {
   surfaceAlpha: { minimum: 0.1, maximum: 1, step: 0.05 },
   probeRadius: { minimum: 1, maximum: 3, step: 0.1 },
 } as const;
-
-/** Which buttons the toolbar over the canvas shows. */
-export interface Molecule3DTools {
-  /** Distance, angle and dihedral tools, and a button removing them all. */
-  measure: boolean;
-  /** A popover with the representation, the size and the surface sliders. */
-  options: boolean;
-  /** A toggle turning the model on its own. */
-  spin: boolean;
-  /** A toggle drawing the molecular surface. */
-  surface: boolean;
-  /** A button framing the model again. */
-  reset: boolean;
-  /** A popover saving the picture as a PNG or an SVG. */
-  export: boolean;
-  /**
-   * A toggle filling the screen with the canvas and its toolbars. It is left
-   * out where the browser cannot fill the screen, as on an iPhone or in a
-   * frame not allowed to.
-   */
-  fullscreen: boolean;
-  /** A popover listing what the mouse and the keyboard do on the canvas. */
-  help: boolean;
-}
-
-/** Every tool on. */
-export const DEFAULT_MOLECULE_3D_TOOLS: Molecule3DTools = {
-  measure: true,
-  options: true,
-  spin: true,
-  surface: true,
-  reset: true,
-  export: true,
-  fullscreen: true,
-  help: true,
-};
 
 /**
  * Narrow an arbitrary string — a stored preference, a picker's value — to a
@@ -147,8 +124,8 @@ export function isSurfaceColoringId(value: string): value is SurfaceColoringId {
 /**
  * Complete and repair settings from any source: missing fields take their
  * default, numbers are clamped into {@link MOLECULE_3D_RANGES}, an unknown
- * representation or colouring falls back to the default one, and a colour that
- * is not `#rrggbb` to its default.
+ * representation, colouring or partial bond mode falls back to the default
+ * one, and a colour that is not `#rrggbb` to its default.
  * @param settings - Whatever a site has, possibly read back from storage.
  * @returns Settings the viewer can draw.
  */
@@ -164,6 +141,8 @@ export function normalizeMolecule3DSettings(
     probeRadius,
     surfaceColoring,
     surfaceColor,
+    partialBonds,
+    partialBondLengths,
   } = settings;
   return {
     representation:
@@ -181,6 +160,13 @@ export function normalizeMolecule3DSettings(
         ? surfaceColoring
         : defaults.surfaceColoring,
     surfaceColor: hexColor(surfaceColor, defaults.surfaceColor),
+    partialBonds: isPartialBondMode(partialBonds)
+      ? partialBonds
+      : defaults.partialBonds,
+    partialBondLengths:
+      typeof partialBondLengths === 'boolean'
+        ? partialBondLengths
+        : defaults.partialBondLengths,
   };
 }
 
@@ -215,19 +201,10 @@ export function sameMolecule3DSettings(
     first.surfaceAlpha === second.surfaceAlpha &&
     first.probeRadius === second.probeRadius &&
     first.surfaceColoring === second.surfaceColoring &&
-    first.surfaceColor === second.surfaceColor
+    first.surfaceColor === second.surfaceColor &&
+    first.partialBonds === second.partialBonds &&
+    first.partialBondLengths === second.partialBondLengths
   );
-}
-
-/**
- * Complete a partial tool selection.
- * @param tools - The tools a site switched on or off.
- * @returns Every tool, those not named left on.
- */
-export function resolveMolecule3DTools(
-  tools: Partial<Molecule3DTools> = {},
-): Molecule3DTools {
-  return { ...DEFAULT_MOLECULE_3D_TOOLS, ...tools };
 }
 
 function hexColor(value: string | undefined, fallback: string): string {

@@ -15,10 +15,8 @@ import { MolstarToolbar } from '../../molstar/ui/MolstarToolbar.tsx';
 import { useMolstarTools } from '../../molstar/ui/useMolstarTools.ts';
 import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
-import {
-  normalizeMolecule3DSettings,
-  resolveMolecule3DTools,
-} from '../core/settings.ts';
+import { normalizeMolecule3DSettings } from '../core/settings.ts';
+import { resolveMolecule3DTools } from '../core/tools.ts';
 
 import { Molecule3DOptions } from './Molecule3DOptions.tsx';
 import { Molecule3DStage } from './Molecule3DStage.tsx';
@@ -186,6 +184,7 @@ export function MoleculeCanvas3D(props: MoleculeCanvas3DProps): ReactElement {
                   onChange={setSettings}
                   polarSurfaceArea={polarSurfaceArea}
                   defaults={initialSettings}
+                  format={molfile.format}
                 />
               }
               exportLabel={

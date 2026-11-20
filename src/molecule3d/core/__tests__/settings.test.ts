@@ -6,9 +6,9 @@ import {
   isSurfaceColoringId,
   normalizeMolecule3DSettings,
   resetMolecule3DSettings,
-  resolveMolecule3DTools,
   sameMolecule3DSettings,
 } from '../settings.ts';
+import { resolveMolecule3DTools } from '../tools.ts';
 
 test('nothing given is the default settings', () => {
   expect(normalizeMolecule3DSettings()).toStrictEqual(
@@ -35,6 +35,8 @@ test('stored settings are repaired rather than dropped', () => {
     probeRadius: 1,
     surfaceColoring: 'uniform',
     surfaceColor: '#94a3b8',
+    partialBonds: 'auto',
+    partialBondLengths: true,
   });
 });
 
@@ -79,6 +81,8 @@ test('a reset returns to the defaults but leaves the surface toggle alone', () =
     probeRadius: 2.2,
     surfaceColoring: 'polarity',
     surfaceColor: '#332288',
+    partialBonds: 'on',
+    partialBondLengths: false,
   } as const;
 
   expect(resetMolecule3DSettings(changed)).toStrictEqual({
@@ -103,5 +107,31 @@ test('settings compare equal only when every field does', () => {
   ).toBe(false);
   expect(
     sameMolecule3DSettings(settings, { ...settings, surfaceColor: '#000000' }),
+  ).toBe(false);
+});
+
+test('a stored partial bond mode is kept when valid, and repaired when not', () => {
+  expect(
+    normalizeMolecule3DSettings({ partialBonds: 'off' }).partialBonds,
+  ).toBe('off');
+  expect(
+    normalizeMolecule3DSettings({
+      partialBonds: 'dashed' as never,
+      partialBondLengths: 'yes' as never,
+    }),
+  ).toStrictEqual(DEFAULT_MOLECULE_3D_SETTINGS);
+});
+
+test('settings drawing other partial bonds compare unequal', () => {
+  const settings = DEFAULT_MOLECULE_3D_SETTINGS;
+
+  expect(
+    sameMolecule3DSettings(settings, { ...settings, partialBonds: 'off' }),
+  ).toBe(false);
+  expect(
+    sameMolecule3DSettings(settings, {
+      ...settings,
+      partialBondLengths: false,
+    }),
   ).toBe(false);
 });

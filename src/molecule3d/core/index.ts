@@ -49,15 +49,27 @@ export {
   sameMeasurements,
 } from './measurement.ts';
 export type { Molecule3DFile } from './file.ts';
+export type { PartialBondMode } from './partialBondMode.ts';
+export {
+  PARTIAL_BOND_MODES,
+  isPartialBondMode,
+  showsPartialBonds,
+} from './partialBondMode.ts';
+export type { PartialBondReach } from './partialBondRanges.ts';
+export { FAR_PARTIAL_BOND, NEAR_PARTIAL_BOND } from './partialBondRanges.ts';
+export type {
+  PartialBond,
+  PartialBondGeometry,
+  PartialBondOptions,
+} from './partialBonds.ts';
+export { findPartialBonds } from './partialBonds.ts';
 export type {
   Molecule3DSettings,
-  Molecule3DTools,
   RepresentationId,
   SurfaceColoringId,
 } from './settings.ts';
 export {
   DEFAULT_MOLECULE_3D_SETTINGS,
-  DEFAULT_MOLECULE_3D_TOOLS,
   MOLECULE_3D_RANGES,
   REPRESENTATIONS,
   REPRESENTATION_LABELS,
@@ -68,6 +80,7 @@ export {
   isSurfaceColoringId,
   normalizeMolecule3DSettings,
   resetMolecule3DSettings,
-  resolveMolecule3DTools,
   sameMolecule3DSettings,
 } from './settings.ts';
+export type { Molecule3DTools } from './tools.ts';
+export { DEFAULT_MOLECULE_3D_TOOLS, resolveMolecule3DTools } from './tools.ts';

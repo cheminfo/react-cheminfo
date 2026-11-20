@@ -112,6 +112,7 @@ function render(
       <Molecule3DOptions
         settings={settings}
         defaults={DEFAULT_MOLECULE_3D_SETTINGS}
+        format="mol"
         polarSurfaceArea={polarSurfaceArea}
         onChange={(next) => {
           changes.push(next);

@@ -5,7 +5,8 @@ import type { Molecule3DCamera } from '../core/camera.ts';
 import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { AtomReference, Measurement } from '../core/measurement.ts';
-import type { Molecule3DSettings, Molecule3DTools } from '../core/settings.ts';
+import type { Molecule3DSettings } from '../core/settings.ts';
+import type { Molecule3DTools } from '../core/tools.ts';
 
 /** The scene on screen, rendered as a picture on request. */
 export interface Molecule3DCapture {
