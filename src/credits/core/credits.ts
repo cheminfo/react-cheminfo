@@ -497,6 +497,22 @@ export const CREDITS = [
     license: 'BSD-3-Clause',
   },
   {
+    // By Volodymyr Baydalka, published from his docxjs repository.
+    id: 'docx-preview',
+    name: 'docx-preview',
+    href: 'https://github.com/VolodymyrBaydalka/docxjs',
+    description: 'shows a Word document in the page, laid out as it prints.',
+    license: 'Apache-2.0',
+  },
+  {
+    // By catamphetamine.
+    id: 'read-excel-file',
+    name: 'read-excel-file',
+    href: 'https://gitlab.com/catamphetamine/read-excel-file',
+    description: 'reads the sheets of an Excel workbook into rows.',
+    license: 'MIT',
+  },
+  {
     id: 'preact-signals',
     name: 'Preact Signals',
     href: 'https://preactjs.com/guide/v10/signals/',

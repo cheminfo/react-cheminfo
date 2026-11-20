@@ -115,7 +115,26 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(70);
+  expect(CREDITS).toHaveLength(72);
+});
+
+test('the Word and Excel readers are credited to their own authors', () => {
+  expect(credits(['docx-preview', 'read-excel-file'])).toStrictEqual([
+    {
+      id: 'docx-preview',
+      name: 'docx-preview',
+      href: 'https://github.com/VolodymyrBaydalka/docxjs',
+      description: 'shows a Word document in the page, laid out as it prints.',
+      license: 'Apache-2.0',
+    },
+    {
+      id: 'read-excel-file',
+      name: 'read-excel-file',
+      href: 'https://gitlab.com/catamphetamine/read-excel-file',
+      description: 'reads the sheets of an Excel workbook into rows.',
+      license: 'MIT',
+    },
+  ]);
 });
 
 test('the Zakodium tooling is credited as ours, under its npm name', () => {
