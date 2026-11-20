@@ -131,6 +131,31 @@ test('a stir bar turns as a whole; a paddle turns alone under its shaft', () => 
   );
 });
 
+test('a flask on an orbital shaker swirls as a whole; the platform of the shaker swirls alone over its casing', () => {
+  const flask: SceneItem = {
+    owner: { kind: 'glass', id: 'g1' },
+    swirling: 6.25,
+    primitives: [{ kind: 'path', d: 'M0 0L1 1', width: 0.6, extent: [] }],
+  };
+
+  expect(sceneBody(sceneOf(flask), { style: STYLE })).toBe(
+    `${OPEN}<g cd:glass="g1" class="glass-swirling" style="--glass-orbit: 6.25px"><path d="M0 0L1 1"/></g></g>`,
+  );
+
+  const shaker: SceneItem = {
+    owner: { kind: 'glass', id: 'g2' },
+    swirling: 6.25,
+    primitives: [
+      { kind: 'path', d: 'M0 0', width: 0.6, extent: [] },
+      { kind: 'path', d: 'M1 1', width: 0.6, extent: [], swirls: true },
+    ],
+  };
+
+  expect(sceneBody(sceneOf(shaker), { style: STYLE })).toBe(
+    `${OPEN}<g cd:glass="g2"><path d="M0 0"/><g class="glass-swirling" style="--glass-orbit: 6.25px"><path d="M1 1"/></g></g></g>`,
+  );
+});
+
 test('a rotor spins as one group in its place, the rest of its piece still', () => {
   const pump: SceneItem = {
     owner: { kind: 'glass', id: 'g3' },

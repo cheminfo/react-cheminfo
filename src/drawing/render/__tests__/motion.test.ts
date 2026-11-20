@@ -42,7 +42,7 @@ test('a run keeps its own clock, repeated for ever', () => {
   ).toStrictEqual({ begin: '1.23s', dur: '0.30s', repeatCount: 'indefinite' });
 });
 
-test('a scene moves when a piece turns, a bubble rises, something runs or a rotor spins', () => {
+test('a scene moves when a piece turns, a bubble rises, something runs, a rotor spins or a shaker swirls', () => {
   const owner = { kind: 'glass', id: 'g1' };
 
   expect(sceneMoves(sceneOf())).toBe(false);
@@ -72,6 +72,18 @@ test('a scene moves when a piece turns, a bubble rises, something runs or a roto
   expect(
     sceneMoves(sceneOf({ owner, primitives: [path({ spins: 'clockwise' })] })),
   ).toBe(true);
+  expect(
+    sceneMoves(sceneOf({ owner, primitives: [path()], swirling: 6 })),
+  ).toBe(true);
+  expect(
+    sceneMoves(sceneOf({ owner, primitives: [path({ swirls: true })] })),
+  ).toBe(true);
+});
+
+test('a piece an orbital shaker swirls sways across its orbit at 180 rpm, and never where less motion is asked for', () => {
+  expect(MOTION_STYLE).toContain(
+    "[data-motion='moving'] .glass-swirling{animation: glass-swirl 0.167s ease-in-out infinite alternate;}@keyframes glass-swirl{from{transform: translateX(calc(-1 * var(--glass-orbit)));}to{transform: translateX(var(--glass-orbit));}}",
+  );
 });
 
 test('a rotor spins about the middle of its box, either way, and never where less motion is asked for', () => {
@@ -79,7 +91,7 @@ test('a rotor spins about the middle of its box, either way, and never where les
     "[data-motion='moving'] .glass-spinning{animation: glass-spin 1.2s linear infinite;transform-box: fill-box;transform-origin: center;}[data-motion='moving'] .glass-spinning-back{animation-direction: reverse;}@keyframes glass-spin{to{transform: rotate(360deg);}}",
   );
   expect(MOTION_STYLE).toContain(
-    '{.glass-bubble,.glass-turning,.glass-spinning{animation: none;}',
+    '{.glass-bubble,.glass-turning,.glass-spinning,.glass-swirling{animation: none;}',
   );
 });
 
@@ -94,7 +106,7 @@ test('the stylesheet a figure carries is the page one without comments or spare 
     ),
   ).toBe(true);
   expect(MOTION_STYLE).toContain(
-    '@media print,(prefers-reduced-motion: reduce){.glass-bubble,.glass-turning,.glass-spinning{animation: none;}',
+    '@media print,(prefers-reduced-motion: reduce){.glass-bubble,.glass-turning,.glass-spinning,.glass-swirling{animation: none;}',
   );
   expect(
     MOTION_STYLE.endsWith(

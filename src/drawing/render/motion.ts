@@ -111,6 +111,23 @@ export const MOTION_CSS = `/* A bubble rises from where it is drawn, three of it
   }
 }
 
+/* A piece an orbital shaker swirls, seen edge on: it sways from one side of
+   the orbit to the other and back, a round trip a third of a second long, as
+   at 180 rpm. */
+[data-motion='moving'] .glass-swirling {
+  animation: glass-swirl 0.167s ease-in-out infinite alternate;
+}
+
+@keyframes glass-swirl {
+  from {
+    transform: translateX(calc(-1 * var(--glass-orbit)));
+  }
+
+  to {
+    transform: translateX(var(--glass-orbit));
+  }
+}
+
 /* A figure carries each bubble running along water, and each drop falling, as
    a run that only shows moving (written hidden, for a program that reads no
    style), and the ones drawn where they stand as a still copy that only shows
@@ -126,7 +143,8 @@ export const MOTION_CSS = `/* A bubble rises from where it is drawn, three of it
 @media print, (prefers-reduced-motion: reduce) {
   .glass-bubble,
   .glass-turning,
-  .glass-spinning {
+  .glass-spinning,
+  .glass-swirling {
     animation: none;
   }
 
@@ -175,19 +193,20 @@ export function runTiming(flow: NonNullable<PathPrimitive['flow']>): {
 
 /**
  * Whether a scene has anything that moves: a bubble, a run, a turning piece,
- * a spinning rotor.
+ * a spinning rotor, a piece an orbital shaker swirls.
  * @param scene - The scene.
  * @returns True when a figure of it can be set moving.
  */
 export function sceneMoves(scene: Scene): boolean {
   for (const item of scene.items) {
-    if (item.turning !== undefined) return true;
+    if (item.turning !== undefined || item.swirling !== undefined) return true;
     for (const primitive of item.primitives) {
       if (
         primitive.kind === 'path' &&
         (primitive.flow !== undefined ||
           primitive.bubble !== undefined ||
-          primitive.spins !== undefined)
+          primitive.spins !== undefined ||
+          primitive.swirls !== undefined)
       ) {
         return true;
       }

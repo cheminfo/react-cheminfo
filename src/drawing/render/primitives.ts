@@ -93,6 +93,13 @@ export interface PathPrimitive {
    */
   turns?: true;
   /**
+   * Whether it alone swirls while its piece runs, the rest still: the
+   * platform of an orbital shaker, over its casing. Set moving it swirls; a
+   * file holds it still.
+   * @default undefined — the whole piece swirls, as a flask on the platform does
+   */
+  swirls?: true;
+  /**
    * The way it spins in its own plane while its piece runs, with the
    * primitives drawn next to it that spin the same way, about the middle of
    * their box: a rotor seen face on, drawn whole about its axle. Set moving
@@ -223,6 +230,13 @@ export interface SceneItem<K extends string = string> {
    * @default undefined — it stays still
    */
   turning?: number;
+  /**
+   * For what an orbital shaker swirls, the radius of its orbit, in points:
+   * set moving, it circles the orbit, seen edge on as a sway from one side
+   * to the other; a file holds it still.
+   * @default undefined — it stays still
+   */
+  swirling?: number;
 }
 
 /** A whole rendered drawing. */

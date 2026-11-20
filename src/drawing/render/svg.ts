@@ -181,18 +181,45 @@ function itemMarkup(item: SceneItem, options: SvgOptions): string {
           : inner.join('');
       })
       .join('');
-  // A piece whose paddle alone turns keeps the rest still.
-  if (item.turning !== undefined && item.primitives.some(turnsAlone)) {
-    const still = item.primitives.filter((primitive) => !turnsAlone(primitive));
-    const paddle = item.primitives.filter(turnsAlone);
-    return `<g cd:${kind}="${id}"${label}${ink}${faded}>${markup(still)}<g${turningMarkup(item.turning)}>${markup(paddle)}</g></g>`;
+  const motion = motionOf(item);
+  // A piece whose paddle or platform alone moves keeps the rest still.
+  if (motion && item.primitives.some(motion.alone)) {
+    const still = item.primitives.filter(
+      (primitive) => !motion.alone(primitive),
+    );
+    const moving = item.primitives.filter(motion.alone);
+    return `<g cd:${kind}="${id}"${label}${ink}${faded}>${markup(still)}<g${motion.markup}>${markup(moving)}</g></g>`;
   }
-  const turning = item.turning === undefined ? '' : turningMarkup(item.turning);
-  return `<g cd:${kind}="${id}"${label}${ink}${faded}${turning}>${markup(item.primitives)}</g>`;
+  const whole = motion?.markup ?? '';
+  return `<g cd:${kind}="${id}"${label}${ink}${faded}${whole}>${markup(item.primitives)}</g>`;
+}
+
+// How a piece moves, and which of its primitives move alone when some do: a
+// stir bar turns, a stirrer's paddle under its shaft; a flask on an orbital
+// shaker swirls, the shaker's platform over its casing.
+function motionOf(
+  item: SceneItem,
+): { markup: string; alone: (primitive: Primitive) => boolean } | undefined {
+  if (item.turning !== undefined) {
+    return { markup: turningMarkup(item.turning), alone: turnsAlone };
+  }
+  if (item.swirling !== undefined) {
+    return { markup: swirlingMarkup(item.swirling), alone: swirlsAlone };
+  }
+  return undefined;
 }
 
 function turnsAlone(primitive: Primitive): boolean {
   return primitive.kind === 'path' && primitive.turns === true;
+}
+
+function swirlsAlone(primitive: Primitive): boolean {
+  return primitive.kind === 'path' && primitive.swirls === true;
+}
+
+// What sets a piece swirling on the orbit of an orbital shaker.
+function swirlingMarkup(orbit: number): string {
+  return ` class="glass-swirling" style="--glass-orbit: ${number(orbit)}px"`;
 }
 
 // What sets a stir bar turning about the upright, the way it lies.
