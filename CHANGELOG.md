@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.139.0](https://github.com/cheminfo/react-cheminfo/compare/v0.138.0...v0.139.0) (2026-11-20)
+
+
+### Features
+
+* let the zoom bar stop short of 1600 %, show a fitted view and name its fit button ([f3fd121](https://github.com/cheminfo/react-cheminfo/commit/f3fd121d5e81201a0db4d8e34f17d46912c6b03f))
+
 ## [0.138.0](https://github.com/cheminfo/react-cheminfo/compare/v0.137.0...v0.138.0) (2026-11-20)
 
 
