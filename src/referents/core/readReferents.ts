@@ -4,6 +4,7 @@
  */
 
 import type {
+  FigureQuote,
   FigureReferent,
   FigureReferents,
   ReferentBox,
@@ -15,7 +16,8 @@ import type {
 /**
  * Referents from parsed JSON.
  * @param value - What was parsed.
- * @returns The referents and series that read; empty lists for anything else.
+ * @returns The referents, series and quotes that read; empty lists for
+ * anything else, and no quotes when none read.
  */
 export function readReferents(value: unknown): FigureReferents {
   const record = isRecord(value) ? value : {};
@@ -29,7 +31,30 @@ export function readReferents(value: unknown): FigureReferents {
     const one = readSeries(item);
     if (one) series.push(one);
   }
-  return { referents, series };
+  const quotes: FigureQuote[] = [];
+  for (const item of listOf(record.quotes)) {
+    const quote = readQuote(item);
+    if (quote) quotes.push(quote);
+  }
+  return quotes.length === 0
+    ? { referents, series }
+    : { referents, series, quotes };
+}
+
+function readQuote(value: unknown): FigureQuote | undefined {
+  if (!isRecord(value) || !isKey(value.key) || !isKey(value.kind)) {
+    return undefined;
+  }
+  if (!isText(value.title) || !isText(value.html)) return undefined;
+  const quote: FigureQuote = {
+    key: value.key,
+    kind: value.kind,
+    title: value.title,
+    html: value.html,
+  };
+  if (isText(value.picture)) quote.picture = value.picture;
+  copyStructure(value, quote);
+  return quote;
 }
 
 function readReferent(value: unknown): FigureReferent | undefined {

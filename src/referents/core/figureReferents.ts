@@ -14,8 +14,9 @@ export const FIGURE_REFERENTS_NAMESPACE =
   'https://www.cheminfo.org/ns/referents/1';
 
 /**
- * Write what a figure numbers into its SVG, in place of what it carried. A
- * figure numbering nothing is written without any.
+ * Write what a figure numbers and lets a document quote into its SVG, in
+ * place of what it carried. A figure numbering and quoting nothing is written
+ * without any.
  * @param svg - The figure, as an SVG document.
  * @param referents - What it numbers.
  * @returns The figure.
@@ -25,7 +26,11 @@ export function withFigureReferents(
   referents: FigureReferents,
 ): string {
   const text = withoutFigureReferents(svg);
-  if (referents.referents.length === 0 && referents.series.length === 0) {
+  if (
+    referents.referents.length === 0 &&
+    referents.series.length === 0 &&
+    (referents.quotes ?? []).length === 0
+  ) {
     return text;
   }
   const element = `<cheminfo:referents xmlns:cheminfo="${FIGURE_REFERENTS_NAMESPACE}">${escapeText(JSON.stringify(referents))}</cheminfo:referents>`;

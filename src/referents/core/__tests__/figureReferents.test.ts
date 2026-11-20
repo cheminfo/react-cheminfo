@@ -124,3 +124,43 @@ test('broken JSON reads as nothing', () => {
 
   expect(readFigureReferents(svg)).toBeUndefined();
 });
+
+const QUOTE = {
+  key: 'nmr:proton',
+  kind: 'nmr',
+  title: '¹H NMR · ethylbenzene',
+  html: '<sup>1</sup>H NMR (400 MHz, CDCl<sub>3</sub>) δ 1.24 (t, <i>J</i> = 7.6 Hz, 3H).',
+  picture: '<svg><text>CCc1ccccc1</text></svg>',
+  mf: 'C8H10',
+};
+
+test('the texts a figure lets a document quote ride beside its referents', () => {
+  const svg = withFigureReferents(FIGURE, {
+    referents: [],
+    series: [],
+    quotes: [QUOTE],
+  });
+
+  expect(readFigureReferents(svg)).toStrictEqual({
+    referents: [],
+    series: [],
+    quotes: [QUOTE],
+  });
+});
+
+test('a quote without its kind, title or text is left out', () => {
+  const svg = withFigureReferents(FIGURE, {
+    referents: [{ key: 'k1' }],
+    series: [],
+    quotes: [
+      { ...QUOTE, kind: '' },
+      { ...QUOTE, title: '' },
+      { ...QUOTE, html: '' },
+    ],
+  });
+
+  expect(readFigureReferents(svg)).toStrictEqual({
+    referents: [{ key: 'k1' }],
+    series: [],
+  });
+});

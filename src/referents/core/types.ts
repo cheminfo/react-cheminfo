@@ -131,12 +131,57 @@ export interface ReferentSeries {
   numbering?: SeriesNumbering;
 }
 
+/**
+ * A text a figure lets a document quote as it stands, rather than number: the
+ * description of an NMR spectrum as a journal prints it, offered by the `@`
+ * menu of the document the figure is placed in.
+ */
+export interface FigureQuote {
+  /** What names it, stable for as long as the figure carries it. */
+  key: string;
+  /** What it is, `nmr`: quotes of one kind are offered together. */
+  kind: string;
+  /** What it is offered as, `¹H NMR · ethylbenzene`. */
+  title: string;
+  /**
+   * The text, as inline HTML: only `<sup>`, `<sub>`, `<i>`, `<em>`, `<b>` and
+   * `<strong>` are read, by `quoteParts`.
+   */
+  html: string;
+  /**
+   * What it describes, as an SVG document: the structure the spectrum was
+   * recorded on.
+   * @default undefined — named by its title alone
+   */
+  picture?: string;
+  /**
+   * The structure as an OpenChemLib ID code.
+   * @default undefined
+   */
+  idCode?: string;
+  /**
+   * The structure as SMILES.
+   * @default undefined
+   */
+  smiles?: string;
+  /**
+   * The structure's molecular formula.
+   * @default undefined
+   */
+  mf?: string;
+}
+
 /** What a figure numbers. */
 export interface FigureReferents {
   /** The referents, in the order their labels are read. */
   referents: FigureReferent[];
   /** The series the figure defines. */
   series: ReferentSeries[];
+  /**
+   * The texts it lets a document quote.
+   * @default undefined — none
+   */
+  quotes?: FigureQuote[];
 }
 
 /** A label, or a reference in the text: a referent, or one of its members. */
