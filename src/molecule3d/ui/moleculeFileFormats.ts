@@ -19,6 +19,7 @@ import {
 } from '../../structure/core/molfileExport.ts';
 import { notationText } from '../../structure/ui/structureNotationText.ts';
 import type { Molecule3DFile } from '../core/file.ts';
+import { isMolfileFormat } from '../core/file.ts';
 
 /** A molfile the viewer's export writes. */
 export type MoleculeFileFormat = 'molfileV2000' | 'molfileV3000';
@@ -30,8 +31,9 @@ const DIALECTS: Readonly<Record<MoleculeFileFormat, MolfileDialect>> = {
 
 /**
  * How many atoms a molfile can be written with, when one can: the file on
- * screen has to be a connection table of a single model, so neither an XYZ,
- * which has no bonds, nor a series of frames, which is not one molecule.
+ * screen has to be a molfile of a single model, so neither an XYZ, which has
+ * no bonds, nor a PDB, which openchemlib does not read, nor a series of
+ * frames, which is not one molecule.
  * @param file - The file on screen.
  * @param frameCount - How many frames the scene holds.
  * @returns The atoms, or `0` when no molfile can be written.
@@ -40,7 +42,7 @@ export function moleculeFileAtoms(
   file: Molecule3DFile | null | undefined,
   frameCount: number,
 ): number {
-  if (!file || file.format === 'xyz' || frameCount > 1) return 0;
+  if (!file || !isMolfileFormat(file.format) || frameCount > 1) return 0;
   return classifyMolfile(file.data).atomCount;
 }
 

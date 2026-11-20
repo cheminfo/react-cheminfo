@@ -49,6 +49,7 @@ export {
   sameMeasurements,
 } from './measurement.ts';
 export type { Molecule3DFile } from './file.ts';
+export { isMolfileFormat } from './file.ts';
 export type { PartialBondMode } from './partialBondMode.ts';
 export {
   PARTIAL_BOND_MODES,

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import type { Molecule3DFile } from '../core/file.ts';
+import { isMolfileFormat } from '../core/file.ts';
 
 /**
  * Ertl's topological polar surface area of the molecule, from openchemlib,
  * loaded only once a caller asks for it.
  * @param molfile - The molecule, or `null`.
  * @param enabled - Whether to compute it at all.
- * @returns The area in Å², or `null` while unknown, disabled, for an XYZ
- * file, or when openchemlib is not installed or cannot read the molfile.
+ * @returns The area in Å², or `null` while unknown, disabled, for a file that
+ * is not a molfile, or when openchemlib is not installed or cannot read it.
  */
 export function usePolarSurfaceArea(
   molfile: Molecule3DFile | null,
@@ -18,9 +19,9 @@ export function usePolarSurfaceArea(
     data: string;
     area: number | null;
   } | null>(null);
-  // An XYZ file has no bonds for openchemlib to find the polar atoms by.
+  // openchemlib finds the polar atoms by the bonds of a molfile.
   const data =
-    enabled && molfile?.format !== 'xyz' ? (molfile?.data ?? null) : null;
+    enabled && molfile && isMolfileFormat(molfile.format) ? molfile.data : null;
 
   useEffect(() => {
     if (data === null) return;

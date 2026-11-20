@@ -32,7 +32,10 @@ export function isPartialBondMode(value: unknown): value is PartialBondMode {
  * An XYZ file carries no bonds: they are guessed from the distances, and the
  * guess is what drops the stretched bonds of a transition state, so `auto`
  * draws them. A molfile states its bonds, the forming ones included when its
- * author wanted them, so `auto` adds nothing to it.
+ * author wanted them, so `auto` adds nothing to it. Nor to a PDB: its bonds
+ * are written in `CONECT` records, and where they are not, the file is mostly
+ * a measured structure, whose stretched pairs are far likelier two sites of a
+ * disorder than a bond being made.
  * @param mode - The setting.
  * @param format - The format of the file on screen.
  * @returns True when the partial bonds are drawn.
