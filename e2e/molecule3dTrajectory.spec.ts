@@ -5,9 +5,11 @@ import { expect, test } from '@playwright/test';
 import { openStory } from './story.ts';
 
 // molstar needs a real WebGL2 context, which headless Chromium only gets from
-// the software renderer.
+// the software renderer. Rendering then costs time in proportion to the pixels,
+// and a narrow window halves the viewer's width, and so the frames' pixels.
 test.use({
   launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader'] },
+  viewport: { width: 320, height: 640 },
 });
 
 /** An open panel, never the tooltip of the button that opened it. */
@@ -17,8 +19,8 @@ test('a file of several frames plays, and saves as an animated PNG of every fram
   page,
 }) => {
   // molstar's lazy chunk and twenty software-rendered frames outlast 30 s cold,
-  // and a two-core CI runner takes three times as long as a laptop.
-  test.setTimeout(180_000);
+  // and the save alone takes about a minute on two cores of a CI runner.
+  test.setTimeout(240_000);
   await openStory(page, 'molecule3d-moleculeviewer3d--trajectory');
   const canvas = page.getByTestId('molecule3d').locator('canvas');
   await expect(canvas).toBeVisible({ timeout: 60_000 });
@@ -46,7 +48,7 @@ test('a file of several frames plays, and saves as an animated PNG of every fram
   await panel.getByRole('radio', { name: '150 dpi', exact: true }).click();
 
   const [download] = await Promise.all([
-    page.waitForEvent('download', { timeout: 90_000 }),
+    page.waitForEvent('download', { timeout: 150_000 }),
     panel.getByRole('button', { name: 'Save' }).click(),
   ]);
   expect(download.suggestedFilename()).toBe('molecule.png');
