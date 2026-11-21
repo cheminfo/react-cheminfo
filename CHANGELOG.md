@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.141.0](https://github.com/cheminfo/react-cheminfo/compare/v0.140.1...v0.141.0) (2026-11-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* format citations with the journals' CSL styles
+
+### Features
+
+* format citations with the journals' CSL styles ([c5eb904](https://github.com/cheminfo/react-cheminfo/commit/c5eb90439ad2c12ae5e33cfc7639a961486d730f))
+
 ## [0.140.1](https://github.com/cheminfo/react-cheminfo/compare/v0.140.0...v0.140.1) (2026-11-21)
 
 
