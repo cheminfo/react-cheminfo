@@ -15,20 +15,13 @@ import {
   figureFrame,
 } from '../../molecule3d/core/figureFrame.ts';
 
-import { pictureHelper } from './captureScene.ts';
+import { FIGURE_SAMPLE_LEVEL, pictureHelper } from './captureScene.ts';
 
 /** The longest side of the quick render that finds the molecule, in pixels. */
 const PREVIEW_SIDE = 512;
 
 /** The margin left around the molecule, as a fraction of its own size. */
 const FIGURE_PADDING = 0.04;
-
-/**
- * How many times the figure is drawn to smooth its edges, as molstar counts
- * them: level 2 is 4 draws. molstar's own screenshots take 16, which costs four
- * times as long and changes nothing to see at a figure's size.
- */
-const FIGURE_SAMPLE_LEVEL = 2;
 
 /** The whole frame, as a crop. */
 const WHOLE_FRAME = { x: 0, y: 0, width: 1, height: 1 };

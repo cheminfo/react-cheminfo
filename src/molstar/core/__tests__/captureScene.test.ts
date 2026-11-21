@@ -112,6 +112,23 @@ test('a frame that fails to render still restores the frame, the loop and the pl
   ]);
 });
 
+test('the frames are drawn four times each, and the pass gets its own setting back', async () => {
+  const { plugin, passProps } = picturePlugin({
+    trajectories: [{ frames: 2, shown: 0 }],
+  });
+
+  await captureFrames(
+    plugin,
+    { width: 40, height: 30 },
+    { playing: false, framesPerSecond: 20 },
+  );
+
+  expect(passProps).toStrictEqual([
+    { multiSample: { mode: 'on', sampleLevel: 2 } },
+    { multiSample: { mode: 'on', sampleLevel: 4 } },
+  ]);
+});
+
 interface PictureOptions {
   /**
    * The trajectories on screen.
@@ -135,13 +152,15 @@ interface PictureOptions {
  * records the values it is set to, and its image pass renders the frame the
  * first model shows.
  * @param options - See {@link PictureOptions}.
- * @returns The plugin, the log of its calls and the helper values set.
+ * @returns The plugin, the log of its calls, the helper values set and the
+ * image pass props set.
  */
 function picturePlugin(options: PictureOptions = {}) {
   const { failFrame, ...trajectory } = options;
   const standIn = trajectoryStandIn(trajectory);
   const { log, shownFrames } = standIn;
   const values: unknown[] = [];
+  const passProps: unknown[] = [];
   const helper = {
     values: {
       imageFormat: 'png',
@@ -157,6 +176,10 @@ function picturePlugin(options: PictureOptions = {}) {
     },
     getImageDataUri: async () => 'data:image/png;base64,picture',
     imagePass: {
+      props: { multiSample: { mode: 'on', sampleLevel: 4 } },
+      setProps(props: unknown) {
+        passProps.push(props);
+      },
       async updateBackground() {
         log.push('background');
       },
@@ -185,5 +208,5 @@ function picturePlugin(options: PictureOptions = {}) {
       },
     },
   });
-  return { plugin, log, values };
+  return { plugin, log, values, passProps };
 }

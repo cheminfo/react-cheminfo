@@ -31,6 +31,14 @@ export async function captureScene(
   return pictureHelper(plugin, size).getImageDataUri();
 }
 
+/**
+ * How many times a figure or a frame of an animation is drawn to smooth its
+ * edges, as molstar counts them: level 2 is 4 draws. molstar's own screenshots
+ * take 16, which costs four times as long and changes nothing to see at a
+ * figure's size, nor in a frame shown for a twentieth of a second.
+ */
+export const FIGURE_SAMPLE_LEVEL = 2;
+
 /** How a series of frames is played, so it can be resumed once captured. */
 export interface FramePlayback {
   playing: boolean;
@@ -57,8 +65,12 @@ export async function captureFrames(
   const loop = plugin.animationLoop;
   const shown = shownTrajectoryFrame(plugin);
   const count = Math.max(1, trajectoryFrameCount(plugin));
+  const { multiSample } = pass.props;
   await stopTrajectory(plugin);
   loop.stop({ noDraw: true });
+  pass.setProps({
+    multiSample: { ...multiSample, sampleLevel: FIGURE_SAMPLE_LEVEL },
+  });
   try {
     await pass.updateBackground();
     const frames: ImageData[] = [];
@@ -78,6 +90,7 @@ export async function captureFrames(
     }
     return frames;
   } finally {
+    pass.setProps({ multiSample });
     if (count > 1) await showTrajectoryFrame(plugin, shown);
     loop.start({ immediate: true });
     await setTrajectoryPlayback(
