@@ -75,3 +75,28 @@ export function referenceVenue(reference: Reference): string {
     ? reference.repository
     : reference.journalAbbreviation;
 }
+
+/**
+ * The pages of an article, as BibTeX and RIS write them.
+ * @param reference - The article.
+ * @param dash - What joins the two ends.
+ * @returns One number for a journal that paginates by article number, the
+ * range otherwise.
+ */
+export function pageRange(reference: ArticleReference, dash = '–'): string {
+  const { firstPage, lastPage } = reference;
+  if (firstPage === lastPage) return firstPage;
+  return `${firstPage}${dash}${lastPage}`;
+}
+
+/**
+ * An author with the family name first, `Vanderveen, J. R.`, or the name of an
+ * organisation alone.
+ * @param author - The author.
+ * @returns The name, as a reference list writes it.
+ */
+export function nameFamilyFirst(author: ReferenceAuthor): string {
+  return author.given === ''
+    ? author.family
+    : `${author.family}, ${author.given}`;
+}

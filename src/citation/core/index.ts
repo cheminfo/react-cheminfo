@@ -11,6 +11,7 @@ export {
   DEFAULT_CITATION_STYLE,
   citationFilename,
   formatCitation,
+  formatEach,
 } from './formats.ts';
 export { GFN2_XTB_PAPER, GFN2_XTB_WORK } from './gfn2Paper.ts';
 export {
@@ -27,12 +28,8 @@ export type {
   ReferenceAuthor,
 } from './reference.ts';
 export { doiUrl, referenceVenue } from './reference.ts';
-export type {
-  CitationSegment,
-  CitationStyle,
-  CitationStyleId,
-} from './segments.ts';
-export { CITATION_STYLES, citationSegments } from './segments.ts';
+export type { CitationStyle, CitationStyleId } from './styles.ts';
+export { CITATION_STYLES } from './styles.ts';
 export { TEACHING_PAPER, TEACHING_WORK } from './teachingPaper.ts';
 export type { CitedWork } from './works.ts';
 export {

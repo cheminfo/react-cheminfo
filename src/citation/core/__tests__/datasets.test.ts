@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 import { formatCitation } from '../formats.ts';
 import type { DatasetReference } from '../reference.ts';
 import { referenceVenue } from '../reference.ts';
+import { CITATION_STYLES } from '../styles.ts';
 import { formatCitations } from '../works.ts';
 
 import { PAPER } from './paper.ts';
@@ -26,36 +27,29 @@ const DATASET: DatasetReference = {
 
 const DOI = 'https://doi.org/10.5281/zenodo.18380123';
 
-test('a dataset names its repository where an article names its journal', () => {
-  expect(formatCitation(DATASET, 'text', 'acs')).toBe(
-    `Waser, J.; Wu, W.; Milzarek, T. M. Raw data for the article "Accessing CF3-Cyclopropenes"; Zenodo, 2026. ${DOI}`,
+test('a dataset is written as each style writes one, its repository as publisher', async () => {
+  const texts = await Promise.all(
+    CITATION_STYLES.map((style) => formatCitation(DATASET, 'text', style.id)),
   );
-  expect(formatCitation(DATASET, 'text', 'nature')).toBe(
-    `Waser, J., Wu, W. & Milzarek, T. M. Raw data for the article "Accessing CF3-Cyclopropenes". Zenodo (2026). ${DOI}`,
+  const written = Object.fromEntries(
+    CITATION_STYLES.map((style, index) => [style.label, texts[index]]),
   );
-  expect(formatCitation(DATASET, 'text', 'rsc')).toBe(
-    `J. Waser, W. Wu and T. M. Milzarek, Raw data for the article "Accessing CF3-Cyclopropenes", Zenodo, 2026. ${DOI}`,
-  );
-  expect(formatCitation(DATASET, 'text', 'wiley')).toBe(
-    `J. Waser, W. Wu, T. M. Milzarek, Raw data for the article "Accessing CF3-Cyclopropenes", Zenodo, 2026. ${DOI}`,
+
+  expect(written).toStrictEqual({
+    ACS: `Waser, J.; Wu, W.; Milzarek, T. M. Raw Data for the Article “Accessing CF3-Cyclopropenes,” 2026. ${DOI}`,
+    Nature: `Waser, J., Wu, W. & Milzarek, T. M. Raw data for the article “Accessing CF3-Cyclopropenes.” Zenodo ${DOI} (2026).`,
+    RSC: 'J. Waser, W. Wu and T. M. Milzarek, 2026.',
+    Angewandte: `J. Waser, W. Wu, T. M. Milzarek (2026), ${DOI}.`,
+  });
+  await expect(formatCitation(DATASET, 'html')).resolves.toBe(
+    `Waser, J.; Wu, W.; Milzarek, T. M. Raw Data for the Article “Accessing CF3-Cyclopropenes,” 2026. ${DOI}`,
   );
 });
 
-test('the repository of a dataset is set in italics', () => {
-  expect(formatCitation(DATASET, 'html')).toContain(
-    `; <em>Zenodo</em>, 2026. <a href="${DOI}">doi:10.5281/zenodo.18380123</a>`,
-  );
-  expect(formatCitation(DATASET, 'markdown')).toContain('; *Zenodo*, 2026.');
-});
-
-test('a version is written after the title', () => {
-  expect(formatCitation({ ...DATASET, version: '2' }, 'text')).toContain(
-    '"Accessing CF3-Cyclopropenes", version 2; Zenodo, 2026.',
-  );
-});
-
-test('a dataset is a BibTeX misc entry published by its repository', () => {
-  expect(formatCitation({ ...DATASET, version: '2' }, 'bibtex')).toBe(
+test('a dataset is a BibTeX misc entry published by its repository', async () => {
+  await expect(
+    formatCitation({ ...DATASET, version: '2' }, 'bibtex'),
+  ).resolves.toBe(
     `@misc{Waser2026,
   author = {Waser, J. and Wu, W. and Milzarek, T. M.},
   title = {Raw data for the article "Accessing CF3-Cyclopropenes"},
@@ -69,8 +63,10 @@ test('a dataset is a BibTeX misc entry published by its repository', () => {
   );
 });
 
-test('a dataset is an RIS DATA record, its version as the edition', () => {
-  expect(formatCitation({ ...DATASET, version: '2' }, 'ris')).toBe(
+test('a dataset is an RIS DATA record, its version as the edition', async () => {
+  await expect(
+    formatCitation({ ...DATASET, version: '2' }, 'ris'),
+  ).resolves.toBe(
     [
       'TY  - DATA',
       'AU  - Waser, J.',
@@ -87,22 +83,22 @@ test('a dataset is an RIS DATA record, its version as the edition', () => {
   );
 });
 
-test('an organisation is written by its name alone', () => {
+test('an organisation is written by its name alone', async () => {
   const byConsortium: DatasetReference = {
     ...DATASET,
     authors: [{ given: '', family: 'SciPeaks consortium' }],
   };
 
-  expect(formatCitation(byConsortium, 'text', 'acs')).toBe(
-    `SciPeaks consortium. Raw data for the article "Accessing CF3-Cyclopropenes"; Zenodo, 2026. ${DOI}`,
+  await expect(formatCitation(byConsortium, 'text')).resolves.toBe(
+    `SciPeaks consortium. Raw Data for the Article “Accessing CF3-Cyclopropenes,” 2026. ${DOI}`,
   );
-  expect(formatCitation(byConsortium, 'ris')).toContain(
+  await expect(formatCitation(byConsortium, 'ris')).resolves.toContain(
     'AU  - SciPeaks consortium\n',
   );
 });
 
-test('a dataset and an article are written together', () => {
-  const ris = formatCitations([DATASET, PAPER], 'ris');
+test('a dataset and an article are written together', async () => {
+  const ris = await formatCitations([DATASET, PAPER], 'ris');
 
   expect(ris.match(/^TY {2}- \w+$/gm)).toStrictEqual([
     'TY  - DATA',

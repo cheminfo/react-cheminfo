@@ -1,7 +1,6 @@
 import type { CitationFormatId } from './formats.ts';
-import { citationFilename, formatCitation } from './formats.ts';
+import { citationFilename, formatEach } from './formats.ts';
 import type { Reference } from './reference.ts';
-import type { CitationStyleId } from './segments.ts';
 
 /**
  * One of the works a site asks to be cited, with the words that say which part
@@ -51,17 +50,16 @@ export function citedReferences(works: readonly CitedWork[]): Reference[] {
  * written citation takes one reference per line.
  * @param references - References to render, in reading order.
  * @param format - Format to render them in.
- * @param style - Journal style, for the formats that have one.
+ * @param style - The CSL style of a format written as a journal writes it.
  * @returns The citations, ready to be copied to the clipboard or saved.
  */
-export function formatCitations(
+export async function formatCitations(
   references: readonly Reference[],
   format: CitationFormatId,
-  style?: CitationStyleId,
-): string {
-  return references
-    .map((reference) => formatCitation(reference, format, style))
-    .join(SEPARATORS[format]);
+  style?: string,
+): Promise<string> {
+  const written = await formatEach(references, format, style);
+  return written.join(SEPARATORS[format]);
 }
 
 /**

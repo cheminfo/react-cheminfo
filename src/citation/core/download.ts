@@ -12,12 +12,13 @@ import { citationsFilename, formatCitations } from './works.ts';
  * installed.
  * @param references - References to save, in reading order.
  * @param download - File to write, from `CITATION_DOWNLOADS`.
+ * @returns Resolves once the file is handed to the browser.
  */
-export function downloadCitations(
+export async function downloadCitations(
   references: readonly Reference[],
   download: CitationDownload,
-): void {
-  const content = formatCitations(references, download.format);
+): Promise<void> {
+  const content = await formatCitations(references, download.format);
   downloadBlob(
     new Blob([content], { type: download.mimeType }),
     citationsFilename(references, download.extension),
@@ -28,10 +29,11 @@ export function downloadCitations(
  * Save one reference as the file a reference manager imports.
  * @param reference - Reference to save.
  * @param download - File to write, from `CITATION_DOWNLOADS`.
+ * @returns Resolves once the file is handed to the browser.
  */
 export function downloadCitation(
   reference: Reference,
   download: CitationDownload,
-): void {
-  downloadCitations([reference], download);
+): Promise<void> {
+  return downloadCitations([reference], download);
 }

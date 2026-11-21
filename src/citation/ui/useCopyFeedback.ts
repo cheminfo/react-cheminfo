@@ -6,7 +6,6 @@ import { useChromeT } from '../../i18n/ui/useT.ts';
 import { copyCitations } from '../core/clipboard.ts';
 import type { CitationFormatId } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
-import type { CitationStyleId } from '../core/segments.ts';
 
 import type { CopyState } from './entries.tsx';
 
@@ -24,7 +23,7 @@ export interface CopyFeedback {
     key: string,
     references: readonly Reference[],
     format: CitationFormatId,
-    style?: CitationStyleId,
+    style?: string,
   ) => void;
 }
 

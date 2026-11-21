@@ -7,7 +7,7 @@ import { useActionTooltip } from '../../shared/ui/useActionTooltip.ts';
 import { downloadCitations } from '../core/download.ts';
 import type { CitationDownload, CitationFormat } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
-import type { CitationStyle } from '../core/segments.ts';
+import type { CitationStyle } from '../core/styles.ts';
 
 import { CitationPreview } from './CitationPreview.tsx';
 
@@ -108,7 +108,7 @@ export function DownloadEntry(props: DownloadEntryProps): ReactElement {
           text={t.or(`cite.download.${download.format}`, download.label)}
           labelElement={download.hint}
           onClick={() => {
-            downloadCitations(references, download);
+            void downloadCitations(references, download);
           }}
         />
       )}

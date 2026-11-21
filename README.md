@@ -52,6 +52,7 @@ only when it drags a heavy dependency behind it.
 | `react-cheminfo/mass`                      | the mass spectrum chart, peak table and editor                 | React, ms-spectrum, jcampconverter, xy-parser    |
 | `react-cheminfo/xps`                       | the XPS chart, peak, fit and composition tables, editor        | React, xps-analysis, ml-gsd, xy-parser           |
 | `react-cheminfo/xtb`                       | GFN2-xTB as a geometry relaxer                                 | nothing on import; xtb-wasm on the first call    |
+| `react-cheminfo/csl`                       | CSL JSON read, citations formatted in a journal's CSL style    | nothing on import; citeproc and the style first  |
 | `react-cheminfo/host`                      | data handed over by a page that frames the tool                | nothing on import; ajv once the page is framed   |
 | `react-cheminfo/demo`                      | a tool playing a steps slide's demo, with a cursor             | nothing; loaded only on a page with `?demo=`     |
 | `react-cheminfo/host-testing`              | a stand-in host and SciPeaks' messages, for e2e tests          | nothing; Node only                               |
@@ -180,7 +181,8 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **An empty tool**          | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `EmptyGuide`, `EmptyGuideSection`, `ShortcutList`, `ShortcutKeys`                                                                                                                                                                                                                                               |
 | **Waiting for data**       | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `DataDropZone`                                                                                                                                                                                                                                                                                                  |
 | **Languages**              | `LANGUAGES`, `DEFAULT_LANGUAGE`, `LANGUAGE_LABELS`, `isLanguage`, `MessageCatalog`, `CHROME_CATALOG`, `setMessageSession`, `loadCatalogs`, `startTranslateMode`, `LANGUAGE_PARAM`, `withLanguageParam`                                                                                                                                                                                                                                                                                                                | `useT`, `useChromeT`, `useLanguage`, `LanguageSelect`, `SiteLanguage`                                                                                                                                                                                                                                           |
-| **Citation**               | `formatCitation`, `formatCitations`, `citationSegments`, `downloadCitation`, `citedReferences`, `doiUrl`, `referenceVenue`                                                                                                                                                                                                                                                                                                                                                                                            | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                                 |
+| **Citation**               | `formatCitation`, `formatCitations`, `formatEach`, `downloadCitation`, `citedReferences`, `doiUrl`, `referenceVenue`                                                                                                                                                                                                                                                                                                                                                                                                  | `CiteButton`, `CitationMenu`, `CitationPreview`                                                                                                                                                                                                                                                                 |
+| **CSL**                    | `readCslText`, `formatCslCitations`, `formatCslEntries`, `referenceToCsl`, `itemLabel`, `CSL_STYLE_IDS` (all `/csl`)                                                                                                                                                                                                                                                                                                                                                                                                  | —                                                                                                                                                                                                                                                                                                               |
 | **Contact**                | `CONTACT_FORM_URLS`, `contactFormUrl`, `contactUrl`                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | `ContactButton`                                                                                                                                                                                                                                                                                                 |
 | **Share & embed**          | `parseShareConfig`, `applyShareConfig`, `buildShareUrl`, `buildEmbedCode`, `isHidden`, `visibleShareParts`, `applySharePreset`, `findSharePreset`, the param codecs, `syncPreferencesWithUrl`, `preferenceEffect`, `pinnedPreferenceSearch`, `applyPreferencesFromSearch`, `writePreferencesToSearch`, sealed links: `openSealedAddress`, `sealShareUrl`, `sealQuery`, `unsealQuery`, links to an example: `opensOnLinks`, `defaultOpensOn`, `opensOnSearch`, `createExampleMark`, `packLinkValue`, `unpackLinkValue` | `ShareDialog`, `ShareButton`, `HiddenPartsProvider`, `PagePart`, `useIsHidden`, `SealedLinkRefused`, `ShareOpensOn`, `useOpensOnShare`                                                                                                                                                                          |
 | **Routing & head**         | `createTabRouter`, `readRoute`, `writeRoute`, `subscribeToRoute`, `adoptLegacyHashAddress`, `writeDocumentMeta`, `pageLocation`, `pageHistory`                                                                                                                                                                                                                                                                                                                                                                        | `useTabRoute`                                                                                                                                                                                                                                                                                                   |
@@ -267,9 +269,11 @@ import { CiteButton } from 'react-cheminfo/ui';
 ```
 
 - **HTML** and **Markdown**, each in the four styles chemists are asked for —
-  ACS, Nature, RSC and Wiley. An HTML copy is written to the clipboard in both
-  flavours, so Word and Google Docs keep the emphasis while a plain editor
-  receives a clean line; that is why plain text is not a separate entry.
+  ACS, Nature, RSC and Angewandte — formatted by citeproc-js in the journals'
+  CSL styles, exactly as Zotero formats them. An HTML copy is written to the
+  clipboard in both flavours, so Word and Google Docs keep the emphasis while a
+  plain editor receives a clean line; that is why plain text is not a separate
+  entry.
 - **BibTeX**, **RIS** and the **DOI link**, which carry no style.
 - **RIS and BibTeX files**, served with the MIME types Zotero, Mendeley and
   EndNote recognise, so opening the saved file imports it.
@@ -278,8 +282,10 @@ import { CiteButton } from 'react-cheminfo/ui';
   menu, for a header that has run out of room. The label stays what the pointer
   and a screen reader are told.
 
-Adding a style means one function in `citation/core/segments.ts` and one entry
-in `CITATION_STYLES` — the three output formats and the preview follow.
+Adding a style means one entry in `CITATION_STYLES`, naming a CSL style that
+`react-cheminfo/csl` holds (`CSL_STYLE_IDS`) — the three output formats and the
+preview follow. A style it does not hold is added to `scripts/csl-styles.mjs`,
+which writes it from a checkout of the CSL styles repository.
 
 A site is often built on more than one work — the tool it wraps, and the
 platform it runs on — and a reader handed two references has to be told what is
@@ -328,8 +334,8 @@ import { PLATFORM_WORK, TEACHING_WORK } from 'react-cheminfo/core';
 
 A dataset is cited too. Give the reference `kind: 'dataset'` and a
 `repository` in place of the journal, volume and pages: every style writes it
-the way it writes data, BibTeX as a `@misc` entry and RIS as a `DATA` record,
-and its entry opens the dataset rather than an article.
+the way its CSL style writes data, BibTeX as a `@misc` entry and RIS as a
+`DATA` record, and its entry opens the dataset rather than an article.
 
 ```tsx
 const RECORD: DatasetReference = {

@@ -505,6 +505,23 @@ export const CREDITS = [
     license: 'Apache-2.0',
   },
   {
+    // By Frank Bennett; the processor Zotero runs.
+    id: 'citeproc',
+    name: 'citeproc-js',
+    href: 'https://citeproc-js.readthedocs.io/',
+    packageName: 'citeproc',
+    description: 'formats citations and reference lists in a journal’s style.',
+    license: 'CPAL-1.0 OR AGPL-1.0',
+  },
+  {
+    // The styles are written by their contributors, each named in its file.
+    id: 'csl-styles',
+    name: 'Citation Style Language styles',
+    href: 'https://citationstyles.org/',
+    description: 'how each journal writes its references, as Zotero uses it.',
+    license: 'CC-BY-SA-3.0',
+  },
+  {
     // By catamphetamine.
     id: 'read-excel-file',
     name: 'read-excel-file',

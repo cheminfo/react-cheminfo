@@ -1,13 +1,15 @@
+import { formatCslEntries } from '../../csl/core/formatCsl.ts';
+import { referenceToCsl } from '../../csl/core/referenceItem.ts';
+
+import { markdownOfHtml } from './citationMarkup.ts';
 import type {
   ArticleReference,
   DatasetReference,
   Reference,
   ReferenceAuthor,
 } from './reference.ts';
-import { doiUrl } from './reference.ts';
-import { renderHtml, renderMarkdown, renderText } from './render.ts';
-import type { CitationStyleId } from './segments.ts';
-import { citationSegments, nameFamilyFirst, pageRange } from './segments.ts';
+import { doiUrl, nameFamilyFirst, pageRange } from './reference.ts';
+import type { CitationStyleId } from './styles.ts';
 
 /** The formats the reference can be copied in. */
 export type CitationFormatId =
@@ -41,7 +43,8 @@ export const CITATION_FORMATS = [
 ] as const satisfies readonly CitationFormat[];
 
 /** The style a format that has one is written in unless another is picked. */
-export const DEFAULT_CITATION_STYLE: CitationStyleId = 'acs';
+export const DEFAULT_CITATION_STYLE: CitationStyleId =
+  'american-chemical-society';
 
 /** One entry of the download menu: a file a reference manager imports. */
 export interface CitationDownload {
@@ -90,27 +93,49 @@ export function citationFilename(
  * Render a reference in one of the citation formats.
  * @param reference - Reference to render.
  * @param format - Format to render it in.
- * @param style - Journal style, for the formats that have one.
+ * @param style - The CSL style of a format written as a journal writes it.
  * @returns The citation, ready to be copied to the clipboard.
  */
-export function formatCitation(
+export async function formatCitation(
   reference: Reference,
   format: CitationFormatId,
-  style: CitationStyleId = DEFAULT_CITATION_STYLE,
-): string {
+  style: string = DEFAULT_CITATION_STYLE,
+): Promise<string> {
+  const [written] = await formatEach([reference], format, style);
+  return written ?? '';
+}
+
+/**
+ * Render each reference in one of the citation formats: the written ones —
+ * text, HTML, Markdown — by citeproc-js in a CSL style, as Zotero writes them,
+ * the others as reference managers import them.
+ * @param references - References to render, in reading order.
+ * @param format - Format to render them in.
+ * @param style - The CSL style of a format written as a journal writes it.
+ * @returns One citation per reference, in the same order.
+ * @throws {Error} For a format or a style there is not.
+ */
+export async function formatEach(
+  references: readonly Reference[],
+  format: CitationFormatId,
+  style: string = DEFAULT_CITATION_STYLE,
+): Promise<string[]> {
   switch (format) {
     case 'text':
-      return renderText(citationSegments(reference, style));
+      return formatCslEntries(references.map(referenceToCsl), style, 'text');
     case 'html':
-      return renderHtml(citationSegments(reference, style));
-    case 'markdown':
-      return renderMarkdown(citationSegments(reference, style));
+      return formatCslEntries(references.map(referenceToCsl), style, 'html');
+    case 'markdown': {
+      const items = references.map(referenceToCsl);
+      const entries = await formatCslEntries(items, style, 'html');
+      return entries.map(markdownOfHtml);
+    }
     case 'bibtex':
-      return formatBibTeX(reference);
+      return references.map(formatBibTeX);
     case 'ris':
-      return formatRis(reference);
+      return references.map(formatRis);
     case 'doi':
-      return doiUrl(reference);
+      return references.map(doiUrl);
     default:
       throw new Error(`unknown citation format: ${String(format)}`);
   }

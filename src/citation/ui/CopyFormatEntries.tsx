@@ -4,7 +4,7 @@ import type { ReactElement } from 'react';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { CITATION_FORMATS } from '../core/formats.ts';
 import type { Reference } from '../core/reference.ts';
-import { CITATION_STYLES } from '../core/segments.ts';
+import { CITATION_STYLES } from '../core/styles.ts';
 
 import { CopyEntry } from './entries.tsx';
 import type { CopyFeedback } from './useCopyFeedback.ts';

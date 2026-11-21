@@ -47,7 +47,9 @@ test('a styled format holds the four journal styles', async ({ page }) => {
   await expect(page.getByRole('menuitem', { name: 'ACS' })).toBeVisible();
   await expect(page.getByRole('menuitem', { name: 'Nature' })).toBeVisible();
   await expect(page.getByRole('menuitem', { name: 'RSC' })).toBeVisible();
-  await expect(page.getByRole('menuitem', { name: 'Wiley' })).toBeVisible();
+  await expect(
+    page.getByRole('menuitem', { name: 'Angewandte' }),
+  ).toBeVisible();
 });
 
 test('a style entry keeps its row on one line', async ({ page }) => {
@@ -74,7 +76,7 @@ test('copying a style puts the reference on the clipboard and says so', async ({
   // is the styled line rather than the markup.
   const copied = await copiedText(page);
   expect(copied).toContain('Patiny, L.; Borel, A.');
-  expect(copied).toContain('J. Chem. Inf. Model. 2013, 53, 1223–1228.');
+  expect(copied).toContain('J. Chem. Inf. Model. 2013, 53 (5), 1223–1228.');
   expect(copied).toContain(DOI_URL);
   expect(copied).not.toContain('<i>');
 });

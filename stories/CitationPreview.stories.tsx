@@ -1,7 +1,7 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 
 import { CITATION_FORMATS } from '../src/citation/core/formats.ts';
-import { CITATION_STYLES } from '../src/citation/core/segments.ts';
+import { CITATION_STYLES } from '../src/citation/core/styles.ts';
 import { CitationPreview } from '../src/citation/ui/CitationPreview.tsx';
 
 import { PAPER } from './paper.ts';
@@ -29,7 +29,11 @@ const meta = {
   title: 'Citation/CitationPreview',
   component: CitationPreview,
   decorators: [onDarkPlate],
-  args: { reference: PAPER, format: 'html', style: 'acs' },
+  args: {
+    reference: PAPER,
+    format: 'html',
+    style: 'american-chemical-society',
+  },
   argTypes: {
     format: { control: 'select', options: FORMAT_IDS },
     style: { control: 'select', options: STYLE_IDS },
