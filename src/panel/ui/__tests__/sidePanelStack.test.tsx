@@ -74,9 +74,9 @@ test('a header says whether its panel is open', () => {
 
 test('the chevron is the first button of its header', () => {
   mount();
-  const [header] = host.querySelectorAll('[role="button"]');
+  const toolbar = headers()[0]?.lastElementChild;
 
-  expect(header?.querySelector('button')?.dataset.panelOpen).toBe('true');
+  expect(toolbar?.querySelector('button')?.dataset.panelOpen).toBe('true');
 });
 
 test('the chevron folds its own panel away', () => {
@@ -105,6 +105,32 @@ test('the cross closes the panel it stands in', () => {
 
   expect(closed).toStrictEqual(['peaks']);
 });
+
+/**
+ * The header of each panel, in either of react-science's markups: before
+ * 24.1 the header itself is the `role="button"`, from 24.1 it holds a real
+ * button, the title, beside the toolbar.
+ * @returns The headers, in order.
+ */
+function headers(): HTMLElement[] {
+  return [
+    ...host.querySelectorAll<HTMLElement>(
+      'div[role="button"], div:has(> button[aria-expanded])',
+    ),
+  ];
+}
+
+/**
+ * What a click on a header lands on: the header, or the title button it
+ * holds.
+ * @param header - The header.
+ * @returns The element that handles the click.
+ */
+function headerTarget(header: HTMLElement | undefined): HTMLElement | null {
+  return (
+    header?.querySelector<HTMLElement>(':scope > button') ?? header ?? null
+  );
+}
 
 /**
  * The focus button of a panel.
@@ -159,9 +185,8 @@ test('focusing a folded panel unfolds it', () => {
 
 test('a shift-click on a header puts its panel in focus', () => {
   mount();
-  const header = host.querySelector<HTMLElement>('div[role="button"]');
   act(() => {
-    header?.dispatchEvent(
+    headerTarget(headers()[0])?.dispatchEvent(
       new MouseEvent('click', { bubbles: true, shiftKey: true }),
     );
   });
@@ -245,9 +270,8 @@ test('a shift-click reports every other panel folded, one after another', () => 
       { id: 'metadata', title: 'Metadata', icon: 'chart' },
     ],
   );
-  const header = host.querySelector<HTMLElement>('div[role="button"]');
   act(() => {
-    header?.dispatchEvent(
+    headerTarget(headers()[0])?.dispatchEvent(
       new MouseEvent('click', { bubbles: true, shiftKey: true }),
     );
   });

@@ -2333,10 +2333,16 @@ span.taxon-lineage__name {
    chevron says which are folded, and the border under an open header closes it
    against its body.
 
+   Two markups are matched. Before react-science 24.1 the header is itself the
+   `role="button"`; from 24.1 it is a plain element holding a real button, the
+   title, which the browser would otherwise draw with its own border and
+   background.
+
    The chevron leads the header, where a disclosure is looked for. react-science
    draws every header button on the right, so the chevron is lifted out of that
    run and set before the title. */
-[role='button']:has(.side-panel__fold) {
+[role='button']:has(.side-panel__fold),
+:has(> button[aria-expanded]):has(.side-panel__fold) {
   position: relative;
   padding-left: 32px;
   border-top: 1px solid var(--border);
@@ -2345,16 +2351,31 @@ span.taxon-lineage__name {
   text-shadow: none;
 }
 
-[role='button']:has(.side-panel__fold):hover {
+[role='button']:has(.side-panel__fold):hover,
+:has(> button[aria-expanded]):has(.side-panel__fold):hover {
   background: color-mix(in oklab, var(--text) 9%, var(--surface-sunken));
 }
 
-[role='button']:has(.side-panel__fold[data-panel-open='true']) {
+[role='button']:has(.side-panel__fold[data-panel-open='true']),
+:has(> button[aria-expanded]):has(.side-panel__fold[data-panel-open='true']) {
   border-bottom: 1px solid var(--border);
 }
 
+/* The title, from react-science 24.1: the header's text, not a button. */
+:has(> button[aria-expanded]):has(.side-panel__fold) > button[aria-expanded] {
+  padding: 5px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: bold;
+  text-align: left;
+}
+
 /* Under the header, so it outweighs the button's own emotion class. */
-[role='button'] .side-panel__fold {
+[role='button'] .side-panel__fold,
+:has(> button[aria-expanded]) .side-panel__fold {
   position: absolute;
   top: 50%;
   left: 2px;
@@ -2364,12 +2385,15 @@ span.taxon-lineage__name {
 /* The pin stays quiet: pale while the panel is only passing through, and the
    ink of the header's other buttons once it is kept, so the two read apart at
    a glance. Never the brand colour, which marks where the reader is. */
-[role='button'] .side-panel__pin .bp6-icon {
+[role='button'] .side-panel__pin .bp6-icon,
+:has(> button[aria-expanded]) .side-panel__pin .bp6-icon {
   color: color-mix(in oklab, var(--text-faint) 50%, var(--surface));
 }
 
 [role='button'] .side-panel__pin:hover .bp6-icon,
-[role='button'] .side-panel__pin--on .bp6-icon {
+[role='button'] .side-panel__pin--on .bp6-icon,
+:has(> button[aria-expanded]) .side-panel__pin:hover .bp6-icon,
+:has(> button[aria-expanded]) .side-panel__pin--on .bp6-icon {
   color: var(--text-muted);
 }
 
