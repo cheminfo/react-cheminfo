@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.140.1](https://github.com/cheminfo/react-cheminfo/compare/v0.140.0...v0.140.1) (2026-11-21)
+
+
+### Bug Fixes
+
+* keep side panel headers flat under react-science 24.1 ([2693a32](https://github.com/cheminfo/react-cheminfo/commit/2693a324e6ac6e96e08c7bc0c1cd03bed229d77f))
+
 ## [0.140.0](https://github.com/cheminfo/react-cheminfo/compare/v0.139.0...v0.140.0) (2026-11-21)
 
 
