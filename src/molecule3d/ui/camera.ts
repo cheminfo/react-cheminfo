@@ -8,6 +8,7 @@
 import type { Camera } from 'molstar/lib/mol-canvas3d/camera.js';
 import { Vec3 } from 'molstar/lib/mol-math/linear-algebra.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
+import type { PluginSpec } from 'molstar/lib/mol-plugin/spec.js';
 
 import {
   DEFAULT_CAMERA_DURATION,
@@ -105,6 +106,27 @@ export function applyCamera(
       return { ...pose, radius: framed };
     },
   });
+}
+
+/**
+ * A plugin spec whose camera moves only when this viewer moves it.
+ *
+ * molstar reframes on its own whenever a scene commit finds no representation,
+ * which a restyle can pass through — the old model is removed and committed
+ * before the new one exists — so switching an option off would sometimes zoom
+ * the view. Every framing here goes through `requestCameraReset`, which still
+ * sets the far plane's reach.
+ * @param spec - The spec to refine.
+ * @returns The spec, with molstar's own reframing switched off.
+ */
+export function withManualCamera(spec: PluginSpec): PluginSpec {
+  return {
+    ...spec,
+    canvas3d: {
+      ...spec.canvas3d,
+      camera: { ...spec.canvas3d?.camera, manualReset: true },
+    },
+  };
 }
 
 /**

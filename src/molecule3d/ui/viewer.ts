@@ -25,7 +25,7 @@ import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DHighlight } from '../core/highlight.ts';
 import type { Measurement, MeasurementKind } from '../core/measurement.ts';
 
-import { applyCamera, resetCamera } from './camera.ts';
+import { applyCamera, resetCamera, withManualCamera } from './camera.ts';
 import { MoleculeFrames } from './moleculeFrames.ts';
 import {
   MODEL_REPRESENTATION_REF,
@@ -71,7 +71,10 @@ export class Molecule3DViewer extends SceneWatches {
       onMeasure = ignore,
       onFrameCountChange = ignore,
     } = options;
-    const plugin = new MolstarPlugin(container, { background });
+    const plugin = new MolstarPlugin(container, {
+      background,
+      spec: withManualCamera,
+    });
     super(plugin);
     this.#plugin = plugin;
     this.ready = this.#plugin.ready;

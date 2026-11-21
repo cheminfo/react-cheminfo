@@ -3,9 +3,10 @@ import type { Canvas3DCameraResetOptions } from 'molstar/lib/mol-canvas3d/canvas
 import type { Scene } from 'molstar/lib/mol-gl/scene.js';
 import { Vec3 } from 'molstar/lib/mol-math/linear-algebra.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
+import type { PluginSpec } from 'molstar/lib/mol-plugin/spec.js';
 import { expect, test, vi } from 'vitest';
 
-import { resetCamera } from '../camera.ts';
+import { resetCamera, withManualCamera } from '../camera.ts';
 
 type SnapshotFunction = (
   scene: Scene,
@@ -120,4 +121,25 @@ test('a viewer without a canvas asks for nothing', () => {
   expect(() => {
     resetCamera(plugin);
   }).not.toThrow();
+});
+
+test('the camera moves only when the viewer moves it, and keeps the rest of its spec', () => {
+  const spec = {
+    actions: [],
+    canvas3d: {
+      renderer: { backgroundColor: 0xffffff },
+      camera: { helper: { axes: { name: 'off', params: {} } } },
+    },
+  } as unknown as PluginSpec;
+
+  expect(withManualCamera(spec)).toStrictEqual({
+    actions: [],
+    canvas3d: {
+      renderer: { backgroundColor: 0xffffff },
+      camera: {
+        helper: { axes: { name: 'off', params: {} } },
+        manualReset: true,
+      },
+    },
+  });
 });
