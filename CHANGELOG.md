@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.140.0](https://github.com/cheminfo/react-cheminfo/compare/v0.139.0...v0.140.0) (2026-11-21)
+
+
+### Features
+
+* add fair.cheminfo.org to the family as an unlisted site ([62f80f2](https://github.com/cheminfo/react-cheminfo/commit/62f80f21fc43d2d9945eb24688280b567c3c6358))
+* credit docx-preview and read-excel-file ([708e17f](https://github.com/cheminfo/react-cheminfo/commit/708e17f2e9f1cc1dbf2b24d45de981fa922f13ab))
+* draw the partial bonds of a transition state ([002a7b7](https://github.com/cheminfo/react-cheminfo/commit/002a7b729db244f4d61a1a5c191988eb4843bcf6))
+* read PDB files in the 3D molecule viewer ([b6fcbe5](https://github.com/cheminfo/react-cheminfo/commit/b6fcbe5049294dc6258d89114d2d1375ab7b8327))
+* search the Tools menu and link it to www.cheminfo.org ([0c828d4](https://github.com/cheminfo/react-cheminfo/commit/0c828d490f5ce8692a4e0992eef43c956d1f4b57))
+
+
+### Bug Fixes
+
+* copy the molfile from the 3D export again ([aed0322](https://github.com/cheminfo/react-cheminfo/commit/aed03222d5fd459a9a5a7bd206cf8346c73e4f62))
+
 ## [0.139.0](https://github.com/cheminfo/react-cheminfo/compare/v0.138.0...v0.139.0) (2026-11-20)
 
 
