@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.143.0](https://github.com/cheminfo/react-cheminfo/compare/v0.142.0...v0.143.0) (2026-11-22)
+
+
+### Features
+
+* size the atoms and the bonds of a ball and stick model apart ([27fc574](https://github.com/cheminfo/react-cheminfo/commit/27fc5748c9e97797bc45b97d3ad21cfe1e7dc8b0))
+
 ## [0.142.0](https://github.com/cheminfo/react-cheminfo/compare/v0.141.0...v0.142.0) (2026-11-22)
 
 
