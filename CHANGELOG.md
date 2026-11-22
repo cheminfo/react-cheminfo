@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.142.0](https://github.com/cheminfo/react-cheminfo/compare/v0.141.0...v0.142.0) (2026-11-22)
+
+
+### Features
+
+* let a site's own 3D scene offer the display options ([e2a593b](https://github.com/cheminfo/react-cheminfo/commit/e2a593ba48dd7f791b90a82ab15bc35de51c628f))
+
+
+### Bug Fixes
+
+* keep the 3D molecule view still when an option redraws the model ([59726aa](https://github.com/cheminfo/react-cheminfo/commit/59726aa966a9abde03529f27612f7ca56f87df1f))
+
+
+### Performance Improvements
+
+* draw each frame of an animated PNG four times, not sixteen ([5b67930](https://github.com/cheminfo/react-cheminfo/commit/5b679301279e123b61f4124309beb3b37d487ab8))
+
 ## [0.141.0](https://github.com/cheminfo/react-cheminfo/compare/v0.140.1...v0.141.0) (2026-11-21)
 
 
