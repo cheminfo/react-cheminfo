@@ -1,7 +1,7 @@
 /**
  * The molstar layer under the 3D views: the plugin lifecycle, the camera, the
- * hover labels, the measurements, the highlights, the frames of a trajectory
- * and the picture of a scene.
+ * hover labels, the measurements, the highlights, the frames of a trajectory,
+ * the picture of a scene, and how a model and its surface are drawn.
  *
  * Three of our sites mount a headless molstar canvas — the molecule viewer
  * here, lcao's orbitals and symmetry's crystals — and each of them had its own
@@ -76,3 +76,18 @@ export {
   stopTrajectory,
   trajectoryFrameCount,
 } from './trajectory.ts';
+export {
+  POLARITY_COLOR_THEME,
+  registerPolarityTheme,
+} from './polarityColorTheme.ts';
+export type {
+  MoleculeStyle,
+  RepresentationParams,
+  SurfaceStyle,
+} from './representation.ts';
+export {
+  atomRadius,
+  bondRadius,
+  modelRepresentationParams,
+  surfaceRepresentationParams,
+} from './representation.ts';

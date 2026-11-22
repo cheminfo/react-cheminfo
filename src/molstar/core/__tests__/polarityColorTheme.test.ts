@@ -18,7 +18,7 @@ import type { ColorTheme } from 'molstar/lib/mol-theme/color.js';
 import { Color } from 'molstar/lib/mol-util/color/color.js';
 import { assert, expect, test } from 'vitest';
 
-import { SURFACE_CHARGE_COLORS } from '../../core/settings.ts';
+import { SURFACE_CHARGE_COLORS } from '../../../molecule3d/core/settings.ts';
 import {
   POLARITY_COLOR_THEME,
   polarityColorThemeProvider,

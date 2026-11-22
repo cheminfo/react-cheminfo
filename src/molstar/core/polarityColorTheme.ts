@@ -17,7 +17,7 @@ import type { ThemeDataContext } from 'molstar/lib/mol-theme/theme.js';
 import { Color } from 'molstar/lib/mol-util/color/color.js';
 import { ParamDefinition as PD } from 'molstar/lib/mol-util/param-definition.js';
 
-import { SURFACE_CHARGE_COLORS } from '../core/settings.ts';
+import { SURFACE_CHARGE_COLORS } from '../../molecule3d/core/settings.ts';
 
 /** Registry name of the theme. */
 export const POLARITY_COLOR_THEME = 'molecule3d-polarity';

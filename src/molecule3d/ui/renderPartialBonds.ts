@@ -14,6 +14,7 @@ import { StateTransformer } from 'molstar/lib/mol-state/index.js';
 import { Task } from 'molstar/lib/mol-task/index.js';
 import { ParamDefinition as PD } from 'molstar/lib/mol-util/param-definition.js';
 
+import { bondRadius } from '../../molstar/core/index.ts';
 import type { RepresentationId } from '../core/settings.ts';
 
 import type { PartialBondProps } from './partialBondShapes.ts';
@@ -21,7 +22,7 @@ import {
   createPartialBondRepresentation,
   partialBondScene,
 } from './partialBondShapes.ts';
-import { MOLECULE_STRUCTURE_REF, bondRadius } from './renderMolecule.ts';
+import { MOLECULE_STRUCTURE_REF } from './renderMolecule.ts';
 import type { PartialBondStyle } from './viewerTypes.ts';
 
 /** The partial bond node, replaced in place whenever the style changes. */

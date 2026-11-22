@@ -10,6 +10,8 @@
 export { Molecule3DExport } from './Molecule3DExport.tsx';
 export type { Molecule3DExportProps } from './Molecule3DExport.tsx';
 export { Molecule3DHelp } from './Molecule3DHelp.tsx';
+export { Molecule3DOptions } from './Molecule3DOptions.tsx';
+export type { Molecule3DOptionsProps } from './Molecule3DOptions.tsx';
 export { Molecule3DStage } from './Molecule3DStage.tsx';
 export type { Molecule3DStageProps } from './Molecule3DStage.tsx';
 export { Molecule3DToolbar } from './Molecule3DToolbar.tsx';
@@ -23,6 +25,7 @@ export type {
 } from './exportMoleculeImage.ts';
 export { exportMoleculeImage } from './exportMoleculeImage.ts';
 export type { ImageExport } from './useImageExport.ts';
+export { usePolarSurfaceArea } from './usePolarSurfaceArea.ts';
 export { useImageExport } from './useImageExport.ts';
 export { MoleculeViewer3D } from './MoleculeViewer3D.tsx';
 export type {

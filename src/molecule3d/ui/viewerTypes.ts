@@ -4,7 +4,7 @@
  */
 
 import type { Measurement } from '../core/measurement.ts';
-import type { RepresentationId, SurfaceColoringId } from '../core/settings.ts';
+import type { RepresentationId } from '../core/settings.ts';
 
 /** Settings fixed for the life of a viewer. */
 export interface Molecule3DViewerOptions {
@@ -27,20 +27,6 @@ export interface Molecule3DViewerOptions {
   onFrameCountChange?: (frameCount: number) => void;
 }
 
-/** How to draw the model. */
-export interface MoleculeStyle {
-  /**
-   * Which representation to draw.
-   * @default 'ball-and-stick'
-   */
-  representation?: RepresentationId;
-  /**
-   * Radius multiplier; 1 is the size each representation picks for itself.
-   * @default 1
-   */
-  sizeFactor?: number;
-}
-
 /** How to draw the partial bonds, sized after the model they are drawn over. */
 export interface PartialBondStyle {
   /**
@@ -60,26 +46,7 @@ export interface PartialBondStyle {
   lengths?: boolean;
 }
 
-/** How to draw the molecular surface. */
-export interface SurfaceStyle {
-  /**
-   * Radius of the probe rolled over the atoms, ångström; 1.4 is water.
-   * @default 1.4
-   */
-  probeRadius?: number;
-  /**
-   * Surface opacity. Below 1 the model stays visible inside it.
-   * @default 0.5
-   */
-  alpha?: number;
-  /**
-   * How the surface is coloured.
-   * @default 'uniform'
-   */
-  coloring?: SurfaceColoringId;
-  /**
-   * Surface colour in `uniform` mode, `#rrggbb`.
-   * @default '#94a3b8'
-   */
-  color?: string;
-}
+export {
+  type MoleculeStyle,
+  type SurfaceStyle,
+} from '../../molstar/core/representation.ts';

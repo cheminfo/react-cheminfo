@@ -31,8 +31,12 @@ export interface Molecule3DOptionsProps {
   polarSurfaceArea: number | null;
   /** What the reset button returns to; `showSurface` is left as it is. */
   defaults: Molecule3DSettings;
-  /** The format of the file on screen, which decides the partial bonds' `auto`. */
-  format: Molecule3DFile['format'];
+  /**
+   * The format of the file on screen, which decides the partial bonds' `auto`;
+   * without it the partial bonds are not offered, for a scene that draws none.
+   * @default undefined
+   */
+  format?: Molecule3DFile['format'];
 }
 
 /**
@@ -77,13 +81,15 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
             onChange({ ...settings, sizeFactor });
           }}
         />
-        <div style={FULL_ROW_STYLE}>
-          <Molecule3DPartialBonds
-            settings={settings}
-            onChange={onChange}
-            format={format}
-          />
-        </div>
+        {format === undefined ? null : (
+          <div style={FULL_ROW_STYLE}>
+            <Molecule3DPartialBonds
+              settings={settings}
+              onChange={onChange}
+              format={format}
+            />
+          </div>
+        )}
         {settings.showSurface ? null : (
           <span style={SURFACE_OFF_STYLE} data-testid="molecule3d-surface-off">
             {t('molecule3d.surfaceOff')}

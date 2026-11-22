@@ -9,16 +9,13 @@
 
 import type { Structure } from 'molstar/lib/mol-model/structure.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
-import { createStructureRepresentationParams } from 'molstar/lib/mol-plugin-state/helpers/structure-representation-params.js';
 import { PluginStateObject } from 'molstar/lib/mol-plugin-state/objects.js';
 import { StructureFromModel } from 'molstar/lib/mol-plugin-state/transforms/model.js';
 import { StructureRepresentation3D } from 'molstar/lib/mol-plugin-state/transforms/representation.js';
-import type { StateTransformer } from 'molstar/lib/mol-state/index.js';
 
+import type { MoleculeStyle } from '../../molstar/core/index.ts';
+import { modelRepresentationParams } from '../../molstar/core/index.ts';
 import type { Molecule3DFile } from '../core/file.ts';
-import type { RepresentationId } from '../core/settings.ts';
-
-import type { MoleculeStyle } from './viewerTypes.ts';
 
 /** State-tree ref of the structure every representation hangs off. */
 export const MOLECULE_STRUCTURE_REF = 'molecule3d-structure';
@@ -28,24 +25,6 @@ const MOLECULE_DATA_REF = 'molecule3d-data';
 
 /** The drawn model, replaced in place whenever the style changes. */
 export const MODEL_REPRESENTATION_REF = 'molecule3d-model';
-
-/**
- * molstar's ball-and-stick radius factor that a size factor of 1 stands for:
- * thin sticks and readable balls.
- */
-const NATURAL_SIZE_FACTOR = 0.25;
-
-/** Bond radius as a fraction of the atom radius; molstar's own default. */
-const BALL_AND_STICK_ASPECT_RATIO = 2 / 3;
-
-/** Spacefill multiplies the van der Waals radius, whose honest value is 1. */
-const SPACEFILL_SCALE = 4;
-
-/** Sticks take the factor as a radius in ångström; 0.3 Å is licorice. */
-const STICK_SCALE = 1.2;
-
-/** molstar's van der Waals radius of carbon, which sizes a C–C bond, Å. */
-const CARBON_VDW_RADIUS = 1.7;
 
 /**
  * Replace the displayed molecule. Everything already on screen goes first.
@@ -62,7 +41,6 @@ export async function renderMolecule(
   molfile: Molecule3DFile,
   style: MoleculeStyle = {},
 ): Promise<number> {
-  const { representation = 'ball-and-stick', sizeFactor = 1 } = style;
   await clearMolecule(plugin);
   const data = await plugin.builders.data.rawData(
     { data: molfile.data },
@@ -95,12 +73,7 @@ export async function renderMolecule(
     .applyOrUpdate(
       MODEL_REPRESENTATION_REF,
       StructureRepresentation3D,
-      modelParams(
-        plugin,
-        structure,
-        representation,
-        sizeFactor * NATURAL_SIZE_FACTOR,
-      ),
+      modelRepresentationParams(plugin, structure, style),
     )
     .commit();
   return trajectory.data?.frameCount ?? 1;
@@ -127,75 +100,4 @@ export function moleculeStructure(
   const object = plugin.state.data.cells.get(MOLECULE_STRUCTURE_REF)?.obj;
   if (!PluginStateObject.Molecule.Structure.is(object)) return undefined;
   return object.data;
-}
-
-/**
- * The radius molstar gives a C–C bond of the model, so what is drawn beside
- * the bonds can be sized after them.
- * @param representation - Which representation.
- * @param sizeFactor - The settings' radius multiplier.
- * @returns The radius in ångström; 0 for spacefill, which draws no bonds.
- */
-export function bondRadius(
-  representation: RepresentationId,
-  sizeFactor: number,
-): number {
-  const factor = sizeFactor * NATURAL_SIZE_FACTOR;
-  if (representation === 'spacefill') return 0;
-  if (representation === 'stick') return factor * STICK_SCALE;
-  return factor * BALL_AND_STICK_ASPECT_RATIO * CARBON_VDW_RADIUS;
-}
-
-/**
- * Translate one of the three representations into molstar's own. `stick` is a
- * genuine licorice model: a uniform size theme and an aspect ratio of 1 give
- * atoms and bonds one radius, so the joints are caps of the stick's thickness.
- * @param plugin - The molstar context.
- * @param structure - The atoms to draw.
- * @param representation - Which representation.
- * @param sizeFactor - molstar's own radius factor.
- * @returns The parameters of the representation node.
- */
-function modelParams(
-  plugin: PluginContext,
-  structure: Structure,
-  representation: RepresentationId,
-  sizeFactor: number,
-): StateTransformer.Params<StructureRepresentation3D> {
-  const color = 'element-symbol' as const;
-  const colorParams = {
-    carbonColor: { name: 'element-symbol', params: {} },
-  } as const;
-  if (representation === 'spacefill') {
-    return createStructureRepresentationParams(plugin, structure, {
-      type: 'spacefill',
-      typeParams: { sizeFactor: sizeFactor * SPACEFILL_SCALE },
-      color,
-      colorParams,
-    });
-  }
-  if (representation === 'stick') {
-    return createStructureRepresentationParams(plugin, structure, {
-      type: 'ball-and-stick',
-      typeParams: {
-        sizeFactor: sizeFactor * STICK_SCALE,
-        sizeAspectRatio: 1,
-        aromaticBonds: false,
-      },
-      color,
-      colorParams,
-      size: 'uniform',
-      sizeParams: { value: 1 },
-    });
-  }
-  return createStructureRepresentationParams(plugin, structure, {
-    type: 'ball-and-stick',
-    typeParams: {
-      sizeFactor,
-      sizeAspectRatio: BALL_AND_STICK_ASPECT_RATIO,
-      aromaticBonds: false,
-    },
-    color,
-    colorParams,
-  });
 }

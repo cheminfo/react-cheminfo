@@ -51,3 +51,18 @@ test('a greyed reset says it is already at the defaults', () => {
   expect(render(1)).toContain('title="Already at the defaults"');
   expect(render(1.5)).not.toContain('title="Already at the defaults"');
 });
+
+test('the partial bonds are offered only when the file format is known', () => {
+  const withoutFormat = renderToStaticMarkup(
+    <Molecule3DOptions
+      settings={DEFAULT_MOLECULE_3D_SETTINGS}
+      defaults={DEFAULT_MOLECULE_3D_SETTINGS}
+      polarSurfaceArea={null}
+      onChange={() => undefined}
+    />,
+  );
+
+  expect(render(1)).toContain('data-testid="molecule3d-partial-bonds"');
+  expect(withoutFormat).not.toContain('data-testid="molecule3d-partial-bonds"');
+  expect(withoutFormat).toContain('data-testid="molecule3d-size-value"');
+});
