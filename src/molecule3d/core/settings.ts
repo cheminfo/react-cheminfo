@@ -39,8 +39,16 @@ export const SURFACE_COLORING_LABELS: Record<SurfaceColoringId, string> = {
 /** How the model and its surface are drawn. */
 export interface Molecule3DSettings {
   representation: RepresentationId;
-  /** Radius multiplier; 1 is the size each representation picks for itself. */
+  /**
+   * Radius multiplier; 1 is the size each representation picks for itself. In
+   * ball and stick it sizes the balls only, the bonds having their own.
+   */
   sizeFactor: number;
+  /**
+   * Bond radius multiplier of the ball and stick model, whatever the size of
+   * the balls; 1 is the bond drawn beside balls of size 1.
+   */
+  bondSizeFactor: number;
   /** Whether the translucent molecular surface is drawn over the model. */
   showSurface: boolean;
   /** Surface opacity; below 1 the model stays visible inside it. */
@@ -79,6 +87,7 @@ export const SURFACE_CHARGE_COLORS = {
 export const DEFAULT_MOLECULE_3D_SETTINGS: Molecule3DSettings = {
   representation: 'ball-and-stick',
   sizeFactor: 1,
+  bondSizeFactor: 1,
   showSurface: false,
   surfaceAlpha: 0.5,
   probeRadius: 1.4,
@@ -92,6 +101,7 @@ export const DEFAULT_MOLECULE_3D_SETTINGS: Molecule3DSettings = {
 /** The span, and the slider step, of every numeric setting. */
 export const MOLECULE_3D_RANGES = {
   sizeFactor: { minimum: 0.2, maximum: 2, step: 0.1 },
+  bondSizeFactor: { minimum: 0.2, maximum: 2, step: 0.1 },
   surfaceAlpha: { minimum: 0.1, maximum: 1, step: 0.05 },
   probeRadius: { minimum: 1, maximum: 3, step: 0.1 },
 } as const;
@@ -136,6 +146,7 @@ export function normalizeMolecule3DSettings(
   const {
     representation,
     sizeFactor,
+    bondSizeFactor,
     showSurface,
     surfaceAlpha,
     probeRadius,
@@ -150,6 +161,7 @@ export function normalizeMolecule3DSettings(
         ? representation
         : defaults.representation,
     sizeFactor: clamp(sizeFactor, 'sizeFactor'),
+    bondSizeFactor: clamp(bondSizeFactor, 'bondSizeFactor'),
     showSurface:
       typeof showSurface === 'boolean' ? showSurface : defaults.showSurface,
     surfaceAlpha: clamp(surfaceAlpha, 'surfaceAlpha'),
@@ -168,6 +180,26 @@ export function normalizeMolecule3DSettings(
         ? partialBondLengths
         : defaults.partialBondLengths,
   };
+}
+
+/**
+ * The sizes a representation is drawn at once it is picked: the site's own
+ * for the representation it opens on, the family's for the others. Sizes kept
+ * across a switch would draw ball and stick picked after thin sticks with
+ * balls thinner than its bonds.
+ * @param representation - The representation picked.
+ * @param defaults - The settings the viewer opened on.
+ * @returns The atom and bond sizes to draw it at.
+ */
+export function representationSizes(
+  representation: RepresentationId,
+  defaults: Molecule3DSettings = DEFAULT_MOLECULE_3D_SETTINGS,
+): Pick<Molecule3DSettings, 'sizeFactor' | 'bondSizeFactor'> {
+  const { sizeFactor, bondSizeFactor } =
+    defaults.representation === representation
+      ? defaults
+      : DEFAULT_MOLECULE_3D_SETTINGS;
+  return { sizeFactor, bondSizeFactor };
 }
 
 /**
@@ -197,6 +229,7 @@ export function sameMolecule3DSettings(
   return (
     first.representation === second.representation &&
     first.sizeFactor === second.sizeFactor &&
+    first.bondSizeFactor === second.bondSizeFactor &&
     first.showSurface === second.showSurface &&
     first.surfaceAlpha === second.surfaceAlpha &&
     first.probeRadius === second.probeRadius &&

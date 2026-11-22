@@ -763,6 +763,8 @@
   "molecule3d.representation.spacefill": "Kalotten",
   "molecule3d.representation.stick": "Stäbe",
   "molecule3d.size": "Größe",
+  "molecule3d.atomSize": "Atomgröße",
+  "molecule3d.bondSize": "Bindungsdicke",
   "molecule3d.surfaceOpacity": "Deckkraft der Oberfläche",
   "molecule3d.solventProbe": "Lösungsmittelsonde [Å]",
   "molecule3d.solventProbeHelp": "Radius der Lösungsmittelkugel, die über die Atome gerollt wird. 1,4 Å entspricht einem Wassermolekül; eine größere Sonde glättet die Oberfläche und schließt die engen Taschen.",

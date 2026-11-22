@@ -80,8 +80,20 @@ export {
   isRepresentationId,
   isSurfaceColoringId,
   normalizeMolecule3DSettings,
+  representationSizes,
   resetMolecule3DSettings,
   sameMolecule3DSettings,
 } from './settings.ts';
 export type { Molecule3DTools } from './tools.ts';
 export { DEFAULT_MOLECULE_3D_TOOLS, resolveMolecule3DTools } from './tools.ts';
+export type {
+  LinkedMolecule3DSetting,
+  Molecule3DSettingSignals,
+  Molecule3DSettingsParamsOptions,
+  SettingSignal,
+} from './settingSignals.ts';
+export {
+  molecule3DSettingsParams,
+  readMolecule3DSettings,
+  writeMolecule3DSettings,
+} from './settingSignals.ts';

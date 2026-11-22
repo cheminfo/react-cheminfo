@@ -31,10 +31,17 @@ export interface MoleculeStyle {
    */
   representation?: RepresentationId;
   /**
-   * Radius multiplier; 1 is the size each representation picks for itself.
+   * Radius multiplier; 1 is the size each representation picks for itself. In
+   * ball and stick it sizes the balls only.
    * @default 1
    */
   sizeFactor?: number;
+  /**
+   * Bond radius multiplier of the ball and stick model, whatever the size of
+   * the balls.
+   * @default 1
+   */
+  bondSizeFactor?: number;
 }
 
 /** How to draw the molecular surface. */
@@ -71,8 +78,11 @@ export type RepresentationParams =
  */
 const NATURAL_SIZE_FACTOR = 0.25;
 
-/** Bond radius as a fraction of the atom radius; molstar's own default. */
-const BALL_AND_STICK_ASPECT_RATIO = 2 / 3;
+/**
+ * Bond radius as a fraction of the smaller ball's, at sizes of 1: a C–C bond
+ * of 0.17 Å, molstar's own, beside balls large enough to read the element by.
+ */
+const BALL_AND_STICK_ASPECT_RATIO = 0.4;
 
 /** Spacefill multiplies the van der Waals radius, whose honest value is 1. */
 const SPACEFILL_SCALE = 4;
@@ -98,7 +108,11 @@ export function modelRepresentationParams(
   structure: Structure,
   style: MoleculeStyle = {},
 ): RepresentationParams {
-  const { representation = 'ball-and-stick', sizeFactor = 1 } = style;
+  const {
+    representation = 'ball-and-stick',
+    sizeFactor = 1,
+    bondSizeFactor = 1,
+  } = style;
   const factor = sizeFactor * NATURAL_SIZE_FACTOR;
   const color = 'element-symbol' as const;
   const colorParams = {
@@ -130,7 +144,10 @@ export function modelRepresentationParams(
     type: 'ball-and-stick',
     typeParams: {
       sizeFactor: factor,
-      sizeAspectRatio: BALL_AND_STICK_ASPECT_RATIO,
+      // molstar draws a bond at this share of its smaller ball, so dividing by
+      // the balls' factor leaves the bond sized by its own.
+      sizeAspectRatio:
+        (BALL_AND_STICK_ASPECT_RATIO * bondSizeFactor) / sizeFactor,
       aromaticBonds: false,
     },
     color,
@@ -185,16 +202,25 @@ export function surfaceRepresentationParams(
  * the bonds can be sized after them.
  * @param representation - Which representation.
  * @param sizeFactor - The settings' radius multiplier.
+ * @param bondSizeFactor - The settings' bond multiplier, which ball and stick
+ * sizes its bonds by.
  * @returns The radius in ångström; 0 for spacefill, which draws no bonds.
  */
 export function bondRadius(
   representation: RepresentationId,
   sizeFactor: number,
+  bondSizeFactor = 1,
 ): number {
-  const factor = sizeFactor * NATURAL_SIZE_FACTOR;
   if (representation === 'spacefill') return 0;
-  if (representation === 'stick') return factor * STICK_SCALE;
-  return factor * BALL_AND_STICK_ASPECT_RATIO * CARBON_VDW_RADIUS;
+  if (representation === 'stick') {
+    return sizeFactor * NATURAL_SIZE_FACTOR * STICK_SCALE;
+  }
+  return (
+    bondSizeFactor *
+    NATURAL_SIZE_FACTOR *
+    BALL_AND_STICK_ASPECT_RATIO *
+    CARBON_VDW_RADIUS
+  );
 }
 
 /**

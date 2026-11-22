@@ -1,7 +1,8 @@
 /**
  * The display options of the molecule viewer, shown in the toolbar's popover:
- * the representation, the size, the partial bonds, and the surface's opacity,
- * solvent probe and colours, with a button returning them all to the defaults.
+ * the representation, the size of the atoms and of the bonds, the partial
+ * bonds, and the surface's opacity, solvent probe and colours, with a button
+ * returning them all to the defaults.
  */
 
 import { Button, SegmentedControl, Slider } from '@blueprintjs/core';
@@ -16,6 +17,7 @@ import {
   REPRESENTATIONS,
   REPRESENTATION_LABELS,
   isRepresentationId,
+  representationSizes,
   resetMolecule3DSettings,
   sameMolecule3DSettings,
 } from '../core/settings.ts';
@@ -49,6 +51,8 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
   const t = useChromeT();
   const reset = resetMolecule3DSettings(settings, defaults);
   const atDefaults = sameMolecule3DSettings(settings, reset);
+  // Spacefill draws no bond, and sticks give bonds and atoms one radius.
+  const ballAndStick = settings.representation === 'ball-and-stick';
 
   return (
     <div style={PANEL_STYLE}>
@@ -66,13 +70,17 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
         value={settings.representation}
         onValueChange={(value) => {
           if (isRepresentationId(value)) {
-            onChange({ ...settings, representation: value });
+            onChange({
+              ...settings,
+              representation: value,
+              ...representationSizes(value, defaults),
+            });
           }
         }}
       />
       <div style={GRID_STYLE}>
         <SliderRow
-          label={t('molecule3d.size')}
+          label={t(ballAndStick ? 'molecule3d.atomSize' : 'molecule3d.size')}
           range={MOLECULE_3D_RANGES.sizeFactor}
           digits={1}
           value={settings.sizeFactor}
@@ -81,6 +89,18 @@ export function Molecule3DOptions(props: Molecule3DOptionsProps): ReactElement {
             onChange({ ...settings, sizeFactor });
           }}
         />
+        {ballAndStick ? (
+          <SliderRow
+            label={t('molecule3d.bondSize')}
+            range={MOLECULE_3D_RANGES.bondSizeFactor}
+            digits={1}
+            value={settings.bondSizeFactor}
+            testId="molecule3d-bond-size-value"
+            onChange={(bondSizeFactor) => {
+              onChange({ ...settings, bondSizeFactor });
+            }}
+          />
+        ) : null}
         {format === undefined ? null : (
           <div style={FULL_ROW_STYLE}>
             <Molecule3DPartialBonds

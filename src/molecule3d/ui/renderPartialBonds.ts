@@ -15,7 +15,6 @@ import { Task } from 'molstar/lib/mol-task/index.js';
 import { ParamDefinition as PD } from 'molstar/lib/mol-util/param-definition.js';
 
 import { bondRadius } from '../../molstar/core/index.ts';
-import type { RepresentationId } from '../core/settings.ts';
 
 import type { PartialBondProps } from './partialBondShapes.ts';
 import {
@@ -47,6 +46,7 @@ export async function renderPartialBonds(
   const {
     representation = 'ball-and-stick',
     sizeFactor = 1,
+    bondSizeFactor = 1,
     lengths = true,
   } = style;
   if (!plugin.state.data.cells.has(MOLECULE_STRUCTURE_REF)) return;
@@ -54,17 +54,14 @@ export async function renderPartialBonds(
     .build()
     .to(MOLECULE_STRUCTURE_REF)
     .applyOrUpdate(PARTIAL_BONDS_REF, PartialBonds3D, {
-      radius: dashRadius(representation, sizeFactor),
+      radius: Math.max(
+        0.02,
+        bondRadius(representation, sizeFactor, bondSizeFactor) *
+          DASH_RADIUS_SCALE,
+      ),
       lengths,
     })
     .commit();
-}
-
-function dashRadius(representation: RepresentationId, sizeFactor: number) {
-  return Math.max(
-    0.02,
-    bondRadius(representation, sizeFactor) * DASH_RADIUS_SCALE,
-  );
 }
 
 const createTransformer = StateTransformer.builderFactory('react-cheminfo');

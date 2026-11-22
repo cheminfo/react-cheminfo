@@ -763,6 +763,8 @@
   "molecule3d.representation.spacefill": "Sphères compactes",
   "molecule3d.representation.stick": "Bâtonnets",
   "molecule3d.size": "Taille",
+  "molecule3d.atomSize": "Taille des atomes",
+  "molecule3d.bondSize": "Taille des liaisons",
   "molecule3d.surfaceOpacity": "Opacité de la surface",
   "molecule3d.solventProbe": "Sonde de solvant [Å]",
   "molecule3d.solventProbeHelp": "Rayon de la sphère de solvant roulée sur les atomes. 1,4 Å correspond à une molécule d'eau ; une sonde plus grande lisse la surface et ferme les poches étroites.",

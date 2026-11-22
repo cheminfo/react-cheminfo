@@ -17,8 +17,16 @@ test('sticks draw every atom at the stick radius, whatever the element', () => {
   expect(atomRadius('stick', 1, 1.1)).toBeCloseTo(0.3, 10);
 });
 
-test('a bond is two thirds of a carbon ball, a stick, or nothing in spacefill', () => {
-  expect(bondRadius('ball-and-stick', 1)).toBeCloseTo((0.25 * 2 * 1.7) / 3, 10);
+test('a bond is 0.17 Å beside a carbon ball, a stick, or nothing in spacefill', () => {
+  expect(bondRadius('ball-and-stick', 1)).toBeCloseTo(0.17, 10);
   expect(bondRadius('stick', 1)).toBeCloseTo(0.3, 10);
   expect(bondRadius('spacefill', 1)).toBe(0);
+});
+
+test('a ball and stick bond is sized by its own factor, whatever the balls', () => {
+  const bond = 0.17;
+
+  expect(bondRadius('ball-and-stick', 0.4, 1)).toBeCloseTo(bond, 10);
+  expect(bondRadius('ball-and-stick', 2, 0.5)).toBeCloseTo(bond / 2, 10);
+  expect(bondRadius('stick', 0.4, 2)).toBeCloseTo(0.12, 10);
 });

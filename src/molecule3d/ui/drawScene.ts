@@ -46,6 +46,7 @@ export async function drawScene(
   await viewer.showMolecule(molfile, {
     representation: safe.representation,
     sizeFactor: safe.sizeFactor,
+    bondSizeFactor: safe.bondSizeFactor,
   });
   if (
     safe.representation !== 'spacefill' &&
@@ -54,6 +55,7 @@ export async function drawScene(
     await viewer.showPartialBonds({
       representation: safe.representation,
       sizeFactor: safe.sizeFactor,
+      bondSizeFactor: safe.bondSizeFactor,
       lengths: safe.partialBondLengths,
     });
   }

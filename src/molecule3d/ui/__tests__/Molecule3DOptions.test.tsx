@@ -66,3 +66,20 @@ test('the partial bonds are offered only when the file format is known', () => {
   expect(withoutFormat).not.toContain('data-testid="molecule3d-partial-bonds"');
   expect(withoutFormat).toContain('data-testid="molecule3d-size-value"');
 });
+
+test('ball and stick sizes its atoms and its bonds apart; the others have one size', () => {
+  const ballAndStick = render(1);
+  const sticks = renderToStaticMarkup(
+    <Molecule3DOptions
+      settings={{ ...DEFAULT_MOLECULE_3D_SETTINGS, representation: 'stick' }}
+      defaults={DEFAULT_MOLECULE_3D_SETTINGS}
+      polarSurfaceArea={null}
+      onChange={() => undefined}
+    />,
+  );
+
+  expect(ballAndStick).toContain('>Atom size<');
+  expect(ballAndStick).toContain('data-testid="molecule3d-bond-size-value"');
+  expect(sticks).toContain('>Size<');
+  expect(sticks).not.toContain('data-testid="molecule3d-bond-size-value"');
+});

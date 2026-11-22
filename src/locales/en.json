@@ -739,6 +739,8 @@
   "molecule3d.representation.spacefill": "Spacefill",
   "molecule3d.representation.stick": "Sticks",
   "molecule3d.size": "Size",
+  "molecule3d.atomSize": "Atom size",
+  "molecule3d.bondSize": "Bond size",
   "molecule3d.surfaceOpacity": "Surface opacity",
   "molecule3d.solventProbe": "Solvent probe [Å]",
   "molecule3d.solventProbeHelp": "Radius of the solvent sphere rolled over the atoms. 1.4 Å is a water molecule; a larger probe smooths the surface and closes the narrow pockets.",

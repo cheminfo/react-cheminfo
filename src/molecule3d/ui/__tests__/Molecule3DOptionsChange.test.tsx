@@ -48,23 +48,49 @@ test('picking a representation changes it alone', () => {
   ]);
 });
 
+test('ball and stick picked after thin sticks is drawn at its own sizes', () => {
+  const thin: Molecule3DSettings = {
+    ...SURFACE_ON,
+    representation: 'stick',
+    sizeFactor: 0.4,
+    bondSizeFactor: 1.6,
+  };
+  render(thin);
+  click(buttonNamed('Ball and stick'));
+
+  expect(changes).toStrictEqual([
+    {
+      ...thin,
+      representation: 'ball-and-stick',
+      sizeFactor: 1,
+      bondSizeFactor: 1,
+    },
+  ]);
+});
+
 test('each slider moves its own setting by one step', () => {
   render(SURFACE_ON);
-  const [size, opacity, probe] = host.querySelectorAll('.bp6-slider-handle');
+  const [size, bond, opacity, probe] =
+    host.querySelectorAll('.bp6-slider-handle');
   press(size, 'ArrowRight');
+  press(bond, 'ArrowLeft');
   press(opacity, 'ArrowLeft');
   press(probe, 'ArrowRight');
 
   expect(
-    changes.map(({ sizeFactor, surfaceAlpha, probeRadius }) => ({
-      sizeFactor,
-      surfaceAlpha,
-      probeRadius,
-    })),
+    changes.map(
+      ({ sizeFactor, bondSizeFactor, surfaceAlpha, probeRadius }) => ({
+        sizeFactor,
+        bondSizeFactor,
+        surfaceAlpha,
+        probeRadius,
+      }),
+    ),
   ).toStrictEqual([
-    { sizeFactor: 1.1, surfaceAlpha: 0.5, probeRadius: 1.4 },
-    { sizeFactor: 1, surfaceAlpha: 0.45, probeRadius: 1.4 },
-    { sizeFactor: 1, surfaceAlpha: 0.5, probeRadius: 1.5 },
+    { sizeFactor: 1.1, bondSizeFactor: 1, surfaceAlpha: 0.5, probeRadius: 1.4 },
+    { sizeFactor: 1, bondSizeFactor: 0.9, surfaceAlpha: 0.5, probeRadius: 1.4 },
+    { sizeFactor: 1, bondSizeFactor: 1, surfaceAlpha: 0.45, probeRadius: 1.4 },
+    { sizeFactor: 1, bondSizeFactor: 1, surfaceAlpha: 0.5, probeRadius: 1.5 },
   ]);
 });
 

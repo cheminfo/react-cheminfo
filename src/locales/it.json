@@ -739,6 +739,8 @@
   "molecule3d.representation.spacefill": "Sfere compatte",
   "molecule3d.representation.stick": "Bastoncini",
   "molecule3d.size": "Dimensione",
+  "molecule3d.atomSize": "Dimensione degli atomi",
+  "molecule3d.bondSize": "Spessore dei legami",
   "molecule3d.surfaceOpacity": "Opacità della superficie",
   "molecule3d.solventProbe": "Sonda di solvente [Å]",
   "molecule3d.solventProbeHelp": "Raggio della sfera di solvente fatta rotolare sugli atomi. 1,4 Å corrisponde a una molecola d'acqua; una sonda più grande liscia la superficie e chiude le tasche strette.",

@@ -40,6 +40,11 @@ export interface PartialBondStyle {
    */
   sizeFactor?: number;
   /**
+   * The model's bond multiplier, which ball and stick sizes its bonds by.
+   * @default 1
+   */
+  bondSizeFactor?: number;
+  /**
    * Whether each is labelled with its length.
    * @default true
    */

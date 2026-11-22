@@ -5,6 +5,7 @@ import {
   isRepresentationId,
   isSurfaceColoringId,
   normalizeMolecule3DSettings,
+  representationSizes,
   resetMolecule3DSettings,
   sameMolecule3DSettings,
 } from '../settings.ts';
@@ -21,6 +22,7 @@ test('stored settings are repaired rather than dropped', () => {
     normalizeMolecule3DSettings({
       representation: 'cartoon' as never,
       sizeFactor: 9,
+      bondSizeFactor: 0,
       showSurface: true,
       surfaceAlpha: Number.NaN,
       probeRadius: 0.2,
@@ -30,6 +32,7 @@ test('stored settings are repaired rather than dropped', () => {
   ).toStrictEqual({
     representation: 'ball-and-stick',
     sizeFactor: 2,
+    bondSizeFactor: 0.2,
     showSurface: true,
     surfaceAlpha: 0.5,
     probeRadius: 1,
@@ -76,6 +79,7 @@ test('a reset returns to the defaults but leaves the surface toggle alone', () =
   const changed = {
     representation: 'spacefill',
     sizeFactor: 1.6,
+    bondSizeFactor: 0.6,
     showSurface: true,
     surfaceAlpha: 0.8,
     probeRadius: 2.2,
@@ -106,6 +110,9 @@ test('settings compare equal only when every field does', () => {
     sameMolecule3DSettings(settings, { ...settings, probeRadius: 1.5 }),
   ).toBe(false);
   expect(
+    sameMolecule3DSettings(settings, { ...settings, bondSizeFactor: 0.5 }),
+  ).toBe(false);
+  expect(
     sameMolecule3DSettings(settings, { ...settings, surfaceColor: '#000000' }),
   ).toBe(false);
 });
@@ -134,4 +141,25 @@ test('settings drawing other partial bonds compare unequal', () => {
       partialBondLengths: false,
     }),
   ).toBe(false);
+});
+
+test('a picked representation is drawn at the site sizes if it opens on it, the family ones otherwise', () => {
+  const sticks = {
+    ...DEFAULT_MOLECULE_3D_SETTINGS,
+    representation: 'stick',
+    sizeFactor: 0.4,
+  } as const;
+
+  expect(representationSizes('stick', sticks)).toStrictEqual({
+    sizeFactor: 0.4,
+    bondSizeFactor: 1,
+  });
+  expect(representationSizes('ball-and-stick', sticks)).toStrictEqual({
+    sizeFactor: 1,
+    bondSizeFactor: 1,
+  });
+  expect(representationSizes('spacefill')).toStrictEqual({
+    sizeFactor: 1,
+    bondSizeFactor: 1,
+  });
 });

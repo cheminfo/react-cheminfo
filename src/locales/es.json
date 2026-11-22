@@ -763,6 +763,8 @@
   "molecule3d.representation.spacefill": "Esferas compactas",
   "molecule3d.representation.stick": "Varillas",
   "molecule3d.size": "Tamaño",
+  "molecule3d.atomSize": "Tamaño de los átomos",
+  "molecule3d.bondSize": "Grosor de los enlaces",
   "molecule3d.surfaceOpacity": "Opacidad de la superficie",
   "molecule3d.solventProbe": "Sonda de disolvente [Å]",
   "molecule3d.solventProbeHelp": "Radio de la esfera de disolvente que se hace rodar sobre los átomos. 1,4 Å corresponde a una molécula de agua; una sonda mayor suaviza la superficie y cierra los huecos estrechos.",

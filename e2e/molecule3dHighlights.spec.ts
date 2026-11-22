@@ -75,9 +75,11 @@ test('the C–H row leaves the C–C bonds between its carbons in their colours'
 
   // The C–H row lights the carbon at one end of each C–C bond, the C=O row
   // the one at the other end. Had either lit the half-bonds leaving its atoms,
-  // the two together would cover the C–C bonds; they leave them to the C–C row.
+  // the two together would cover the C–C bonds and leave next to nothing; they
+  // leave them to the C–C row, whose ink is mostly its two carbons beside bonds
+  // this thin.
   expect(inkOutside(carbonCarbon, carbonHydrogen, carbonyl)).toBeGreaterThan(
-    carbonCarbon.pixels.size / 4,
+    carbonCarbon.pixels.size / 8,
   );
 });
 
