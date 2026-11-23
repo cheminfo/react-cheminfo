@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.145.0](https://github.com/cheminfo/react-cheminfo/compare/v0.144.0...v0.145.0) (2026-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* showClipboardNotice takes { tone }, and copySvg returns a CopyOutcome.
+
+### Features
+
+* say how every copy went, at the bottom of the window ([5d12676](https://github.com/cheminfo/react-cheminfo/commit/5d126768448a159045da7c824fa5e4fd6e8461a4))
+
 ## [0.144.0](https://github.com/cheminfo/react-cheminfo/compare/v0.143.0...v0.144.0) (2026-11-23)
 
 
