@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.146.0](https://github.com/cheminfo/react-cheminfo/compare/v0.145.0...v0.146.0) (2026-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* CrystalScene.representation is removed; CrystalViewer3D takes settings, defaultSettings and onSettingsChange instead.
+
+### Features
+
+* offer the display options and the surface on the crystal viewer ([084cc9a](https://github.com/cheminfo/react-cheminfo/commit/084cc9a715f354897106641c6d47f96ae6761ec8))
+* say where a document is kept, and move it to this computer ([e30e589](https://github.com/cheminfo/react-cheminfo/commit/e30e589fbdb26a7845561b406d46b89a11c266ba))
+
 ## [0.145.0](https://github.com/cheminfo/react-cheminfo/compare/v0.144.0...v0.145.0) (2026-11-23)
 
 
