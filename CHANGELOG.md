@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.144.0](https://github.com/cheminfo/react-cheminfo/compare/v0.143.0...v0.144.0) (2026-11-23)
+
+
+### Features
+
+* hatch periodic table cells, and a shared swatch legend ([3d18a2a](https://github.com/cheminfo/react-cheminfo/commit/3d18a2a1f9725bae7fa1ed92adb68fe075d1af9b))
+
 ## [0.143.0](https://github.com/cheminfo/react-cheminfo/compare/v0.142.0...v0.143.0) (2026-11-22)
 
 
