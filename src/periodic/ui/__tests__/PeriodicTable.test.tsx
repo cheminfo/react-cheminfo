@@ -280,3 +280,22 @@ test('the header strips shift the empty block with the cells', () => {
   expect(html).toContain('grid-column:4 / span 10');
   expect(html).toContain('grid-row:2 / span 3');
 });
+
+test('a cell named by hatchedOf is hatched over its colour, the others are not', () => {
+  const html = renderToStaticMarkup(
+    <PeriodicTable hatchedOf={(element) => element.symbol === 'C'} />,
+  );
+  const carbon = (html.split('data-testid="element-C"', 2)[1] ?? '').slice(
+    0,
+    2000,
+  );
+  const nitrogen = (html.split('data-testid="element-N"', 2)[1] ?? '').slice(
+    0,
+    2000,
+  );
+
+  expect(carbon).toContain('repeating-linear-gradient(135deg');
+  expect(carbon).toContain(ofWidth(0.32));
+  expect(nitrogen).not.toContain('repeating-linear-gradient');
+  expect(html.split('repeating-linear-gradient')).toHaveLength(2);
+});

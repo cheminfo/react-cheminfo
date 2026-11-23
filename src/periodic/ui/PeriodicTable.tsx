@@ -55,6 +55,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
     nameOf = defaultNameOf,
     shellsOf,
     isIncluded,
+    hatchedOf,
     inset,
     headers = false,
     onSelectRange,
@@ -187,6 +188,7 @@ export function PeriodicTable(props: PeriodicTableProps): ReactElement {
             swatch={swatchOf(element)}
             isSelected={element.symbol === selected}
             isIncluded={isIncluded?.(element)}
+            isHatched={hatchedOf?.(element)}
             column={cell.column + offset}
             row={cell.row + offset}
             onSelect={onSelect ?? noop}

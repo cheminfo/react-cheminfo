@@ -1,11 +1,12 @@
 /**
- * The key to the family colours, under the table.
+ * The key to the family colours, under the table: the shared
+ * {@link SwatchLegend} fed the ten families.
  */
 
-import type { CSSProperties, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
+import { SwatchLegend } from '../../color/ui/SwatchLegend.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -41,76 +42,23 @@ export interface CategoryLegendProps {
 export function CategoryLegend(props: CategoryLegendProps): ReactElement {
   const { className, onSelect, selected } = props;
   const t = useChromeT();
-
+  const entries = CATEGORY_ORDER.map((category) => ({
+    key: category,
+    label: t.or(`periodic.category.${category}`, CATEGORY_LABELS[category]),
+    swatch: categorySwatch(category),
+  }));
   return (
-    <div className={className} style={legendStyle}>
-      {CATEGORY_ORDER.map((category) => {
-        const swatch = categorySwatch(category);
-        const label = t.or(
-          `periodic.category.${category}`,
-          CATEGORY_LABELS[category],
-        );
-        const mark = (
-          <span style={{ ...swatchStyle, background: swatch.background }} />
-        );
-        if (onSelect === undefined) {
-          return (
-            <span key={category} style={itemStyle}>
-              {mark}
-              {label}
-            </span>
-          );
-        }
-        return (
-          <button
-            key={category}
-            type="button"
-            aria-pressed={category === selected}
-            onClick={() => {
-              onSelect(category);
-            }}
-            style={{
-              ...itemStyle,
-              ...buttonStyle,
-              fontWeight: category === selected ? 700 : 400,
-            }}
-          >
-            {mark}
-            {label}
-          </button>
-        );
-      })}
-    </div>
+    <SwatchLegend
+      className={className}
+      entries={entries}
+      selected={selected}
+      onSelect={
+        onSelect === undefined
+          ? undefined
+          : (key) => {
+              onSelect(key as ElementCategory);
+            }
+      }
+    />
   );
 }
-
-const legendStyle = {
-  color: TOKEN.textMuted,
-  display: 'flex',
-  flexWrap: 'wrap',
-  fontSize: 11,
-  gap: '2px 10px',
-} as const satisfies CSSProperties;
-
-const itemStyle = {
-  alignItems: 'center',
-  display: 'inline-flex',
-  gap: 4,
-} as const satisfies CSSProperties;
-
-const buttonStyle = {
-  background: 'none',
-  border: 'none',
-  color: 'inherit',
-  cursor: 'pointer',
-  font: 'inherit',
-  padding: 0,
-} as const satisfies CSSProperties;
-
-const swatchStyle = {
-  border: '1px solid rgb(255 255 255 / 0.55)',
-  borderRadius: 2,
-  display: 'inline-block',
-  height: 10,
-  width: 10,
-} as const satisfies CSSProperties;

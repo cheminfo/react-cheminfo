@@ -3,6 +3,7 @@ export { contrastRatio, readableInk, relativeLuminance } from './contrast.ts';
 export type { RgbColor } from './hex.ts';
 export { normalizeHexColor, parseHexColor, toHexColor } from './hex.ts';
 export { colorScaleGradient } from './gradient.ts';
+export { hatchedBackground } from './hatch.ts';
 export type { HsvColor } from './hsv.ts';
 export { hsvToRgb, rgbToHsv, wrapHue } from './hsv.ts';
 export type {

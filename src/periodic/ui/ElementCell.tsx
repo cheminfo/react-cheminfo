@@ -14,6 +14,7 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
+import { hatchedBackground } from '../../color/core/hatch.ts';
 import type { Swatch } from '../../color/core/interpolate.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { ElementPick } from '../core/layout.ts';
@@ -94,6 +95,11 @@ export interface ElementCellProps {
    */
   isIncluded?: boolean;
   /**
+   * Whether the cell is hatched over its colour, in its own ink.
+   * @default false
+   */
+  isHatched?: boolean;
+  /**
    * Called on pointer enter with the symbol, and on leave with `null`.
    * @default undefined
    */
@@ -124,6 +130,7 @@ export function ElementCell(props: ElementCellProps): ReactElement {
     shells,
     isSelected = false,
     isIncluded = true,
+    isHatched = false,
     onHover,
   } = props;
   const t = useChromeT();
@@ -167,7 +174,15 @@ export function ElementCell(props: ElementCellProps): ReactElement {
         gridTemplateColumns:
           shells === undefined ? '1fr' : `1fr ${SHELLS_COLUMN}`,
         columnGap: shells === undefined ? undefined : SHELLS_AIR,
-        background: swatch.background,
+        // The stripes are a share of the width, so a table drawn larger keeps
+        // the same hatch.
+        background: isHatched
+          ? hatchedBackground(
+              swatch.background,
+              swatch.foreground,
+              ofWidth(0.32),
+            )
+          : swatch.background,
         color: swatch.foreground,
         opacity: isIncluded ? 1 : 0.28,
         // A ring rather than a fill: a table coloured by a property must keep

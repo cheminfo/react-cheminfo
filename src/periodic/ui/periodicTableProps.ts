@@ -57,6 +57,14 @@ export interface PeriodicTableProps {
    */
   isIncluded?: (element: PeriodicElement) => boolean;
   /**
+   * Whether an element's cell is hatched over its colour: a second, weaker
+   * reading of the same element. The NMR table hatches an element whose
+   * observable isotope makes up less than 5 % of it. Give the legend the same
+   * hatch through `SwatchLegend`.
+   * @default no cell is
+   */
+  hatchedOf?: (element: PeriodicElement) => boolean;
+  /**
    * What is written in the block the table leaves empty, in the middle of the
    * top edge: columns 3 to 12 of the first three periods, or 3 to 26 in 32
    * columns. A tool that reads one element off the table puts what it says

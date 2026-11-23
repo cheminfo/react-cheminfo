@@ -6,3 +6,5 @@ export type { ColorScaleLegendProps } from './ColorScaleLegend.tsx';
 export { ColorScaleLegend } from './ColorScaleLegend.tsx';
 export type { ColorScaleSelectProps } from './ColorScaleSelect.tsx';
 export { ColorScaleSelect } from './ColorScaleSelect.tsx';
+export type { SwatchLegendEntry, SwatchLegendProps } from './SwatchLegend.tsx';
+export { SwatchLegend } from './SwatchLegend.tsx';
