@@ -3,6 +3,8 @@ import type { Molecule } from 'openchemlib';
 import type { CSSProperties, ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 
+import { isCopied } from '../../clipboard/core/copyOutcome.ts';
+import { announceCopy } from '../../clipboard/ui/announceCopy.ts';
 import { copyFigure } from '../../download/core/copyFigure.ts';
 import { copySvg } from '../../download/core/copySvg.ts';
 import { downloadBlob } from '../../download/core/downloadBlob.ts';
@@ -16,6 +18,7 @@ import {
 } from '../../download/core/figureScale.ts';
 import { FIGURE_SVG_TYPE } from '../../download/core/figureSvg.ts';
 import { withPageFigureSource } from '../../download/core/pageFigureSource.ts';
+import { announcedFigureCopy } from '../../download/ui/announceFigureCopy.ts';
 import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OVERLAY_HELP_NAME_STYLE } from '../../overlay/ui/overlayRowStyles.ts';
@@ -143,11 +146,15 @@ export function StructurePicturePane(
           size="small"
           text={t('structure.export.copySvg')}
           onClick={() =>
-            void run(async () =>
-              (await copySvg(picture.markup))
+            void run(async () => {
+              // Copied as its text, the SVG is still on the clipboard: the
+              // notice at the bottom says which browsers copy it as a picture.
+              const outcome = await copySvg(picture.markup);
+              announceCopy(outcome, t, t('structure.export.svgCopied'));
+              return isCopied(outcome)
                 ? t('structure.export.svgCopied')
-                : t('clipboard.failed'),
-            )
+                : t('clipboard.failed');
+            })
           }
         />
         <Button
@@ -158,16 +165,20 @@ export function StructurePicturePane(
             // Safari only allows a clipboard write the click itself started,
             // so the image is handed over as a promise rather than awaited
             // first — see `copyFigure`.
-            void run(async () =>
-              (await copyFigure(
-                png(),
-                withPageFigureSource(picture.markup),
-              )) === 'copied'
-                ? t('download.hintCopied', {
-                    pixels: formatFigurePixels(picture),
-                  })
-                : t('download.copyUnsupported'),
-            )
+            void run(async () => {
+              const notice = await announcedFigureCopy(
+                copyFigure(png(), withPageFigureSource(picture.markup)),
+                t,
+              );
+              if (notice === 'copied') {
+                return t('download.hintCopied', {
+                  pixels: formatFigurePixels(picture),
+                });
+              }
+              return notice === 'copyRefused'
+                ? t('clipboard.notice.refused')
+                : t('download.copyUnsupported');
+            })
           }
         />
       </div>

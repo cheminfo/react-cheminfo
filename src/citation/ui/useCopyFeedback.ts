@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { announceCopy } from '../../clipboard/ui/announceCopy.ts';
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
@@ -60,11 +61,18 @@ export function useCopyFeedback(): CopyFeedback {
       copyCitations(references, format, style).then(
         () => {
           announce(key, false);
+          announceCopy(
+            'copied',
+            t,
+            references.length === 1
+              ? t('cite.copiedNotice')
+              : t('cite.copiedNoticeMany', { count: references.length }),
+          );
         },
         () => {
-          // A denied clipboard permission is the usual cause, and the menu is
-          // the only place the user can be told about it.
+          // A denied clipboard permission is the usual cause.
           announce(key, true);
+          announceCopy('refused', t);
         },
       );
     },

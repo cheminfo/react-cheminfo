@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-import { showClipboardNotice } from '../../clipboard/core/showClipboardNotice.ts';
-import { errorMessage } from '../../error/core/toError.ts';
+import { announceCopyFailure } from '../../clipboard/ui/announceCopy.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { PageFigureWriter } from '../core/copyPageFigure.ts';
 import { copyPageFigure } from '../core/copyPageFigure.ts';
+
+import { announceFigureCopy } from './announceFigureCopy.ts';
 
 /**
  * Copy the page's figure with Ctrl+C, or ⌘C on a Mac, as on every site of the
@@ -35,14 +36,10 @@ export function useFigureCopyShortcut(write: PageFigureWriter | null): void {
       event.preventDefault();
       copyPageFigure(draw).then(
         (notice) => {
-          if (notice === 'copied') {
-            showClipboardNotice(translate('clipboard.figureCopied'));
-          } else if (notice !== undefined) {
-            showClipboardNotice(translate('download.copyUnsupported'), true);
-          }
+          announceFigureCopy(notice, translate);
         },
         (error: unknown) => {
-          showClipboardNotice(errorMessage(error), true);
+          announceCopyFailure(error, translate);
         },
       );
     }

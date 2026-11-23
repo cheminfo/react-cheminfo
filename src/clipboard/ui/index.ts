@@ -1,3 +1,8 @@
+export {
+  announceCopy,
+  announceCopyFailure,
+  copiedText,
+} from './announceCopy.ts';
 export type {
   ClickToCopyElement,
   ClickToCopyLayout,

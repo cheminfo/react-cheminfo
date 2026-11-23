@@ -1,14 +1,24 @@
-import { writeClipboardItem } from '../../clipboard/core/clipboardItem.ts';
+import {
+  pictureRefusal,
+  writeClipboardItem,
+} from '../../clipboard/core/clipboardItem.ts';
 
 import { figureClipboardParts } from './figureClipboard.ts';
 
 /**
  * What the last copy or send came to, when it is worth a line of its own:
- * `sendReady` is a file written too late for the press that asked for it,
- * which the next press hands to the share sheet at once.
+ * `copyUnsupported` is a browser that copies no picture, `copyRefused` one
+ * that does and refused this one, and `sendReady` is a file written too late
+ * for the press that asked for it, which the next press hands to the share
+ * sheet at once.
  */
 export type FigureNotice =
-  'copied' | 'copyUnsupported' | 'sent' | 'sendReady' | 'sendUnsupported';
+  | 'copied'
+  | 'copyUnsupported'
+  | 'copyRefused'
+  | 'sent'
+  | 'sendReady'
+  | 'sendUnsupported';
 
 /**
  * Put a figure on the clipboard: the PNG for whatever takes a picture, and the
@@ -20,7 +30,8 @@ export type FigureNotice =
  * @param png - The picture being painted.
  * @param figure - The figure as the site saves it, being written: the SVG
  * `withPageFigureSource` returns.
- * @returns `copied`, or `copyUnsupported` where the clipboard takes no picture.
+ * @returns `copied`; `copyUnsupported` where the clipboard takes no picture;
+ * `copyRefused` where it does and would not take this one.
  * @throws {Error} The painting's own error, when the picture or the figure
  *   could not be painted — a failure to report, not a browser that cannot copy.
  */
@@ -32,5 +43,5 @@ export async function copyFigure(
     return 'copied';
   }
   await Promise.all([png, figure]);
-  return 'copyUnsupported';
+  return pictureRefusal() === 'refused' ? 'copyRefused' : 'copyUnsupported';
 }

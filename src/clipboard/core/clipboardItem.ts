@@ -32,15 +32,38 @@ export async function writeClipboardItem(
 }
 
 /**
- * Whether the clipboard says it takes a type. Asked before writing: a write it
- * refuses would spend the click, and whatever is written after it would be
- * refused too in Safari.
+ * The types every browser with a `ClipboardItem` writes — Chrome, Edge,
+ * Firefox from 127 and Safari from 13.1 alike — so a browser too old to answer
+ * `ClipboardItem.supports` still takes them.
+ */
+const BASELINE_TYPES = new Set(['text/plain', 'text/html', 'image/png']);
+
+/**
+ * Whether the clipboard takes a type. Asked before writing: a write it refuses
+ * would spend the click, and whatever is written after it would be refused too
+ * in Safari.
  * @param type - A MIME type, e.g. `image/svg+xml`.
- * @returns Whether `ClipboardItem.supports` names it; `false` where the
- * browser cannot say.
+ * @returns Whether `ClipboardItem.supports` names it, or, where the browser
+ * cannot say, whether every browser with a `ClipboardItem` takes it; `false`
+ * where there is no `ClipboardItem`.
  */
 export function clipboardSupports(type: string): boolean {
   if (typeof ClipboardItem === 'undefined') return false;
   const item = ClipboardItem as { supports?: (type: string) => boolean };
-  return typeof item.supports === 'function' && item.supports(type);
+  return typeof item.supports === 'function'
+    ? item.supports(type)
+    : BASELINE_TYPES.has(type);
+}
+
+/**
+ * Why a picture did not reach the clipboard: this browser takes none, or it
+ * takes them and refused this one — a denied permission, a frame not allowed
+ * to write, or a click that no longer counts as one.
+ * @returns `unsupported` or `refused`.
+ */
+export function pictureRefusal(): 'unsupported' | 'refused' {
+  return typeof globalThis.navigator?.clipboard?.write === 'function' &&
+    clipboardSupports('image/png')
+    ? 'refused'
+    : 'unsupported';
 }

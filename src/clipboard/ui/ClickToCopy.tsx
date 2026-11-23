@@ -14,7 +14,6 @@ import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { ClipboardContent } from '../core/writeToClipboard.ts';
-import { writeToClipboard } from '../core/writeToClipboard.ts';
 
 import { useCopyToClipboard } from './useCopyToClipboard.ts';
 
@@ -145,9 +144,7 @@ export function ClickToCopy(props: ClickToCopyProps): ReactElement {
   ): void {
     if (isOnNestedControl(event)) return;
     event.stopPropagation();
-    void copy(
-      typeof value === 'function' ? () => writeToClipboard(value()) : value,
-    );
+    void copy(typeof value === 'function' ? value() : value);
   }
 
   const outcome = copied ? 'copied' : failed ? 'failed' : undefined;

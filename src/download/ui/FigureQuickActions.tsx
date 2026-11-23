@@ -100,6 +100,7 @@ function quickNote(
     if (notice === 'copied') return fileCopy.copied;
   }
   if (notice === 'copyUnsupported') return t('download.copyUnsupported');
+  if (notice === 'copyRefused') return t('clipboard.notice.refused');
   if (notice === 'copied') {
     return t(svg ? 'download.copiedPngSvg' : 'download.copiedPng');
   }

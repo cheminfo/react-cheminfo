@@ -11,7 +11,7 @@ afterEach(() => {
 test('a clipboard taking SVG pictures gets the drawing and its text', async () => {
   const { items, texts } = stubClipboard({ svg: true });
 
-  await expect(copySvg(MARKUP)).resolves.toBe(true);
+  await expect(copySvg(MARKUP)).resolves.toBe('copied');
   expect(items).toHaveLength(1);
   expect(Object.keys(items[0] ?? {})).toStrictEqual([
     'image/svg+xml',
@@ -25,7 +25,7 @@ test('a clipboard taking SVG pictures gets the drawing and its text', async () =
 test('a clipboard taking no SVG picture gets the text alone', async () => {
   const { items, texts } = stubClipboard({ svg: false });
 
-  await expect(copySvg(MARKUP)).resolves.toBe(true);
+  await expect(copySvg(MARKUP)).resolves.toBe('copiedAsText');
   expect(items).toStrictEqual([]);
   expect(texts).toStrictEqual([MARKUP]);
 });
@@ -33,8 +33,19 @@ test('a clipboard taking no SVG picture gets the text alone', async () => {
 test('a refused picture still leaves the text', async () => {
   const { texts } = stubClipboard({ svg: true, refuseItems: true });
 
-  await expect(copySvg(MARKUP)).resolves.toBe(true);
+  await expect(copySvg(MARKUP)).resolves.toBe('copiedAsText');
   expect(texts).toStrictEqual([MARKUP]);
+});
+
+test('a clipboard refusing the text too copies nothing', async () => {
+  const { texts } = stubClipboard({
+    svg: true,
+    refuseItems: true,
+    refuseText: true,
+  });
+
+  await expect(copySvg(MARKUP)).resolves.toBe('refused');
+  expect(texts).toStrictEqual([]);
 });
 
 interface ClipboardStubOptions {
@@ -42,6 +53,8 @@ interface ClipboardStubOptions {
   svg: boolean;
   /** Whether every item write is refused. */
   refuseItems?: boolean;
+  /** Whether every text write is refused. */
+  refuseText?: boolean;
 }
 
 /**
@@ -50,7 +63,7 @@ interface ClipboardStubOptions {
  * @returns The items and the texts it took.
  */
 function stubClipboard(options: ClipboardStubOptions) {
-  const { svg, refuseItems = false } = options;
+  const { svg, refuseItems = false, refuseText = false } = options;
   const items: Array<Record<string, Blob>> = [];
   const texts: string[] = [];
   class FakeClipboardItem {
@@ -72,6 +85,7 @@ function stubClipboard(options: ClipboardStubOptions) {
         for (const item of written) items.push(item.record);
       },
       writeText: async (text: string) => {
+        if (refuseText) throw new Error('NotAllowedError');
         texts.push(text);
       },
     },

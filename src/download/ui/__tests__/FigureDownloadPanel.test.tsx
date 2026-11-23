@@ -152,7 +152,7 @@ test('a browser that cannot copy a picture is told to save it', () => {
   const html = panel({ format: 'png', notice: 'copyUnsupported' });
 
   expect(html).toContain(
-    'This browser cannot put a picture on the clipboard. Save it instead.',
+    'This browser cannot copy a picture. Save it instead, or use a recent Chrome, Edge, Firefox or Safari.',
   );
 });
 

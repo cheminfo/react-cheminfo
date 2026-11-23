@@ -21,3 +21,7 @@ export type {
 } from './useFigureDownload.tsx';
 export { useFigureDownload } from './useFigureDownload.tsx';
 export { useFigureCopyShortcut } from './useFigureCopyShortcut.ts';
+export {
+  announceFigureCopy,
+  announcedFigureCopy,
+} from './announceFigureCopy.ts';

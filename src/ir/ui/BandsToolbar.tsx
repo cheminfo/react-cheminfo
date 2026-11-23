@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Button, Toolbar } from 'react-science/ui';
 
+import { useCopyToClipboard } from '../../clipboard/ui/useCopyToClipboard.ts';
 import { panelToolbarStyle } from '../../panel/core/panelStyles.ts';
 
 import { bandsToTsv } from './bandsTsv.ts';
@@ -26,6 +27,7 @@ export function BandsToolbar() {
     () => bandsToTsv(assigned, mode, assignments),
     [assigned, mode, assignments],
   );
+  const { copy } = useCopyToClipboard();
 
   return (
     <div className="no-print" style={panelToolbarStyle}>
@@ -91,7 +93,7 @@ export function BandsToolbar() {
         disabled={assigned.length === 0}
         tooltipProps={{ content: 'Copy the table' }}
         aria-label="Copy the table"
-        onClick={() => void navigator.clipboard?.writeText(tsv)}
+        onClick={() => void copy(tsv)}
       />
     </div>
   );

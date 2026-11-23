@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
+import type { CopyOutcome } from '../core/copyOutcome.ts';
 
 import {
   DEFAULT_COPY_RESET_AFTER,
@@ -17,10 +18,11 @@ export interface CopyButtonProps {
    * what a whole list has to be: writing ten thousand structures out on every
    * render, for a button nobody may press, is a page that stutters as it is
    * scrolled. A function may also make the write itself and say whether the
-   * clipboard took it — `() => writeBlobToClipboard(png)` for an image — and
-   * is then called inside the click, which is the only time Safari allows it.
+   * clipboard took it, or how it went — `() => writeBlobToClipboard(png)` for
+   * an image, `() => copySvg(markup)` for an SVG — and is then called inside
+   * the click, which is the only time Safari allows it.
    */
-  content: string | (() => string | Promise<boolean>);
+  content: string | (() => string | Promise<boolean | CopyOutcome>);
   /**
    * Text of the button. Left out for an icon-only button, which is what a
    * dense row of them needs.

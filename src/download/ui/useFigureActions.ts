@@ -1,3 +1,4 @@
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { copyFigure } from '../core/copyFigure.ts';
 import { resizedSvgFigure } from '../core/croppedMarkup.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
@@ -8,6 +9,7 @@ import type { FigureSvg } from '../core/figureSvg.ts';
 import { figureSvg } from '../core/figureSvg.ts';
 import { withPageFigureSource } from '../core/pageFigureSource.ts';
 
+import { announcedFigureCopy } from './announceFigureCopy.ts';
 import type { FigureRedraw } from './useFigureRedraw.tsx';
 import { useFigureSend } from './useFigureSend.ts';
 import type { FigureTask } from './useFigureTask.ts';
@@ -80,6 +82,7 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
     options;
   const { pictureScale, sizeFactor = 1 } = options;
   const { redrawAt, redraw } = options;
+  const t = useChromeT();
   const { run, busy, failure, notice, clear } = useFigureTask();
   const sendFile = useFigureSend({ run, notice });
 
@@ -125,9 +128,12 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
     // still being painted: Safari only allows a write the click itself started.
     const drawn = atSize();
     run(
-      copyFigure(
-        drawn.then((figure) => figurePng(figure, pictureScale)),
-        drawn.then((figure) => withPageFigureSource(figure.markup)),
+      announcedFigureCopy(
+        copyFigure(
+          drawn.then((figure) => figurePng(figure, pictureScale)),
+          drawn.then((figure) => withPageFigureSource(figure.markup)),
+        ),
+        t,
       ),
     );
   }

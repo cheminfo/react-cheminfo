@@ -8,6 +8,7 @@ import type { ReactElement } from 'react';
 import { useCallback, useState } from 'react';
 
 import { writeToClipboard } from '../../clipboard/core/writeToClipboard.ts';
+import { announceCopy } from '../../clipboard/ui/announceCopy.ts';
 import type { FigureNotice } from '../../download/core/copyFigure.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import {
@@ -17,6 +18,7 @@ import {
 } from '../../download/core/figureDpi.ts';
 import type { FigurePixels } from '../../download/core/figureScale.ts';
 import { FigureDownloadPanel } from '../../download/ui/FigureDownloadPanel.tsx';
+import { announcedFigureCopy } from '../../download/ui/announceFigureCopy.ts';
 import { useFigureSend } from '../../download/ui/useFigureSend.ts';
 import { useFigureTask } from '../../download/ui/useFigureTask.ts';
 import { useAsync } from '../../hooks/ui/useAsync.ts';
@@ -115,7 +117,15 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
   const versionLabel = writtenVersion === 'molfileV3000' ? 'V3000' : 'V2000';
 
   async function copyMolfile(molfileText: string): Promise<FigureNotice> {
-    if (await writeToClipboard(molfileText)) return 'copied';
+    if (await writeToClipboard(molfileText)) {
+      announceCopy(
+        'copied',
+        t,
+        t('molecule3d.copiedMolfile', { version: versionLabel }),
+      );
+      return 'copied';
+    }
+    announceCopy('refused', t);
     throw new Error(t('clipboard.failed'));
   }
 
@@ -169,7 +179,7 @@ export function Molecule3DExport(props: Molecule3DExportProps): ReactElement {
         }
       }}
       onCopy={() => {
-        if (file === null) run(onCopy(scale));
+        if (file === null) run(announcedFigureCopy(onCopy(scale), t));
         else if (text) run(copyMolfile(text));
       }}
       onSend={

@@ -36,7 +36,8 @@ test('hovering shows the clipboard cursor and no glyph; a click copies and ticks
   expect(await copiedText(page, value)).toBe('C=CC=O');
   await expect(icon).toHaveClass(/bp6-icon-tick/);
   await expect(icon).toHaveCSS('opacity', '1');
-  await expect(page.getByRole('status')).toHaveText('Copied');
+  await expect(value.getByRole('status')).toHaveText('Copied');
+  await expect(page.locator('.clipboard-notice')).toHaveText('Copied: C=CC=O');
 
   await expect(value).not.toHaveAttribute('data-copy', /./, { timeout: 3000 });
   await expect(icon).toHaveClass(/bp6-icon-clipboard/);

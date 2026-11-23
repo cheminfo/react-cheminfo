@@ -37,6 +37,15 @@ test('a clipboard that takes no picture says so', async () => {
   );
 });
 
+test('a clipboard that takes pictures and refused this one says so', async () => {
+  stubClipboard({ refuse: true });
+  const png = Promise.resolve(new Blob(['png'], { type: 'image/png' }));
+
+  await expect(copyFigure(png, Promise.resolve(FIGURE))).resolves.toBe(
+    'copyRefused',
+  );
+});
+
 test('a picture that could not be painted reports the painting error', async () => {
   stubClipboard();
   const png = Promise.reject(new Error('The canvas is tainted.'));
@@ -59,9 +68,15 @@ test('a figure that could not be written reports its error', async () => {
 /**
  * A clipboard that reads every rendering it is handed, as a browser does, and
  * refuses the item when one of them fails.
+ * @param options - How it behaves.
+ * @param options.refuse - Whether it refuses every write, as a denied
+ * permission does.
  * @returns What it was given, item by item.
  */
-function stubClipboard(): Array<Record<string, Promise<Blob>>> {
+function stubClipboard(
+  options: { refuse?: boolean } = {},
+): Array<Record<string, Promise<Blob>>> {
+  const { refuse = false } = options;
   const written: Array<Record<string, Promise<Blob>>> = [];
   class FakeClipboardItem {
     public readonly record: Record<string, Promise<Blob>>;
@@ -74,6 +89,7 @@ function stubClipboard(): Array<Record<string, Promise<Blob>>> {
   vi.stubGlobal('navigator', {
     clipboard: {
       write: async (items: FakeClipboardItem[]) => {
+        if (refuse) throw new Error('NotAllowedError');
         await Promise.all(items.flatMap((item) => Object.values(item.record)));
         for (const item of items) written.push(item.record);
       },
