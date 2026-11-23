@@ -72,11 +72,6 @@ export interface CrystalScene {
    */
   readonly elementStyle?: ElementStyle;
   /**
-   * How the atoms are drawn.
-   * @default 'ball-and-stick'
-   */
-  readonly representation?: 'ball-and-stick' | 'spacefill';
-  /**
    * Which bonds are drawn; changing it leaves the camera where it is.
    * @default 'all'
    */

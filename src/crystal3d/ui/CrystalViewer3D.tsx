@@ -20,6 +20,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { Suspense, lazy, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import type { Molecule3DSettings } from '../../molecule3d/core/settings.ts';
 import type { Molecule3DTools } from '../../molecule3d/core/tools.ts';
 // Deep import on purpose: the probe imports nothing, while a barrel would pull
 // molstar in — which is exactly what asking first exists to avoid.
@@ -49,9 +50,27 @@ export interface CrystalViewer3DProps {
   background?: string;
   /**
    * Which tools the toolbars offer; every one it does not name is on.
-   * @default every tool but the display options and the surface
+   * @default every tool
    */
   tools?: Partial<Molecule3DTools>;
+  /**
+   * How the atoms are drawn — the representation, its sizes and the molecular
+   * surface the display options set — when the page owns it: to keep it in
+   * the address, or the same on every page of the site.
+   * @default undefined
+   */
+  settings?: Molecule3DSettings;
+  /**
+   * How the atoms are drawn at first when the viewer owns it, and what the
+   * display options' reset button returns to either way.
+   * @default DEFAULT_MOLECULE_3D_SETTINGS
+   */
+  defaultSettings?: Partial<Molecule3DSettings>;
+  /**
+   * Called with the new settings after any change from the toolbar.
+   * @default undefined
+   */
+  onSettingsChange?: (settings: Molecule3DSettings) => void;
   /**
    * Base name of a picture saved from the toolbar, extension excluded.
    * @default 'crystal'
@@ -91,6 +110,9 @@ export function CrystalViewer3D(props: CrystalViewer3DProps): ReactElement {
     height = 420,
     background,
     tools,
+    settings,
+    defaultSettings,
+    onSettingsChange,
     fileName,
     caption,
     emptyMessage,
@@ -133,6 +155,9 @@ export function CrystalViewer3D(props: CrystalViewer3DProps): ReactElement {
               scene={scene}
               background={background}
               tools={tools}
+              settings={settings}
+              defaultSettings={defaultSettings}
+              onSettingsChange={onSettingsChange}
               fileName={fileName}
               onFailure={setFailure}
               onHandle={onHandle}

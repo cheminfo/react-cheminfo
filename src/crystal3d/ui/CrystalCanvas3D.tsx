@@ -14,15 +14,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Molecule3DCamera } from '../../molecule3d/core/camera.ts';
 import type { Measurement } from '../../molecule3d/core/measurement.ts';
+import type { Molecule3DSettings } from '../../molecule3d/core/settings.ts';
+import { normalizeMolecule3DSettings } from '../../molecule3d/core/settings.ts';
 import type { Molecule3DTools } from '../../molecule3d/core/tools.ts';
+import { Molecule3DOptions } from '../../molecule3d/ui/Molecule3DOptions.tsx';
 import { Molecule3DStage } from '../../molecule3d/ui/Molecule3DStage.tsx';
+import { useControlledState } from '../../molecule3d/ui/useControlledState.ts';
 import { useImageExport } from '../../molecule3d/ui/useImageExport.ts';
 import { MolstarToolbar } from '../../molstar/ui/MolstarToolbar.tsx';
 import { useMolstarTools } from '../../molstar/ui/useMolstarTools.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { sceneOrientation } from '../core/orientation.ts';
 import type { ViewerAtom } from '../core/types.ts';
-import type { CrystalViewer } from '../viewer/index.ts';
+import type { CrystalViewer, StructureStyle } from '../viewer/index.ts';
 import {
   DEFAULT_CAMERA_DURATION,
   createCrystalViewer,
@@ -41,9 +45,26 @@ export interface CrystalCanvas3DProps {
   background?: string;
   /**
    * Which tools the toolbars offer; every one it does not name is on.
-   * @default every tool but the display options and the surface
+   * @default every tool
    */
   tools?: Partial<Molecule3DTools>;
+  /**
+   * How the atoms are drawn, when the page owns it — to keep it in the
+   * address, or the same on every page of the site.
+   * @default undefined
+   */
+  settings?: Molecule3DSettings;
+  /**
+   * How the atoms are drawn at first when the canvas owns it, and what the
+   * display options' reset button returns to either way.
+   * @default DEFAULT_MOLECULE_3D_SETTINGS
+   */
+  defaultSettings?: Partial<Molecule3DSettings>;
+  /**
+   * Called with the new settings after any change from the toolbar.
+   * @default undefined
+   */
+  onSettingsChange?: (settings: Molecule3DSettings) => void;
   /**
    * Base name of a picture saved from the toolbar, extension excluded.
    * @default 'crystal'
@@ -73,6 +94,9 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
     scene,
     background,
     tools,
+    settings: settingsProp,
+    defaultSettings,
+    onSettingsChange,
     fileName = 'crystal',
     onFailure,
     onHandle,
@@ -82,7 +106,6 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
     camera = null,
     cell = null,
     repeat,
-    representation,
     bonds = 'all',
     elements,
     labels,
@@ -91,6 +114,15 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
   } = scene;
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [initialSettings] = useState(() =>
+    normalizeMolecule3DSettings(defaultSettings),
+  );
+  const [settings, setSettings] = useControlledState(
+    settingsProp,
+    initialSettings,
+    onSettingsChange,
+  );
+  const style = useStructureStyle(settings, bonds);
 
   // The viewer is not React state: it is an external resource the effects below
   // reach through this handle. Putting it in state would set state inside an
@@ -183,12 +215,20 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
     return viewer.onHover(setHovered);
   }, [container, background]);
 
+  // Before the structure below, so a new viewer draws its first structure in
+  // the style on screen; a later change redraws the style alone.
+  useEffect(() => {
+    const viewer = held.current;
+    if (viewer === null) return;
+    void report(failure, viewer.setStyle(style));
+  }, [container, background, style]);
+
   useEffect(() => {
     const viewer = held.current;
     if (viewer === null) return;
     container?.setAttribute('data-drawn', 'false');
     const work = (async () => {
-      await viewer.showStructure(atoms, { representation });
+      await viewer.showStructure(atoms);
       await viewer.showCell(cell, repeat);
       const wanted = opening.current;
       if (wanted !== null && wanted !== applied.current) {
@@ -201,15 +241,7 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
     })();
     drawing.current = work.catch(() => undefined);
     void report(failure, work);
-  }, [container, background, atoms, cell, repeat, representation]);
-
-  // Declared after the structure, so a new viewer draws its first structure
-  // with these bonds; a later change redraws the bonds alone.
-  useEffect(() => {
-    const viewer = held.current;
-    if (viewer === null) return;
-    void report(failure, viewer.setBonds(bonds));
-  }, [container, background, bonds]);
+  }, [container, background, atoms, cell, repeat]);
 
   // Once the structure above is on screen, so they are drawn on the atoms they
   // name.
@@ -264,10 +296,22 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
           {atoms.length > 0 && (
             <MolstarToolbar
               controls={controls}
-              tools={{ ...DEFAULT_TOOLS, ...tools }}
+              tools={tools}
               fullscreen={fullscreen}
               measurementCount={measurements.length}
               onClearMeasurements={clearMeasurements}
+              showSurface={settings.showSurface}
+              onShowSurfaceChange={(showSurface) => {
+                setSettings({ ...settings, showSurface });
+              }}
+              options={
+                <Molecule3DOptions
+                  settings={settings}
+                  onChange={setSettings}
+                  polarSurfaceArea={null}
+                  defaults={initialSettings}
+                />
+              }
               onResetView={() => {
                 void held.current?.resetCamera(
                   DEFAULT_CAMERA_DURATION,
@@ -286,6 +330,56 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
         </>
       )}
     </Molecule3DStage>
+  );
+}
+
+/**
+ * The style the viewer draws, the same object while nothing it reads changes:
+ * a page rebuilding equal settings on every render must not redraw the atoms.
+ * @param settings - The display options.
+ * @param bonds - Which bonds the scene asks for.
+ * @returns The style.
+ */
+function useStructureStyle(
+  settings: Molecule3DSettings,
+  bonds: StructureStyle['bonds'],
+): StructureStyle {
+  const {
+    representation,
+    sizeFactor,
+    bondSizeFactor,
+    showSurface,
+    probeRadius,
+    surfaceAlpha,
+    surfaceColoring,
+    surfaceColor,
+  } = settings;
+  return useMemo(
+    () => ({
+      representation,
+      sizeFactor,
+      bondSizeFactor,
+      bonds,
+      surface: showSurface
+        ? {
+            probeRadius,
+            alpha: surfaceAlpha,
+            coloring: surfaceColoring,
+            color: surfaceColor,
+          }
+        : null,
+    }),
+    [
+      representation,
+      sizeFactor,
+      bondSizeFactor,
+      bonds,
+      showSurface,
+      probeRadius,
+      surfaceAlpha,
+      surfaceColoring,
+      surfaceColor,
+    ],
   );
 }
 
@@ -351,16 +445,6 @@ async function report(
 }
 
 const NO_MEASUREMENTS: readonly Measurement[] = [];
-
-/**
- * A crystal is not a molecule: its look is the page's to set — the elements,
- * the labels, the representation — so the display options and the molecular
- * surface are not offered.
- */
-const DEFAULT_TOOLS: Partial<Molecule3DTools> = {
-  options: false,
-  surface: false,
-};
 
 const STAGE_STYLE: CSSProperties = {
   position: 'relative',

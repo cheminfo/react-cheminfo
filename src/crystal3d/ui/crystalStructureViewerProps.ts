@@ -1,3 +1,4 @@
+import type { Molecule3DSettings } from '../../molecule3d/core/settings.ts';
 import type { Molecule3DTools } from '../../molecule3d/core/tools.ts';
 import type { CrystalViewSettings } from '../core/crystalView.ts';
 
@@ -34,8 +35,25 @@ export interface CrystalStructureViewerProps {
    */
   height?: number | string;
   /**
+   * How the atoms are drawn — the representation, its sizes and the molecular
+   * surface the toolbar's display options set — when the page owns it.
+   * @default undefined
+   */
+  displaySettings?: Molecule3DSettings;
+  /**
+   * How the atoms are drawn at first when the viewer owns it, and what the
+   * display options' reset button returns to either way.
+   * @default DEFAULT_MOLECULE_3D_SETTINGS
+   */
+  defaultDisplaySettings?: Partial<Molecule3DSettings>;
+  /**
+   * Called with every change the display options make.
+   * @default undefined
+   */
+  onDisplaySettingsChange?: (settings: Molecule3DSettings) => void;
+  /**
    * Which tools the toolbars offer; every one it does not name is on.
-   * @default every tool but the display options and the surface
+   * @default every tool
    */
   tools?: Partial<Molecule3DTools>;
   /**

@@ -9,7 +9,6 @@
  */
 
 import { clearMeasurements } from '../../molstar/core/index.ts';
-import type { CrystalBonds } from '../core/crystalView.ts';
 import { mergeDrawings, withoutDrawings } from '../core/drawingSet.ts';
 import type {
   CellRepeat,
@@ -22,6 +21,7 @@ import type {
 import type { PlayOptions } from './animate.ts';
 import {
   playOperation,
+  reapplyOperation,
   resetOperation,
   setOperationFraction,
 } from './animate.ts';
@@ -30,7 +30,7 @@ import { CrystalViewerPlugin } from './plugin.ts';
 import type { CellStyle } from './renderCell.ts';
 import type { ElementLayerStyle } from './renderElements.ts';
 import type { StructureStyle } from './renderStructure.ts';
-import { setStructureBonds } from './renderStructure.ts';
+import { setStructureStyle } from './renderStructure.ts';
 import { drawCell, drawElements, drawStructure } from './sceneParts.ts';
 
 /**
@@ -55,7 +55,7 @@ export function createCrystalViewer(
 export class CrystalViewer extends CrystalViewerPlugin {
   #drawings: readonly SymmetryDrawing[] = [];
   #elementStyle: ElementLayerStyle = {};
-  #bonds: CrystalBonds = 'all';
+  #style: StructureStyle = {};
 
   /**
    * The symmetry elements drawn right now, in drawing order.
@@ -66,34 +66,34 @@ export class CrystalViewer extends CrystalViewerPlugin {
   }
 
   /**
-   * Replace the atoms on screen.
+   * Replace the atoms on screen, drawn as {@link CrystalViewer.setStyle} said
+   * last. A new structure stands where its coordinates put it, whatever
+   * operation the previous one was left at.
    * @param atoms - The whole scene, expanded and repeated already, in Cartesian
    *   ångström. An empty list clears them.
-   * @param style - See {@link StructureStyle}; its bonds are the ones last
-   *   set by {@link CrystalViewer.setBonds}.
    * @returns Resolves once the atoms are drawn.
    */
-  showStructure(
-    atoms: readonly ViewerAtom[],
-    style?: Omit<StructureStyle, 'bonds'>,
-  ): Promise<void> {
+  showStructure(atoms: readonly ViewerAtom[]): Promise<void> {
     // A measurement names atoms of the structure it was taken on.
     return this.run(async (plugin) => {
       await clearMeasurements(plugin);
-      await drawStructure(plugin, atoms, { ...style, bonds: this.#bonds });
+      await drawStructure(plugin, atoms, this.#style);
+      resetOperation(plugin);
     });
   }
 
   /**
-   * Draw other bonds, on the atoms on screen and on every later structure. The
-   * atoms are not drawn again, so the camera stays where it is.
-   * @param bonds - Which bonds are drawn.
+   * Draw the atoms another way, on screen and in every later structure. The
+   * atoms are not built again, so the camera stays where it is.
+   * @param style - See {@link StructureStyle}.
    * @returns Resolves once they are drawn.
    */
-  setBonds(bonds: CrystalBonds): Promise<void> {
-    if (bonds === this.#bonds) return Promise.resolve();
-    this.#bonds = bonds;
-    return this.run((plugin) => setStructureBonds(plugin, bonds));
+  setStyle(style: StructureStyle): Promise<void> {
+    this.#style = style;
+    return this.run(async (plugin) => {
+      await setStructureStyle(plugin, style);
+      reapplyOperation(plugin);
+    });
   }
 
   /**

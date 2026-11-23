@@ -40,6 +40,9 @@ export function CrystalStructureView(
     settings: settingsProp,
     defaultSettings = DEFAULT_SETTINGS,
     onSettingsChange,
+    displaySettings,
+    defaultDisplaySettings,
+    onDisplaySettingsChange,
     height,
     tools,
     fileName,
@@ -73,6 +76,9 @@ export function CrystalStructureView(
       name={name}
       settings={settings}
       onSettingsChange={setSettings}
+      displaySettings={displaySettings}
+      defaultDisplaySettings={defaultDisplaySettings}
+      onDisplaySettingsChange={onDisplaySettingsChange}
       height={height}
       tools={tools}
       fileName={fileName}
@@ -86,13 +92,28 @@ type CrystalDrawingProps = Required<
 > &
   Pick<
     CrystalStructureViewerProps,
-    'height' | 'tools' | 'fileName' | 'onHandle'
+    | 'displaySettings'
+    | 'defaultDisplaySettings'
+    | 'onDisplaySettingsChange'
+    | 'height'
+    | 'tools'
+    | 'fileName'
+    | 'onHandle'
   > & {
     cell: CellAtoms;
   };
 
 function CrystalDrawing(props: CrystalDrawingProps): ReactElement {
-  const { cell, name, settings, onSettingsChange, ...viewer } = props;
+  const {
+    cell,
+    name,
+    settings,
+    onSettingsChange,
+    displaySettings,
+    defaultDisplaySettings,
+    onDisplaySettingsChange,
+    ...viewer
+  } = props;
   const { packing, cells, unitCell, bonds } = settings;
   const view = useMemo(
     () => crystalView(cell.atoms, cell.lattice, { packing, cells, bondLimit }),
@@ -110,7 +131,14 @@ function CrystalDrawing(props: CrystalDrawingProps): ReactElement {
   const caption = useCrystalCaption(name, view, cells);
   return (
     <div style={COLUMN_STYLE}>
-      <CrystalViewer3D {...viewer} scene={scene} caption={caption} />
+      <CrystalViewer3D
+        {...viewer}
+        scene={scene}
+        caption={caption}
+        settings={displaySettings}
+        defaultSettings={defaultDisplaySettings}
+        onSettingsChange={onDisplaySettingsChange}
+      />
       <CrystalViewControls
         packing={packing}
         onPackingChange={(next) => {

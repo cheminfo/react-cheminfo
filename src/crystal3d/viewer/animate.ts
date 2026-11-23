@@ -15,7 +15,7 @@ import type { Matrix4 } from '../core/operationMatrix.ts';
 import { IDENTITY_MATRIX4, operationAt } from '../core/operationMatrix.ts';
 import type { ViewerOperation } from '../core/types.ts';
 
-import { structureRepresentation } from './renderStructure.ts';
+import { structureRepresentations } from './renderStructure.ts';
 
 /** How an operation is played. */
 export interface PlayOptions {
@@ -95,13 +95,23 @@ export function resetOperation(plugin: PluginContext): void {
   applyTransform(plugin, IDENTITY_MATRIX4);
 }
 
+/**
+ * Move the structure to where the operation on screen holds it again, after
+ * its representations were drawn anew — a surface added half-way through an
+ * operation must stand where the atoms stand.
+ * @param plugin - The molstar context.
+ */
+export function reapplyOperation(plugin: PluginContext): void {
+  applyTransform(plugin, transforms.get(plugin) ?? IDENTITY_MATRIX4);
+}
+
 function applyTransform(plugin: PluginContext, matrix: Matrix4): void {
-  const representation = structureRepresentation(plugin);
-  if (representation === undefined) return;
-  representation.setState({
-    transform: Mat4.fromArray(Mat4.identity(), matrix as number[], 0),
-  });
-  plugin.canvas3d?.update(representation);
+  transforms.set(plugin, matrix);
+  const transform = Mat4.fromArray(Mat4.identity(), matrix as number[], 0);
+  for (const representation of structureRepresentations(plugin)) {
+    representation.setState({ transform });
+    plugin.canvas3d?.update(representation);
+  }
   plugin.canvas3d?.requestDraw();
 }
 
@@ -111,3 +121,6 @@ function now(): number {
 
 /** The animation in flight per plugin; a new one invalidates the old. */
 const tokens = new WeakMap<PluginContext, number>();
+
+/** Where the operation on screen holds the structure, per plugin. */
+const transforms = new WeakMap<PluginContext, Matrix4>();
