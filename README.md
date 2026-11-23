@@ -164,6 +164,17 @@ keeps the changes and a red cross that puts them back. A site's
 holding its data files as they open anywhere, and, when asked, the view and the
 workspace, which `<SaveDocumentDialog>` offers.
 
+**Where a document is** is said the same way on every site. A document is on
+this computer (a file, in the site's folder or picked elsewhere), in this
+browser only, or not saved yet and kept as a draft, and each place has one icon
+everywhere: a screen, a window, a dashed circle (`PLACE_ICONS`). `documentPlace`
+reads the place from the saver's file. `<DocumentPlaceLine>` says it at the top
+of a folder panel, or with `compact` in a status line, and offers to move a
+document of this browser to this computer. `<SaveToolbarItems>` saves on this
+computer or in this browser, and `<SavedDocumentsSection saver>` moves every
+document of this browser to the folder. A browser never tells a page the full
+path of a folder, only its name, and the line says so on hover.
+
 `react-cheminfo/vite` is the one door with a split bill: `cheminfoPrerender`
 needs nothing beyond Vite's own plugin type, while `ogCardHtml` renders a mark
 and therefore loads React — but on the call, not on the import, so the plugin

@@ -19,6 +19,7 @@ import { storageUsage } from '../core/persistentStorage.ts';
 import { DraftRow } from './DraftRow.tsx';
 import { FolderNoMatch } from './FolderSearch.tsx';
 import { FolderSection } from './FolderSection.tsx';
+import { PLACE_ICONS } from './placeIcons.ts';
 
 /** Props of {@link DraftsSection}. */
 export interface DraftsSectionProps<D> {
@@ -104,6 +105,7 @@ export function DraftsSection<D>(props: DraftsSectionProps<D>): ReactElement {
   return (
     <FolderSection
       name="drafts"
+      icon={PLACE_ICONS.nowhere}
       title={t('drafts.heading')}
       count={named.length}
     >

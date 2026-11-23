@@ -18,10 +18,12 @@ import {
   FolderCrumbs,
   FolderFileRow,
   HeadingAction,
+  NoFolder,
   SubfolderRow,
 } from './FolderRows.tsx';
 import { FolderNoMatch } from './FolderSearch.tsx';
 import { FolderSection } from './FolderSection.tsx';
+import { PLACE_ICONS } from './placeIcons.ts';
 import { folderPathLabel } from './saveMessages.ts';
 import { useFolderVersion } from './useFolderLabel.ts';
 import type { ConfirmOpen } from './useOpenConfirmation.tsx';
@@ -53,7 +55,8 @@ export interface FolderDocumentsSectionProps {
  * the latest first. A click on a folder opens it, and Save then writes new
  * documents there; a click on a file opens it, and Save writes over it. After
  * a reload the browser asks once before the page reads the folder again.
- * Nothing is shown while no folder was chosen. Inside a `<PanelSearch>`, the
+ * While no folder was chosen it says what one is for and offers to choose it,
+ * or, in a browser that keeps none, which browsers do. Inside a `<PanelSearch>`, the
  * files of every folder below are searched, each saying where it is.
  * @param props - See {@link FolderDocumentsSectionProps}.
  * @returns The section, or nothing.
@@ -84,7 +87,18 @@ export function FolderDocumentsSection(
     files.length + folders.length,
     allFiles.length + allFolders.length,
   );
-  if (!data?.root) return null;
+  if (!data) return null;
+  if (!data.root) {
+    return deep ? null : (
+      <FolderSection
+        name="folder"
+        icon={PLACE_ICONS.computer}
+        title={t('place.computer')}
+      >
+        <NoFolder folder={folder} />
+      </FolderSection>
+    );
+  }
   const { root, readable, path } = data;
   const label = folderPathLabel(root, path);
 

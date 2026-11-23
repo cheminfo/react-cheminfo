@@ -14,7 +14,7 @@ import {
   isKeptAs,
   namesInBrowser,
   namesInFolder,
-  stemOf,
+  suggestedChoice,
 } from './documentSaverNames.ts';
 import type {
   DocumentSaver,
@@ -30,6 +30,7 @@ import {
   freeFileName,
   writeFile,
 } from './fileAccess.ts';
+import { moveToFolder } from './moveToFolder.ts';
 import { saveInBrowser } from './saveInBrowser.ts';
 
 /**
@@ -43,7 +44,7 @@ import { saveInBrowser } from './saveInBrowser.ts';
 export function createDocumentSaver<D>(
   options: DocumentSaverOptions<D>,
 ): DocumentSaver<D> {
-  const { site, formats, file, savedDocuments } = options;
+  const { site, formats, file, savedDocuments, stem } = options;
   const folder = options.folder ?? createSiteFolder(site);
   const rememberedKey = `${site}:save-target`;
 
@@ -66,20 +67,11 @@ export function createDocumentSaver<D>(
   }
 
   function suggestion(): SaveChoice {
-    const kept = file.peek();
-    const offered = targets();
-    const where = kept?.savedId ? 'browser' : kept?.handle ? 'file' : undefined;
-    return {
-      name: kept ? stemOf(formats, kept.name) : options.stem(),
-      target:
-        remembered() ??
-        offered.find((target) => target === where) ??
-        offered[0] ??
-        'download',
-      format: kept ? formatOfName(formats, kept.name).id : formats[0].id,
-      view: kept?.parts?.view ?? false,
-      workspace: kept?.parts?.workspace ?? false,
-    };
+    return suggestedChoice(formats, file.peek(), {
+      offered: targets(),
+      remembered: remembered(),
+      stem,
+    });
   }
 
   async function writeOver(
@@ -142,6 +134,7 @@ export function createDocumentSaver<D>(
         choice.name,
         document,
         file.peek()?.savedId,
+        choice.replace === true,
       );
       file.value = kept;
       return outcome;
@@ -201,6 +194,8 @@ export function createDocumentSaver<D>(
   return {
     formats,
     folder,
+    file,
+    ...(savedDocuments ? { savedDocuments } : {}),
     targets,
     remembered,
     remember: (target) => {
@@ -237,6 +232,16 @@ export function createDocumentSaver<D>(
       return saveTo({ ...suggestion(), target });
     },
     saveTo,
+    moveToFolder: async (ids) =>
+      savedDocuments
+        ? moveToFolder({
+            folder,
+            store: savedDocuments,
+            format: formats[0],
+            file,
+            ids,
+          })
+        : { kind: 'moved', count: 0, folder: [] },
   };
 }
 

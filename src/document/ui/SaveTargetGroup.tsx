@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { SaveTarget } from '../../storage/core/documentFile.ts';
+import { TARGET_ICONS } from '../../storage/ui/placeIcons.ts';
 
 import { Described } from './Described.tsx';
 
@@ -62,6 +63,7 @@ export function SaveTargetGroup(props: SaveTargetGroupProps): ReactElement {
                 value={target}
                 labelElement={
                   <Described
+                    icon={TARGET_ICONS[target]}
                     label={
                       known
                         ? t('saving.folderKnown', { folder: folderName })

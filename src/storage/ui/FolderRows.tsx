@@ -1,11 +1,14 @@
-import { Icon } from '@blueprintjs/core';
+import { Button, Icon } from '@blueprintjs/core';
 import type { ReactElement, ReactNode } from 'react';
 
 import { formatRelativeTime } from '../../format/core/relativeTime.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { FolderEntry } from '../core/siteFolderTypes.ts';
+import { PanelEmpty } from '../../panel/ui/PanelMessage.tsx';
+import { canPickFolders } from '../core/fileAccess.ts';
+import type { FolderEntry, SiteFolder } from '../core/siteFolderTypes.ts';
 
+import { PLACE_ICONS } from './placeIcons.ts';
 import { folderPathLabel } from './saveMessages.ts';
 
 /**
@@ -33,7 +36,11 @@ export function FolderCrumbs(props: {
   const heading = (
     <h3 className="folder-panel__heading folder-panel__crumbs">
       {toggle}
-      <Icon icon="folder-open" size={12} />
+      <Icon
+        icon={PLACE_ICONS.computer}
+        size={12}
+        className="folder-panel__place"
+      />
       {steps.map((name, index) => {
         const last = index === steps.length - 1;
         return (
@@ -75,17 +82,20 @@ export function FolderCrumbs(props: {
  * A command of a section, written small and grey on its heading line.
  * @param props - What it says and does.
  * @param props.text - What it reads.
+ * @param props.title - What hovering it says.
  * @param props.onClick - What it does.
  * @returns The button.
  */
 export function HeadingAction(props: {
   text: string;
+  title?: string;
   onClick: () => void;
 }): ReactElement {
   return (
     <button
       type="button"
       className="folder-panel__heading-action"
+      title={props.title}
       onClick={props.onClick}
     >
       {props.text}
@@ -175,5 +185,32 @@ export function FolderFileRow(props: {
         </span>
       </button>
     </li>
+  );
+}
+
+/**
+ * What a folder section says before any folder was chosen: what one is for,
+ * and the way to choose it — or, in a browser that keeps none, which do.
+ * @param props - What it shows.
+ * @param props.folder - The site's folder.
+ * @returns The message and its button.
+ */
+export function NoFolder(props: { folder: SiteFolder }): ReactElement {
+  const t = useChromeT();
+  if (!canPickFolders()) {
+    return <PanelEmpty>{t('documents.saveInFolderUnavailable')}</PanelEmpty>;
+  }
+  return (
+    <div className="folder-panel__none">
+      <PanelEmpty>{t('folder.none')}</PanelEmpty>
+      <Button
+        size="small"
+        icon={PLACE_ICONS.computer}
+        text={t('folder.chooseFirst')}
+        onClick={() => {
+          void props.folder.choose();
+        }}
+      />
+    </div>
   );
 }

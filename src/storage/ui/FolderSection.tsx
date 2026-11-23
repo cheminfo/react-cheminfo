@@ -1,3 +1,4 @@
+import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
 import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
@@ -21,6 +22,16 @@ export interface FolderSectionProps {
    */
   heading?: (toggle: ReactElement) => ReactNode;
   /**
+   * The icon of the place it lists, drawn before the title.
+   * @default undefined — none
+   */
+  icon?: IconName;
+  /**
+   * What the section does, small and grey at the end of its heading line.
+   * @default undefined — nothing
+   */
+  actions?: ReactNode;
+  /**
    * How many rows it holds, said beside the title while it is closed.
    * @default undefined — nothing is said
    */
@@ -40,7 +51,7 @@ export interface FolderSectionProps {
  * @returns The section.
  */
 export function FolderSection(props: FolderSectionProps): ReactElement {
-  const { name, title, heading, count, children } = props;
+  const { name, title, heading, icon, actions, count, children } = props;
   const needle = usePanelNeedle();
   const [chosen, setChosen] = useState(() => SECTIONS.read().value[name]);
   const open = chosen || needle !== '';
@@ -57,20 +68,25 @@ export function FolderSection(props: FolderSectionProps): ReactElement {
   return (
     <section className="folder-panel__section" aria-label={title}>
       {heading === undefined ? (
-        <h3 className="folder-panel__heading">
-          <button
-            type="button"
-            className="folder-panel__toggle"
-            aria-expanded={open}
-            onClick={toggle}
-          >
-            {chevron}
-            {title}
-            {!open && count ? (
-              <span className="folder-panel__count">{count}</span>
-            ) : null}
-          </button>
-        </h3>
+        <HeadingRow actions={actions}>
+          <h3 className="folder-panel__heading">
+            <button
+              type="button"
+              className="folder-panel__toggle"
+              aria-expanded={open}
+              onClick={toggle}
+            >
+              {chevron}
+              {icon ? (
+                <Icon icon={icon} size={12} className="folder-panel__place" />
+              ) : null}
+              {title}
+              {!open && count ? (
+                <span className="folder-panel__count">{count}</span>
+              ) : null}
+            </button>
+          </h3>
+        </HeadingRow>
       ) : (
         heading(
           <button
@@ -86,6 +102,23 @@ export function FolderSection(props: FolderSectionProps): ReactElement {
       )}
       {open ? children : null}
     </section>
+  );
+}
+
+function HeadingRow(props: {
+  actions: ReactNode;
+  children: ReactElement;
+}): ReactElement {
+  if (props.actions === undefined || props.actions === null) {
+    return props.children;
+  }
+  return (
+    <div className="folder-panel__heading-row">
+      {props.children}
+      <span className="folder-panel__heading-actions no-print">
+        {props.actions}
+      </span>
+    </div>
   );
 }
 

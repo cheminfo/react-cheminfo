@@ -4,9 +4,11 @@ import type {
   Cell,
   DocumentFile,
   DocumentPartsKept,
+  ReadonlyCell,
   SaveTarget,
 } from './documentFile.ts';
 import type { PickerType } from './fileAccess.ts';
+import type { MoveOutcome } from './moveToFolder.ts';
 
 /** A format a site saves its documents in. */
 export interface SaveFormat<D> {
@@ -111,6 +113,13 @@ export interface DocumentSaver<D> {
   readonly formats: readonly [SaveFormat<D>, ...Array<SaveFormat<D>>];
   /** The site's folder. */
   readonly folder: SiteFolder;
+  /** Where the document on screen is kept: what `documentPlace` reads. */
+  readonly file: ReadonlyCell<DocumentFile<D> | null>;
+  /**
+   * The documents kept in this browser under a name.
+   * @default undefined — the site keeps none
+   */
+  readonly savedDocuments?: SavedDocuments<D>;
   /** The places this browser offers, here. */
   targets: () => SaveTarget[];
   /** The place chosen before, while this browser still offers it. */
@@ -144,4 +153,11 @@ export interface DocumentSaver<D> {
    * documents. Call it from the click that chose.
    */
   saveTo: (choice: SaveChoice) => Promise<SaveOutcome>;
+  /**
+   * Move documents saved in this browser to the site's folder on this
+   * computer, as files of the site's usual format. Call it from a click.
+   * @param ids - The documents; every one saved in this browser by default.
+   * @returns What was done.
+   */
+  moveToFolder: (ids?: readonly string[]) => Promise<MoveOutcome>;
 }

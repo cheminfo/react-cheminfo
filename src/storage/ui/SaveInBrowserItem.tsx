@@ -9,6 +9,7 @@ import type {
 } from '../core/createSavedDocuments.ts';
 
 import { DocumentNameDialog } from './DocumentNameDialog.tsx';
+import { TARGET_ICONS } from './placeIcons.ts';
 import { takenNames } from './savedDocumentsState.ts';
 
 /** Props of {@link SaveInBrowserItem}. */
@@ -64,7 +65,7 @@ export function SaveInBrowserItem<TData>(
   return (
     <>
       <Toolbar.Item
-        icon="add-to-folder"
+        icon={TARGET_ICONS.browser}
         tooltip={label}
         aria-label={label}
         disabled={disabled}
@@ -85,6 +86,7 @@ export function SaveInBrowserItem<TData>(
       <DocumentNameDialog
         isOpen={asking !== null}
         mode="save"
+        icon={TARGET_ICONS.browser}
         initialName={asking?.name ?? ''}
         taken={asking?.taken ?? new Map()}
         onSubmit={async (name) => {

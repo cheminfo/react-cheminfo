@@ -75,6 +75,10 @@ export type {
   SaveOutcome,
 } from './documentSaverTypes.ts';
 export { createDocumentSaver } from './createDocumentSaver.ts';
+export type { DocumentPlace, PlaceKind } from './documentPlace.ts';
+export { documentPlace, placeKind } from './documentPlace.ts';
+export type { MoveOutcome, MoveToFolderOptions } from './moveToFolder.ts';
+export { moveToFolder } from './moveToFolder.ts';
 export type {
   Draft,
   DraftFile,

@@ -1,6 +1,7 @@
 import type { SavedDocuments } from './createSavedDocuments.ts';
 import { nameKey } from './createSavedDocuments.ts';
-import type { SaveFormat } from './documentSaverTypes.ts';
+import type { DocumentFile, SaveTarget } from './documentFile.ts';
+import type { SaveChoice, SaveFormat } from './documentSaverTypes.ts';
 import type { SiteFolder } from './siteFolderTypes.ts';
 
 /**
@@ -95,4 +96,39 @@ export async function isKeptAs(
   } catch {
     return false;
   }
+}
+
+/**
+ * What Save as opens on: where the document is kept, else the place chosen
+ * before, else the first one offered.
+ * @param formats - The site's formats, the usual one first.
+ * @param kept - Where the document on screen is kept.
+ * @param context - What this browser offers, and what was chosen before.
+ * @param context.offered - The places this browser offers.
+ * @param context.remembered - The place chosen before.
+ * @param context.stem - The name a document never saved is offered.
+ * @returns The choice.
+ */
+export function suggestedChoice<D>(
+  formats: readonly [SaveFormat<D>, ...Array<SaveFormat<D>>],
+  kept: DocumentFile<D> | null,
+  context: {
+    offered: readonly SaveTarget[];
+    remembered: SaveTarget | undefined;
+    stem: () => string;
+  },
+): SaveChoice {
+  const { offered, remembered, stem } = context;
+  const where = kept?.savedId ? 'browser' : kept?.handle ? 'file' : undefined;
+  return {
+    name: kept ? stemOf(formats, kept.name) : stem(),
+    target:
+      remembered ??
+      offered.find((target) => target === where) ??
+      offered[0] ??
+      'download',
+    format: kept ? formatOfName(formats, kept.name).id : formats[0].id,
+    view: kept?.parts?.view ?? false,
+    workspace: kept?.parts?.workspace ?? false,
+  };
 }

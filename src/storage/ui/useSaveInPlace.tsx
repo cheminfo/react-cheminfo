@@ -6,6 +6,7 @@ import { nameKey } from '../core/createSavedDocuments.ts';
 import type { DocumentSaver, NamedTarget } from '../core/documentSaverTypes.ts';
 
 import { DocumentNameDialog } from './DocumentNameDialog.tsx';
+import { TARGET_ICONS } from './placeIcons.ts';
 import { folderPathLabel, saveMessage } from './saveMessages.ts';
 
 /** What {@link useSaveInPlace} gives: the question, and its dialog. */
@@ -15,6 +16,12 @@ export interface SaveInPlace {
    * @param target - The folder open in the panel, or this browser.
    */
   ask: (target: NamedTarget) => void;
+  /**
+   * Ask for the site's folder when none was chosen yet, then the name of the
+   * document on screen, and save it there. Call it from a click: the browser
+   * opens its folder picker only then.
+   */
+  askFolder: () => void;
   /** The name dialog, to render once beside the page. */
   dialog: ReactElement;
 }
@@ -52,6 +59,14 @@ export function useSaveInPlace<D>(
     });
   }
 
+  function askFolder(): void {
+    // The picker opens in the click itself, before the name is asked.
+    void saver.folder.current().then(async (chosen) => {
+      if (!chosen && !(await saver.folder.choose())) return;
+      ask('folder');
+    });
+  }
+
   async function titleOf(target: NamedTarget): Promise<string> {
     if (target === 'browser') return t('documents.saveTitle');
     const root = await saver.folder.current();
@@ -67,7 +82,7 @@ export function useSaveInPlace<D>(
       isOpen={asking !== null}
       mode="save"
       title={asking?.title}
-      icon={asking?.target === 'folder' ? 'floppy-disk' : undefined}
+      icon={asking ? TARGET_ICONS[asking.target] : undefined}
       initialName={asking?.name ?? ''}
       taken={asking?.taken ?? new Map()}
       onSubmit={async (name) => {
@@ -87,5 +102,5 @@ export function useSaveInPlace<D>(
       }}
     />
   );
-  return { ask, dialog };
+  return { ask, askFolder, dialog };
 }

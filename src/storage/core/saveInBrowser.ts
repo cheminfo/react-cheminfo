@@ -11,6 +11,8 @@ import type { SaveOutcome } from './documentSaverTypes.ts';
  * @param wanted - The name asked for.
  * @param document - The document.
  * @param ownId - The saved document it is, if it is one.
+ * @param replace - Write over the document already going by that name: the
+ * name dialog said so before.
  * @returns What was done, and the file the document is now kept in.
  */
 export async function saveInBrowser<D>(
@@ -18,8 +20,9 @@ export async function saveInBrowser<D>(
   wanted: string,
   document: D,
   ownId: string | undefined,
+  replace = false,
 ): Promise<{ outcome: SaveOutcome; kept: DocumentFile<D> }> {
-  const listed = await store.list();
+  const listed = replace ? [] : await store.list();
   const taken = new Set<string>();
   for (const saved of listed) {
     if (saved.id !== ownId) taken.add(nameKey(saved.name));

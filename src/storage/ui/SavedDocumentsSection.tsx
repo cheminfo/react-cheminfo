@@ -17,10 +17,15 @@ import type {
   SavedDocument,
   SavedDocuments,
 } from '../core/createSavedDocuments.ts';
+import type { DocumentSaver } from '../core/documentSaverTypes.ts';
+import { canPickFolders } from '../core/fileAccess.ts';
 
 import { DocumentNameDialog } from './DocumentNameDialog.tsx';
+import { HeadingAction } from './FolderRows.tsx';
 import { FolderNoMatch } from './FolderSearch.tsx';
 import { FolderSection } from './FolderSection.tsx';
+import { PLACE_ICONS } from './placeIcons.ts';
+import { moveMessage } from './placeMessages.ts';
 import { takenNames, useStoreVersion } from './savedDocumentsState.ts';
 import type { ConfirmOpen } from './useOpenConfirmation.tsx';
 import { useOpenConfirmation } from './useOpenConfirmation.tsx';
@@ -46,6 +51,17 @@ export interface SavedDocumentsSectionProps<TData> {
    * @default undefined — the name alone
    */
   thumbnail?: (document: SavedDocument<TData>) => ReactNode;
+  /**
+   * The site's saver: the heading then offers to move every document to a
+   * folder of this computer, where the browser keeps one.
+   * @default undefined — nothing is offered
+   */
+  saver?: DocumentSaver<TData>;
+  /**
+   * Says what the move did.
+   * @default undefined — nothing is said
+   */
+  notify?: (text: string, intent?: 'success' | 'danger') => void;
 }
 
 /**
@@ -61,6 +77,7 @@ export function SavedDocumentsSection<TData>(
   props: SavedDocumentsSectionProps<TData>,
 ): ReactElement {
   const { store, currentId = null, onOpen, confirmOpen, thumbnail } = props;
+  const { saver, notify } = props;
   const t = useChromeT();
   const language = useLanguage();
   const version = useStoreVersion(store);
@@ -78,8 +95,23 @@ export function SavedDocumentsSection<TData>(
   return (
     <FolderSection
       name="documents"
+      icon={PLACE_ICONS.browser}
       title={t('documents.heading')}
       count={documents.length}
+      actions={
+        saver && documents.length > 0 && canPickFolders() ? (
+          <HeadingAction
+            text={t('place.moveToComputer')}
+            title={t('documents.moveAllTooltip')}
+            onClick={() => {
+              void saver.moveToFolder().then((outcome) => {
+                const message = moveMessage(outcome, t);
+                if (message) notify?.(message.text, message.intent);
+              });
+            }}
+          />
+        ) : undefined
+      }
     >
       {listing.data?.available === false ? (
         <PanelEmpty>{t('documents.unavailable')}</PanelEmpty>

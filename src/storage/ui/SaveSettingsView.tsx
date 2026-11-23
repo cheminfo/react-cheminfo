@@ -1,8 +1,11 @@
 import { Radio, RadioGroup } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { Described } from '../../document/ui/Described.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { SaveTarget } from '../core/documentFile.ts';
+
+import { TARGET_ICONS } from './placeIcons.ts';
 
 /** Props of {@link SaveSettingsView}. */
 export interface SaveSettingsViewProps {
@@ -57,7 +60,8 @@ export function SaveSettingsView(props: SaveSettingsViewProps): ReactElement {
             key={target}
             value={target}
             labelElement={
-              <Choice
+              <Described
+                icon={TARGET_ICONS[target]}
                 label={
                   target === 'folder' && folder !== undefined
                     ? t('saving.folderKnown', { folder })
@@ -71,7 +75,7 @@ export function SaveSettingsView(props: SaveSettingsViewProps): ReactElement {
         <Radio
           value={ASK}
           labelElement={
-            <Choice
+            <Described
               label={t('saving.ask')}
               description={t('saving.askDescription')}
             />
@@ -79,14 +83,5 @@ export function SaveSettingsView(props: SaveSettingsViewProps): ReactElement {
         />
       </RadioGroup>
     </div>
-  );
-}
-
-function Choice(props: { label: string; description: string }): ReactElement {
-  return (
-    <span className="folder-panel__choice">
-      <span>{props.label}</span>
-      <span className="folder-panel__note">{props.description}</span>
-    </span>
   );
 }
