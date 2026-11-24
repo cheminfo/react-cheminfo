@@ -123,3 +123,51 @@
   padding-left: 4px;
   border-left: 1px solid var(--border);
 }
+
+/* The symbol palette stands on the far side of the bar from the caption, so
+   the text it types into stays in view. It is as wide as the bar, in the
+   caption's font, one row to a group. */
+.caption-symbols {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  min-width: 18rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  gap: 2px;
+  white-space: normal;
+}
+
+.caption-toolbar[data-below] .caption-symbols {
+  top: calc(100% + 4px);
+  bottom: auto;
+}
+
+.caption-symbols__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: stretch;
+  padding-top: 2px;
+  border-top: 1px solid var(--border);
+}
+
+/* One character to a key, large enough to tell α from a, and narrow enough
+   for the Greek letters to hold one row over draw's bar. */
+.caption-symbols .bp6-button.caption-symbols__symbol {
+  min-width: 23px;
+  padding: 0;
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.caption-symbols .bp6-button.caption-symbols__greek,
+.caption-toolbar__symbols.bp6-button {
+  font-family: inherit;
+}

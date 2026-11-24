@@ -18,6 +18,15 @@ export {
   captionSchema,
   captionText,
 } from './captionSchema.ts';
+export type { CaptionSymbol } from './captionSymbols.ts';
+export {
+  CAPTION_SYMBOLS,
+  greekCaptionSelection,
+  insertCaptionSymbol,
+  selectionHasLatinLetter,
+} from './captionSymbols.ts';
+export type { CaptionSymbolPaletteProps } from './CaptionSymbolPalette.tsx';
+export { CaptionSymbolPalette } from './CaptionSymbolPalette.tsx';
 export type { CaptionToolbarProps } from './CaptionToolbar.tsx';
 export { CaptionToolbar } from './CaptionToolbar.tsx';
 export type { ToolbarFit } from './toolbarInView.ts';

@@ -62,7 +62,7 @@ export function useToolbarInView(ref: RefObject<HTMLElement | null>): void {
     toolbar.style.removeProperty('--caption-toolbar-shift');
     delete toolbar.dataset.below;
     const { shift, below } = toolbarFit(
-      toolbar.getBoundingClientRect(),
+      withPalette(toolbar),
       area.getBoundingClientRect(),
     );
     if (shift !== 0) {
@@ -70,4 +70,18 @@ export function useToolbarInView(ref: RefObject<HTMLElement | null>): void {
     }
     if (below) toolbar.dataset.below = '';
   });
+}
+
+// The bar and, while it is open, the symbol palette standing on it.
+function withPalette(toolbar: HTMLElement): ScreenBox {
+  const bar = toolbar.getBoundingClientRect();
+  const palette = toolbar
+    .querySelector('.caption-symbols')
+    ?.getBoundingClientRect();
+  if (!palette) return bar;
+  return {
+    left: Math.min(bar.left, palette.left),
+    right: Math.max(bar.right, palette.right),
+    top: Math.min(bar.top, palette.top),
+  };
 }

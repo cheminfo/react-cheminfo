@@ -12,6 +12,7 @@ import { clampCaptionSize } from '../core/captions.ts';
 import { IS_MAC } from '../core/platform.ts';
 
 import { captionSchema } from './captionSchema.ts';
+import { selectionHasLatinLetter } from './captionSymbols.ts';
 
 /** The sizes a run grows and shrinks through, in points. */
 const SIZE_STEPS = [
@@ -30,6 +31,8 @@ export interface CaptionSelectionStyle {
   active: ReadonlySet<CaptionMark>;
   /** Its size, in points, or undefined when it holds several. */
   size?: number;
+  /** Whether it holds a Latin letter, which can be made Greek. */
+  latin: boolean;
 }
 
 /**
@@ -103,7 +106,11 @@ export function captionSelectionStyle(
       if (captionSchema.marks[name]?.isInSet(marks)) active.add(name);
     }
     const size = captionSchema.marks.size.isInSet(marks);
-    return { active, size: size ? (size.attrs.points as number) : base };
+    return {
+      active,
+      size: size ? (size.attrs.points as number) : base,
+      latin: false,
+    };
   }
   const sizes = new Set<number>();
   const counts = new Map<CaptionMark, number>();
@@ -125,7 +132,11 @@ export function captionSelectionStyle(
   for (const name of CAPTION_MARKS) {
     if (characters > 0 && counts.get(name) === characters) active.add(name);
   }
-  return { active, size: sizes.size === 1 ? [...sizes][0] : undefined };
+  return {
+    active,
+    size: sizes.size === 1 ? [...sizes][0] : undefined,
+    latin: selectionHasLatinLetter(state),
+  };
 }
 
 /**

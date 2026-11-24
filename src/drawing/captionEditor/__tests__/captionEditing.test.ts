@@ -73,6 +73,7 @@ test('a size is set on a selection, and the caption size clears it', () => {
   expect(captionSelectionStyle(larger, 10)).toStrictEqual({
     active: new Set(),
     size: 14,
+    latin: true,
   });
 
   const grown = apply(larger, stepCaptionSize(1, 10));

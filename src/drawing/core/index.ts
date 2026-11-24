@@ -228,6 +228,11 @@ export {
   frameTransform,
   framedBox,
 } from './selectionFrame.ts';
+export {
+  hasLatinLetter,
+  latinToGreek,
+  symbolFontToUnicode,
+} from './symbolFont.ts';
 export type { Similarity } from './transform.ts';
 export {
   mapCurve,

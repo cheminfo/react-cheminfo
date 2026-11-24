@@ -13,6 +13,16 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { CaptionEditor } from '../CaptionEditor.tsx';
 import type { CaptionEditorResult } from '../captionEditorProps.ts';
 
+// jsdom lays out no text, and a command scrolls the caret into view: it is
+// measured as an empty box at the origin.
+if (!('getClientRects' in Range.prototype)) {
+  const empty = { x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0 };
+  Object.assign(Range.prototype, {
+    getClientRects: () => [],
+    getBoundingClientRect: () => ({ ...empty, width: 0, height: 0 }),
+  });
+}
+
 let host: HTMLDivElement;
 let root: Root;
 
@@ -169,5 +179,46 @@ test('the toolbar sets the alignment, the font and the chemical rules kept', () 
       family: "'Courier New', Courier, monospace",
       chemical: false,
     },
+  ]);
+});
+
+test('Escape closes the symbol palette first, then drops the caption', () => {
+  const kept = open(() => true);
+  click('Symbols');
+
+  expect(host.querySelector('.caption-symbols')).not.toBeNull();
+
+  press('Escape');
+
+  expect(host.querySelector('.caption-symbols')).toBeNull();
+  expect(kept.closes()).toBe(0);
+
+  press('Escape');
+
+  expect(kept.kept).toStrictEqual([]);
+  expect(kept.closes()).toBe(1);
+});
+
+test('the palette types a symbol, and makes the selected letters Greek', () => {
+  const typed = open(() => true);
+  click('Symbols');
+  // The box opens with everything selected: the symbol takes its place.
+  click('beta');
+  press('Enter', true);
+
+  expect(typed.kept.map(({ text }) => text)).toStrictEqual(['β']);
+
+  act(() => {
+    root.unmount();
+  });
+  root = createRoot(host);
+  const greek = open(() => true);
+  click('Symbols');
+  click('Make the selected letters Greek');
+  press('Enter', true);
+
+  // H, O and C become capital eta, omicron and chi; the marks stay.
+  expect(greek.kept.map(({ text }) => text)).toStrictEqual([
+    '\u0397_2\u039F **ανδ** \u03A7\u039F2',
   ]);
 });

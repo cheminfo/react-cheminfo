@@ -10,6 +10,7 @@ import type { FontChoice } from '../core/fonts.ts';
 import { CAPTION_FONTS } from '../core/fonts.ts';
 import { MOD_KEY, shortcutText } from '../core/platform.ts';
 
+import { CaptionSymbolPalette } from './CaptionSymbolPalette.tsx';
 import type { CaptionMark, CaptionSelectionStyle } from './captionCommands.ts';
 import { setCaptionSize, toggleCaptionMark } from './captionCommands.ts';
 
@@ -89,7 +90,8 @@ export interface CaptionToolbarProps {
 
 /**
  * The styles of a caption being typed, over the box it is typed in: bold,
- * italic, subscript, superscript and the size of the selection, then the
+ * italic, subscript, superscript, the symbol palette (Greek letters, signs
+ * and arrows) and the size of the selection, then the
  * automatic formulas, the font and the alignment of the whole caption, and
  * last the tick that keeps it. Its buttons leave the keys with the text.
  * @param props - The styles of the selection, and how to change them.
@@ -135,6 +137,7 @@ export function CaptionToolbar(props: CaptionToolbarProps): ReactElement {
           />
         ))}
       </ButtonGroup>
+      <CaptionSymbolPalette family={family} latin={selection.latin} run={run} />
       <div
         className="caption-toolbar__size"
         title={`Size of the selection, in points (${shortcutText(['⇧', MOD_KEY, '>'])} larger, ${shortcutText(['⇧', MOD_KEY, '<'])} smaller)`}
