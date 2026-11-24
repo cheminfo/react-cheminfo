@@ -4,9 +4,14 @@ const PATH_SEPARATOR = /[/\\]/gu;
 // Control characters that are not whitespace: a newline is folded into a space
 // below rather than dropped, so a pasted two-line name stays readable.
 const CONTROL = /[^\P{Cc}\s]/gu;
+// Invisible marks — a soft hyphen, a zero-width space or joiner, a bidi
+// override — which Chrome refuses in a file name and nobody can see.
+const FORMAT = /\p{Cf}/gu;
 const WHITESPACE = /\s+/gu;
 const LEADING = /^[\s.-]+/u;
 const TRAILING = /[\s.]+$/u;
+// The devices Windows reserves, whatever the extension: `CON.txt` is refused.
+const DEVICE = /^(?:aux|con|nul|prn|com\d|lpt\d)(?=\.|$)/iu;
 
 /**
  * Turn whatever a molecule, a list or a page is called into a name a file
@@ -24,10 +29,12 @@ const TRAILING = /[\s.]+$/u;
 export function sanitizeFileName(name: string, fallback = 'download'): string {
   const cleaned = name
     .replaceAll(CONTROL, '')
+    .replaceAll(FORMAT, '')
     .replaceAll(PATH_SEPARATOR, '-')
     .replaceAll(RESERVED, '')
     .replaceAll(WHITESPACE, ' ')
     .replace(LEADING, '')
-    .replace(TRAILING, '');
+    .replace(TRAILING, '')
+    .replace(DEVICE, '$&_');
   return cleaned === '' ? fallback : cleaned;
 }

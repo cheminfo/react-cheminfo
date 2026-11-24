@@ -105,7 +105,17 @@ export type SaveOutcome =
   | { kind: 'name'; target: NamedTarget }
   | { kind: 'cancelled' }
   | { kind: 'empty' }
-  | { kind: 'failed'; name: string; message: string };
+  | {
+      kind: 'failed';
+      name: string;
+      message: string;
+      /**
+       * The folder it was to be written in, when that folder is no longer on
+       * this computer: moved, renamed or deleted since it was chosen.
+       * @default undefined — the folder is there, or none was used
+       */
+      missingFolder?: string;
+    };
 
 /** Save and Save as, the same way on every site of the family. */
 export interface DocumentSaver<D> {

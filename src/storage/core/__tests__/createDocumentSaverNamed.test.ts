@@ -180,3 +180,55 @@ test('the names taken in the folder are its files without their extension', asyn
     ]),
   );
 });
+
+test('a name kept with a time is saved in the folder without its colon', async () => {
+  const { folder, files } = fakeFolder([]);
+  const { saver } = saverOf(folder);
+
+  const outcome = await saver.saveTo({
+    ...saver.suggestion(),
+    name: 'Caffeine, 16 Nov 2026, 07:01',
+    target: 'folder',
+  });
+
+  expect(outcome).toStrictEqual({
+    kind: 'saved',
+    target: 'folder',
+    name: 'Caffeine, 16 Nov 2026, 0701.tex.svg',
+  });
+  expect([...files.keys()]).toStrictEqual([
+    'Caffeine, 16 Nov 2026, 0701.tex.svg',
+  ]);
+});
+
+test('a folder no longer on the disk is named rather than not found', async () => {
+  const directory = {
+    kind: 'directory',
+    name: 'export',
+    getFileHandle: folderGone,
+    keys: () => ({ next: folderGone }),
+  } as unknown as FileSystemDirectoryHandle;
+  const folder = {
+    writable: () => Promise.resolve(directory),
+    changed: vi.fn(),
+  } as unknown as SiteFolder;
+  const { saver, file } = saverOf(folder);
+
+  const outcome = await saver.saveTo({
+    ...saver.suggestion(),
+    name: 'Caffeine',
+    target: 'folder',
+  });
+
+  expect(outcome).toStrictEqual({
+    kind: 'failed',
+    name: 'Caffeine.tex.svg',
+    message: 'gone',
+    missingFolder: 'export',
+  });
+  expect(file.value).toBeNull();
+});
+
+function folderGone(): Promise<never> {
+  return Promise.reject(new DOMException('gone', 'NotFoundError'));
+}

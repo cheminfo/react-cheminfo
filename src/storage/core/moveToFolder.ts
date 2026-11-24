@@ -4,6 +4,7 @@ import type { SavedDocument, SavedDocuments } from './createSavedDocuments.ts';
 import type { Cell, DocumentFile } from './documentFile.ts';
 import type { SaveFormat } from './documentSaverTypes.ts';
 import { freeFileName, writeFile } from './fileAccess.ts';
+import { fileStem, missingFolder } from './folderChecks.ts';
 import type { SiteFolder } from './siteFolderTypes.ts';
 
 /** What moving documents out of this browser did. */
@@ -23,7 +24,18 @@ export type MoveOutcome =
    * One could not be written: it and the ones after it stay in the browser.
    * Its `name` is the one it is saved under in the browser.
    */
-  | { kind: 'failed'; count: number; name: string; message: string };
+  | {
+      kind: 'failed';
+      count: number;
+      name: string;
+      message: string;
+      /**
+       * The folder they were to go to, when that folder is no longer on this
+       * computer: moved, renamed or deleted since it was chosen.
+       * @default undefined — the folder is there
+       */
+      missingFolder?: string;
+    };
 
 /** What {@link moveToFolder} moves, and where. */
 export interface MoveToFolderOptions<D> {
@@ -64,6 +76,7 @@ export async function moveToFolder<D>(
     (document) => !wanted || wanted.has(document.id),
   );
   let count = 0;
+  let failure: { name: string; message: string } | undefined;
   for (const document of documents) {
     try {
       // eslint-disable-next-line no-await-in-loop -- one at a time: each name must be free of the files written before, and a failure leaves the rest in the browser
@@ -73,13 +86,21 @@ export async function moveToFolder<D>(
         file.value = { name: handle.name, handle, saved: kept.saved };
       }
     } catch (error) {
-      folder.changed();
-      const message = errorMessage(error);
-      return { kind: 'failed', count, name: document.name, message };
+      failure = { name: document.name, message: errorMessage(error) };
+      break;
     }
     count++;
   }
   folder.changed();
+  if (failure) {
+    const missing = await missingFolder(directory);
+    return {
+      kind: 'failed',
+      count,
+      ...failure,
+      ...(missing === undefined ? {} : { missingFolder: missing }),
+    };
+  }
   const root = await folder.current();
   return {
     kind: 'moved',
@@ -96,7 +117,11 @@ async function moveOne<D>(
   format: SaveFormat<D>,
   store: SavedDocuments<D>,
 ): Promise<FileSystemFileHandle> {
-  const name = await freeFileName(directory, document.name, format.extension);
+  const name = await freeFileName(
+    directory,
+    fileStem(document.name),
+    format.extension,
+  );
   const handle = await directory.getFileHandle(name, { create: true });
   await writeFile(handle, async () =>
     format.write(document.data, undefined, name),

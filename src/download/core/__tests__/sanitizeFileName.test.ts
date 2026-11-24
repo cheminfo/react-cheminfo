@@ -28,6 +28,25 @@ test('the characters a file system reserves are removed', () => {
   expect(sanitizeFileName('a<b>c:d"e|f?g*h.txt')).toBe('abcdefgh.txt');
 });
 
+test('a time keeps its digits once its colon is gone', () => {
+  expect(sanitizeFileName('Caffeine, 16 Nov 2026, 07:01')).toBe(
+    'Caffeine, 16 Nov 2026, 0701',
+  );
+});
+
+test('the invisible marks Chrome refuses in a file name are dropped', () => {
+  expect(sanitizeFileName('soft­hyphen​zero‍width‮.txt')).toBe(
+    'softhyphenzerowidth.txt',
+  );
+});
+
+test('a device Windows reserves is not the name of a file', () => {
+  expect(sanitizeFileName('CON')).toBe('CON_');
+  expect(sanitizeFileName('nul.txt')).toBe('nul_.txt');
+  expect(sanitizeFileName('lpt1.write.html')).toBe('lpt1_.write.html');
+  expect(sanitizeFileName('console.txt')).toBe('console.txt');
+});
+
 test('the name is not left hidden, relative, or trailing a dot', () => {
   expect(sanitizeFileName('.hidden')).toBe('hidden');
   expect(sanitizeFileName('trailing...')).toBe('trailing');

@@ -21,8 +21,12 @@ export function saveMessage(
 ): SaveMessage | undefined {
   if (outcome.kind === 'empty') return { text: t('saving.empty') };
   if (outcome.kind === 'failed') {
-    const { name, message } = outcome;
-    return { text: t('saving.failed', { name, message }), intent: 'danger' };
+    const { name, message, missingFolder } = outcome;
+    const text =
+      missingFolder === undefined
+        ? t('saving.failed', { name, message })
+        : t('folder.gone', { folder: missingFolder });
+    return { text, intent: 'danger' };
   }
   if (outcome.kind !== 'saved') return undefined;
   const { name, wanted, target } = outcome;

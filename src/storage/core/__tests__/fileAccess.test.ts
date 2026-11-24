@@ -220,3 +220,31 @@ test('a name a folder already holds is numbered as a download would be', async (
     'notes.write.html',
   );
 });
+
+test('a folder under the name is not free, and a refused name is not tried 999 times', async () => {
+  const folder = {
+    getFileHandle: vi.fn((name: string) =>
+      Promise.reject(
+        name.includes(':')
+          ? new TypeError('Name is not allowed.')
+          : new DOMException('a folder', 'TypeMismatchError'),
+      ),
+    ),
+  };
+  const directory = folder as unknown as FileSystemDirectoryHandle;
+
+  await expect(
+    freeFileName(directory, 'at 07:01', '.write.html'),
+  ).rejects.toThrow('Name is not allowed.');
+  expect(folder.getFileHandle).toHaveBeenCalledOnce();
+
+  folder.getFileHandle.mockImplementation((name: string) =>
+    name === 'figures.write.html'
+      ? Promise.reject(new DOMException('a folder', 'TypeMismatchError'))
+      : Promise.reject(new DOMException('absent', 'NotFoundError')),
+  );
+
+  await expect(freeFileName(directory, 'figures', '.write.html')).resolves.toBe(
+    'figures (2).write.html',
+  );
+});

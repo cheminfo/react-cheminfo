@@ -2,6 +2,7 @@ import type { SavedDocuments } from './createSavedDocuments.ts';
 import { nameKey } from './createSavedDocuments.ts';
 import type { DocumentFile, SaveTarget } from './documentFile.ts';
 import type { SaveChoice, SaveFormat } from './documentSaverTypes.ts';
+import { fileStem } from './folderChecks.ts';
 import type { SiteFolder } from './siteFolderTypes.ts';
 
 /**
@@ -120,13 +121,15 @@ export function suggestedChoice<D>(
 ): SaveChoice {
   const { offered, remembered, stem } = context;
   const where = kept?.savedId ? 'browser' : kept?.handle ? 'file' : undefined;
+  const target =
+    remembered ??
+    offered.find((place) => place === where) ??
+    offered[0] ??
+    'download';
+  const name = kept ? stemOf(formats, kept.name) : stem();
   return {
-    name: kept ? stemOf(formats, kept.name) : stem(),
-    target:
-      remembered ??
-      offered.find((target) => target === where) ??
-      offered[0] ??
-      'download',
+    name: target === 'browser' ? name : fileStem(name),
+    target,
     format: kept ? formatOfName(formats, kept.name).id : formats[0].id,
     view: kept?.parts?.view ?? false,
     workspace: kept?.parts?.workspace ?? false,

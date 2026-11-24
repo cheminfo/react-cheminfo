@@ -181,3 +181,53 @@ test('no folder picked moves nothing', async () => {
   expect(unavailable).toStrictEqual({ kind: 'unavailable' });
   expect(kept).toStrictEqual([NOTES]);
 });
+
+test('a name kept with a time becomes a file name the disk takes', async () => {
+  const { directory, written } = fakeDirectory([]);
+  const { store, kept } = memoryStore([
+    { id: 't', name: 'Caffeine, 16 Nov 2026, 07:01', savedAt: 3, data: 'x' },
+  ]);
+
+  const outcome = await moveToFolder({
+    folder: fakeFolder(directory),
+    store,
+    format: TEXT,
+    file: cell<DocumentFile<string> | null>(null),
+  });
+
+  expect(outcome.kind).toBe('moved');
+  expect([...written.keys()]).toStrictEqual([
+    'Caffeine, 16 Nov 2026, 0701.notes.txt',
+  ]);
+  expect(kept).toStrictEqual([]);
+});
+
+test('a folder no longer on the disk is named, and nothing leaves the browser', async () => {
+  const directory = {
+    kind: 'directory',
+    name: 'export',
+    getFileHandle: folderGone,
+    keys: () => ({ next: folderGone }),
+  } as unknown as FileSystemDirectoryHandle;
+  const { store, kept } = memoryStore([NOTES]);
+
+  const outcome = await moveToFolder({
+    folder: fakeFolder(directory),
+    store,
+    format: TEXT,
+    file: cell<DocumentFile<string> | null>(null),
+  });
+
+  expect(outcome).toStrictEqual({
+    kind: 'failed',
+    count: 0,
+    name: 'Notes',
+    message: 'gone',
+    missingFolder: 'export',
+  });
+  expect(kept).toStrictEqual([NOTES]);
+});
+
+function folderGone(): Promise<never> {
+  return Promise.reject(new DOMException('gone', 'NotFoundError'));
+}

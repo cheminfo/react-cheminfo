@@ -220,8 +220,11 @@ async function holdsEntry(
     await folder.getFileHandle(name);
     return true;
   } catch (error) {
+    if (!(error instanceof DOMException)) throw error;
+    if (error.name === 'NotFoundError') return false;
     // A folder under that name is not free either.
-    return !(error instanceof DOMException && error.name === 'NotFoundError');
+    if (error.name === 'TypeMismatchError') return true;
+    throw error;
   }
 }
 

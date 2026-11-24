@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { nameKey } from '../core/createSavedDocuments.ts';
 import type { DocumentSaver, NamedTarget } from '../core/documentSaverTypes.ts';
+import { fileStem } from '../core/folderChecks.ts';
 
 import { DocumentNameDialog } from './DocumentNameDialog.tsx';
 import { TARGET_ICONS } from './placeIcons.ts';
@@ -51,11 +52,12 @@ export function useSaveInPlace<D>(
 
   function ask(target: NamedTarget): void {
     const { name } = saver.suggestion();
+    const offered = target === 'folder' ? fileStem(name) : name;
     void Promise.all([
       saver.takenNames(target).catch(() => new Map<string, string>()),
       titleOf(target),
     ]).then(([taken, title]) => {
-      setAsking({ target, name, taken, title });
+      setAsking({ target, name: offered, taken, title });
     });
   }
 
@@ -85,16 +87,23 @@ export function useSaveInPlace<D>(
       icon={asking ? TARGET_ICONS[asking.target] : undefined}
       initialName={asking?.name ?? ''}
       taken={asking?.taken ?? new Map()}
-      onSubmit={async (name) => {
+      onSubmit={async (typed) => {
         if (!asking) return;
+        const name = asking.target === 'folder' ? fileStem(typed) : typed;
         const outcome = await saver.saveTo({
           ...saver.suggestion(),
           name,
           target: asking.target,
           replace: asking.taken.has(nameKey(name)),
         });
-        if (outcome.kind === 'failed') throw new Error(outcome.message);
         const message = saveMessage(outcome, t);
+        if (outcome.kind === 'failed') {
+          throw new Error(
+            outcome.missingFolder === undefined
+              ? outcome.message
+              : message?.text,
+          );
+        }
         if (message) notify(message.text, message.intent);
       }}
       onClose={() => {

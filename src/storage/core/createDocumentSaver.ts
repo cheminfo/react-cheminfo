@@ -11,7 +11,6 @@ import type { DocumentPartsKept, SaveTarget } from './documentFile.ts';
 import { SAVE_TARGETS } from './documentFile.ts';
 import {
   formatOfName,
-  isKeptAs,
   namesInBrowser,
   namesInFolder,
   suggestedChoice,
@@ -27,11 +26,12 @@ import {
   canPickFiles,
   canPickFolders,
   chooseSaveFile,
-  freeFileName,
   writeFile,
 } from './fileAccess.ts';
+import { fileStem } from './folderChecks.ts';
 import { moveToFolder } from './moveToFolder.ts';
 import { saveInBrowser } from './saveInBrowser.ts';
+import { saveInFolder } from './saveInFolder.ts';
 
 /**
  * Save a site's documents in one of four places — a file the visitor picks,
@@ -100,27 +100,15 @@ export function createDocumentSaver<D>(
     document: D,
     parts: DocumentPartsKept | undefined,
   ): Promise<SaveOutcome> {
-    const directory = await folder.writable();
-    if (directory === null) return { kind: 'cancelled' };
-    if (directory === undefined) return download(choice, document, parts);
-    const { extension } = formatOf(choice.format);
-    const wanted = `${choice.name}${extension}`;
-    try {
-      const name =
-        choice.replace === true ||
-        (await isKeptAs(file.peek()?.handle, directory, wanted))
-          ? wanted
-          : await freeFileName(directory, choice.name, extension);
-      const handle = await directory.getFileHandle(name, { create: true });
-      const outcome = await writeOver(handle, document, parts);
-      folder.changed();
-      if (outcome.kind !== 'saved') return outcome;
-      return name === wanted
-        ? { ...outcome, target: 'folder' }
-        : { ...outcome, target: 'folder', wanted };
-    } catch (error) {
-      return { kind: 'failed', name: wanted, message: errorMessage(error) };
-    }
+    const outcome = await saveInFolder({
+      folder,
+      stem: choice.name,
+      extension: formatOf(choice.format).extension,
+      replace: choice.replace === true,
+      kept: file.peek()?.handle,
+      write: (handle) => writeOver(handle, document, parts),
+    });
+    return outcome ?? download(choice, document, parts);
   }
 
   async function inBrowser(
@@ -175,20 +163,22 @@ export function createDocumentSaver<D>(
       ? choice.target
       : 'download';
     writeStorageText(rememberedKey, target);
-    const format = formatOf(choice.format);
+    if (target === 'browser') return inBrowser(choice, document);
+    // A file cannot take every name the browser keeps, e.g. a time's colon.
+    const named = { ...choice, name: fileStem(choice.name) };
+    const format = formatOf(named.format);
     const parts = format.holdsParts
-      ? { view: choice.view, workspace: choice.workspace }
+      ? { view: named.view, workspace: named.workspace }
       : undefined;
     if (target === 'file') {
-      const name = `${choice.name}${format.extension}`;
+      const name = `${named.name}${format.extension}`;
       const handle = await chooseSaveFile(name, format.picker);
       if (handle === null) return { kind: 'cancelled' };
-      if (handle === undefined) return download(choice, document, parts);
+      if (handle === undefined) return download(named, document, parts);
       return writeOver(handle, document, parts);
     }
-    if (target === 'folder') return inFolder(choice, document, parts);
-    if (target === 'browser') return inBrowser(choice, document);
-    return download(choice, document, parts);
+    if (target === 'folder') return inFolder(named, document, parts);
+    return download(named, document, parts);
   }
 
   return {

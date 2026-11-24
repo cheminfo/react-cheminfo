@@ -72,8 +72,12 @@ export function moveMessage(
     return { text: t('documents.saveInFolderUnavailable'), intent: 'danger' };
   }
   if (outcome.kind === 'failed') {
-    const { name, message } = outcome;
-    return { text: t('place.moveFailed', { name, message }), intent: 'danger' };
+    const { name, message, missingFolder } = outcome;
+    const text =
+      missingFolder === undefined
+        ? t('place.moveFailed', { name, message })
+        : t('folder.gone', { folder: missingFolder });
+    return { text, intent: 'danger' };
   }
   return {
     text: t('place.moved', {
