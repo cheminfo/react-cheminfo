@@ -121,3 +121,34 @@ test('an occupancy is carried onto every atom of the site', () => {
     0.5, 0.5, 0.5, 0.5,
   ]);
 });
+
+const WRITTEN_MAGNESIUM: AsymmetricSite = {
+  label: 'Mg1',
+  element: 'Mg',
+  x: 0.333,
+  y: 0.667,
+  z: 0.25,
+};
+
+test('a site on a threefold axis written to three decimals is one atom per image', () => {
+  const magnesium = expandSite(WRITTEN_MAGNESIUM, 0, operationsOf(194));
+
+  expect(magnesium).toHaveLength(2);
+  expect(magnesium[0]?.position).toStrictEqual([0.333, 0.667, 0.25]);
+});
+
+test('the exact orbit keeps the copies a written coordinate leaves', () => {
+  expect(
+    expandSite(WRITTEN_MAGNESIUM, 0, operationsOf(194), 1e-4),
+  ).toHaveLength(6);
+});
+
+test('two images an atom apart are still two atoms', () => {
+  const nearMirror = expandSite(
+    { label: 'Y1', element: 'Y', x: 0, y: 0, z: 0.0071 },
+    0,
+    operationsOf(166),
+  );
+
+  expect(nearMirror).toHaveLength(6);
+});

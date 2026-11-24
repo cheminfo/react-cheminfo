@@ -16,7 +16,11 @@ export {
   keptSites,
 } from './disorder.ts';
 export type { AsymmetricSite, ExpandedAtom } from './expand.ts';
-export { expandSite, expandStructure } from './expand.ts';
+export {
+  WRITTEN_SITE_TOLERANCE,
+  expandSite,
+  expandStructure,
+} from './expand.ts';
 export type {
   CrystalMolecule,
   CrystalMoleculeAtom,

@@ -11,6 +11,14 @@
 import { orbit } from './symmetry/operation.ts';
 import type { CrystalOperation, Dimension } from './symmetry/types.ts';
 
+/**
+ * The fractional distance below which two images of a site read from a file
+ * are one atom. A file writes ⅓ as 0.3333, so the images of an atom on a
+ * threefold axis land 1e-4 or 2e-4 apart, and three decimals put them 1e-3
+ * apart. 2e-3 is 0.04 Å on a 20 Å axis: closer than any two atoms are.
+ */
+export const WRITTEN_SITE_TOLERANCE = 2e-3;
+
 /** One line of the asymmetric unit, as a CIF or the atom table gives it. */
 export interface AsymmetricSite {
   /** `Na1` — the label the file uses, unique within the structure. */
@@ -49,14 +57,14 @@ export interface ExpandedAtom {
  * @param sites - The asymmetric unit, in the order the file lists it.
  * @param operations - The full coset list of the setting, centring included.
  * @param tolerance - Fractional distance below which two images are one atom.
- *   @default 1e-4
+ *   @default WRITTEN_SITE_TOLERANCE
  * @returns The atoms, grouped by the site they came from, each carrying the
  *   index of the operation that generated it.
  */
 export function expandStructure(
   sites: readonly AsymmetricSite[],
   operations: ReadonlyArray<CrystalOperation<Dimension>>,
-  tolerance?: number,
+  tolerance = WRITTEN_SITE_TOLERANCE,
 ): ExpandedAtom[] {
   const atoms: ExpandedAtom[] = [];
   for (let index = 0; index < sites.length; index++) {
@@ -76,14 +84,14 @@ export function expandStructure(
  * @param siteIndex - Where it sits in that list, carried onto every atom.
  * @param operations - The full coset list.
  * @param tolerance - As {@link expandStructure}.
- *   @default 1e-4
+ *   @default WRITTEN_SITE_TOLERANCE
  * @returns One atom per distinct image, the site's own position first.
  */
 export function expandSite(
   site: AsymmetricSite,
   siteIndex: number,
   operations: ReadonlyArray<CrystalOperation<Dimension>>,
-  tolerance?: number,
+  tolerance = WRITTEN_SITE_TOLERANCE,
 ): ExpandedAtom[] {
   const images = orbit([site.x, site.y, site.z], operations, tolerance);
   const atoms: ExpandedAtom[] = [];
