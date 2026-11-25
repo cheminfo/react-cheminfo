@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.148.0](https://github.com/cheminfo/react-cheminfo/compare/v0.147.0...v0.148.0) (2026-11-25)
+
+
+### Features
+
+* **about:** name only its own people on a project outside the family ([7b6788c](https://github.com/cheminfo/react-cheminfo/commit/7b6788cb4965367b8281c98d128ed62946a4a2f1))
+* **ecosystem:** offer draw for a structure, to draw it or cut it into fragments ([56d0c00](https://github.com/cheminfo/react-cheminfo/commit/56d0c001d8ffaab1ffed4d72dcd36d63afae94a3))
+* **projection:** draw the ten strongest components of the explained shares ([035fb9a](https://github.com/cheminfo/react-cheminfo/commit/035fb9aca206bd1dfcbe8315dedaacbf376376b1))
+* **structure:** show the structure search inline with StructureSearchPanel ([0c74e06](https://github.com/cheminfo/react-cheminfo/commit/0c74e061165b67da1da015b49d212e21d2e47e7f))
+
+
+### Bug Fixes
+
+* **seo:** let a failed build report its own error, not the prerender's ([3370ab6](https://github.com/cheminfo/react-cheminfo/commit/3370ab64fc51b87f3b5cda601e13460898d6231c))
+
 ## [0.147.0](https://github.com/cheminfo/react-cheminfo/compare/v0.146.0...v0.147.0) (2026-11-25)
 
 
