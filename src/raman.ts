@@ -5,13 +5,19 @@
  * name. What it opens is the same code as `react-cheminfo/ir` — one shell, one
  * set of panels — and the same spectrum model, which a host fills with an
  * `intensity` array where an infrared spectrum carries absorbance and
- * transmittance.
+ * transmittance. `loadRamanSpectra` fills it from a file: JCAMP-DX, SPC,
+ * Renishaw WDF or two columns of text.
  */
 
 export type { LoadedIrSpectrum } from './ir/core/analysisSpectra.ts';
 export type { IrEditorHandle, IrPlotClick } from './ir/core/irEditorApi.ts';
 export { bandsFromRamanPeaks, ramanPeaksFromBands } from './ir/core/irPeaks.ts';
 export type { IrSpectrum } from './ir/core/irSpectrum.ts';
+export type {
+  LoadIrSpectraOptions,
+  LoadIrSpectraResult,
+} from './ir/core/loadIrSpectra.ts';
+export { loadRamanSpectra } from './ir/core/loadRamanSpectra.ts';
 export { toIrSpectra } from './ir/core/toIrSpectrum.ts';
 export type { IrHostPanel } from './ir/ui/irHostPanels.ts';
 export type {

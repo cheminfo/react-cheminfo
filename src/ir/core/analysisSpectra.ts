@@ -22,9 +22,8 @@ export type AbsorptionTechnique = 'infrared' | 'uvvis';
 /**
  * One spectrum as a reader produced it, before it is named and coloured.
  *
- * The readers of this package produce infrared spectra, which carry absorbance
- * and transmittance; a host reading a Raman file builds one carrying its
- * intensity instead.
+ * An infrared or UV-vis spectrum carries absorbance and transmittance; a Raman
+ * or a fluorescence spectrum carries its intensity instead.
  */
 export interface LoadedIrSpectrum {
   /** The wavenumbers — or, for a Raman spectrum, the Raman shifts — ascending. */

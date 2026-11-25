@@ -9,6 +9,9 @@
 
 import type { IrFormat } from './irSpectrum.ts';
 
+/** What a file is recognised as from its own bytes, or else from its name. */
+export type DetectedIrFormat = Extract<IrFormat, 'jcamp' | 'spc' | 'text'>;
+
 /**
  * How much of the file the decision is taken on.
  *
@@ -26,7 +29,7 @@ const HEADER_BYTES = 4096;
  * function inherited from `Object.prototype`, which is neither a format nor
  * `undefined` and so passes every check made of it.
  */
-const EXTENSIONS = new Map<string, IrFormat>([
+const EXTENSIONS = new Map<string, DetectedIrFormat>([
   ['jdx', 'jcamp'],
   ['dx', 'jcamp'],
   ['jcamp', 'jcamp'],
@@ -59,7 +62,7 @@ const DECODER = new TextDecoder();
 export function detectIrFormat(
   data: Uint8Array | string,
   fileName?: string,
-): IrFormat | 'unknown' {
+): DetectedIrFormat | 'unknown' {
   if (isSpc(data)) return 'spc';
 
   const header = stripByteOrderMark(readHeader(data)).trimStart();
@@ -131,7 +134,7 @@ function stripByteOrderMark(header: string): string {
  * @param fileName - The name, when the file has one.
  * @returns The format, or `undefined` when the extension names none.
  */
-function formatFromExtension(fileName?: string): IrFormat | undefined {
+function formatFromExtension(fileName?: string): DetectedIrFormat | undefined {
   if (fileName === undefined) return undefined;
   const extension = fileName.split('.').pop();
   if (extension === undefined || extension === fileName) return undefined;

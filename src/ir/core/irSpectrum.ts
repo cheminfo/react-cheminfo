@@ -39,7 +39,7 @@ export type IrTrace = DataXY<Float64Array>;
 
 /**
  * The formats a spectrum can have been read from. `wdf` is Renishaw's Raman
- * format, which a host reads with its own parser and hands over.
+ * format, which `loadRamanSpectra` reads.
  */
 export type IrFormat = 'jcamp' | 'spc' | 'text' | 'wdf' | 'calculated';
 
