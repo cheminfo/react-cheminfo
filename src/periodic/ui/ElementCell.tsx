@@ -187,8 +187,8 @@ export function ElementCell(props: ElementCellProps): ReactElement {
         opacity: isIncluded ? 1 : 0.28,
         // A ring rather than a fill: a table coloured by a property must keep
         // saying what the value is while a cell is selected. Drawn as an inset
-        // shadow, never an outline: a click focuses the cell, and a site's
-        // focus-ring reset (`outline: none !important`) would erase it.
+        // shadow, never an outline: a click focuses the cell, and the focus
+        // reset of chrome.css (`outline: none !important`) would erase it.
         // Thick enough to be seen from the back of a room, and inside the cell
         // so a neighbour never covers it.
         boxShadow: isSelected

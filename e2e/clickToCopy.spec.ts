@@ -68,6 +68,23 @@ test('Enter copies a focused value, as a click does', async ({ page }) => {
   expect(await copiedText(page, value)).toBe('C=CC=O');
 });
 
+test('a value focused from the keyboard draws no focus ring', async ({
+  page,
+}) => {
+  await openStory(page, 'clipboard-clicktocopy--default');
+  const value = page.getByRole('button', { name: 'C=CC=O' });
+
+  // A key first, so the browser counts the focus that follows as the
+  // keyboard's: the one case that used to draw a ring.
+  await page.keyboard.press('Tab');
+  await value.focus();
+
+  expect(await value.evaluate((node) => node.matches(':focus-visible'))).toBe(
+    true,
+  );
+  await expect(value).toHaveCSS('outline-style', 'none');
+});
+
 test('a table cell copies its own value', async ({ page }) => {
   await openStory(page, 'clipboard-clicktocopy--table-cells');
   const cell = page.getByRole('cell', { name: '-13.19' });

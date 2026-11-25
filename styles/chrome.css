@@ -6,9 +6,10 @@
  * `--brand`, `--brand-alt`, the readable `--brand-alt-text` when the second one
  * is too light for text, and `--accent: var(--brand)`.
  *
- * The page background, the box-sizing reset and the focus policy stay with the
- * site: a rule shipped from a package cannot be relied on to lose the cascade
- * against the page importing it.
+ * The page background and the box-sizing reset stay with the site: a rule
+ * shipped from a package cannot be relied on to lose the cascade against the
+ * page importing it. The focus reset is the exception, because it must win on
+ * every site: no ring, ever.
  */
 
 :root {
@@ -52,6 +53,13 @@ textarea,
 select,
 button {
   font-family: inherit;
+}
+
+/* No focus ring, ever: not after a click, not from the keyboard. `!important`
+   because Blueprint's own `.bp6-…:focus` outlines are more specific than `*`. */
+*:focus,
+*:focus-visible {
+  outline: none !important;
 }
 
 /* A formula is MathML the browser draws natively, in a font made for it: the
@@ -1288,11 +1296,6 @@ select,
   transition: background-color 120ms ease;
 }
 
-.click-to-copy:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
 .click-to-copy[data-copy='copied'] {
   background-color: color-mix(in oklab, #238551 15%, transparent);
 }
@@ -1501,11 +1504,6 @@ tr[data-highlight='selected'][data-highlight][data-highlight][data-highlight]
   background: color-mix(in oklab, var(--accent) 28%, var(--surface));
 }
 
-.range-slider .bp6-slider-handle:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
 .range-slider .bp6-disabled .bp6-slider-handle {
   background: var(--surface-sunken);
   box-shadow: 0 0 0 1px var(--border-strong);
@@ -1528,11 +1526,6 @@ tr[data-highlight='selected'][data-highlight][data-highlight][data-highlight]
   cursor: text;
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
-}
-
-.range-slider__value:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
 }
 
 .range-slider__value:disabled {
@@ -2684,11 +2677,6 @@ span.taxon-lineage__name {
 .empty-guide button.empty-guide__action:first-child:hover {
   background: color-mix(in oklab, var(--accent) 85%, black);
   color: var(--surface);
-}
-
-.empty-guide button.empty-guide__action:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 .empty-guide__help {
