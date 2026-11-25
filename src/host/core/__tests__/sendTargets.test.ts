@@ -27,6 +27,23 @@ test('a site takes the offer its own order of kinds prefers', () => {
   );
 });
 
+test('a structure lists draw, to edit it or to cut it into mass fragments', () => {
+  const targets = sendTargets(
+    [{ kind: 'chem.molfile.2d', label: 'Ethylbenzene' }],
+    'mass',
+  );
+
+  const listed: Array<[string, string | undefined, string | undefined]> = [];
+  for (const { site, receiver, offer } of targets) {
+    listed.push([site.id, receiver.page, offer.label]);
+  }
+
+  expect(listed).toStrictEqual([
+    ['draw', undefined, 'Ethylbenzene'],
+    ['draw', '/?workspace=fragmentation', 'Ethylbenzene'],
+  ]);
+});
+
 test('a site is never offered what it sends itself', () => {
   expect(sendTargets([SPECTRA], 'ml')).toStrictEqual([]);
 });

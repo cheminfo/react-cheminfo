@@ -388,6 +388,18 @@ export const ECOSYSTEM_SITES: readonly EcosystemSite[] = [
     // Ink and red on paper: a red nib on the navy stays under 4:1, where on
     // white it reads at 5.9:1.
     mark: { plate: '#ffffff', accent: '#c0261d', edge: '#dfe3e8' },
+    // The kinds of its tool's `structure` input, STRUCTURE_KINDS of /host.
+    receives: [
+      {
+        kinds: ['chem.molfile', 'chem.ocl.id', 'chem.smiles'],
+        does: 'Draw the structure to journal standards',
+      },
+      {
+        kinds: ['chem.molfile', 'chem.ocl.id', 'chem.smiles'],
+        does: 'Cut its bonds into mass fragments, each with its m/z',
+        page: '/?workspace=fragmentation',
+      },
+    ],
   },
   {
     id: 'plate',
