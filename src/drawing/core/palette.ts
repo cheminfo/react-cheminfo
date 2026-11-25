@@ -6,6 +6,8 @@
  * A colour is written `#rrggbb`, or `#rrggbbaa` with its alpha.
  */
 
+import { OKABE_ITO } from '../../color/core/okabeIto.ts';
+
 /** A colour of the palette, with the name a menu gives it. */
 interface PaletteColor {
   /** Its name. */
@@ -14,18 +16,8 @@ interface PaletteColor {
   value: string;
 }
 
-/** Okabe–Ito (2008): black first, the ink of every structure. */
-export const PALETTE: readonly PaletteColor[] = [
-  // tokens-ok: the colours of a figure, not of the site.
-  { name: 'Black', value: '#000000' },
-  { name: 'Orange', value: '#e69f00' },
-  { name: 'Sky blue', value: '#56b4e9' },
-  { name: 'Bluish green', value: '#009e73' },
-  { name: 'Yellow', value: '#f0e442' },
-  { name: 'Blue', value: '#0072b2' },
-  { name: 'Vermilion', value: '#d55e00' },
-  { name: 'Reddish purple', value: '#cc79a7' },
-];
+/** Okabe–Ito (2008), `OKABE_ITO`: black first, the ink of every structure. */
+export const PALETTE: readonly PaletteColor[] = OKABE_ITO;
 
 /**
  * Whether a text is a colour a drawing can carry.

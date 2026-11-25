@@ -15,9 +15,9 @@ import {
   CHART_TICK_LABEL_STYLE,
   CHART_TICK_LENGTH,
   CHART_TICK_MARK_STYLE,
-  CHART_TICK_ROOM,
   CHART_TITLE_OFFSET,
   CHART_ZERO_RULE_STYLE,
+  chartTickRoom,
 } from './chartStyles.ts';
 
 /** What {@link ChartAxis} draws. */
@@ -155,7 +155,12 @@ function axisMarks(
       );
     }
   }
-  if (title !== '') marks.push(axisTitle(horizontal, plot, showTicks, title));
+  if (title !== '') {
+    const room = showTicks
+      ? chartTickRoom(horizontal ? 'bottom' : 'left', scale)
+      : 0;
+    marks.push(axisTitle(horizontal, plot, room, title));
+  }
   return marks;
 }
 
@@ -190,11 +195,10 @@ function tickMark(
 function axisTitle(
   horizontal: boolean,
   plot: ChartPlotArea,
-  showTicks: boolean,
+  room: number,
   title: string,
 ): ReactElement {
   if (horizontal) {
-    const room = showTicks ? CHART_TICK_ROOM.bottom : 0;
     return (
       <text
         key="title"
@@ -207,7 +211,6 @@ function axisTitle(
       </text>
     );
   }
-  const room = showTicks ? CHART_TICK_ROOM.left : 0;
   const x = plot.left - room - CHART_TICK_LENGTH;
   const y = (plot.top + plot.bottom) / 2;
   return (

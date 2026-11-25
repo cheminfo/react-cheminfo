@@ -40,7 +40,11 @@ export async function fetchJson<T>(
   try {
     response = await send(url, { ...init, headers, body });
   } catch (error) {
-    if (init.signal?.aborted === true) throw error;
+    // fetch reports a network failure with a TypeError; an abort, or
+    // anything else, is thrown on as it is.
+    if (!(error instanceof TypeError) || init.signal?.aborted === true) {
+      throw error;
+    }
     throw new ApiError('the server could not be reached', {
       status: 0,
       error: 'Network Error',

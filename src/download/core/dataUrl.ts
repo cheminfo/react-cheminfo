@@ -1,8 +1,8 @@
 /**
- * Pictures as `data:` URLs, the way a document holds them: a file read into
- * one, an SVG written into one, and an SVG read back out of one — without a
- * `FileReader` or a `fetch`, so it runs in a worker, under a content security
- * policy forbidding `data:` fetches, and in Node.
+ * Pictures as `data:` URLs, the way a document holds them: bytes or a file
+ * read into one, an SVG written into one, and an SVG read back out of one —
+ * without a `FileReader` or a `fetch`, so it runs in a worker, under a content
+ * security policy forbidding `data:` fetches, and in Node.
  */
 
 import { decode, encode } from 'uint8-base64';
@@ -11,14 +11,25 @@ import { decode, encode } from 'uint8-base64';
 const SVG_TYPE = 'image/svg+xml';
 
 /**
+ * Bytes as a base64 `data:` URL: a PNG encoded in memory, written where an
+ * `<img>` reads it, so the picture travels with the SVG or the page that
+ * shows it.
+ * @param bytes - The bytes.
+ * @param type - What they hold: `image/png`.
+ * @returns The URL.
+ */
+export function bytesDataUrl(bytes: Uint8Array, type: string): string {
+  return `data:${type};base64,${base64(bytes)}`;
+}
+
+/**
  * A blob as a base64 `data:` URL, as a `FileReader` writes it.
  * @param blob - The blob, its `type` naming what it holds.
  * @returns The URL.
  */
 export async function blobDataUrl(blob: Blob): Promise<string> {
   const type = blob.type || 'application/octet-stream';
-  const bytes = new Uint8Array(await blob.arrayBuffer());
-  return `data:${type};base64,${base64(bytes)}`;
+  return bytesDataUrl(new Uint8Array(await blob.arrayBuffer()), type);
 }
 
 /**
@@ -27,7 +38,7 @@ export async function blobDataUrl(blob: Blob): Promise<string> {
  * @returns The URL.
  */
 export function svgDataUrl(svg: string): string {
-  return `data:${SVG_TYPE};base64,${base64(new TextEncoder().encode(svg))}`;
+  return bytesDataUrl(new TextEncoder().encode(svg), SVG_TYPE);
 }
 
 /**

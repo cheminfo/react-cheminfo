@@ -1,13 +1,14 @@
 import type { ReactElement } from 'react';
 
+import { useChartFrame } from '../../chart/ui/chartFrameContext.ts';
 import type { OverlayLegendEntry } from '../../overlay/ui/OverlayLegend.tsx';
 import { OverlayLegend } from '../../overlay/ui/OverlayLegend.tsx';
 
 import { projectionMapCorner } from './projectionMapCorner.ts';
 import type { ProjectionMapCloud } from './projectionMapModel.ts';
 import {
-  PROJECTION_PLOT_AREA_STYLE,
-  PROJECTION_PLOT_ROOM,
+  projectionPlotArea,
+  projectionPlotAreaStyle,
 } from './projectionTabStyles.ts';
 
 /** What {@link ProjectionMapLegend} needs. */
@@ -22,7 +23,10 @@ interface ProjectionMapLegendProps {
   xDomain: readonly [number, number];
   /** The range the vertical axis covers. */
   yDomain: readonly [number, number];
-  /** Width of the whole figure, in pixels. */
+  /**
+   * Width of the whole figure, in pixels: where its plot is taken to fall when
+   * it is not a frame, which says where it put it.
+   */
   width: number;
   /** Its height. */
   height: number;
@@ -41,7 +45,8 @@ interface ProjectionMapLegendProps {
  *
  * Inside the plot every corner is honest, so the corner is chosen by counting
  * the dots under each — a key in a fixed corner eventually sits on the one
- * cluster the reader came for.
+ * cluster the reader came for. Over a frame, the plot is the one the frame
+ * drew, so a column of wide labels moves the key with the plot.
  * @param props - See {@link ProjectionMapLegendProps}.
  * @returns The key.
  */
@@ -49,21 +54,19 @@ export function ProjectionMapLegend(
   props: ProjectionMapLegendProps,
 ): ReactElement {
   const { title, entries, cloud, xDomain, yDomain, width, height } = props;
+  const frame = useChartFrame();
 
-  const plotWidth =
-    width - PROJECTION_PLOT_ROOM.left - PROJECTION_PLOT_ROOM.right;
-  const plotHeight =
-    height - PROJECTION_PLOT_ROOM.top - PROJECTION_PLOT_ROOM.bottom;
+  const plot = frame?.plot ?? projectionPlotArea(width, height);
   const corner = projectionMapCorner(
     cloud,
     xDomain,
     yDomain,
-    Math.max(0, plotWidth),
-    Math.max(0, plotHeight),
+    plot.width,
+    plot.height,
   );
 
   return (
-    <div style={PROJECTION_PLOT_AREA_STYLE}>
+    <div style={projectionPlotAreaStyle(plot)}>
       <OverlayLegend placement={corner} title={title} entries={entries} />
     </div>
   );

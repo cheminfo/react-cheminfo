@@ -3,6 +3,7 @@ import { Icon } from '@blueprintjs/core';
 import {
   countLabel,
   statusBarStyle as barStyle,
+  statusCutStyle as cutStyle,
   statusItemStyle as itemStyle,
   statusMutedStyle as mutedStyle,
   statusSpacerStyle as spacerStyle,
@@ -82,7 +83,7 @@ export function MassStatusBar() {
       {error === null ? null : (
         <span style={errorStyle} title={error}>
           <Icon icon="warning-sign" size={12} />
-          {error}
+          <span style={cutStyle}>{error}</span>
         </span>
       )}
     </div>
@@ -90,19 +91,19 @@ export function MassStatusBar() {
 }
 
 const nameStyle = {
-  ...itemStyle,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  ...cutStyle,
   maxWidth: '32%',
   fontWeight: 600,
 } as const;
 
-/** The one red in the shell: a refusal, and nothing else, is written in it. */
+/**
+ * A refusal, in the family's danger colour and nothing else in it: the
+ * glyph, then its words, cut as the bar's other long items are.
+ */
 const errorStyle = {
   ...itemStyle,
   gap: 4,
-  color: '#C0392B',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  color: 'var(--danger)',
+  minWidth: 0,
   maxWidth: '60%',
 } as const;

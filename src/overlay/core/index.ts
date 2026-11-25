@@ -36,4 +36,4 @@ export type {
   OverlayCardPlacement,
   OverlayCardPlacementOptions,
 } from './placeOverlayCard.ts';
-export { placeOverlayCard } from './placeOverlayCard.ts';
+export { OVERLAY_CARD_OFFSET, placeOverlayCard } from './placeOverlayCard.ts';

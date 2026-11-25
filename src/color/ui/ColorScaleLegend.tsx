@@ -2,6 +2,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useId } from 'react';
 
 import { formatTrimmed } from '../../format/core/numbers.ts';
+import { withUnit } from '../../format/core/unitSpace.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ColorScale } from '../core/interpolate.ts';
@@ -172,10 +173,6 @@ function sampledStops(scale: ColorScale): GradientStop[] | null {
 
 function defaultFormatValue(value: number): string {
   return formatTrimmed(value, 3);
-}
-
-function withUnit(value: string, unit: string): string {
-  return unit === '' ? value : `${value} ${unit}`;
 }
 
 const ROW_STYLE = {

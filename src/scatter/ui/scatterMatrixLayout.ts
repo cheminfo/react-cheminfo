@@ -9,9 +9,12 @@
  * of the figure.
  */
 
+import { chartAxisScale } from '../../chart/core/chartAxisScale.ts';
+import type { ChartExtent } from '../../chart/core/chartExtent.ts';
 import {
   CHART_TICK_ROOM as TICKS,
   CHART_TITLE_ROOM as TITLES,
+  chartTickRoom,
 } from '../../chart/ui/chartStyles.ts';
 
 /** Room a cell keeps around its plot before its outer edges ask for more. */
@@ -32,7 +35,12 @@ export const SCATTER_MATRIX_MARGINS = {
  */
 export const SCATTER_MATRIX_GAP = 6;
 
-/** Room the left column and the bottom row keep for their ticks and titles. */
+/**
+ * Room the left column and the bottom row keep for their ticks and titles
+ * when the labels up the column are no wider than the family's usual column of
+ * figures — the least {@link scatterMatrixRoom} gives, and the room the count
+ * of axes that fit a width is decided at.
+ */
 export const SCATTER_MATRIX_ROOM = {
   left: SCATTER_MATRIX_MARGINS.left + TICKS.left + TITLES.left,
   bottom: SCATTER_MATRIX_MARGINS.bottom + TICKS.bottom + TITLES.bottom,
@@ -102,16 +110,63 @@ export function scatterMatrixAxesThatFit(
  * The side of every plot rectangle once the chrome has taken its share.
  * @param width - What the grid was given, in pixels.
  * @param count - How many axes are laid out.
+ * @param left - Room the left column keeps, from {@link scatterMatrixRoom}.
+ * Defaults to {@link SCATTER_MATRIX_ROOM}'s, labels no wider than usual.
  * @returns The side, in pixels, which the caller floors at the smallest plot.
  */
-export function scatterMatrixPlotSide(width: number, count: number): number {
+export function scatterMatrixPlotSide(
+  width: number,
+  count: number,
+  left: number = SCATTER_MATRIX_ROOM.left,
+): number {
   if (count < 1) return SCATTER_MATRIX_SMALLEST_PLOT;
   const inner = SCATTER_MATRIX_MARGINS.left + SCATTER_MATRIX_GAP;
   const chrome =
-    SCATTER_MATRIX_ROOM.left +
-    (count - 1) * inner +
-    count * SCATTER_MATRIX_MARGINS.right;
+    left + (count - 1) * inner + count * SCATTER_MATRIX_MARGINS.right;
   return (Math.max(0, width) - chrome) / count;
+}
+
+/**
+ * Room the left column and the bottom row keep for their ticks and titles.
+ *
+ * The left is as wide as the widest label written up the column: a column of
+ * `-125.5` needs more than the family's usual room, and the axis title beside
+ * it is drawn past those labels, so a room fixed in advance would put the
+ * title outside the cell. The labels are worked out the way each cell's frame
+ * works them out, from the same domain and the same tick count.
+ * @param extents - The range of each laid-out axis, by its index.
+ * @param shown - How many axes are laid out.
+ * @param ticks - How many ticks a written axis aims for.
+ * @returns The room, in pixels: never less than {@link SCATTER_MATRIX_ROOM}.
+ */
+export function scatterMatrixRoom(
+  extents: readonly ChartExtent[],
+  shown: number,
+  ticks: number,
+): { left: number; bottom: number } {
+  let labels: number = TICKS.left;
+  // The diagonal heads the column and writes no ticks of its own.
+  for (let row = 1; row < shown; row++) {
+    const [min, max] = scatterMatrixDomain(extents[row]);
+    const scale = chartAxisScale(min, max, { count: ticks });
+    labels = Math.max(labels, chartTickRoom('left', scale));
+  }
+  return {
+    left: SCATTER_MATRIX_MARGINS.left + labels + TITLES.left,
+    bottom: SCATTER_MATRIX_ROOM.bottom,
+  };
+}
+
+/**
+ * The domain a cell draws an axis over: the axis' range, or the unit range
+ * while it has none.
+ * @param extent - The axis' range, if it was measured.
+ * @returns The domain.
+ */
+export function scatterMatrixDomain(
+  extent: ChartExtent | undefined,
+): [number, number] {
+  return [extent?.min ?? 0, extent?.max ?? 1];
 }
 
 /**

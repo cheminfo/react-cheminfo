@@ -41,14 +41,14 @@ function askAgain(signal: AbortSignal): Promise<string> {
 }
 
 function Probe(props: {
-  task: (signal: AbortSignal) => Promise<string>;
+  task: ((signal: AbortSignal) => Promise<string>) | null;
   refreshKey: number;
 }) {
   seen.push(useAsync(props.task, props.refreshKey));
   return null;
 }
 
-function mount(task: (signal: AbortSignal) => Promise<string>) {
+function mount(task: ((signal: AbortSignal) => Promise<string>) | null) {
   const root = createRoot(document.createElement('div'));
   mounted.unmount = () => root.unmount();
   const render = (nextTask: typeof task, refreshKey: number) => {
@@ -210,4 +210,29 @@ test('unmounting aborts the run, and its late answer is dropped', async () => {
 
   expect(questions[0]?.signal.aborted).toBe(true);
   expect(seen).toHaveLength(rendered);
+});
+
+test('a null task asks nothing: the run in flight is aborted, the answer kept, nothing pending', async () => {
+  const render = mount(ask);
+  await act(async () => {
+    questions[0]?.resolve('C6H6');
+  });
+  render(askAgain, 1);
+
+  render(null, 1);
+
+  expect(questions).toHaveLength(2);
+  expect(questions[1]?.signal.aborted).toBe(true);
+  expect(last()).toStrictEqual({
+    status: 'success',
+    data: 'C6H6',
+    error: undefined,
+    pending: false,
+    failure: undefined,
+  });
+
+  render(askAgain, 1);
+
+  expect(questions).toHaveLength(3);
+  expect(last().pending).toBe(true);
 });

@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
+import { AffixSelect } from '../src/number/ui/AffixSelect.tsx';
+import { NumberDragGrip } from '../src/number/ui/NumberDragGrip.tsx';
 import type { NumberInputProps } from '../src/number/ui/NumberInput.tsx';
 import { NumberInput } from '../src/number/ui/NumberInput.tsx';
 
@@ -26,6 +28,53 @@ function NumberInputDemo(props: NumberInputProps): ReactElement {
 function noop(): void {
   // The line under the box is what a page would do with the number.
 }
+
+/**
+ * A length in each of the three sizes a box comes in: a grip at its left, its
+ * unit chosen at its right, both on the line of the typed value.
+ * @returns The three boxes.
+ */
+function UnitsDemo(): ReactElement {
+  const [value, setValue] = useState<number | undefined>(1.5);
+  const [unit, setUnit] = useState('nm');
+
+  return (
+    <div style={STACK_STYLE}>
+      {SIZES.map((size) => (
+        <NumberInput
+          key={size}
+          size={size}
+          value={value}
+          allowEmpty
+          step={0.1}
+          buttons={size === 'medium'}
+          ariaLabel={`Length, ${size}`}
+          testId={`length-${size}`}
+          onChange={setValue}
+          leftElement={
+            <NumberDragGrip
+              value={value}
+              step={0.1}
+              label={`Drag to change the length, ${size}`}
+              onChange={setValue}
+            />
+          }
+          rightElement={
+            <AffixSelect
+              value={unit}
+              options={UNITS}
+              ariaLabel={`Unit, ${size}`}
+              onChange={setUnit}
+            />
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
+const SIZES = ['small', 'medium', 'large'] as const;
+const UNITS = ['nm', 'µm', 'px'] as const;
 
 const meta = {
   title: 'Number/NumberInput',
@@ -76,6 +125,18 @@ export const WholeNumbers: Story = {
 /** A box in a table, where the buttons would not fit. */
 export const NoButtons: Story = {
   args: { value: -1.5, min: -5, max: 5, step: 0.1, buttons: false },
+};
+
+/**
+ * A length with its grip and its unit, small, medium (with its steppers) and
+ * large: the unit and the grip sit on the typed value's line in every size.
+ */
+export const WithUnits: Story = {
+  render: () => (
+    <div style={{ width: 220 }}>
+      <UnitsDemo />
+    </div>
+  ),
 };
 
 /**

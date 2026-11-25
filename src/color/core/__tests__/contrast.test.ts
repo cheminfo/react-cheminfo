@@ -1,6 +1,10 @@
 import { expect, test } from 'vitest';
 
+import { FAMILY_TOKEN_VALUES } from '../../../tokens/core/familyTokens.ts';
 import { contrastRatio, readableInk, relativeLuminance } from '../contrast.ts';
+
+/** The ink readable on a light ground: the family's text colour. */
+const INK = FAMILY_TOKEN_VALUES['--text'];
 
 test('luminance runs from black to white', () => {
   expect(relativeLuminance('#000000')).toBe(0);
@@ -21,8 +25,8 @@ test('contrast reaches 21 for black on white and 1 for a colour on itself', () =
 });
 
 test('the ink flips once the background is dark enough to need it', () => {
-  expect(readableInk('#ffffff')).toBe('#182026');
-  expect(readableInk('#b4de2c')).toBe('#182026');
+  expect(readableInk('#ffffff')).toBe(INK);
+  expect(readableInk('#b4de2c')).toBe(INK);
   expect(readableInk('#440154')).toBe('#ffffff');
   expect(readableInk('#000000')).toBe('#ffffff');
 });
@@ -30,7 +34,7 @@ test('the ink flips once the background is dark enough to need it', () => {
 test('the chosen ink is always the one with the higher contrast', () => {
   for (const background of ['#ffffff', '#b4de2c', '#31688e', '#440154']) {
     const ink = readableInk(background);
-    const other = ink === '#ffffff' ? '#182026' : '#ffffff';
+    const other = ink === '#ffffff' ? INK : '#ffffff';
 
     expect(contrastRatio(background, ink)).toBeGreaterThanOrEqual(
       contrastRatio(background, other),

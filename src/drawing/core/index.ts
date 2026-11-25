@@ -34,6 +34,7 @@ export {
 export type { ChemicalRange } from './chemicalText.ts';
 export type { DashPattern, LineDash } from './dashes.ts';
 export { LINE_DASHES, isLineDash } from './dashes.ts';
+export { HALO, haloStrokeWidth, haloText } from './halo.ts';
 export { chemicalRanges } from './chemicalText.ts';
 export type { CubicPiece, CurveControl } from './curves.ts';
 export {
@@ -57,17 +58,24 @@ export {
   writeFile,
 } from '../../storage/core/fileAccess.ts';
 export type { FontChoice } from './fonts.ts';
-export { CAPTION_FAMILIES, CAPTION_FONTS, FONTS } from './fonts.ts';
+export {
+  CAPTION_FAMILIES,
+  CAPTION_FONTS,
+  DRAWING_FONT,
+  FONTS,
+} from './fonts.ts';
 export { formulaParts } from './formulaText.ts';
 export {
   angleTo,
   boundsOf,
   boxContains,
   boxCorners,
+  boxEdges,
   boxFromCorners,
   clampToBox,
   distance,
   distanceToSegment,
+  edgesOverlap,
   normalizeAngle,
   polar,
   polygonContains,
@@ -113,6 +121,8 @@ export {
   isClosedGraphic,
   mapPath,
 } from './graphics.ts';
+export type { PixelSize } from './pixels.ts';
+export { coveredPixels } from './pixels.ts';
 export { createIdAllocator, identified, nextId } from './ids.ts';
 export { localPaper, paperFor } from './localPaper.ts';
 export { MIXED, MIXED_VALUE } from './mixed.ts';
@@ -240,7 +250,7 @@ export {
   transformCaption,
   transformPicture,
 } from './transform.ts';
-export type { Box, DrawPage, FigureSize, Point } from './types.ts';
+export type { Box, DrawPage, Edges, FigureSize, Point } from './types.ts';
 export { arrayOf, isFiniteNumber, isRecord } from './values.ts';
 export { along, leftOf, turnAbout, unit } from './vectors.ts';
 export type { UndoHistory, UndoHistoryOptions } from './undoHistory.ts';

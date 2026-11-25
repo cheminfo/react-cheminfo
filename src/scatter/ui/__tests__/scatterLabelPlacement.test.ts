@@ -1,10 +1,10 @@
 import { expect, test } from 'vitest';
 
+import { edgesOverlap } from '../../../drawing/core/geometry.ts';
 import {
   LabelBoxField,
   labelBoxHeight,
   labelBoxWidth,
-  labelBoxesOverlap,
 } from '../scatterLabelBoxes.ts';
 import type { PlacedScatterLabel } from '../scatterLabelPlacement.ts';
 import { placeScatterLabels } from '../scatterLabelPlacement.ts';
@@ -121,7 +121,7 @@ test('the field answers what has been written near a place, and only that', () =
     false,
   );
   expect(
-    labelBoxesOverlap(
+    edgesOverlap(
       { left: 0, top: 0, right: 10, bottom: 10 },
       { left: 10, top: 0, right: 20, bottom: 10 },
     ),
@@ -179,7 +179,7 @@ function overlapsAnother(
   for (let other = 0; other < boxes.length; other++) {
     const against = boxes[other];
     if (other === index || against === undefined) continue;
-    if (labelBoxesOverlap(box, against)) return true;
+    if (edgesOverlap(box, against)) return true;
   }
   return false;
 }

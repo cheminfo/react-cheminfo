@@ -481,6 +481,106 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'image-js',
+    name: 'image-js',
+    href: 'https://www.npmjs.com/package/image-js',
+    own: true,
+    description:
+      'processes the images, and finds and measures the objects in them.',
+    license: 'MIT',
+  },
+  {
+    id: 'tiff',
+    name: 'tiff',
+    href: 'https://www.npmjs.com/package/tiff',
+    own: true,
+    description: 'reads TIFF files, stacks and metadata included.',
+    license: 'MIT',
+  },
+  {
+    id: 'fast-png',
+    name: 'fast-png',
+    href: 'https://www.npmjs.com/package/fast-png',
+    own: true,
+    description: 'reads and writes PNG files, animated ones included.',
+    license: 'MIT',
+  },
+  {
+    id: 'dagre',
+    name: 'dagre',
+    href: 'https://github.com/dagrejs/dagre',
+    packageName: '@dagrejs/dagre',
+    description: 'lays out a graph in ranks, so its arrows all point one way.',
+    license: 'MIT',
+  },
+  {
+    id: 'culori',
+    name: 'culori',
+    href: 'https://github.com/Evercoder/culori',
+    packageName: 'culori',
+    description:
+      'converts the colours picked in OKLCH into the sRGB a screen paints.',
+    license: 'MIT',
+  },
+  {
+    id: 'zod',
+    name: 'Zod',
+    href: 'https://zod.dev/',
+    description: 'the schemas settings and saved files are checked against.',
+    license: 'MIT',
+  },
+  {
+    // Reached through @zakodium/pdnd-esm, which re-exports it as ES modules.
+    id: 'pragmatic-drag-and-drop',
+    name: 'Pragmatic drag and drop',
+    href: 'https://atlassian.design/components/pragmatic-drag-and-drop/',
+    packageName: '@atlaskit/pragmatic-drag-and-drop',
+    description: 'the dragging that puts the rows of a list in order.',
+    license: 'Apache-2.0',
+  },
+  {
+    id: 'mediabunny',
+    name: 'Mediabunny',
+    href: 'https://mediabunny.dev/',
+    description: 'reads movies frame by frame, decoded by the browser.',
+    license: 'MPL-2.0',
+  },
+  {
+    id: 'onnxruntime-web',
+    name: 'ONNX Runtime Web',
+    href: 'https://onnxruntime.ai/',
+    description:
+      'runs the neural networks in the page, on WebGPU or WebAssembly.',
+    license: 'MIT',
+  },
+  {
+    // The code is MIT; the weights a site downloads, ViT-T LM among them, are
+    // CC-BY-4.0.
+    id: 'micro-sam',
+    name: 'Segment Anything for Microscopy',
+    href: 'https://github.com/computational-cell-analytics/micro-sam',
+    description:
+      'the light-microscopy model that outlines a cell from a click.',
+    license: 'MIT AND CC-BY-4.0',
+  },
+  {
+    id: 'slimsam',
+    name: 'SlimSAM',
+    href: 'https://github.com/czg1225/SlimSAM',
+    description:
+      'the small general model that outlines any object from a click.',
+    license: 'Apache-2.0',
+  },
+  {
+    id: 'arraybuffer-xml-parser',
+    name: 'arraybuffer-xml-parser',
+    href: 'https://www.npmjs.com/package/arraybuffer-xml-parser',
+    own: true,
+    description:
+      'reads the XML a file carries, such as the metadata of an OME-TIFF.',
+    license: 'MIT',
+  },
+  {
     id: 'file-collection',
     name: 'file-collection',
     href: 'https://www.npmjs.com/package/file-collection',

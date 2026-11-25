@@ -1,4 +1,5 @@
-import { isTextEntryTarget } from './keyTargets.ts';
+import { fromPortal } from './eventSource.ts';
+import { ownsNavigationKeys } from './keyTargets.ts';
 
 /** The default number of entries `PageUp` and `PageDown` move by. */
 const DEFAULT_PAGE_STEP = 10;
@@ -21,8 +22,24 @@ export interface ListNavigationOptions {
 export interface ListNavigationKeyEvent {
   /** The key that was pressed. */
   key: string;
-  /** What the event was aimed at, used to leave typing alone. */
+  /**
+   * What the event was aimed at, used to leave typing and controls that move
+   * within themselves alone.
+   * @default undefined — no target: the key is the list's
+   */
   target?: EventTarget | null;
+  /**
+   * The list's element, whose handler reads the key: a key reaching it from
+   * outside its own nodes — from a menu or a dialog opened inside it, through
+   * a React portal — is the menu's.
+   * @default undefined — every key is the list's own
+   */
+  currentTarget?: EventTarget | null;
+  /**
+   * A control inside the list already acted on the key.
+   * @default false
+   */
+  defaultPrevented?: boolean;
   /** Stops the browser scrolling the page under the list. */
   preventDefault: () => void;
 }
@@ -88,10 +105,14 @@ export function nextSelectedIndex(
 /**
  * Move a list's selection from a keyboard event.
  *
- * A key that reaches a text field, a select or an editable region is left
- * alone, so typing a filter inside the list never moves the selection. A key
- * the list acts on has its default suppressed even when the selection does not
- * move, so the page never scrolls out from under the last entry.
+ * A key a control inside the list already acted on (`defaultPrevented`), one
+ * aimed at a control that moves within itself — a text field, a select whose
+ * list is open, a slider, a spin button ({@link ownsNavigationKeys}) —, or one
+ * reaching the list from a menu or a dialog opened inside it (`fromPortal`) is
+ * left alone, so typing a filter, choosing an option, moving a slider or
+ * walking a row's menu inside the list never moves the selection. A key the list acts on has its default
+ * suppressed even when the selection does not move, so the page never scrolls
+ * out from under the last entry.
  * @param event - The keyboard event, synthetic or native.
  * @param options - See {@link ListNavigationHandlerOptions}.
  * @returns Whether the selection moved, i.e. whether `onSelect` was called.
@@ -100,7 +121,16 @@ export function handleListNavigationKey(
   event: ListNavigationKeyEvent,
   options: ListNavigationHandlerOptions,
 ): boolean {
-  if (isTextEntryTarget(event.target)) return false;
+  if (
+    event.defaultPrevented === true ||
+    ownsNavigationKeys(event.target) ||
+    fromPortal({
+      target: event.target ?? null,
+      currentTarget: event.currentTarget ?? null,
+    })
+  ) {
+    return false;
+  }
   const next = nextSelectedIndex(event.key, options);
   if (next === null) return false;
   event.preventDefault();

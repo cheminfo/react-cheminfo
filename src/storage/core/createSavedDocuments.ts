@@ -1,78 +1,18 @@
 import type { DBSchema } from 'idb';
 
 import { openSiteDatabase } from './openSiteDatabase.ts';
+import type {
+  SavedDocument,
+  SavedDocuments,
+  SavedDocumentsOptions,
+} from './savedDocumentsTypes.ts';
+import { StoreRefusal, refusingWrite } from './storeRefusal.ts';
 
-/** A document kept in this browser under a name. */
-export interface SavedDocument<TData> {
-  /** Its identifier, kept when it is saved again or renamed. */
-  id: string;
-  /** The name it is listed under, unique among the site's documents. */
-  name: string;
-  /** When it was last saved, in epoch milliseconds. */
-  savedAt: number;
-  /** The document, as the site holds it. */
-  data: TData;
-}
-
-/** Options of {@link createSavedDocuments}. */
-export interface SavedDocumentsOptions<TData> {
-  /**
-   * The site's database stem, e.g. `write-cheminfo`; the documents are kept in
-   * a database of their own, `<name>-documents`.
-   */
-  name: string;
-  /**
-   * The document a stored value holds, or undefined when it holds none. Rows
-   * are read like a file, so one written by an older build cannot break the
-   * page.
-   */
-  read: (value: unknown) => TData | undefined;
-}
-
-/** The documents a site keeps in this browser under a name. */
-export interface SavedDocuments<TData> {
-  /** Whether this browser lets the page keep them. */
-  isAvailable: () => Promise<boolean>;
-  /** Every document, the most recently saved first. */
-  list: () => Promise<Array<SavedDocument<TData>>>;
-  /** The document saved under a name, compared without case or outer spaces. */
-  named: (name: string) => Promise<SavedDocument<TData> | undefined>;
-  /**
-   * Keep a document under a name, in place of the one saved under it before.
-   * @throws {Error} When the name is empty or longer than {@link MAX_DOCUMENT_NAME}.
-   */
-  save: (name: string, data: TData) => Promise<SavedDocument<TData>>;
-  /**
-   * Save a document again under the name it has now, renamed or not.
-   * @returns It, or `undefined` when it was forgotten meanwhile.
-   */
-  update: (
-    id: string,
-    data: TData,
-  ) => Promise<SavedDocument<TData> | undefined>;
-  /**
-   * Give a document another name.
-   * @throws {Error} When the name is not one a document can take, or another
-   * document goes by it.
-   */
-  rename: (id: string, name: string) => Promise<void>;
-  /** Forget a document. */
-  remove: (id: string) => Promise<void>;
-  /**
-   * Take documents back from a backup, each with the name and the date it was
-   * saved under. One saved here under the same name is replaced; the others
-   * stay. A document the site no longer reads is left out.
-   * @returns How many were taken back.
-   */
-  restore: (
-    documents: ReadonlyArray<SavedDocument<unknown>>,
-  ) => Promise<number>;
-  /**
-   * Be told when the documents change, in this tab or another.
-   * @returns The function that stops it.
-   */
-  subscribe: (listener: () => void) => () => void;
-}
+export type {
+  SavedDocument,
+  SavedDocuments,
+  SavedDocumentsOptions,
+} from './savedDocumentsTypes.ts';
 
 /** The longest name a document takes. */
 export const MAX_DOCUMENT_NAME = 120;
@@ -154,7 +94,7 @@ export function createSavedDocuments<TData>(
         data,
       };
       const db = await database.open();
-      await db.put('documents', document);
+      await refusingWrite(() => db.put('documents', document));
       changed();
       return document;
     },
@@ -168,7 +108,7 @@ export function createSavedDocuments<TData>(
         savedAt: Date.now(),
         data,
       };
-      await db.put('documents', document);
+      await refusingWrite(() => db.put('documents', document));
       changed();
       return document;
     },
@@ -176,12 +116,17 @@ export function createSavedDocuments<TData>(
       const documentName = checkedName(given);
       const holder = await named(documentName);
       if (holder && holder.id !== id) {
-        throw new Error(`A document is already saved as ${holder.name}.`);
+        throw new StoreRefusal(
+          'taken',
+          `A document is already saved as ${holder.name}.`,
+        );
       }
       const db = await database.open();
       const row = await db.get('documents', id);
       if (!row) return;
-      await db.put('documents', { ...row, name: documentName });
+      await refusingWrite(() =>
+        db.put('documents', { ...row, name: documentName }),
+      );
       changed();
     },
     remove: async (id) => {
@@ -212,10 +157,12 @@ export function createSavedDocuments<TData>(
       if (rows.length === 0) return 0;
       const db = await database.open();
       const transaction = db.transaction('documents', 'readwrite');
-      await Promise.all([
-        ...rows.map((row) => transaction.store.put(row)),
-        transaction.done,
-      ]);
+      await refusingWrite(() =>
+        Promise.all([
+          ...rows.map((row) => transaction.store.put(row)),
+          transaction.done,
+        ]),
+      );
       changed();
       return rows.length;
     },
@@ -240,9 +187,12 @@ export function nameKey(name: string): string {
 
 function checkedName(name: string): string {
   const trimmed = name.trim();
-  if (trimmed === '') throw new Error('A document needs a name.');
+  if (trimmed === '') {
+    throw new StoreRefusal('name', 'A document needs a name.');
+  }
   if (trimmed.length > MAX_DOCUMENT_NAME) {
-    throw new Error(
+    throw new StoreRefusal(
+      'name',
       `A name is at most ${MAX_DOCUMENT_NAME} characters long; this one has ${trimmed.length}.`,
     );
   }

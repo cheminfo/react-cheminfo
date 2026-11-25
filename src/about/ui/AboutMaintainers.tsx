@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react';
 
+import { listFormatters } from '../../i18n/core/listFormatters.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { MaintainerLine } from '../core/team.ts';
@@ -26,7 +27,7 @@ export function AboutMaintainers(props: AboutMaintainersProps): ReactElement {
       {props.maintainers.map(({ name, organisation, works, tooling }) => {
         const named = tooling ? [...works, t('about.role.theTooling')] : works;
         const text = t('about.role.maintains', {
-          works: new Intl.ListFormat(language).format(named),
+          works: listFormatters(language).names(named),
         });
         return (
           <li key={name}>

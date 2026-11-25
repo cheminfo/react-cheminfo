@@ -340,9 +340,14 @@ function cellContent(
  */
 function shareLabel(share: number | null): string {
   if (share === null) return '—';
-  if (share > 0 && share < 0.001) return '<0.1 %';
+  if (share > 0 && share < SMALLEST_SHARE) {
+    return `<${formatPercent(SMALLEST_SHARE)}`;
+  }
   return formatPercent(share);
 }
+
+/** The smallest share written as a number: 0.1 % at one decimal. */
+const SMALLEST_SHARE = 0.001;
 
 /**
  * The energy to two decimals, or a dash when there is none.
@@ -422,7 +427,7 @@ function rowStyle(
 }
 
 const SELECTED_ROW_STATIC = {
-  background: 'color-mix(in oklab, var(--accent) 12%, white)',
+  background: 'var(--accent-wash)',
   fontWeight: 600,
 } as const satisfies CSSProperties;
 

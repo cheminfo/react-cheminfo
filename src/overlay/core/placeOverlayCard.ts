@@ -20,6 +20,27 @@ export interface OverlayCardPlacementOptions {
    * @default 14
    */
   offset?: number;
+  /**
+   * Width of the mark's box, from the pointer position rightwards: a card
+   * anchored to a mark rather than to the pointer opens beside the box, to its
+   * right, or flips to its left side, and never covers it.
+   * @default 0 — a point
+   */
+  anchorWidth?: number;
+  /**
+   * Which side of the pointer the card opens on, before a flip: below it, or
+   * above it — a card pinned to a pixel reads above the pixel, as a label
+   * does.
+   * @default 'below'
+   */
+  opens?: 'below' | 'above';
+  /**
+   * Another card already on the figure — a loupe, a pinned readout — that
+   * this one must not cover: it then takes the first of its other sides,
+   * across, then along, then both, that keeps clear of it.
+   * @default undefined — nothing to keep clear of
+   */
+  avoid?: { left: number; top: number; width: number; height: number };
 }
 
 /** Where a pointer-following card goes, and which way round it ended up. */
@@ -35,8 +56,10 @@ export interface OverlayCardPlacement {
 }
 
 /**
- * Place a card down and to the right of the pointer, flipping it to the other
- * side of whichever axis would push it out of the figure.
+ * Place a card down and to the right of the pointer — or up, `opens: 'above'`
+ * —, flipping it to the other side of whichever axis would push it out of the
+ * figure. A card anchored to a mark's box (`anchorWidth`) opens beside the box
+ * and flips to the box's other side.
  *
  * Pure arithmetic on numbers the caller has already measured, so it runs on
  * every pointer move without touching the DOM: reading the card's size back
@@ -57,26 +80,61 @@ export function placeOverlayCard(
     cardHeight,
     boxWidth,
     boxHeight,
-    offset = DEFAULT_OFFSET,
+    offset = OVERLAY_CARD_OFFSET,
+    anchorWidth = 0,
+    opens = 'below',
   } = options;
 
-  const flippedX = pointerX + offset + cardWidth > boxWidth;
-  const flippedY = pointerY + offset + cardHeight > boxHeight;
-  return {
-    left: withinBox(
-      flippedX ? pointerX - offset - cardWidth : pointerX + offset,
-      boxWidth - cardWidth,
-    ),
-    top: withinBox(
-      flippedY ? pointerY - offset - cardHeight : pointerY + offset,
-      boxHeight - cardHeight,
-    ),
-    flippedX,
-    flippedY,
+  const right = pointerX + Math.max(0, anchorWidth);
+  const below = pointerY + offset;
+  const above = pointerY - offset - cardHeight;
+  const flippedX = right + offset + cardWidth > boxWidth;
+  const flippedY =
+    opens === 'below' ? below + cardHeight > boxHeight : above < 0;
+  const at = (acrossX: boolean, acrossY: boolean): OverlayCardPlacement => {
+    const downwards = opens === 'below' ? !acrossY : acrossY;
+    return {
+      left: withinBox(
+        acrossX ? pointerX - offset - cardWidth : right + offset,
+        boxWidth - cardWidth,
+      ),
+      top: withinBox(downwards ? below : above, boxHeight - cardHeight),
+      flippedX: acrossX,
+      flippedY: acrossY,
+    };
   };
+  const natural = at(flippedX, flippedY);
+  const { avoid } = options;
+  if (avoid === undefined || !covers(natural, cardWidth, cardHeight, avoid)) {
+    return natural;
+  }
+  const others = [
+    at(flippedX, !flippedY),
+    at(!flippedX, flippedY),
+    at(!flippedX, !flippedY),
+  ];
+  for (const other of others) {
+    if (!covers(other, cardWidth, cardHeight, avoid)) return other;
+  }
+  return natural;
 }
 
-const DEFAULT_OFFSET = 14;
+function covers(
+  card: OverlayCardPlacement,
+  width: number,
+  height: number,
+  other: NonNullable<OverlayCardPlacementOptions['avoid']>,
+): boolean {
+  return (
+    card.left < other.left + other.width &&
+    other.left < card.left + width &&
+    card.top < other.top + other.height &&
+    other.top < card.top + height
+  );
+}
+
+/** The gap kept between the pointer and a card, CSS pixels, unless told otherwise. */
+export const OVERLAY_CARD_OFFSET = 14;
 
 /**
  * The flip alone is not enough when the card is larger than the figure it has

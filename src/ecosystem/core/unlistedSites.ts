@@ -81,4 +81,18 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     // the dark form sits at 1.19:1 there and vanishes at 16 px.
     mark: { plate: '#3f6212', accent: '#7dd3fc' },
   },
+  {
+    id: 'image',
+    name: { lead: 'image', alt: 'cheminfo', dot: true },
+    host: 'image.cheminfo.org',
+    tagline: 'Measure objects in scientific images, in calibrated units.',
+    group: 'research',
+    // A deep ink-blue, the colour of a dark-field micrograph's background:
+    // 18.6:1 on white.
+    brand: '#0c0a3e',
+    // DAPI's cyan, 5.4:1 on white, so the name's second half needs no darker
+    // twin.
+    brandAlt: '#0e7490',
+    mark: { plate: '#0c0a3e', accent: '#22d3ee' },
+  },
 ];

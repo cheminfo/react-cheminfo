@@ -203,3 +203,14 @@ test('a backup refused whole says why', async () => {
   );
   expect(alertIcon()).toBe('error');
 });
+
+test('a site saying what a restore did in its own place is handed the sentence, and no alert opens', async () => {
+  const onRestored = vi.fn();
+  render({ onRestored });
+
+  await pick([new File(['{}'], 'backup.json')]);
+
+  expect(onRestored.mock.calls).toStrictEqual([['Restored 3 drawings.']]);
+  expect(document.body.querySelector('.bp6-alert')).toBeNull();
+  expect(current().busy).toBe(false);
+});

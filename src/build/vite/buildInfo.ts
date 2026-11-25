@@ -52,8 +52,10 @@ export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
   const { fileName = BUILD_INFO_FILE } = options;
   let root = process.cwd();
   let outDir = 'dist';
+  // A dev server closing runs `closeBundle` too: only a build writes.
+  let building = false;
   let info: BuildInfo = resolveBuildInfo(root);
-  const packages = createPackageCollector();
+  const packages = createPackageCollector(() => root);
 
   return {
     name: 'cheminfo-build-info',
@@ -73,6 +75,7 @@ export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
     configResolved(config) {
       root = config.root;
       outDir = config.build.outDir;
+      building = config.command === 'build';
       info = resolveBuildInfo(root);
     },
     resolveId(id) {
@@ -86,6 +89,7 @@ export function cheminfoBuildInfo(options: BuildInfoOptions = {}): Plugin {
       packages.record(bundle);
     },
     closeBundle() {
+      if (!building) return;
       packages.write(resolve(root, outDir));
       if (fileName === false) return;
       const target = resolve(root, outDir, fileName);

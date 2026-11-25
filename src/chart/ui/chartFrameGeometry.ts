@@ -34,10 +34,12 @@ export function chartFrameGeometry(
   const xAxis = chartAxisScale(x.domain[0], x.domain[1], {
     count: x.tickCount,
     nice: x.nice,
+    format: x.format,
   });
   const yAxis = chartAxisScale(y.domain[0], y.domain[1], {
     count: y.tickCount,
     nice: y.nice,
+    format: y.format,
   });
   const plot = chartPlotArea(width, height, margins, {
     bottom: chartOuterRoom('bottom', x, xAxis),

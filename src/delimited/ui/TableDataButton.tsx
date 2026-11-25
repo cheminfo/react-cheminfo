@@ -3,6 +3,7 @@ import { Button } from '@blueprintjs/core';
 import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
@@ -139,18 +140,19 @@ export function TableDataButton(props: TableDataButtonProps): ReactElement {
       {trigger ? (
         trigger(show)
       ) : (
-        <Button
-          className={joinClassNames('no-print', buttonClassName)}
-          icon={icon}
-          text={text}
-          variant={minimal ? 'minimal' : 'solid'}
-          size={small ? 'small' : 'medium'}
-          disabled={nothing}
-          title={told}
-          aria-label={text ?? told}
-          data-testid={testId}
-          onClick={show}
-        />
+        <HelpTooltip content={{ body: told }}>
+          <Button
+            className={joinClassNames('no-print', buttonClassName)}
+            icon={icon}
+            text={text}
+            variant={minimal ? 'minimal' : 'solid'}
+            size={small ? 'small' : 'medium'}
+            disabled={nothing}
+            aria-label={text ?? told}
+            data-testid={testId}
+            onClick={show}
+          />
+        </HelpTooltip>
       )}
       <DelimitedTextDialog
         {...dialog}

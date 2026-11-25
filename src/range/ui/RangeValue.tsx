@@ -84,7 +84,6 @@ export function RangeValue(props: RangeValueProps): ReactElement {
         open && 'range-slider__value--open',
       )}
       disabled={disabled}
-      title={t('range.typeValue')}
       aria-label={name}
       onClick={onEdit}
     >

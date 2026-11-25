@@ -58,7 +58,7 @@ test('the level reads the share of the printed size, and fit is a button of its 
   });
   const level = host.querySelector('button[aria-label="Zoom level"]');
 
-  expect(level?.textContent).toContain('150 %');
+  expect(level?.textContent).toContain('150\u00A0%');
 
   const fit = host.querySelector(
     'button[aria-label="Fit the drawing in view"]',
@@ -98,14 +98,14 @@ test('a view that stops short ends the menu there, and a fitted one marks no zoo
   const items = [...document.querySelectorAll('[role="menuitem"]')];
 
   expect(items.map((item) => item.textContent)).toStrictEqual([
-    '25 %',
-    '50 %',
-    '75 %',
-    '100 %',
-    '150 %',
-    '200 %',
-    '300 %',
-    '400 %',
+    '25\u00A0%',
+    '50\u00A0%',
+    '75\u00A0%',
+    '100\u00A0%',
+    '150\u00A0%',
+    '200\u00A0%',
+    '300\u00A0%',
+    '400\u00A0%',
   ]);
   expect(document.querySelector('[role="menuitem"].bp6-active')).toBeNull();
 

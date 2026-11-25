@@ -23,6 +23,12 @@ export interface BackupRestoreOptions {
    * @default an alert of its own
    */
   onError?: (message: string) => void;
+  /**
+   * Shows what a restore did, handed the sentence `onRestore` returned, for a
+   * site that says it in a place of its own rather than over the page.
+   * @default undefined — an alert of its own
+   */
+  onRestored?: (sentence: string) => void;
 }
 
 /** The two actions, for a site to put in its own toolbar or menu. */
@@ -45,7 +51,7 @@ export interface BackupRestore {
  * @returns See {@link BackupRestore}.
  */
 export function useBackupRestore(options: BackupRestoreOptions): BackupRestore {
-  const { onBackup, onRestore, accept, onError } = options;
+  const { onBackup, onRestore, accept, onError, onRestored } = options;
   const t = useChromeT();
   const input = useRef<HTMLInputElement | null>(null);
   const [busy, setBusy] = useState(false);
@@ -77,7 +83,9 @@ export function useBackupRestore(options: BackupRestoreOptions): BackupRestore {
     if (!file) return;
     setBusy(true);
     try {
-      setNotice({ intent: 'success', text: await onRestore(file) });
+      const sentence = await onRestore(file);
+      if (onRestored) onRestored(sentence);
+      else setNotice({ intent: 'success', text: sentence });
     } catch (error) {
       fail(t('storage.restoreFailed', { message: errorMessage(error) }));
     } finally {

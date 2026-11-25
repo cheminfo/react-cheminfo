@@ -11,6 +11,7 @@ import {
   withFigureSource,
 } from '../../download/core/figureSource.ts';
 import type { FigureStates } from '../../download/core/figureState.ts';
+import { listFormatters } from '../../i18n/core/listFormatters.ts';
 
 import type { HostOutputs } from './hostOutputs.ts';
 import { kindAccepts } from './kindAccepts.ts';
@@ -67,7 +68,7 @@ export async function answerGet(
   if (wanted.size === 0) {
     return noOutput(
       id,
-      `${tool.name} has no output called ${LIST.format(keys)}.`,
+      `${tool.name} has no output called ${LIST.either(keys)}.`,
     );
   }
   const items: HostItem[] = [];
@@ -177,4 +178,4 @@ function noOutput(id: string, message: string): ResultMessage {
   };
 }
 
-const LIST = new Intl.ListFormat('en', { type: 'disjunction' });
+const LIST = listFormatters('en');

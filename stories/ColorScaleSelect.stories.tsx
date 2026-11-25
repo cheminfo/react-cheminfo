@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { swatchAt } from '../src/color/core/interpolate.ts';
 import { positionInRange } from '../src/color/core/scale.ts';
 import { resolveColorScale } from '../src/color/core/scaleText.ts';
+import { DEFAULT_COLOR_SCALE_KINDS } from '../src/color/core/scales.ts';
 import type { ColorScaleSelectProps } from '../src/color/ui/ColorScaleSelect.tsx';
 import { ColorScaleSelect } from '../src/color/ui/ColorScaleSelect.tsx';
 
@@ -93,6 +94,10 @@ const meta = {
     value: { control: 'text' },
     label: { control: 'text' },
     allowCustom: { control: 'boolean' },
+    kinds: {
+      control: 'check',
+      options: ['sequential', 'diverging', 'cyclic', 'channel'],
+    },
   },
   parameters: {
     layout: 'padded',
@@ -128,6 +133,14 @@ export const Custom: Story = {
 /** A site that offers the scales it knows, and nothing hand-built. */
 export const NamedScalesOnly: Story = {
   args: { allowCustom: false, value: 'cividis' },
+};
+
+/**
+ * One channel of a fluorescence image: black to the colour it is shown in,
+ * from a picker that offers the channel tables beside the other scales.
+ */
+export const OneChannel: Story = {
+  args: { value: 'cyan', kinds: [...DEFAULT_COLOR_SCALE_KINDS, 'channel'] },
 };
 
 const STACK_STYLE = {

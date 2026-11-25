@@ -3,6 +3,7 @@ import { Button, Callout, HTMLTable, Tag } from '@blueprintjs/core';
 import { useMemo } from 'react';
 
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import { listFormatters } from '../../i18n/core/listFormatters.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type {
@@ -81,7 +82,7 @@ export function MoleculesTokenTable(props: MoleculesTokenTableProps) {
         dateStyle: 'medium',
         timeStyle: 'short',
       }),
-      sources: new Intl.ListFormat(language, { type: 'disjunction' }),
+      sources: listFormatters(language),
     }),
     [language],
   );
@@ -151,7 +152,7 @@ export function MoleculesTokenTable(props: MoleculesTokenTableProps) {
                   <td>
                     {check.sources.length === 0
                       ? t('moleculesToken.anySource')
-                      : formats.sources.format(check.sources)}
+                      : formats.sources.either(check.sources)}
                   </td>
                   <td>
                     <Tag minimal intent={INTENT[check.verdict]}>

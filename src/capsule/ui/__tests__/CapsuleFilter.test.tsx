@@ -1,42 +1,9 @@
-import type { ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
-import type { CapsuleOption } from '../CapsuleFilter.tsx';
 import { CapsuleFilter } from '../CapsuleFilter.tsx';
-import { capsuleFilterCapsules } from '../capsuleFilterCapsules.tsx';
 
-const OPTIONS: readonly CapsuleOption[] = [
-  { value: 'all', label: 'All', count: 1204 },
-  { value: 'solved', label: 'Solved', count: 812, intent: 'success' },
-  { value: 'failed', label: 'Failed', count: 17, intent: 'danger' },
-];
-
-type EquationType = 'acidoBasic' | 'complexation' | 'precipitation';
-
-const TYPES: ReadonlyArray<CapsuleOption<EquationType>> = [
-  { value: 'acidoBasic', label: 'acid-base', intent: 'primary' },
-  { value: 'complexation', label: 'complexation', intent: 'success' },
-  { value: 'precipitation', label: 'precipitation', intent: 'warning' },
-];
-
-// The capsules are a plain function of the row's props, so they can be read
-// and clicked without mounting anything.
-function capsulesOf<TValue extends string>(
-  props: Parameters<typeof capsuleFilterCapsules<TValue>>[0],
-): Array<ReactElement<ClickableProps>> {
-  return capsuleFilterCapsules(props) as Array<ReactElement<ClickableProps>>;
-}
-
-interface ClickableProps {
-  onClick: () => void;
-}
-
-function pressedStates(html: string): Array<string | undefined> {
-  return [...html.matchAll(/aria-pressed="(?<pressed>true|false)"/g)].map(
-    (match) => match.groups?.pressed,
-  );
-}
+import { OPTIONS, TYPES, pressedStates } from './capsuleOptions.ts';
 
 test('every capsule is drawn, with its count grouped in thousands', () => {
   const html = renderToStaticMarkup(
@@ -68,38 +35,6 @@ test('a capsule keeps its semantic colour whether or not it is selected', () => 
 
   expect(html).toContain('bp6-intent-success');
   expect(html).toContain('bp6-intent-danger');
-});
-
-test('a capsule given a colour of its own carries it and its ink, and no intent', () => {
-  const html = renderToStaticMarkup(
-    <CapsuleFilter
-      multiple
-      options={[
-        {
-          value: 'flasks',
-          label: 'Flasks',
-          color: '#2563eb',
-          intent: 'danger',
-        },
-        { value: 'adapters', label: 'Adapters', color: '#fde047' },
-        { value: 'other', label: 'Other' },
-      ]}
-      values={['flasks']}
-      onChange={() => null}
-    />,
-  );
-  // A coloured capsule writes its style first, before aria-pressed.
-  const capsules = html.split(/<span (?=[^>]*aria-pressed)/).slice(1);
-
-  expect(capsules).toHaveLength(3);
-  expect(capsules[0]).toContain('colored-capsule');
-  expect(capsules[0]).toContain('--capsule:#2563eb;--capsule-ink:#ffffff');
-  expect(capsules[0]).not.toContain('bp6-intent-');
-  expect(capsules[0]).not.toContain('bp6-minimal');
-  expect(capsules[1]).toContain('--capsule:#fde047;--capsule-ink:#182026');
-  expect(capsules[1]).toContain('bp6-minimal');
-  expect(capsules[2]).not.toContain('colored-capsule');
-  expect(capsules[2]).not.toContain('style=');
 });
 
 test('the row is reachable by tab and says which capsule is selected', () => {
@@ -209,97 +144,4 @@ test('the class a site gives reaches the row', () => {
   );
 
   expect(html).toContain('class="capsule-filter results-filter"');
-});
-
-test('picking a capsule of a single row reports its value', () => {
-  const picked: string[] = [];
-  const capsules = capsulesOf({
-    options: OPTIONS,
-    value: 'all',
-    onChange: (value) => picked.push(value),
-  });
-
-  capsules[2]?.props.onClick();
-
-  expect(picked).toStrictEqual(['failed']);
-});
-
-test('a multiple row fills every selected capsule, and the reset only when none is', () => {
-  const some = renderToStaticMarkup(
-    <CapsuleFilter
-      multiple
-      options={TYPES}
-      values={['acidoBasic', 'precipitation']}
-      allOption={{ label: 'all types', count: 431 }}
-      onChange={() => null}
-    />,
-  );
-  const none = renderToStaticMarkup(
-    <CapsuleFilter
-      multiple
-      options={TYPES}
-      values={[]}
-      allOption={{ label: 'all types', count: 431 }}
-      onChange={() => null}
-    />,
-  );
-
-  expect(some).toContain('all types (431)');
-  expect(pressedStates(some)).toStrictEqual(['false', 'true', 'false', 'true']);
-  expect(pressedStates(none)).toStrictEqual([
-    'true',
-    'false',
-    'false',
-    'false',
-  ]);
-});
-
-test('a reset capsule saying it is not selected stays empty on an empty row', () => {
-  const html = renderToStaticMarkup(
-    <CapsuleFilter
-      multiple
-      options={TYPES}
-      values={[]}
-      allOption={{ label: 'all types', count: 431, selected: false }}
-      onChange={() => null}
-    />,
-  );
-
-  expect(pressedStates(html)).toStrictEqual([
-    'false',
-    'false',
-    'false',
-    'false',
-  ]);
-});
-
-test('a multiple row without a reset capsule draws only its options', () => {
-  const html = renderToStaticMarkup(
-    <CapsuleFilter
-      multiple
-      options={TYPES}
-      values={['complexation']}
-      onChange={() => null}
-    />,
-  );
-
-  expect(pressedStates(html)).toStrictEqual(['false', 'true', 'false']);
-  expect(html).not.toContain('all types');
-});
-
-test('a capsule toggles within the selection, kept in option order, and the reset clears it', () => {
-  const picked: EquationType[][] = [];
-  const capsules = capsulesOf<EquationType>({
-    multiple: true,
-    options: TYPES,
-    values: ['precipitation'],
-    allOption: { label: 'all types' },
-    onChange: (values) => picked.push(values),
-  });
-
-  capsules[1]?.props.onClick();
-  capsules[3]?.props.onClick();
-  capsules[0]?.props.onClick();
-
-  expect(picked).toStrictEqual([['acidoBasic', 'precipitation'], [], []]);
 });

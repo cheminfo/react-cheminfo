@@ -1,39 +1,19 @@
-import type { DragEvent } from 'react';
-import { useMemo, useState } from 'react';
-
+import type { DropTarget } from '../../dropzone/ui/useDropTarget.ts';
+import { useDropTarget } from '../../dropzone/ui/useDropTarget.ts';
 import type { StructureTransfer } from '../core/structureTransfer.ts';
-import {
-  carriesStructure,
-  readStructureTransfer,
-} from '../core/structureTransfer.ts';
 
-/** The drag handlers of one element. */
-export interface DropHandlers {
-  onDragEnter?: (event: DragEvent<HTMLElement>) => void;
-  onDragOver?: (event: DragEvent<HTMLElement>) => void;
-  onDragLeave?: (event: DragEvent<HTMLElement>) => void;
-  onDrop?: (event: DragEvent<HTMLElement>) => void;
-}
+export type { DropHandlers } from '../../dropzone/ui/useDropTarget.ts';
 
 /** A drop target, in two parts: the element and the overlay it raises. */
-export interface StructureDropTarget {
-  /** Whether a file or text is being dragged over the target. */
-  over: boolean;
-  /** Put on the element that takes the drop. */
-  targetProps: DropHandlers;
-  /**
-   * Put on the overlay drawn while `over`. It covers the target and takes
-   * every drag event from then on, so moving across the canvas and the buttons
-   * underneath never reads as leaving, and leaving the overlay is leaving.
-   */
-  overlayProps: DropHandlers;
-}
+export type StructureDropTarget = DropTarget;
 
 /**
- * Take a file or text dropped on an element.
+ * Take a structure file, or structure text, dropped on an element: the
+ * family's drop target (`useDropTarget`), a folder not walked.
  * @param onDrop - Where the drop goes; `undefined` takes none.
  * @param takesText - Whether text is taken as well as files, so a target that
  * cannot use text raises no veil over a drag holding only text.
+ * @default true
  * @returns Whether a drag is over the element, and the handlers to put on it
  * and on its overlay.
  */
@@ -41,42 +21,5 @@ export function useStructureDrop(
   onDrop: ((transfer: StructureTransfer) => void) | undefined,
   takesText = true,
 ): StructureDropTarget {
-  const [over, setOver] = useState(false);
-
-  return useMemo(() => {
-    if (onDrop === undefined) {
-      return { over: false, targetProps: {}, overlayProps: {} };
-    }
-    const accept = (event: DragEvent<HTMLElement>): boolean => {
-      const { types } = event.dataTransfer;
-      if (!(takesText ? carriesStructure(types) : types.includes('Files'))) {
-        return false;
-      }
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'copy';
-      return true;
-    };
-    return {
-      over,
-      targetProps: {
-        onDragEnter: (event) => {
-          if (accept(event)) setOver(true);
-        },
-        onDragOver: accept,
-      },
-      overlayProps: {
-        onDragOver: accept,
-        onDragLeave: (event) => {
-          if (event.target === event.currentTarget) setOver(false);
-        },
-        onDrop: (event) => {
-          setOver(false);
-          const transfer = readStructureTransfer(event.dataTransfer);
-          if (transfer === null) return;
-          event.preventDefault();
-          onDrop(transfer);
-        },
-      },
-    };
-  }, [onDrop, over, takesText]);
+  return useDropTarget(onDrop, { takesText });
 }

@@ -58,7 +58,7 @@ test('a toggle short of room keeps the name a screen reader reads', () => {
 
   expect(html).toContain('aria-pressed="false"');
   expect(html).toContain('aria-label="Setosa"');
-  expect(html).toContain('title="Setosa"');
+  expect(html).not.toContain('title="Setosa"');
   expect(html).not.toContain('>Setosa<');
 });
 
@@ -164,7 +164,7 @@ test('a control with no layer above it is still drawn from real measurements', (
 
   expect(html).toBe(
     '<div style="display:inline-flex;align-items:center;gap:6px;min-height:30px">' +
-      '<span style="color:var(--text-muted);font-size:11px;font-weight:500;white-space:nowrap;user-select:none">Dot size</span>' +
+      '<span style="color:var(--text-muted);font-size:12px;font-weight:500;white-space:nowrap;user-select:none">Dot size</span>' +
       '<span>x</span></div>',
   );
 });

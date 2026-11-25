@@ -9,6 +9,7 @@ export {
 export type { WriteRouteOptions } from './history.ts';
 export {
   ROUTE_CHANGE_EVENT,
+  isBareRoot,
   openingRoute,
   readRoute,
   subscribeToRoute,

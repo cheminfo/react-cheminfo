@@ -4,12 +4,12 @@ import { chartAxisTitle, chartShare } from '../chartLabels.ts';
 
 test('a share is written after the name as a percentage', () => {
   expect(chartAxisTitle('PC1', { share: 0.7296244541329989 })).toBe(
-    'PC1 — 73.0 %',
+    'PC1 — 73.0\u00A0%',
   );
   expect(chartAxisTitle('PC2', { share: 0.22850761786701762 })).toBe(
-    'PC2 — 22.9 %',
+    'PC2 — 22.9\u00A0%',
   );
-  expect(chartAxisTitle('PC1', { share: 0 })).toBe('PC1 — 0.0 %');
+  expect(chartAxisTitle('PC1', { share: 0 })).toBe('PC1 — 0.0\u00A0%');
 });
 
 test('a method that publishes no share gets a bare name', () => {
@@ -20,16 +20,16 @@ test('a method that publishes no share gets a bare name', () => {
 
 test('the caller chooses how many decimals', () => {
   expect(chartAxisTitle('PC1', { share: 0.7296, digits: 2 })).toBe(
-    'PC1 — 72.96 %',
+    'PC1 — 72.96\u00A0%',
   );
   expect(chartAxisTitle('PC1', { share: 0.7296, digits: 0 })).toBe(
-    'PC1 — 73 %',
+    'PC1 — 73\u00A0%',
   );
   expect(chartAxisTitle('PC1', { share: 0.7296, digits: -2 })).toBe(
-    'PC1 — 73 %',
+    'PC1 — 73\u00A0%',
   );
   expect(chartAxisTitle('PC1', { share: 0.7296, digits: Number.NaN })).toBe(
-    'PC1 — 73.0 %',
+    'PC1 — 73.0\u00A0%',
   );
 });
 
@@ -43,5 +43,7 @@ test('a share written on its own carries no unit and the same one decimal', () =
 test('a title and a bare share agree on the same quantity', () => {
   const share = 0.7296244541329989;
 
-  expect(chartAxisTitle('PC1', { share })).toBe(`PC1 — ${chartShare(share)} %`);
+  expect(chartAxisTitle('PC1', { share })).toBe(
+    `PC1 — ${chartShare(share)}\u00A0%`,
+  );
 });

@@ -23,11 +23,11 @@ function requireScale(id: string) {
   return entry;
 }
 
-test('ten scales are offered, each under a name of its own', () => {
+test('seventeen scales are offered, each under a name of its own', () => {
   const ids = new Set(COLOR_SCALES.map((scale) => scale.id));
 
-  expect(COLOR_SCALES).toHaveLength(10);
-  expect(ids.size).toBe(10);
+  expect(COLOR_SCALES).toHaveLength(17);
+  expect(ids.size).toBe(17);
   expect([...ids]).toStrictEqual([
     'viridis',
     'plasma',
@@ -39,6 +39,13 @@ test('ten scales are offered, each under a name of its own', () => {
     'cool-warm',
     'blue-red',
     'rainbow',
+    'grey',
+    'red',
+    'green',
+    'blue',
+    'cyan',
+    'magenta',
+    'yellow',
   ]);
 });
 
@@ -103,6 +110,33 @@ test('the rainbow is two anchors turning the long way round the wheel', () => {
   expect(rainbow.scale.stops).toHaveLength(2);
   expect(rainbow.scale.interpolation).toBe('hsv-long');
   expect(colorAt(rainbow.scale, 0.5)).toBe('#00ff00');
+});
+
+test('each channel scale runs from black to its one colour, mixed in RGB', () => {
+  const channels = COLOR_SCALES.filter((entry) => entry.kind === 'channel');
+
+  expect(
+    channels.map((entry) => [
+      entry.id,
+      entry.scale.interpolation,
+      entry.scale.stops.map((stop) => `${stop.position} ${stop.color}`),
+    ]),
+  ).toStrictEqual([
+    ['grey', 'rgb', ['0 #000000', '1 #ffffff']],
+    ['red', 'rgb', ['0 #000000', '1 #ff0000']],
+    ['green', 'rgb', ['0 #000000', '1 #00ff00']],
+    ['blue', 'rgb', ['0 #000000', '1 #0000ff']],
+    ['cyan', 'rgb', ['0 #000000', '1 #00ffff']],
+    ['magenta', 'rgb', ['0 #000000', '1 #ff00ff']],
+    ['yellow', 'rgb', ['0 #000000', '1 #ffff00']],
+  ]);
+  expect(COLOR_SCALE_KIND_LABELS.channel).toBe('Black to one colour');
+});
+
+test('half the signal of a channel is half its colour', () => {
+  expect(colorAt(requireScale('red').scale, 0.5)).toBe('#800000');
+  expect(colorAt(requireScale('grey').scale, 0.5)).toBe('#808080');
+  expect(colorAt(requireScale('cyan').scale, 0.25)).toBe('#004040');
 });
 
 test('a scale nobody offers is not invented', () => {

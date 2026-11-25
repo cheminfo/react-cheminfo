@@ -20,7 +20,8 @@ export type { Translate } from '../core/index.ts';
  *
  * It is meant to be called while rendering, never kept in a module constant:
  * the language and a translator's edits both change under the page, and only a
- * render picks them up.
+ * render picks them up. While neither changes, every render and every
+ * component gets the same function, so a memo keyed on it holds.
  * @param catalog - The catalog to read, typed by its English keys.
  * @returns See {@link Translate}.
  */
@@ -28,9 +29,9 @@ export function useT<TKey extends string>(
   catalog: MessageCatalog<TKey>,
 ): Translate<TKey> {
   const language = useLanguage();
-  useMessagesVersion();
+  const version = useMessagesVersion();
   catalog.prefetch(language);
-  return catalogTranslate(catalog, language);
+  return translatorOf(catalog, language, version);
 }
 
 /**
@@ -64,4 +65,29 @@ export function translateMessage<TKey extends string>(
   options?: TranslateOptions,
 ): string {
   return catalog.translate(key, language, options);
+}
+
+/** The formatter last built for a catalog in a language, and at which version. */
+interface KeptTranslator {
+  version: number;
+  translate: Translate<string>;
+}
+
+const translators = new WeakMap<object, Map<Language, KeptTranslator>>();
+
+function translatorOf<TKey extends string>(
+  catalog: MessageCatalog<TKey>,
+  language: Language,
+  version: number,
+): Translate<TKey> {
+  let byLanguage = translators.get(catalog);
+  if (byLanguage === undefined) {
+    byLanguage = new Map();
+    translators.set(catalog, byLanguage);
+  }
+  const kept = byLanguage.get(language);
+  if (kept?.version === version) return kept.translate;
+  const translate = catalogTranslate(catalog, language);
+  byLanguage.set(language, { version, translate });
+  return translate;
 }

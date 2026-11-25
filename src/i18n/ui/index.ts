@@ -7,5 +7,6 @@ export {
   useLanguage,
   useMessagesVersion,
 } from './useLanguage.ts';
+export { useLists } from './useLists.ts';
 export type { Translate } from './useT.ts';
 export { translateMessage, useChromeT, useT } from './useT.ts';

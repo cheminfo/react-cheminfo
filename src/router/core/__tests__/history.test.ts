@@ -1,11 +1,13 @@
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, expect, onTestFinished, test, vi } from 'vitest';
 
 import {
   ROUTE_CHANGE_EVENT,
+  isBareRoot,
   readRoute,
   subscribeToRoute,
   writeRoute,
 } from '../history.ts';
+import { holdPageAddress, releasePageAddress } from '../pageAddress.ts';
 import { createTabRouter } from '../tabRouter.ts';
 
 type Tab = 'convert' | 'tutorial' | 'exercises';
@@ -146,6 +148,35 @@ test('without a browser the route is the home one and nothing is written', () =>
   expect(() => {
     subscribeToRoute(router, () => null)();
   }).not.toThrow();
+});
+
+test('only the bare root of a site is bare: no page, no query, no fragment', () => {
+  onTestFinished(releasePageAddress);
+  const site = createTabRouter<'workbench' | 'examples'>({
+    tabs: ['workbench', 'examples'],
+    home: 'workbench',
+  });
+  const mounted = createTabRouter<'workbench' | 'examples'>({
+    tabs: ['workbench', 'examples'],
+    home: 'workbench',
+    basePath: '/image/',
+  });
+  const bare = (router: typeof site, address: string): boolean => {
+    holdPageAddress(address);
+    return isBareRoot(router);
+  };
+
+  expect(bare(site, '/')).toBe(true);
+  expect(bare(site, '/?example=shapes')).toBe(false);
+  expect(bare(site, '/examples')).toBe(false);
+  expect(bare(site, '/#x')).toBe(false);
+  expect(bare(mounted, '/image/')).toBe(true);
+  expect(bare(mounted, '/image')).toBe(true);
+  expect(bare(mounted, '/image/examples')).toBe(false);
+
+  releasePageAddress();
+
+  expect(isBareRoot(site)).toBe(false);
 });
 
 interface Move {

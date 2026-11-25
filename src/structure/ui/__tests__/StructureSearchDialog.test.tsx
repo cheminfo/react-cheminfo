@@ -69,8 +69,8 @@ test('a similarity search shows its threshold, and a site its own controls', () 
 
   expect(markup).toContain('aria-label="Minimum similarity"');
   // A threshold off the usual steps is still offered, so it stays selected.
-  expect(markup).toContain('≥ 42 %');
-  expect(markup).toContain('≥ 95 %');
+  expect(markup).toContain('≥ 42\u00A0%');
+  expect(markup).toContain('≥ 95\u00A0%');
   expect(markup).toContain('FragFp');
 });
 

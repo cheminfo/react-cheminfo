@@ -1,3 +1,5 @@
+import { FAMILY_TOKEN_VALUES } from '../../tokens/core/familyTokens.ts';
+
 import { parseHexColor } from './hex.ts';
 
 const RED_WEIGHT = 0.2126;
@@ -5,8 +7,8 @@ const GREEN_WEIGHT = 0.7152;
 const BLUE_WEIGHT = 0.0722;
 const LINEAR_THRESHOLD = 0.039_28;
 
-/** The ink written on a light background. */
-const DARK_INK = '#182026';
+/** The ink written on a light background: the family's text colour. */
+const DARK_INK = FAMILY_TOKEN_VALUES['--text'];
 /** The ink written on a dark background. */
 const LIGHT_INK = '#ffffff';
 
@@ -14,7 +16,7 @@ const LIGHT_INK = '#ffffff';
 export interface ReadableInkOptions {
   /**
    * The ink for a light background.
-   * @default '#182026'
+   * @default the family's `--text`, `FAMILY_TOKEN_VALUES['--text']`
    */
   dark?: string;
   /**

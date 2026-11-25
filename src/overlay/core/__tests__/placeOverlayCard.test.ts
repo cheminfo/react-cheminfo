@@ -68,3 +68,52 @@ test('the gap to the pointer is the caller offset when one is given', () => {
     placeOverlayCard({ ...CARD, pointerX: 100, pointerY: 100, offset: 30 }),
   ).toStrictEqual({ left: 130, top: 130, flippedX: false, flippedY: false });
 });
+
+test('a card anchored to a mark’s box opens beside the box, and flips to its other side', () => {
+  const box = { pointerX: 300, pointerY: 50, anchorWidth: 60, offset: 8 };
+
+  expect([
+    placeOverlayCard({ ...CARD, ...box }),
+    placeOverlayCard({ ...CARD, ...box, pointerX: 400 }),
+    placeOverlayCard({ ...CARD, ...box, anchorWidth: -5 }),
+  ]).toStrictEqual([
+    { left: 368, top: 58, flippedX: false, flippedY: false },
+    { left: 192, top: 58, flippedX: true, flippedY: false },
+    { left: 308, top: 58, flippedX: false, flippedY: false },
+  ]);
+});
+
+test('a card opening above the pointer sits above it, and flips below near the top edge', () => {
+  expect([
+    placeOverlayCard({ ...CARD, pointerX: 100, pointerY: 200, opens: 'above' }),
+    placeOverlayCard({ ...CARD, pointerX: 100, pointerY: 40, opens: 'above' }),
+  ]).toStrictEqual([
+    { left: 114, top: 106, flippedX: false, flippedY: false },
+    { left: 114, top: 54, flippedX: false, flippedY: true },
+  ]);
+});
+
+test('a card keeps clear of another on the figure: across, then along, then both, else where it opens', () => {
+  const card = {
+    cardWidth: 100,
+    cardHeight: 60,
+    boxWidth: 800,
+    boxHeight: 600,
+  };
+  const pointer = { pointerX: 300, pointerY: 300 };
+  const loupe = { left: 324, top: 324, width: 120, height: 120 };
+  const placed = (avoid: typeof loupe) =>
+    placeOverlayCard({ ...card, ...pointer, avoid });
+
+  expect([
+    placeOverlayCard({ ...card, ...pointer }),
+    placed(loupe),
+    placed({ ...loupe, top: 200, height: 250 }),
+    placed({ left: 0, top: 0, width: 800, height: 600 }),
+  ]).toStrictEqual([
+    { left: 314, top: 314, flippedX: false, flippedY: false },
+    { left: 314, top: 226, flippedX: false, flippedY: true },
+    { left: 186, top: 314, flippedX: true, flippedY: false },
+    { left: 314, top: 314, flippedX: false, flippedY: false },
+  ]);
+});

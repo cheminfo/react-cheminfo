@@ -50,6 +50,15 @@ export {
   pointText,
   unescapeXml,
 } from './markup.ts';
+export type {
+  InterfaceTextKind,
+  InterfaceTextOptions,
+} from './interfaceText.ts';
+export {
+  INTERFACE_FACE_SLACK,
+  INTERFACE_FONT,
+  interfaceTextWidth,
+} from './interfaceText.ts';
 export type { FontMetrics } from './metrics.ts';
 export {
   CAP_HEIGHT,

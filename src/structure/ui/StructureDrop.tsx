@@ -1,9 +1,9 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { DropOverlay } from '../../dropzone/ui/DropOverlay.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { StructureTransfer } from '../core/structureTransfer.ts';
 
-import { StructureDropOverlay } from './StructureDropOverlay.tsx';
 import { useStructureDrop } from './useStructureDrop.ts';
 
 /** What {@link StructureDrop} needs. */
@@ -56,7 +56,7 @@ export function StructureDrop(props: StructureDropProps): ReactElement {
     >
       {children}
       {drop.over ? (
-        <StructureDropOverlay
+        <DropOverlay
           label={label ?? t('structure.import.drop')}
           handlers={drop.overlayProps}
         />

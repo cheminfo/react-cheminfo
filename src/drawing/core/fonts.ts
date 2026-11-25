@@ -12,12 +12,23 @@ export interface FontChoice {
 }
 
 /**
+ * The font a drawing's text is set in when nothing else is asked: Arial,
+ * whose metrics — Helvetica's — are those `textWidth` lays text out with, so
+ * a label's measured box is the box it draws; its micro sign stands upright,
+ * as a unit symbol is written, where Helvetica's leans.
+ */
+export const DRAWING_FONT: FontChoice = {
+  name: 'Arial',
+  family: 'Arial, Helvetica, sans-serif',
+};
+
+/**
  * The fonts journals accept. Text is laid out with the metrics of Helvetica,
  * which Arial shares; Times is narrower, so a line drawn up to a label only
  * ever stops a little early.
  */
 export const FONTS: readonly FontChoice[] = [
-  { name: 'Arial', family: 'Arial, Helvetica, sans-serif' },
+  DRAWING_FONT,
   { name: 'Helvetica', family: 'Helvetica, Arial, sans-serif' },
   { name: 'Times New Roman', family: "'Times New Roman', Times, serif" },
 ];

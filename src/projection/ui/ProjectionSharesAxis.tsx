@@ -1,27 +1,26 @@
 import type { ReactElement } from 'react';
 
 import { chartBand, chartBandCenter } from '../../chart/core/chartBand.ts';
+import type { ChartPlotArea } from '../../chart/ui/chartFrameTypes.ts';
 import type { ExplainedShares } from '../core/explainedShares.ts';
 
 import {
   AXIS_CAPTION_STYLE,
   AXIS_LAYER_STYLE,
   AXIS_NAME_STYLE,
-  SHARES_BOTTOM_ROOM,
   SHARES_CAPTION_OFFSET,
-  SHARES_LEFT_ROOM,
   SHARES_NAME_OFFSET,
-  SHARES_RIGHT_ROOM,
 } from './projectionTabStyles.ts';
 
 /** What {@link SharesAxis} writes. */
 interface SharesAxisProps {
   /** The bars, for their names. */
   shares: ExplainedShares;
-  /** Total width of the figure, in pixels, which the slots are laid out in. */
-  width: number;
-  /** Total height, which fixes the baseline the names sit on. */
-  height: number;
+  /**
+   * The plot the frame laid out: the slots run across it and the names sit
+   * under its foot.
+   */
+  plot: ChartPlotArea;
   /** What the axis measures, written under the names. */
   caption: string;
 }
@@ -36,10 +35,9 @@ interface SharesAxisProps {
  * @returns The names.
  */
 export function SharesAxis(props: SharesAxisProps): ReactElement {
-  const { shares, width, height, caption } = props;
-  const right = Math.max(SHARES_LEFT_ROOM, width - SHARES_RIGHT_ROOM);
-  const band = chartBand(shares.components.length, SHARES_LEFT_ROOM, right);
-  const baseline = height - SHARES_BOTTOM_ROOM;
+  const { shares, plot, caption } = props;
+  const band = chartBand(shares.components.length, plot.left, plot.right);
+  const baseline = plot.bottom;
 
   return (
     <svg width="100%" height="100%" style={AXIS_LAYER_STYLE}>
@@ -55,7 +53,7 @@ export function SharesAxis(props: SharesAxisProps): ReactElement {
         </text>
       ))}
       <text
-        x={(SHARES_LEFT_ROOM + right) / 2}
+        x={(plot.left + plot.right) / 2}
         y={baseline + SHARES_CAPTION_OFFSET}
         textAnchor="middle"
         style={AXIS_CAPTION_STYLE}

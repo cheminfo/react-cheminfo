@@ -2,9 +2,12 @@
 import { normalizeColor, readHexColor, readRgbColor } from './colors.ts';
 import type { OpenParen } from './cssReading.ts';
 import {
+  ACCENT_WASH_HINT,
   driftedFallback,
+  readAccentWash,
   readBrandDeclaration,
   readVarToken,
+  waivesWholeFile,
 } from './cssReading.ts';
 import { BANNED_COLORS } from './rules.ts';
 import type { TokenViolationKind } from './types.ts';
@@ -99,16 +102,6 @@ export function findTokenViolations(
 }
 
 const DEFAULT_IGNORE_MARKER = 'tokens-ok';
-
-// How far into a file the whole-file waiver may sit: a licence header, an
-// import or two, and the comment saying why this file writes colours.
-const WAIVER_LINES = 6;
-
-function waivesWholeFile(text: string, marker: string): boolean {
-  if (marker.length === 0) return false;
-  const head = text.split('\n', WAIVER_LINES).join('\n').toLowerCase();
-  return head.includes(`${marker}: file`);
-}
 
 interface Candidate extends Omit<TokenViolation, 'file'> {
   /** The colour written, or `null` for a property that should not be declared. */
@@ -216,6 +209,20 @@ function scanFile(
         });
       }
       index = match.end - 1;
+      continue;
+    }
+
+    if (char === 'c') {
+      const wash = readAccentWash(lower, index);
+      if (wash === 0) continue;
+      candidates.push({
+        line,
+        column: index - lineStart + 1,
+        kind: 'retyped-token',
+        text: text.slice(index, index + wash),
+        hint: ACCENT_WASH_HINT,
+        color: null,
+      });
       continue;
     }
 

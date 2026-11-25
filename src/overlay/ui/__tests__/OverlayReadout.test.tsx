@@ -10,6 +10,30 @@ const MEASUREMENTS: readonly OverlayReadoutRow[] = [
   { label: 'Species', value: 'Setosa', color: '#e69f00' },
 ];
 
+test('the card is a designed card: its title a step larger and ruled off, its values bold, at the everyday density', () => {
+  const html = renderToStaticMarkup(
+    <OverlayReadout
+      x={10}
+      y={10}
+      boxWidth={600}
+      boxHeight={400}
+      title="#129"
+      rows={MEASUREMENTS.slice(0, 1)}
+    />,
+  );
+  const styles = [...html.matchAll(/style="(?<rules>[^"]*)"/g)].map(
+    (match) => match.groups?.rules,
+  );
+
+  expect(styles.slice(0, 2)).toStrictEqual([
+    'display:flex;flex-direction:column;gap:2px;box-sizing:border-box;padding:6px 8px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-md);color:var(--text);font-size:12px;line-height:1.4;white-space:nowrap;max-width:280px;position:absolute;z-index:2;pointer-events:none;left:0;top:0;visibility:hidden',
+    'display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:2px;margin-bottom:2px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600',
+  ]);
+  expect(styles.at(-1)).toBe(
+    'margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap',
+  );
+});
+
 test('forty rows are cut to twelve, and the rest are one line saying so', () => {
   const html = renderToStaticMarkup(
     <OverlayReadout
@@ -80,38 +104,6 @@ test('a pinned card takes the pointer back and offers the way out', () => {
   expect(pinned).toContain('aria-label="Dismiss"');
 });
 
-test('with room, the card opens down and to the right of the pointer', () => {
-  const html = renderToStaticMarkup(
-    <OverlayReadout
-      x={20}
-      y={20}
-      boxWidth={600}
-      boxHeight={400}
-      title="Sample 12"
-      rows={MEASUREMENTS}
-    />,
-  );
-
-  expect(html).toContain('left:34px');
-  expect(html).toContain('top:34px');
-});
-
-test('near the right edge the card opens to the left, not off the figure', () => {
-  const html = renderToStaticMarkup(
-    <OverlayReadout
-      x={380}
-      y={20}
-      boxWidth={400}
-      boxHeight={400}
-      title="Sample 12"
-      rows={MEASUREMENTS}
-    />,
-  );
-
-  expect(left(html)).toBe(146);
-  expect(left(html)).toBeLessThan(380);
-});
-
 test('a row belonging to one series carries that series colour', () => {
   const html = renderToStaticMarkup(
     <OverlayReadout
@@ -137,9 +129,4 @@ function rows(count: number): OverlayReadoutRow[] {
     written.push({ label: `Row ${index}`, value: `${index} cm` });
   }
   return written;
-}
-
-function left(html: string): number {
-  const found = /left:(?<pixels>\d+)px/.exec(html);
-  return found === null ? Number.NaN : Number(found.groups?.pixels);
 }

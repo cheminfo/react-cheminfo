@@ -1,36 +1,23 @@
-import {
-  Button,
-  Menu,
-  MenuDivider,
-  MenuItem,
-  PopoverNext,
-} from '@blueprintjs/core';
+import { Button, PopoverNext } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayValueButton } from '../../overlay/ui/OverlayValueButton.tsx';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
-import { normalizeHexColor } from '../core/hex.ts';
 import { sampleScale } from '../core/interpolate.ts';
-import { formatColorScale, resolveColorScale } from '../core/scaleText.ts';
-import { COLOR_SCALES } from '../core/scales.ts';
-import {
-  UNIFORM_COLOR_SCALE_ID,
-  formatUniformColorScale,
-  isUniformColorScale,
-  uniformSwatch,
-} from '../core/uniform.ts';
+import { resolveColorScale } from '../core/scaleText.ts';
+import type { COLOR_SCALES, ColorScaleKind } from '../core/scales.ts';
+import { DEFAULT_COLOR_SCALE_KINDS } from '../core/scales.ts';
+import type { UNIFORM_COLOR_SCALE_ID } from '../core/uniform.ts';
+import { isUniformColorScale, uniformSwatch } from '../core/uniform.ts';
 
 import { ColorScaleBar } from './ColorScaleBar.tsx';
-import { ColorScaleEditor } from './ColorScaleEditor.tsx';
-import { ColorScaleEntry } from './ColorScaleEntry.tsx';
+import { ColorScaleSelectMenu } from './ColorScaleSelectMenu.tsx';
 
 const BUTTON_BAR_WIDTH = 72;
 // Its two ends and its middle: the most dots `OverlaySwatchIcon` draws.
 const BAR_SWATCHES = 3;
-// A `type="color"` input only takes six hex digits.
-const UNREADABLE_COLOR = '#000000';
 
 /** What {@link ColorScaleSelect} chooses. */
 export interface ColorScaleSelectProps {
@@ -60,6 +47,14 @@ export interface ColorScaleSelectProps {
    */
   allowUniform?: boolean;
   /**
+   * The kinds of scale the menu offers, each under its heading, in the order
+   * {@link COLOR_SCALES} lists them. A site showing the channels of an image
+   * adds `'channel'`: black to one colour, as a microscope shows a channel. A
+   * scale in force that is not offered is still drawn and named.
+   * @default DEFAULT_COLOR_SCALE_KINDS — sequential, diverging and cyclic
+   */
+  kinds?: readonly ColorScaleKind[];
+  /**
    * Whether it is a form field — a caption over a full-width button — or a
    * setting on a figure's bar, writing its name and its scale on one compact
    * line as `OverlayValueButton` does. The bar form needs an `OverlayLayer` or
@@ -80,8 +75,8 @@ export interface ColorScaleSelectProps {
 }
 
 /**
- * The picker a quantity's colours are chosen with: every scale drawn as itself,
- * and a way to build one.
+ * The picker a quantity's colours are chosen with: every scale it offers drawn
+ * as itself, and a way to build one.
  *
  * A ramp is picked by looking at it rather than by reading its name, so the
  * menu is the strips; the reader who needs the rainbow their course used, or
@@ -97,6 +92,7 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
     label = '',
     allowCustom = true,
     allowUniform = false,
+    kinds = DEFAULT_COLOR_SCALE_KINDS,
     appearance = 'field',
     testId,
   } = props;
@@ -107,95 +103,20 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
   const oneColor = uniformSwatch(uniform ? value : undefined).background;
   const resolved = resolveColorScale(value);
 
-  const content = isEditing ? (
-    <div>
-      <div style={EDITOR_HEADER_STYLE}>
-        <Button
-          icon="chevron-left"
-          variant="minimal"
-          size="small"
-          text={t('color.scales')}
-          onClick={() => {
-            setEditing(false);
-          }}
-        />
-        <Button
-          size="small"
-          text={t('color.done')}
-          onClick={() => {
-            setEditing(false);
-            setOpen(false);
-          }}
-        />
-      </div>
-      <ColorScaleEditor
-        value={resolved.scale}
-        onChange={(scale) => {
-          onChange(formatColorScale(scale));
-        }}
-      />
-    </div>
-  ) : (
-    <Menu style={MENU_STYLE}>
-      {allowUniform ? (
-        <MenuItem
-          roleStructure="listoption"
-          selected={uniform}
-          htmlTitle={t('color.uniformDescription')}
-          text={
-            <span style={UNIFORM_ITEM_STYLE}>
-              <span>{t('color.uniform')}</span>
-              <input
-                type="color"
-                aria-label={t('color.uniformColour')}
-                title={t('color.uniformColour')}
-                value={normalizeHexColor(oneColor) ?? UNREADABLE_COLOR}
-                style={UNIFORM_INPUT_STYLE}
-                // The swatch picks the colour; the rest of the row chooses
-                // one colour and closes the menu.
-                onClick={(event) => {
-                  event.stopPropagation();
-                }}
-                onChange={(event) => {
-                  onChange(formatUniformColorScale(event.target.value));
-                }}
-              />
-            </span>
-          }
-          onClick={() => {
-            onChange(uniform ? value : UNIFORM_COLOR_SCALE_ID);
-          }}
-        />
-      ) : null}
-      {COLOR_SCALES.map((entry, index) => (
-        <ColorScaleEntry
-          key={entry.id}
-          id={entry.id}
-          label={entry.label}
-          kind={entry.kind}
-          description={entry.description}
-          previous={COLOR_SCALES[index - 1]?.kind}
-          selected={!uniform && entry.id === resolved.id}
-          onChange={onChange}
-        />
-      ))}
-      {allowCustom ? (
-        <>
-          <MenuDivider />
-          <MenuItem
-            icon="edit"
-            text={t('color.customEllipsis')}
-            label={
-              resolved.id === null && !uniform ? t('color.inUse') : undefined
-            }
-            shouldDismissPopover={false}
-            onClick={() => {
-              setEditing(true);
-            }}
-          />
-        </>
-      ) : null}
-    </Menu>
+  const content = (
+    <ColorScaleSelectMenu
+      value={value}
+      onChange={onChange}
+      kinds={kinds}
+      allowCustom={allowCustom}
+      allowUniform={allowUniform}
+      editing={isEditing}
+      onEditing={setEditing}
+      onDone={() => {
+        setEditing(false);
+        setOpen(false);
+      }}
+    />
   );
 
   const scaleName = uniform
@@ -297,39 +218,8 @@ const BUTTON_TEXT_STYLE = {
   width: '100%',
 } as const satisfies CSSProperties;
 
-// The lines of the menu, so one colour reads as one more choice among them.
-const UNIFORM_ITEM_STYLE = {
-  display: 'grid',
-  gridTemplateColumns: '7rem 1fr',
-  alignItems: 'center',
-  gap: 10,
-  minWidth: 220,
-} as const satisfies CSSProperties;
-
 const UNIFORM_BAR_STYLE = {
   display: 'inline-block',
   height: 12,
   borderRadius: 2,
-} as const satisfies CSSProperties;
-
-const UNIFORM_INPUT_STYLE = {
-  width: '100%',
-  height: 18,
-  padding: 0,
-  border: 0,
-  background: 'none',
-  cursor: 'pointer',
-} as const satisfies CSSProperties;
-
-const MENU_STYLE = {
-  maxHeight: '60vh',
-  overflowY: 'auto',
-} as const satisfies CSSProperties;
-
-const EDITOR_HEADER_STYLE = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 8,
-  padding: '8px 12px 0',
 } as const satisfies CSSProperties;

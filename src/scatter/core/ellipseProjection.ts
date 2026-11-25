@@ -99,12 +99,12 @@ export function projectEllipse(
  *
  * Prefer {@link projectEllipse} on linear axes: it is exact, it is constant
  * time, and the browser draws a curve rather than a polygon.
- * @param ellipse - An ellipse in data units.
+ * @param ellipse - An ellipse in data units: only its centre, its two semi-axes and its angle are read.
  * @param steps - Points around the outline, at least three. Sixty-four keeps the flat sides under a third of a pixel on a 640 by 400 plot. Defaults to `64`.
  * @returns The outline in data units, the first point not repeated at the end.
  */
 export function ellipsePolygon(
-  ellipse: ConfidenceEllipse,
+  ellipse: Pick<ConfidenceEllipse, 'cx' | 'cy' | 'rx' | 'ry' | 'angle'>,
   steps = DEFAULT_STEPS,
 ): EllipsePoint[] {
   const total = Number.isFinite(steps)

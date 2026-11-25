@@ -15,7 +15,10 @@
  * translation adds or drops, a message left empty, and — as a count rather
  * than a fault — the keys still missing. It also refuses an ICU plural or
  * select, which the page's formatter does not load: a message with branches is
- * written as one key per branch instead.
+ * written as one key per branch instead — a family `key_one`, `key_other`,
+ * which must write `other`, and to which a translation may add the branches
+ * its language needs (`few`, `many`); a translated branch may write the
+ * placeholders of English's `other`, `{count}` among them.
  *
  * Exits 1 when anything is reported, 2 when it was called wrongly, 0 otherwise.
  */
@@ -24,11 +27,16 @@ import { basename, join } from 'node:path';
 import process from 'node:process';
 
 import { countOf, usageError } from './cli.mjs';
+import {
+  englishOf,
+  familyOf,
+  familyPlaceholders,
+  placeholders,
+} from './messageKeys.mjs';
 
 const TOOL = 'check-messages';
 const SOURCE_LOCALE = 'en';
 const DEFAULT_DIRECTORY = 'src/locales';
-const PLACEHOLDER = /\{(?<name>[^{}]*)\}/g;
 
 process.exit(main(process.argv.slice(2)));
 
@@ -140,6 +148,14 @@ function catalogProblems(catalog, directory, locale) {
     if (message.trim() === '') {
       problems.push(`${where}: ${key} is empty`);
     }
+    const family = familyOf(key);
+    if (
+      locale === SOURCE_LOCALE &&
+      family !== undefined &&
+      !hasOwn(catalog, `${family}_other`)
+    ) {
+      problems.push(`${where}: ${key} has no ${family}_other branch`);
+    }
     for (const name of placeholders(message)) {
       if (name.includes(',')) {
         problems.push(
@@ -165,12 +181,14 @@ function catalogProblems(catalog, directory, locale) {
 function localeProblems(source, catalog, where) {
   const problems = [];
   for (const [key, message] of Object.entries(catalog)) {
-    if (!hasOwn(source, key)) {
+    const english = englishOf(source, key);
+    if (english === undefined) {
       problems.push(`${where}: ${key} is not a key of English`);
       continue;
     }
     if (typeof message !== 'string') continue;
-    const wanted = placeholders(source[key]);
+    const wanted = placeholders(english);
+    const allowed = new Set([...wanted, ...familyPlaceholders(source, key)]);
     const written = placeholders(message);
     for (const name of wanted) {
       if (!written.has(name)) {
@@ -178,25 +196,12 @@ function localeProblems(source, catalog, where) {
       }
     }
     for (const name of written) {
-      if (!wanted.has(name)) {
+      if (!allowed.has(name)) {
         problems.push(`${where}: ${key} adds the placeholder {${name}}`);
       }
     }
   }
   return problems;
-}
-
-/**
- * The names a message fills in.
- * @param {string} message - The message.
- * @returns {Set<string>} Every `{name}` it writes.
- */
-function placeholders(message) {
-  const names = new Set();
-  for (const match of message.matchAll(PLACEHOLDER)) {
-    names.add(match.groups.name);
-  }
-  return names;
 }
 
 /**

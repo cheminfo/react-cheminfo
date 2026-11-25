@@ -1,4 +1,5 @@
 import { MISSING_VALUE } from './missing.ts';
+import { UNIT_SPACE } from './unitSpace.ts';
 
 const BYTE_UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'] as const;
 const BYTES_PER_UNIT = 1024;
@@ -6,6 +7,16 @@ const MILLISECONDS_PER_SECOND = 1000;
 const TENTHS_PER_MINUTE = 600;
 const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
+
+/** How {@link formatBytes} counts. */
+export interface FormatBytesOptions {
+  /**
+   * Bytes in a kilobyte, and kilobytes in a megabyte: 1 024 as a file system
+   * counts, or 1 000 as a download page and a model hub write their sizes.
+   * @default 1024
+   */
+  base?: 1000 | 1024;
+}
 
 /** How a duration is spelled. */
 export type DurationStyle = 'compact' | 'spaced';
@@ -15,7 +26,12 @@ const UNIT_NAMES: Record<
   { millisecond: string; second: string; minute: string; hour: string }
 > = {
   compact: { millisecond: 'ms', second: 's', minute: 'm', hour: 'h' },
-  spaced: { millisecond: ' ms', second: ' s', minute: ' min', hour: ' h' },
+  spaced: {
+    millisecond: `${UNIT_SPACE}ms`,
+    second: `${UNIT_SPACE}s`,
+    minute: `${UNIT_SPACE}min`,
+    hour: `${UNIT_SPACE}h`,
+  },
 };
 
 /** How {@link formatDuration} writes a duration. */
@@ -37,30 +53,36 @@ export interface FormatDurationOptions {
 
 /**
  * A byte count in the largest unit that keeps it under a thousand: `512 B`,
- * `1.5 kB`, `240 MB`.
+ * `1.5 kB`, `240 MB`, the number and its unit joined by a no-break space.
  *
  * Bytes are whole; every larger unit keeps one decimal until the number
  * reaches a hundred, where the decimal stops carrying information.
  * @param bytes - The size in bytes.
+ * @param options - See {@link FormatBytesOptions}.
  * @returns The size and its unit, or the missing marker when there is no finite, non-negative size.
  */
-export function formatBytes(bytes: number | undefined): string {
+export function formatBytes(
+  bytes: number | undefined,
+  options: FormatBytesOptions = {},
+): string {
   if (bytes === undefined || !Number.isFinite(bytes) || bytes < 0) {
     return MISSING_VALUE;
   }
+  const { base = BYTES_PER_UNIT } = options;
   let value = bytes;
   let unitIndex = 0;
-  while (value >= BYTES_PER_UNIT && unitIndex < BYTE_UNITS.length - 1) {
-    value /= BYTES_PER_UNIT;
+  while (value >= base && unitIndex < BYTE_UNITS.length - 1) {
+    value /= base;
     unitIndex += 1;
   }
   const digits = unitIndex === 0 || value >= 100 ? 0 : 1;
-  return `${value.toFixed(digits)} ${BYTE_UNITS[unitIndex] ?? 'B'}`;
+  return `${value.toFixed(digits)}${UNIT_SPACE}${BYTE_UNITS[unitIndex] ?? 'B'}`;
 }
 
 /**
  * A duration written with its two largest units: `45s`, `3m 20s`, `2h 05m`,
- * or `45 s`, `3 min 20 s`, `2 h 05 min` in the spaced style.
+ * or `45 s`, `3 min 20 s`, `2 h 05 min` in the spaced style, where each
+ * number and its unit are joined by a no-break space.
  * @param milliseconds - The duration in milliseconds.
  * @param options - See {@link FormatDurationOptions}.
  * @returns The duration, or the missing marker when there is no finite, non-negative duration.

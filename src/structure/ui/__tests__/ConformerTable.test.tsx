@@ -65,8 +65,8 @@ test('the population column is the Boltzmann share of the relative energies', ()
   const html = renderToStaticMarkup(<ConformerTable conformers={butane()} />);
 
   // 65 % anti, 17.5 % in each gauche well — the shares boltzmannShares gives.
-  expect(html).toContain('65.0 %');
-  expect(html).toContain('17.5 %');
+  expect(html).toContain('65.0\u00A0%');
+  expect(html).toContain('17.5\u00A0%');
 });
 
 test('the energies are labelled with a sign and the lowest reads as zero', () => {
@@ -81,7 +81,7 @@ test('a share too small to round is written as a bound, never as zero', () => {
     <ConformerTable conformers={[conformer(1, 0, 0), conformer(2, 20, 20)]} />,
   );
 
-  expect(html).toContain('&lt;0.1 %');
+  expect(html).toContain('&lt;0.1\u00A0%');
   expect(html).not.toContain('>0%<');
 });
 
@@ -107,7 +107,7 @@ test('the refined ranking reads the refined energies, not the force field ones',
   // GFN2 puts conformer 2 lowest, so it takes the larger share — the opposite
   // of what the force field said. Reading the wrong field would print 65 %.
   expect(html).toContain('+1.50');
-  expect(html).toContain('92.5 %');
+  expect(html).toContain('92.5\u00A0%');
   expect(html).not.toContain('+0.78');
 });
 

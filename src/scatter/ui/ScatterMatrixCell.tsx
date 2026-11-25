@@ -10,7 +10,7 @@ import { scatterMatrixDots } from './scatterMatrixDots.tsx';
 import {
   SCATTER_MATRIX_MARGINS as MARGINS,
   SCATTER_MATRIX_SHARE_IN_TITLE,
-  scatterMatrixTickCount,
+  scatterMatrixDomain,
 } from './scatterMatrixLayout.ts';
 import { scatterMatrixOutlines } from './scatterMatrixOutlines.tsx';
 
@@ -81,7 +81,7 @@ function frameProps(
   row: number,
   column: number,
 ): Omit<ChartFrameProps, 'children'> {
-  const { shown, side, axes, extents, spread, room } = grid;
+  const { shown, side, ticks, axes, extents, spread, room } = grid;
   const across = axes[column];
   const up = axes[row];
   const first = column === 0;
@@ -92,7 +92,6 @@ function frameProps(
     left: first ? room.left : MARGINS.left,
     bottom: last ? room.bottom : MARGINS.bottom,
   };
-  const ticks = scatterMatrixTickCount(side);
   const wide =
     side + MARGINS.right + MARGINS.left >= SCATTER_MATRIX_SHARE_IN_TITLE;
   const alongTitle = chartAxisTitle(across?.name ?? '', wide ? across : {});
@@ -102,7 +101,7 @@ function frameProps(
     height: side + MARGINS.top + margins.bottom,
     margins,
     x: {
-      domain: [extents[column]?.min ?? 0, extents[column]?.max ?? 1],
+      domain: scatterMatrixDomain(extents[column]),
       label: last ? alongTitle : undefined,
       showTicks: last,
       tickCount: ticks,
@@ -115,7 +114,7 @@ function frameProps(
             showGrid: false,
           }
         : {
-            domain: [extents[row]?.min ?? 0, extents[row]?.max ?? 1],
+            domain: scatterMatrixDomain(extents[row]),
             label: first ? upTitle : undefined,
             showTicks: first,
             tickCount: ticks,

@@ -103,8 +103,8 @@ test('the grid names each axis once along the foot and once up the side', () => 
   const html = render({});
 
   expect(html.match(new RegExp(TITLE_INK, 'gu'))).toHaveLength(7);
-  expect(html).toContain('>PC 1 — 73.0 %</text>');
-  expect(html).toContain('>PC 4 — 0.5 %</text>');
+  expect(html).toContain('>PC 1 — 73.0\u00A0%</text>');
+  expect(html).toContain('>PC 4 — 0.5\u00A0%</text>');
 });
 
 test('a cell too narrow for a share writes the component name alone', () => {
@@ -112,16 +112,16 @@ test('a cell too narrow for a share writes the component name alone', () => {
 
   expect(html).toContain('>PC 1</text>');
   expect(html).toContain('>PC 3</text>');
-  expect(html).not.toContain('— 73.0 %');
-  expect(html).not.toContain('>73.0 %</text>');
+  expect(html).not.toContain('— 73.0\u00A0%');
+  expect(html).not.toContain('>73.0\u00A0%</text>');
 });
 
 test('a diagonal carries its axis in one corner and its share in the other', () => {
   const html = render({});
 
   expect(html.match(/font-size:10px;font-variant-numeric/gu)).toHaveLength(4);
-  expect(html).toContain('>73.0 %</text>');
-  expect(html).toContain('>0.5 %</text>');
+  expect(html).toContain('>73.0\u00A0%</text>');
+  expect(html).toContain('>0.5\u00A0%</text>');
   expect(html).toContain('>PC 3</text>');
 });
 

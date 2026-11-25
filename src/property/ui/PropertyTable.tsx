@@ -1,13 +1,20 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import { ClickToCopy } from '../../clipboard/ui/ClickToCopy.tsx';
-import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { copyableText } from '../core/copyableText.ts';
+
+import { PropertySection } from './PropertySection.tsx';
 
 /** One row of a {@link PropertyTable}. */
 export interface PropertyRow {
-  /** What the row is called. */
+  /** What the row is called, and the name its copy target carries. */
   label: string;
+  /**
+   * What the row's heading cell shows when it must differ from the label as
+   * text: a range of numbers kept on one line, for instance.
+   * @default the label
+   */
+  labelContent?: ReactNode;
   /** The value, already formatted: text, a number, or a drawn element. */
   value: ReactNode;
   /**
@@ -30,6 +37,18 @@ export interface PropertyTableProps {
    * @default undefined — no heading
    */
   title?: string;
+  /**
+   * The heading is a name — a file, an identifier, a step — written as it
+   * is, rather than a label set in small capitals.
+   * @default false
+   */
+  titleAsWritten?: boolean;
+  /**
+   * What stands between the heading and the rows and speaks for the whole
+   * group: a badge, a note, an action.
+   * @default undefined — nothing
+   */
+  lead?: ReactNode;
   /** The rows, in the order they are read. */
   rows: readonly PropertyRow[];
   /**
@@ -42,16 +61,21 @@ export interface PropertyTableProps {
 /**
  * One group of properties as a two-column table, each value its own copy
  * target: a mass, a formula or an identifier is taken away with one click, and
- * a row with no value is drawn as a plain cell.
+ * a row with no value is drawn as a plain cell; what speaks for the whole
+ * group stands under its heading.
  * @param props - The heading and the rows.
  * @returns The group.
  */
 export function PropertyTable(props: PropertyTableProps): ReactElement {
-  const { title, rows, className } = props;
+  const { title, lead, rows, className, titleAsWritten = false } = props;
   return (
-    <section className={joinClassNames('properties', className)}>
-      {title === undefined ? null : (
-        <h3 className="properties__title">{title}</h3>
+    <PropertySection
+      title={title}
+      titleAsWritten={titleAsWritten}
+      className={className}
+    >
+      {lead === undefined ? null : (
+        <div className="properties__lead">{lead}</div>
       )}
       <table className="properties__table">
         <tbody>
@@ -60,7 +84,7 @@ export function PropertyTable(props: PropertyTableProps): ReactElement {
             return (
               <tr key={row.label}>
                 <th scope="row">
-                  {row.label}
+                  {row.labelContent ?? row.label}
                   {row.note === undefined ? null : (
                     <span className="properties__note">{row.note}</span>
                   )}
@@ -78,6 +102,6 @@ export function PropertyTable(props: PropertyTableProps): ReactElement {
           })}
         </tbody>
       </table>
-    </section>
+    </PropertySection>
   );
 }

@@ -89,9 +89,11 @@ test('the unit follows each end value, and the label is written before them', ()
   );
 
   expect(html).toContain('>Molar mass</span>');
-  expect(html).toContain('>1 g/mol</span>');
-  expect(html).toContain('>10 g/mol</span>');
-  expect(html).toContain('aria-label="Molar mass from 1 g/mol to 10 g/mol"');
+  expect(html).toContain('>1\u00A0g/mol</span>');
+  expect(html).toContain('>10\u00A0g/mol</span>');
+  expect(html).toContain(
+    'aria-label="Molar mass from 1\u00A0g/mol to 10\u00A0g/mol"',
+  );
 });
 
 test('with no label the scale still says what it is to a screen reader', () => {

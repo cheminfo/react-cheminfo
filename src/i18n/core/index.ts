@@ -14,7 +14,18 @@ export type {
   TranslateOptions,
 } from './messageCatalog.ts';
 export { MessageCatalog } from './messageCatalog.ts';
+export type { ListFormatters } from './listFormatters.ts';
+export { listFormatters } from './listFormatters.ts';
 export type { MessageValues } from './messageValues.ts';
+export {
+  PLURAL_CATEGORIES,
+  PLURAL_SEPARATOR,
+  PLURAL_VALUE,
+  pluralBranch,
+  pluralCategory,
+  pluralFamily,
+  pluralOther,
+} from './plural.ts';
 export type { Translate } from './translate.ts';
 export { catalogTranslate } from './translate.ts';
 export type { ProsePiece } from './prose.ts';

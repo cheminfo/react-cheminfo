@@ -59,7 +59,6 @@ export {
   SCATTER_LABEL_SIZE,
   labelBoxHeight,
   labelBoxWidth,
-  labelBoxesOverlap,
 } from './scatterLabelBoxes.ts';
 export type { ScatterLabelInk, ScatterPixelLabel } from './scatterLabels.ts';
 export { scatterGroupLabels, scatterPointLabels } from './scatterLabels.ts';
@@ -78,6 +77,7 @@ export {
   SCATTER_MATRIX_SMALLEST_PLOT,
   scatterMatrixAxesThatFit,
   scatterMatrixPlotSide,
+  scatterMatrixRoom,
   scatterMatrixTickCount,
 } from './scatterMatrixLayout.ts';
 export { scatterMatrixOutlines } from './scatterMatrixOutlines.tsx';

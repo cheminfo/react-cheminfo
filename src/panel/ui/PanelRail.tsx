@@ -11,6 +11,9 @@ import type { IconName, MaybeElement } from '@blueprintjs/core';
 import type { ReactNode } from 'react';
 import { ActivityBar } from 'react-science/ui';
 
+import { HelpBody } from '../../help/ui/HelpBody.tsx';
+import { useHelpCards } from '../../help/ui/useHelpCards.ts';
+
 /**
  * One panel the rail can open.
  *
@@ -46,6 +49,7 @@ export function PanelRail<TId extends string>(
   props: PanelRailProps<TId>,
 ): ReactNode {
   const { panels, openIds, onToggle } = props;
+  const help = useHelpCards();
 
   return (
     <ActivityBar>
@@ -58,7 +62,10 @@ export function PanelRail<TId extends string>(
           data-panel-id={panel.id}
           key={panel.id}
           icon={panel.icon}
-          tooltip={panel.title}
+          // The family's help card rather than Blueprint's dark slab, opening
+          // as every help of the family does.
+          tooltip={<HelpBody content={{ title: panel.title }} />}
+          tooltipProps={help(panel.id)}
           // A tooltip is not an accessible name: without this every toggle is
           // an icon-only button with no name at all.
           aria-label={panel.title}

@@ -60,6 +60,13 @@ export interface OverlayBarShapeProps {
   /** Whether the bar has folded its controls away behind that button. */
   folded: boolean;
   /**
+   * Whether a stretched bar also folds its far end on its own once its row no
+   * longer holds every control at its own width: only a bar whose caller left
+   * the folding to it. A card ignores it.
+   * @default false
+   */
+  foldsWhenCrowded?: boolean;
+  /**
    * How a stretched bar's controls are drawn while nothing points at the
    * figure.
    * @default 'visible'

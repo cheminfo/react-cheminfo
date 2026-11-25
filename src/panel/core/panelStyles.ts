@@ -44,7 +44,7 @@ export const shortPanelStyle = {
  */
 export const panelToolbarStyle = {
   display: 'flex',
-  borderBottom: '1px solid rgb(217 223 230)',
+  borderBottom: '1px solid var(--border)',
 } as const;
 
 /**
@@ -110,10 +110,10 @@ export const panelStickyHeaderStyle = {
   position: 'sticky',
   top: 0,
   zIndex: 1,
-  background: 'rgb(255 255 255)',
+  background: 'var(--surface)',
   textAlign: 'left',
   padding: 0,
-  borderBottom: '1px solid rgb(217 223 230)',
+  borderBottom: '1px solid var(--border)',
 } as const;
 
 /** The same heading when it is plain text, which has to pad itself. */

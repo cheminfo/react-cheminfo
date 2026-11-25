@@ -88,9 +88,9 @@ test('every sample is one dot inside a twelve-edged box', () => {
 test('the frame names all three components, shares and all', () => {
   const html = draw();
 
-  expect(html).toContain('>PC1 — 73.0 %</text>');
-  expect(html).toContain('>PC2 — 22.9 %</text>');
-  expect(html).toContain('>PC3 — 3.7 %</text>');
+  expect(html).toContain('>PC1 — 73.0\u00A0%</text>');
+  expect(html).toContain('>PC2 — 22.9\u00A0%</text>');
+  expect(html).toContain('>PC3 — 3.7\u00A0%</text>');
 });
 
 test('each group gets a glass shell', () => {
@@ -130,9 +130,9 @@ test('the third axis is never one already drawn', () => {
   // one still free rather than drawing a component against itself.
   const html = draw({ options: { zAxis: 0 } });
 
-  expect(html).toContain('>PC1 \u2014 73.0 %</text>');
-  expect(html).toContain('>PC2 \u2014 22.9 %</text>');
-  expect(html).toContain('>PC3 \u2014 3.7 %</text>');
+  expect(html).toContain('>PC1 \u2014 73.0\u00A0%</text>');
+  expect(html).toContain('>PC2 \u2014 22.9\u00A0%</text>');
+  expect(html).toContain('>PC3 \u2014 3.7\u00A0%</text>');
 });
 
 test('the key names the groups and counts them, as it does on the map', () => {

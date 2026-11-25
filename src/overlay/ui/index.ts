@@ -47,6 +47,18 @@ export type {
   OverlayReadoutRow,
 } from './OverlayReadout.tsx';
 export { OverlayReadout } from './OverlayReadout.tsx';
+export type { ReadoutCardProps, ReadoutCardRow } from './ReadoutCard.tsx';
+export { ReadoutCard } from './ReadoutCard.tsx';
+export { CARD_FRAME_STYLE } from './overlayFigureStyles.ts';
+export type {
+  MeasuredPlacement,
+  MeasuredPlacementOptions,
+  PlaceMeasuredCard,
+} from './useMeasuredPlacement.ts';
+export {
+  useMeasuredPlace,
+  useMeasuredPlacement,
+} from './useMeasuredPlacement.ts';
 export type {
   OverlayControlProps,
   OverlayOption,

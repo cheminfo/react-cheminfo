@@ -48,6 +48,7 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
     contact,
     belowHeader,
     mainClassName,
+    fillWindow = false,
     mainTestId,
     mainElement: Main = 'main',
     footer = {},
@@ -65,7 +66,12 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
       ) : (
         <SiteTheme siteId={siteId} />
       )}
-      <div className="site-shell">
+      <div
+        className={joinClassNames(
+          'site-shell',
+          fillWindow ? 'site-shell--window' : undefined,
+        )}
+      >
         <SiteHeader
           siteId={siteId}
           site={site}

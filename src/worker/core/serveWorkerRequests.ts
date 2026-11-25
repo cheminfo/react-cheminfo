@@ -1,5 +1,8 @@
 import { errorMessage } from '../../error/core/toError.ts';
 
+import { yieldToBrowser } from './chunks.ts';
+import { CancelledRequestError } from './errors.ts';
+import { HandOver } from './handOver.ts';
 import type {
   WorkerProgressMessage,
   WorkerResponseMessage,
@@ -33,10 +36,11 @@ export interface ServeWorkerRequestsOptions<TRequest, TResponse> {
   accepts?: (request: unknown) => request is TRequest;
   /**
    * The buffers of an answer to hand over rather than copy, e.g. the grid of
-   * a sampled orbital.
+   * a sampled orbital. It is handed the request the answer answers too, so a
+   * worker serving several kinds of request lists each kind's buffers.
    * @default undefined — every answer is copied
    */
-  transfer?: (response: TResponse) => Transferable[];
+  transfer?: (response: TResponse, request: TRequest) => Transferable[];
   /**
    * What a failed answer carries besides its message, for the page's channel
    * to word the failure in its own language — the key of a translatable
@@ -53,8 +57,12 @@ export interface ServeWorkerRequestsOptions<TRequest, TResponse> {
  *
  * The handler receives a signal that is aborted when the page sends the cancel
  * message of a `cooperativeCancel` channel, and a `reportProgress` that posts
- * news the caller's `onProgress` receives. A failure travels back as its
- * message. Called in a module that the page also imports for its in-process
+ * news the caller's `onProgress` receives. A job starts once the messages the
+ * page sent before it have been read, so a request cancelled while the worker
+ * was busy is answered with a cancellation and its handler never runs. A failure travels back as its
+ * message. A handler that knows its answer's buffers returns `handOver(answer,
+ * buffers)`: the answer is posted with them handed over, and `transfer` is not
+ * asked. Called in a module that the page also imports for its in-process
  * fallback, it attaches nothing there, because that scope is not a worker's.
  * @param handler - Runs one job; may be async.
  * @param options - See {@link ServeWorkerRequestsOptions}.
@@ -64,7 +72,8 @@ export function serveWorkerRequests<TRequest, TResponse, TProgress = never>(
   handler: (
     request: TRequest,
     context: WorkerJobContext<TProgress>,
-  ) => TResponse | Promise<TResponse>,
+  ) =>
+    TResponse | HandOver<TResponse> | Promise<TResponse | HandOver<TResponse>>,
   options: ServeWorkerRequestsOptions<TRequest, TResponse> = {},
 ): boolean {
   const { accepts, transfer, detail } = options;
@@ -100,11 +109,35 @@ export function serveWorkerRequests<TRequest, TResponse, TProgress = never>(
       },
     };
 
-    void Promise.resolve()
-      .then(() => handler(request as TRequest, context))
+    // A job starts once the messages already sent to the worker are read: a
+    // request the page cancelled while the worker was busy never runs.
+    void yieldToBrowser()
+      .then(() => {
+        if (controller.signal.aborted) {
+          throw new CancelledRequestError(
+            `request ${id} was cancelled before it started`,
+          );
+        }
+        return handler(request as TRequest, context);
+      })
       .then(
-        (response) => {
-          answer(scope, { id, ok: true, response }, transfer);
+        (result) => {
+          if (result instanceof HandOver) {
+            const listed = [...result.transfer];
+            answer(
+              scope,
+              { id, ok: true, response: result.response },
+              () => listed,
+            );
+            return;
+          }
+          answer(
+            scope,
+            { id, ok: true, response: result },
+            transfer === undefined
+              ? undefined
+              : (answered) => transfer(answered, request as TRequest),
+          );
         },
         (error: unknown) => {
           const message = errorMessage(error);

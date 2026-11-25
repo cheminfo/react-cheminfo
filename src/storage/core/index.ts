@@ -17,13 +17,18 @@ export type {
 export { createSiteBackup } from './siteBackup.ts';
 export type { Autosave, AutosaveOptions } from './createAutosave.ts';
 export { createAutosave } from './createAutosave.ts';
+export type { DocumentManifest } from './documentManifest.ts';
+export { readArchiveManifest } from './documentManifest.ts';
 export type { RestoreGuard } from './createRestoreGuard.ts';
 export { createRestoreGuard } from './createRestoreGuard.ts';
 export type { TabClaims } from './createTabClaims.ts';
 export { createTabClaims } from './createTabClaims.ts';
+export { openCacheStore } from './openCacheStore.ts';
 export type { SiteDatabase, SiteDatabaseOptions } from './openSiteDatabase.ts';
 export { openSiteDatabase } from './openSiteDatabase.ts';
 export type { StorageUsage } from './persistentStorage.ts';
+export type { StoreRefusalReason } from './storeRefusal.ts';
+export { StoreRefusal, isStoreRefusal, refusingWrite } from './storeRefusal.ts';
 export { requestPersistentStorage, storageUsage } from './persistentStorage.ts';
 export { watchPageLeave } from './watchPageLeave.ts';
 export { createWorkspaces } from './createWorkspaces.ts';

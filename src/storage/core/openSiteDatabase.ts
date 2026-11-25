@@ -3,6 +3,8 @@ import { openDB } from 'idb';
 
 import { toError } from '../../error/core/toError.ts';
 
+import { StoreRefusal } from './storeRefusal.ts';
+
 /** What {@link openSiteDatabase} opens, and how it is laid out. */
 export interface SiteDatabaseOptions<TSchema extends DBSchema | unknown> {
   /** The database's name, the same on every visit: the data is found by it. */
@@ -38,7 +40,8 @@ export interface SiteDatabase<TSchema extends DBSchema | unknown> {
  * An upgrade blocked by another tab rejects instead of waiting forever. When
  * another tab asks for a newer version, this connection closes so that tab can
  * proceed, and the next `open` reconnects. A browser that refuses storage —
- * synchronously, as Safari does — rejects like any other failure, so a page can
+ * synchronously, as Safari does — rejects with an `unavailable`
+ * {@link StoreRefusal}, a blocked upgrade with a `blocked` one, so a page can
  * keep working and simply save nothing.
  * @param options - See {@link SiteDatabaseOptions}.
  * @returns The database. Nothing is opened until `open` is first called.
@@ -64,7 +67,8 @@ export function openSiteDatabase<TSchema extends DBSchema | unknown = unknown>(
           blocked: () => {
             settled = true;
             reject(
-              new Error(
+              new StoreRefusal(
+                'blocked',
                 `${name} is open at an older version in another tab: close it, then reload this one`,
               ),
             );
@@ -80,7 +84,7 @@ export function openSiteDatabase<TSchema extends DBSchema | unknown = unknown>(
           },
         });
       } catch (error) {
-        reject(toError(error));
+        reject(unavailable(error));
         return;
       }
       request.then(
@@ -90,7 +94,7 @@ export function openSiteDatabase<TSchema extends DBSchema | unknown = unknown>(
           else resolve(db);
         },
         (error: unknown) => {
-          reject(toError(error));
+          reject(unavailable(error));
         },
       );
     });
@@ -120,4 +124,11 @@ export function openSiteDatabase<TSchema extends DBSchema | unknown = unknown>(
       );
     },
   };
+}
+
+// The browser refusing to open the database: its own error kept as the cause.
+function unavailable(error: unknown): StoreRefusal {
+  return new StoreRefusal('unavailable', toError(error).message, {
+    cause: error,
+  });
 }

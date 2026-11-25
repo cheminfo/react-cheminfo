@@ -9,3 +9,5 @@ export {
   settleHandles,
 } from './rangeBounds.ts';
 export { rangeHistogramPath } from './rangeHistogram.ts';
+export type { SliderKey, SliderKeySteps } from './sliderKey.ts';
+export { sliderKeyValue } from './sliderKey.ts';

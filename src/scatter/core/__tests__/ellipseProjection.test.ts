@@ -124,6 +124,17 @@ test('the sampled outline starts on the major axis and never repeats itself', ()
   ]);
 });
 
+test('an outline is drawn from the centre, the axes and the angle alone', () => {
+  const outline = ellipsePolygon({ cx: 0, cy: 0, rx: 2, ry: 1, angle: 0 }, 4);
+
+  expect(outline).toStrictEqual([
+    { x: 2, y: 0 },
+    { x: expect.closeTo(0, 12), y: 1 },
+    { x: -2, y: expect.closeTo(0, 12) },
+    { x: expect.closeTo(0, 12), y: -1 },
+  ]);
+});
+
 test('a sampled outline is given at least three points', () => {
   expect(ellipsePolygon(CLOUD, 1)).toHaveLength(3);
   expect(ellipsePolygon(CLOUD, 0)).toHaveLength(3);

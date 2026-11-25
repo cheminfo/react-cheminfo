@@ -2,6 +2,7 @@ import { Callout } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
 import { CodeBlock } from '../../clipboard/ui/CodeBlock.tsx';
+import { listFormatters } from '../../i18n/core/listFormatters.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
@@ -40,9 +41,9 @@ export function MoleculesTokenFix(
   if (toFix.length === 0) return null;
 
   const one = toFix.length === 1;
-  const variables = new Intl.ListFormat(language, {
-    type: 'conjunction',
-  }).format(toFix.map((check) => check.variable));
+  const variables = listFormatters(language).names(
+    toFix.map((check) => check.variable),
+  );
   const admin = `${trimTrailingSlash(moleculesUrl)}/admin`;
   const unsetOnly = toFix.every((check) => check.verdict === 'unset');
 

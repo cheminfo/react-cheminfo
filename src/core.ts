@@ -11,6 +11,42 @@ export * from './contact/core/index.ts';
 export * from './credits/core/index.ts';
 export * from './delimited/core/index.ts';
 export * from './download/core/index.ts';
+export * from './dropzone/core/index.ts';
+// The framework-free geometry of the drawing plane, so a worker can turn,
+// bound, hit and measure points without loading the editor that
+// `react-cheminfo/drawing` exports.
+export {
+  boundsOf,
+  boxContains,
+  boxCorners,
+  boxEdges,
+  boxFromCorners,
+  clampToBox,
+  distanceToSegment,
+  edgesOverlap,
+  polygonContains,
+  signedArea,
+} from './drawing/core/geometry.ts';
+// The halo a mark is drawn over, for a picture painted where no SVG is.
+export { HALO, haloStrokeWidth, haloText } from './drawing/core/halo.ts';
+export type { PixelSize } from './drawing/core/pixels.ts';
+export { coveredPixels } from './drawing/core/pixels.ts';
+export type { Edges } from './drawing/core/types.ts';
+export { pictureCorners } from './drawing/core/pictures.ts';
+export { turnAbout } from './drawing/core/vectors.ts';
+export type {
+  InterfaceTextKind,
+  InterfaceTextOptions,
+} from './drawing/render/interfaceText.ts';
+export {
+  INTERFACE_FACE_SLACK,
+  INTERFACE_FONT,
+  interfaceTextWidth,
+} from './drawing/render/interfaceText.ts';
+export { textWidth } from './drawing/render/metrics.ts';
+// The checks a value read from a file or a message goes through before it is
+// trusted, for a worker as for the page.
+export { arrayOf, isFiniteNumber, isRecord } from './drawing/core/values.ts';
 export * from './ecosystem/core/index.ts';
 export * from './error/core/index.ts';
 export * from './fetch/core/index.ts';
@@ -46,6 +82,7 @@ export * from './state/core/index.ts';
 // Framework-free molfile and editor-value helpers, so a worker can read a
 // molfile without loading the editor that `react-cheminfo/structure` exports.
 export * from './structure/core/index.ts';
+export * from './task/core/index.ts';
 export * from './taxonomy/core/index.ts';
 export * from './tokens/core/index.ts';
 export * from './worker/core/index.ts';

@@ -4,6 +4,8 @@
  * a list of peaks picked off one.
  */
 
+export type { BinChartProps, BinReadout } from './BinChart.tsx';
+export { BinChart } from './BinChart.tsx';
 export type { ChartAxisProps } from './ChartAxis.tsx';
 export type { WheelZoomApi, WheelZoomOptions } from './useWheelZoom.ts';
 export { CHART_WHEEL_DWELL, useWheelZoom } from './useWheelZoom.ts';
@@ -12,10 +14,12 @@ export type {
   ChartAxisSpec,
   ChartFrameProps,
   ChartFrameRender,
+  ChartFrameSvgProps,
   ChartMargins,
   ChartPlotArea,
 } from './ChartFrame.tsx';
 export { ChartFrame } from './ChartFrame.tsx';
+export { useChartFrame } from './chartFrameContext.ts';
 export { chartFrameGeometry } from './chartFrameGeometry.ts';
 export type { ChartSeriesMarksProps } from './ChartSeriesMarks.tsx';
 export { ChartSeriesMarks } from './ChartSeriesMarks.tsx';

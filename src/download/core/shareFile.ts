@@ -9,6 +9,8 @@
  * press hands it over at once, before anything is awaited.
  */
 
+import { isAbortError } from '../../error/core/abort.ts';
+
 /** What became of a file handed to the share sheet. */
 export type ShareOutcome =
   /** An app took it. */
@@ -51,7 +53,7 @@ export async function shareFile(file: File): Promise<ShareOutcome> {
     await navigator.share({ files: [shared] });
     return 'sent';
   } catch (error) {
-    if (isDomError(error, 'AbortError')) return 'cancelled';
+    if (isAbortError(error)) return 'cancelled';
     if (isDomError(error, 'NotAllowedError')) return 'expired';
     throw error;
   }
@@ -80,6 +82,7 @@ function isDomError(error: unknown, name: string): boolean {
   return (
     typeof error === 'object' &&
     error !== null &&
-    (error as { name?: unknown }).name === name
+    'name' in error &&
+    error.name === name
   );
 }

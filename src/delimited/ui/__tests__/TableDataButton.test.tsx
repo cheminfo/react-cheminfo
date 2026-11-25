@@ -107,3 +107,19 @@ test('a caller whose chrome is not Blueprint supplies the trigger instead', () =
   expect(html).toContain('Take the table');
   expect(html).not.toContain('<button');
 });
+
+test('the default button is named for a screen reader and carries no native tooltip', () => {
+  const html = renderToStaticMarkup(<TableDataButton rows={ROWS} />);
+
+  expect(html).toContain('aria-label="Copy or download data"');
+  expect(html).not.toContain('title=');
+});
+
+test('a site naming the affordance names the button by it', () => {
+  const html = renderToStaticMarkup(
+    <TableDataButton rows={ROWS} tooltip="Peak table" />,
+  );
+
+  expect(html).toContain('aria-label="Peak table"');
+  expect(html).not.toContain('title=');
+});

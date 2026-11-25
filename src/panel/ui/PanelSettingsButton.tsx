@@ -1,6 +1,8 @@
 import type { ReactElement } from 'react';
 import { Toolbar } from 'react-science/ui';
 
+import { HelpBody } from '../../help/ui/HelpBody.tsx';
+import { useHelpCards } from '../../help/ui/useHelpCards.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 
 import type { PanelSettings } from './usePanelSettings.ts';
@@ -18,7 +20,9 @@ export interface PanelSettingsButtonProps extends PanelSettings {
  * says what it does to them.
  *
  * Fed by `usePanelSettings`, which remembers the settings on opening
- * and puts them back on cancelling.
+ * and puts them back on cancelling. Each button's help is the family's help
+ * card, opening as every help card does (`useHelpCards`): the cross that
+ * takes the gear's place under a pointer standing still stays silent.
  * @param props - See {@link PanelSettingsButtonProps}.
  * @returns The toolbar.
  */
@@ -27,6 +31,7 @@ export function PanelSettingsButton(
 ): ReactElement {
   const { panel, isOpen, onOpen, onConfirm, onCancel } = props;
   const t = useChromeT();
+  const help = useHelpCards();
   return (
     <div className="no-print" style={{ display: 'contents' }}>
       <Toolbar aria-label={t('panel.settingsToolbar', { panel })}>
@@ -35,14 +40,22 @@ export function PanelSettingsButton(
             <Toolbar.Item
               icon="tick"
               intent="success"
-              tooltip={t('panel.settingsKeepTooltip')}
+              tooltip={
+                <HelpBody content={{ title: t('panel.settingsKeepTooltip') }} />
+              }
+              tooltipProps={help('keep')}
               aria-label={t('panel.settingsKeep', { panel })}
               onClick={onConfirm}
             />
             <Toolbar.Item
               icon="cross"
               intent="danger"
-              tooltip={t('panel.settingsCancelTooltip')}
+              tooltip={
+                <HelpBody
+                  content={{ title: t('panel.settingsCancelTooltip') }}
+                />
+              }
+              tooltipProps={help('cancel')}
               aria-label={t('panel.settingsCancel', { panel })}
               onClick={onCancel}
             />
@@ -50,7 +63,10 @@ export function PanelSettingsButton(
         ) : (
           <Toolbar.Item
             icon="cog"
-            tooltip={t('panel.settingsTooltip')}
+            tooltip={
+              <HelpBody content={{ title: t('panel.settingsTooltip') }} />
+            }
+            tooltipProps={help('settings')}
             aria-label={t('panel.settings', { panel })}
             onClick={onOpen}
           />

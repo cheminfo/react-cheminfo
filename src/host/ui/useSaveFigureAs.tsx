@@ -15,6 +15,7 @@ import {
 import { FIGURE_SVG_TYPE } from '../../download/core/figureSvg.ts';
 import { errorMessage } from '../../error/core/toError.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import type { ArchiveEntry } from '../../storage/core/backupFiles.ts';
 import {
   siteDocumentExtension,
   siteDocumentName,
@@ -42,10 +43,33 @@ export interface SaveFigureAsOptions {
    */
   workspace?: () => Record<string, unknown>;
   /**
+   * The site's other files, written into the document after the figure — what
+   * the site's own Save writes, so Save as keeps the same document. The SVG
+   * saved alone carries none of them.
+   * @returns The files, each at the path it is unzipped to.
+   * @default undefined — the figure is the document's only data
+   */
+  data?: () => Promise<readonly ArchiveEntry[]>;
+  /**
+   * Files the document carries beside its data, kept under `files/`: copies
+   * for whoever unzips it, such as a table. The SVG saved alone carries none.
+   * @returns The files, each at its path inside `files/`.
+   * @default undefined — the document carries none
+   */
+  attachments?: () => Promise<readonly ArchiveEntry[]>;
+  /**
    * The build that writes the document, e.g. `3d.cheminfo.org 1.4.0`.
    * @default undefined
    */
   generator?: string;
+  /**
+   * Told once the file is handed to the browser, with the name chosen, without
+   * its extension, and what was saved: a site marks the document it wrote as
+   * saved. Never told of a cancel, of a failure, or while there is nothing to
+   * save.
+   * @default undefined
+   */
+  onSaved?: (choice: { name: string; format: 'svg' | 'document' }) => void;
 }
 
 /** What {@link useSaveFigureAs} gives a site. */
@@ -59,13 +83,15 @@ export interface SaveFigureAs {
 /**
  * Save as, the same way on every site of the family: the site's own SVG,
  * which opens here again and anywhere as a picture, is offered first; the
- * site's document, `.<site>.zip`, holds the same figure and the workspace
- * beside it.
+ * site's document, `.<site>.zip`, holds the same figure, the site's other
+ * files and the workspace beside it.
  * @param options - See {@link SaveFigureAsOptions}.
  * @returns The opener, and the dialog to render beside it.
  */
 export function useSaveFigureAs(options: SaveFigureAsOptions): SaveFigureAs {
-  const { site, figure, stem, workspace, generator } = options;
+  const { site, figure, stem, workspace, data, attachments, generator } =
+    options;
+  const { onSaved } = options;
   const t = useChromeT();
   const [initial, setInitial] = useState<SaveDocumentChoice | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
@@ -90,6 +116,7 @@ export function useSaveFigureAs(options: SaveFigureAsOptions): SaveFigureAs {
     const figureName = siteFigureName(choice.name, site);
     if (choice.format === 'svg') {
       downloadBlob(new Blob([svg], { type: FIGURE_SVG_TYPE }), figureName);
+      onSaved?.({ name: choice.name, format: 'svg' });
       return;
     }
     const kept =
@@ -102,11 +129,20 @@ export function useSaveFigureAs(options: SaveFigureAsOptions): SaveFigureAs {
             },
           }
         : {};
+    const [files, carried] = await Promise.all([
+      data?.() ?? [],
+      attachments?.() ?? [],
+    ]);
     const document = await writeSiteDocument(
-      { data: [{ path: figureName, content: svg }], ...kept },
+      {
+        data: [{ path: figureName, content: svg }, ...files],
+        attachments: carried,
+        ...kept,
+      },
       { site, ...(generator ? { generator } : {}) },
     );
     downloadBlob(document, siteDocumentName(choice.name, site));
+    onSaved?.({ name: choice.name, format: 'document' });
   }
 
   const dialog = (

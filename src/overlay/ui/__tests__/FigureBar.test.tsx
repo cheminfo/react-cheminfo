@@ -46,9 +46,10 @@ test('a figure bar reads its settings from the left and keeps the glyphs right',
 
   expect(scale).toBeLessThan(colour);
   expect(colour).toBeLessThan(save);
-  // The settings and the glyphs are the two sides of one group set apart.
+  // The settings and the glyphs are the two sides of one group set apart,
+  // which never gives up its own width to the start.
   expect(html).toContain(
-    'flex:1 1 auto;align-items:center;justify-content:space-between',
+    'flex:1 0 auto;align-items:center;justify-content:space-between',
   );
   expect(html).toMatch(
     /<span>Colour by<\/span><\/div><div style="[^"]*"><span>Save<\/span>/,

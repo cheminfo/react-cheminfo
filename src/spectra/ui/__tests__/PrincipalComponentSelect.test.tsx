@@ -28,9 +28,11 @@ test('an option is valued with the zero-based column while its label says PC1', 
     />,
   );
 
-  expect(html).toContain('<option value="0" selected="">PC1 — 74.2 %</option>');
-  expect(html).toContain('<option value="1">PC2 — 18.3 %</option>');
-  expect(html).toContain('<option value="2">PC3 — 4.5 %</option>');
+  expect(html).toContain(
+    '<option value="0" selected="">PC1 — 74.2\u00A0%</option>',
+  );
+  expect(html).toContain('<option value="1">PC2 — 18.3\u00A0%</option>');
+  expect(html).toContain('<option value="2">PC3 — 4.5\u00A0%</option>');
 });
 
 test('the shares of the two picked components are added up in one line', () => {

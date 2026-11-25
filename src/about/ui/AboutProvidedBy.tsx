@@ -2,6 +2,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import type { Language } from '../../i18n/core/languages.ts';
+import { listFormatters } from '../../i18n/core/listFormatters.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
@@ -114,7 +115,7 @@ function roleOf(
       works.length === 0
         ? t('about.role.tooling')
         : t('about.role.toolingAnd', {
-            works: new Intl.ListFormat(language).format(works),
+            works: listFormatters(language).names(works),
           });
   }
   return <RoleText text={text} organisation={organisation} />;

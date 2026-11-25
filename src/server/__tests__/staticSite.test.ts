@@ -81,6 +81,13 @@ test('a page the browser holds is answered with a 304', async () => {
   expect(again.body).toBe('');
 });
 
+test("a page's tag is the start of the SHA-256 of what is served", async () => {
+  const app = await site();
+  const response = await app.inject({ url: '/titration' });
+
+  expect(response.headers.etag).toBe('"1709f62030af03367e0a51fc"');
+});
+
 test('a hashed bundle is kept for a year, any other file is revalidated', async () => {
   const app = await site();
   const bundle = await app.inject({ url: '/assets/index-a1b2.js' });

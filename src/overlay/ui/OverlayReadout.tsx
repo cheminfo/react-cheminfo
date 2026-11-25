@@ -1,14 +1,13 @@
 import type { CSSProperties, ReactElement } from 'react';
-import { useRef } from 'react';
-import { Button } from 'react-science/ui';
 
-import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
-import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
-import { placeOverlayCard } from '../core/placeOverlayCard.ts';
+import type { OverlayCardPlacementOptions } from '../core/placeOverlayCard.ts';
 
-import { overlayReadoutStyle } from './overlayFigureStyles.ts';
+import type { ReadoutCardRow } from './ReadoutCard.tsx';
+import { ReadoutCard } from './ReadoutCard.tsx';
+import { READOUT_PLACE_STYLE } from './overlayFigureStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
+import { useMeasuredPlacement } from './useMeasuredPlacement.ts';
 
 /** One line of an {@link OverlayReadout}. */
 export interface OverlayReadoutRow {
@@ -33,6 +32,13 @@ export interface OverlayReadoutProps {
   boxWidth: number;
   /** Height of the figure. */
   boxHeight: number;
+  /**
+   * Width of the mark's box from `x` rightwards, for a card anchored to a mark
+   * rather than following the pointer: it opens beside the box and flips to
+   * the box's other side (`placeOverlayCard`).
+   * @default 0 — the card follows the pointer
+   */
+  anchorWidth?: number;
   /** The first line, in bold — normally what the reader pointed at. */
   title: string;
   /** Everything the caller knows about it, in the caller's own order. */
@@ -59,11 +65,18 @@ export interface OverlayReadoutProps {
    * @default undefined
    */
   testId?: string;
+  /**
+   * Another card on the figure this one keeps clear of — a loupe beside the
+   * pointer, say (`placeOverlayCard`'s `avoid`).
+   * @default undefined — nothing to keep clear of
+   */
+  avoid?: OverlayCardPlacementOptions['avoid'];
 }
 
 /**
  * The card that follows the pointer and says everything known about the mark
- * under it.
+ * under it: the family's designed card (`ReadoutCard`), placed by its size as
+ * drawn (`useMeasuredPlacement`) — hidden until it has been measured once.
  *
  * It follows the pointer rather than anchoring to the mark, because a
  * nearest-within-radius hit test changes which mark it names while the pointer
@@ -78,63 +91,47 @@ export function OverlayReadout(props: OverlayReadoutProps): ReactElement {
     y,
     boxWidth,
     boxHeight,
+    anchorWidth = 0,
     title,
     rows,
     maxRows = 12,
     pinned = false,
     onUnpin,
     testId,
+    avoid,
   } = props;
-  const t = useChromeT();
   const { metrics } = useOverlaySurface();
-  const card = useRef<HTMLDivElement>(null);
-  const measured = useContainerSize(card);
+  const { attach, style } = useMeasuredPlacement({
+    pointerX: x,
+    pointerY: y,
+    boxWidth,
+    boxHeight,
+    anchorWidth,
+    avoid,
+  });
 
   const room = Math.max(1, maxRows);
   const hidden = pinned ? 0 : Math.max(0, rows.length - room);
   const written = hidden === 0 ? rows : rows.slice(0, room);
-  const lines = written.length + (hidden === 0 ? 1 : 2);
-  const place = placeOverlayCard({
-    pointerX: x,
-    pointerY: y,
-    cardWidth: measured.width > 0 ? measured.width : ESTIMATED_WIDTH,
-    cardHeight: measured.height > 0 ? measured.height : estimatedHeight(lines),
-    boxWidth,
-    boxHeight,
-  });
 
   return (
-    <div
-      ref={card}
-      data-testid={testId}
+    <ReadoutCard
+      ref={attach}
+      testId={testId}
       role={pinned ? 'group' : 'tooltip'}
-      aria-label={pinned ? title : undefined}
+      ariaLabel={pinned ? title : undefined}
+      title={title}
+      rows={readoutLines(written)}
+      footer={
+        hidden === 0 ? undefined : `+ ${hidden} more — click to keep this open`
+      }
+      onDismiss={pinned ? onUnpin : undefined}
       style={{
-        ...overlayReadoutStyle(metrics),
-        left: place.left,
-        top: place.top,
+        ...READOUT_PLACE_STYLE,
+        ...style,
         ...(pinned ? pinnedStyle(boxHeight, metrics) : null),
       }}
-    >
-      <div style={TITLE_STYLE}>
-        <span>{title}</span>
-        {pinned && onUnpin !== undefined ? (
-          <Button
-            variant="minimal"
-            size="small"
-            icon="cross"
-            aria-label={t('overlay.dismiss')}
-            onClick={onUnpin}
-          />
-        ) : null}
-      </div>
-      {readoutLines(written)}
-      {hidden === 0 ? null : (
-        <div style={FOOTER_STYLE}>
-          {`+ ${hidden} more — click to keep this open`}
-        </div>
-      )}
-    </div>
+    />
   );
 }
 
@@ -145,40 +142,22 @@ export function OverlayReadout(props: OverlayReadoutProps): ReactElement {
  * A label can legitimately repeat — the same axis drawn on both sides of a map
  * writes its name twice — so a repeat is counted and carries that count.
  * @param rows - The lines to write, in the caller's order.
- * @returns One element per row.
+ * @returns The card's rows.
  */
-function readoutLines(rows: readonly OverlayReadoutRow[]): ReactElement[] {
-  const lines: ReactElement[] = [];
+function readoutLines(rows: readonly OverlayReadoutRow[]): ReadoutCardRow[] {
+  const lines: ReadoutCardRow[] = [];
   const seen = new Map<string, number>();
   for (const row of rows) {
     const repeat = seen.get(row.label) ?? 0;
     seen.set(row.label, repeat + 1);
-    lines.push(
-      <div
-        key={repeat === 0 ? row.label : `${row.label} ${String(repeat)}`}
-        style={ROW_STYLE}
-      >
-        {row.color === undefined ? null : (
-          <span style={{ ...CHIP_STYLE, background: row.color }} />
-        )}
-        <span style={LABEL_STYLE}>{row.label}</span>
-        <span style={VALUE_STYLE}>{row.value}</span>
-      </div>,
-    );
+    lines.push({
+      key: repeat === 0 ? row.label : `${row.label} ${String(repeat)}`,
+      label: row.label,
+      value: row.value,
+      ...(row.color === undefined ? {} : { color: row.color }),
+    });
   }
   return lines;
-}
-
-/**
- * The card is placed from an estimate until it has been measured once, and the
- * estimate errs wide on purpose: a card that flips a few pixels early is still
- * read where the reader is looking, while one that flips late is cut off by
- * the edge of the figure.
- * @param lines - How many lines the card is about to hold, its title included.
- * @returns Its likely height in pixels.
- */
-function estimatedHeight(lines: number): number {
-  return ESTIMATED_PADDING + lines * ESTIMATED_LINE_HEIGHT;
 }
 
 /**
@@ -200,50 +179,4 @@ function pinnedStyle(
   };
 }
 
-const ESTIMATED_WIDTH = 220;
-const ESTIMATED_LINE_HEIGHT = 18;
-const ESTIMATED_PADDING = 16;
 const MINIMUM_PINNED_HEIGHT = 80;
-
-const TITLE_STYLE = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 8,
-  fontWeight: 600,
-} as const satisfies CSSProperties;
-
-const ROW_STYLE = {
-  display: 'flex',
-  alignItems: 'baseline',
-  gap: 6,
-} as const satisfies CSSProperties;
-
-const LABEL_STYLE = {
-  color: 'var(--text-muted)',
-} as const satisfies CSSProperties;
-
-/**
- * The values line up on their own column and share one digit width, so a
- * column of numbers can be compared down the card rather than read one by one.
- */
-const VALUE_STYLE = {
-  marginLeft: 'auto',
-  fontVariantNumeric: 'tabular-nums',
-  whiteSpace: 'nowrap',
-} as const satisfies CSSProperties;
-
-const CHIP_STYLE = {
-  alignSelf: 'center',
-  flex: 'none',
-  width: 8,
-  height: 8,
-  borderRadius: 2,
-} as const satisfies CSSProperties;
-
-const FOOTER_STYLE = {
-  marginTop: 2,
-  paddingTop: 2,
-  borderTop: '1px solid var(--border)',
-  color: 'var(--text-faint)',
-} as const satisfies CSSProperties;

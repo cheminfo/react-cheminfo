@@ -2,6 +2,8 @@ import type { ColorScale } from './interpolate.ts';
 import { evenScale } from './interpolate.ts';
 import {
   BLUE_RED_COLORS,
+  CHANNEL_BLACK,
+  CHANNEL_COLORS,
   CIVIDIS_COLORS,
   COOL_WARM_COLORS,
   GREYS_COLORS,
@@ -18,9 +20,11 @@ import {
  * A `sequential` one climbs from a low end to a high end; a `diverging` one
  * reads away from a middle in both directions; a `cyclic` one turns around the
  * colour wheel and orders nothing, so it is offered for the reader who wants
- * the rainbow their course used and never chosen for them.
+ * the rainbow their course used and never chosen for them; a `channel` one
+ * runs from black to one colour, the way a microscope shows one channel, so
+ * several of them add up into one picture.
  */
-export type ColorScaleKind = 'sequential' | 'diverging' | 'cyclic';
+export type ColorScaleKind = 'sequential' | 'diverging' | 'cyclic' | 'channel';
 
 /** One of the scales the family reads a quantity with. */
 export interface NamedColorScale {
@@ -41,7 +45,18 @@ export const COLOR_SCALE_KIND_LABELS: Record<ColorScaleKind, string> = {
   sequential: 'Low to high',
   diverging: 'Away from a middle',
   cyclic: 'Around the wheel',
+  channel: 'Black to one colour',
 };
+
+/**
+ * The kinds a picker offers unless it is told which: every one but `channel`,
+ * which only an image of several channels needs.
+ */
+export const DEFAULT_COLOR_SCALE_KINDS: readonly ColorScaleKind[] = [
+  'sequential',
+  'diverging',
+  'cyclic',
+];
 
 /** The scale a site reads a quantity with unless a link says otherwise. */
 export const DEFAULT_COLOR_SCALE_ID = 'viridis';
@@ -133,6 +148,21 @@ export const COLOR_SCALES: readonly NamedColorScale[] = [
       interpolation: 'hsv-long',
     },
   },
+  channelScale('grey', 'Grey', 'Black to white, a channel seen on its own.'),
+  channelScale('red', 'Red', 'Black to red, one channel of a composite.'),
+  channelScale('green', 'Green', 'Black to green, one channel of a composite.'),
+  channelScale('blue', 'Blue', 'Black to blue, one channel of a composite.'),
+  channelScale('cyan', 'Cyan', 'Black to cyan, one channel of a composite.'),
+  channelScale(
+    'magenta',
+    'Magenta',
+    'Black to magenta, which a colour-blind eye still tells from green.',
+  ),
+  channelScale(
+    'yellow',
+    'Yellow',
+    'Black to yellow, one channel of a composite.',
+  ),
 ];
 
 /**
@@ -145,4 +175,20 @@ export function colorScaleById(id: string): NamedColorScale | undefined {
     if (scale.id === id) return scale;
   }
   return undefined;
+}
+
+// Mixed in RGB from black, so half the signal is half the colour: what lets
+// the channels of a composite add up into one picture.
+function channelScale(
+  id: keyof typeof CHANNEL_COLORS,
+  label: string,
+  description: string,
+): NamedColorScale {
+  return {
+    id,
+    label,
+    kind: 'channel',
+    description,
+    scale: evenScale([CHANNEL_BLACK, CHANNEL_COLORS[id]], 'rgb'),
+  };
 }

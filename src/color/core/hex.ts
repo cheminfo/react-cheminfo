@@ -62,12 +62,21 @@ export function normalizeHexColor(value: unknown): string | null {
   return toHexColor(parseHexColor(text));
 }
 
+/**
+ * One channel as {@link toHexColor} writes it: rounded half up and held inside
+ * 0..255, a value that is not a number reading as 0.
+ * @param value - The channel, as an interpolation leaves it.
+ * @returns A whole number from 0 to 255.
+ */
+export function roundChannel(value: number): number {
+  return clamp(Math.round(value), 0, MAXIMUM_CHANNEL);
+}
+
 function channelAt(digits: string, index: number, size: number): number {
   const part = digits.slice(index * size, index * size + size);
   return Number.parseInt(size === 1 ? `${part}${part}` : part, 16);
 }
 
 function channelHex(value: number): string {
-  const safe = clamp(Math.round(value), 0, MAXIMUM_CHANNEL);
-  return safe.toString(16).padStart(2, '0');
+  return roundChannel(value).toString(16).padStart(2, '0');
 }

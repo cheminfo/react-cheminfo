@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { writeBlobToClipboard } from '../../clipboard/core/writeBlobToClipboard.ts';
 import { CopyButton } from '../../clipboard/ui/CopyButton.tsx';
 import { copySvg } from '../../download/core/copySvg.ts';
+import { svgDataUrl } from '../../download/core/dataUrl.ts';
 import { figurePng } from '../../download/core/figurePng.ts';
 import { HelpTooltip } from '../../help/ui/index.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
@@ -88,7 +89,7 @@ function QrCodePanel(props: {
     <div className="share-qr" role="group" aria-label={t('share.qrCode')}>
       <img
         className="share-qr__code"
-        src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(code.markup)}`}
+        src={svgDataUrl(code.markup)}
         alt={t('share.qrCodeAlt')}
       />
       <p className="share-qr__hint">{t('share.qrCodeHint')}</p>

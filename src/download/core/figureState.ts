@@ -19,6 +19,7 @@
 
 import { isSameSite } from '../../ecosystem/core/lookup.ts';
 
+import { digestHex } from './digestHex.ts';
 import {
   FIGURE_STATE_ENCODING,
   packFigureValue,
@@ -206,12 +207,7 @@ export async function figureDigest(
   const end = figure.lastIndexOf('</svg>');
   if (end < start) return undefined;
   const body = figure.slice(start, end).replaceAll(/\s+/g, ' ').trim();
-  const hash = new Uint8Array(
-    await subtle.digest('SHA-256', new TextEncoder().encode(body)),
-  );
-  let hex = '';
-  for (const byte of hash) hex += byte.toString(16).padStart(2, '0');
-  return hex;
+  return digestHex('SHA-256', new TextEncoder().encode(body));
 }
 
 async function encodeState(

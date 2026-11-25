@@ -20,8 +20,8 @@ test('a component is named as a chemist writes it, counting from one', () => {
 });
 
 test('the share of the variance travels with the name, so noise is visible before it is plotted', () => {
-  expect(principalComponentLabel(0, VARIANCE)).toBe('PC1 — 74.2 %');
-  expect(principalComponentLabel(3, VARIANCE)).toBe('PC4 — 2.4 %');
+  expect(principalComponentLabel(0, VARIANCE)).toBe('PC1 — 74.2\u00A0%');
+  expect(principalComponentLabel(3, VARIANCE)).toBe('PC4 — 2.4\u00A0%');
 });
 
 test('a component the decomposition never reported is named without a share', () => {
@@ -30,9 +30,9 @@ test('a component the decomposition never reported is named without a share', ()
 
 test('every component that exists can be picked, in order', () => {
   expect(principalComponentChoices(3, VARIANCE)).toStrictEqual([
-    { index: 0, label: 'PC1 — 74.2 %' },
-    { index: 1, label: 'PC2 — 15.3 %' },
-    { index: 2, label: 'PC3 — 6.1 %' },
+    { index: 0, label: 'PC1 — 74.2\u00A0%' },
+    { index: 1, label: 'PC2 — 15.3\u00A0%' },
+    { index: 2, label: 'PC3 — 6.1\u00A0%' },
   ]);
 });
 

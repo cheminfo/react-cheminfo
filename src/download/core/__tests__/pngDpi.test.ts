@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { pngDpi, withPngDpi } from '../pngDpi.ts';
+import { pngDpi, withPngDpi, withoutPngDpi } from '../pngDpi.ts';
 
 /** A 1×1 transparent PNG, as browsers write them: no resolution chunk. */
 const PIXEL = Uint8Array.from(
@@ -54,4 +54,16 @@ test('the chunk carries the checksum a reader verifies', () => {
 
 test('anything that is not a PNG is refused', () => {
   expect(() => withPngDpi(new Uint8Array(16), 300)).toThrow('Not a PNG file.');
+});
+
+test('a resolution left out gives back the PNG it was written into, byte for byte', () => {
+  const without = withoutPngDpi(withPngDpi(PIXEL, 300));
+
+  expect(without).toStrictEqual(PIXEL);
+  expect(chunkTypes(without)).toStrictEqual(['IHDR', 'IDAT', 'IEND']);
+  expect(pngDpi(without)).toBeUndefined();
+});
+
+test('a PNG stating no resolution comes back as it is', () => {
+  expect(withoutPngDpi(PIXEL)).toBe(PIXEL);
 });

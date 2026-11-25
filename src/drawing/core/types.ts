@@ -63,3 +63,15 @@ export interface Box {
   /** Height. */
   height: number;
 }
+
+/** A rectangle by its four sides, `top` above `bottom`: what an overlap test compares. */
+export interface Edges {
+  /** Its left side. */
+  left: number;
+  /** Its top side. */
+  top: number;
+  /** Its right side. */
+  right: number;
+  /** Its bottom side. */
+  bottom: number;
+}

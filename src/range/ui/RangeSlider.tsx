@@ -34,6 +34,12 @@ export interface RangeSliderProps {
    */
   unit?: string;
   /**
+   * Whether the label and the clear button are written over the track: a row
+   * that names its range itself leaves them out.
+   * @default true
+   */
+  heading?: boolean;
+  /**
    * The two ends of the track, low first: usually the smallest and largest
    * value the data holds. A handle at an end leaves that side open, so a value
    * past the track is never cut by a filter nobody touched.
@@ -78,6 +84,12 @@ export interface RangeSliderProps {
   histogram?: ArrayLike<number>;
   /** @default false */
   disabled?: boolean;
+  /**
+   * Whether a bounded range offers a button that opens both sides. A range
+   * that always has two ends — a display window — has nothing to clear.
+   * @default true
+   */
+  clearable?: boolean;
   /** @default undefined */
   className?: string;
   /**
@@ -107,7 +119,9 @@ interface Drag {
 export function RangeSlider(props: RangeSliderProps): ReactElement {
   const { label, unit, domain, value, onChange, onPreview } = props;
   const { step = 1, integer = false, format = numberText } = props;
-  const { histogram, disabled = false, className, testId } = props;
+  const { histogram, disabled = false, clearable = true } = props;
+  const { heading = true } = props;
+  const { className, testId } = props;
   const t = useChromeT();
   const [drag, setDrag] = useState<Drag | null>(null);
   const [editing, setEditing] = useState<'min' | 'max' | null>(null);
@@ -141,22 +155,25 @@ export function RangeSlider(props: RangeSliderProps): ReactElement {
       className={joinClassNames('range-slider', className)}
       data-testid={testId}
     >
-      <div className="range-slider__head">
-        <span className="range-slider__label">
-          {label}
-          {unit ? <span className="range-slider__unit"> ({unit})</span> : null}
-        </span>
-        {isRangeBounded(value) && !disabled ? (
-          <Button
-            variant="minimal"
-            size="small"
-            icon="cross"
-            aria-label={t('range.clear', { label })}
-            title={t('range.clear', { label })}
-            onClick={() => onChange(OPEN_RANGE)}
-          />
-        ) : null}
-      </div>
+      {heading ? (
+        <div className="range-slider__head">
+          <span className="range-slider__label">
+            {label}
+            {unit ? (
+              <span className="range-slider__unit"> ({unit})</span>
+            ) : null}
+          </span>
+          {clearable && isRangeBounded(value) && !disabled ? (
+            <Button
+              variant="minimal"
+              size="small"
+              icon="cross"
+              aria-label={t('range.clear', { label })}
+              onClick={() => onChange(OPEN_RANGE)}
+            />
+          ) : null}
+        </div>
+      ) : null}
       {drawable ? (
         <div className="range-slider__track">
           {histogram === undefined ? null : (

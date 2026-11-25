@@ -22,6 +22,14 @@ export {
 } from './chartAxisScale.ts';
 export type { ChartBand, ChartBandOptions } from './chartBand.ts';
 export { chartBand, chartBandCenter, chartBandIndexAt } from './chartBand.ts';
+export type { BinScale, BinSeries, ShownBins } from './binSteps.ts';
+export {
+  BIN_LOG_FLOOR,
+  atLeastSpan,
+  binAt,
+  binSteps,
+  binsInWindow,
+} from './binSteps.ts';
 export type { ChartBins } from './chartBins.ts';
 export { chartBinCounts } from './chartBins.ts';
 export type {

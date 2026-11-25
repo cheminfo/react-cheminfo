@@ -8,6 +8,7 @@
  * draws: what the drawing holds is stated in the metadata of the native SVG.
  */
 
+import { boxEdges, edgesOverlap } from '../core/geometry.ts';
 import { splitColor } from '../core/palette.ts';
 import type { Box, FigureSize } from '../core/types.ts';
 
@@ -105,22 +106,13 @@ export function sheetBody(
 ): string {
   const items = scene.items.filter((item) => {
     const box = primitivesBounds(item.primitives);
-    return box !== undefined && boxesMeet(box, sheet);
+    return box !== undefined && edgesOverlap(boxEdges(box), boxEdges(sheet));
   });
   const { background, ...style } = options.style;
   return `${background ? backgroundRect(sheet, background) : ''}${sceneBody(
     { ...scene, items },
     { ...options, style },
   )}`;
-}
-
-function boxesMeet(a: Box, b: Box): boolean {
-  return (
-    a.x < b.x + b.width &&
-    b.x < a.x + a.width &&
-    a.y < b.y + b.height &&
-    b.y < a.y + a.height
-  );
 }
 
 /** A molecule of the drawing, and the items it paints, in paint order. */

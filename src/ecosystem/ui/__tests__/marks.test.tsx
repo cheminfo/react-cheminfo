@@ -88,6 +88,16 @@ test('fair draws its archive box on its olive plate, the peak in light blue', ()
   expect(fair).not.toContain('var(--brand)');
 });
 
+test('image draws a nucleus, the outline found around it, and a second object', () => {
+  const html = renderToStaticMarkup(<SiteMark siteId="image" />);
+
+  expect(html).toContain('fill="#0c0a3e"');
+  expect(html.match(/<circle /g)).toHaveLength(3);
+  expect(html).toContain(
+    '<circle cx="12.5" cy="13" r="8.75" fill="none" stroke="#22d3ee" stroke-width="2.5"></circle>',
+  );
+});
+
 test('chembio and wikidata draw the marks they brought with them', () => {
   const chembio = renderToStaticMarkup(<SiteMark siteId="chembio" />);
   const wikidata = renderToStaticMarkup(<SiteMark siteId="wikidata" />);

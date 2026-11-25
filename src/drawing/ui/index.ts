@@ -27,6 +27,11 @@ export type { GraphicFieldsProps } from './GraphicFields.tsx';
 export { GraphicFields } from './GraphicFields.tsx';
 export { GraphicFillFields } from './GraphicFillFields.tsx';
 export { GraphicGradientFields } from './GraphicGradientFields.tsx';
+export type {
+  MarkOpacityInputProps,
+  MarkSizeInputProps,
+} from './MarkStyleInputs.tsx';
+export { MarkOpacityInput, MarkSizeInput } from './MarkStyleInputs.tsx';
 export { MeasuredSlider } from './MeasuredSlider.tsx';
 export type {
   ChoiceFieldProps,

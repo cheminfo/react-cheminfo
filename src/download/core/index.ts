@@ -59,7 +59,15 @@ export {
   svgFigure,
 } from './croppedMarkup.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
-export { blobDataUrl, svgDataUrl, svgOfDataUrl } from './dataUrl.ts';
+export {
+  blobDataUrl,
+  bytesDataUrl,
+  svgDataUrl,
+  svgOfDataUrl,
+} from './dataUrl.ts';
+export { digestHex } from './digestHex.ts';
+export type { BlobBytes } from './bytesBlob.ts';
+export { bytesBlob } from './bytesBlob.ts';
 export type { DocumentFigureRedraw } from './documentFigure.ts';
 export {
   DOCUMENT_FIGURE_SIZE,
@@ -137,7 +145,7 @@ export {
   figureSize,
 } from './figureTarget.ts';
 export { paintedBox } from './paintedBox.ts';
-export { pngDpi, withPngDpi } from './pngDpi.ts';
+export { pngDpi, withPngDpi, withoutPngDpi } from './pngDpi.ts';
 export {
   automaticFileStem,
   figureFileName,
@@ -145,6 +153,7 @@ export {
   siteFigureName,
 } from './figureFileName.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';
+export { urlFileName } from './urlFileName.ts';
 
 export { drawingIn, stackDrawings } from './stackedDrawing.ts';
 export type { SvgBox } from './svgBounds.ts';

@@ -2,6 +2,8 @@ import type { IconName } from '@blueprintjs/core';
 import { Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
+
 import { overlayIconButtonStyle } from './overlayControlStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
 import { useOverlayInteraction } from './useOverlayInteraction.ts';
@@ -16,10 +18,10 @@ export interface OverlayIconButtonProps {
   icon: IconName | ReactElement;
   /**
    * What the setting is called, phrased as the question the reader already
-   * has: `Colour by`, `Group outlines`. It is written into both `title` and
-   * `aria-label`, because a glyph says nothing until it is named — that is the
-   * price of an icon-only bar, and it is paid here rather than left to each
-   * caller to remember.
+   * has: `Colour by`, `Group outlines`. It is the button's `aria-label` and
+   * the family's help card the pointer opens on it, because a glyph says
+   * nothing until it is named — that is the price of an icon-only bar, and it
+   * is paid here rather than left to each caller to remember.
    */
   label: string;
   /**
@@ -60,8 +62,8 @@ export interface OverlayIconButtonProps {
    */
   onClick?: () => void;
   /**
-   * Whether the pointer is left without the browser's own tooltip, for a
-   * button that already opens a card of its own on hover: the two would
+   * Whether the pointer is left without the help card naming the button, for
+   * a button that already opens a card of its own on hover: the two would
    * otherwise stack. The screen reader is still told the name.
    * @default false
    */
@@ -95,11 +97,10 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
   const name = value === undefined ? label : `${label} — ${value}`;
   const told = disabled && disabledReason !== undefined ? disabledReason : name;
 
-  return (
+  const button = (
     <button
       type="button"
       className="no-print"
-      title={untitled ? undefined : told}
       aria-label={name}
       aria-haspopup={opensMenu ? 'menu' : undefined}
       aria-expanded={opensMenu ? active : undefined}
@@ -122,7 +123,17 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
       )}
     </button>
   );
+  if (untitled) return button;
+  // The card's target is a span around the button: the tooltip clears the
+  // popup state of the element it wraps, and the button's own must stand.
+  return (
+    <HelpTooltip content={{ title: told }} placement="bottom">
+      <span style={TARGET_STYLE}>{button}</span>
+    </HelpTooltip>
+  );
 }
+
+const TARGET_STYLE = { display: 'inline-flex' } as const;
 
 /**
  * How big the glyph is drawn inside the button.

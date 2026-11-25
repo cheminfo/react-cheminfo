@@ -28,15 +28,35 @@ export interface TabClaims {
  * it lives, so a crashed tab lets go of it with nothing to clean up. Where the
  * browser has no Web Locks every claim holds, as if the site had one tab.
  *
+ * A page going away for good — a reload, a link followed in the same tab —
+ * lets go of its claims as it is hidden (`pagehide`) and notes in the tab's
+ * session storage the ids it let go of; a page kept for the back button keeps
+ * them. The next page of the tab waits for those ids rather than finding them
+ * still held by the page it replaces, whose letting go no browser promises to
+ * deliver before the new page asks.
+ *
  * A duplicated tab inherits the original's session storage, so what it
- * `remembered` may be claimed already; it then has to start on an id of its own.
+ * `remembered` may be claimed already; with no page of its own gone before,
+ * it asks without waiting, and then has to start on an id of its own.
+ *
+ * The claims live as long as the page, by design: create them once per scope,
+ * when the module loads, as `createDraftSession` does. The `pagehide` listener
+ * that lets go of them is never removed, so each further call adds one more.
  * @param scope - Names the locks and the remembered id, e.g. `draw:drafts`.
  * @returns The claims.
  */
 export function createTabClaims(scope: string): TabClaims {
   const prefix = `${scope}:`;
   const rememberedKey = `${scope}:current`;
+  const leftKey = `${scope}:left`;
   const releases = new Map<string, () => void>();
+  const left = takeLeft(leftKey);
+  globalThis.addEventListener?.('pagehide', (event) => {
+    if (event.persisted) return;
+    noteLeft(leftKey, [...releases.keys()]);
+    for (const release of releases.values()) release();
+    releases.clear();
+  });
 
   return {
     claim: async (id) => {
@@ -46,9 +66,11 @@ export function createTabClaims(scope: string): TabClaims {
         releases.set(id, () => undefined);
         return true;
       }
+      // This tab's previous page let go of it as it went away: wait for it.
+      const ifAvailable = !left.delete(id);
       return new Promise<boolean>((resolve) => {
         locks
-          .request(`${prefix}${id}`, { ifAvailable: true }, (lock) => {
+          .request(`${prefix}${id}`, { ifAvailable }, (lock) => {
             if (!lock) {
               resolve(false);
               return undefined;
@@ -104,4 +126,32 @@ export function createTabClaims(scope: string): TabClaims {
       }
     },
   };
+}
+
+/**
+ * The ids this tab's previous page let go of as it went away, read once by
+ * the page that follows it and forgotten, so a later duplicate of the tab
+ * does not wait for them.
+ * @param key - Where they are kept in the tab's session storage.
+ * @returns The ids.
+ */
+function takeLeft(key: string): Set<string> {
+  try {
+    const written = globalThis.sessionStorage?.getItem(key) ?? null;
+    globalThis.sessionStorage?.removeItem(key);
+    return new Set(
+      written === null || written === '' ? [] : written.split('\n'),
+    );
+  } catch {
+    // A tab that cannot remember has no previous page to wait for.
+    return new Set();
+  }
+}
+
+function noteLeft(key: string, ids: readonly string[]): void {
+  try {
+    if (ids.length > 0) globalThis.sessionStorage?.setItem(key, ids.join('\n'));
+  } catch {
+    // A tab that cannot remember asks for its ids without waiting.
+  }
 }

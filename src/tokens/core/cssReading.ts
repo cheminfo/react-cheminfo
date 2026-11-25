@@ -1,8 +1,9 @@
 // tokens-ok: file — the checker compares fallbacks with the family's values.
 /**
  * The pieces of CSS the token checker reads beyond a colour: a declaration of
- * one of the site's own palette properties, the token a `var()` reads, and
- * whether the fallback written after it is that token's value.
+ * one of the site's own palette properties, the token a `var()` reads,
+ * whether the fallback written after it is that token's value, the accent
+ * wash written out, and the waiver a file carries at its head.
  */
 
 import { normalizeColor } from './colors.ts';
@@ -163,4 +164,41 @@ function isSpace(char: string | undefined): boolean {
 
 function collapse(text: string): string {
   return text.toLowerCase().replaceAll(/\s+/g, ' ');
+}
+
+/** What the checker says of the accent wash written out. */
+export const ACCENT_WASH_HINT =
+  'the accent wash — use var(--accent-wash), or var(--accent-wash-clear) over a ground that shows through.';
+
+// The tint `--accent-wash` holds, written out: a mix of the accent at 12 %
+// over any ground, as every copy of it was spelled.
+const ACCENT_WASH = /color-mix\(\s*in\s+oklab\s*,\s*var\(--accent\)\s+12%/y;
+
+/**
+ * The accent wash written out where the token was meant:
+ * `color-mix(in oklab, var(--accent) 12%`, over any ground.
+ * @param lower - The text being scanned, already lowercased.
+ * @param start - The index of the `c` of `color-mix`.
+ * @returns How many characters it takes, 0 when it is not there.
+ */
+export function readAccentWash(lower: string, start: number): number {
+  ACCENT_WASH.lastIndex = start;
+  return ACCENT_WASH.exec(lower)?.[0].length ?? 0;
+}
+
+// How far into a file the whole-file waiver may sit: a licence header, an
+// import or two, and the comment saying why this file writes colours.
+const WAIVER_LINES = 6;
+
+/**
+ * Whether a file waives the checker as a whole, in its first lines:
+ * `tokens-ok: file`, saying why beside it.
+ * @param text - The file.
+ * @param marker - The waiver's word; empty for none.
+ * @returns Whether it does.
+ */
+export function waivesWholeFile(text: string, marker: string): boolean {
+  if (marker.length === 0) return false;
+  const head = text.split('\n', WAIVER_LINES).join('\n').toLowerCase();
+  return head.includes(`${marker}: file`);
 }

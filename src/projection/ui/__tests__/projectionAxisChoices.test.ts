@@ -20,14 +20,19 @@ test('an axis another picker draws is kept, greyed, with the reason it gives', (
   ).toStrictEqual([
     {
       value: '0',
-      label: 'PC1 — 73.0 %',
+      label: 'PC1 — 73.0\u00A0%',
       disabled: true,
       title: 'Already drawn on another axis.',
     },
-    { value: '1', label: 'PC2 — 22.9 %', disabled: false, title: undefined },
+    {
+      value: '1',
+      label: 'PC2 — 22.9\u00A0%',
+      disabled: false,
+      title: undefined,
+    },
     {
       value: '2',
-      label: 'PC3 — 3.7 %',
+      label: 'PC3 — 3.7\u00A0%',
       disabled: true,
       title: 'Already drawn on another axis.',
     },

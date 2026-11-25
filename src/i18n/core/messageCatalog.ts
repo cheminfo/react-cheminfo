@@ -9,7 +9,10 @@
  * Only the plain `{name}` argument of ICU MessageFormat is filled here. A
  * plural or a select needs the formatter itself, which is 40 kB an ordinary
  * visit must not pay for — `check-messages` refuses one in a catalog, and the
- * page is written with a key per branch instead.
+ * page is written with a key per branch instead: a family read by its base
+ * key and a numeric `count`, its branch chosen for the language asked
+ * (`plural.ts`). A number a message carries is written by the catalog's
+ * `formatNumber`, so a page hands its numbers raw.
  */
 
 import type { CatalogSource, Messages } from '../../translate/core/catalog.ts';
@@ -17,59 +20,22 @@ import { ownMessage } from '../../translate/core/catalog.ts';
 
 import type { Language } from './languages.ts';
 import { DEFAULT_LANGUAGE } from './languages.ts';
+import type {
+  LooseKey,
+  MessageCatalogOptions,
+  MessagesLoader,
+  TranslateOptions,
+} from './messageCatalogTypes.ts';
 import type { MessageValues } from './messageValues.ts';
+import { pluralBranch, pluralOther } from './plural.ts';
 import { messageSession, notifyMessages } from './session.ts';
 
-/** A language's messages, fetched only once a visitor asks for that language. */
-export type MessagesLoader = () => Promise<{ default: Messages }>;
-
-/**
- * A key the catalog declares, or any other string.
- *
- * Many keys are built from the data — `site.isomers.tagline`, `element.Fe.name`
- * — so a row added before the catalogs have caught up must read as itself
- * rather than fail to compile.
- */
-export type LooseKey<TKey extends string> =
-  TKey | (string & Record<never, never>);
-
-/** How a key is resolved when no catalog carries it, and with what. */
-export interface TranslateOptions {
-  /**
-   * What to answer when neither the language nor English carries the key.
-   * @default the key itself
-   */
-  fallback?: string;
-  /**
-   * What each `{placeholder}` of the message stands for.
-   * @default undefined
-   */
-  values?: MessageValues;
-}
-
-/** How a catalog is declared. */
-export interface MessageCatalogOptions<TKey extends string> {
-  /**
-   * The name the page knows the catalog by, unique on the page, e.g.
-   * `react-cheminfo` or `isomers.cheminfo.org`.
-   */
-  id: string;
-  /** The GitHub repository the files live in, written `owner/repo`. */
-  repository: string;
-  /**
-   * The directory holding the locale files, relative to the repository root,
-   * e.g. `src/locales`.
-   */
-  directory: string;
-  /** The English messages, which are the keys the catalog declares. */
-  source: Record<TKey, string>;
-  /**
-   * The other languages: the messages themselves, or the import that fetches
-   * them. A language left out simply reads as English.
-   * @default {}
-   */
-  translations?: Partial<Record<Language, Messages | MessagesLoader>>;
-}
+export type {
+  LooseKey,
+  MessageCatalogOptions,
+  MessagesLoader,
+  TranslateOptions,
+} from './messageCatalogTypes.ts';
 
 /**
  * The messages of one repository, read in whichever language the page is
@@ -84,13 +50,16 @@ export class MessageCatalog<TKey extends string = string> {
   readonly #loaded = new Map<Language, Messages>();
   readonly #loaders = new Map<Language, MessagesLoader>();
   readonly #pending = new Map<Language, Promise<Messages>>();
+  readonly #formatNumber: (value: number, language: Language) => string;
 
   /**
    * Declare a catalog.
    * @param options - See {@link MessageCatalogOptions}.
    */
   public constructor(options: MessageCatalogOptions<TKey>) {
-    const { id, repository, directory, source, translations = {} } = options;
+    const { id, repository, directory, source } = options;
+    const { translations = {}, formatNumber = String } = options;
+    this.#formatNumber = formatNumber;
     this.id = id;
     this.source = { id, repository, directory, messages: source };
     this.#loaded.set(DEFAULT_LANGUAGE, source);
@@ -113,11 +82,13 @@ export class MessageCatalog<TKey extends string = string> {
   }
 
   /**
-   * The text a key carries in one language.
+   * The text a key carries in one language: the key's own message, or — for a
+   * family of branches, `key_one` and `key_other` — the branch its numeric
+   * `count` takes in that language.
    * @param key - Key to read.
    * @param language - Language to read it in.
    * @param options - See {@link TranslateOptions}.
-   * @returns The text.
+   * @returns The text, its numbers written by the catalog's `formatNumber`.
    */
   public translate(
     key: LooseKey<TKey>,
@@ -125,20 +96,24 @@ export class MessageCatalog<TKey extends string = string> {
     options: TranslateOptions = {},
   ): string {
     const { fallback = key, values } = options;
+    const written = this.#written(values, language);
+    const read = this.resolvedKey(key, language, values);
     const english = this.source.messages;
     const session = messageSession();
     if (session !== null) {
       // A key the catalog does not declare is not the translator's to edit:
       // marking it would offer them a message that lives nowhere.
-      if (ownMessage(english, key) === undefined) return fill(fallback, values);
-      return session.format(this.id, key, values);
+      if (ownMessage(english, read) === undefined) {
+        return fill(fallback, written);
+      }
+      return session.format(this.id, read, written);
     }
     const translated = this.#loaded.get(language);
     const message =
-      (translated === undefined ? undefined : ownMessage(translated, key)) ??
-      ownMessage(english, key) ??
+      (translated === undefined ? undefined : ownMessage(translated, read)) ??
+      ownMessage(english, read) ??
       fallback;
-    return fill(message, values);
+    return fill(message, written);
   }
 
   /**
@@ -151,7 +126,11 @@ export class MessageCatalog<TKey extends string = string> {
    * @returns True when English carries it.
    */
   public declares(key: string): boolean {
-    return ownMessage(this.source.messages, key) !== undefined;
+    const english = this.source.messages;
+    return (
+      ownMessage(english, key) !== undefined ||
+      ownMessage(english, pluralOther(key)) !== undefined
+    );
   }
 
   /**
@@ -202,6 +181,47 @@ export class MessageCatalog<TKey extends string = string> {
   public prefetch(language: Language): void {
     if (this.#loaded.has(language) || this.#pending.has(language)) return;
     void this.load(language);
+  }
+
+  /**
+   * The key a message is read under in a language: the key itself, or — a
+   * family of branches, `key_one` and `key_other` — the branch its numeric
+   * `count` takes there, `other` when the language writes no such branch.
+   * @param key - The key asked for.
+   * @param language - The language it is read in.
+   * @param values - The message's values.
+   * @returns The key whose message is read.
+   */
+  public resolvedKey(
+    key: string,
+    language: Language,
+    values?: MessageValues,
+  ): string {
+    const english = this.source.messages;
+    if (ownMessage(english, key) !== undefined) return key;
+    const other = pluralOther(key);
+    if (ownMessage(english, other) === undefined) return key;
+    const branch = pluralBranch(key, values, language);
+    const translated = this.#loaded.get(language);
+    const written =
+      ownMessage(english, branch) !== undefined ||
+      (translated !== undefined &&
+        ownMessage(translated, branch) !== undefined);
+    return written ? branch : other;
+  }
+
+  // The values with every number written as the catalog writes numbers.
+  #written(
+    values: MessageValues | undefined,
+    language: Language,
+  ): MessageValues | undefined {
+    if (values === undefined) return undefined;
+    const text: Record<string, string> = {};
+    for (const [name, value] of Object.entries(values)) {
+      text[name] =
+        typeof value === 'number' ? this.#formatNumber(value, language) : value;
+    }
+    return text;
   }
 }
 

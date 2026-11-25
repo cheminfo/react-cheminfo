@@ -85,9 +85,12 @@ export interface OverlayBarProps {
   /**
    * Whether the bar is reduced to a button opening the same controls in a
    * popover. Left out, it folds on its own once the figure is narrower than
-   * `collapseBelow`. A caller that needs to know whether a bar left to decide
-   * has folded asks `overlayBarFolded` with the width `useOverlaySurface`
-   * reads, which is the answer the bar itself draws from.
+   * `collapseBelow`, and a stretched bar also folds its far end once its row
+   * no longer holds every control at its own width. Given, it is the answer
+   * alone: `false` keeps every control on the row, however crowded. A caller
+   * that needs to know whether a bar left to decide has folded asks
+   * `overlayBarFolded` with the width `useOverlaySurface` reads, which is the
+   * answer the bar itself draws from below `collapseBelow`.
    * @default undefined — the bar decides from the figure's width
    */
   collapsed?: boolean;
@@ -167,6 +170,7 @@ export function OverlayBar(props: OverlayBarProps): ReactElement {
         moreIcon={moreIcon}
         morePadded={morePadded}
         folded={folded}
+        foldsWhenCrowded={collapsed === undefined}
         rest={rest}
         testId={testId}
       >

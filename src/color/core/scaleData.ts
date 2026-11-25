@@ -8,6 +8,8 @@
  * `d3-scale-chromatic`. Nine stops interpolated in sRGB reproduce each map
  * closely enough that no eye separates the two, and keeps a scale a plain list
  * a legend and a CSS gradient can both be written from.
+ *
+ * The channel scales need no sampling: each is black and one colour.
  */
 
 /** Viridis: the default, monotone in lightness and safe under colour deficiency. */
@@ -126,3 +128,21 @@ export const BLUE_RED_COLORS: readonly string[] = [
   '#b82d35',
   '#67001f',
 ];
+
+/** Where every channel scale starts: no signal is black, whatever the colour. */
+export const CHANNEL_BLACK = '#000000';
+
+/**
+ * The colour each channel scale climbs to from black: white for a channel seen
+ * on its own, then the three primaries a camera records and the three a
+ * printer mixes, the colours a microscope shows its channels in.
+ */
+export const CHANNEL_COLORS = {
+  grey: '#ffffff',
+  red: '#ff0000',
+  green: '#00ff00',
+  blue: '#0000ff',
+  cyan: '#00ffff',
+  magenta: '#ff00ff',
+  yellow: '#ffff00',
+} as const;

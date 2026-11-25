@@ -2,6 +2,7 @@ import { Button, HTMLSelect } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { keyBelongsToFocus } from '../../hooks/ui/focusKeys.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { NumberInput } from '../../number/ui/NumberInput.tsx';
 import { normalizeHexColor } from '../core/hex.ts';
@@ -81,7 +82,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
     const index = hovered;
     function onKeyDown(event: globalThis.KeyboardEvent): void {
       if (event.key !== 'Backspace' && event.key !== 'Delete') return;
-      if (isEditable(event.target)) return;
+      if (keyBelongsToFocus(event)) return;
       event.preventDefault();
       onChange({
         stops: removeColorStop(stops, index),
@@ -168,16 +169,6 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
 
       <p style={HINT_STYLE}>{t('color.editorHint')}</p>
     </div>
-  );
-}
-
-function isEditable(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  return (
-    target.isContentEditable ||
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
   );
 }
 

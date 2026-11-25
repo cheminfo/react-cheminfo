@@ -3,6 +3,8 @@ import { Menu, MenuDivider, MenuItem, PopoverNext } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 import { useId, useState } from 'react';
 
+import type { HelpContent } from '../../help/ui/HelpBody.tsx';
+
 import type { OverlayOption } from './OverlayRow.tsx';
 import { OverlayValueButton } from './OverlayValueButton.tsx';
 import { useOverlaySurface } from './overlaySurface.ts';
@@ -37,6 +39,12 @@ export interface OverlayValueMenuProps<TValue extends string = string> {
    * @default undefined — no dots are drawn
    */
   swatches?: readonly string[];
+  /**
+   * What the setting does, in a sentence, opened as the family's help card
+   * when the pointer rests on the button.
+   * @default undefined — the pointer is told the name and the value
+   */
+  help?: HelpContent;
   /**
    * Whether the setting cannot be reached at all.
    * @default false
@@ -75,7 +83,7 @@ export function OverlayValueMenu<TValue extends string = string>(
   props: OverlayValueMenuProps<TValue>,
 ): ReactElement {
   const { label, value, options, onChange, keyWord, showKey } = props;
-  const { swatches, disabled = false, disabledReason } = props;
+  const { swatches, disabled = false, disabledReason, help } = props;
   const { placement = 'bottom-end', testId } = props;
   const { metrics } = useOverlaySurface();
   const headingId = useId();
@@ -129,6 +137,7 @@ export function OverlayValueMenu<TValue extends string = string>(
         active={open}
         disabled={disabled}
         disabledReason={disabledReason}
+        help={help}
         testId={testId}
         opensMenu
       />

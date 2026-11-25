@@ -10,7 +10,7 @@ import { useDebouncedValue } from '../useDebouncedValue.ts';
 import { useDocumentListNavigation } from '../useDocumentListNavigation.ts';
 import { useListKeyboardNavigation } from '../useListKeyboardNavigation.ts';
 import { usePolling } from '../usePolling.ts';
-import { useResizeObserver } from '../useResizeObserver.ts';
+import { sizeOf, useResizeObserver } from '../useResizeObserver.ts';
 
 const neverSettles = () =>
   new Promise<number>(() => {
@@ -123,4 +123,21 @@ test('the navigation hook hands back a handler that selects the next entry', () 
 
   expect(selected).toStrictEqual([3]);
   expect(prevented).toBe(1);
+});
+
+test('a resize reads the content box, or the border box — padding and border included — when asked', () => {
+  const entry = {
+    contentRect: { width: 126.7, height: 79.6 } as DOMRectReadOnly,
+    borderBoxSize: [{ inlineSize: 148.7, blockSize: 93.6 }],
+  };
+
+  expect([
+    sizeOf(entry, 'content-box'),
+    sizeOf(entry, 'border-box'),
+    sizeOf({ ...entry, borderBoxSize: [] }, 'border-box'),
+  ]).toStrictEqual([
+    { width: 126.7, height: 79.6 },
+    { width: 148.7, height: 93.6 },
+    { width: 126.7, height: 79.6 },
+  ]);
 });

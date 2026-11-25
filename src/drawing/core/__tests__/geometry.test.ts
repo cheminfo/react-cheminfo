@@ -10,10 +10,12 @@ import {
   boundsOf,
   boxContains,
   boxCorners,
+  boxEdges,
   boxFromCorners,
   clampToBox,
   distance,
   distanceToSegment,
+  edgesOverlap,
   normalizeAngle,
   polar,
   polygonContains,
@@ -120,4 +122,21 @@ test('a coordinate is kept to a hundredth of a point, never as -0', () => {
   expect(roundCoordinate(1.234)).toBe(1.23);
   expect(roundCoordinate(-7.126)).toBe(-7.13);
   expect(Object.is(roundCoordinate(-0.001), 0)).toBe(true);
+});
+
+test('two boxes overlap when they share area; touching along an edge is no overlap', () => {
+  const box = boxEdges({ x: 0, y: 0, width: 10, height: 10 });
+
+  expect([
+    edgesOverlap(box, boxEdges({ x: 5, y: 5, width: 10, height: 10 })),
+    edgesOverlap(box, boxEdges({ x: 10, y: 0, width: 5, height: 5 })),
+    edgesOverlap(box, boxEdges({ x: 2, y: 2, width: 1, height: 1 })),
+    edgesOverlap(box, boxEdges({ x: -3, y: 11, width: 30, height: 4 })),
+  ]).toStrictEqual([true, false, true, false]);
+  expect(boxEdges({ x: 2, y: 3, width: 4, height: 5 })).toStrictEqual({
+    left: 2,
+    top: 3,
+    right: 6,
+    bottom: 8,
+  });
 });

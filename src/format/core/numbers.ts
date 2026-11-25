@@ -1,11 +1,18 @@
 import { clamp } from './clamp.ts';
 import { MISSING_VALUE } from './missing.ts';
+import { UNIT_SPACE } from './unitSpace.ts';
+
+// A number that rounds to zero is written without a sign: `-0.04` to one
+// decimal is `0.0`, not `-0.0`.
+const SIGN = { signDisplay: 'negative' } as const;
 
 const INTEGER_FORMATTER = new Intl.NumberFormat('en-US', {
+  ...SIGN,
   maximumFractionDigits: 0,
 });
 
 const COMPACT_FORMATTER = new Intl.NumberFormat('en-US', {
+  ...SIGN,
   notation: 'compact',
   maximumFractionDigits: 1,
 });
@@ -25,41 +32,89 @@ export interface SignificantDigits {
 }
 
 /**
- * A whole number, grouped in thousands: `1,234,567`.
+ * How the thousands of a number are grouped: by the locale's comma, or by a
+ * no-break space — `33 076`, the grouping SI writes, which no line breaks.
+ */
+export type NumberGrouping = 'comma' | 'space';
+
+/** How a grouped number is written. */
+export interface GroupingOptions {
+  /**
+   * What groups the thousands.
+   * @default 'comma'
+   */
+  grouping?: NumberGrouping;
+}
+
+/**
+ * A whole number, grouped in thousands: `1,234,567`, or `1 234 567`.
  *
  * Anything after the decimal point is rounded away. The locale is fixed to
  * `en-US`, so the same page reads the same way wherever it is opened.
  * @param value - The number to write.
+ * @param options - See {@link GroupingOptions}.
  * @returns The grouped number, or the missing marker when it is not finite.
  */
-export function formatInteger(value: number): string {
+export function formatInteger(
+  value: number,
+  options: GroupingOptions = {},
+): string {
   if (!Number.isFinite(value)) return MISSING_VALUE;
-  return INTEGER_FORMATTER.format(value);
+  return formatGrouped(INTEGER_FORMATTER, value, options.grouping);
+}
+
+/**
+ * A number written by a formatter, its thousands grouped as asked: the
+ * formatter's group separator is replaced part by part, never as text, so a
+ * locale whose decimal sign is a comma keeps it.
+ * @param formatter - The formatter.
+ * @param value - The number to write.
+ * @param grouping - What groups the thousands.
+ * @default grouping 'comma' — the formatter's own
+ * @returns The text.
+ */
+export function formatGrouped(
+  formatter: Intl.NumberFormat,
+  value: number,
+  grouping: NumberGrouping = 'comma',
+): string {
+  if (grouping === 'comma') return formatter.format(value);
+  let text = '';
+  for (const part of formatter.formatToParts(value)) {
+    text += part.type === 'group' ? UNIT_SPACE : part.value;
+  }
+  return text;
 }
 
 /**
  * A number grouped in thousands and held to a fixed number of decimals:
- * `1,234.50`.
+ * `1,234.50`, or `1 234.50`.
  *
  * The digits are kept even when they are zeros, which is what a column of
  * figures wants; use {@link formatTrimmed} for a label that should not carry
  * them.
  * @param value - The number to write.
  * @param digits - Decimals to show. Defaults to `2`; a count outside 0..20 is clamped into it, and one that is not a finite number falls back to the default.
+ * @param options - See {@link GroupingOptions}.
  * @returns The formatted number, or the missing marker when it is not finite.
  */
-export function formatDecimal(value: number, digits = DEFAULT_DIGITS): string {
+export function formatDecimal(
+  value: number,
+  digits = DEFAULT_DIGITS,
+  options: GroupingOptions = {},
+): string {
   if (!Number.isFinite(value)) return MISSING_VALUE;
   const safeDigits = wholeCount(digits, 0, MAXIMUM_DIGITS);
   let formatter = decimalFormatters.get(safeDigits);
   if (formatter === undefined) {
     formatter = new Intl.NumberFormat('en-US', {
+      ...SIGN,
       minimumFractionDigits: safeDigits,
       maximumFractionDigits: safeDigits,
     });
     decimalFormatters.set(safeDigits, formatter);
   }
-  return formatter.format(value);
+  return formatGrouped(formatter, value, options.grouping);
 }
 
 /**
@@ -90,7 +145,8 @@ export function formatTrimmed(
 }
 
 /**
- * A share written as a percentage with its unit: `74.2 %`.
+ * A share written as a percentage with its unit, joined by a no-break space:
+ * `74.2 %`.
  *
  * The number is held to a fixed count of decimals, so a column of shares lines
  * up and a title and the sentence under it agree on their precision.
@@ -104,7 +160,7 @@ export function formatPercent(
 ): string {
   if (!Number.isFinite(share)) return MISSING_VALUE;
   const safeDigits = Number.isFinite(digits) ? digits : DEFAULT_PERCENT_DIGITS;
-  return `${formatDecimal(share * PERCENT, safeDigits)} %`;
+  return `${formatDecimal(share * PERCENT, safeDigits)}${UNIT_SPACE}%`;
 }
 
 /**

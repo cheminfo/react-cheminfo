@@ -1,7 +1,9 @@
 import type { ReactElement } from 'react';
 
 import { chartBand } from '../../chart/core/chartBand.ts';
+import type { ChartAxisSpec } from '../../chart/ui/ChartFrame.tsx';
 import { ChartFrame } from '../../chart/ui/ChartFrame.tsx';
+import { chartFrameGeometry } from '../../chart/ui/chartFrameGeometry.ts';
 import type { ExplainedShares } from '../core/explainedShares.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
 import { PROJECTION_COPY } from '../core/projectionCopy.ts';
@@ -67,26 +69,30 @@ export function ProjectionSharesTab(
   const { width = 0, height = PROJECTION_TAB_HEIGHT } = props;
 
   const slots = shares.components.length;
+  const x: ChartAxisSpec = {
+    domain: [0, slots],
+    showTicks: false,
+    showGrid: false,
+    nice: false,
+  };
+  // The names under the bars are written in HTML, so they read the plot the
+  // frame lays out rather than working out its edges a second time.
+  const geometry = chartFrameGeometry(width, height, x, SHARE_AXIS, MARGINS);
 
   return (
     <div data-testid={testId}>
       <ChartFrame
         width={width}
         height={height}
-        margins={{ bottom: SHARES_BOTTOM_ROOM }}
-        x={{
-          domain: [0, slots],
-          showTicks: false,
-          showGrid: false,
-          nice: false,
-        }}
-        y={{ domain: [0, WHOLE_SHARE], label: VERTICAL_CAPTION, tickCount: 5 }}
+        margins={MARGINS}
+        x={x}
+        y={SHARE_AXIS}
+        geometry={geometry}
         label={`${result.method}. ${copy.intro.shares}`}
         overlay={
           <SharesAxis
             shares={shares}
-            width={width}
-            height={height}
+            plot={geometry.plot}
             caption={HORIZONTAL_CAPTION}
           />
         }
@@ -109,6 +115,9 @@ export function ProjectionSharesTab(
 /** Share of a slot left empty between two bars. */
 const BAR_GAP = 0.3;
 
+/** Room under the plot for the names and the caption the tab writes there. */
+const MARGINS = { bottom: SHARES_BOTTOM_ROOM };
+
 /**
  * The two axis captions, in words the reader already has.
  *
@@ -118,3 +127,10 @@ const BAR_GAP = 0.3;
  */
 const HORIZONTAL_CAPTION = 'Components, strongest first';
 const VERTICAL_CAPTION = 'Share of the differences explained';
+
+/** The vertical axis: every share, as a percentage. */
+const SHARE_AXIS: ChartAxisSpec = {
+  domain: [0, WHOLE_SHARE],
+  label: VERTICAL_CAPTION,
+  tickCount: 5,
+};

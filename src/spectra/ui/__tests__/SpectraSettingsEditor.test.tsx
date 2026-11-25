@@ -85,7 +85,7 @@ test('the component picker is drawn only for a page that has a decomposition', (
 
   expect(without).not.toContain('Principal components');
   expect(withPanel).toContain('Principal components');
-  expect(withPanel).toContain('PC1 — 74.2 %');
+  expect(withPanel).toContain('PC1 — 74.2\u00A0%');
   expect(withPanel).toContain('89.5 %');
 });
 

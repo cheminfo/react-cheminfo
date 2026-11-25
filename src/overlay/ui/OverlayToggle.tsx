@@ -64,7 +64,8 @@ export interface OverlayToggleProps extends OverlayControlProps {
  * reimplement both and usually gets one of them subtly wrong.
  *
  * A swatch takes the glyph's place when both are given, since the colour is
- * what ties the entry to a mark on the chart.
+ * what ties the entry to a mark on the chart. A button drawn without its words
+ * is named by the family's help card when it carries no help of its own.
  * @param props - See {@link OverlayToggleProps}.
  * @returns The toggle.
  */
@@ -111,8 +112,9 @@ export function OverlayToggle(props: OverlayToggleProps): ReactElement {
     );
   }
 
+  const named = help ?? (hideLabel ? { title: label } : undefined);
   return (
-    <OverlayRow label={label} help={help} hideLabel disabled={disabled}>
+    <OverlayRow label={label} help={named} hideLabel disabled={disabled}>
       <Button
         variant="minimal"
         size={metrics.blueprintSize}
@@ -120,7 +122,6 @@ export function OverlayToggle(props: OverlayToggleProps): ReactElement {
         disabled={disabled}
         aria-pressed={checked}
         aria-label={label}
-        title={hideLabel ? label : undefined}
         icon={
           swatch === undefined ? (
             icon
@@ -129,6 +130,7 @@ export function OverlayToggle(props: OverlayToggleProps): ReactElement {
           )
         }
         text={hideLabel ? undefined : label}
+        style={{ fontSize: metrics.fontSize }}
         data-testid={testId}
         onClick={() => onChange(!checked)}
       />

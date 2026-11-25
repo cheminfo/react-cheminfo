@@ -9,6 +9,7 @@
 
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react';
 
+import { tryCapturePointer } from '../../hooks/ui/pointerDrag.ts';
 import type { LassoPath } from '../core/lassoPath.ts';
 import type { ScatterSelectionMode } from '../core/scatterSelection.ts';
 
@@ -211,11 +212,9 @@ export function surfacePosition(
 export function capturePointer(event: ReactPointerEvent<Element>): void {
   const target = event.currentTarget;
   if (typeof target?.setPointerCapture !== 'function') return;
-  try {
-    target.setPointerCapture(event.pointerId);
-  } catch {
-    // The pointer was already gone; the drag ends through the same one path.
-  }
+  // A pointer already gone is not captured; the drag ends through the same
+  // one path.
+  tryCapturePointer(target, event.pointerId);
 }
 
 /**

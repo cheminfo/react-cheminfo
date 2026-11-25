@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { Accordion, Button } from 'react-science/ui';
 
+import { useHelpCards } from '../../help/ui/useHelpCards.ts';
 import type { Language } from '../../i18n/core/languages.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
@@ -63,6 +64,9 @@ export function SidePanelItem(props: SidePanelItemProps) {
   const { id, title, isOpen, onOpenChange, focus, pin, fillScreen } = props;
   const { onClose, children } = props;
   const t = useChromeT();
+  // The header's buttons explain themselves on the family's help card, as the
+  // rail's do, never on Blueprint's dark slab.
+  const help = useHelpCards();
   const panel = inSentence(title, useLanguage());
   const [screenFillable] = useState(canFillScreen);
   const canFill = fillScreen && screenFillable;
@@ -93,6 +97,7 @@ export function SidePanelItem(props: SidePanelItemProps) {
             aria-expanded={isOpen}
             aria-label={t(isOpen ? 'panel.fold' : 'panel.unfold', { panel })}
             tooltipProps={{
+              ...help('fold'),
               content: t(isOpen ? 'panel.foldTooltip' : 'panel.unfoldTooltip'),
             }}
             onClick={() => onOpenChange(!isOpen)}
@@ -104,7 +109,10 @@ export function SidePanelItem(props: SidePanelItemProps) {
               variant="minimal"
               icon="fullscreen"
               aria-label={t('panel.fillScreen', { panel })}
-              tooltipProps={{ content: t('panel.fillScreenTooltip') }}
+              tooltipProps={{
+                ...help('fill'),
+                content: t('panel.fillScreenTooltip'),
+              }}
               onClick={fill}
             />
           )}
@@ -120,6 +128,7 @@ export function SidePanelItem(props: SidePanelItemProps) {
               aria-pressed={pin.pinned}
               aria-label={t('panel.pin', { panel })}
               tooltipProps={{
+                ...help('pin'),
                 content: pin.pinned
                   ? t('panel.unpinTooltip')
                   : t('panel.pinTooltip'),
@@ -134,6 +143,7 @@ export function SidePanelItem(props: SidePanelItemProps) {
               aria-pressed={focus.active}
               aria-label={t('panel.focus', { panel })}
               tooltipProps={{
+                ...help('focus'),
                 content: focus.active
                   ? t('panel.unfocusTooltip')
                   : t('panel.focusTooltip'),
@@ -144,7 +154,10 @@ export function SidePanelItem(props: SidePanelItemProps) {
           <Button
             variant="minimal"
             icon="cross"
-            tooltipProps={{ content: t('panel.closeTooltip') }}
+            tooltipProps={{
+              ...help('close'),
+              content: t('panel.closeTooltip'),
+            }}
             aria-label={t('panel.close', { panel })}
             onClick={onClose}
           />
@@ -162,7 +175,10 @@ export function SidePanelItem(props: SidePanelItemProps) {
                   className="no-print"
                   icon="minimize"
                   aria-label={t('panel.leaveFullScreen')}
-                  tooltipProps={{ content: t('panel.leaveFullScreenTooltip') }}
+                  tooltipProps={{
+                    ...help('leaveFullScreen'),
+                    content: t('panel.leaveFullScreenTooltip'),
+                  }}
                   onClick={fullscreen.toggle}
                 />
               </div>

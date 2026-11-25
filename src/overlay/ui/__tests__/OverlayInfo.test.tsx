@@ -24,7 +24,7 @@ test('the glyph is named as the question the reader has', () => {
   );
 
   expect(html).toContain('aria-label="What is a principal component?"');
-  expect(html).toContain('title="What is a principal component?"');
+  expect(html).not.toContain('title=');
 });
 
 test('the glyph shrinks with the chrome around it', () => {

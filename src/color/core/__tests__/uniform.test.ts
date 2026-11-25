@@ -1,11 +1,15 @@
 import { expect, test } from 'vitest';
 
+import { FAMILY_TOKEN_VALUES } from '../../../tokens/core/familyTokens.ts';
 import {
   UNIFORM_SWATCH,
   formatUniformColorScale,
   isUniformColorScale,
   uniformSwatch,
 } from '../uniform.ts';
+
+/** The ink readable on a light ground: the family's text colour. */
+const INK = FAMILY_TOKEN_VALUES['--text'];
 
 test('one colour is recognised however the link writes it', () => {
   expect(isUniformColorScale('uniform')).toBe(true);
@@ -20,7 +24,7 @@ test('one colour names its colour, and the ink that reads on it', () => {
   });
   expect(uniformSwatch('Uniform-FD0')).toStrictEqual({
     background: '#ffdd00',
-    foreground: '#182026',
+    foreground: INK,
   });
 });
 

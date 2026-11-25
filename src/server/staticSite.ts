@@ -3,6 +3,7 @@ import { join, relative, resolve, sep } from 'node:path';
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+import { digestHex } from '../download/core/digestHex.ts';
 import { joinBasePath, normalizeBasePath } from '../router/core/basePath.ts';
 import { injectTrackingScript } from '../seo/core/trackingScript.ts';
 import { escapeAttribute } from '../share/core/escape.ts';
@@ -212,12 +213,6 @@ function sendPage(
 }
 
 async function etagOf(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(text),
-  );
-  const bytes = new Uint8Array(digest).subarray(0, 12);
-  let hex = '';
-  for (const byte of bytes) hex += byte.toString(16).padStart(2, '0');
-  return `"${hex}"`;
+  const digest = await digestHex('SHA-256', new TextEncoder().encode(text));
+  return `"${digest.slice(0, 24)}"`;
 }

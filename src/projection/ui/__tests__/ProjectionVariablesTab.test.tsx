@@ -84,9 +84,9 @@ test('one panel per component, each titled with its own share', () => {
   const html = render(iris);
 
   expect(count(html, /role="img" aria-label="PC/g)).toBe(3);
-  expect(html).toContain('PC1 — 73.0 %');
-  expect(html).toContain('PC2 — 22.9 %');
-  expect(html).toContain('PC3 — 3.7 %');
+  expect(html).toContain('PC1 — 73.0\u00A0%');
+  expect(html).toContain('PC2 — 22.9\u00A0%');
+  expect(html).toContain('PC3 — 3.7\u00A0%');
   expect(html).not.toContain('PC4 —');
 });
 

@@ -6,6 +6,8 @@
  * offers are its own: it passes them as a `PickerType`.
  */
 
+import { isAbortError } from '../../error/core/abort.ts';
+
 /** A kind of file a picker offers. */
 export interface PickerType {
   /** What the picker calls it. */
@@ -93,7 +95,7 @@ export async function chooseSaveFile(
       types: [type],
     });
   } catch (error) {
-    return isCancel(error) ? null : undefined;
+    return isAbortError(error) ? null : undefined;
   }
 }
 
@@ -112,7 +114,7 @@ export async function chooseOpenFile(
     const [handle] = await showOpenFilePicker({ id: PICKER_ID, types: [type] });
     return handle ?? null;
   } catch (error) {
-    return isCancel(error) ? null : undefined;
+    return isAbortError(error) ? null : undefined;
   }
 }
 
@@ -130,7 +132,7 @@ export async function chooseFolder(): Promise<
   try {
     return await showDirectoryPicker({ id: PICKER_ID, mode: 'readwrite' });
   } catch (error) {
-    return isCancel(error) ? null : undefined;
+    return isAbortError(error) ? null : undefined;
   }
 }
 
@@ -235,8 +237,4 @@ function isFramed(): boolean {
   } catch {
     return true;
   }
-}
-
-function isCancel(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'AbortError';
 }

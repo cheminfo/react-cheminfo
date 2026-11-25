@@ -176,6 +176,24 @@ export function currentAddress(): string {
   return `${location.pathname}${location.search}${location.hash}`;
 }
 
+/**
+ * Whether the address on screen is the bare root of the site: the router's
+ * root, after its base path, with no page, no query and no fragment. It is the
+ * one address a site may open on what the visitor did last; every other one is
+ * a link somebody handed out, and opens what it names.
+ * @param router - The site's router.
+ * @returns True for the bare root; false for any other address, and where
+ * there is no page address at all.
+ */
+export function isBareRoot<Tab extends string>(
+  router: TabRouter<Tab>,
+): boolean {
+  const location = pageLocation();
+  if (location === undefined) return false;
+  if (location.search !== '' || location.hash !== '') return false;
+  return stripBasePath(router.basePath ?? '', location.pathname) === '/';
+}
+
 function withKeptParams<Tab extends string>(
   router: TabRouter<Tab>,
   route: TabRouteInput<Tab>,
@@ -198,11 +216,4 @@ function withKeptParams<Tab extends string>(
   if (kept.length === 0) return target;
   const separator = target.includes('?') ? '&' : '?';
   return `${target}${separator}${formatQueryEntries(kept)}`;
-}
-
-function isBareRoot<Tab extends string>(router: TabRouter<Tab>): boolean {
-  const location = pageLocation();
-  if (location === undefined) return false;
-  if (location.search !== '' || location.hash !== '') return false;
-  return stripBasePath(router.basePath ?? '', location.pathname) === '/';
 }

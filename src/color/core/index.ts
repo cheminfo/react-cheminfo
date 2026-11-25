@@ -4,6 +4,7 @@ export type { RgbColor } from './hex.ts';
 export { normalizeHexColor, parseHexColor, toHexColor } from './hex.ts';
 export { colorScaleGradient } from './gradient.ts';
 export { hatchedBackground } from './hatch.ts';
+export { OKABE_ITO } from './okabeIto.ts';
 export type { HsvColor } from './hsv.ts';
 export { hsvToRgb, rgbToHsv, wrapHue } from './hsv.ts';
 export type {
@@ -13,6 +14,8 @@ export type {
   Swatch,
 } from './interpolate.ts';
 export { colorAt, evenScale, sampleScale, swatchAt } from './interpolate.ts';
+export type { ScaleSampler } from './sampler.ts';
+export { scaleSampler } from './sampler.ts';
 export type { PositionInRangeOptions } from './scale.ts';
 export { positionInRange } from './scale.ts';
 export type { ColorScaleKind, NamedColorScale } from './scales.ts';
@@ -20,6 +23,7 @@ export {
   COLOR_SCALES,
   COLOR_SCALE_KIND_LABELS,
   DEFAULT_COLOR_SCALE_ID,
+  DEFAULT_COLOR_SCALE_KINDS,
   colorScaleById,
 } from './scales.ts';
 export {

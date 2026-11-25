@@ -92,6 +92,13 @@ interface OverlayNameLook {
    * @default false
    */
   disabled?: boolean;
+  /**
+   * Whether the name stands on the bar's line in front of its control, among
+   * settings that name themselves in their own words (a value button's key):
+   * it is then written at the size of those words.
+   * @default false — a caption, a panel's name column or a name above its control
+   */
+  inline?: boolean;
 }
 
 /**
@@ -102,7 +109,8 @@ interface OverlayNameLook {
  * word. When it carries help it is underlined with dots and takes the help
  * cursor, which is the one convention that lets every question mark leave the
  * panel — and it fades with its control, because a name at full strength over
- * a greyed control reads as half broken rather than as unavailable.
+ * a greyed control reads as half broken rather than as unavailable. On a
+ * bar's line it is as large as the words of the settings beside it.
  * @param metrics - The measurements the card is drawn from.
  * @param look - See {@link OverlayNameLook}.
  * @returns The name's rules.
@@ -111,10 +119,10 @@ export function overlayNameStyle(
   metrics: OverlayMetrics,
   look: OverlayNameLook,
 ): CSSProperties {
-  const { help = false, disabled = false } = look;
+  const { help = false, disabled = false, inline = false } = look;
   return {
     color: 'var(--text-muted)',
-    fontSize: metrics.labelSize,
+    fontSize: inline ? metrics.fontSize : metrics.labelSize,
     fontWeight: 500,
     whiteSpace: 'nowrap',
     userSelect: 'none',

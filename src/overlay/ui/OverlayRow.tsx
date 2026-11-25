@@ -151,13 +151,17 @@ export function OverlayRow(props: OverlayRowProps): ReactElement {
       id={layout === 'grid' ? nameId : undefined}
       className={help === undefined ? undefined : 'help-name'}
       tabIndex={help === undefined ? undefined : 0}
-      style={overlayNameStyle(metrics, { help: help !== undefined, disabled })}
+      style={overlayNameStyle(metrics, {
+        help: help !== undefined,
+        disabled,
+        inline: layout === 'row' && labelPlacement === 'inline',
+      })}
     >
       {label}
     </span>
   ) : null;
   const explained =
-    help === undefined ? (
+    help === undefined || name === null ? (
       name
     ) : (
       <HelpTooltip content={help}>{name}</HelpTooltip>

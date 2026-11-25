@@ -246,38 +246,3 @@ export function overlayBarGroundStyle(
     transition: 'opacity 150ms ease-out',
   };
 }
-
-/**
- * Everything on a stretched bar after its start: the settings, then the glyphs
- * pushed to the right edge, so settings always read from the left and the `?`
- * and the save glyph are always found in the same corner.
- * @param metrics - The measurements the bar is drawn from.
- * @returns The group's rules.
- */
-export function overlayBarGroupStyle(metrics: OverlayMetrics): CSSProperties {
-  return {
-    display: 'flex',
-    flex: '1 1 auto',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: metrics.gap,
-    minWidth: 0,
-  };
-}
-
-/**
- * One end of a stretched bar.
- *
- * Both ends are drawn from the same rule, so the pills at the start and the
- * controls at the end keep one rhythm across the width between them.
- * @param metrics - The measurements the bar is drawn from.
- * @returns The end's rules.
- */
-export function overlayBarSideStyle(metrics: OverlayMetrics): CSSProperties {
-  return {
-    display: 'flex',
-    alignItems: 'center',
-    gap: metrics.gap,
-    minWidth: 0,
-  };
-}

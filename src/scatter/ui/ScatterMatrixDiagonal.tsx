@@ -24,6 +24,11 @@ export interface ScatterMatrixGrid {
   shown: number;
   /** Side of every plot rectangle, in pixels — the same in every cell. */
   side: number;
+  /**
+   * How many ticks a written axis aims for, chosen once for the grid: the
+   * labels the left column's room was measured on are the ones drawn.
+   */
+  ticks: number;
   /** Room the left column and the bottom row keep for their ticks and titles. */
   room: { left: number; bottom: number };
   /** One range per axis, so a column reads across and a row reads down. */

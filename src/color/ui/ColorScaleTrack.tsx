@@ -7,6 +7,7 @@ import type {
 import { useRef } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { sliderKeyValue } from '../../range/core/sliderKey.ts';
 import type { ColorScale, ColorStop } from '../core/interpolate.ts';
 import { addColorStop, moveColorStop } from '../core/stops.ts';
 
@@ -104,26 +105,17 @@ export function ColorScaleTrack(props: ColorScaleTrackProps): ReactElement {
       onRemove(index);
       return;
     }
-    const step = event.shiftKey ? KEY_STEP_LARGE : KEY_STEP;
-    const delta =
-      event.key === 'ArrowRight' || event.key === 'ArrowUp'
-        ? step
-        : event.key === 'ArrowLeft' || event.key === 'ArrowDown'
-          ? -step
-          : 0;
-    if (delta === 0) return;
-    event.preventDefault();
     // From the keyboard an anchor stops at its neighbours, so focus stays on
     // the anchor being moved.
-    const low = scale.stops[index - 1]?.position ?? 0;
-    const high = scale.stops[index + 1]?.position ?? 1;
-    const position = (scale.stops[index]?.position ?? 0) + delta;
-    const moved = moveColorStop(
-      scale.stops,
-      index,
-      Math.min(high, Math.max(low, position)),
-    );
-    onChange(moved.stops);
+    const position = sliderKeyValue(scale.stops[index]?.position ?? 0, event, {
+      min: scale.stops[index - 1]?.position ?? 0,
+      max: scale.stops[index + 1]?.position ?? 1,
+      step: KEY_STEP,
+      page: KEY_STEP_LARGE,
+    });
+    if (position === null) return;
+    event.preventDefault();
+    onChange(moveColorStop(scale.stops, index, position).stops);
   }
 
   return (

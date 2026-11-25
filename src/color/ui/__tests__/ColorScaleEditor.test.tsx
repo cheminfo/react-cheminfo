@@ -35,7 +35,7 @@ test('the saturation and the brightness are set for every anchor at once', () =>
 
   expect(html).toContain('Saturation');
   expect(html).toContain('Brightness');
-  expect(html.match(/100 %/g)).toHaveLength(2);
+  expect(html.match(/100\u00A0%/g)).toHaveLength(2);
 });
 
 test('the first anchor is the one shown to set exactly, with one colour box', () => {

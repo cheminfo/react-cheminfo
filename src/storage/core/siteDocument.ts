@@ -4,10 +4,16 @@ import {
   SOURCE_VERSION,
 } from '../../download/core/sourceEnvelope.ts';
 import { isSameSite } from '../../ecosystem/core/lookup.ts';
-import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 import type { ArchiveEntry, ArchiveFile } from './backupFiles.ts';
 import { readArchive, writeArchive } from './backupFiles.ts';
+import type { DocumentManifest } from './documentManifest.ts';
+import {
+  MANIFEST,
+  manifestCandidates,
+  parsedManifestText,
+  readManifest,
+} from './documentManifest.ts';
 import type { WorkspaceRecord } from './workspaceFile.ts';
 import { readWorkspaceValue, writeWorkspaceText } from './workspaceFile.ts';
 
@@ -16,7 +22,6 @@ import { readWorkspaceValue, writeWorkspaceText } from './workspaceFile.ts';
  * file of the family carries (`sourceEnvelope.ts`).
  */
 
-const MANIFEST = 'manifest.json';
 const VIEW = 'view.json';
 const PREFERENCES = 'preferences.json';
 const ATTACHMENTS = 'files/';
@@ -79,19 +84,6 @@ export interface SiteDocument {
   preferences?: WorkspaceRecord;
   /** The files it carries beside, their paths taken from inside `files/`. */
   attachments: ArchiveFile[];
-}
-
-/** The manifest at the root of a document. */
-interface DocumentManifest {
-  format: typeof SOURCE_FORMAT;
-  version: typeof SOURCE_VERSION;
-  site: string;
-  generator?: string;
-  savedAt: string;
-  data: string[];
-  view?: string;
-  preferences?: string;
-  attachments?: string[];
 }
 
 /**
@@ -236,38 +228,13 @@ export function siteDocumentExtension(site: string): string {
 function findManifest(
   files: readonly ArchiveFile[],
 ): { manifest: DocumentManifest; folder: string } | undefined {
-  const candidates = files
-    .filter(({ path }) => path === MANIFEST || path.endsWith(`/${MANIFEST}`))
-    .toSorted((a, b) => a.path.length - b.path.length);
-  for (const candidate of candidates) {
+  for (const candidate of manifestCandidates(files)) {
     const manifest = readManifest(parsedJson(candidate));
     if (manifest) {
       return { manifest, folder: candidate.path.slice(0, -MANIFEST.length) };
     }
   }
   return undefined;
-}
-
-function readManifest(value: unknown): DocumentManifest | undefined {
-  if (
-    !isPlainRecord(value) ||
-    value.format !== SOURCE_FORMAT ||
-    value.version !== SOURCE_VERSION
-  ) {
-    return undefined;
-  }
-  const { site, generator, savedAt, data, view, preferences } = value;
-  if (typeof site !== 'string' || !Array.isArray(data)) return undefined;
-  return {
-    format: SOURCE_FORMAT,
-    version: SOURCE_VERSION,
-    site,
-    ...(typeof generator === 'string' ? { generator } : {}),
-    savedAt: typeof savedAt === 'string' ? savedAt : '',
-    data: data.filter((path): path is string => typeof path === 'string'),
-    ...(typeof view === 'string' ? { view } : {}),
-    ...(typeof preferences === 'string' ? { preferences } : {}),
-  };
 }
 
 function readPreferencesPart(
@@ -283,12 +250,7 @@ function readPreferencesPart(
 }
 
 function parsedJson(entry: ArchiveFile | undefined): unknown {
-  if (!entry) return undefined;
-  try {
-    return JSON.parse(entry.text());
-  } catch {
-    return undefined;
-  }
+  return entry === undefined ? undefined : parsedManifestText(entry.text());
 }
 
 export { SOURCE_FORMAT as DOCUMENT_FORMAT } from '../../download/core/sourceEnvelope.ts';

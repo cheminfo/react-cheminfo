@@ -38,6 +38,8 @@ test('a site no menu lists yet is still found by its identifier and its host', (
   expect(findSiteByHost('www.molecules.cheminfo.org')?.id).toBe('molecules');
   expect(siteById('mz').host).toBe('mz.cheminfo.org');
   expect(findSiteByHost('mz.cheminfo.org')?.id).toBe('mz');
+  expect(siteById('image').host).toBe('image.cheminfo.org');
+  expect(findSiteByHost('image.cheminfo.org')?.id).toBe('image');
 });
 
 test('fair is one of the family, found by its identifier and its host', () => {

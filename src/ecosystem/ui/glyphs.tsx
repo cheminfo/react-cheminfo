@@ -924,4 +924,21 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // A nucleus inside the outline segmentation drew around it, and a smaller
+  // object beside it: an image read as the objects it holds. The outline
+  // carries the answering colour, because the outline is what the tool finds.
+  image: (alt) => (
+    <>
+      <circle cx="12.5" cy="13" r="5.5" fill="#ffffff" />
+      <circle
+        cx="12.5"
+        cy="13"
+        r="8.75"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.5"
+      />
+      <circle cx="23" cy="22.5" r="3.5" fill="#ffffff" />
+    </>
+  ),
 };

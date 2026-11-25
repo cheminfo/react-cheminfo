@@ -17,6 +17,7 @@ export * from './dropzone/ui/index.ts';
 export * from './ecosystem/ui/index.ts';
 export * from './error/ui/index.ts';
 export * from './guide/ui/index.ts';
+export * from './format/ui/index.ts';
 export * from './help/ui/index.ts';
 export * from './highlight/ui/index.ts';
 export * from './hooks/ui/index.ts';

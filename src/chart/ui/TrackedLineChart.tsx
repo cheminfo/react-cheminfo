@@ -184,7 +184,7 @@ export function TrackedLineChart(props: TrackedLineChartProps): ReactElement {
     .toSorted((a, b) => Number(b.muted === true) - Number(a.muted === true));
   const slots = Math.max(1, categories.length);
   const domain = y?.domain ?? seriesDomain(drawn, categories.length);
-  const nicing = { count: y?.tickCount, nice: y?.nice };
+  const nicing = { count: y?.tickCount, nice: y?.nice, format: y?.format };
   const ticks = chartAxisScale(domain[0], domain[1], nicing);
   const under: ChartAxisSpec = { domain: [0, slots], label: xLabel };
   const margins = {

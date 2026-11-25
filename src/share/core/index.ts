@@ -24,6 +24,14 @@ export { createExampleMark } from './exampleMark.ts';
 export type { KeySetParamOptions } from './keySetParam.ts';
 export { keySetParam } from './keySetParam.ts';
 export {
+  TOO_LARGE_MESSAGE,
+  fromBase64Url,
+  pipeBytes,
+  toBase64Url,
+} from './linkBytes.ts';
+export type { LinkTextLimits } from './linkText.ts';
+export { packLinkText, unpackLinkText } from './linkText.ts';
+export {
   MAX_LINK_TOKEN,
   packLinkValue,
   packLinkValueIfFits,

@@ -1,90 +1,27 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useId } from 'react';
 
 import { OverlayLayer } from '../../overlay/ui/OverlayLayer.tsx';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
-import type { ChartAxisScale } from '../core/chartAxisScale.ts';
-import type { ChartScale } from '../core/chartScale.ts';
 
 import { ChartAxis } from './ChartAxis.tsx';
+import { ChartFrameContext } from './chartFrameContext.ts';
 import { chartFrameGeometry } from './chartFrameGeometry.ts';
+import type {
+  ChartAxisSpec,
+  ChartFrameRender,
+  ChartFrameSvgProps,
+  ChartMargins,
+} from './chartFrameTypes.ts';
 import { CHART_SVG_STYLE, chartFrameStyle } from './chartStyles.ts';
 
-/** How one axis of a {@link ChartFrame} is drawn. */
-export interface ChartAxisSpec {
-  /** The data range the axis covers, before nicing. */
-  domain: readonly [number, number];
-  /**
-   * The axis title, already carrying its share — build it with
-   * `chartAxisTitle`. Any power of ten the labels were divided by is appended
-   * by the frame itself.
-   * @default undefined — the axis carries no title and its margin shrinks
-   */
-  label?: string;
-  /**
-   * Roughly how many ticks to aim for.
-   * @default 5
-   */
-  tickCount?: number;
-  /**
-   * Whether to rule the plot at every tick.
-   * @default true
-   */
-  showGrid?: boolean;
-  /**
-   * Whether the tick marks and their labels are drawn. An inner cell of a pair
-   * grid turns them off and keeps the grid.
-   * @default true
-   */
-  showTicks?: boolean;
-  /**
-   * Whether the domain is widened outward to whole tick steps.
-   * @default true
-   */
-  nice?: boolean;
-}
-
-/** The rectangle the data is drawn in, in SVG pixels. */
-export interface ChartPlotArea {
-  /** Left edge. */
-  left: number;
-  /** Top edge. */
-  top: number;
-  /** Right edge. */
-  right: number;
-  /** Bottom edge. */
-  bottom: number;
-  /** Width. */
-  width: number;
-  /** Height. */
-  height: number;
-}
-
-/** Room left around the plot, in pixels. */
-export interface ChartMargins {
-  /** Above the plot. */
-  top: number;
-  /** To the right of it. */
-  right: number;
-  /** Below it, where the horizontal axis is written. */
-  bottom: number;
-  /** To its left, where the vertical axis is written. */
-  left: number;
-}
-
-/** What a {@link ChartFrame} hands the function that draws inside it. */
-export interface ChartFrameRender {
-  /** The rectangle to draw in. */
-  plot: ChartPlotArea;
-  /** Data to pixels, horizontally. */
-  x: ChartScale;
-  /** Data to pixels, vertically; its `factor` is negative. */
-  y: ChartScale;
-  /** The horizontal axis as it was niced. */
-  xAxis: ChartAxisScale;
-  /** The vertical axis as it was niced. */
-  yAxis: ChartAxisScale;
-}
+export type {
+  ChartAxisSpec,
+  ChartFrameRender,
+  ChartFrameSvgProps,
+  ChartMargins,
+  ChartPlotArea,
+} from './chartFrameTypes.ts';
 
 /** What {@link ChartFrame} needs. */
 export interface ChartFrameProps {
@@ -105,7 +42,8 @@ export interface ChartFrameProps {
    * What floats over the chart in HTML rather than SVG — an `OverlayBar`, a
    * legend, a readout. It is wrapped in an `OverlayLayer`, so it is not
    * clipped, not scaled, and lets every pointer event through except on the
-   * cards themselves.
+   * cards themselves; and it reads the frame it floats over with
+   * `useChartFrame`, so a key held inside the plot follows the plot.
    * @default undefined
    */
   overlay?: ReactNode;
@@ -134,6 +72,19 @@ export interface ChartFrameProps {
    * @default undefined — the frame works them out itself
    */
   geometry?: ChartFrameRender;
+  /**
+   * The SVG's handlers and ref, for a chart that answers gestures — a drag
+   * that zooms or selects, a wheel, a double click.
+   * @default undefined — the frame answers none
+   */
+  svgProps?: ChartFrameSvgProps;
+  /**
+   * Whether a still chart scales down with the box it is placed in — a
+   * document read on a phone: its drawing keeps its proportions, its text
+   * with it, and is never wider than `width`.
+   * @default false — drawn at its width and height
+   */
+  scalable?: boolean;
   /**
    * A class added to the wrapper, for a site placing the figure.
    * @default undefined
@@ -170,6 +121,8 @@ export function ChartFrame(props: ChartFrameProps): ReactElement {
     label = '',
     margins = {},
     geometry,
+    svgProps,
+    scalable = false,
     className,
     testId,
   } = props;
@@ -200,12 +153,22 @@ export function ChartFrame(props: ChartFrameProps): ReactElement {
   return (
     <div
       className={joinClassNames('chart-frame', className)}
-      style={chartFrameStyle(width, height)}
+      style={
+        scalable
+          ? scalableFrameStyle(width, height)
+          : chartFrameStyle(width, height)
+      }
       data-testid={testId}
     >
       <svg
-        width={Math.max(0, width)}
-        height={Math.max(0, height)}
+        {...svgProps}
+        width={scalable ? '100%' : Math.max(0, width)}
+        height={scalable ? '100%' : Math.max(0, height)}
+        viewBox={
+          scalable
+            ? `0 0 ${Math.max(0, width)} ${Math.max(0, height)}`
+            : undefined
+        }
         style={CHART_SVG_STYLE}
         role={label === '' ? undefined : 'img'}
         aria-label={label === '' ? undefined : label}
@@ -229,9 +192,27 @@ export function ChartFrame(props: ChartFrameProps): ReactElement {
       </svg>
       {overlay === undefined ? null : (
         <OverlayLayer width={width} busy={busy}>
-          {overlay}
+          <ChartFrameContext.Provider value={frame}>
+            {overlay}
+          </ChartFrameContext.Provider>
         </OverlayLayer>
       )}
     </div>
   );
+}
+
+/**
+ * The block of a still chart that scales down with its box: as wide as the
+ * box allows up to its own width, its height kept in proportion.
+ * @param width - Its width, in pixels.
+ * @param height - Its height, in pixels.
+ * @returns The block's style.
+ */
+function scalableFrameStyle(width: number, height: number): CSSProperties {
+  return {
+    position: 'relative',
+    width: '100%',
+    maxWidth: Math.max(0, width),
+    aspectRatio: `${Math.max(1, width)} / ${Math.max(1, height)}`,
+  };
 }

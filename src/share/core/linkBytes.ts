@@ -3,34 +3,30 @@
  * inflated through the browser's own streams.
  */
 
+import { base64ToUint8Array, uint8ArrayToBase64 } from 'uint8array-extras';
+
+/** What {@link pipeBytes} throws once the bytes out weigh more than allowed. */
+export const TOO_LARGE_MESSAGE = 'The value unpacks larger than allowed.';
+
 /**
  * Write bytes in the URL-safe base64 alphabet, without padding.
  * @param bytes - The bytes.
  * @returns The text.
  */
 export function toBase64Url(bytes: Uint8Array): string {
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCodePoint(byte);
-  return btoa(binary)
-    .replaceAll('+', '-')
-    .replaceAll('/', '_')
-    .replace(/[=]+$/, '');
+  return uint8ArrayToBase64(bytes, { urlSafe: true });
 }
 
 /**
  * Read bytes written by {@link toBase64Url}.
  * @param text - The text, without padding.
- * @returns The bytes, or `null` when the text is not URL-safe base64.
+ * @returns The bytes, or `null` when the text is not URL-safe base64, or its
+ * length leaves a single character over, which no number of bytes is written
+ * as.
  */
 export function fromBase64Url(text: string): Uint8Array<ArrayBuffer> | null {
   if (!/^[\w-]*$/.test(text) || text.length % 4 === 1) return null;
-  const base64 = text.replaceAll('-', '+').replaceAll('_', '/');
-  const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index++) {
-    bytes[index] = binary.codePointAt(index) ?? 0;
-  }
-  return bytes;
+  return base64ToUint8Array(text);
 }
 
 /**
@@ -41,8 +37,9 @@ export function fromBase64Url(text: string): Uint8Array<ArrayBuffer> | null {
  * cannot make the page inflate without end.
  * @default Infinity
  * @returns The bytes out.
- * @throws {Error} When the bytes out weigh more than `limit`, or the stream
- * cannot read the bytes in.
+ * @throws {RangeError} {@link TOO_LARGE_MESSAGE} as soon as the bytes out
+ * weigh more than `limit`; whatever the stream throws when it cannot read the
+ * bytes in.
  */
 export async function pipeBytes(
   bytes: Uint8Array<ArrayBuffer>,
@@ -66,7 +63,7 @@ function capped(limit: number): TransformStream<Uint8Array, Uint8Array> {
     transform(chunk, controller) {
       length += chunk.byteLength;
       if (length > limit) {
-        controller.error(new Error('The value unpacks larger than allowed.'));
+        controller.error(new RangeError(TOO_LARGE_MESSAGE));
         return;
       }
       controller.enqueue(chunk);

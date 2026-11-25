@@ -20,8 +20,8 @@ test('both axes say how much of the differences they account for', () => {
     <PcaViewer pca={model} rows={rows} scaled samples={SAMPLES} />,
   );
 
-  expect(html).toContain('PC1 — 73.0 %');
-  expect(html).toContain('PC2 — 22.9 %');
+  expect(html).toContain('PC1 — 73.0\u00A0%');
+  expect(html).toContain('PC2 — 22.9\u00A0%');
 });
 
 test('every flower is one filled dot', () => {

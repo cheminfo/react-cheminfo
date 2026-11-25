@@ -31,6 +31,29 @@
 
   --header-height: 3rem;
   --page-max: 84rem;
+
+  /* What a status says is shared too, and never retuned per site. */
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+}
+
+/* Blueprint's primary intent — a primary button or tag, a checked control —
+   is the site's accent. Its hover and press shades are darker, as Blueprint's
+   own blues are: they also write the text of minimal and outlined primary
+   buttons, which a lighter shade would leave under 4.5:1 on white. */
+:root {
+  --bp-intent-primary-rest: var(--accent, var(--bp-palette-blue-3));
+  --bp-intent-primary-hover: color-mix(
+    in oklab,
+    var(--accent, var(--bp-palette-blue-3)) 85%,
+    black
+  );
+  --bp-intent-primary-active: color-mix(
+    in oklab,
+    var(--accent, var(--bp-palette-blue-3)) 70%,
+    black
+  );
 }
 
 /* The size goes on `body`, never on `html`: `rem` has to stay the browser's
@@ -66,6 +89,166 @@ math {
    rules are more specific and still stretch a button that asks to. */
 .bp6-button {
   flex-shrink: 0;
+}
+
+/* Muted text is the family's grey wherever Blueprint writes it. */
+.bp6-text-muted {
+  color: var(--text-muted);
+}
+
+/* The inks Blueprint reads from its own variables — muted text, the text of a
+   control, what is disabled, and the wash a minimal button takes under the
+   pointer — are the family's. */
+:root {
+  --bp-typography-color-muted: var(--text-muted);
+  --bp-typography-color-default-rest: var(--text);
+  --bp-typography-color-default-disabled: var(--text-faint);
+  --bp-intent-default-disabled: var(--text-faint);
+  --bp-intent-default-hover: var(--text);
+  --bp-intent-default-active: var(--text);
+}
+
+/* The greys and the blue Blueprint compiles in as values rather than reading
+   them from a variable. An intent keeps its own colour: its rules are more
+   specific than these. */
+.bp6-html-select .bp6-icon {
+  color: var(--text-muted);
+}
+
+.bp6-spinner .bp6-spinner-head {
+  stroke: var(--text-muted);
+}
+
+.bp6-spinner .bp6-spinner-track {
+  stroke: var(--border);
+}
+
+.bp6-spinner.bp6-intent-primary .bp6-spinner-head {
+  stroke: var(--accent);
+}
+
+.bp6-progress-bar {
+  background: var(--border);
+}
+
+.bp6-progress-bar .bp6-progress-meter {
+  background-color: var(--text-muted);
+}
+
+.bp6-progress-bar.bp6-intent-primary .bp6-progress-meter {
+  background-color: var(--accent);
+}
+
+.bp6-input:disabled,
+.bp6-input.bp6-disabled {
+  background: var(--surface-sunken);
+}
+
+table.bp6-html-table td,
+table.bp6-html-table th {
+  color: var(--text);
+}
+
+/* A striped table's every other row lies on the sunken ground. */
+table.bp6-html-table.bp6-html-table-striped tbody tr:nth-child(odd) td {
+  background: var(--surface-sunken);
+}
+
+/* Blueprint's warning intent — a warning callout, a warning button — is the
+   family's warning colour, as its primary is the accent: a button filled with
+   it, in the family's ink; a callout washed with it, its icon in it and its
+   words in the family's ink, since the warning colour on white is under
+   4.5:1. */
+:root {
+  --bp-intent-warning-rest: var(--warning);
+  --bp-intent-warning-hover: color-mix(in oklab, var(--warning) 85%, black);
+  --bp-intent-warning-active: color-mix(in oklab, var(--warning) 70%, black);
+  --bp-intent-warning-foreground: var(--text);
+  --bp6-button-warning-rest: var(--warning);
+}
+
+.bp6-callout.bp6-intent-warning,
+.bp6-callout.bp6-intent-warning .bp6-heading {
+  color: var(--text);
+}
+
+.bp6-callout.bp6-intent-warning[class*='bp6-icon-']::before,
+.bp6-callout.bp6-intent-warning > .bp6-icon:first-child {
+  color: var(--warning);
+}
+
+.bp6-callout.bp6-intent-warning:not(.bp6-minimal) {
+  background-color: color-mix(in oklab, var(--warning) 10%, white);
+}
+
+/* A primary callout is the site's accent, as a primary button is. */
+.bp6-callout.bp6-intent-primary,
+.bp6-callout.bp6-intent-primary[class*='bp6-icon-']::before,
+.bp6-callout.bp6-intent-primary > .bp6-icon:first-child,
+.bp6-callout.bp6-intent-primary .bp6-heading {
+  color: var(--accent);
+}
+
+.bp6-callout.bp6-intent-primary:not(.bp6-minimal) {
+  background-color: color-mix(in oklab, var(--accent) 10%, white);
+}
+
+/* The icons and the labels of a menu, and the icon heading a dialog, a drawer
+   or a callout. A callout of an intent keeps its colour, which Blueprint gives
+   it with a rule exactly as specific as this one. */
+.bp6-menu-item::before,
+.bp6-menu-item .bp6-menu-item-icon,
+.bp6-menu-item .bp6-menu-item-selected-icon,
+.bp6-menu-item .bp6-submenu-icon,
+.bp6-menu-item .bp6-menu-item-label {
+  color: var(--text-muted);
+}
+
+.bp6-dialog-header .bp6-icon:not([class*='bp6-intent']),
+.bp6-drawer-header .bp6-icon {
+  color: var(--text-muted);
+}
+
+.bp6-callout.bp6-callout-icon:where(:not([class*='bp6-intent-']))
+  > .bp6-icon:first-child {
+  color: var(--text-muted);
+}
+
+/* An empty state — a page waiting for data, a panel with nothing to show —
+   in the family's greys: its words muted, its glyph faint. */
+.bp6-non-ideal-state,
+.bp6-non-ideal-state .bp6-heading {
+  color: var(--text-muted);
+}
+
+.bp6-non-ideal-state-visual {
+  color: var(--text-faint);
+}
+
+/* A link is the site's accent, never Blueprint's blue. Blueprint's own
+   underline on hover is kept, and a button drawn as a link keeps its colours:
+   its rules outrank an element. */
+a,
+a:hover {
+  color: var(--accent);
+}
+
+/* A link inside a sentence is underlined too: on a site whose accent is close
+   to the text, the colour alone does not tell it from the words beside it
+   (WCAG 1.4.1). A link with a role (a button drawn as a link, a menu item),
+   a page's own navigation and a picture that is a link keep their own look. */
+.site-shell__main
+  :where(p, li, dd, td, figcaption)
+  a:not([role], .nav-link, nav a, :has(img)) {
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 2px;
+}
+
+.site-shell__main
+  :where(p, li, dd, td, figcaption)
+  a:not([role], .nav-link, nav a, :has(img)):hover {
+  text-decoration-color: currentcolor;
 }
 
 /* ── The bar ─────────────────────────────────────────────────────────────── */
@@ -274,7 +457,7 @@ math {
    the page you are on. */
 .nav-link--active,
 .nav-link--active:hover {
-  background: color-mix(in oklab, var(--accent) 12%, white);
+  background: var(--accent-wash);
   color: var(--accent);
 }
 
@@ -305,11 +488,19 @@ math {
   font-weight: 600;
 }
 
-/* The brand marks the current entry of a header menu too, not Blueprint's own
-   blue. */
-.nav-menu .bp6-menu-item.bp6-active,
-.nav-menu .bp6-menu-item.bp6-active:hover {
-  background: color-mix(in oklab, var(--accent) 12%, white);
+/* The brand marks the current entry of every menu — a header menu, a
+   picker's step, a select's choice —, never Blueprint's own blue. An entry of
+   an intent keeps the colour that says so: its rules are more specific. */
+.bp6-menu-item.bp6-active,
+.bp6-menu-item.bp6-active:where(:not([class*='bp6-intent-'])):hover {
+  background: var(--accent-wash);
+  color: var(--accent);
+}
+
+.bp6-menu-item.bp6-active::before,
+.bp6-menu-item.bp6-active .bp6-menu-item-icon,
+.bp6-menu-item.bp6-active .bp6-menu-item-selected-icon,
+.bp6-menu-item.bp6-active .bp6-submenu-icon {
   color: var(--accent);
 }
 
@@ -723,6 +914,17 @@ a.source-badge:hover {
   overflow-y: auto;
   min-height: 0;
   padding-right: 4px;
+}
+
+/* What the person must read before handing the link out stands first in the
+   options, in view when the dialog opens; a notice that says nothing takes no
+   room. */
+.share-dialog__notice {
+  margin-bottom: 14px;
+}
+
+.share-dialog__notice:empty {
+  display: none;
 }
 
 /* The tabs the two panes fold into on a narrow dialog. */
@@ -1201,6 +1403,12 @@ a.source-badge:hover {
   }
 }
 
+/* A bar that would cut the name keeps the mark alone: an ellipsis halfway
+   through a site's name names no site (`useWholeWordmark`). */
+.brand--mark-only .wordmark {
+  display: none;
+}
+
 /* ── The footer ──────────────────────────────────────────────────────────── */
 
 /* The family, in the page rather than only behind the Tools button: this is
@@ -1281,6 +1489,15 @@ select,
     copy;
 }
 
+/* The brand tint that says "this one": the current page, the selected row, the
+   chosen entry. It is declared on the root, as the accent it mixes is, so it
+   follows the site's colour; the clear one is for a ground that shows
+   through. A site writes the token, never the mix (check-tokens flags it). */
+:root {
+  --accent-wash: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  --accent-wash-clear: color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
 .click-to-copy {
   position: relative;
   border-radius: 4px;
@@ -1355,7 +1572,7 @@ select,
    would stay on after the tap, over the tick. */
 @media (hover: hover) {
   .click-to-copy:not([data-copy]):hover {
-    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+    background-color: var(--accent-wash-clear);
   }
 }
 
@@ -1384,7 +1601,7 @@ select,
   .click-to-copy.click-to-copy.click-to-copy.click-to-copy:is(td, th):not(
       [data-copy]
     ):hover {
-    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+    background-color: var(--accent-wash-clear);
   }
 }
 
@@ -1473,40 +1690,41 @@ tr[data-highlight='selected'][data-highlight][data-highlight][data-highlight]
 }
 
 /* Blueprint paints the track in its own grey and the kept part in its own
-   blue, which are the two colours the family never uses. */
-.range-slider .bp6-slider {
+   blue, which are the two colours the family never uses. A single value's
+   slider, `MeasuredSlider`, is drawn as a range's. */
+:is(.range-slider, .measured-slider) .bp6-slider {
   min-width: 0;
 }
 
-.range-slider .bp6-slider-progress {
+:is(.range-slider, .measured-slider) .bp6-slider-progress {
   background: var(--border);
 }
 
-.range-slider .bp6-slider-progress.bp6-intent-primary {
+:is(.range-slider, .measured-slider) .bp6-slider-progress.bp6-intent-primary {
   background: var(--accent);
 }
 
-.range-slider .bp6-slider-handle {
+:is(.range-slider, .measured-slider) .bp6-slider-handle {
   background: var(--surface);
   box-shadow:
     0 0 0 1px var(--accent),
     var(--shadow-sm);
 }
 
-.range-slider .bp6-slider-handle:hover {
-  background: color-mix(in oklab, var(--accent) 12%, var(--surface));
+:is(.range-slider, .measured-slider) .bp6-slider-handle:hover {
+  background: var(--accent-wash);
 }
 
-.range-slider .bp6-slider-handle.bp6-active {
+:is(.range-slider, .measured-slider) .bp6-slider-handle.bp6-active {
   background: color-mix(in oklab, var(--accent) 28%, var(--surface));
 }
 
-.range-slider .bp6-slider-handle:focus-visible {
+:is(.range-slider, .measured-slider) .bp6-slider-handle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
-.range-slider .bp6-disabled .bp6-slider-handle {
+:is(.range-slider, .measured-slider) .bp6-disabled .bp6-slider-handle {
   background: var(--surface-sunken);
   box-shadow: 0 0 0 1px var(--border-strong);
 }
@@ -1546,7 +1764,7 @@ tr[data-highlight='selected'][data-highlight][data-highlight][data-highlight]
 
 @media (hover: hover) {
   .range-slider__value:not(:disabled):hover {
-    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+    background-color: var(--accent-wash-clear);
   }
 }
 
@@ -1776,6 +1994,14 @@ span.taxon-lineage__name {
 
 .help-icon:hover {
   color: var(--accent);
+}
+
+/* A shell that fills the window — a workbench — never scrolls itself: its
+   main area takes the room under the bar and each panel scrolls inside it. */
+.site-shell--window {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ── What a logger collected ────────────────────────────────────────────── */
@@ -2260,7 +2486,7 @@ span.taxon-lineage__name {
 .exercise-list__item--active,
 .exercise-list__item--active:hover {
   border-color: color-mix(in oklab, var(--accent) 30%, white);
-  background: color-mix(in oklab, var(--accent) 12%, white);
+  background: var(--accent-wash);
   color: var(--accent);
 }
 
@@ -2291,7 +2517,21 @@ span.taxon-lineage__name {
   text-transform: uppercase;
 }
 
+/* A heading that is a name — a file, a step — keeps its own case. */
+.properties__title--as-written {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* What speaks for the whole group, between its heading and its rows. */
+.properties__lead {
+  margin: 0 0 0.35rem;
+}
+
 .properties__table {
+  /* Where a value ends: short of the edge by the room its copy glyph takes. */
+  --properties-value-inset: 22px;
+
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
@@ -2306,11 +2546,27 @@ span.taxon-lineage__name {
 }
 
 .properties__table td {
-  padding: 0.3rem 22px 0.3rem 0;
+  padding: 0.3rem var(--properties-value-inset) 0.3rem 0;
   font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
   text-align: right;
   vertical-align: top;
-  word-break: break-all;
+}
+
+/*
+  A table of numbers among the tables of properties — a statistic per column,
+  their names over them — ends where their values end: the last column keeps
+  the values' inset, so its numbers line up with the values above and below.
+*/
+.properties__table--numbers th:not(:first-child),
+.properties__table--numbers td {
+  padding: 0.3rem 0 0.3rem 8px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.properties__table--numbers tr > :last-child {
+  padding-right: var(--properties-value-inset);
 }
 
 .properties__note {
@@ -2450,7 +2706,7 @@ span.taxon-lineage__name {
 .settings-dialog__tabs.bp6-vertical
   > .bp6-tab-list
   > .bp6-tab[aria-selected='true'] {
-  background: color-mix(in oklab, var(--accent) 12%, white);
+  background: var(--accent-wash);
   color: var(--accent);
 }
 
@@ -2558,12 +2814,25 @@ span.taxon-lineage__name {
 }
 
 /* A fixed part of a field's value — an extension, a unit — sits on the field's
-   line, in the field's type: Blueprint hangs it from the top of the box. */
+   line, in the field's type: Blueprint hangs it from the top of the box. The
+   field's text is Blueprint's body size for its size class — medium by
+   default, small or large on a `.bp6-small` or `.bp6-large` group — never the
+   page's, and the affix takes the same. The class sits on the field's group
+   (`NumberInput` applies it whenever it has an affix) or on an element around
+   it, for a field a library draws. */
 .input-affix .bp6-input-left-container,
 .input-affix .bp6-input-action {
   display: flex;
   height: 100%;
   align-items: center;
+}
+
+/* The field stands at the top of the group's line, so the group is exactly
+   as tall as the field and the affix, centred in the group, is centred on the
+   field's line: aligned to the middle of the page's taller line, the field
+   would leave a strip above it and the affix would sit a pixel high. */
+:is(.input-affix, .input-affix .bp6-input-group) > .bp6-input {
+  vertical-align: top;
 }
 
 .input-affix .bp6-input-left-container > *,
@@ -2572,6 +2841,35 @@ span.taxon-lineage__name {
   color: var(--text-muted);
   font-size: var(--bp-typography-size-body-medium);
   line-height: 1;
+}
+
+:is(.input-affix.bp6-small, .input-affix .bp6-small)
+  > :is(.bp6-input-left-container, .bp6-input-action)
+  > * {
+  font-size: var(--bp-typography-size-body-small);
+}
+
+:is(.input-affix.bp6-large, .input-affix .bp6-large)
+  > :is(.bp6-input-left-container, .bp6-input-action)
+  > * {
+  font-size: var(--bp-typography-size-body-large);
+}
+
+/* A choice worn as an affix (`<AffixSelect>`), a quantity's unit: the
+   affix's type on the field's line, with no box of its own. */
+.affix-select {
+  height: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.affix-select:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 /*
@@ -3571,7 +3869,7 @@ button.empty-guide__figure:focus-visible .empty-guide__label {
 .chip[aria-pressed='true'],
 .chip[aria-pressed='true']:hover {
   border-color: color-mix(in oklab, var(--accent) 30%, white);
-  background: color-mix(in oklab, var(--accent) 12%, white);
+  background: var(--accent-wash);
   color: var(--accent);
 }
 

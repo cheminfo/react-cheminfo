@@ -16,11 +16,12 @@ import {
   SCATTER_MATRIX_GAP as GAP,
   SCATTER_MATRIX_MARGINS as MARGINS,
   SCATTER_MATRIX_MOST_AXES,
-  SCATTER_MATRIX_ROOM as ROOM,
   SCATTER_MATRIX_SMALLEST_OUTLINE,
   SCATTER_MATRIX_SMALLEST_PLOT,
   scatterMatrixAxesThatFit,
   scatterMatrixPlotSide,
+  scatterMatrixRoom,
+  scatterMatrixTickCount,
 } from './scatterMatrixLayout.ts';
 import type { ScatterMatrixProps } from './scatterMatrixProps.ts';
 
@@ -47,9 +48,10 @@ export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
 
   const wanted = Math.min(count, axes.length, scores.columns);
   const shown = scatterMatrixAxesThatFit(width, wanted);
-  const side = Math.max(
-    SCATTER_MATRIX_SMALLEST_PLOT,
-    scatterMatrixPlotSide(width, shown),
+  // The density of the ticks is chosen once, at the usual room, so the labels
+  // the left column's room is measured on are the labels every cell writes.
+  const ticks = scatterMatrixTickCount(
+    Math.max(SCATTER_MATRIX_SMALLEST_PLOT, scatterMatrixPlotSide(width, shown)),
   );
 
   const shape = useMemo(() => {
@@ -65,6 +67,14 @@ export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
     }
     return { extents, spread };
   }, [scores, shown, bins, groupOf, groups]);
+  const room = useMemo(
+    () => scatterMatrixRoom(shape.extents, shown, ticks),
+    [shape, shown, ticks],
+  );
+  const side = Math.max(
+    SCATTER_MATRIX_SMALLEST_PLOT,
+    scatterMatrixPlotSide(width, shown, room.left),
+  );
 
   const colors = useMemo(() => {
     if (groups === undefined) return undefined;
@@ -109,7 +119,8 @@ export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
     ...shape,
     shown,
     side,
-    room: ROOM,
+    ticks,
+    room,
     colors,
     groupOf,
     groupSpread,
@@ -144,8 +155,8 @@ export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
       <div
         style={{
           ...GRID_STYLE,
-          gridTemplateColumns: `${side + MARGINS.right + ROOM.left}px ${inner.repeat(rest)}`,
-          gridTemplateRows: `${above.repeat(rest)}${side + MARGINS.top + ROOM.bottom}px`,
+          gridTemplateColumns: `${side + MARGINS.right + room.left}px ${inner.repeat(rest)}`,
+          gridTemplateRows: `${above.repeat(rest)}${side + MARGINS.top + room.bottom}px`,
         }}
       >
         {cells}

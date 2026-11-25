@@ -54,6 +54,22 @@ test('both axes are captioned in words rather than named after the maths', () =>
   expect(html).toContain('>PC4</text>');
 });
 
+test('each name stands under its own bar, and the caption under the plot', () => {
+  const html = render();
+
+  // The names are written in HTML over the frame, from the plot it laid out:
+  // 61 to 608 across four slots, under a foot at 329.
+  expect(
+    html.match(/<text x="[\d.]+" y="344"[^>]*>PC\d<\/text>/g)?.map(xOf),
+  ).toStrictEqual([129.375, 266.125, 402.875, 539.625]);
+  expect(
+    html.match(/<rect data-component="\d"[^>]*>/g)?.map(centreOf),
+  ).toStrictEqual([129.375, 266.125, 402.875, 539.625]);
+  expect(html).toContain(
+    '<text x="334.5" y="367" text-anchor="middle" style="fill:var(--text-muted);font-size:12px;font-weight:500;user-select:none">Components, strongest first</text>',
+  );
+});
+
 test('the bars name themselves, so the figure carries no key of its own', () => {
   const html = render();
 
@@ -78,4 +94,13 @@ function render(target = 0.95): string {
 
 function count(html: string, pattern: RegExp): number {
   return html.match(pattern)?.length ?? 0;
+}
+
+function xOf(element: string): number {
+  return Number(/ x="(?<x>[\d.]+)"/.exec(element)?.groups?.x);
+}
+
+function centreOf(bar: string): number {
+  const width = Number(/ width="(?<width>[\d.]+)"/.exec(bar)?.groups?.width);
+  return xOf(bar) + width / 2;
 }

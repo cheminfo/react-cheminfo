@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import { Fragment } from 'react';
+import { Fragment, useRef } from 'react';
 
 import { contactFormUrl } from '../../contact/core/contactUrl.ts';
 import { ContactButton } from '../../contact/ui/ContactButton.tsx';
@@ -14,6 +14,7 @@ import { NavEntry } from './NavEntry.tsx';
 import { NavMenuButton } from './NavMenuButton.tsx';
 import type { NavItem } from './navItem.ts';
 import { isModifiedClick } from './navItem.ts';
+import { useWholeWordmark } from './useWholeWordmark.ts';
 
 export interface SiteHeaderProps {
   /**
@@ -152,6 +153,11 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
   } = props;
   const t = useChromeT();
   const language = useLanguage();
+  const bar = useRef<HTMLDivElement>(null);
+  const markOnly = useWholeWordmark(
+    bar,
+    embedded ? undefined : (record?.host ?? siteId),
+  );
 
   if (embedded) return null;
 
@@ -164,9 +170,9 @@ export function SiteHeader(props: SiteHeaderProps): ReactElement | null {
 
   return (
     <header className="app-header no-print">
-      <div className={INNER_CLASS[width]}>
+      <div ref={bar} className={INNER_CLASS[width]}>
         <a
-          className="brand"
+          className={markOnly ? 'brand brand--mark-only' : 'brand'}
           href={homeHref}
           title={site.host}
           onClick={(event) => {

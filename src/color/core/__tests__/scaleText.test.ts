@@ -16,6 +16,20 @@ test('a link naming one of ours gets it, under its own name', () => {
   expect(colorAt(resolved.scale, 0)).toBe('#0d0887');
 });
 
+test('a link naming a channel gets black to that colour', () => {
+  expect(resolveColorScale('cyan')).toStrictEqual({
+    id: 'cyan',
+    label: 'Cyan',
+    scale: {
+      stops: [
+        { position: 0, color: '#000000' },
+        { position: 1, color: '#00ffff' },
+      ],
+      interpolation: 'rgb',
+    },
+  });
+});
+
 test('a name is read whatever case and spacing it arrives in', () => {
   expect(resolveColorScale('  Cool-Warm ').id).toBe('cool-warm');
 });

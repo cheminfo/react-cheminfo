@@ -10,6 +10,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { DEFAULT_COLOR_SCALE_KINDS } from '../../core/scales.ts';
 import type { ColorScaleSelectProps } from '../ColorScaleSelect.tsx';
 import { ColorScaleSelect } from '../ColorScaleSelect.tsx';
 
@@ -75,6 +76,12 @@ function isOpen(): boolean {
   return document.querySelector('.bp6-popover-open') !== null;
 }
 
+function menuHeadings(): Array<string | null> {
+  return [...document.querySelectorAll('.bp6-menu-header')].map(
+    (heading) => heading.textContent,
+  );
+}
+
 function buttonNamed(text: string): Element | undefined {
   return [...document.querySelectorAll('button')].find(
     (entry) => entry.textContent === text,
@@ -95,6 +102,45 @@ test('the menu draws every scale under the heading of its kind, the one in force
   expect(document.querySelectorAll('[role="option"]')).toHaveLength(10);
   expect(selected('Plasma')).toBe('true');
   expect(selected('Magma')).toBe('false');
+});
+
+test('a picker given the channel kind lists the channels last, and one is picked from the strips like any other scale', () => {
+  open({ start: 'viridis', kinds: ['channel', ...DEFAULT_COLOR_SCALE_KINDS] });
+
+  expect(menuHeadings()).toStrictEqual([
+    'Low to high',
+    'Away from a middle',
+    'Around the wheel',
+    'Black to one colour',
+  ]);
+  expect(document.querySelectorAll('[role="option"]')).toHaveLength(17);
+
+  click(item('Cyan'));
+
+  expect(changes).toStrictEqual(['cyan']);
+  expect(
+    document.querySelector('button[aria-label="Colour scale"]')?.textContent,
+  ).toBe('Cyan');
+});
+
+test('a picker left to its defaults lists no channel, and still names one in force', () => {
+  open({ start: 'cyan' });
+
+  expect({
+    named: document.querySelector('button[aria-label="Colour scale"]')
+      ?.textContent,
+    listed: document.querySelectorAll('[role="option"]').length,
+    cyan: item('Cyan'),
+  }).toStrictEqual({ named: 'Cyan', listed: 10, cyan: undefined });
+});
+
+test('a picker given the channel kind alone lists the seven channels, the one in force selected', () => {
+  open({ start: 'magenta', kinds: ['channel'] });
+
+  expect(menuHeadings()).toStrictEqual(['Black to one colour']);
+  expect(document.querySelectorAll('[role="option"]')).toHaveLength(7);
+  expect(selected('Magenta')).toBe('true');
+  expect(selected('Cyan')).toBe('false');
 });
 
 test('a strip picked is the scale handed up, and its name goes on the button', () => {

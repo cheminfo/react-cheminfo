@@ -110,8 +110,8 @@ test('a selected dot gains an accent ring and keeps its group colour', () => {
 test('an axis is titled the way every figure in the package titles one', () => {
   const html = draw();
 
-  expect(html).toContain('PC1 — 73.0 %');
-  expect(html).toContain('PC2 — 22.9 %');
+  expect(html).toContain('PC1 — 73.0\u00A0%');
+  expect(html).toContain('PC2 — 22.9\u00A0%');
 });
 
 test('rows the model never saw are drawn hollow and named in the key', () => {

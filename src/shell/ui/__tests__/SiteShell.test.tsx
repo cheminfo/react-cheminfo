@@ -107,6 +107,17 @@ test('a framed page is the page alone', () => {
   );
 });
 
+test('a workbench’s shell fills the window; a page’s scrolls', () => {
+  render({ fillWindow: true });
+  const workbench = host.querySelector('.site-shell')?.className;
+  render({});
+
+  expect([
+    workbench,
+    host.querySelector('.site-shell')?.className,
+  ]).toStrictEqual(['site-shell site-shell--window', 'site-shell']);
+});
+
 test('a site routing its own About keeps its page on show', () => {
   render({ about: { content: ABOUT, active: true, routed: true } });
 

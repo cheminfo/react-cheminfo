@@ -176,6 +176,46 @@ test('typing inside the list never moves the selection', () => {
   expect(prevented).toBe(0);
 });
 
+test('a key a control inside the list owns, or already acted on, never moves the selection; a row of the list does', () => {
+  const selected: number[] = [];
+  const targets = [
+    element({ role: 'slider' }),
+    element({ role: 'spinbutton' }),
+    element({ role: 'combobox' }),
+    element({ 'aria-haspopup': 'listbox', 'aria-expanded': 'true' }),
+    element({ 'aria-haspopup': 'listbox', 'aria-expanded': 'false' }),
+    element({ role: 'option' }),
+  ];
+  const moved = targets.map((target) => {
+    const event = keyEvent('ArrowDown');
+    return handleListNavigationKey(
+      { ...event, target: target as unknown as EventTarget },
+      {
+        length: 5,
+        selectedIndex: 1,
+        onSelect: (index) => selected.push(index),
+      },
+    );
+  });
+  const handled = handleListNavigationKey(
+    { ...keyEvent('End'), defaultPrevented: true },
+    { length: 5, selectedIndex: 1, onSelect: (index) => selected.push(index) },
+  );
+
+  expect({ moved, handled, selected }).toStrictEqual({
+    moved: [false, false, false, false, true, true],
+    handled: false,
+    selected: [2, 2],
+  });
+});
+
+function element(attributes: Record<string, string>) {
+  return {
+    tagName: 'DIV',
+    getAttribute: (name: string) => attributes[name] ?? null,
+  };
+}
+
 function keyEvent(key: string): ListNavigationKeyEvent & { prevented: number } {
   const event = {
     key,

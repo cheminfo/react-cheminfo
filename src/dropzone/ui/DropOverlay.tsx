@@ -1,24 +1,23 @@
 import { Icon } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
-import type { DropHandlers } from './useStructureDrop.ts';
+import type { DropHandlers } from './useDropTarget.ts';
 
-/** What {@link StructureDropOverlay} needs. */
-export interface StructureDropOverlayProps {
+/** What {@link DropOverlay} needs. */
+export interface DropOverlayProps {
   /** What the overlay says. */
   label: string;
-  /** The overlay handlers of `useStructureDrop`. */
+  /** The overlay handlers of `useDropTarget`. */
   handlers: DropHandlers;
 }
 
 /**
- * The veil a drop target raises while a file or text is dragged over it.
- * @param props - See {@link StructureDropOverlayProps}.
+ * The veil a drop target raises while a file or text is dragged over it. Its
+ * test id is the one the family's end-to-end tests have always found it by.
+ * @param props - See {@link DropOverlayProps}.
  * @returns The overlay.
  */
-export function StructureDropOverlay(
-  props: StructureDropOverlayProps,
-): ReactElement {
+export function DropOverlay(props: DropOverlayProps): ReactElement {
   const { label, handlers } = props;
   return (
     <div data-testid="structure-drop-overlay" style={OVERLAY} {...handlers}>

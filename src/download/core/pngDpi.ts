@@ -49,6 +49,36 @@ export function withPngDpi(
 }
 
 /**
+ * A PNG stating no resolution: every `pHYs` chunk left out, every other chunk
+ * kept byte for byte — for a picture whose pixel is finer than the chunk can
+ * say, which a reader would otherwise place at a size it was never drawn at.
+ * @param png - The PNG file's bytes.
+ * @returns A new PNG file, or the same bytes when they stated no resolution.
+ */
+export function withoutPngDpi(png: Uint8Array): Uint8Array {
+  const view = new DataView(png.buffer, png.byteOffset, png.byteLength);
+  const kept: Array<[start: number, end: number]> = [[0, SIGNATURE.length]];
+  let dropped = false;
+  let offset = SIGNATURE.length;
+  while (offset + 12 <= png.length) {
+    const end = offset + 12 + view.getUint32(offset);
+    if (chunkType(png, offset) === 'pHYs') dropped = true;
+    else kept.push([offset, Math.min(end, png.length)]);
+    offset = end;
+  }
+  if (!dropped) return png;
+  let total = 0;
+  for (const [start, end] of kept) total += end - start;
+  const result = new Uint8Array(total);
+  let position = 0;
+  for (const [start, end] of kept) {
+    result.set(png.subarray(start, end), position);
+    position += end - start;
+  }
+  return result;
+}
+
+/**
  * The resolution a PNG states.
  * @param png - The PNG file's bytes.
  * @returns Whole dots per inch, or `undefined` when it states none.

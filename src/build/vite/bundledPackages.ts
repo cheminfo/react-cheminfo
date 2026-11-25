@@ -4,7 +4,12 @@
  * The list cannot be read off a manifest, which also names what tree-shaking
  * removed, and it cannot reach the page through a module, because it only
  * exists once the bundle does. So it is read off the finished bundle, workers
- * included, and written beside it.
+ * included, and written beside it. A package linked from a checkout — a
+ * `file:` dependency, which npm installs as a link and the bundler resolves
+ * to its real path, outside every `node_modules` — is found by its own
+ * `package.json`, the nearest one above its modules, so it is listed as the
+ * released package will be. A package whose manifest is private is never
+ * released, so it is not listed.
  */
 
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -17,6 +22,8 @@ import {
   BUNDLED_PACKAGES_FILE,
   LICENSE_TEXTS_FILE,
 } from '../core/bundledPackages.ts';
+
+import { packageDirectoryOf } from './packageOfModule.ts';
 
 /** What a bundle is read for, whichever bundler wrote it. */
 type BundleToRead = Record<
@@ -42,17 +49,24 @@ export interface PackageCollector {
 
 /**
  * Start gathering the packages of one build.
+ * @param projectRoot - The project being built, whose own modules are not a
+ *   package it hands out: read when a bundle is recorded.
+ * @default the working directory
  * @returns The collector.
  */
-export function createPackageCollector(): PackageCollector {
+export function createPackageCollector(
+  projectRoot: () => string = () => process.cwd(),
+): PackageCollector {
   const directories = new Map<string, BundledPackage | undefined>();
+  const nearest = new Map<string, string | null>();
 
   function record(bundle: BundleToRead): void {
+    const project = projectRoot();
     for (const file of Object.values(bundle)) {
       for (const [id, rendered] of Object.entries(file.modules ?? {})) {
         // Tree-shaking left the module in the graph and nothing of it on disk.
         if (rendered.renderedLength === 0 || id.startsWith('\0')) continue;
-        const directory = PACKAGE_DIRECTORY.exec(id)?.groups?.directory;
+        const directory = packageDirectoryOf(id, project, nearest);
         if (directory === undefined || directories.has(directory)) continue;
         directories.set(directory, readPackage(directory));
       }
@@ -112,10 +126,6 @@ export function isOwnPackage(name: string, repository: unknown): boolean {
   return typeof url === 'string' && OWN_REPOSITORY.test(url);
 }
 
-/** The folder of the package a module belongs to, the innermost one. */
-const PACKAGE_DIRECTORY =
-  /^(?<directory>.*\/node_modules\/(?:@[^/]+\/)?[^/]+)\//;
-
 /** An address on GitHub, or the `org/name` shorthand npm also accepts. */
 const OWN_REPOSITORY =
   /(?:^|^github:|github\.com[/:])(?:cheminfo|cheminfo-js|mljs|image-js|zakodium|zakodium-oss)\/[^/]+/i;
@@ -136,7 +146,9 @@ function readPackage(directory: string): BundledPackage | undefined {
   const manifest = readManifest(directory);
   const { name, version, repository } = manifest;
   if (typeof name !== 'string' || typeof version !== 'string') return undefined;
-  if (UNLISTED.has(name)) return undefined;
+  // Never published: a workspace beside the project, such as a backend whose
+  // modules the frontend imports, is the project's own code.
+  if (manifest.private === true || UNLISTED.has(name)) return undefined;
 
   const license = licenseOf(manifest);
   return {

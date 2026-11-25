@@ -192,7 +192,7 @@ test('a setting is the same track one size down, and the type does not shrink wi
   expect(strip).toContain('height:26px;padding:0 10px');
   expect(setting).toContain('height:22px;padding:0 8px');
   expect(strip.match(/font-size:12px/g)).toHaveLength(3);
-  expect(setting.match(/font-size:12px/g)).toHaveLength(2);
+  expect(setting.match(/font-size:12px/g)).toHaveLength(3);
 });
 
 test('a segmented control the figure cannot use greys every choice at once', () => {

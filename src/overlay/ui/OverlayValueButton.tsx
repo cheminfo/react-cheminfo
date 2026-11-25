@@ -1,6 +1,9 @@
 import { Icon } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import type { HelpContent } from '../../help/ui/HelpBody.tsx';
+import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
+
 import { OverlaySwatchIcon } from './OverlaySwatchIcon.tsx';
 import { useOverlaySurface } from './overlaySurface.ts';
 import {
@@ -43,6 +46,14 @@ export interface OverlayValueButtonProps {
    * @default undefined — no dots are drawn
    */
   swatches?: readonly string[];
+  /**
+   * What the setting does, in a sentence, opened as the family's help card
+   * when the pointer rests on the button — in place of the plain tooltip
+   * naming the setting and its value, which the button then leaves to its
+   * accessible name.
+   * @default undefined — the pointer is told the name and the value
+   */
+  help?: HelpContent;
   /**
    * Whether the choices behind it are showing.
    * @default false
@@ -93,14 +104,15 @@ export function OverlayValueButton(
 ): ReactElement {
   const { label, value, keyWord = label, showKey = true, swatches } = props;
   const { active = false, disabled = false, disabledReason } = props;
-  const { opensMenu = false, onClick, testId } = props;
+  const { opensMenu = false, onClick, testId, help } = props;
   const { metrics } = useOverlaySurface();
   const { hovered, focused, handlers } = useOverlayInteraction();
 
   const name = `${label} — ${value}`;
-  const told = disabled && disabledReason !== undefined ? disabledReason : name;
+  const why = disabled ? disabledReason : undefined;
+  const told = why ?? (help === undefined ? name : undefined);
 
-  return (
+  const button = (
     <button
       type="button"
       title={told}
@@ -127,6 +139,11 @@ export function OverlayValueButton(
         <Icon icon="caret-down" size={caretSize(metrics.fontSize)} />
       </span>
     </button>
+  );
+  return help === undefined || why !== undefined ? (
+    button
+  ) : (
+    <HelpTooltip content={help}>{button}</HelpTooltip>
   );
 }
 

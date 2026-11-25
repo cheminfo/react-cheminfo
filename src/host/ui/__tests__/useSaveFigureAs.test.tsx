@@ -22,6 +22,30 @@ vi.mock('../../../download/core/downloadBlob.ts', () => ({
 const SVG =
   '<svg xmlns="http://www.w3.org/2000/svg"><title>plate</title></svg>';
 
+// What a site's own Save writes after its figure: an original, byte for byte,
+// and a file of its own; then two copies for whoever unzips the document.
+const ORIGINAL = new Uint8Array([0x49, 0x49, 0x2a, 0, 0x08, 0, 0xff, 0x80]);
+const LANES = '{"lanes":4,"unit":"µm"}';
+const WORKFLOW = '{"steps":[]}';
+const TABLE = new TextEncoder().encode('#,Area\n1,426\n');
+const asked: string[] = [];
+const CARRIED = {
+  data: async () => {
+    asked.push('data');
+    return [
+      { path: 'images/2c26b46b/plate.tif', content: ORIGINAL },
+      { path: 'images/fcde2b2e/lanes.json', content: LANES },
+    ];
+  },
+  attachments: async () => {
+    asked.push('attachments');
+    return [
+      { path: 'workflow.json', content: new Blob([WORKFLOW]) },
+      { path: 'tables/step-1.csv', content: TABLE },
+    ];
+  },
+};
+
 let host: HTMLDivElement;
 let root: Root;
 
@@ -45,7 +69,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function Saving(props: { keepsWorkspace: boolean }): ReactElement {
+function Saving(props: {
+  keepsWorkspace: boolean;
+  carriesFiles: boolean;
+}): ReactElement {
   const saveAs = useSaveFigureAs({
     site: 'plate',
     figure: async () => SVG,
@@ -53,6 +80,7 @@ function Saving(props: { keepsWorkspace: boolean }): ReactElement {
     ...(props.keepsWorkspace
       ? { workspace: () => ({ lanes: 4, scale: 'linear' }) }
       : {}),
+    ...(props.carriesFiles ? CARRIED : {}),
   });
   return (
     <>
@@ -62,9 +90,12 @@ function Saving(props: { keepsWorkspace: boolean }): ReactElement {
   );
 }
 
-function render(keepsWorkspace = true): void {
+function render(keepsWorkspace = true, carriesFiles = false): void {
+  asked.length = 0;
   act(() => {
-    root.render(<Saving keepsWorkspace={keepsWorkspace} />);
+    root.render(
+      <Saving keepsWorkspace={keepsWorkspace} carriesFiles={carriesFiles} />,
+    );
   });
   act(() => {
     document.querySelector<HTMLButtonElement>('#save-as')?.click();
@@ -165,4 +196,54 @@ test('a site keeping no workspace saves its document with the figure alone', asy
   );
 
   expect(saved.preferences).toBeUndefined();
+});
+
+test('Save as writes what Save writes: the figure first, then the other files', async () => {
+  render(true, true);
+  act(() => {
+    document
+      .querySelector<HTMLInputElement>('input[value="document"]')
+      ?.click();
+  });
+
+  await submit();
+
+  const saved = await readSiteDocument(
+    downloads[0]?.blob ?? new Blob(),
+    'plate',
+  );
+  const encoder = new TextEncoder();
+
+  expect(asked).toStrictEqual(['data', 'attachments']);
+  expect(saved.data.map(({ path }) => path)).toStrictEqual([
+    'tlc-plate.plate.svg',
+    'images/2c26b46b/plate.tif',
+    'images/fcde2b2e/lanes.json',
+  ]);
+  expect(saved.data[0]?.text()).toBe(SVG);
+  expect(saved.attachments.map(({ path }) => path)).toStrictEqual([
+    'workflow.json',
+    'tables/step-1.csv',
+  ]);
+  expect(
+    [...saved.data.slice(1), ...saved.attachments].map(({ bytes }) => [
+      ...bytes,
+    ]),
+  ).toStrictEqual(
+    [ORIGINAL, encoder.encode(LANES), encoder.encode(WORKFLOW), TABLE].map(
+      (bytes) => [...bytes],
+    ),
+  );
+});
+
+test('the SVG saved alone asks for none of the other files', async () => {
+  render(true, true);
+
+  await submit();
+
+  expect(downloads.map(({ name }) => name)).toStrictEqual([
+    'tlc-plate.plate.svg',
+  ]);
+  await expect(downloads[0]?.blob.text()).resolves.toBe(SVG);
+  expect(asked).toStrictEqual([]);
 });

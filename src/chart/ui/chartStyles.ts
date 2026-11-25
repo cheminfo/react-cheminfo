@@ -14,6 +14,7 @@
 
 import type { CSSProperties } from 'react';
 
+import { interfaceTextWidth } from '../../drawing/render/interfaceText.ts';
 import type { ChartAxisScale } from '../core/chartAxisScale.ts';
 
 import type {
@@ -49,6 +50,42 @@ export const CHART_TICK_LABEL_INSET = 8;
 export const CHART_TITLE_OFFSET = 14;
 
 /**
+ * Room between the widest label of a vertical axis and the axis title, which
+ * keeps the title's descenders off the figures.
+ */
+const TICK_LABEL_GAP = 2;
+
+/**
+ * How much room the tick marks and the labels of an axis take outside the
+ * plot. A vertical axis takes more than its usual room when its labels are
+ * wider than a column of two or three digits — `60,000` on a 16-bit image —
+ * measured at the size they are written in, so the title beside them never
+ * runs into them.
+ * @param side - Which edge.
+ * @param scale - The axis as it was niced, its labels written.
+ * @returns The room, in pixels.
+ */
+export function chartTickRoom(
+  side: 'bottom' | 'left',
+  scale: ChartAxisScale,
+): number {
+  if (side === 'bottom') return CHART_TICK_ROOM.bottom;
+  let widest = 0;
+  for (const label of scale.labels) {
+    widest = Math.max(
+      widest,
+      interfaceTextWidth(label, CHART_TICK_LABEL_STYLE.fontSize, {
+        kind: 'figures',
+      }),
+    );
+  }
+  return Math.max(
+    CHART_TICK_ROOM.left,
+    Math.ceil(CHART_TICK_LABEL_INSET + widest + TICK_LABEL_GAP),
+  );
+}
+
+/**
  * How much room one edge of the plot gives up.
  *
  * An inner cell of a pair grid keeps its grid and drops its ticks, and a
@@ -56,7 +93,8 @@ export const CHART_TITLE_OFFSET = 14;
  * pixels back rather than framing the plot with empty margin. An axis whose
  * labels were divided by a power of ten always keeps its title room even
  * unnamed, because without the factor written down the labels read as the
- * wrong number entirely.
+ * wrong number entirely. A vertical axis whose labels are wide takes the room
+ * they need: see {@link chartTickRoom}.
  * @param side - Which edge, since a column of numbers is wider than a row.
  * @param spec - How the axis on that edge was asked for.
  * @param scale - The axis as it was niced, for the power of ten it lifted.
@@ -69,7 +107,7 @@ export function chartOuterRoom(
 ): number {
   const { label, showTicks = true } = spec;
   const named = (label !== undefined && label !== '') || scale.exponent !== 0;
-  const ticks = showTicks ? CHART_TICK_ROOM[side] : 0;
+  const ticks = showTicks ? chartTickRoom(side, scale) : 0;
   return (
     CHART_BASE_MARGINS[side] + ticks + (named ? CHART_TITLE_ROOM[side] : 0)
   );

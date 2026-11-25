@@ -4,11 +4,11 @@ import type { ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import { isEditingField } from '../../panel/core/isEditingField.ts';
-import type { StructureTransfer } from '../../structure/core/structureTransfer.ts';
-import { readStructureTransfer } from '../../structure/core/structureTransfer.ts';
-import { StructureDropOverlay } from '../../structure/ui/StructureDropOverlay.tsx';
-import { useStructureDrop } from '../../structure/ui/useStructureDrop.ts';
+import type { DropTransfer } from '../core/dropTransfer.ts';
+import { listenToPagePaste } from '../core/pagePaste.ts';
+
+import { DropOverlay } from './DropOverlay.tsx';
+import { useDropTarget } from './useDropTarget.ts';
 
 /** What {@link DataDropZone} needs. */
 export interface DataDropZoneProps {
@@ -19,8 +19,17 @@ export interface DataDropZoneProps {
    * @default undefined
    */
   description?: ReactNode;
-  /** Called with the files dropped, pasted or chosen, unread. */
+  /**
+   * Called with the files dropped, pasted or chosen, unread. A dropped folder
+   * gives the files inside it, each named by its path in the drop: `a/b.tif`.
+   */
   onFiles: (files: File[]) => void;
+  /**
+   * Told why a dropped folder could not be walked, after the drop's own list
+   * of files was handed to `onFiles` in its place.
+   * @default undefined — not told
+   */
+  onUnread?: (reason: Error) => void;
   /**
    * Called with text pasted, or dragged in from another page. Without it the
    * zone takes files only.
@@ -71,7 +80,7 @@ export interface DataDropZoneProps {
  * @returns The zone.
  */
 export function DataDropZone(props: DataDropZoneProps): ReactElement {
-  const { title, description, onFiles, onText, onPasteClick } = props;
+  const { title, description, onFiles, onUnread, onText, onPasteClick } = props;
   const {
     accept,
     multiple = true,
@@ -83,31 +92,16 @@ export function DataDropZone(props: DataDropZoneProps): ReactElement {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const take = useCallback(
-    (transfer: StructureTransfer) => {
+    (transfer: DropTransfer) => {
       if (transfer.kind === 'files') onFiles(transfer.files);
       else onText?.(transfer.text);
     },
     [onFiles, onText],
   );
   const takesText = onText !== undefined;
-  const drop = useStructureDrop(take, takesText);
+  const drop = useDropTarget(take, { takesText, walksFolders: true, onUnread });
 
-  useEffect(() => {
-    function onPaste(event: ClipboardEvent): void {
-      if (event.defaultPrevented) return;
-      if (isEditingField(event.target)) return;
-      if (isEditingField(document.activeElement)) return;
-      const transfer = readStructureTransfer(event.clipboardData);
-      if (transfer === null) return;
-      if (transfer.kind === 'text' && !takesText) return;
-      event.preventDefault();
-      take(transfer);
-    }
-    document.addEventListener('paste', onPaste);
-    return () => {
-      document.removeEventListener('paste', onPaste);
-    };
-  }, [take, takesText]);
+  useEffect(() => listenToPagePaste(take, { takesText }), [take, takesText]);
 
   return (
     <div
@@ -164,10 +158,7 @@ export function DataDropZone(props: DataDropZoneProps): ReactElement {
         }}
       />
       {drop.over ? (
-        <StructureDropOverlay
-          label={t('dropZone.drop')}
-          handlers={drop.overlayProps}
-        />
+        <DropOverlay label={t('dropZone.drop')} handlers={drop.overlayProps} />
       ) : null}
     </div>
   );

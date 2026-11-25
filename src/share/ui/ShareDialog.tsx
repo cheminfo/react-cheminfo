@@ -105,6 +105,13 @@ export interface ShareDialogProps<
    */
   usePortal?: boolean;
   /**
+   * What the person must read before handing the link out — what it cannot
+   * carry, say: shown first, above the options, so it is in view when the
+   * dialog opens.
+   * @default undefined — no notice
+   */
+  notice?: ReactNode;
+  /**
    * An extra section for what only this tool can configure — a series length, a
    * difficulty, a seed. A function is handed the draft, so such a section can
    * write the tool's own parameters into the link.

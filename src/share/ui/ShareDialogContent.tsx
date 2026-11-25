@@ -4,22 +4,15 @@ import { useRef, useState } from 'react';
 
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
 import type {
-  HideablePart,
   ShareConfig,
   ShareParamCodecs,
   ShareParamValues,
-  SharePreset,
-  ShareVocabulary,
 } from '../core/index.ts';
 import {
   applySharePreset,
   buildEmbedCode,
   buildShareUrl,
-  canOpenSealedAddresses,
   findSharePreset,
-  isShareConfigured,
-  parseShareConfig,
-  suggestedShareConfig,
   visibleShareParts,
 } from '../core/index.ts';
 
@@ -27,11 +20,17 @@ import { ShareConfigOptions } from './ShareConfigOptions.tsx';
 import type { ShareDialogProps, ShareDraft } from './ShareDialog.tsx';
 import { ShareLinkBar } from './ShareLinkBar.tsx';
 import { SharePanes } from './SharePanes.tsx';
-import type { SharePartDescriptions } from './SharePartRow.tsx';
+import { SharePresetSummary } from './SharePresetSummary.tsx';
 import { SharePresetTabs } from './SharePresetTabs.tsx';
 import { SharePreview } from './SharePreview.tsx';
-import { ShareSealOption } from './ShareSealOption.tsx';
 import { withPart } from './draft.ts';
+import {
+  embeddedWhenSealed,
+  findPreset,
+  highlightOf,
+  initialDraft,
+  offeredWhenOpened,
+} from './shareDialogDraft.ts';
 import { useSealedUrl } from './useSealedUrl.ts';
 
 const NO_PRESETS: readonly never[] = [];
@@ -47,9 +46,10 @@ export type ShareDialogContentProps<
 > = Omit<ShareDialogProps<Codecs>, 'isOpen' | 'usePortal'>;
 
 /**
- * The share dialog's body: the options on the left and the page they write on
- * the right, and what one does with the link in the footer, never scrolled
- * away. A copy closes the dialog, since it was what the dialog was opened for.
+ * The share dialog's body: the options on the left — under the notice, when
+ * the site gives one, so it is in view when the dialog opens — and the page
+ * they write on the right, and what one does with the link in the footer,
+ * never scrolled away. A copy closes the dialog, since it was what the dialog was opened for.
  * @param props - What the site's links can say, how the page is named, and the extra section.
  * @returns The body and the footer of the dialog.
  */
@@ -68,6 +68,7 @@ export function ShareDialogContent<
     frameHeight,
     preview = true,
     partDescriptions = 'inline',
+    notice,
     children,
   } = props;
 
@@ -151,10 +152,15 @@ export function ShareDialogContent<
   const openPreset = findPreset(presets, presetKey);
   const optionsPane = (
     <div className="share-dialog__options">
+      {notice === undefined ? null : (
+        <section className="share-section share-dialog__notice">
+          {notice}
+        </section>
+      )}
       {openPreset === undefined ? (
         options
       ) : (
-        <PresetSummary
+        <SharePresetSummary
           description={openPreset.description}
           sealed={sealed}
           descriptions={partDescriptions}
@@ -209,80 +215,4 @@ export function ShareDialogContent<
       />
     </>
   );
-}
-
-// A preset says what it hands out; protecting the link is the one switch it
-// leaves to the teacher, so it stays within reach on every tab.
-function PresetSummary(props: {
-  description: string;
-  sealed: boolean;
-  descriptions: SharePartDescriptions;
-  onSealedChange: ((sealed: boolean) => void) | undefined;
-}): ReactElement {
-  const { description, sealed, descriptions, onSealedChange } = props;
-  return (
-    <>
-      <p className="share-dialog__preset">{description}</p>
-      {onSealedChange === undefined ? null : (
-        <ShareSealOption
-          sealed={sealed}
-          descriptions={descriptions}
-          onChange={onSealedChange}
-        />
-      )}
-    </>
-  );
-}
-
-// A sealed page is always embedded, whatever a preset said.
-function embeddedWhenSealed<Codecs extends ShareParamCodecs>(
-  config: ShareConfig<Codecs>,
-  sealed: boolean,
-): ShareConfig<Codecs> {
-  return sealed ? { ...config, embed: true } : config;
-}
-
-// A site that never opens a sealed address must not hand one out.
-function offeredWhenOpened(
-  setSealed: (sealed: boolean) => void,
-): ((sealed: boolean) => void) | undefined {
-  return canOpenSealedAddresses() ? setSealed : undefined;
-}
-
-function initialDraft<Codecs extends ShareParamCodecs>(
-  search: string,
-  vocabulary: ShareVocabulary<Codecs>,
-  preset: SharePreset<Codecs> | undefined,
-): ShareConfig<Codecs> {
-  const current = parseShareConfig(search, vocabulary);
-  if (isShareConfigured(current, vocabulary)) return current;
-  const suggested = suggestedShareConfig(vocabulary);
-  return preset === undefined
-    ? suggested
-    : applySharePreset(suggested, preset, vocabulary);
-}
-
-// The name in the list and the box on the page are the same thing, so the
-// preview is told what the reader is pointing at rather than a key it would
-// have to look a name up for.
-function highlightOf(
-  parts: readonly HideablePart[],
-  pointed: string | null,
-): { part: string; label: string } | null {
-  if (pointed === null) return null;
-  for (const part of parts) {
-    if (part.key === pointed) return { part: part.key, label: part.label };
-  }
-  return null;
-}
-
-function findPreset<Codecs extends ShareParamCodecs>(
-  presets: ReadonlyArray<SharePreset<Codecs>>,
-  key: string | null,
-): SharePreset<Codecs> | undefined {
-  if (key === null) return undefined;
-  for (const preset of presets) {
-    if (preset.key === key) return preset;
-  }
-  return undefined;
 }

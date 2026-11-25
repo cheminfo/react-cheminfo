@@ -25,12 +25,12 @@ test('a significant-digit count out of range is clamped, and one that is not a n
 });
 
 test('a share is written as a percentage with its unit, to one decimal unless asked', () => {
-  expect(formatPercent(0.742)).toBe('74.2 %');
-  expect(formatPercent(0.729_6, 2)).toBe('72.96 %');
-  expect(formatPercent(1)).toBe('100.0 %');
-  expect(formatPercent(0.003, 0)).toBe('0 %');
-  expect(formatPercent(12.5)).toBe('1,250.0 %');
-  expect(formatPercent(0.5, Number.NaN)).toBe('50.0 %');
+  expect(formatPercent(0.742)).toBe('74.2\u00A0%');
+  expect(formatPercent(0.729_6, 2)).toBe('72.96\u00A0%');
+  expect(formatPercent(1)).toBe('100.0\u00A0%');
+  expect(formatPercent(0.003, 0)).toBe('0\u00A0%');
+  expect(formatPercent(12.5)).toBe('1,250.0\u00A0%');
+  expect(formatPercent(0.5, Number.NaN)).toBe('50.0\u00A0%');
   expect(formatPercent(Number.NaN)).toBe('–');
 });
 
@@ -87,4 +87,15 @@ test('a compact number is shortened once it reaches a thousand', () => {
   expect(formatCompact(1234)).toBe('1.2K');
   expect(formatCompact(3_400_000)).toBe('3.4M');
   expect(formatCompact(-1500)).toBe('-1.5K');
+});
+
+test('a number that rounds to zero is written without a sign, a negative one keeps it', () => {
+  expect([
+    formatDecimal(-0.04, 1),
+    formatDecimal(-0.06, 1),
+    formatInteger(-0.4),
+    formatInteger(-1.4),
+    formatCompact(-0.04),
+    formatPercent(-0.0004),
+  ]).toStrictEqual(['0.0', '-0.1', '0', '-1', '0', '0.0\u00A0%']);
 });

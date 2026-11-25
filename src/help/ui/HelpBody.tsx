@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { ShortcutKeys } from '../../guide/ui/ShortcutList.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 
@@ -36,6 +37,12 @@ export interface HelpContent {
    * @default undefined — the body stands on its own, as a plain tooltip does
    */
   title?: string;
+  /**
+   * The keys that do it, drawn as caps beside the title: a toolbar tool's
+   * letter, `['Ctrl', 'Z']` for undo.
+   * @default undefined — no key does it
+   */
+  shortcuts?: readonly string[];
   /**
    * The explanation: one or two sentences, any content of the site's own, or
    * an array of strings, which is set as one paragraph each.
@@ -84,14 +91,19 @@ export interface HelpBodyProps {
 export function HelpBody(props: HelpBodyProps): ReactElement {
   const { className, content, width = DEFAULT_WIDTH } = props;
   const t = useChromeT();
-  const { title, body, example, link } = content;
+  const { title, shortcuts, body, example, link } = content;
 
   return (
     <div
       className={joinClassNames('help-body', className)}
       style={{ ...BODY_STYLE, maxWidth: width }}
     >
-      {title === undefined ? null : <div style={TITLE_STYLE}>{title}</div>}
+      {title === undefined && shortcuts === undefined ? null : (
+        <div style={HEAD_STYLE}>
+          {title === undefined ? null : <div style={TITLE_STYLE}>{title}</div>}
+          {shortcuts === undefined ? null : <ShortcutKeys keys={shortcuts} />}
+        </div>
+      )}
       {body === undefined ? null : (
         <div style={TEXT_STYLE}>{paragraphsOf(body)}</div>
       )}
@@ -176,6 +188,14 @@ const BODY_STYLE = {
   display: 'flex',
   flexDirection: 'column',
   gap: 6,
+} as const satisfies CSSProperties;
+
+/** The title, then the keys at the end of its line. */
+const HEAD_STYLE = {
+  display: 'flex',
+  alignItems: 'baseline',
+  justifyContent: 'space-between',
+  gap: 8,
 } as const satisfies CSSProperties;
 
 const TITLE_STYLE = { fontWeight: 600 } as const satisfies CSSProperties;

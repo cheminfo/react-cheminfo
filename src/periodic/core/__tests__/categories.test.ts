@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 
 import { contrastRatio } from '../../../color/core/contrast.ts';
+import { FAMILY_TOKEN_VALUES } from '../../../tokens/core/familyTokens.ts';
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -8,6 +9,9 @@ import {
   categorySwatch,
 } from '../categories.ts';
 import { PERIODIC_ELEMENTS } from '../elements.ts';
+
+/** The ink readable on a light ground: the family's text colour. */
+const INK = FAMILY_TOKEN_VALUES['--text'];
 
 test('the legend lists every family exactly once', () => {
   expect(CATEGORY_ORDER).toHaveLength(10);
@@ -44,5 +48,5 @@ test('the ten colours are distinct', () => {
 
 test('an unknown family still gets a readable swatch', () => {
   expect(UNKNOWN_SWATCH.background).toBe('#e4e8ee');
-  expect(UNKNOWN_SWATCH.foreground).toBe('#182026');
+  expect(UNKNOWN_SWATCH.foreground).toBe(INK);
 });

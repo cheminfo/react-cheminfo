@@ -10,6 +10,7 @@ import { useState } from 'react';
 
 import { clamp } from '../../format/core/clamp.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import {
   isPartialNumber,
   numberText,
@@ -17,115 +18,14 @@ import {
   stepNumber,
 } from '../core/numberText.ts';
 
-/** What every number box takes, whether or not it can be left empty. */
-export interface NumberInputBaseProps {
-  /**
-   * Smallest accepted value, applied when the box is left rather than while it
-   * is typed in.
-   * @default undefined — unbounded below
-   */
-  min?: number;
-  /**
-   * Largest accepted value, applied when the box is left.
-   * @default undefined — unbounded above
-   */
-  max?: number;
-  /**
-   * What one press of an arrow key or a stepper button adds; Shift multiplies
-   * it by ten and Alt divides it by ten.
-   * @default 1
-   */
-  step?: number;
-  /**
-   * Whether only whole numbers are wanted. A typed decimal is rounded when the
-   * box is left.
-   * @default false
-   */
-  integer?: boolean;
-  /**
-   * Whether the up and down buttons are drawn beside the box.
-   * @default true
-   */
-  buttons?: boolean;
-  /**
-   * Grey text shown while the box is empty.
-   * @default undefined — the box carries no placeholder
-   */
-  placeholder?: string;
-  /** @default false */
-  disabled?: boolean;
-  /**
-   * Whether the control takes the whole width it is given.
-   * @default false
-   */
-  fill?: boolean;
-  /** @default 'medium' */
-  size?: 'small' | 'medium' | 'large';
-  /**
-   * Accessible name, for a box no `<label>` points at.
-   * @default undefined — the box is named by its label
-   */
-  ariaLabel?: string;
-  /**
-   * The box's id, for a `<label htmlFor>` elsewhere in the form.
-   * @default undefined
-   */
-  id?: string;
-  /**
-   * A name a test finds the box by, written as `data-testid`.
-   * @default undefined
-   */
-  testId?: string;
-  /**
-   * Drawn inside the box at its left — a unit, a prefix such as `10⁻`.
-   * @default undefined
-   */
-  leftElement?: ReactElement;
-  /**
-   * Drawn inside the box at its right — a unit, a small button.
-   * @default undefined
-   */
-  rightElement?: ReactElement;
-  /** @default undefined */
-  className?: string;
-  /** @default undefined */
-  style?: CSSProperties;
-}
+import type { NumberInputProps } from './NumberInputProps.ts';
 
-/** A box that always holds a number. */
-export interface RequiredNumberInputProps extends NumberInputBaseProps {
-  /** The number the box shows. */
-  value: number;
-  /**
-   * Whether an emptied box hands up nothing. A required box keeps the number
-   * it had and shows it again when the box is left.
-   * @default false
-   */
-  allowEmpty?: false;
-  /** Called with the new number, never while the text is half-typed. */
-  onChange: (value: number) => void;
-}
-
-/** A box that may be left empty, which hands up `undefined`. */
-export interface OptionalNumberInputProps extends NumberInputBaseProps {
-  /** The number the box shows, or nothing when it is empty. */
-  value: number | undefined;
-  allowEmpty: true;
-  /**
-   * Where an arrow key or a stepper button starts from while the box is
-   * empty. A box standing for several values that differ — the sizes of the
-   * objects selected together — steps from one of them rather than from zero,
-   * which would bring every one of them down to the bottom of the range.
-   * @default undefined — an empty box steps from zero
-   */
-  stepFrom?: number;
-  /** Called with the new number, or with `undefined` when the box is emptied. */
-  onChange: (value: number | undefined) => void;
-}
-
-/** See {@link NumberInput}. */
-export type NumberInputProps =
-  RequiredNumberInputProps | OptionalNumberInputProps;
+export type {
+  NumberInputBaseProps,
+  NumberInputProps,
+  OptionalNumberInputProps,
+  RequiredNumberInputProps,
+} from './NumberInputProps.ts';
 
 /**
  * A number typed into a box.
@@ -152,12 +52,15 @@ export function NumberInput(props: NumberInputProps): ReactElement {
     placeholder,
     disabled = false,
     fill = false,
+    digits,
     size = 'medium',
     ariaLabel,
     id,
     testId,
     leftElement,
     rightElement,
+    intent = 'none',
+    onBlur,
     className,
     style,
   } = props;
@@ -240,7 +143,7 @@ export function NumberInput(props: NumberInputProps): ReactElement {
       disabled={disabled}
       placeholder={placeholder}
       value={draft.text}
-      intent={isPartialNumber(draft.text) ? 'none' : 'danger'}
+      intent={isPartialNumber(draft.text) ? intent : 'danger'}
       inputMode={integer ? 'numeric' : 'decimal'}
       spellCheck={false}
       autoComplete="off"
@@ -250,11 +153,22 @@ export function NumberInput(props: NumberInputProps): ReactElement {
       data-testid={testId}
       leftElement={leftElement}
       rightElement={rightElement}
-      className={buttons ? undefined : className}
-      style={buttons ? undefined : style}
+      className={
+        joinClassNames(
+          (leftElement !== undefined || rightElement !== undefined) &&
+            'input-affix',
+          buttons ? undefined : className,
+        ) || undefined
+      }
+      style={
+        buttons ? digitsWidth(digits) : { ...style, ...digitsWidth(digits) }
+      }
       onValueChange={type}
       onKeyDown={press}
-      onBlur={leave}
+      onBlur={() => {
+        leave();
+        onBlur?.();
+      }}
     />
   );
 
@@ -292,6 +206,16 @@ export function NumberInput(props: NumberInputProps): ReactElement {
       </ButtonGroup>
     </ControlGroup>
   );
+}
+
+/**
+ * The width of a box holding some digits: a character each, and two more for
+ * the box's padding either side.
+ * @param digits - How many digits it holds, if it is sized by them.
+ * @returns The style, or nothing for a box its group sizes.
+ */
+function digitsWidth(digits: number | undefined): CSSProperties | undefined {
+  return digits === undefined ? undefined : { width: `${digits + 2}ch` };
 }
 
 /**

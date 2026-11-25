@@ -57,8 +57,10 @@ export { rowSpacers } from './rowSpacers.ts';
 export {
   countLabel,
   statusBarStyle,
+  statusCutStyle,
   statusItemStyle,
   statusMutedStyle,
+  statusRoomLeftStyle,
   statusSpacerStyle,
 } from './statusBar.ts';
 export { filterNeedle, matchesNeedle } from './textFilter.ts';

@@ -101,7 +101,7 @@ test('a caller owning the tab gets the one it asked for', () => {
 
   expect(html).toContain('Share of the differences explained');
   expect(html).toContain('Components, strongest first');
-  expect(html).not.toContain('PC1 — 73.0 %');
+  expect(html).not.toContain('PC1 — 73.0\u00A0%');
 });
 
 test('a site that narrowed the panels away from the map is not shown the map', () => {
@@ -121,8 +121,8 @@ test('a site that narrowed the panels away from the map is not shown the map', (
   // strip that does not name one.
   expect(html).toContain('>What differs</button>');
   expect(layer(html, 'points')).toBe('');
-  expect(html).toContain('PC1 — 73.0 %');
-  expect(html).toContain('PC3 — 3.7 %');
+  expect(html).toContain('PC1 — 73.0\u00A0%');
+  expect(html).toContain('PC3 — 3.7\u00A0%');
 });
 
 test('narrowing to one panel leaves no strip, and still is not the map', () => {
@@ -157,8 +157,8 @@ test('the options a caller owns are the ones the figure is drawn from', () => {
     />,
   );
 
-  expect(html).toContain('PC3 — 3.7 %');
-  expect(html).toContain('PC4 — 0.5 %');
+  expect(html).toContain('PC3 — 3.7\u00A0%');
+  expect(html).toContain('PC4 — 0.5\u00A0%');
 });
 
 function layer(html: string, name: string): string {

@@ -3,11 +3,10 @@ import { clamp } from '../../format/core/clamp.ts';
 import type { ReadableInkOptions } from './contrast.ts';
 import { readableInk } from './contrast.ts';
 import { parseHexColor, toHexColor } from './hex.ts';
-import type { HsvColor } from './hsv.ts';
-import { hsvToRgb, rgbToHsv, wrapHue } from './hsv.ts';
+import { rgbToHsv } from './hsv.ts';
+import type { HuePath } from './huePath.ts';
+import { huePath, lerp, mixTones } from './huePath.ts';
 
-const HALF_TURN = 180;
-const TURN = 360;
 const MINIMUM_SAMPLES = 2;
 
 /** A colour, and the ink that stays readable on it. */
@@ -97,11 +96,12 @@ export function colorAt(scale: ColorScale, position: number): string {
     if (at > end.position) continue;
     const span = end.position - start.position;
     const ratio = span <= 0 ? 0 : (at - start.position) / span;
-    return mix(start.color, end.color, ratio, {
-      interpolation,
-      turn: longTurn(first.color, last.color),
-      whole: stops.length === MINIMUM_SAMPLES,
-    });
+    return mix(
+      start.color,
+      end.color,
+      ratio,
+      huePath(first.color, last.color, interpolation, stops.length),
+    );
   }
   return toHexColor(parseHexColor(last.color));
 }
@@ -141,65 +141,15 @@ export function sampleScale(scale: ColorScale, count: number): string[] {
   return colors;
 }
 
-interface HuePath {
-  interpolation: ColorInterpolation;
-  /** The way the long path turns: 1 up the wheel, -1 down it. */
-  turn: number;
-  /** Whether the two anchors are the whole scale, so one hue on both is a full turn. */
-  whole: boolean;
-}
-
 function mix(start: string, end: string, ratio: number, path: HuePath): string {
   const from = parseHexColor(start);
   const to = parseHexColor(end);
   if (path.interpolation === 'rgb') {
     return toHexColor({
-      red: from.red + (to.red - from.red) * ratio,
-      green: from.green + (to.green - from.green) * ratio,
-      blue: from.blue + (to.blue - from.blue) * ratio,
+      red: lerp(from.red, to.red, ratio),
+      green: lerp(from.green, to.green, ratio),
+      blue: lerp(from.blue, to.blue, ratio),
     });
   }
-
-  const one = rgbToHsv(from);
-  const other = rgbToHsv(to);
-  const [fromHue, toHue] = pairHues(one, other);
-  const hue = fromHue + hueStep(fromHue, toHue, path) * ratio;
-  return toHexColor(
-    hsvToRgb({
-      hue: wrapHue(hue),
-      saturation: one.saturation + (other.saturation - one.saturation) * ratio,
-      value: one.value + (other.value - one.value) * ratio,
-    }),
-  );
-}
-
-// A grey, black or white has no hue of its own, so it takes the other one's:
-// the path then fades to it instead of sweeping through red on the way.
-function pairHues(one: HsvColor, other: HsvColor): [number, number] {
-  if (one.saturation === 0) return [other.hue, other.hue];
-  if (other.saturation === 0) return [one.hue, one.hue];
-  return [one.hue, other.hue];
-}
-
-function hueStep(from: number, to: number, path: HuePath): number {
-  if (path.interpolation !== 'hsv-long') return shortestStep(from, to);
-  const step = path.turn > 0 ? upStep(from, to) : -upStep(to, from);
-  return step === 0 && path.whole ? path.turn * TURN : step;
-}
-
-function longTurn(first: string, last: string): number {
-  const [from, to] = pairHues(
-    rgbToHsv(parseHexColor(first)),
-    rgbToHsv(parseHexColor(last)),
-  );
-  // Two ends of one hue are a full turn apart, taken up the wheel.
-  return shortestStep(from, to) > 0 ? -1 : 1;
-}
-
-function shortestStep(from: number, to: number): number {
-  return ((((to - from) % TURN) + TURN + HALF_TURN) % TURN) - HALF_TURN;
-}
-
-function upStep(from: number, to: number): number {
-  return (((to - from) % TURN) + TURN) % TURN;
+  return toHexColor(mixTones(rgbToHsv(from), rgbToHsv(to), ratio, path));
 }

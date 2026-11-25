@@ -2,6 +2,7 @@ import { Menu, MenuItem, PopoverNext } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 import { Button } from 'react-science/ui';
 
+import { HELP_CARD_TOOLTIP_PROPS } from '../../help/ui/helpCardTooltipProps.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 
 import type { BackupRestoreOptions } from './useBackupRestore.tsx';
@@ -53,7 +54,11 @@ export function BackupMenu(props: BackupMenuProps): ReactElement {
           size="small"
           icon="database"
           aria-label={title}
-          tooltipProps={{ content: title, placement: 'bottom' }}
+          tooltipProps={{
+            ...HELP_CARD_TOOLTIP_PROPS,
+            content: title,
+            placement: 'bottom',
+          }}
           loading={busy}
         />
       </PopoverNext>

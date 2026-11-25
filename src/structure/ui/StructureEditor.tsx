@@ -10,13 +10,13 @@
 import type { CSSProperties, ReactElement } from 'react';
 import { Suspense, lazy, useCallback } from 'react';
 
+import { DropOverlay } from '../../dropzone/ui/DropOverlay.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
 import { EditorHelpButton } from './EditorHelpButton.tsx';
 import { EditorImportButton } from './EditorImportButton.tsx';
 import { EditorImportProblem } from './EditorImportProblem.tsx';
-import { StructureDropOverlay } from './StructureDropOverlay.tsx';
 import { StructureEditorGuide } from './StructureEditorGuide.tsx';
 import { StructureEditorSplash } from './StructureEditorSplash.tsx';
 import { ToolbarTooltip } from './ToolbarTooltip.tsx';
@@ -158,7 +158,7 @@ export function StructureEditor(props: StructureEditorProps): ReactElement {
         )}
       </Suspense>
       {drop.over ? (
-        <StructureDropOverlay
+        <DropOverlay
           label={t('structure.import.drop')}
           handlers={drop.overlayProps}
         />

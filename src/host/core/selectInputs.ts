@@ -3,6 +3,8 @@
  * host is answered with when the request loads nothing.
  */
 
+import { listFormatters } from '../../i18n/core/listFormatters.ts';
+
 import { kindAccepts } from './kindAccepts.ts';
 import type { CheckedValue, KnownKind } from './kinds.ts';
 import { checkValue, isKnownKind } from './kinds.ts';
@@ -137,15 +139,15 @@ function refusal(
     const keys = inputs.map((input) => input.key);
     return {
       code: 'invalid',
-      message: `No item for ${LIST.format(keys)} has the shape its kind requires, so ${tool.name} loaded nothing.`,
+      message: `No item for ${LIST.either(keys)} has the shape its kind requires, so ${tool.name} loaded nothing.`,
       errors,
     };
   }
   const kinds = inputs.flatMap((input) => input.kinds);
   return {
     code: 'no-input',
-    message: `No item is a ${LIST.format(kinds)}, so ${tool.name} loaded nothing.`,
+    message: `No item is a ${LIST.either(kinds)}, so ${tool.name} loaded nothing.`,
   };
 }
 
-const LIST = new Intl.ListFormat('en', { type: 'disjunction' });
+const LIST = listFormatters('en');

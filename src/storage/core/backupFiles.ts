@@ -23,10 +23,13 @@ export interface ArchiveFile {
   text: () => string;
 }
 
-// A backup is a few files written once: the workers zip.js would start are a
-// second script to load for no measurable gain, and a CSP that forbids them
-// would make the backup fail instead.
-const ZIP_OPTIONS = { useWebWorkers: false };
+/**
+ * How zip.js writes and reads every archive of a site, backups and documents
+ * alike: on the page's own thread. A backup is a few files written once, so
+ * the workers zip.js would start are a second script to load for no
+ * measurable gain, and a CSP that forbids them would make the backup fail.
+ */
+export const ZIP_OPTIONS = { useWebWorkers: false };
 
 type Zip = typeof ZipModule;
 
@@ -35,10 +38,11 @@ let zip: Promise<Zip> | null = null;
 /**
  * zip.js, fetched the first time an archive is written or read: a page that
  * never backs anything up never downloads it. A fetch that failed is tried
- * again on the next call.
+ * again on the next call. The reader of a document's manifest shares it, so
+ * the module is fetched once whichever needs it first.
  * @returns The module.
  */
-function loadZip(): Promise<Zip> {
+export function loadZip(): Promise<Zip> {
   zip ??= import('@zip.js/zip.js').catch((error: unknown) => {
     zip = null;
     throw error;

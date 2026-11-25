@@ -38,21 +38,24 @@ export type AsyncResult<TData> = AsyncState<TData> & {
  * hands it to `fetch` stops asking a question nobody waits for.
  *
  * The task is a dependency, so pass a stable function — declared at module
- * scope, or wrapped in `useCallback` over the values it reads.
+ * scope, or wrapped in `useCallback` over the values it reads. A `null` task
+ * asks nothing — a picture scrolled out of view: the run in flight is
+ * aborted, what is on screen stays, and nothing is pending.
  * @param task - The async function to run, handed a signal aborted once its
- * answer is no longer wanted.
+ * answer is no longer wanted; `null` to ask nothing.
  * @param refreshKey - Changing it runs the task again; only its identity
  * matters. Defaults to `undefined`.
  * @returns Where the latest run stands, whether it is still running, and why
  * it failed.
  */
 export function useAsync<TData>(
-  task: (signal: AbortSignal) => Promise<TData>,
+  task: ((signal: AbortSignal) => Promise<TData>) | null,
   refreshKey?: unknown,
 ): AsyncResult<TData> {
   const [answer, setAnswer] = useState<Answer<TData>>(UNANSWERED);
 
   useEffect(() => {
+    if (task === null) return;
     const controller = new AbortController();
     task(controller.signal).then(
       (data) => {
@@ -81,7 +84,8 @@ export function useAsync<TData>(
   }, [task, refreshKey]);
 
   const pending =
-    answer.task !== task || !Object.is(answer.refreshKey, refreshKey);
+    task !== null &&
+    (answer.task !== task || !Object.is(answer.refreshKey, refreshKey));
   const failure = pending ? undefined : answer.failure;
   return useMemo(
     () => ({ ...answer.state, pending, failure }),

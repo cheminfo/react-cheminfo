@@ -16,11 +16,13 @@
 
 import type { CSSProperties } from 'react';
 
+import type { ChartPlotArea } from '../../chart/ui/chartFrameTypes.ts';
 import {
   CHART_BASE_MARGINS,
   CHART_TICK_ROOM,
   CHART_TITLE_OFFSET,
   CHART_TITLE_ROOM,
+  chartPlotArea,
 } from '../../chart/ui/chartStyles.ts';
 /** Height a tab takes when the viewer does not say, and the least one panel gets. */
 export const PROJECTION_TAB_HEIGHT = 420;
@@ -30,13 +32,10 @@ export const SMALLEST_PANEL = 110;
 export const PANEL_TITLE_ROOM = 18;
 
 /**
- * Where the plot rectangle falls inside a figure whose two axes are both
- * named, which is every scores map this viewer draws.
- *
- * It is the frame's own arithmetic repeated rather than measured, because the
- * chrome that has to stay off the axis labels — the floating key — is laid out
- * in HTML beside the drawing rather than inside it, and has nothing to measure
- * until after it has been placed.
+ * Where the plot of a figure that is not a frame — the turning cloud — is
+ * taken to fall: where a map of the same size puts it, both its axes named
+ * and their labels no wider than usual. A map reads its own frame instead
+ * (`useChartFrame`), which follows its labels.
  */
 export const PROJECTION_PLOT_ROOM = {
   top: CHART_BASE_MARGINS.top,
@@ -49,21 +48,44 @@ export const PROJECTION_PLOT_ROOM = {
 } as const;
 
 /**
+ * The plot rectangle of a figure that is not a frame, from
+ * {@link PROJECTION_PLOT_ROOM}.
+ * @param width - Width of the figure, in pixels.
+ * @param height - Its height.
+ * @returns The rectangle.
+ */
+export function projectionPlotArea(
+  width: number,
+  height: number,
+): ChartPlotArea {
+  return chartPlotArea(
+    width,
+    height,
+    PROJECTION_PLOT_ROOM,
+    PROJECTION_PLOT_ROOM,
+  );
+}
+
+/**
  * The rectangle the data is drawn in, as a layer of its own.
  *
  * Chrome placed in it is placed against the picture rather than against the
  * figure's box, which is what keeps a floating key off the axis labels without
  * either of them knowing about the other. It takes no pointer events: only the
  * card inside it takes those back.
+ * @param plot - The plot rectangle.
+ * @returns The layer's rules.
  */
-export const PROJECTION_PLOT_AREA_STYLE = {
-  position: 'absolute',
-  top: PROJECTION_PLOT_ROOM.top,
-  right: PROJECTION_PLOT_ROOM.right,
-  bottom: PROJECTION_PLOT_ROOM.bottom,
-  left: PROJECTION_PLOT_ROOM.left,
-  pointerEvents: 'none',
-} as const satisfies CSSProperties;
+export function projectionPlotAreaStyle(plot: ChartPlotArea): CSSProperties {
+  return {
+    position: 'absolute',
+    top: plot.top,
+    left: plot.left,
+    width: plot.width,
+    height: plot.height,
+    pointerEvents: 'none',
+  };
+}
 
 /** A column of panels, tight enough that the stack reads as one figure. */
 export const STACK_STYLE = {
@@ -108,13 +130,6 @@ export const WHOLE_SHARE = 100;
 /** Room under the shares plot for the component names and the caption below them. */
 export const SHARES_BOTTOM_ROOM =
   CHART_BASE_MARGINS.bottom + CHART_TICK_ROOM.bottom + CHART_TITLE_ROOM.bottom;
-
-/** Where the left edge of the shares plot falls, which its names are laid out from. */
-export const SHARES_LEFT_ROOM =
-  CHART_BASE_MARGINS.left + CHART_TICK_ROOM.left + CHART_TITLE_ROOM.left;
-
-/** Where the right edge of the shares plot falls. */
-export const SHARES_RIGHT_ROOM = CHART_BASE_MARGINS.right;
 
 /** Baselines of a component's name and of the caption under the names. */
 export const SHARES_NAME_OFFSET = 15;

@@ -1,6 +1,6 @@
 import { clamp } from '../../format/core/clamp.ts';
 
-import type { Box, Point } from './types.ts';
+import type { Box, Edges, Point } from './types.ts';
 
 /**
  * The distance between two points.
@@ -80,6 +80,37 @@ export function boundsOf(points: readonly Point[], margin = 0): Box {
     y: minY - margin,
     width: maxX - minX + 2 * margin,
     height: maxY - minY + 2 * margin,
+  };
+}
+
+/**
+ * Whether two rectangles share some area: rectangles that only touch along a
+ * side do not. The one overlap test of the family: a label placed among
+ * others, a scale bar kept clear of a credit.
+ * @param one - A rectangle.
+ * @param other - Another rectangle.
+ * @returns True when they overlap.
+ */
+export function edgesOverlap(one: Edges, other: Edges): boolean {
+  return (
+    one.left < other.right &&
+    other.left < one.right &&
+    one.top < other.bottom &&
+    other.top < one.bottom
+  );
+}
+
+/**
+ * The four sides of a box.
+ * @param box - The box.
+ * @returns Its sides.
+ */
+export function boxEdges(box: Box): Edges {
+  return {
+    left: box.x,
+    top: box.y,
+    right: box.x + box.width,
+    bottom: box.y + box.height,
   };
 }
 

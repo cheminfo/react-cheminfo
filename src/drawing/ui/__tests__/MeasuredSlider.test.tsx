@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 /**
  * Blueprint's slider, mounted again whenever its width changes, so a slider
- * first mounted in a folded panel measures its track once it is shown.
+ * first mounted in a folded panel measures its track once it is shown — but
+ * not under a pointer pressed on it, whose drag would lose its handle.
  */
 
 import { Classes } from '@blueprintjs/core';
@@ -80,10 +81,51 @@ test('a slider whose width changes is mounted again, and measures again', () => 
   ).toBe('4');
 });
 
+test('a width that changes under a pointer pressed on the slider waits for the release: the drag keeps its handle', () => {
+  widthBecomes(240);
+  const held = slider();
+  act(() => {
+    host
+      .querySelector(`.${Classes.SLIDER_HANDLE}`)
+      ?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+  });
+  widthBecomes(221);
+  const during = slider();
+  act(() => {
+    globalThis.dispatchEvent(new MouseEvent('pointerup'));
+  });
+  const released = slider();
+
+  expect([during === held, released === held]).toStrictEqual([true, false]);
+});
+
 test('a width that rounds to the same pixel keeps the slider as it is', () => {
   widthBecomes(240.4);
   const shown = slider();
   widthBecomes(239.6);
 
   expect(slider()).toBe(shown);
+});
+
+test('a value moved in steps of 0.05 is reported on the grid of its steps, as it is stored', () => {
+  const values: number[] = [];
+  act(() => {
+    root.render(
+      <MeasuredSlider
+        min={0}
+        max={1}
+        stepSize={0.05}
+        value={0.6}
+        onChange={(value) => values.push(value)}
+      />,
+    );
+  });
+  const handle = host.querySelector(`.${Classes.SLIDER_HANDLE}`);
+  act(() => {
+    handle?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }),
+    );
+  });
+
+  expect([0.6 - 0.05, values]).toStrictEqual([0.5499999999999999, [0.55]]);
 });

@@ -15,17 +15,11 @@
  * grid turns it back into a handful of comparisons.
  */
 
-/** A rectangle in the frame's pixels. */
-export interface LabelBox {
-  /** Left edge. */
-  left: number;
-  /** Top edge. */
-  top: number;
-  /** Right edge. */
-  right: number;
-  /** Bottom edge. */
-  bottom: number;
-}
+import { edgesOverlap } from '../../drawing/core/geometry.ts';
+import type { Edges } from '../../drawing/core/types.ts';
+
+/** A rectangle in the frame's pixels, by its four sides. */
+export type LabelBox = Edges;
 
 /**
  * How wide a word will be drawn, in pixels, without laying it out.
@@ -56,21 +50,6 @@ export function labelBoxWidth(
  */
 export function labelBoxHeight(fontSize: number): number {
   return fontSize + LINE_ROOM;
-}
-
-/**
- * Whether two rectangles share any pixel at all.
- * @param one - One rectangle.
- * @param other - The other.
- * @returns Whether they touch.
- */
-export function labelBoxesOverlap(one: LabelBox, other: LabelBox): boolean {
-  return (
-    one.left < other.right &&
-    other.left < one.right &&
-    one.top < other.bottom &&
-    other.top < one.bottom
-  );
 }
 
 /**
@@ -113,7 +92,7 @@ export class LabelBoxField {
         const written = this.#cells.get(cellKey(column, row));
         if (written === undefined) continue;
         for (const other of written) {
-          if (labelBoxesOverlap(box, other)) return false;
+          if (edgesOverlap(box, other)) return false;
         }
       }
     }

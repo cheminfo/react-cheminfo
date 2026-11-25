@@ -1,6 +1,10 @@
 import { expect, test } from 'vitest';
 
+import { FAMILY_TOKEN_VALUES } from '../../../tokens/core/familyTokens.ts';
 import { colorAt, evenScale, sampleScale, swatchAt } from '../interpolate.ts';
+
+/** The ink readable on a light ground: the family's text colour. */
+const INK = FAMILY_TOKEN_VALUES['--text'];
 
 test('a list of colours becomes a scale with them spread evenly', () => {
   expect(evenScale(['#000000', '#808080', '#ffffff'])).toStrictEqual({
@@ -157,7 +161,7 @@ test('a swatch carries the colour and the ink that reads on it', () => {
   });
   expect(swatchAt(scale, 1)).toStrictEqual({
     background: '#ffffff',
-    foreground: '#182026',
+    foreground: INK,
   });
 });
 
