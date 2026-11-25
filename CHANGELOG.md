@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.147.0](https://github.com/cheminfo/react-cheminfo/compare/v0.146.0...v0.147.0) (2026-11-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* CaptionSelectionStyle has a new required `latin` field.
+
+### Features
+
+* draw no focus ring, ever, from the shared stylesheet ([8b84356](https://github.com/cheminfo/react-cheminfo/commit/8b84356a2f696dcb511b8b5fd372f6798fb90f24))
+* read Raman spectra with loadRamanSpectra ([4fa71a2](https://github.com/cheminfo/react-cheminfo/commit/4fa71a2ee542965d2215191b87c8570d3ad67da6))
+* type Greek letters and signs into a caption from a symbol palette ([307627d](https://github.com/cheminfo/react-cheminfo/commit/307627d470894cd2273ee15bd57890a74f209bff))
+
+
+### Bug Fixes
+
+* draw a site written to finite precision once per image ([fcee2be](https://github.com/cheminfo/react-cheminfo/commit/fcee2be9d55b61548e88011d4fa8d3ffd499f822))
+* save in a folder under a name a file can take, and say when the folder is gone ([c98745c](https://github.com/cheminfo/react-cheminfo/commit/c98745cb90addf76717b25d23b291d11d3ba3247))
+
 ## [0.146.0](https://github.com/cheminfo/react-cheminfo/compare/v0.145.0...v0.146.0) (2026-11-23)
 
 
