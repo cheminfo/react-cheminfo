@@ -456,6 +456,8 @@ const STORY_IDS = [
   'structure-structuresearchdialog--default',
   'structure-structuresearchdialog--similarity',
   'structure-structuresearchdialog--site-modes',
+  'structure-structuresearchpanel--default',
+  'structure-structuresearchpanel--site-thresholds',
   'taxonomy-taxonlineage--default',
   'taxonomy-taxonlineage--every-rank',
   'taxonomy-taxonlineage--organism-names',
