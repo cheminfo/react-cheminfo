@@ -31,7 +31,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Draw a structure and pick how it is matched: contained, similar, or the same compound with or without its stereochemistry and tautomerism. What is drawn is handed back when the dialog closes, by Apply or by Escape alike.',
+          'Draw a structure and press how it is matched: contained, similar, or the same compound with or without its stereochemistry and tautomerism. Each mode is a large button saying what it finds; pressing it closes the dialog with that mode. Escape hands back what is drawn in the mode the dialog opened on.',
       },
     },
   },

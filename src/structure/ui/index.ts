@@ -27,6 +27,8 @@ export type { StructureEditorHelpProps } from './StructureEditorHelp.tsx';
 export { StructureEditorHelp } from './StructureEditorHelp.tsx';
 export type { StructureSearchDialogProps } from './StructureSearchDialog.tsx';
 export { StructureSearchDialog } from './StructureSearchDialog.tsx';
+export type { StructureSearchPanelProps } from './StructureSearchPanel.tsx';
+export { StructureSearchPanel } from './StructureSearchPanel.tsx';
 export type { StructureSearchModeLabel } from './useStructureSearchModes.ts';
 export { useStructureSearchModes } from './useStructureSearchModes.ts';
 export type { StructureExportDialogProps } from './StructureExportDialog.tsx';

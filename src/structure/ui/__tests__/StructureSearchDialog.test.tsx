@@ -27,7 +27,7 @@ test('a closed dialog renders nothing', () => {
   expect(markup).not.toContain('structure-search');
 });
 
-test('an open dialog offers every mode and the default fragments', () => {
+test('an open dialog offers every mode, said what it finds, and the default fragments', () => {
   const markup = renderToStaticMarkup(
     <StructureSearchDialog
       isOpen
@@ -47,16 +47,22 @@ test('an open dialog offers every mode and the default fragments', () => {
     'Any tautomer',
     'Benzene',
     'Trifluoromethyl',
-    'Apply',
+    'Search the drawing',
+    'Every molecule the drawing is part of.',
+    'The same compound in any tautomeric form, its stereochemistry ignored.',
   ]) {
     expect(markup).toContain(`>${label}<`);
   }
 
-  // The threshold belongs to a similarity search only.
-  expect(markup).not.toContain('Minimum similarity');
+  expect(markup).not.toContain('>Apply<');
+  // The least similarity is set before Similar to is pressed.
+  expect(markup).toContain('aria-label="Minimum similarity"');
+  // The mode the dialog opened on is shown as the one in force.
+  expect(markup.match(/aria-current="true"/g)).toHaveLength(1);
+  expect(markup).toMatch(/aria-current="true"[^>]*><b [^>]*>Contains</);
 });
 
-test('a similarity search shows its threshold, and a site its own controls', () => {
+test('a similarity search keeps its threshold, and a site adds its own controls', () => {
   const markup = renderToStaticMarkup(
     <StructureSearchDialog
       isOpen
@@ -91,4 +97,21 @@ test('a site offers only its own modes and its own fragments', () => {
   expect(markup).not.toContain('>Similar to<');
   expect(markup).toContain('>Tropane<');
   expect(markup).not.toContain('>Benzene<');
+  expect(markup).not.toContain('Minimum similarity');
+});
+
+test('a site offers its own steps of similarity', () => {
+  const markup = renderToStaticMarkup(
+    <StructureSearchDialog
+      isOpen
+      usePortal={false}
+      value={{ ...EMPTY, mode: 'similarity', threshold: 0.8 }}
+      thresholds={[0.7, 0.8, 0.9, 1]}
+      onClose={noop}
+    />,
+  );
+
+  expect(markup).toContain('≥ 70 %');
+  expect(markup).toContain('≥ 100 %');
+  expect(markup).not.toContain('≥ 95 %');
 });

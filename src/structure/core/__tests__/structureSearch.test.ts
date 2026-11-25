@@ -20,6 +20,15 @@ test('a threshold off the steps is offered in its place', () => {
   ]);
 });
 
+test('a site offers its own steps, with a threshold off them in its place', () => {
+  const steps = [0.7, 0.8, 0.9, 1];
+
+  expect(similarityThresholds(0.8, steps)).toStrictEqual(steps);
+  expect(similarityThresholds(0.85, steps)).toStrictEqual([
+    0.7, 0.8, 0.85, 0.9, 1,
+  ]);
+});
+
 test('a SMILES becomes the idCode of a query fragment', () => {
   const idCode = fragmentIdCode('c1ccccc1');
 

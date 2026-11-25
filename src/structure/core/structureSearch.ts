@@ -56,13 +56,15 @@ export const SIMILARITY_THRESHOLDS: readonly number[] = [
  * chosen one when it is none of them, so a link asking for 0.42 still finds it
  * in the list.
  * @param current - The threshold in force.
+ * @param steps - The steps a site offers, ascending.
  * @returns The thresholds, ascending.
  */
-export function similarityThresholds(current: number): number[] {
-  if (SIMILARITY_THRESHOLDS.includes(current) || !Number.isFinite(current)) {
-    return [...SIMILARITY_THRESHOLDS];
+export function similarityThresholds(
+  current: number,
+  steps: readonly number[] = SIMILARITY_THRESHOLDS,
+): number[] {
+  if (steps.includes(current) || !Number.isFinite(current)) {
+    return [...steps];
   }
-  return [...SIMILARITY_THRESHOLDS, current].toSorted(
-    (left, right) => left - right,
-  );
+  return [...steps, current].toSorted((left, right) => left - right);
 }
