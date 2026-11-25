@@ -1,5 +1,17 @@
 import type { CreditEntry, CreditId } from '../../credits/core/credits.ts';
 
+import {
+  COORDINATOR,
+  FAMILY_MAINTAINERS,
+  FAMILY_PEOPLE,
+} from './familyPeople.ts';
+
+export {
+  COORDINATOR,
+  FAMILY_MAINTAINERS,
+  FAMILY_PEOPLE,
+} from './familyPeople.ts';
+
 /** Where someone works, named and linked after what they do. */
 export interface Organisation {
   /** Its name, as it writes it. */
@@ -87,49 +99,6 @@ export interface MaintainerLine {
   /** Whether they maintain the tooling this site is built with. */
   tooling: boolean;
 }
-
-/** Who coordinates the family, and whose line is the family's on most sites. */
-export const COORDINATOR = 'Luc Patiny';
-
-const ZAKODIUM: Organisation = {
-  name: 'Zakodium',
-  href: 'https://www.zakodium.com',
-};
-
-/**
- * The people every About lists first, in this order: who had the idea and
- * coordinates, who maintains the design library, who maintains the tooling.
- */
-export const FAMILY_PEOPLE: readonly FamilyPerson[] = [
-  { name: COORDINATOR, role: 'coordinates' },
-  {
-    name: 'Daniel Kostro',
-    role: 'design',
-    organisation: ZAKODIUM,
-    when: 'react-science',
-  },
-  {
-    name: 'Michaël Zasso',
-    role: 'tooling',
-    organisation: ZAKODIUM,
-    maintains: ['openchemlib'],
-  },
-];
-
-/** Who maintains what a site made with others runs on, in the order listed. */
-export const FAMILY_MAINTAINERS: readonly FamilyMaintainer[] = [
-  {
-    name: 'Daniel Kostro',
-    organisation: ZAKODIUM,
-    maintains: ['react-science'],
-  },
-  {
-    name: 'Michaël Zasso',
-    organisation: ZAKODIUM,
-    maintains: ['openchemlib', 'react-ocl', 'react-science'],
-    tooling: true,
-  },
-];
 
 /**
  * Whether a site was made with somebody besides the family's coordinator. Only
@@ -222,6 +191,20 @@ export function aboutMaintainers(
   return lines;
 }
 
+/**
+ * The list under the names on a site that is not the family's: its leads, then
+ * the people it names with a role, and nobody it does not name.
+ * @param named - The people and contributors the site names.
+ * @param leads - The people whose work the site is, listed first.
+ * @returns The list, in order.
+ */
+export function ownTeam(
+  named: readonly AboutTeamEntry[],
+  leads: readonly AboutTeamEntry[] = [],
+): TeamMember[] {
+  return withNamed([...leads], named);
+}
+
 function makers(
   named: readonly AboutTeamEntry[],
   leads: readonly AboutTeamEntry[],
@@ -236,6 +219,13 @@ function makers(
   } else if (coordinator && !named.some(isCoordinatorWithRole)) {
     team.push({ name: COORDINATOR, family: { role: 'interface', works: [] } });
   }
+  return withNamed(team, named);
+}
+
+function withNamed(
+  team: TeamMember[],
+  named: readonly AboutTeamEntry[],
+): TeamMember[] {
   for (const person of named) {
     if (person.role === undefined) continue;
     if (team.some((member) => member.name === person.name)) continue;

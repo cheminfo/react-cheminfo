@@ -145,6 +145,34 @@ test('a site another organisation provides may leave the coordinator out', () =>
   ]);
 });
 
+test('a personal project lists only the people it names', () => {
+  const about = resolveAbout({
+    ...SMILES,
+    siteId: OUTSIDE,
+    credits: ['openchemlib', 'react-science'],
+    people: [{ name: 'Luc Patiny' }],
+    family: false,
+  });
+
+  expect(about.people).toStrictEqual([{ name: 'Luc Patiny' }]);
+  expect(about.team).toStrictEqual([]);
+  expect(about.maintainers).toStrictEqual([]);
+});
+
+test('a personal project made with others lists them, and no maintainers', () => {
+  const about = resolveAbout({
+    ...SMILES,
+    people: [{ name: 'Luc Patiny' }],
+    contributors: [{ name: 'Jane Doe', role: 'drew the mark' }],
+    family: false,
+  });
+
+  expect(about.team).toStrictEqual([
+    { name: 'Jane Doe', role: 'drew the mark' },
+  ]);
+  expect(about.maintainers).toStrictEqual([]);
+});
+
 test('a site made with others lists who made it, and who maintains what it runs on apart', () => {
   const about = resolveAbout({
     ...SMILES,
