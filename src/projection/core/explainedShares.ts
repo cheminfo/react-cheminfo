@@ -23,7 +23,7 @@ export interface ComponentShare {
 
 /** Everything the "how much each explains" tab draws. */
 export interface ExplainedShares {
-  /** One entry per component, largest first. */
+  /** One entry per component drawn, largest first. */
   components: readonly ComponentShare[];
   /** The cumulative share the marker aims at; `0` draws no marker. */
   target: number;
@@ -41,6 +41,13 @@ export interface ExplainedSharesOptions {
    * @default 0.95
    */
   target?: number;
+  /**
+   * The most components drawn, the strongest ones. A spectrum fitted on
+   * hundreds of samples yields hundreds of components, and past the first few
+   * their bars are too thin to see and their names run into one another.
+   * @default 10
+   */
+  count?: number;
 }
 
 /**
@@ -57,12 +64,15 @@ export function explainedShares(
   axes: readonly ProjectionAxis[],
   options: ExplainedSharesOptions = {},
 ): ExplainedShares {
-  const { target = DEFAULT_TARGET } = options;
+  const { target = DEFAULT_TARGET, count = DEFAULT_COUNT } = options;
   const aim = Number.isFinite(target) ? Math.min(1, Math.max(0, target)) : 0;
+  const drawn = Number.isFinite(count)
+    ? Math.min(axes.length, Math.max(1, Math.floor(count)))
+    : axes.length;
 
   const components: ComponentShare[] = [];
   let running = 0;
-  for (let index = 0; index < axes.length; index++) {
+  for (let index = 0; index < drawn; index++) {
     const axis = axes[index];
     if (axis === undefined) continue;
     // An axis that publishes no share stands at zero rather than stopping the
@@ -100,6 +110,8 @@ export function explainedShares(
 }
 
 const DEFAULT_TARGET = 0.95;
+
+const DEFAULT_COUNT = 10;
 
 /** How far off 1 a whole model's shares may land and still be a whole model. */
 const ROUNDING = 1e-9;

@@ -44,8 +44,8 @@ interface ProjectionSharesTabProps {
 }
 
 /**
- * One bar per component, each in its own component's colour, with the running
- * total drawn over them.
+ * One bar per component, the ten strongest, each in its own component's
+ * colour, with the running total drawn over them.
  *
  * The colour is the whole point of this tab. On most charts of explained
  * shares the bars are one colour, or a gradient, and a reader who asks what it

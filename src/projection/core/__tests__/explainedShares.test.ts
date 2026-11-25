@@ -83,3 +83,34 @@ test('no axes at all give no bars and no marker', () => {
     reachesTargetAt: null,
   });
 });
+
+const twelve: ProjectionAxis[] = [];
+for (let index = 0; index < 12; index++) {
+  twelve.push({ name: `PC${index + 1}`, share: 0.5 ** (index + 1) });
+}
+
+test('only the ten strongest components are drawn', () => {
+  const drawn = explainedShares(twelve);
+
+  expect(drawn.components).toHaveLength(10);
+  expect(drawn.components[9]?.label).toBe('PC10');
+  expect(drawn.components[9]?.cumulative).toBe(0.9990234375);
+});
+
+test('a target the drawn components do not reach is not reached', () => {
+  expect(explainedShares(twelve, { target: 0.999 }).reachesTargetAt).toBe(10);
+  expect(
+    explainedShares(twelve, { target: 0.9995 }).reachesTargetAt,
+  ).toBeNull();
+});
+
+test('the count of drawn components can be raised or lowered', () => {
+  expect(explainedShares(twelve, { count: 3 }).components).toHaveLength(3);
+  expect(explainedShares(twelve, { count: 0 }).components).toHaveLength(1);
+  expect(
+    explainedShares(twelve, { count: Number.POSITIVE_INFINITY }).components,
+  ).toHaveLength(12);
+  expect(
+    explainedShares(twelve, { count: 12, target: 0.9995 }).reachesTargetAt,
+  ).toBe(11);
+});
