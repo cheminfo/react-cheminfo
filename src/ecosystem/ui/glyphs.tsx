@@ -621,6 +621,23 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
   // An infobox: the structure at its top, a ring, and two rows of data under
   // it. The second row carries the answering colour, the blue of a link. Both
   // rows and the gap between them fall on whole pixels at 16 px.
+  // The diamond of a hazard label holding a flask: what a substance is, and how
+  // it must be handled.
+  store: (alt) => (
+    <>
+      <path
+        d="M16 3.6 28.4 16 16 28.4 3.6 16Z"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14.3 9.6h3.4v4.6l3.5 6.2c.4.7-.1 1.6-.9 1.6h-8.6c-.8 0-1.3-.9-.9-1.6l3.5-6.2Z"
+        fill={alt}
+      />
+    </>
+  ),
   wikidata: (alt) => (
     <>
       <path

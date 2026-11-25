@@ -12,8 +12,12 @@ import type {
 export interface MoleculesClientOptions {
   /** Where molecules.cheminfo.org answers, e.g. `https://molecules.cheminfo.org`. */
   baseUrl: string;
-  /** The token issued for the source the client writes for. */
-  token: string;
+  /**
+   * The token issued for the source the client writes for. Reading takes none,
+   * so a client that only calls `lookup` leaves it out.
+   * @default undefined - no token is sent
+   */
+  token?: string;
   /**
    * How long one request may keep being retried while the server is busy or
    * unreachable, in milliseconds.

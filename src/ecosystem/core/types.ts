@@ -26,6 +26,7 @@ export type SiteId =
   | 'database'
   | 'molecules'
   | 'fair'
+  | 'store'
   | 'symmetry'
   | 'osiris'
   | 'atoms'

@@ -19,6 +19,21 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     mark: { plate: '#be185d', accent: '#5eead4' },
   },
   {
+    id: 'store',
+    name: { lead: 'store', alt: 'cheminfo', dot: true },
+    host: 'store.cheminfo.org',
+    tagline: 'What is known about a molecule, and who says so.',
+    group: 'research',
+    // The red of a GHS pictogram's frame, the first thing a label says: 6.5
+    // Oklab units from the nearest lead of the family, and 4.8:1 on white.
+    brand: '#e01e24',
+    // The blue of the health quadrant of an NFPA diamond, 8.3:1 on white.
+    brandAlt: '#1e4e8c',
+    // That blue sits too close to the red plate at 16 px, so the flask in the
+    // diamond takes the yellow of the diamond's instability quadrant.
+    mark: { plate: '#e01e24', accent: '#fde047' },
+  },
+  {
     id: 'mz',
     name: { lead: 'mz', alt: 'cheminfo', dot: true },
     host: 'mz.cheminfo.org',

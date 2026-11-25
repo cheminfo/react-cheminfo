@@ -78,7 +78,7 @@ export function createMoleculesClient(
       response = await fetchImplementation(`${baseUrl}${call.path}`, {
         method: call.method,
         headers: {
-          authorization: `Bearer ${token}`,
+          ...(token === undefined ? {} : { authorization: `Bearer ${token}` }),
           ...(call.payload === undefined
             ? {}
             : {

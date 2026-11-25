@@ -78,6 +78,21 @@ function client(
   });
 }
 
+test('a client holding no token sends none', async () => {
+  const sent: RequestInit[] = [];
+  const client = createMoleculesClient({
+    baseUrl: 'https://molecules.example',
+    fetch: (_url, init) => {
+      sent.push(init ?? {});
+      return Promise.resolve(Response.json({ results: [] }));
+    },
+  });
+
+  await client.lookup(['CCO'], 'smiles');
+
+  expect(new Headers(sent[0]?.headers).has('authorization')).toBe(false);
+});
+
 test('a batch is sent gzipped, with the token, and its answer returned', async () => {
   const summary = {
     total: 1,
