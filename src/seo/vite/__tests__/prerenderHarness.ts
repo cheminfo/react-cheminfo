@@ -38,16 +38,18 @@ export const PAGE = [
  * Run the build hooks over a directory holding an `index.html`.
  * @param options - What the build was configured with.
  * @param out - The build output directory.
+ * @param error - What the build failed with, as the bundler hands it to `closeBundle`.
  */
 export async function build(
   options: PrerenderOptions,
   out: string,
+  error?: Error,
 ): Promise<void> {
   const plugin = cheminfoPrerender(options);
   configure(plugin, 'build', out);
   // The hook fetches the chrome's catalogs before it writes, so it is awaited
   // here exactly as vite awaits it.
-  await hookOf(plugin, 'closeBundle')();
+  await hookOf(plugin, 'closeBundle')(error);
 }
 
 /**

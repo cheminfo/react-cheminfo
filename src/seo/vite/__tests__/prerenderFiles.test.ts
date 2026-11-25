@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -80,6 +80,19 @@ test('a site naming no root still gets the index a server hands out', async () =
     '<link rel="canonical" href="https://3d.cheminfo.org/first" />',
   );
   expect(index).not.toContain('<!--cheminfo:head-->');
+});
+
+test('a failed build is left to report its own error', async () => {
+  const out = mkdtempSync(join(tmpdir(), 'cheminfo-prerender-'));
+
+  await expect(
+    build(
+      { site: '3d', routes: ROUTES },
+      out,
+      new Error('"spinRuns" is not exported by "react-cheminfo/drawing"'),
+    ),
+  ).resolves.toBeUndefined();
+  expect(readdirSync(out)).toStrictEqual([]);
 });
 
 test('an address written twice is refused before anything is built', async () => {

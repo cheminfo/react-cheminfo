@@ -214,8 +214,10 @@ export function cheminfoPrerender(options: PrerenderOptions): Plugin {
         serve ? page(html, homeRoute(routes), DEFAULT_LANGUAGE) : html,
     },
 
-    async closeBundle() {
-      if (serve) return;
+    // A failed build wrote no page, and throwing here would replace the error
+    // the bundler is about to report with an ENOENT on `index.html`.
+    async closeBundle(error?: Error) {
+      if (serve || error) return;
       // The crawl path names the family in the chrome's own words, and every
       // language but the default arrives as a chunk of its own, so they are all
       // fetched before a single file is written.
