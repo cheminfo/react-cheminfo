@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.148.1](https://github.com/cheminfo/react-cheminfo/compare/v0.148.0...v0.148.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* name the zoom bar's fit button "Zoom to fit", as its tooltip does ([2e07a52](https://github.com/cheminfo/react-cheminfo/commit/2e07a522a1e6ddf6501ead95273cced8fa8eb193))
+
 ## [0.148.0](https://github.com/cheminfo/react-cheminfo/compare/v0.147.0...v0.148.0) (2026-11-25)
 
 
