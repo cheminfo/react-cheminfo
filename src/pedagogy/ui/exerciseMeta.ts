@@ -7,6 +7,7 @@
 
 import type { IconName, Intent } from '@blueprintjs/core';
 
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import type { ExerciseLevel, ExerciseStatus } from '../core/types.ts';
 
 /** Green for a beginner, amber for an intermediate, red for an advanced one. */
@@ -15,6 +16,16 @@ export const LEVEL_INTENT: Record<ExerciseLevel, Intent> = {
   intermediate: 'warning',
   advanced: 'danger',
 };
+
+/**
+ * The chrome's message naming each level, so a tag or a strip that is not
+ * given a name of its own says it in the language of the page.
+ */
+export const LEVEL_NAME_KEY = {
+  beginner: 'pedagogy.levelBeginner',
+  intermediate: 'pedagogy.levelIntermediate',
+  advanced: 'pedagogy.levelAdvanced',
+} as const satisfies Record<ExerciseLevel, ChromeKey>;
 
 /** The three levels in teaching order, for a page listing all of them. */
 export const LEVEL_ORDER: readonly ExerciseLevel[] = [

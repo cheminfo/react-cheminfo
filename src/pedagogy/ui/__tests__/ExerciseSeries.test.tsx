@@ -121,6 +121,31 @@ test('a new series is pushed, and the others of the tool forgotten', () => {
   expect(store.records()).toStrictEqual({});
 });
 
+test('the tag a page gives the series is the one its questions carry', () => {
+  act(() => {
+    root.render(
+      <ExerciseSeries
+        tool={ELECTRONS}
+        store={store}
+        label={(ion) => ion.formula}
+        prompt={(ion) => <p>How many electrons has {ion.name}?</p>}
+        tag={(ion) => `${ion.protons} protons`}
+        seed={42}
+        onSeed={() => undefined}
+        count={3}
+        onCount={() => undefined}
+        split={null}
+        onSplit={() => undefined}
+      />,
+    );
+  });
+  const first = pickSeeded(ELECTRONS.pool, 3, 42)[0];
+
+  expect(
+    host.querySelector('.series-question__meta .bp6-tag')?.textContent,
+  ).toBe(`${first?.protons} protons`);
+});
+
 class NoResizeObserver implements ResizeObserver {
   public observe(): void {
     // Nothing is measured: the row stacks or splits on the window alone.

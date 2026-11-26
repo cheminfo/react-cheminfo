@@ -1,9 +1,12 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { CHROME_CATALOG } from '../../../i18n/core/chromeCatalog.ts';
+import { SiteLanguage } from '../../../language/ui/SiteLanguage.tsx';
 import { ExerciseLevelTag, ExerciseStatusIcon } from '../ExerciseTags.tsx';
 import {
   LEVEL_INTENT,
+  LEVEL_NAME_KEY,
   LEVEL_ORDER,
   STATUS_ICON,
   STATUS_INTENT,
@@ -37,6 +40,23 @@ test('a tag that is switched off keeps the colour of its level', () => {
   expect(on).toContain('bp6-intent-danger');
   expect(on).not.toContain('bp6-minimal');
   expect(off).toContain('>advanced</span>');
+});
+
+test('a level tag names its level in the language of the page', async () => {
+  await CHROME_CATALOG.load('fr');
+  const french = renderToStaticMarkup(
+    <SiteLanguage value="fr">
+      <ExerciseLevelTag level="intermediate" />
+    </SiteLanguage>,
+  );
+
+  expect(LEVEL_NAME_KEY).toStrictEqual({
+    beginner: 'pedagogy.levelBeginner',
+    intermediate: 'pedagogy.levelIntermediate',
+    advanced: 'pedagogy.levelAdvanced',
+  });
+  expect(french).toContain('>intermédiaire</span>');
+  expect(french).toContain('bp6-intent-warning');
 });
 
 test('a level tag can be relabelled without losing its colour', () => {

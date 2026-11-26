@@ -13,7 +13,18 @@ import type { TestCaseResult, ValidationResult } from './validation.ts';
 /** What a student has typed into a question, field by field. */
 export type Answers = Readonly<Record<string, string>>;
 
-/** One box a question asks the student to fill. */
+/** One answer a field offers to pick, rather than to type. */
+export interface AnswerChoice {
+  /** What picking it writes into {@link Answers}, e.g. `anode`. */
+  value: string;
+  /**
+   * What the button reads, as authored prose: `{{Cu(2+)}}` is drawn as a
+   * formula, `**strong**` and `` `code` `` as everywhere else.
+   */
+  label: string;
+}
+
+/** One box a question asks the student to fill, or one pick to make. */
 export interface AnswerField {
   /** Key of the value in {@link Answers}. */
   key: string;
@@ -30,6 +41,13 @@ export interface AnswerField {
    * @default 'decimal'
    */
   inputMode?: 'decimal' | 'text';
+  /**
+   * The answers on offer, when the field is a pick rather than a box: a sign,
+   * a direction, which electrode. It is drawn as a row of buttons of which one
+   * is checked, and the `value` of the one picked is what the grader reads.
+   * @default undefined — a box typed into
+   */
+  choices?: readonly AnswerChoice[];
 }
 
 /** The verdict on one field of an answer. */

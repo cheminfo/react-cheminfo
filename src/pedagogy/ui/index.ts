@@ -9,6 +9,7 @@ export type {
 export { ExerciseLevelTag, ExerciseStatusIcon } from './ExerciseTags.tsx';
 export {
   LEVEL_INTENT,
+  LEVEL_NAME_KEY,
   LEVEL_ORDER,
   STATUS_ICON,
   STATUS_INTENT,

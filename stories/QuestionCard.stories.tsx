@@ -1,15 +1,29 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ReactNode } from 'react';
+import { MF } from 'react-mf';
 
 import { emptyAttempt } from '../src/pedagogy/core/attempts.ts';
+import { GlossaryProvider } from '../src/pedagogy/ui/GlossaryProvider.tsx';
 import { QuestionCard } from '../src/pedagogy/ui/QuestionCard.tsx';
 
 import type { Ion } from './seriesFixtures.tsx';
-import { ELECTRONS, ionPrompt, storyStore } from './seriesFixtures.tsx';
+import {
+  CHARGE_SIGNS,
+  ELECTRONS,
+  ionPrompt,
+  storyStore,
+} from './seriesFixtures.tsx';
 
 import '../styles/chrome.css';
 
 const IRON = ELECTRONS.pool[2] as Ion;
 const KEY = 'electrons/42/Fe(3+)';
+const SODIUM = ELECTRONS.pool[0] as Ion;
+const SIGN_KEY = 'signs/42/Na+';
+
+function formula(mf: string): ReactNode {
+  return <MF mf={mf} />;
+}
 
 const meta = {
   title: 'Pedagogy/QuestionCard',
@@ -83,4 +97,27 @@ export const SolutionShowing: Story = {
   args: {
     store: storyStore({ [KEY]: { ...emptyAttempt(), showSolution: true } }),
   },
+};
+
+/**
+ * An answer picked from a row rather than typed: the arrows move the pick,
+ * Space picks, Enter checks the answer.
+ */
+export const ChoiceField: Story = {
+  args: {
+    tool: CHARGE_SIGNS,
+    question: SODIUM,
+    storageKey: SIGN_KEY,
+    prompt: (ion) => <p>What is {ion.name}?</p>,
+    store: storyStore({
+      [SIGN_KEY]: { ...emptyAttempt(), answers: { sign: 'anion' } },
+    }),
+  },
+  decorators: [
+    (Story) => (
+      <GlossaryProvider glossary={{}} renderMf={formula}>
+        <Story />
+      </GlossaryProvider>
+    ),
+  ],
 };

@@ -7,7 +7,7 @@ import { ActionTooltip } from '../../shared/ui/ActionTooltip.tsx';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ExerciseLevel } from '../core/types.ts';
 
-import { LEVEL_ORDER } from './exerciseMeta.ts';
+import { LEVEL_NAME_KEY, LEVEL_ORDER } from './exerciseMeta.ts';
 import { HOVER_OPEN_DELAY } from './pedagogyStyle.ts';
 import type { TutorialLevelColours } from './tutorialLevels.ts';
 import { TUTORIAL_LEVEL_COLOURS } from './tutorialLevels.ts';
@@ -41,7 +41,8 @@ export interface TutorialStepStripProps {
   onSelect: (index: number) => void;
   /**
    * What each strip is called — `Basics`, `π bonds, planarity, conjugation`.
-   * @default undefined — the level names its own strip
+   * @default undefined — the level names its own strip, in the language of
+   * the page
    */
   levelLabels?: Partial<Record<ExerciseLevel, string>>;
   /**
@@ -92,7 +93,7 @@ export function TutorialStepStrip(props: TutorialStepStripProps): ReactElement {
             steps={steps}
             positions={positions}
             colours={TUTORIAL_LEVEL_COLOURS[level]}
-            label={levelLabels?.[level] ?? level}
+            label={levelLabels?.[level] ?? t(LEVEL_NAME_KEY[level])}
             activeIndex={active}
             onSelect={onSelect}
           />
@@ -189,6 +190,7 @@ interface StepButtonProps {
  */
 function StepButton(props: StepButtonProps): ReactElement {
   const { step, position, colours, active, onSelect } = props;
+  const t = useChromeT();
 
   return (
     <ActionTooltip
@@ -198,7 +200,10 @@ function StepButton(props: StepButtonProps): ReactElement {
     >
       <button
         type="button"
-        aria-label={`Step ${position + 1}: ${step.title}`}
+        aria-label={t('pedagogy.stepLabel', {
+          number: position + 1,
+          title: step.title,
+        })}
         aria-current={active ? 'step' : undefined}
         style={numberStyle(colours, active)}
         onClick={() => {

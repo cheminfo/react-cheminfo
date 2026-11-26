@@ -1,9 +1,15 @@
 import { Icon, Tag } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { ExerciseLevel, ExerciseStatus } from '../core/types.ts';
 
-import { LEVEL_INTENT, STATUS_ICON, STATUS_INTENT } from './exerciseMeta.ts';
+import {
+  LEVEL_INTENT,
+  LEVEL_NAME_KEY,
+  STATUS_ICON,
+  STATUS_INTENT,
+} from './exerciseMeta.ts';
 
 /** What {@link ExerciseLevelTag} needs. */
 export interface ExerciseLevelTagProps {
@@ -11,7 +17,8 @@ export interface ExerciseLevelTagProps {
   level: ExerciseLevel;
   /**
    * What the tag reads.
-   * @default the level itself — `beginner`, `intermediate`, `advanced`
+   * @default the level's name in the language of the page — `beginner`,
+   * `intermediate`, `advanced` in English
    */
   label?: string;
   /**
@@ -40,7 +47,14 @@ export interface ExerciseLevelTagProps {
  * @returns The tag.
  */
 export function ExerciseLevelTag(props: ExerciseLevelTagProps): ReactElement {
-  const { className, level, label = level, active = false, onClick } = props;
+  const t = useChromeT();
+  const {
+    className,
+    level,
+    label = t(LEVEL_NAME_KEY[level]),
+    active = false,
+    onClick,
+  } = props;
 
   return (
     <Tag

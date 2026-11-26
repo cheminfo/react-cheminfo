@@ -309,6 +309,7 @@ const STORY_IDS = [
   'pedagogy-hintladder--renamed-for-the-tool',
   'pedagogy-hintladder--without-the-button',
   'pedagogy-questioncard--checked-wrong',
+  'pedagogy-questioncard--choice-field',
   'pedagogy-questioncard--default',
   'pedagogy-questioncard--solution-showing',
   'pedagogy-questioncard--solved-with-hints',

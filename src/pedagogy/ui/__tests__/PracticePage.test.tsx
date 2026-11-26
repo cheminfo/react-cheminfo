@@ -1,9 +1,29 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { CHROME_CATALOG } from '../../../i18n/core/chromeCatalog.ts';
+import { SiteLanguage } from '../../../language/ui/SiteLanguage.tsx';
 import { HiddenPartsProvider } from '../../../share/ui/HiddenPartsProvider.tsx';
 import { CalculatorTable } from '../CalculatorTable.tsx';
 import { PracticePage } from '../PracticePage.tsx';
+
+test('a French page heads its calculator in French', async () => {
+  await CHROME_CATALOG.load('fr');
+  const html = renderToStaticMarkup(
+    <SiteLanguage value="fr">
+      <PracticePage
+        title="Électrons"
+        lead="Comptez-les."
+        playground={<p>box</p>}
+        exercises={<p>series</p>}
+      />
+    </SiteLanguage>,
+  );
+
+  expect(html).toContain(
+    '<h2 class="panel__title" id="calculator-heading">Calculatrice</h2>',
+  );
+});
 
 test('a practice page draws its calculator, then its series', () => {
   const html = renderToStaticMarkup(

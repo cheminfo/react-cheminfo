@@ -13,7 +13,7 @@ import { ExerciseActions } from './ExerciseActions.tsx';
 import { GlossaryText } from './GlossaryText.tsx';
 import { HintLadder } from './HintLadder.tsx';
 import { TestCaseList } from './TestCaseList.tsx';
-import { LEVEL_INTENT } from './exerciseMeta.ts';
+import { LEVEL_INTENT, LEVEL_NAME_KEY } from './exerciseMeta.ts';
 import { useAttemptRecords } from './useAttemptRecords.ts';
 
 /** What a tool's own answer input is handed. */
@@ -32,6 +32,13 @@ export interface AnswerInputProps<Question> {
 export interface QuestionRendering<Question> {
   /** The statement of the question. */
   prompt: (question: Question) => ReactNode;
+  /**
+   * What the tag beside the question's number reads — the audience a question
+   * is written for, the course it belongs to — in the colour of its level.
+   * Nothing returned leaves the tag out.
+   * @default the name of the question's level, in the language of the page
+   */
+  tag?: (question: Question) => ReactNode;
   /**
    * An input of the tool's own — a drawing canvas, a reaction to balance — in
    * place of the typed boxes.
@@ -92,6 +99,7 @@ export function QuestionCard<Question>(
     total,
     onNext,
     prompt,
+    tag,
     answer,
     solution,
   } = props;
@@ -113,6 +121,8 @@ export function QuestionCard<Question>(
   const checked = checkedAnswers === snapshot;
   const solutionsHidden = isHidden('solutions');
   const level = tool.level?.(question);
+  const levelName = level === undefined ? null : t(LEVEL_NAME_KEY[level]);
+  const tagged = tag === undefined ? levelName : tag(question);
 
   function setAnswer(key: string, value: string): void {
     store.updateAttempt(storageKey, { answers: { ...answers, [key]: value } });
@@ -132,9 +142,12 @@ export function QuestionCard<Question>(
     >
       <div className="series-question__meta">
         <span>{t('pedagogy.questionOf', { number, total })}</span>
-        {level === undefined ? null : (
-          <Tag minimal intent={LEVEL_INTENT[level]}>
-            {level}
+        {tagged === null || tagged === undefined ? null : (
+          <Tag
+            minimal
+            intent={level === undefined ? undefined : LEVEL_INTENT[level]}
+          >
+            {tagged}
           </Tag>
         )}
       </div>

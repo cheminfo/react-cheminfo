@@ -2177,6 +2177,18 @@ span.taxon-lineage__name {
   width: 10rem;
 }
 
+/* A pick takes the width of its answers, which wrap on a narrow card. */
+.series-answers__field--choices {
+  width: auto;
+  max-width: 100%;
+}
+
+.series-answers__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
 /* A formula is read character by character, so its box is set monospace. */
 .formula-input input {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

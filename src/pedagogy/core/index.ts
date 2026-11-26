@@ -72,6 +72,7 @@ export {
 export { drawRoundRobin, kindSeed } from './roundRobin.ts';
 export type {
   AnswerCheck,
+  AnswerChoice,
   AnswerField,
   Answers,
   FieldCase,

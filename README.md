@@ -1149,6 +1149,16 @@ the same questions. `seedParam` reads a seed a link pins, and `?seed=each` for
 one series per student. `createProgressController(signal)` is the handful of
 actions an exercise page performs on progress kept in a signal.
 
+A series that mixes kinds of question draws them with `drawRoundRobin(pools,
+count, seed)`: one pool per kind, each shuffled by its own `kindSeed`, then the
+kinds in turn, so the series opens on the first kind whatever the seed and a
+kind a filter empties leaves the others' questions where they were. A field
+that offers its answers rather than a box carries `choices`: `AnswerFields`
+draws it as a row of buttons of which one is picked, each label authored prose
+in which `{{Cu(2+)}}` is drawn. `readAnswerNumber` reads a power of ten however
+it is typed — `1.93 × 10^3`, `1,93·10³`, `1.93E3` — and a card's `tag` says what
+the tag beside the question's number reads, in the colour of its level.
+
 Formulas come from their own door, because they are read by `mf-parser` and
 drawn by `react-mf`: `readFormula` reads `NO3-`, `SO4--` and `CuSO4.5H2O` the
 way a student types them, which the parser alone reads as neutral or as a

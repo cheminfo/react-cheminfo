@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { CHROME_CATALOG } from '../../../i18n/core/chromeCatalog.ts';
+import { SiteLanguage } from '../../../language/ui/SiteLanguage.tsx';
 import type { TutorialStep } from '../../core/types.ts';
 import { TutorialStepStrip } from '../TutorialStepStrip.tsx';
 import { TUTORIAL_LEVEL_COLOURS } from '../tutorialLevels.ts';
@@ -154,4 +156,18 @@ test('a strip is named by the tool, and the pager may carry a word', () => {
   expect(html).toContain('Advanced features');
   expect(html).toContain('or use ↑ / ↓');
   expect(html).not.toContain('>beginner<');
+});
+
+test('a French page names the strips and the steps in French', async () => {
+  await CHROME_CATALOG.load('fr');
+  const html = renderToStaticMarkup(
+    <SiteLanguage value="fr">
+      <TutorialStepStrip steps={STEPS} activeIndex={0} onSelect={noop} />
+    </SiteLanguage>,
+  );
+
+  expect(html).toContain('>débutant</span>');
+  expect(html).toContain('>avancé</span>');
+  expect(html).toContain('aria-label="Étape 3 : Lookahead"');
+  expect(html).toContain('Étape 1 sur 3');
 });

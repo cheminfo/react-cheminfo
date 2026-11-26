@@ -83,6 +83,46 @@ export const ELECTRONS: SeriesTool<Ion> = {
     `${ion.protons} protons and a charge of ${ion.charge} leave ${ion.protons - ion.charge} electrons.`,
 };
 
+/** A tool whose answer is picked rather than typed: cation or anion. */
+export const CHARGE_SIGNS: SeriesTool<Ion> = {
+  id: 'signs',
+  pool: IONS,
+  key: (ion) => ion.formula,
+  level: () => 'beginner',
+  fields: () => [
+    {
+      key: 'sign',
+      label: 'The ion is',
+      choices: [
+        { value: 'cation', label: 'a cation, like {{Na+}}' },
+        { value: 'anion', label: 'an anion, like {{Cl-}}' },
+      ],
+    },
+  ],
+  grade(ion, answers) {
+    const picked = answers.sign ?? '';
+    const expected = ion.charge > 0 ? 'cation' : 'anion';
+    if (picked === '') {
+      return finishValidation([emptyCase('The ion is', 'one of the answers')]);
+    }
+    return finishValidation([
+      {
+        label: 'The ion is',
+        passed: picked === expected,
+        reason:
+          picked === expected ? picked : `${picked}, expected ${expected}`,
+        actual: picked,
+      },
+    ]);
+  },
+  hints: () => [
+    'Look at the sign of the charge.',
+    'An ion that lost electrons is positive.',
+  ],
+  solution: (ion) =>
+    `A charge of ${ion.charge} makes it **${ion.charge > 0 ? 'a cation' : 'an anion'}**.`,
+};
+
 /**
  * How a question is named in the list: its formula, drawn.
  * @param ion - The question.

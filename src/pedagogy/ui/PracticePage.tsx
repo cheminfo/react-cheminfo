@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { PagePart } from '../../share/ui/PagePart.tsx';
 
 import { GlossaryText } from './GlossaryText.tsx';
@@ -29,6 +30,7 @@ export interface PracticePageProps {
  */
 export function PracticePage(props: PracticePageProps): ReactElement {
   const { title, lead, playground, exercises } = props;
+  const t = useChromeT();
   return (
     <div className="tool-page">
       <header className="page-head">
@@ -41,7 +43,7 @@ export function PracticePage(props: PracticePageProps): ReactElement {
         <PagePart part="playground">
           <section className="panel" aria-labelledby="calculator-heading">
             <h2 className="panel__title" id="calculator-heading">
-              Calculator
+              {t('pedagogy.calculator')}
             </h2>
             {playground}
           </section>

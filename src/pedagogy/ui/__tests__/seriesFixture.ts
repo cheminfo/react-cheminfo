@@ -67,3 +67,36 @@ export const ELECTRONS: SeriesTool<Ion> = {
   solution: (ion) =>
     `${ion.protons} protons, charge ${ion.charge}: ${ion.protons - ion.charge} electrons.`,
 };
+
+/** The two answers the sign of a charge offers, the second one a formula. */
+export const SIGN_CHOICES = [
+  { value: 'cation', label: 'a cation' },
+  { value: 'anion', label: 'an anion, like {{Cl-}}' },
+] as const;
+
+/** A tool whose one field is a pick: is the ion a cation or an anion? */
+export const SIGNS: SeriesTool<Ion> = {
+  id: 'signs',
+  pool: IONS,
+  key: (ion) => ion.formula,
+  fields: () => [{ key: 'sign', label: 'The ion is', choices: SIGN_CHOICES }],
+  grade(ion, answers) {
+    const picked = answers.sign ?? '';
+    const expected = ion.charge > 0 ? 'cation' : 'anion';
+    if (picked === '') {
+      return finishValidation([emptyCase('The ion is', 'one of the answers')]);
+    }
+    return finishValidation([
+      {
+        label: 'The ion is',
+        passed: picked === expected,
+        reason:
+          picked === expected ? picked : `${picked}, expected ${expected}`,
+        actual: picked,
+      },
+    ]);
+  },
+  hints: () => ['Look at the sign of the charge.', 'A cation lost electrons.'],
+  solution: (ion) =>
+    `Its charge is ${ion.charge}, so it is a ${ion.charge > 0 ? 'cation' : 'anion'}.`,
+};
