@@ -22,6 +22,15 @@ test('a sub-second duration is written in milliseconds, and under a minute with 
   expect(formatDuration(-1, { subSecond: true })).toBe('–');
 });
 
+test('the tenth of a short duration takes the decimal separator of the page', () => {
+  expect(
+    formatDuration(12_345, { subSecond: true, style: 'spaced' }, 'fr'),
+  ).toBe('12,3 s');
+  expect(formatDuration(999.6, { subSecond: true }, 'de')).toBe('1,0s');
+  expect(formatDuration(200_000, { subSecond: true }, 'fr')).toBe('3m 20s');
+  expect(formatDuration(2345, { subSecond: true }, 'en')).toBe('2.3s');
+});
+
 test('a size is written in the largest unit that keeps it under a thousand', () => {
   expect(formatBytes(0)).toBe('0 B');
   expect(formatBytes(512)).toBe('512 B');

@@ -1,4 +1,8 @@
+import type { Language } from '../../i18n/core/languages.ts';
+import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
+
 import { MISSING_VALUE } from './missing.ts';
+import { formatDecimal } from './numbers.ts';
 
 const BYTE_UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'] as const;
 const BYTES_PER_UNIT = 1024;
@@ -63,11 +67,14 @@ export function formatBytes(bytes: number | undefined): string {
  * or `45 s`, `3 min 20 s`, `2 h 05 min` in the spaced style.
  * @param milliseconds - The duration in milliseconds.
  * @param options - See {@link FormatDurationOptions}.
+ * @param language - The language of the page, which writes the decimal of a
+ * duration under a minute: `2.3 s`, `2,3 s`. Defaults to English.
  * @returns The duration, or the missing marker when there is no finite, non-negative duration.
  */
 export function formatDuration(
   milliseconds: number | undefined,
   options: FormatDurationOptions = {},
+  language: Language = DEFAULT_LANGUAGE,
 ): string {
   if (
     milliseconds === undefined ||
@@ -84,7 +91,7 @@ export function formatDuration(
     if (whole < MILLISECONDS_PER_SECOND) return `${whole}${names.millisecond}`;
     const tenths = Math.round(milliseconds / 100);
     if (tenths < TENTHS_PER_MINUTE) {
-      return `${(tenths / 10).toFixed(1)}${names.second}`;
+      return `${formatDecimal(tenths / 10, 1, language)}${names.second}`;
     }
   }
 

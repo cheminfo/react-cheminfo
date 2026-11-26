@@ -88,3 +88,29 @@ test('a compact number is shortened once it reaches a thousand', () => {
   expect(formatCompact(3_400_000)).toBe('3.4M');
   expect(formatCompact(-1500)).toBe('-1.5K');
 });
+
+test('a number follows the language of the page, English when none is named', () => {
+  // French groups with a narrow no-break space, U+202F.
+  expect(formatInteger(1_234_567, 'fr')).toBe('1 234 567');
+  expect(formatInteger(1_234_567, 'de')).toBe('1.234.567');
+  expect(formatInteger(-9876, 'de')).toBe('-9.876');
+  expect(formatInteger(1_234_567, 'en')).toBe('1,234,567');
+  expect(formatDecimal(1.1, 2, 'fr')).toBe('1,10');
+  expect(formatDecimal(12_345.678, 2, 'es')).toBe('12.345,68');
+  expect(formatDecimal(12_345.678, 1, 'it')).toBe('12.345,7');
+  expect(formatDecimal(1.1, 2)).toBe('1.10');
+  expect(formatTrimmed(1.5, 3, 'fr')).toBe('1,5');
+  expect(formatTrimmed(1234.5678, 2, 'de')).toBe('1234,57');
+  expect(formatTrimmed(2, 2, 'it')).toBe('2');
+  expect(formatTrimmed(1.234e-7, { significant: 3 }, 'fr')).toBe('1,23e-7');
+  expect(formatPercent(0.742, 1, 'fr')).toBe('74,2 %');
+  expect(formatPercent(0.742, 1, 'en')).toBe('74.2 %');
+});
+
+test('a language asked for twice is written the same way both times', () => {
+  expect(formatDecimal(0.5, 3, 'de')).toBe('0,500');
+  expect(formatDecimal(0.5, 3, 'en')).toBe('0.500');
+  expect(formatDecimal(0.5, 3, 'de')).toBe('0,500');
+  expect(formatInteger(Number.NaN, 'fr')).toBe('–');
+  expect(formatTrimmed(Number.NaN, 2, 'fr')).toBe('–');
+});

@@ -7,6 +7,10 @@
  * and the number are two values here, and the text is the one the reader owns.
  */
 
+import { withDecimalSeparator } from '../../format/core/numbers.ts';
+import type { Language } from '../../i18n/core/languages.ts';
+import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
+
 /** Text that reads as a finite number, comma or dot. */
 const NUMBER = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
 
@@ -52,12 +56,19 @@ export function isPartialNumber(text: string): boolean {
 }
 
 /**
- * The text a number is shown with.
+ * The text a number is shown with, with the decimal separator of the page's
+ * language: `0.2` in English, `0,2` in French, German, Spanish and Italian.
+ * Either is read back by {@link readNumber}.
  * @param value - The number, or nothing when the box is empty.
+ * @param language - The language of the page. Defaults to English.
  * @returns Its text, empty when there is no number.
  */
-export function numberText(value: number | undefined): string {
-  return value === undefined || !Number.isFinite(value) ? '' : String(value);
+export function numberText(
+  value: number | undefined,
+  language: Language = DEFAULT_LANGUAGE,
+): string {
+  if (value === undefined || !Number.isFinite(value)) return '';
+  return withDecimalSeparator(String(value), language);
 }
 
 /**

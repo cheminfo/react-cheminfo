@@ -9,6 +9,7 @@ import type { CSSProperties, KeyboardEvent, ReactElement } from 'react';
 import { useState } from 'react';
 
 import { clamp } from '../../format/core/clamp.ts';
+import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import {
   isPartialNumber,
@@ -162,12 +163,14 @@ export function NumberInput(props: NumberInputProps): ReactElement {
     style,
   } = props;
   const t = useChromeT();
+  const language = useLanguage();
   const onChange = props.onChange as (next: number | undefined) => void;
   const stepFrom = props.allowEmpty ? props.stepFrom : undefined;
   const [draft, setDraft] = useState(() => ({
-    text: numberText(value),
+    text: numberText(value, language),
     held: value,
     given: value,
+    language,
   }));
 
   // The number changed elsewhere — a preset, a reset, a link — so the box has
@@ -179,17 +182,31 @@ export function NumberInput(props: NumberInputProps): ReactElement {
     setDraft(
       value === draft.held
         ? { ...draft, given: value }
-        : { text: numberText(value), held: value, given: value },
+        : {
+            text: numberText(value, language),
+            held: value,
+            given: value,
+            language,
+          },
     );
+  } else if (language !== draft.language) {
+    // The page changed language: a number shown as it was given is written
+    // again with the new decimal separator, and text being typed stays as is.
+    const shown = draft.text === numberText(draft.held, draft.language);
+    setDraft({
+      ...draft,
+      text: shown ? numberText(draft.held, language) : draft.text,
+      language,
+    });
   }
 
   function hold(text: string, held: number | undefined, given = draft.given) {
-    setDraft({ text, held, given });
+    setDraft({ text, held, given, language });
   }
 
   function commit(next: number) {
     // A settled number is final, so one the parent refuses is not left shown.
-    hold(numberText(next), next, Number.NaN);
+    hold(numberText(next, language), next, Number.NaN);
     onChange(next);
   }
 
@@ -206,12 +223,12 @@ export function NumberInput(props: NumberInputProps): ReactElement {
 
   function leave() {
     if (draft.text.trim() === '') {
-      if (!allowEmpty) hold(numberText(value), value);
+      if (!allowEmpty) hold(numberText(value, language), value);
       return;
     }
     const parsed = readNumber(draft.text);
     if (parsed === undefined) {
-      hold(numberText(value), value);
+      hold(numberText(value, language), value);
       return;
     }
     const settled = settle(parsed, integer, min, max);
