@@ -69,6 +69,7 @@ export {
   pickSeeded,
   seedParam,
 } from './seed.ts';
+export { drawRoundRobin, kindSeed } from './roundRobin.ts';
 export type {
   AnswerCheck,
   AnswerField,
