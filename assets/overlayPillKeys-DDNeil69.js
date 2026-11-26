@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t,t as n}from"./listNavigation-DJviafMM.js";function r(e,t){n({key:i[e.key]??e.key,target:e.target,preventDefault:()=>e.preventDefault()},t)}var i;function a(){return(a=e((()=>{t(),i={ArrowLeft:`ArrowUp`,ArrowRight:`ArrowDown`}})))()}export{a as n,r as t};
