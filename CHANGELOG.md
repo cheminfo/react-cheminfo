@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.149.0](https://github.com/cheminfo/react-cheminfo/compare/v0.148.2...v0.149.0) (2026-11-26)
+
+
+### Features
+
+* **ecosystem:** add electrochemistry.cheminfo.org ([79a7ce9](https://github.com/cheminfo/react-cheminfo/commit/79a7ce9d4007f9239a517715f73820a3079185cf))
+* **format:** format numbers in the page's language ([31faf84](https://github.com/cheminfo/react-cheminfo/commit/31faf842d56ea5d24fe485ad6e2178e678a2940d))
+* **pedagogy:** draw a series round-robin across its kinds ([a318252](https://github.com/cheminfo/react-cheminfo/commit/a31825260dc99bcc035deb3760744df058aef09c))
+* **pedagogy:** offer answer choices, question tags and level names ([6af0969](https://github.com/cheminfo/react-cheminfo/commit/6af09693ba96c7668debd75acfb3c1e26dcdf892))
+* **pedagogy:** read answers written in scientific notation ([552abfd](https://github.com/cheminfo/react-cheminfo/commit/552abfd340166b89a90d130a71b42d65328e4542))
+* **settings:** let a site name its workspaces ([1643c77](https://github.com/cheminfo/react-cheminfo/commit/1643c77838260ae76adfc02fe2c2da75de40427c))
+
 ## [0.148.2](https://github.com/cheminfo/react-cheminfo/compare/v0.148.1...v0.148.2) (2026-11-26)
 
 
