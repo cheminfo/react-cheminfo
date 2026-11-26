@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.148.2](https://github.com/cheminfo/react-cheminfo/compare/v0.148.1...v0.148.2) (2026-11-26)
+
+
+### Bug Fixes
+
+* depend on fastify and @fastify/static, which the server loads on its first call ([04870c3](https://github.com/cheminfo/react-cheminfo/commit/04870c3d8a8ea58467d7c068940b54979f210595))
+* never let a CDN keep a missing file ([ce7001f](https://github.com/cheminfo/react-cheminfo/commit/ce7001f5a256f22f9df32ca2fae0ad82955642d4))
+
 ## [0.148.1](https://github.com/cheminfo/react-cheminfo/compare/v0.148.0...v0.148.1) (2026-11-26)
 
 
