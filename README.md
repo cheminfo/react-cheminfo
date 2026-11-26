@@ -1583,6 +1583,13 @@ the other three arrive as a chunk of their own, so a site nobody reads in German
 never downloads the German. A site with a language switch draws it with
 `<LanguageSelect value onChange>`, which names each language in its own words.
 
+Numbers follow the page too. `formatInteger`, `formatDecimal`, `formatTrimmed`,
+`formatPercent` and `formatDuration` take the language last — `1,10` and
+`1 234` in French, English when none is passed — and `<NumberInput>` shows its
+number with the page's decimal separator while reading a comma or a point
+whatever the language. A site's own workspaces keep the name they are stored
+under; `<SettingsDialog workspaceName>` shows them in the language of the page.
+
 A site's own text is a catalog of its own, read with the same runtime:
 
 ```ts

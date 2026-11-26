@@ -14,7 +14,10 @@ import { downloadText } from '../../download/core/downloadText.ts';
 import { errorMessage } from '../../error/core/toError.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { workspaceFileName } from '../../storage/core/workspaceFile.ts';
-import type { Workspaces } from '../../storage/core/workspaceTypes.ts';
+import type {
+  WorkspaceSummary,
+  Workspaces,
+} from '../../storage/core/workspaceTypes.ts';
 
 /** What {@link WorkspaceBar} works on, and what it reports. */
 export interface WorkspaceBarProps {
@@ -24,6 +27,13 @@ export interface WorkspaceBarProps {
   onName: (kind: 'new' | 'rename') => void;
   /** Told why an action failed, or `null` once one went through. */
   onError: (message: string | null) => void;
+  /**
+   * The name a workspace is shown under: in the picker, in its menu, in the
+   * question asked before deleting one, and in the name of the file one is
+   * saved to.
+   * @default the name the workspace is stored under
+   */
+  workspaceName?: (workspace: WorkspaceSummary) => string;
 }
 
 /**
@@ -34,7 +44,7 @@ export interface WorkspaceBarProps {
  * @returns The bar.
  */
 export function WorkspaceBar(props: WorkspaceBarProps): ReactElement {
-  const { workspaces, onName, onError } = props;
+  const { workspaces, onName, onError, workspaceName = storedName } = props;
   const t = useChromeT();
   const state = useSyncExternalStore(workspaces.subscribe, workspaces.getState);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +71,7 @@ export function WorkspaceBar(props: WorkspaceBarProps): ReactElement {
                 key={workspace.id}
                 roleStructure="listoption"
                 selected={workspace.id === active.id}
-                text={workspace.name}
+                text={workspaceName(workspace)}
                 label={
                   workspace.source === 'builtin'
                     ? t('settings.builtIn')
@@ -96,7 +106,7 @@ export function WorkspaceBar(props: WorkspaceBarProps): ReactElement {
               onClick={() => {
                 downloadText(
                   workspaces.exportText(),
-                  workspaceFileName(active.name, workspaces.site),
+                  workspaceFileName(workspaceName(active), workspaces.site),
                   'application/json',
                 );
               }}
@@ -112,7 +122,7 @@ export function WorkspaceBar(props: WorkspaceBarProps): ReactElement {
         <Button
           variant="outlined"
           endIcon="caret-down"
-          text={active.name}
+          text={workspaceName(active)}
           title={t('settings.workspaceMenu')}
           data-testid="workspace-picker"
         />
@@ -158,8 +168,12 @@ export function WorkspaceBar(props: WorkspaceBarProps): ReactElement {
           run(() => workspaces.remove(active.id));
         }}
       >
-        {t('settings.deleteQuestion', { name: active.name })}
+        {t('settings.deleteQuestion', { name: workspaceName(active) })}
       </Alert>
     </div>
   );
+}
+
+function storedName(workspace: WorkspaceSummary): string {
+  return workspace.name;
 }

@@ -176,3 +176,71 @@ test('Apply and save asks a name for a workspace of the site, and saves under it
     expect(onClose).toHaveBeenCalledOnce();
   });
 });
+
+test("a site's own workspace is shown, and saved to a file, under the name the page gives it", async () => {
+  vi.stubGlobal('ResizeObserver', StandInObserver);
+  const { workspaces } = await openDialog();
+  act(() => {
+    root.render(
+      <SettingsDialog
+        isOpen
+        onClose={() => undefined}
+        workspaces={workspaces}
+        tabs={[{ id: 'general', title: 'General', content: <p>Resolution</p> }]}
+        workspaceName={(workspace) =>
+          workspace.id === 'drawing' ? 'Dessin' : workspace.name
+        }
+      />,
+    );
+  });
+  const picker = document.querySelector<HTMLButtonElement>(
+    '[data-testid="workspace-picker"]',
+  );
+
+  expect(picker?.textContent).toBe('Dessin');
+
+  act(() => {
+    picker?.click();
+  });
+  const options = [...document.querySelectorAll('[role="option"]')];
+
+  expect(options.map((option) => option.textContent)).toStrictEqual([
+    'DessinBuilt in',
+  ]);
+
+  // The file is handed over by clicking an anchor, which is caught here; the
+  // menu entry, an anchor too, is clicked by an event so it still answers.
+  vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test/1');
+  vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+  const click = vi
+    .spyOn(HTMLAnchorElement.prototype, 'click')
+    .mockImplementation(() => undefined);
+  const save = [
+    ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+  ].find((item) => item.textContent === 'Save to a file');
+  act(() => {
+    save?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
+
+  expect(
+    (click.mock.contexts as HTMLAnchorElement[]).map(
+      (anchor) => anchor.download,
+    ),
+  ).toStrictEqual(['Dessin.draw-workspace.json']);
+
+  vi.restoreAllMocks();
+});
+
+class StandInObserver {
+  public observe(): void {
+    // The menu is placed, never measured, here.
+  }
+
+  public unobserve(): void {
+    // Nothing was observed.
+  }
+
+  public disconnect(): void {
+    // Nothing to stop.
+  }
+}

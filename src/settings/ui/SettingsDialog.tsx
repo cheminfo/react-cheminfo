@@ -11,7 +11,10 @@ import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { errorMessage } from '../../error/core/toError.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { Workspaces } from '../../storage/core/workspaceTypes.ts';
+import type {
+  WorkspaceSummary,
+  Workspaces,
+} from '../../storage/core/workspaceTypes.ts';
 
 import { NameDialog } from './NameDialog.tsx';
 import { WorkspaceBar } from './WorkspaceBar.tsx';
@@ -46,6 +49,13 @@ export interface SettingsDialogProps {
    * @default the chrome's word for settings, in the language of the page
    */
   title?: string;
+  /**
+   * The name a workspace is shown under, for a site whose own workspaces are
+   * named in the language of the page: the picker, its menu, the question
+   * asked before deleting one and the file one is saved to all read it.
+   * @default the name the workspace is stored under
+   */
+  workspaceName?: (workspace: WorkspaceSummary) => string;
 }
 
 /**
@@ -61,7 +71,15 @@ export interface SettingsDialogProps {
  * @returns The dialog.
  */
 export function SettingsDialog(props: SettingsDialogProps): ReactElement {
-  const { isOpen, onClose, title, tabs, workspaces, initialTab } = props;
+  const {
+    isOpen,
+    onClose,
+    title,
+    tabs,
+    workspaces,
+    initialTab,
+    workspaceName,
+  } = props;
   const t = useChromeT();
   const cancelRef = useRef<(() => void) | null>(null);
   return (
@@ -81,6 +99,7 @@ export function SettingsDialog(props: SettingsDialogProps): ReactElement {
         initialTab={initialTab}
         onClose={onClose}
         cancelRef={cancelRef}
+        workspaceName={workspaceName}
       />
     </Dialog>
   );
@@ -92,7 +111,8 @@ function SettingsBody(
     cancelRef: RefObject<(() => void) | null>;
   },
 ): ReactElement {
-  const { workspaces, tabs, initialTab, onClose, cancelRef } = props;
+  const { workspaces, tabs, initialTab, onClose, cancelRef, workspaceName } =
+    props;
   const t = useChromeT();
   const state = useSyncExternalStore(workspaces.subscribe, workspaces.getState);
   const [opening] = useState(() => ({
@@ -157,6 +177,7 @@ function SettingsBody(
         workspaces={workspaces}
         onName={(kind) => setNaming({ kind, thenClose: false })}
         onError={setError}
+        workspaceName={workspaceName}
       />
       {error ? (
         <Callout compact intent="danger" className="settings-dialog__notice">
