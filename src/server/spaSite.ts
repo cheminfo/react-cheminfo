@@ -13,6 +13,7 @@ import {
   BUNDLE_CACHE,
   DEFAULT_RESERVED,
   HIDDEN,
+  MISSING_CACHE,
   PAGE_CACHE,
 } from './routeOptions.ts';
 import { readRouteTable } from './routeTable.ts';
@@ -124,7 +125,7 @@ export async function spaSite(
     if (isHashedBundle(pathname)) {
       return reply
         .code(404)
-        .header('cache-control', 'no-store')
+        .header('cache-control', MISSING_CACHE)
         .type('text/plain; charset=utf-8')
         .send('Not in this build.');
     }
@@ -169,12 +170,10 @@ function sender(
 ) {
   return async (request: FastifyRequest, reply: FastifyReply, url: string) => {
     const { html, known } = await pages.answer(url, originFor(request));
-    reply.header('cache-control', PAGE_CACHE);
+    const code = known ? 200 : status.notFoundStatus;
+    reply.header('cache-control', code === 200 ? PAGE_CACHE : MISSING_CACHE);
     if (!status.indexed) reply.header('x-robots-tag', NO_INDEX);
-    return reply
-      .code(known ? 200 : status.notFoundStatus)
-      .type('text/html; charset=utf-8')
-      .send(html);
+    return reply.code(code).type('text/html; charset=utf-8').send(html);
   };
 }
 

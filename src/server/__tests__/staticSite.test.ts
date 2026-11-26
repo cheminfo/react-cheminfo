@@ -137,6 +137,17 @@ test('an unknown address is the 404 page, never the home page', async () => {
   expect(response.body).toBe(page('Not found'));
 });
 
+test('a missing file is never kept, so a bundle of another build cannot stick', async () => {
+  const app = await site();
+  const bundle = await app.inject({ url: '/assets/start-B0-T8zzf.js' });
+  const address = await app.inject({ url: '/nothing-here' });
+
+  expect(bundle.statusCode).toBe(404);
+  expect(bundle.headers['cache-control']).toBe('no-store');
+  expect(address.statusCode).toBe(404);
+  expect(address.headers['cache-control']).toBe('no-store');
+});
+
 test('a path climbing out of the build names nothing', async () => {
   const app = await site();
   const response = await app.inject({ url: '/..%2f..%2fetc%2fpasswd' });

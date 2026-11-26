@@ -8,6 +8,13 @@ import type { FastifySchema } from 'fastify';
 /** A page is checked on every visit: it names the bundles of its own build. */
 export const PAGE_CACHE = 'no-cache';
 
+/**
+ * A missing file is never kept: the host behind the next request may run the
+ * build that has it, and a CDN or a browser holding the 404 would break every
+ * page naming it for as long as it keeps it.
+ */
+export const MISSING_CACHE = 'no-store';
+
 /** A bundle is named by its content, so it never changes under its name. */
 export const BUNDLE_CACHE = 'public, max-age=31536000, immutable';
 

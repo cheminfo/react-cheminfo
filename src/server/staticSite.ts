@@ -12,6 +12,7 @@ import {
   ALLOW_ORIGIN,
   BUNDLE_CACHE,
   HIDDEN,
+  MISSING_CACHE,
   PAGE_CACHE,
 } from './routeOptions.ts';
 import { isHashedBundle, listSiteFiles, resolveAddress } from './siteFiles.ts';
@@ -201,8 +202,13 @@ function sendPage(
   if (page === undefined) {
     return reply
       .code(status)
+      .header('cache-control', MISSING_CACHE)
       .type('text/plain; charset=utf-8')
       .send('Not found');
+  }
+  if (status !== 200) {
+    reply.header('cache-control', MISSING_CACHE);
+    return reply.code(status).type('text/html; charset=utf-8').send(page.html);
   }
   reply.header('cache-control', PAGE_CACHE).header('etag', page.etag);
   if (status === 200 && request.headers['if-none-match'] === page.etag) {
