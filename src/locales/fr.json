@@ -144,6 +144,7 @@
   "site.optics.tagline": "Placer lentilles et miroirs sur un banc, et suivre la lumière jusqu'à l'image.",
   "site.circuits.tagline": "Câbler piles, ampoules et résistances, et lire ce qu'indiquent les appareils.",
   "site.mechanics.tagline": "Poser un bloc sur un plan incliné ou à une poulie, et voir les forces s'additionner.",
+  "site.electrochemistry.tagline": "Monter piles et électrolyseurs, et voir une électrode grossir pendant que l’autre s’use.",
   "share.button": "Partager",
   "share.buttonTitle": "Partager un lien vers cette page, ou l'intégrer à votre propre site",
   "share.dialogTitleFor": "Partager ou intégrer — {title}",

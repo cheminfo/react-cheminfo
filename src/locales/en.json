@@ -144,6 +144,7 @@
   "site.optics.tagline": "Set lenses and mirrors on a bench, and follow the light to its image.",
   "site.circuits.tagline": "Wire batteries, bulbs and resistors, and read what the meters show.",
   "site.mechanics.tagline": "Put a block on a slope or over a pulley, and see the forces add up.",
+  "site.electrochemistry.tagline": "Build cells and electrolysers, and watch one electrode grow as the other dissolves.",
   "share.button": "Share",
   "share.buttonTitle": "Share a link to this page, or embed it in your own site",
   "share.dialogTitleFor": "Share or embed — {title}",

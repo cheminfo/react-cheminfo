@@ -88,6 +88,14 @@ test('fair draws its archive box on its olive plate, the peak in light blue', ()
   expect(fair).not.toContain('var(--brand)');
 });
 
+test('electrochemistry draws its cell on a violet plate, only the two metal plates in copper', () => {
+  const cell = renderToStaticMarkup(<SiteMark siteId="electrochemistry" />);
+
+  expect(cell).toContain('fill="#8c52cf"');
+  expect(cell.match(/#fcb473/g)).toStrictEqual(['#fcb473']);
+  expect(cell).toContain('d="M7 4V24M25 4V24" fill="none" stroke="#fcb473"');
+});
+
 test('chembio and wikidata draw the marks they brought with them', () => {
   const chembio = renderToStaticMarkup(<SiteMark siteId="chembio" />);
   const wikidata = renderToStaticMarkup(<SiteMark siteId="wikidata" />);

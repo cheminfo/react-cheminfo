@@ -144,6 +144,7 @@
   "site.optics.tagline": "Colocar lentes y espejos en un banco, y seguir la luz hasta la imagen.",
   "site.circuits.tagline": "Conectar pilas, bombillas y resistencias, y leer lo que marcan los medidores.",
   "site.mechanics.tagline": "Poner un bloque en un plano inclinado o en una polea, y ver cómo se suman las fuerzas.",
+  "site.electrochemistry.tagline": "Montar pilas y electrolizadores, y ver cómo un electrodo crece mientras el otro se disuelve.",
   "share.button": "Compartir",
   "share.buttonTitle": "Compartir un enlace a esta página, o incrustarla en su propio sitio",
   "share.dialogTitleFor": "Compartir o incrustar — {title}",

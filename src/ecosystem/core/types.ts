@@ -50,7 +50,8 @@ export type SiteId =
   | 'plate'
   | 'glassware'
   | 'write'
-  | 'nmr';
+  | 'nmr'
+  | 'electrochemistry';
 
 /** A site's name, split the way its own wordmark splits it. */
 export interface SiteName {

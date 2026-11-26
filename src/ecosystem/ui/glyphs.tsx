@@ -907,4 +907,38 @@ export const GLYPHS: Record<SiteId, (alt: string) => ReactNode> = {
       />
     </>
   ),
+  // A galvanic cell as a bench sets it up: two beakers of solution joined by a
+  // salt bridge, in white, and the two metal plates dipping in them in the
+  // answering colour.
+  electrochemistry: (alt) => (
+    <>
+      <path
+        d="M3.5 12.5V25Q3.5 27.5 6 27.5H11.5Q14 27.5 14 25V12.5M18 12.5V25Q18 27.5 20.5 27.5H26Q28.5 27.5 28.5 25V12.5"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3.5 18H14V25Q14 27.5 11.5 27.5H6Q3.5 27.5 3.5 25ZM18 18H28.5V25Q28.5 27.5 26 27.5H20.5Q18 27.5 18 25Z"
+        fill="#ffffff"
+      />
+      <path
+        d="M11.2 20V9.6Q11.2 7 13.8 7H18.2Q20.8 7 20.8 9.6V20"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7 4V24M25 4V24"
+        fill="none"
+        stroke={alt}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+    </>
+  ),
 };
