@@ -64,3 +64,28 @@ test('importing react-cheminfo/server loads no optional peer', () => {
   // TypeBox provider only ever as a type.
   expect(offenders).toStrictEqual([]);
 });
+
+test('what the server imports on its first call is a dependency, never an optional peer', () => {
+  const manifest = JSON.parse(
+    readFileSync(resolve(import.meta.dirname, '../../../package.json'), 'utf8'),
+  ) as { dependencies?: Record<string, string> };
+  const onFirstCall = new Set<string>();
+  for (const file of staticGraph(ENTRY).keys()) {
+    const imports = readFileSync(file, 'utf8').matchAll(
+      /\bimport\(\s*'(?<specifier>[^'.][^']*)'\s*\)/gu,
+    );
+    for (const match of imports) {
+      onFirstCall.add((match.groups as { specifier: string }).specifier);
+    }
+  }
+
+  // A workspace repository hoists react-cheminfo to its root and may keep an
+  // optional peer under one workspace, where this import cannot reach it.
+  expect([...onFirstCall].toSorted()).toStrictEqual([
+    '@fastify/static',
+    'fastify',
+  ]);
+  expect(
+    [...onFirstCall].filter((name) => !(name in (manifest.dependencies ?? {}))),
+  ).toStrictEqual([]);
+});
