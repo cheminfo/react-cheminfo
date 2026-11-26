@@ -13,11 +13,15 @@ import type { FieldCase } from './series.ts';
 
 /**
  * Read a number the way a student types it: `42`, `+5`, `−3` with a real minus
- * sign, `1,5` with a decimal comma, `75.8 %`, `1 000`.
+ * sign, `1,5` with a decimal comma, `75.8 %`, `1 000`, and a power of ten
+ * written any way a keyboard or a calculator writes one: `1.93 × 10^3`,
+ * `1,93·10³`, `1.93x10^3`, `1.93*10^(−3)`, `1.93E3`, `10⁻⁶`.
  *
  * What a typed answer carries beyond a number box — a typographic minus, a
- * percent sign, a space between thousands — is taken off first; the number
- * itself is read by `readNumber`, as every box of the family reads one.
+ * percent sign, a space between thousands, a power of ten — is turned into the
+ * plain form first; the number itself is read by `readNumber`, as every box of
+ * the family reads one, so the value is the one the digits name, with no
+ * rounding from a multiplication.
  * @param text - What was typed.
  * @param integer - Whether only a whole number is an answer.
  * @default integer false
@@ -32,7 +36,7 @@ export function readAnswerNumber(
     .replaceAll(/[−–]/gu, '-')
     .replace(/\s*%$/u, '')
     .replaceAll(/\s/gu, '');
-  return readNumber(cleaned, integer);
+  return readNumber(exponentForm(cleaned), integer);
 }
 
 /**
@@ -91,4 +95,43 @@ export function unreadableCase(
     reason: t('pedagogy.answerUnreadable', { typed: typed.trim(), what }),
     actual: typed,
   };
+}
+
+/**
+ * A power of ten as it is typed, spaces already taken out: a number, a times
+ * sign and `10`, or `10` alone, then the exponent after a caret — in brackets
+ * or not — or raised.
+ */
+const POWER_OF_TEN =
+  /^(?:(?<mantissa>[+-]?[\d.,]+)[×xX*·⋅∙]|(?<sign>[+-]?))10(?:\^\((?<bracketed>[+-]?\d+)\)|\^(?<caret>[+-]?\d+)|(?<raised>[⁺⁻]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+))$/u;
+
+/** Each raised character, as it is written on the line. */
+const RAISED: Readonly<Record<string, string>> = {
+  '⁰': '0',
+  '¹': '1',
+  '²': '2',
+  '³': '3',
+  '⁴': '4',
+  '⁵': '5',
+  '⁶': '6',
+  '⁷': '7',
+  '⁸': '8',
+  '⁹': '9',
+  '⁺': '+',
+  '⁻': '-',
+};
+
+/**
+ * Rewrite a power of ten in the `e` notation `readNumber` reads: `1.93×10^3`
+ * becomes `1.93e3`, `10⁻⁶` becomes `1e-6`. Anything else is left as it is.
+ * @param text - What was typed, its spaces taken out.
+ * @returns The same number in `e` notation, or the text unchanged.
+ */
+function exponentForm(text: string): string {
+  const groups = POWER_OF_TEN.exec(text)?.groups;
+  if (groups === undefined) return text;
+  const { mantissa, sign = '', bracketed, caret, raised = '' } = groups;
+  let exponent = bracketed ?? caret ?? '';
+  for (const character of raised) exponent += RAISED[character] ?? '';
+  return `${mantissa ?? `${sign}1`}e${exponent}`;
 }
