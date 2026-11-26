@@ -60,9 +60,7 @@ test('the level reads the share of the printed size, and fit is a button of its 
 
   expect(level?.textContent).toContain('150 %');
 
-  const fit = host.querySelector(
-    'button[aria-label="Fit the drawing in view"]',
-  );
+  const fit = host.querySelector('button[aria-label="Zoom to fit"]');
   act(() => {
     fit?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });

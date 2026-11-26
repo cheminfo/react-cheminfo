@@ -28,7 +28,7 @@ export interface ZoomControlProps {
   fitDescription?: string;
   /**
    * The fit button's name, for assistive technology.
-   * @default 'Fit the drawing in view'
+   * @default 'Zoom to fit'
    */
   fitLabel?: string;
   /**
@@ -61,7 +61,7 @@ export function ZoomControl(props: ZoomControlProps): ReactElement {
     onZoomShare,
     onFit,
     fitDescription = 'Brings the whole drawing back into view.',
-    fitLabel = 'Fit the drawing in view',
+    fitLabel = 'Zoom to fit',
     fitted = false,
   } = props;
   const share = zoomShare(zoom);
