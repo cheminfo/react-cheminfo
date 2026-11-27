@@ -463,6 +463,8 @@ const STORY_IDS = [
   'taxonomy-taxonlineage--every-rank',
   'taxonomy-taxonlineage--organism-names',
   'taxonomy-taxonlineage--plain-with-ncbi',
+  'tour-guidedtour--default',
+  'tour-guidedtour--waiting',
 ];
 
 // React reports every caught error-boundary hit through `console.error`, so the

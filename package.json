@@ -83,6 +83,7 @@
   },
   "dependencies": {
     "@fastify/static": "^10.1.6",
+    "@floating-ui/react-dom": "^2.1.9",
     "@formatjs/icu-messageformat-parser": "^3.5.20",
     "@pdf-lib/upng": "^1.0.1",
     "@tanstack/react-virtual": "^3.14.13",

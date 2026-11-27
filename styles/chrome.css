@@ -1874,6 +1874,148 @@ span.taxon-lineage__name {
   color: var(--accent);
 }
 
+/* ── A guided tour ──────────────────────────────────────────────────────── */
+
+/*
+  `<GuidedTour>`: the help card's surface beside what to do next, and a ring
+  round it. Nothing is dimmed and nothing takes the pointer, so the page stays
+  in use. Under the overlays (20), so a dialog opened during a tour covers it.
+*/
+.guided-tour {
+  z-index: 19;
+  width: 260px;
+  padding: 8px 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* Its target is not on the page yet: the card waits in the corner. */
+.guided-tour--waiting {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+}
+
+.guided-tour__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guided-tour__count {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.guided-tour__close {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.guided-tour__close:hover {
+  background: var(--surface-sunken);
+  color: var(--text);
+}
+
+.guided-tour__title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.guided-tour__body {
+  margin-top: 2px;
+  color: var(--text-muted);
+}
+
+.guided-tour button.guided-tour__next {
+  margin-top: 8px;
+  padding: 3px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.guided-tour button.guided-tour__next:hover {
+  background: color-mix(in oklab, var(--accent) 85%, black);
+}
+
+/* A corner of the same card, so it carries the same two colours. */
+.guided-tour__arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transform: rotate(45deg);
+}
+
+.guided-tour[data-side='bottom'] .guided-tour__arrow {
+  top: -6px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.guided-tour[data-side='top'] .guided-tour__arrow {
+  bottom: -6px;
+  border-top: 0;
+  border-left: 0;
+}
+
+.guided-tour[data-side='right'] .guided-tour__arrow {
+  left: -6px;
+  border-top: 0;
+  border-right: 0;
+}
+
+.guided-tour[data-side='left'] .guided-tour__arrow {
+  right: -6px;
+  border-bottom: 0;
+  border-left: 0;
+}
+
+.guided-tour__ring {
+  position: fixed;
+  z-index: 18;
+  top: 0;
+  left: 0;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  animation: guided-tour-pulse 1.6s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes guided-tour-pulse {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 45%, transparent);
+  }
+
+  to {
+    box-shadow: 0 0 0 10px color-mix(in oklab, var(--accent) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guided-tour__ring {
+    animation: none;
+  }
+}
+
 /* ── What a logger collected ────────────────────────────────────────────── */
 
 /*
