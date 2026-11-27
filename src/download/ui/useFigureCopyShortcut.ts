@@ -13,11 +13,11 @@ import { announceFigureCopy } from './announceFigureCopy.ts';
  * PNG of it, so draw and write paste a figure a double click opens here
  * again. A notice at the bottom of the window says it was copied.
  *
- * Text selected anywhere — in the page, a field or an editor — is copied as
- * text, as on any page. Otherwise the copy is the figure's, even in an editor
- * that would copy its current line: the listener runs before the page's own.
- * A site with a clipboard of its own, copying what is selected on a canvas,
- * passes `null` and keeps it.
+ * Text selected anywhere — in the page or a field — is copied as text, as on
+ * any page. A code or text editor holding the focus keeps the key whatever is
+ * selected, so it copies its selection, or its current line. Otherwise the
+ * copy is the figure's. A site with a clipboard of its own, copying what is
+ * selected on a canvas, passes `null` and keeps it.
  * @param write - Draws the figure; nothing is copied while it is `null`, and
  * the browser keeps the key.
  */
@@ -30,7 +30,7 @@ export function useFigureCopyShortcut(write: PageFigureWriter | null): void {
   useEffect(() => {
     function onCopy(event: ClipboardEvent): void {
       const { write: draw, t: translate } = latest.current;
-      if (draw === null || event.defaultPrevented || hasTextSelection()) {
+      if (draw === null || event.defaultPrevented || copiesText()) {
         return;
       }
       event.preventDefault();
@@ -51,20 +51,50 @@ export function useFigureCopyShortcut(write: PageFigureWriter | null): void {
 }
 
 /**
- * Whether the reader selected text to copy. A field whose selection cannot be
- * read — a number box — is taken to hold one, so the browser copies it.
- * @returns Whether text is selected.
+ * Whether the copy belongs to the text the reader is working on: an editor
+ * holding the focus, or text selected. A field whose selection cannot be read
+ * — a number box — is taken to hold one, so the browser copies it.
+ * @returns Whether the browser, or the editor, should copy.
  */
-function hasTextSelection(): boolean {
-  const field = document.activeElement;
+function copiesText(): boolean {
+  const focused = focusedElement();
+  if (focused !== null && isTextEditor(focused)) return true;
   if (
-    field instanceof HTMLInputElement ||
-    field instanceof HTMLTextAreaElement
+    focused instanceof HTMLInputElement ||
+    focused instanceof HTMLTextAreaElement
   ) {
-    return field.selectionStart === null
+    return focused.selectionStart === null
       ? true
-      : field.selectionStart !== field.selectionEnd;
+      : focused.selectionStart !== focused.selectionEnd;
   }
   const selection = document.getSelection();
   return selection !== null && !selection.isCollapsed;
+}
+
+/**
+ * The element holding the focus, looked for inside shadow roots too.
+ * @returns The focused element, or `null` when none is.
+ */
+function focusedElement(): Element | null {
+  let focused = document.activeElement;
+  while (focused?.shadowRoot?.activeElement) {
+    focused = focused.shadowRoot.activeElement;
+  }
+  return focused;
+}
+
+/**
+ * Whether the element is an editor that copies its own text: editable content,
+ * an EditContext (Monaco in Chromium), or a multi-line text box, which is how
+ * Monaco and CodeMirror announce the element they type into.
+ * @param element - The focused element.
+ * @returns Whether Ctrl+C is the editor's.
+ */
+function isTextEditor(element: Element): boolean {
+  if (element instanceof HTMLElement && element.isContentEditable) return true;
+  if ('editContext' in element && element.editContext) return true;
+  return (
+    element.getAttribute('role') === 'textbox' &&
+    element.getAttribute('aria-multiline') === 'true'
+  );
 }

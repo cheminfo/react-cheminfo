@@ -73,7 +73,7 @@ export interface HostHandlers {
    */
   states?: () => FigureStates | undefined | Promise<FigureStates | undefined>;
   /**
-   * Whether Ctrl+C, with no text selected, copies the figure the tool hands
+   * Whether Ctrl+C, with no text selected and no editor focused, copies the figure the tool hands
    * back — its `image.svg` output — as a host would take it. A site with a
    * clipboard of its own, copying what is selected on a canvas, says `false`.
    * @default true
@@ -87,7 +87,7 @@ let started = false;
 /**
  * Introduce the tool to its parent frame, or to the window that opened it, and
  * serve that host for the life of the page. Framed or not, Ctrl+C with no text
- * selected copies the figure the tool hands back, as a host would take it —
+ * selected and no editor focused copies the figure the tool hands back, as a host would take it —
  * see {@link HostHandlers.copyShortcut}.
  *
  * Call it after the hook that applies the address: effects run in order, so

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 /**
  * Ctrl+C copying the page's figure: the SVG saying where it came from, and a
- * PNG painted from it — unless text is selected, or the page has nothing to
- * copy. The painting and the clipboard are stood in for.
+ * PNG painted from it — unless text is selected, an editor holds the focus,
+ * or the page has nothing to copy. The painting and the clipboard are stood in for.
  */
 
 import type { ReactElement } from 'react';
@@ -139,6 +139,63 @@ test('text selected on the page is copied as text', async () => {
   await settle();
 
   expect(clipboard).toStrictEqual([]);
+});
+
+test('a code editor typing through an EditContext copies its own text', async () => {
+  mount(async () => FIGURE);
+  // Monaco in Chromium: a focusable div carrying an EditContext, no selection.
+  const editor = document.createElement('div');
+  editor.tabIndex = 0;
+  Object.defineProperty(editor, 'editContext', { value: {} });
+  section.append(editor);
+  editor.focus();
+
+  await expect(pressCopy()).resolves.toBe(false);
+
+  await settle();
+
+  expect(clipboard).toStrictEqual([]);
+  expect(notice()).toBeUndefined();
+});
+
+test('a multi-line text box with nothing selected copies its current line', async () => {
+  mount(async () => FIGURE);
+  // Monaco's text area and CodeMirror's content announce themselves this way.
+  const editor = document.createElement('textarea');
+  editor.setAttribute('role', 'textbox');
+  editor.setAttribute('aria-multiline', 'true');
+  editor.value = 'ms.echo(pdb.id);';
+  section.append(editor);
+  editor.focus();
+  editor.setSelectionRange(4, 4);
+
+  await expect(pressCopy()).resolves.toBe(false);
+});
+
+test('editable content holding the focus copies its own text', async () => {
+  mount(async () => FIGURE);
+  const editor = document.createElement('div');
+  editor.tabIndex = 0;
+  Object.defineProperty(editor, 'isContentEditable', { value: true });
+  section.append(editor);
+  editor.focus();
+
+  await expect(pressCopy()).resolves.toBe(false);
+});
+
+test('a field focused with nothing selected still copies the figure', async () => {
+  mount(async () => FIGURE);
+  const field = document.createElement('input');
+  field.value = 'C6H12O6';
+  section.append(field);
+  field.focus();
+  field.setSelectionRange(2, 2);
+
+  await expect(pressCopy()).resolves.toBe(true);
+
+  await settle();
+
+  expect(clipboard).toHaveLength(1);
 });
 
 test('a page with no figure to give leaves the key to the browser', async () => {
