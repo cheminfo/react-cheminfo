@@ -89,7 +89,7 @@ test('the search takes the keyboard, keeps the sites that answer, and Enter open
 
   await page.keyboard.type('physics');
 
-  await expect(tiles(page)).toHaveCount(3);
+  await expect(tiles(page)).toHaveCount(4);
   await expect(
     page.locator('.ecosystem-menu').getByRole('heading', { level: 3 }),
   ).toHaveText(['Physics']);

@@ -64,6 +64,7 @@ test('the tools a course opens with are the ones under the basics', () => {
   expect(sitesInGroup('physics').map((site) => site.id)).toStrictEqual([
     'optics',
     'circuits',
+    'electrochemistry',
     'mechanics',
   ]);
   expect(sitesInGroup('spectra').map((site) => site.id)).toStrictEqual([

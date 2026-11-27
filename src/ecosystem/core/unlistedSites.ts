@@ -66,20 +66,4 @@ export const UNLISTED_SITES: readonly EcosystemSite[] = [
     // the dark form sits at 1.19:1 there and vanishes at 16 px.
     mark: { plate: '#3f6212', accent: '#7dd3fc' },
   },
-  {
-    id: 'electrochemistry',
-    name: { lead: 'electrochemistry', alt: 'cheminfo', dot: true },
-    host: 'electrochemistry.cheminfo.org',
-    tagline:
-      'Build cells and electrolysers, and watch one electrode grow as the other dissolves.',
-    group: 'basics',
-    // Permanganate violet leads at 4.97:1 on white, 8.6 Oklab units from its
-    // nearest leads (elucidation, spectroscopy and chemcalc, all three at 8.6).
-    brand: '#8c52cf',
-    // Copper answers it at 5.41:1 on white, for the name.
-    brandAlt: '#9a5b13',
-    // The mark takes a light copper, the hue of the second half (62° against
-    // 63°): 37.1 from the violet plate and 21.1 from white, 2.82:1 on the plate.
-    mark: { plate: '#8c52cf', accent: '#fcb473' },
-  },
 ];

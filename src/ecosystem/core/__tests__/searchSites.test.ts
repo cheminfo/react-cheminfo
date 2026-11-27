@@ -29,7 +29,12 @@ test('the site a name starts with comes first, then a word inside a name, then a
 });
 
 test('a topic finds every site under it, in the order of the menu', () => {
-  expect(idsOf('physics')).toStrictEqual(['optics', 'circuits', 'mechanics']);
+  expect(idsOf('physics')).toStrictEqual([
+    'optics',
+    'circuits',
+    'electrochemistry',
+    'mechanics',
+  ]);
 });
 
 test('a site is still found under the name it had before', () => {

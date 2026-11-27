@@ -37,6 +37,7 @@ test('the search keeps the sites that answer, under their own topic', () => {
   expect(siteLinks()).toStrictEqual([
     'https://optics.cheminfo.org/',
     'https://circuits.cheminfo.org/',
+    'https://electrochemistry.cheminfo.org/',
     'https://mechanics.cheminfo.org/',
   ]);
 });

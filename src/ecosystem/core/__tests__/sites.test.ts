@@ -55,6 +55,7 @@ test('the family is the thirty-one sites, listed once each', () => {
     'peptide',
     'optics',
     'circuits',
+    'electrochemistry',
     'mechanics',
   ] satisfies SiteId[]);
 });
@@ -65,7 +66,6 @@ test('the sites not linked from the others yet are named apart', () => {
     'mz',
     'ml',
     'fair',
-    'electrochemistry',
   ] satisfies SiteId[]);
 });
 
