@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.150.0](https://github.com/cheminfo/react-cheminfo/compare/v0.149.1...v0.150.0) (2026-11-27)
+
+
+### Features
+
+* add GuidedTour, a card beside what to do next that moves on when it is done ([64b1c95](https://github.com/cheminfo/react-cheminfo/commit/64b1c9581a2a12f92238c27f3895bf3945aca6fb))
+
+
+### Bug Fixes
+
+* show the guided tour card as a pale yellow note ([d981b61](https://github.com/cheminfo/react-cheminfo/commit/d981b61a24cf3416459b57e5335e100449b594c5))
+
 ## [0.149.1](https://github.com/cheminfo/react-cheminfo/compare/v0.149.0...v0.149.1) (2026-11-27)
 
 
