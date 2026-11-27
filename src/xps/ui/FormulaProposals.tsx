@@ -6,9 +6,9 @@ import { MF } from 'react-mf';
 import { ClickToCopy } from '../../clipboard/ui/ClickToCopy.tsx';
 import { useAsync } from '../../hooks/ui/useAsync.ts';
 import { PanelEmpty, PanelMessage } from '../../panel/ui/PanelMessage.tsx';
+import { defaultFormulaRanges } from '../core/formulaRanges.ts';
 import { formatPercent } from '../core/peakFormat.ts';
 import type { FormulaProposal } from '../core/proposeFormulas.ts';
-import { defaultFormulaRanges } from '../core/proposeFormulas.ts';
 
 import {
   labelStyle,

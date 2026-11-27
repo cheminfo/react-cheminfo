@@ -2,17 +2,9 @@ import { expect, test } from 'vitest';
 
 import type { DrawGraphic } from '../../core/graphics.ts';
 import { graphicPath, graphicPrimitive } from '../graphics.ts';
-import type { DrawingStyle } from '../style.ts';
-import { primitiveMarkup } from '../svg.ts';
+import { primitiveMarkup } from '../primitiveMarkup.ts';
 
-const STYLE: DrawingStyle = {
-  bondLength: 14.4,
-  lineWidth: 0.6,
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  captionSize: 10,
-  captionFamily: 'Arial, Helvetica, sans-serif',
-  color: '#000000',
-};
+import { STYLE } from './drawingStyle.ts';
 
 const BOX: DrawGraphic = {
   type: 'graphic',

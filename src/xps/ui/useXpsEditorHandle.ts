@@ -24,7 +24,7 @@ import { ENERGY_WINDOW } from '../core/xpsEditorApi.ts';
 import { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
 
 /** The ways in the viewer's screen owns: its file picker and its paste. */
-export type XpsEntryPoints = Pick<XpsEditorHandle, 'openFiles' | 'paste'>;
+type XpsEntryPoints = Pick<XpsEditorHandle, 'openFiles' | 'paste'>;
 
 /**
  * Fill in the handle a host drives the viewer through.

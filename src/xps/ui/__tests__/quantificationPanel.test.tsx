@@ -5,6 +5,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { typeInto as typeText } from '../../../__tests__/dom.ts';
 import { vamasFixture } from '../../core/__tests__/vamasFixture.ts';
 import type { XpsSpectrum } from '../../core/xpsSpectrum.ts';
 import type { XpsSettings } from '../../core/xpsState.ts';
@@ -201,12 +202,5 @@ function buttonNamed(text: string): HTMLButtonElement {
  */
 function typeInto(field: HTMLInputElement | null, value: string) {
   if (field === null) throw new Error('No such field');
-  // React follows the value through its own setter, which a plain assignment
-  // on the element would bypass.
-  const descriptor = Object.getOwnPropertyDescriptor(
-    HTMLInputElement.prototype,
-    'value',
-  );
-  descriptor?.set?.call(field, value);
-  field.dispatchEvent(new Event('input', { bubbles: true }));
+  typeText(field, value);
 }

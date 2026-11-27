@@ -10,10 +10,9 @@
 
 import type { MeasurementXY } from 'cheminfo-types';
 import type { Analysis } from 'ir-spectrum';
-import { xySortX } from 'ml-spectra-processing';
 
 import type { LoadedIrSpectrum } from './analysisSpectra.ts';
-import { blockMeta, blockTitle } from './analysisSpectra.ts';
+import { intensitySpectra } from './intensitySpectra.ts';
 import type { IrOrigin } from './irSpectrum.ts';
 
 /**
@@ -27,34 +26,7 @@ export function emissionSpectra(
   analysis: Analysis,
   origin: IrOrigin,
 ): LoadedIrSpectrum[] {
-  const blocks = analysis.spectra;
-  const spectra: LoadedIrSpectrum[] = [];
-  for (let index = 0; index < blocks.length; index++) {
-    const block = blocks[index];
-    if (block === undefined || !isEmission(block)) continue;
-    const wavelengths = block.variables.x?.data;
-    const intensities = block.variables.y?.data;
-    if (
-      wavelengths === undefined ||
-      intensities === undefined ||
-      wavelengths.length < 2
-    ) {
-      continue;
-    }
-    const sorted = xySortX({ x: wavelengths, y: intensities });
-    const blockOrigin: IrOrigin = { ...origin };
-    if (blocks.length > 1) blockOrigin.blockIndex = index;
-    const spectrum: LoadedIrSpectrum = {
-      wavenumber: Float64Array.from(sorted.x),
-      intensity: Float64Array.from(sorted.y),
-      meta: blockMeta(block),
-      origin: blockOrigin,
-    };
-    const title = blockTitle(block);
-    if (title) spectrum.name = title;
-    spectra.push(spectrum);
-  }
-  return spectra;
+  return intensitySpectra(analysis.spectra, origin, isEmission);
 }
 
 /**
@@ -63,7 +35,7 @@ export function emissionSpectra(
  * @param block - One spectrum of the analysis.
  * @returns Whether to read it as an emission spectrum.
  */
-export function isEmission(block: MeasurementXY): boolean {
+function isEmission(block: MeasurementXY): boolean {
   if (EMITTED.test(block.dataType?.toUpperCase() ?? '')) return true;
   if (block.variables.a !== undefined) return false;
   return EMITTED_LABEL.test(block.variables.y?.label?.toLowerCase() ?? '');

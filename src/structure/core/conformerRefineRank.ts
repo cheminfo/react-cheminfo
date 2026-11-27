@@ -1,6 +1,6 @@
 import { isSameShape } from './conformerMinimum.ts';
 import type { ConformerShape } from './conformerShape.ts';
-import type { Conformer } from './conformers.ts';
+import type { Conformer } from './conformerTypes.ts';
 
 /** A refined conformer's energy and shape, which is what tells two minima apart. */
 export interface RefinedMinimum {

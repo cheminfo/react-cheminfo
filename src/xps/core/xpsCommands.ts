@@ -12,7 +12,7 @@
  */
 
 /** The key a command answers to. */
-export interface XpsShortcut {
+interface XpsShortcut {
   /** The `event.key` values it fires on, the first being the one shown. */
   keys: readonly string[];
   /**
@@ -23,7 +23,7 @@ export interface XpsShortcut {
 }
 
 /** A gesture that does the same thing, listed under the tooltip's title. */
-export interface XpsGesture {
+interface XpsGesture {
   /** Where the gesture is made, or what it is made with. */
   title: string;
   /** The buttons, keys or wheel that make it. */
@@ -31,7 +31,7 @@ export interface XpsGesture {
 }
 
 /** One thing the viewer can be asked to do. */
-export interface XpsCommand {
+interface XpsCommand {
   /** What it is called, which is what the tooltip is titled. */
   title: string;
   /**

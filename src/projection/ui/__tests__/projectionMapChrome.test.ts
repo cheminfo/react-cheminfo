@@ -8,11 +8,11 @@ import type {
 } from '../../core/index.ts';
 import {
   PROJECTION_COPY,
-  projectionGrouping,
   resolveProjectionGroups,
-  resolveProjectionOptions,
   resolveProjectionShapes,
 } from '../../core/index.ts';
+import { projectionGrouping } from '../../core/projectionGroupings.ts';
+import { resolveProjectionOptions } from '../../core/resolveProjectionOptions.ts';
 import { projectionMapChrome } from '../projectionMapChrome.ts';
 import { MINIMUM_OUTLINE_POINTS } from '../projectionMapModel.ts';
 

@@ -7,6 +7,12 @@
  * the name is consulted only when the content stayed silent.
  */
 
+import {
+  formatFromExtension,
+  readFileHeader,
+  stripByteOrderMark,
+} from '../../format/core/fileHeader.ts';
+
 /** What a file can turn out to be, as far as this viewer reads it. */
 export type DetectedMassFormat = 'jcamp' | 'text' | 'unknown';
 
@@ -39,12 +45,6 @@ const EXTENSIONS = new Map<string, DetectedMassFormat>([
 ]);
 
 /**
- * The one decoder the header is read through, kept because a drop of fifty
- * files would otherwise build fifty of them for four kilobytes each.
- */
-const DECODER = new TextDecoder();
-
-/**
  * Decide what a dropped file is, from its first bytes and only then its name.
  *
  * Returns `'unknown'` rather than guessing `'text'` for the two cases the
@@ -60,10 +60,12 @@ export function detectMassFormat(
   data: Uint8Array | string,
   fileName?: string,
 ): DetectedMassFormat {
-  const header = stripByteOrderMark(readHeader(data)).trimStart();
+  const header = stripByteOrderMark(
+    readFileHeader(data, HEADER_BYTES),
+  ).trimStart();
   if (header.startsWith('##')) return 'jcamp';
 
-  const named = formatFromExtension(fileName);
+  const named = formatFromExtension(EXTENSIONS, fileName);
   if (named !== undefined && named !== 'text') return named;
   if (header.length === 0) return 'unknown';
   // A binary file decodes to replacement characters; a peak list decodes to
@@ -71,43 +73,4 @@ export function detectMassFormat(
   // reaching the text reader and being told it holds no columns of numbers.
   if (header.includes('�') || header.includes('\0')) return 'unknown';
   return 'text';
-}
-
-/**
- * The first bytes of the file, as text.
- * @param data - The file, or the pasted text.
- * @returns The decoded prefix; a byte sequence cut in half at the end decodes
- * to a replacement character, which the marker looked for does not contain.
- */
-function readHeader(data: Uint8Array | string): string {
-  if (typeof data === 'string') return data.slice(0, HEADER_BYTES);
-  return DECODER.decode(data.subarray(0, HEADER_BYTES));
-}
-
-/**
- * Drop a leading UTF-8 byte order mark.
- *
- * This is the whole reason the header is normalised before it is tested: a
- * `U+FEFF` in front of `##TITLE=` makes a plain `startsWith('##')` fail, and a
- * JCAMP carrying one then goes silently to the text reader, which reads its
- * records as unparsable lines and reports two columns of nothing.
- * @param header - The decoded prefix.
- * @returns The prefix without its mark.
- */
-function stripByteOrderMark(header: string): string {
-  return header.startsWith('﻿') ? header.slice(1) : header;
-}
-
-/**
- * The format a file name claims, used only once the content has said nothing.
- * @param fileName - The name, when the file has one.
- * @returns The format, or `undefined` when the extension names none.
- */
-function formatFromExtension(
-  fileName?: string,
-): DetectedMassFormat | undefined {
-  if (fileName === undefined) return undefined;
-  const extension = fileName.split('.').pop();
-  if (extension === undefined || extension === fileName) return undefined;
-  return EXTENSIONS.get(extension.toLowerCase());
 }

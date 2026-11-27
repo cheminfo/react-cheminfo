@@ -8,7 +8,7 @@ import { beforeAll, expect, test } from 'vitest';
 
 import type { ConformerOptions } from '../conformerOptions.ts';
 import { DEFAULT_CONFORMER_OPTIONS } from '../conformerOptions.ts';
-import type { ConformerSet } from '../conformers.ts';
+import type { ConformerSet } from '../conformerTypes.ts';
 import { continueConformers, generateConformers } from '../conformers.ts';
 import { registerResources } from '../oclResources.ts';
 

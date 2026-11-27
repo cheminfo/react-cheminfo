@@ -7,7 +7,7 @@ import { placeOverlayCard } from '../../overlay/core/placeOverlayCard.ts';
 import { parallelTooltipStyle } from './parallelStyles.ts';
 
 /** What {@link ParallelTooltip} shows, and where. */
-export interface ParallelTooltipProps {
+interface ParallelTooltipProps {
   /** Where the pointer is, in pixels from the figure's left edge. */
   x: number;
   /** Where it is, in pixels from its top edge. */

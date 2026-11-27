@@ -2,7 +2,9 @@ import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import { SelectedTotal, Toolbar } from 'react-science/ui';
 
-import { useCopyToClipboard } from '../../clipboard/ui/useCopyToClipboard.ts';
+import { TableDataButton } from '../../delimited/ui/TableDataButton.tsx';
+import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { countLabel } from '../../panel/core/statusBar.ts';
 import { FilterInput } from '../../panel/ui/FilterInput.tsx';
 import { PanelEmpty } from '../../panel/ui/PanelMessage.tsx';
@@ -10,7 +12,11 @@ import { useFilterBox } from '../../panel/ui/useFilterBox.ts';
 import { isUsableSourceEnergy } from '../core/energy.ts';
 import { filterPeakRows } from '../core/filterRows.ts';
 import type { PeakRow } from '../core/peakRows.ts';
-import { buildPeakRows, peakRowsToTsv } from '../core/peakRows.ts';
+import {
+  PEAK_TABLE_HEADER,
+  buildPeakRows,
+  peakCells,
+} from '../core/peakRows.ts';
 import type { PeakSortKey } from '../core/sortRows.ts';
 import { sortPeakRows } from '../core/sortRows.ts';
 import { findSpectrum } from '../core/spectrumGroups.ts';
@@ -53,7 +59,7 @@ export function PeaksPanel(): ReactNode {
   const [showDetection, setShowDetection] = useState(false);
   const [sortKey, setSortKey] = useState<PeakSortKey>('bindingEnergy');
   const [ascending, setAscending] = useState(true);
-  const { copied, copy } = useCopyToClipboard();
+  const t = useChromeT();
 
   const spectrum = useMemo(
     () => findSpectrum(spectra, selectedId),
@@ -104,13 +110,22 @@ export function PeaksPanel(): ReactNode {
             aria-label="Run the peak detection again"
             onClick={() => setShowDetection(!showDetection)}
           />
-          <Toolbar.Item
-            icon={copied ? 'tick' : 'duplicate'}
-            intent={copied ? 'success' : 'none'}
+          <TableDataButton
+            header={PEAK_TABLE_HEADER}
+            rows={() => peakCells(shown)}
+            title={`Peaks of ${spectrum?.name ?? 'the spectrum'}`}
+            description="One line per peak on screen: both energies, the counts, the width, and the closest level with its distance."
+            fileName={`${sanitizeFileName(spectrum?.name ?? '', 'spectrum')}-peaks`}
             disabled={shown.length === 0}
-            tooltip={copied ? 'Copied' : 'Copy these peaks as a table'}
-            aria-label="Copy these peaks as a table"
-            onClick={() => void copy(peakRowsToTsv(shown))}
+            trigger={(open) => (
+              <Toolbar.Item
+                icon="th"
+                disabled={shown.length === 0}
+                tooltip={t('delimited.copyOrDownload')}
+                aria-label={t('delimited.copyOrDownload')}
+                onClick={open}
+              />
+            )}
           />
         </Toolbar>
         {spectrum === null ? null : (

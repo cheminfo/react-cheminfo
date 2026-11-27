@@ -4,10 +4,7 @@ import {
   CONFORMER_STRATEGIES,
   DEFAULT_CONFORMER_OPTIONS,
   MINIMISATION_ALGORITHMS,
-  MINIMISATION_LABELS,
   ROTATABLE_BOND_WARNING,
-  STRATEGY_DETAILS,
-  STRATEGY_LABELS,
   isConformerStrategy,
   isMinimisationAlgorithm,
 } from '../conformerOptions.ts';
@@ -42,28 +39,6 @@ test('the defaults are the ones the conformer page starts from', () => {
     timeoutSeconds: 10,
   });
   expect(ROTATABLE_BOND_WARNING).toBe(12);
-});
-
-test('every strategy has a label and a one-sentence explanation', () => {
-  const listed = [...CONFORMER_STRATEGIES];
-
-  expect(Object.keys(STRATEGY_LABELS)).toStrictEqual(listed);
-  expect(Object.keys(STRATEGY_DETAILS)).toStrictEqual(listed);
-  expect(STRATEGY_LABELS['adaptive-random']).toBe('Adaptive random');
-  expect(STRATEGY_LABELS['likely-systematic']).toBe('Likely systematic');
-
-  for (const strategy of CONFORMER_STRATEGIES) {
-    expect(STRATEGY_DETAILS[strategy].endsWith('.')).toBe(true);
-    expect(STRATEGY_DETAILS[strategy].split('. ')).toHaveLength(1);
-  }
-});
-
-test('every force field has a label, and none advertises energies', () => {
-  expect(Object.keys(MINIMISATION_LABELS)).toStrictEqual([
-    ...MINIMISATION_ALGORITHMS,
-  ]);
-  expect(MINIMISATION_LABELS.none).toBe('None (no energies)');
-  expect(MINIMISATION_LABELS['MMFF94s+']).toBe('MMFF94s+');
 });
 
 test('the guards accept exactly the listed ids', () => {

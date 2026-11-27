@@ -27,7 +27,7 @@ export const READOUT_GAP = 6;
 export const READOUT_WIDTH = 88;
 
 /** How many lines the readout is written on: one for each axis. */
-export const READOUT_LINES = 2;
+const READOUT_LINES = 2;
 
 /** Where the readout is written, and which way it runs from there. */
 export interface ReadoutPlacement {

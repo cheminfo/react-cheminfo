@@ -19,7 +19,7 @@ import type {
 } from '../core/projectionSamples.ts';
 
 import { ellipseCoverageText } from './projectionEllipse.ts';
-import { UNGROUPED_INK } from './projectionMapModel.ts';
+import { UNGROUPED_INK, markerInk, markerShape } from './projectionMapModel.ts';
 
 /** What the map's chrome is built from. */
 interface ProjectionMapChromeInput {
@@ -238,8 +238,8 @@ function appendMarkerEntries(
     entries.push({
       id: `marker-${marker.label}`,
       label: marker.label,
-      color: groups.entries[marker.group ?? -1]?.color ?? UNGROUPED_INK,
-      shape: marker.shape ?? 'cross',
+      color: markerInk(marker, groups),
+      shape: markerShape(marker),
     });
   }
 }

@@ -1,11 +1,6 @@
 import { expect, test } from 'vitest';
 
-import {
-  parallelIncludedMask,
-  parallelKeptCount,
-  parallelRangeKeeps,
-  parallelSelectionKeeps,
-} from '../parallelFilter.ts';
+import { parallelIncludedMask, parallelKeptCount } from '../parallelFilter.ts';
 import type { ParallelAxis, ParallelRanges } from '../parallelTypes.ts';
 
 const MW = Float64Array.from([100, 200, 300, 400]);
@@ -14,17 +9,6 @@ const AXES: ParallelAxis[] = [
   { id: 'mw', label: 'MW', values: MW },
   { id: 'logP', label: 'logP', values: LOGP },
 ];
-
-test('both ends of an interval are kept', () => {
-  expect(parallelRangeKeeps([0, 1], 0)).toBe(true);
-  expect(parallelRangeKeeps([0, 1], 1)).toBe(true);
-  expect(parallelRangeKeeps([0, 1], 1.0001)).toBe(false);
-  expect(parallelRangeKeeps([0, 1], -0.0001)).toBe(false);
-});
-
-test('a value that is not a number is kept by no interval', () => {
-  expect(parallelRangeKeeps([0, 1], Number.NaN)).toBe(false);
-});
 
 test('nothing brushed keeps every row', () => {
   expect([...parallelIncludedMask(AXES, {}, 4)]).toStrictEqual([1, 1, 1, 1]);
@@ -79,20 +63,6 @@ test('a row the column is too short for falls out of a brushed axis', () => {
   expect([...parallelIncludedMask(axes, { mw: [0, 1000] }, 4)]).toStrictEqual([
     1, 1, 0, 0,
   ]);
-});
-
-test('an axis keeping several intervals keeps a value in any of them', () => {
-  const ranges = [
-    [0, 1],
-    [10, 11],
-  ] as const;
-
-  expect(parallelSelectionKeeps(ranges, 0.5)).toBe(true);
-  expect(parallelSelectionKeeps(ranges, 10.5)).toBe(true);
-  expect(parallelSelectionKeeps(ranges, 5)).toBe(false);
-  expect(parallelSelectionKeeps(ranges, Number.NaN)).toBe(false);
-  // An axis that keeps nothing narrows nothing.
-  expect(parallelSelectionKeeps([], 5)).toBe(true);
 });
 
 test('two intervals on one axis keep the rows in either of them', () => {

@@ -23,6 +23,7 @@ import {
   scatterMatrixPlotSide,
 } from './scatterMatrixLayout.ts';
 import type { ScatterMatrixProps } from './scatterMatrixProps.ts';
+import { scatterGroupInk } from './scatterPlotModel.ts';
 
 /**
  * The same map drawn for every pair of axes, sharing one scale per axis.
@@ -66,12 +67,13 @@ export function ScatterMatrix(props: ScatterMatrixProps): ReactElement {
     return { extents, spread };
   }, [scores, shown, bins, groupOf, groups]);
 
-  const colors = useMemo(() => {
-    if (groups === undefined) return undefined;
-    const inks: string[] = [];
-    for (const group of groups) inks.push(group.color);
-    return inks;
-  }, [groups]);
+  const colors = useMemo(
+    () =>
+      groups === undefined
+        ? undefined
+        : scatterGroupInk(groups, undefined).colors,
+    [groups],
+  );
 
   // Nothing is measured for a grid that will not draw the answer: no groups,
   // outlines turned off, or cells too small to hold one legibly.

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ElementRow } from '../core/elementRows.ts';
 import { signedEnergy } from '../core/panelFormat.ts';
 import { formatEnergy } from '../core/peakFormat.ts';
@@ -123,7 +124,7 @@ const energiesStyle = {
 const energyChipStyle = {
   padding: '0 3px',
   borderRadius: 2,
-  background: 'rgb(237 240 243)',
+  background: TOKEN.surfaceSunken,
   fontVariantNumeric: 'tabular-nums',
   cursor: 'default',
 } as const;

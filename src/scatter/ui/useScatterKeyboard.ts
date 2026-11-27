@@ -1,6 +1,7 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useCallback, useRef, useState } from 'react';
 
+import { isActivationKey } from '../../hooks/ui/activationKey.ts';
 import { handleListNavigationKey } from '../../hooks/ui/listNavigation.ts';
 import type { ScatterSelectionMode } from '../core/scatterSelection.ts';
 
@@ -99,7 +100,7 @@ export function useScatterKeyboard(
         onCancel?.();
         return;
       }
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (isActivationKey(event)) {
         const index = cursorRef.current;
         if (index === -1) return;
         event.preventDefault();

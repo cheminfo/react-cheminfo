@@ -13,21 +13,7 @@ export type {
   CaptionEditorResult,
 } from './captionEditorProps.ts';
 export { captionPreview, setCaptionChemical } from './captionPreview.ts';
-export {
-  captionDocument,
-  captionSchema,
-  captionText,
-} from './captionSchema.ts';
-export type { CaptionSymbol } from './captionSymbols.ts';
-export {
-  CAPTION_SYMBOLS,
-  greekCaptionSelection,
-  insertCaptionSymbol,
-  selectionHasLatinLetter,
-} from './captionSymbols.ts';
-export type { CaptionSymbolPaletteProps } from './CaptionSymbolPalette.tsx';
-export { CaptionSymbolPalette } from './CaptionSymbolPalette.tsx';
+export { captionDocument, captionText } from './captionSchema.ts';
 export type { CaptionToolbarProps } from './CaptionToolbar.tsx';
 export { CaptionToolbar } from './CaptionToolbar.tsx';
-export type { ToolbarFit } from './toolbarInView.ts';
-export { toolbarFit, useToolbarInView } from './toolbarInView.ts';
+export { useToolbarInView } from './toolbarInView.ts';

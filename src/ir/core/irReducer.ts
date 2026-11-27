@@ -13,6 +13,8 @@
  * closed.
  */
 
+import { isChartWindow } from '../../chart/core/chartDomain.ts';
+
 import type { IrBand } from './irBand.ts';
 import {
   arriving,
@@ -25,7 +27,6 @@ import {
 import type { IrPanelId } from './irSidePanels.ts';
 import type { IrDomain, IrSpectrum } from './irSpectrum.ts';
 import type { IrSettings, IrState, IrTool, PartialIrState } from './irState.ts';
-import { isIrWindow } from './irState.ts';
 
 /** Everything that can be asked of the viewer. */
 export type IrAction =
@@ -150,7 +151,7 @@ export function irReducer(state: IrState, action: IrAction): IrState {
     }
 
     case 'setDomain': {
-      if (!isIrWindow(action.domain)) return state;
+      if (!isChartWindow(action.domain)) return state;
       return { ...state, view: { ...state.view, domain: action.domain } };
     }
 

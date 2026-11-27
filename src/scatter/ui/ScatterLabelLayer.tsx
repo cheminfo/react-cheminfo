@@ -10,7 +10,7 @@ import {
 import type { PlacedScatterLabel } from './scatterLabelPlacement.ts';
 
 /** What {@link ScatterLabelLayer} draws. */
-export interface ScatterLabelLayerProps {
+interface ScatterLabelLayerProps {
   /** The words and where they go, from `placeScatterLabels`. */
   labels: readonly PlacedScatterLabel[];
   /**

@@ -4,6 +4,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { typeInto } from '../../../__tests__/dom.ts';
 import { FormulaLookup } from '../FormulaLookup.tsx';
 
 let host: HTMLDivElement;
@@ -34,14 +35,7 @@ function listed(): string[] {
 
 function type(input: HTMLInputElement | undefined, text: string): void {
   if (input === undefined) throw new Error('no box to type into');
-  act(() => {
-    const setValue = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value',
-    )?.set?.bind(input);
-    setValue?.(text);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  typeInto(input, text);
 }
 
 test('the panel opens empty, on the default ranges', () => {

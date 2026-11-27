@@ -132,34 +132,6 @@ export function peakFixture(
 }
 
 /**
- * One fitted component.
- * @param id - Its identity.
- * @param bindingEnergy - Where it sits, in eV.
- * @param area - Area under it.
- * @param shape - The shape, as a file names it. Defaults to `GL(30)`.
- * @returns The component, one eV wide.
- */
-export function componentFixture(
-  id: string,
-  bindingEnergy: number,
-  area: number,
-  shape = 'GL(30)',
-): XpsComponent {
-  return {
-    id,
-    label: id,
-    bindingEnergy,
-    kineticEnergy: null,
-    area,
-    fwhm: 1,
-    shape,
-    relativeSensitivityFactor: null,
-    atomicMass: null,
-    regionId: null,
-  };
-}
-
-/**
  * One region a background was drawn under.
  * @param id - Its identity.
  * @param from - Lower bound in eV of binding energy.

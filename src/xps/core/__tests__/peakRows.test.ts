@@ -1,7 +1,12 @@
 import { expect, test } from 'vitest';
 
 import type { PeakRow } from '../peakRows.ts';
-import { buildPeakRows, peakElementText, peakRowsToTsv } from '../peakRows.ts';
+import {
+  PEAK_TABLE_HEADER,
+  buildPeakRows,
+  peakCells,
+  peakElementText,
+} from '../peakRows.ts';
 
 import { peakFixture, spectrumFixture } from './panelFixture.ts';
 
@@ -104,37 +109,38 @@ test('a spectrum with no detection yet has no rows rather than empty ones', () =
   expect(buildPeakRows(spectrumFixture('fresh'))).toStrictEqual([]);
 });
 
-test('the copied table carries every column the panel shows', () => {
+test('the table taken away carries every column the panel shows', () => {
   const spectrum = spectrumFixture('carbon', {
     sourceEnergy: 1486.6,
     peaks: [peakFixture('one', 284, 12345, 1.4), peakFixture('two', 1e9, 8, 3)],
   });
 
-  expect(peakRowsToTsv(buildPeakRows(spectrum, { tolerance: 0.5 }))).toBe(
-    [
-      'binding energy (eV)\tkinetic energy (eV)\tcounts\twidth (eV)\telement\tlevel\tdelta (eV)',
-      '284.00\t1202.60\t12,345\t1.40\tC\t1s\t+0.00',
-      '1000000000.00\t-999998513.40\t8.00\t3.00\t\t\t',
-    ].join('\n'),
-  );
+  expect(PEAK_TABLE_HEADER).toStrictEqual([
+    'binding energy (eV)',
+    'kinetic energy (eV)',
+    'counts',
+    'width (eV)',
+    'element',
+    'level',
+    'delta (eV)',
+  ]);
+  expect(peakCells(buildPeakRows(spectrum, { tolerance: 0.5 }))).toStrictEqual([
+    ['284.00', '1202.60', '12,345', '1.40', 'C', '1s', '+0.00'],
+    ['1000000000.00', '-999998513.40', '8.00', '3.00', '', '', ''],
+  ]);
 });
 
-test('a spectrum on the kinetic axis copies an empty kinetic column', () => {
+test('a spectrum on the kinetic axis gives an empty kinetic cell', () => {
   const spectrum = spectrumFixture('auger', {
     sourceEnergy: null,
     peaks: [peakFixture('one', 284, 1000, 1)],
   });
 
-  expect(peakRowsToTsv(buildPeakRows(spectrum, { tolerance: 0.5 }))).toBe(
-    [
-      'binding energy (eV)\tkinetic energy (eV)\tcounts\twidth (eV)\telement\tlevel\tdelta (eV)',
-      '284.00\t\t1,000\t1.00\tC\t1s\t+0.00',
-    ].join('\n'),
-  );
+  expect(peakCells(buildPeakRows(spectrum, { tolerance: 0.5 }))).toStrictEqual([
+    ['284.00', '', '1,000', '1.00', 'C', '1s', '+0.00'],
+  ]);
 });
 
-test('an empty table copies as its header alone', () => {
-  expect(peakRowsToTsv([])).toBe(
-    'binding energy (eV)\tkinetic energy (eV)\tcounts\twidth (eV)\telement\tlevel\tdelta (eV)',
-  );
+test('an empty table has no lines under its header', () => {
+  expect(peakCells([])).toStrictEqual([]);
 });

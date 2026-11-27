@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { NumberInput } from '../../number/ui/NumberInput.tsx';
-import { normalizeHexColor } from '../core/hex.ts';
+import { isEditingField } from '../../panel/core/isEditingField.ts';
+import { colorInputValue } from '../core/hex.ts';
 import type {
   ColorInterpolation,
   ColorScale,
   ColorStop,
 } from '../core/interpolate.ts';
+import { COLOR_INTERPOLATIONS } from '../core/interpolate.ts';
 import {
   MINIMUM_CUSTOM_STOPS,
   moveColorStop,
@@ -21,16 +23,6 @@ import { ColorScaleTone } from './ColorScaleTone.tsx';
 import { ColorScaleTrack } from './ColorScaleTrack.tsx';
 
 const POSITION_STEP = 0.01;
-// A `type="color"` input only takes six hex digits; an anchor that is not a
-// hex colour is shown as black until it is picked again.
-const UNREADABLE_COLOR = '#000000';
-
-/** The paths between two anchors, in the order the picker lists them. */
-const INTERPOLATIONS: readonly ColorInterpolation[] = [
-  'rgb',
-  'hsv',
-  'hsv-long',
-];
 
 /** What {@link ColorScaleEditor} edits. */
 export interface ColorScaleEditorProps {
@@ -81,7 +73,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
     const index = hovered;
     function onKeyDown(event: globalThis.KeyboardEvent): void {
       if (event.key !== 'Backspace' && event.key !== 'Delete') return;
-      if (isEditable(event.target)) return;
+      if (isEditingField(event.target)) return;
       event.preventDefault();
       onChange({
         stops: removeColorStop(stops, index),
@@ -116,7 +108,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
           ref={colorInput}
           type="color"
           aria-label={t('color.anchorColour', { index: selected + 1 })}
-          value={normalizeHexColor(stop?.color ?? '') ?? UNREADABLE_COLOR}
+          value={colorInputValue(stop?.color ?? '')}
           style={SWATCH_STYLE}
           onChange={(event) => {
             write(recolorColorStop(stops, selected, event.target.value));
@@ -151,7 +143,7 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
         <HTMLSelect
           aria-label={t('color.path')}
           value={value.interpolation}
-          options={INTERPOLATIONS.map((interpolation) => ({
+          options={COLOR_INTERPOLATIONS.map((interpolation) => ({
             value: interpolation,
             label: t(`color.interpolation.${interpolation}`),
           }))}
@@ -168,16 +160,6 @@ export function ColorScaleEditor(props: ColorScaleEditorProps): ReactElement {
 
       <p style={HINT_STYLE}>{t('color.editorHint')}</p>
     </div>
-  );
-}
-
-function isEditable(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  return (
-    target.isContentEditable ||
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
   );
 }
 

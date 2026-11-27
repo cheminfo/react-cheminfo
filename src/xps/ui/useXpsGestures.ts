@@ -29,6 +29,11 @@ import {
   zoomSelection,
   zoomedDomain,
 } from '../../chart/core/zoomDomain.ts';
+import {
+  draggedTo,
+  releaseDrag,
+  startedDrag,
+} from '../../chart/ui/chartGestures.ts';
 import { useWheelListener } from '../../chart/ui/useWheelListener.ts';
 import { bindingFromAxis } from '../core/energyAxis.ts';
 import type { XpsDomain } from '../core/xpsSpectrum.ts';
@@ -126,45 +131,35 @@ export function useXpsGestures(options: XpsGesturesOptions): XpsGestures {
 
   const onPointerDown = useCallback(
     (event: ReactPointerEvent<SVGSVGElement>) => {
-      if (event.button !== LEFT_BUTTON) return;
-      const point = svgPointAt(svgRef.current, event.clientX, event.clientY);
-      if (point === null) return;
-      // Captured so a drag running off the plot keeps being reported, which is
-      // how a window is framed right up to the edge of the data.
-      event.currentTarget.setPointerCapture(event.pointerId);
-      setDrag({
-        pointerId: event.pointerId,
-        panning: event.shiftKey,
-        moved: 0,
-        fromX: point.x,
-        fromY: point.y,
-        toX: point.x,
-        toY: point.y,
-      });
+      // Captured by startedDrag, so a drag running off the plot keeps being
+      // reported, which is how a window is framed right up to the edge of the
+      // data.
+      const started = startedDrag(event, svgRef.current, undefined);
+      if (started === null) return;
+      setDrag({ ...started, panning: event.shiftKey, moved: 0 });
     },
     [svgRef],
   );
 
   const onPointerMove = useCallback(
     (event: ReactPointerEvent<SVGSVGElement>) => {
-      if (drag?.pointerId !== event.pointerId) return;
-      const point = svgPointAt(svgRef.current, event.clientX, event.clientY);
-      if (point === null) return;
-      const moved = drag.moved + Math.abs(point.x - drag.toX);
+      const point = draggedTo(drag, event, svgRef.current);
+      if (drag === null || point === null) return;
+      const moved = drag.moved + Math.abs(point.toX - drag.toX);
       if (!drag.panning) {
-        setDrag({ ...drag, moved, toX: point.x, toY: point.y });
+        setDrag({ ...drag, moved, toX: point.toX, toY: point.toY });
         return;
       }
-      onDomainChange(pannedDomain(domain, drag.toX, point.x, xScale));
+      onDomainChange(pannedDomain(domain, drag.toX, point.toX, xScale));
       // The origin travels with the hand, so the next move measures the step it
       // made rather than the whole gesture over again.
       setDrag({
         ...drag,
         moved,
-        fromX: point.x,
-        fromY: point.y,
-        toX: point.x,
-        toY: point.y,
+        fromX: point.toX,
+        fromY: point.toY,
+        toX: point.toX,
+        toY: point.toY,
       });
     },
     [drag, svgRef, domain, xScale, onDomainChange],
@@ -173,7 +168,7 @@ export function useXpsGestures(options: XpsGesturesOptions): XpsGestures {
   const onPointerUp = useCallback(
     (event: ReactPointerEvent<SVGSVGElement>) => {
       if (drag?.pointerId !== event.pointerId) return;
-      release(event);
+      releaseDrag(event);
       setDrag(null);
       if (drag.panning) return;
 
@@ -219,7 +214,7 @@ export function useXpsGestures(options: XpsGesturesOptions): XpsGestures {
   const onPointerCancel = useCallback(
     (event: ReactPointerEvent<SVGSVGElement>) => {
       if (drag?.pointerId !== event.pointerId) return;
-      release(event);
+      releaseDrag(event);
       setDrag(null);
     },
     [drag],
@@ -256,9 +251,6 @@ export function useXpsGestures(options: XpsGesturesOptions): XpsGestures {
  */
 const WHEEL_ZOOM_RATE = 0.002;
 
-/** Which button drags; the others belong to menus. */
-const LEFT_BUTTON = 0;
-
 /** A drag as it is held, tied to the pointer that started it. */
 interface Drag extends DragBox {
   /** So a second finger cannot take a drag over from the first. */
@@ -267,14 +259,4 @@ interface Drag extends DragBox {
   panning: boolean;
   /** How far the hand has travelled in all, which tells a click from a drag. */
   moved: number;
-}
-
-/**
- * Give the pointer back, so the next gesture reaches whatever it is aimed at.
- * @param event - The event ending the drag.
- */
-function release(event: ReactPointerEvent<SVGSVGElement>): void {
-  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-    event.currentTarget.releasePointerCapture(event.pointerId);
-  }
 }

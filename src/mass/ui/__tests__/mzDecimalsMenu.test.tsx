@@ -11,7 +11,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import { installProbeStubs } from '../../../chart/ui/__tests__/zoomProbe.tsx';
+import { stubViewerLayout } from '../../../chart/ui/__tests__/viewerLayout.ts';
 import { massFixture } from '../../core/__tests__/massFixtures.ts';
 import { MassEditor } from '../MassEditor.tsx';
 
@@ -19,17 +19,7 @@ let host: HTMLDivElement;
 let root: Root;
 
 beforeEach(() => {
-  installProbeStubs();
-  Element.prototype.scrollIntoView = () => undefined;
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  vi.stubGlobal('ResizeObserver', NoResizeObserver);
-  // jsdom lays nothing out, so the boxes the chart and the table measure are
-  // given a size.
-  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
-    new DOMRect(0, 0, 600, 400),
-  );
-  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(600);
-  vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(400);
+  stubViewerLayout();
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);
@@ -76,18 +66,4 @@ test('a number of decimals picked rewrites the masses of the peak table', async 
 function firstMasses(): Array<string | null> {
   const cells = host.querySelectorAll('tbody tr td:first-child');
   return [...cells].slice(0, 3).map((cell) => cell.textContent);
-}
-
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing was observed.
-  }
 }

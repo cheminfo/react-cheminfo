@@ -9,6 +9,7 @@ import { getClasses } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { occurrences } from '../../../__tests__/markup.ts';
 import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import type {
   ProjectionResult,
@@ -90,8 +91,4 @@ function draw(tab: ProjectionTab): string {
   return renderToStaticMarkup(
     <ProjectionViewer result={IRIS} samples={SAMPLES} tab={tab} />,
   );
-}
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
 }

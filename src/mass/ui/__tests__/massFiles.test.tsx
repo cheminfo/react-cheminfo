@@ -9,18 +9,18 @@
  * object with the types and the files a browser reports.
  */
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { act, createRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import {
+  iconsLoaded,
+  stubViewerLayout,
+} from '../../../chart/ui/__tests__/viewerLayout.ts';
+import { massFixtureFile } from '../../core/__tests__/massFixtures.ts';
 import type { MassEditorHandle } from '../../core/massEditorApi.ts';
 import { MassEditor } from '../MassEditor.tsx';
-
-import { iconsLoaded, stubViewerLayout } from './massViewerStubs.ts';
 
 let host: HTMLDivElement;
 let root: Root;
@@ -45,13 +45,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
-
-function fixtureFile(name: string): File {
-  const bytes = readFileSync(
-    join(import.meta.dirname, '../../core/__tests__/data', name),
-  );
-  return new File([bytes], name);
-}
 
 function picker(): HTMLInputElement {
   const input = host.querySelector<HTMLInputElement>(
@@ -89,8 +82,8 @@ function drag(type: string, types: string[]): Event {
 
 test('the files chosen in the picker are read and drawn, and the picker emptied', async () => {
   choose([
-    fixtureFile('caffeine-peaks.txt'),
-    fixtureFile('aflatoxin-peaks.jdx'),
+    massFixtureFile('caffeine-peaks.txt'),
+    massFixtureFile('aflatoxin-peaks.jdx'),
   ]);
   // The files are read after the event, as in a page.
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);

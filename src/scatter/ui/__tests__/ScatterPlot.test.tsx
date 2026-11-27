@@ -2,6 +2,10 @@ import { getClassesAsNumber, getNumbers } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import {
+  layerUntilClose as layer,
+  occurrences,
+} from '../../../__tests__/markup.ts';
 import { ScatterPlot } from '../ScatterPlot.tsx';
 import type { ScatterPlotProps } from '../scatterPlotProps.ts';
 
@@ -141,13 +145,3 @@ test('a class a site adds lands on the frame the plot is drawn in', () => {
   expect(html).toContain('class="chart-frame pca-map"');
   expect(occurrences(html, 'tabindex="0"')).toBe(1);
 });
-
-function layer(html: string, name: string): string {
-  const start = html.indexOf(`<g data-layer="${name}"`);
-  if (start === -1) return '';
-  return html.slice(start, html.indexOf('</g>', start));
-}
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
-}

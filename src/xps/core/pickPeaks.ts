@@ -153,5 +153,8 @@ const DEFAULT_MAXIMUM_PEAKS = 50;
 /** How small a maximum may be against the tallest and still be a candidate. */
 const DEFAULT_MINIMUM_RATIO = 0.001;
 
-/** How far a maximum must stand out from its surroundings to be a peak. */
-const DEFAULT_MINIMUM_PROMINENCE_RATIO = 0.02;
+/**
+ * How far a maximum must stand out from its surroundings to be a peak, unless
+ * `minProminenceRatio` says otherwise.
+ */
+export const DEFAULT_MINIMUM_PROMINENCE_RATIO = 0.02;

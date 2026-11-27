@@ -17,7 +17,6 @@ export {
 } from './captions.ts';
 export type { Contour, Segment } from './contour.ts';
 export {
-  Pen,
   contourBounds,
   contourEnd,
   isCubic,
@@ -31,16 +30,8 @@ export type {
   LinearPaint,
   RadialPaint,
 } from './gradients.ts';
-export {
-  gradientDefs,
-  gradientFill,
-  gradientId,
-  gradientMarkup,
-  radialTransform,
-  sceneGradients,
-} from './gradients.ts';
-export { gradientPaint } from './graphicPaint.ts';
-export { graphicPath, graphicPrimitive } from './graphics.ts';
+export { gradientMarkup } from './gradients.ts';
+export { graphicPrimitive } from './graphics.ts';
 export {
   ellipsePath,
   escapeAttribute,
@@ -60,14 +51,13 @@ export {
   metricsOf,
   textWidth,
 } from './metrics.ts';
+export { MOTION_CSS } from './motionCss.ts';
 export {
   MOTION_ATTRIBUTE,
-  MOTION_CSS,
   MOTION_STYLE,
   RUN_FADE,
   bubbleDelay,
   figureMoves,
-  movingFigure,
   runTiming,
   sceneMoves,
 } from './motion.ts';
@@ -81,9 +71,11 @@ export {
   pagesLine,
   sheetLines,
 } from './pageGrid.ts';
+export { Pen } from './pen.ts';
 export type { ImagePrimitive } from './pictures.ts';
 export { imageCorners, imageTransform, picturePrimitive } from './pictures.ts';
 export { mapContour, polygonContour, roundedRect } from './outlines.ts';
+export { primitiveMarkup } from './primitiveMarkup.ts';
 export type {
   CaptionPrimitive,
   DotPrimitive,
@@ -101,9 +93,4 @@ export type { SpinRun } from './spinning.ts';
 export { spinClass, spinRuns } from './spinning.ts';
 export type { DrawingStyle } from './style.ts';
 export type { MoleculeGroup, SvgOptions } from './svg.ts';
-export {
-  DRAW_NAMESPACE,
-  primitiveMarkup,
-  sceneBody,
-  sheetBody,
-} from './svg.ts';
+export { DRAW_NAMESPACE, sceneBody, sheetBody } from './svg.ts';

@@ -17,36 +17,7 @@ export type {
   ConfidenceEllipsoid,
   ConfidenceEllipsoidOptions,
 } from './confidenceEllipsoid.ts';
-export {
-  confidenceEllipsoid,
-  ellipsoidStandardDeviations,
-} from './confidenceEllipsoid.ts';
-export type { CubeArm } from './cubeFrame.ts';
-export { CUBE_ARMS, CUBE_ORIGIN, cubeEdges } from './cubeFrame.ts';
-export {
-  coverageForStandardDeviations3,
-  standardDeviationsForCoverage3,
-} from './ellipsoidCoverage.ts';
-export type { EllipsoidSilhouette } from './ellipsoidSilhouette.ts';
-export { ellipsoidSilhouette } from './ellipsoidSilhouette.ts';
-export type {
-  OrbitCamera,
-  OrbitViewport,
-  ProjectedPoint,
-  Vector3,
-} from './orbitCamera.ts';
-export {
-  CUBE_HALF_DIAGONAL,
-  DEFAULT_ORBIT_CAMERA,
-  ORBIT_PITCH_LIMIT,
-  ORBIT_RADIANS_PER_PIXEL,
-  depthFraction,
-  orbitByDrag,
-  projectPoint,
-  rotatePoint,
-} from './orbitCamera.ts';
+export { confidenceEllipsoid } from './confidenceEllipsoid.ts';
+export type { OrbitCamera, Vector3 } from './orbitCamera.ts';
+export { DEFAULT_ORBIT_CAMERA } from './orbitCamera.ts';
 export type { CloudGesture } from './cloudGesture.ts';
-export type { CubePointsOptions } from './cubePoints.ts';
-export { cubePoints } from './cubePoints.ts';
-export type { SymmetricEigen3, SymmetricMatrix3 } from './symmetricEigen.ts';
-export { symmetricEigen3 } from './symmetricEigen.ts';

@@ -11,20 +11,28 @@ import { IrStateProvider } from './IrStateProvider.tsx';
 import type { IrHostPanel } from './irHostPanels.ts';
 import { useIrEditor } from './useIrEditor.ts';
 
-export interface VibrationalEditorProps {
+/**
+ * What every viewer of this family takes — infrared, Raman, UV-vis and
+ * fluorescence — the position on the chart being a wavenumber, a Raman shift
+ * or a wavelength, always held and reported as `wavenumber`.
+ */
+export interface SpectrumViewerProps {
   /**
-   * What the spectra were measured with. Read when the viewer opens and fixed
-   * from then on: it decides the value axes, the direction and name of the
-   * wavenumber axis, and whether the correlation table is asked about a band.
-   */
-  technique: IrTechnique;
-  /**
-   * The spectra to open on. Read when the viewer opens and never again.
+   * The spectra to open on. Read when the viewer opens and never again: what is
+   * on the chart belongs to the viewer from then on, so a host re-rendering with
+   * another array does not silently replace what somebody is looking at. The
+   * `ref` handle is how spectra arrive afterwards.
    * @default []
    */
   data?: IrSpectrum[];
   /**
-   * Called whenever the spectra open change, with the spectra now open.
+   * Called whenever the spectra open change — one loaded, one closed, the chart
+   * cleared, the bands of one picked — with the spectra now open, each carrying
+   * its bands.
+   *
+   * The document only. A zoom, a selection, a rename and a colour change what is
+   * being looked at rather than what is loaded, and a host told about those would
+   * be told on every drag of the mouse.
    * @default undefined
    */
   onChange?: (spectra: IrSpectrum[]) => void;
@@ -42,21 +50,25 @@ export interface VibrationalEditorProps {
    */
   mode?: IrMode;
   /**
-   * The side panels open to begin with, the viewer's own or the host's. An id
-   * no panel answers to is ignored.
+   * The side panels open to begin with: the viewer's own — `'spectra'`,
+   * `'bands'`, `'metadata'` — or the id of one of `panels`. An id no panel
+   * answers to is ignored.
    * @default DEFAULT_SIDE_PANELS
    */
   defaultPanelIds?: readonly IrPanelId[];
   /**
-   * Panels the host adds to the viewer's own: their icons come first in the
-   * activity bar, in the order given, and each behaves as a built-in panel does.
+   * Panels the host adds to the viewer's own — a structure to predict a
+   * spectrum from, say. Their icons come first in the activity bar, in the
+   * order given, and each then behaves as a built-in panel does: toggled on its
+   * own, stacked in the same column with a share of its height, folded and
+   * closed from its header.
    * @default []
    */
   panels?: readonly IrHostPanel[];
   /**
-   * The plot was clicked at this wavenumber (a press that did not travel, i.e.
+   * The plot was clicked at this position (a press that did not travel, i.e.
    * not a zoom drag), with the spectrum selected at that moment. Not called
-   * while bands are picked by hand.
+   * while bands are picked by hand: a click is a band then.
    * @default undefined
    */
   onPlotClick?: (click: IrPlotClick) => void;
@@ -68,10 +80,21 @@ export interface VibrationalEditorProps {
    */
   actions?: ReactNode;
   /**
-   * The handle a host drives the viewer through.
+   * The handle a host drives the viewer through: take these spectra, frame this
+   * position, select that one.
    * @default undefined
    */
   ref?: Ref<IrEditorHandle>;
+}
+
+/** What the viewer of one technique takes: the shared props, and the technique. */
+export interface VibrationalEditorProps extends SpectrumViewerProps {
+  /**
+   * What the spectra were measured with. Read when the viewer opens and fixed
+   * from then on: it decides the value axes, the direction and name of the
+   * wavenumber axis, and whether the correlation table is asked about a band.
+   */
+  technique: IrTechnique;
 }
 
 /**

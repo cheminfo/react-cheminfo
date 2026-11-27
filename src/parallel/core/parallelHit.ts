@@ -12,7 +12,7 @@ import type { ParallelAxisLayout } from './parallelAxes.ts';
 import { parallelPixelAt } from './parallelAxes.ts';
 
 /** How far the pointer may sit from a line and still pick it, in pixels. */
-export const PARALLEL_HOVER_TOLERANCE = 6;
+const PARALLEL_HOVER_TOLERANCE = 6;
 
 /** A pointer position, relative to the top left of the drawing area. */
 export interface ParallelPoint {

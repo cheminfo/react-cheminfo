@@ -9,11 +9,7 @@ import {
   parallelColorSteps,
   parallelPalette,
 } from '../core/parallelPalette.ts';
-import type {
-  ParallelAxis,
-  ParallelRange,
-  ParallelRanges,
-} from '../core/parallelTypes.ts';
+import type { ParallelRange, ParallelRanges } from '../core/parallelTypes.ts';
 
 import { ParallelAxesLayer } from './ParallelAxesLayer.tsx';
 import { ParallelLabels } from './ParallelLabels.tsx';
@@ -21,7 +17,10 @@ import { ParallelTooltip } from './ParallelTooltip.tsx';
 import type { ParallelCoordinatesProps } from './parallelCoordinatesProps.ts';
 import { useParallelInk } from './parallelInk.ts';
 import {
+  PARALLEL_DEFAULT_HEIGHT,
+  PARALLEL_SMALLEST_SIDE,
   parallelColorOf,
+  parallelColumnsOf,
   parallelFigureLabel,
   parallelHighlightsOf,
   parallelIsBrushed,
@@ -36,12 +35,6 @@ import {
 import { useParallelAxisDrag } from './useParallelAxisDrag.ts';
 import { useParallelCanvas } from './useParallelCanvas.ts';
 import { useParallelGesture } from './useParallelGesture.ts';
-
-/** Height the figure takes when the caller names none. */
-const DEFAULT_HEIGHT = 320;
-
-/** The smallest drawing area the figure will lay out, in pixels. */
-const SMALLEST_SIDE = 10;
 
 /** No axis is brushed, shared so an uncontrolled figure never rebuilds it. */
 const NO_RANGES: ParallelRanges = Object.freeze({});
@@ -66,7 +59,13 @@ const NO_RANGES: ParallelRanges = Object.freeze({});
 export function ParallelCoordinates(
   props: ParallelCoordinatesProps,
 ): ReactElement {
-  const { axes, width, height = DEFAULT_HEIGHT, empty, overlay } = props;
+  const {
+    axes,
+    width,
+    height = PARALLEL_DEFAULT_HEIGHT,
+    empty,
+    overlay,
+  } = props;
   const { selected, renderTooltip, renderAxisLabel } = props;
   const { className, testId, ink: inkProp, label: given } = props;
   const { ranges: ownedRanges, defaultRanges, included: givenMask } = props;
@@ -76,11 +75,11 @@ export function ParallelCoordinates(
   const count = parallelRowCount(axes, props.count);
   const innerWidth = Math.max(
     width - PARALLEL_MARGIN.left - PARALLEL_MARGIN.right,
-    SMALLEST_SIDE,
+    PARALLEL_SMALLEST_SIDE,
   );
   const innerHeight = Math.max(
     height - PARALLEL_MARGIN.top - PARALLEL_MARGIN.bottom,
-    SMALLEST_SIDE,
+    PARALLEL_SMALLEST_SIDE,
   );
 
   const [ownRanges, setOwnRanges] = useState<ParallelRanges>(
@@ -92,7 +91,7 @@ export function ParallelCoordinates(
     () => parallelAxisLayouts(axes, count, innerWidth, innerHeight),
     [axes, count, innerWidth, innerHeight],
   );
-  const values = useMemo(() => columnsOf(axes), [axes]);
+  const values = useMemo(() => parallelColumnsOf(axes), [axes]);
   const { ink, ref: figure } = useParallelInk(inkProp);
   const color = useMemo(
     () => parallelColorOf(givenColor, colorAxis, axes),
@@ -243,10 +242,4 @@ export function ParallelCoordinates(
       )}
     </div>
   );
-}
-
-function columnsOf(axes: readonly ParallelAxis[]): Array<ArrayLike<number>> {
-  const columns: Array<ArrayLike<number>> = [];
-  for (const axis of axes) columns.push(axis.values);
-  return columns;
 }

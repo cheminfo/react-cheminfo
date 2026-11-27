@@ -1,15 +1,17 @@
 /**
- * The browser surface the mass viewer needs and jsdom lacks: pointer capture,
- * an SVG's screen matrix, a list scrolling a row into view, a resize observer,
- * and a size for the boxes it measures.
+ * The browser surface a spectrum viewer needs and jsdom lacks: pointer
+ * capture, an SVG's screen matrix, a list scrolling a row into view, a resize
+ * observer, and a size for the boxes it measures.
  *
- * The chart is laid out at 600 × 400 with them, as `massGestures.test.tsx`
- * lays it out. Undone by `vi.restoreAllMocks()` and `vi.unstubAllGlobals()`.
+ * The chart is laid out at 600 × 400 with them. Undone by
+ * `vi.restoreAllMocks()` and `vi.unstubAllGlobals()`.
  */
 
 import { vi } from 'vitest';
 
-import { installProbeStubs } from '../../../chart/ui/__tests__/zoomProbe.tsx';
+import { NoResizeObserver } from '../../../__tests__/dom.ts';
+
+import { installProbeStubs } from './zoomProbe.tsx';
 
 /** Stand in for what jsdom does not lay out. */
 export function stubViewerLayout(): void {
@@ -33,19 +35,4 @@ export function iconsLoaded(): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, 0);
   });
-}
-
-/** A `ResizeObserver` that observes nothing, for a DOM where nothing resizes. */
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing was observed.
-  }
 }

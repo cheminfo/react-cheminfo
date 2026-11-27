@@ -7,9 +7,7 @@
  * take the same ranking.
  */
 
-// Type-only, so nothing here pulls the generator — or openchemlib — into
-// `react-cheminfo/core`, which every page loads.
-import type { ConformerRanking } from './conformers.ts';
+import type { ConformerRanking } from './conformerTypes.ts';
 
 /**
  * What a refinement has to say for an energy column to read it.

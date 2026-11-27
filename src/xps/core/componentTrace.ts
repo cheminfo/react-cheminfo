@@ -27,7 +27,7 @@ import type { XpsTrace } from './xpsSpectrum.ts';
  * a chart in a narrow side panel still gets enough points that a doublet does
  * not read as two triangles.
  */
-export const COMPONENT_SAMPLES = 400;
+const COMPONENT_SAMPLES = 400;
 
 /**
  * How tall a component stands at its own centre.
@@ -48,24 +48,6 @@ export function componentAmplitude(
   const spread = peak.fwhm * shape.integral;
   if (!(spread > 0) || !Number.isFinite(peak.area)) return 0;
   return peak.area / spread;
-}
-
-/**
- * The counts one component contributes at one energy.
- *
- * Parses the shape on every call, so it is for a readout or a test rather than
- * for a loop: `componentTrace` reads the shape once and walks the window.
- * @param peak - The fitted peak.
- * @param energy - Where to read it, in the units the peak's centre is in.
- * @returns The counts, `0` where the shape describes nothing.
- */
-export function componentIntensity(
-  peak: ComponentPeak,
-  energy: number,
-): number {
-  const shape = parseComponentShape(peak.shape);
-  const t = (energy - peak.centre) / peak.fwhm;
-  return componentAmplitude(peak, shape) * shapeValue(shape, t);
 }
 
 /**

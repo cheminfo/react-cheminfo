@@ -3,8 +3,9 @@ import { expect, test } from 'vitest';
 import { plotRect } from '../../../chart/core/chartGeometry.ts';
 import { chartPixel, chartScale } from '../../../chart/core/chartScale.ts';
 import { PEAK_LABEL } from '../../../chart/core/chartTheme.ts';
-import type { MassSpectrum } from '../massSpectrum.ts';
 import { planPeakLabels } from '../peakLabelPlan.ts';
+
+import { centroidedSpectrum } from './massFixtures.ts';
 
 const plot = plotRect({ width: 600, height: 400 });
 const xScale = chartScale(100, 400, plot.left, plot.right);
@@ -12,7 +13,7 @@ const yScale = chartScale(0, 100, plot.bottom, plot.top);
 
 test('a stack stands over its peak, saying what it is before what it measures', () => {
   const [plan] = planPeakLabels({
-    spectrum: centroided([200.1234], [60], [2]),
+    spectrum: centroidedSpectrum('a', [200.1234], [60], [2]),
     plot,
     xScale,
     yScale,
@@ -37,7 +38,7 @@ test('two peaks too close for both stacks leave the fainter one unnamed', () => 
   // Far enough apart to clear the selection's own slots — a tenth of the window
   // — and still closer than a label is wide on a plot this size.
   const crowded = planPeakLabels({
-    spectrum: centroided([200, 231], [50, 100], [0, 0]),
+    spectrum: centroidedSpectrum('a', [200, 231], [50, 100], [0, 0]),
     plot,
     xScale,
     yScale,
@@ -50,7 +51,7 @@ test('two peaks too close for both stacks leave the fainter one unnamed', () => 
   expect(crowded[1]?.labelX).toBe(chartPixel(xScale, 231));
 
   const apart = planPeakLabels({
-    spectrum: centroided([200, 260], [50, 100], [0, 0]),
+    spectrum: centroidedSpectrum('a', [200, 260], [50, 100], [0, 0]),
     plot,
     xScale,
     yScale,
@@ -62,7 +63,7 @@ test('two peaks too close for both stacks leave the fainter one unnamed', () => 
 
 test('a stack over a peak at the edge is slid inside the plot, and its mark is not', () => {
   const [plan] = planPeakLabels({
-    spectrum: centroided([100], [100], [0]),
+    spectrum: centroidedSpectrum('a', [100], [100], [0]),
     plot,
     xScale,
     yScale,
@@ -76,39 +77,10 @@ test('a stack over a peak at the edge is slid inside the plot, and its mark is n
 test('a window holding no peak is planned as nothing at all', () => {
   expect(
     planPeakLabels({
-      spectrum: centroided([], [], []),
+      spectrum: centroidedSpectrum('a', [], [], []),
       plot,
       xScale,
       yScale,
     }),
   ).toStrictEqual([]);
 });
-
-/**
- * A centroided spectrum with the peaks the test asks for.
- * @param mz - The m/z of each peak, ascending.
- * @param intensity - The intensity of each.
- * @param charge - The charge established for each, `0` for none.
- * @returns The spectrum, drawn as its sticks.
- */
-function centroided(
-  mz: number[],
-  intensity: number[],
-  charge: number[],
-): MassSpectrum {
-  return {
-    id: 'a',
-    name: 'a',
-    color: '#000000',
-    profile: null,
-    centroid: {
-      x: Float64Array.from(mz),
-      y: Float64Array.from(intensity),
-      charge: Int16Array.from(charge),
-    },
-    meta: null,
-    origin: { format: 'text' },
-    showProfile: false,
-    showCentroid: true,
-  };
-}

@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import { useMemo } from 'react';
 
 import type { OverlayLegendEntry } from '../../overlay/ui/OverlayLegend.tsx';
 import { OverlayLegend } from '../../overlay/ui/OverlayLegend.tsx';
@@ -54,12 +55,16 @@ export function ProjectionMapLegend(
     width - PROJECTION_PLOT_ROOM.left - PROJECTION_PLOT_ROOM.right;
   const plotHeight =
     height - PROJECTION_PLOT_ROOM.top - PROJECTION_PLOT_ROOM.bottom;
-  const corner = projectionMapCorner(
-    cloud,
-    xDomain,
-    yDomain,
-    Math.max(0, plotWidth),
-    Math.max(0, plotHeight),
+  const corner = useMemo(
+    () =>
+      projectionMapCorner(
+        cloud,
+        xDomain,
+        yDomain,
+        Math.max(0, plotWidth),
+        Math.max(0, plotHeight),
+      ),
+    [cloud, xDomain, yDomain, plotWidth, plotHeight],
   );
 
   return (

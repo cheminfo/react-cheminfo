@@ -72,3 +72,9 @@ test('a step that is not above zero leaves the number alone', () => {
   expect(snapToStep(3.14159, -1)).toBe(3.14159);
   expect(snapToStep(Number.NaN, 1)).toBeNaN();
 });
+
+test('a step written in exponent form keeps its decimals', () => {
+  expect(snapToStep(3.4e-7, 1e-7)).toBe(3e-7);
+  expect(stepNumber(0.5, 1e-7)).toBe(0.5000001);
+  expect(stepNumber(1e-20, 1e-20)).toBe(2e-20);
+});

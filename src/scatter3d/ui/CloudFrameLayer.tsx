@@ -8,7 +8,7 @@ import { projectPoint } from '../core/orbitCamera.ts';
 import { projectSegments } from './cloudGeometry.ts';
 
 /** What {@link CloudFrameLayer} draws. */
-export interface CloudFrameLayerProps {
+interface CloudFrameLayerProps {
   /** Where the reader is standing. */
   camera: OrbitCamera;
   /** Where the middle of the cube is, and how large it is drawn. */

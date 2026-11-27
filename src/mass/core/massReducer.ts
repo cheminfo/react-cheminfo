@@ -11,6 +11,8 @@
  * selecting the spectrum already selected, closing an error already closed.
  */
 
+import { isChartWindow } from '../../chart/core/chartDomain.ts';
+
 import type { MassPanelId } from './massSidePanels.ts';
 import type { MassDomain, MassSpectrum } from './massSpectrum.ts';
 import type {
@@ -19,7 +21,7 @@ import type {
   MassTool,
   PartialMassState,
 } from './massState.ts';
-import { isMassWindow, mergeMassSettings } from './massState.ts';
+import { mergeMassSettings } from './massState.ts';
 import {
   arriving,
   mapSpectrum,
@@ -163,7 +165,7 @@ export function massReducer(state: MassState, action: MassAction): MassState {
     }
 
     case 'setDomain': {
-      if (!isMassWindow(action.domain)) return state;
+      if (!isChartWindow(action.domain)) return state;
       return { ...state, view: { ...state.view, domain: action.domain } };
     }
 

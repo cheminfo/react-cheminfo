@@ -11,13 +11,15 @@ import type { SurfaceEvent } from '../../scatter/ui/lassoGesture.ts';
 import { surfacePosition } from '../../scatter/ui/lassoGesture.ts';
 import type { ParallelAxisLayout } from '../core/parallelAxes.ts';
 import { PARALLEL_MARGIN } from '../core/parallelAxes.ts';
-import type { ParallelBand } from '../core/parallelBrush.ts';
+import type { ParallelBand, ParallelBrushDrag } from '../core/parallelBrush.ts';
 import {
   PARALLEL_BRUSH_HALF_WIDTH,
   parallelBandOf,
+  parallelBrushTarget,
   parallelIsBand,
   parallelRangeOf,
 } from '../core/parallelBrush.ts';
+import type { ParallelPoint } from '../core/parallelHit.ts';
 import {
   parallelRangeList,
   parallelWriteRange,
@@ -121,7 +123,7 @@ export function parallelBandsOf(
 }
 
 /** What a released band does to the intervals its axis already kept. */
-export interface ParallelCommit {
+interface ParallelCommit {
   /** The intervals in force on that axis. */
   list: readonly ParallelRange[];
   /** Which of them the drag took hold of, or `-1` when it began a new one. */
@@ -156,4 +158,49 @@ export function parallelCommitOf(commit: ParallelCommit): ParallelRange[] {
   const range = parallelRangeOf(band, layout);
   if (!several && index === -1) return [range];
   return parallelWriteRange(list, index, range);
+}
+
+/**
+ * The drag a press on an axis starts: the edge or the band it took hold of,
+ * or a new band from where it landed.
+ * @param point - Where the press landed, relative to the drawing area.
+ * @param layout - The axis it landed on.
+ * @param ranges - The intervals every axis keeps.
+ * @returns The drag, as it begins.
+ */
+export function parallelPressDrag(
+  point: ParallelPoint,
+  layout: ParallelAxisLayout,
+  ranges: ParallelRanges,
+): ParallelBrushDrag {
+  const list = parallelRangeList(ranges[layout.id]);
+  const bands: ParallelBand[] = [];
+  for (const range of list) bands.push(parallelBandOf(range, layout));
+  const target = parallelBrushTarget(point.y, bands);
+  const held = target.index === -1 ? undefined : bands[target.index];
+  return {
+    axis: layout.id,
+    index: target.index,
+    grip: target.grip,
+    originY: point.y,
+    origin: held ?? { top: point.y, bottom: point.y },
+  };
+}
+
+/**
+ * Whether a press took hold of an interval and let it go where it found it,
+ * which is a click on that interval rather than a move of it.
+ * @param drag - The drag, as it began.
+ * @param band - The band as the pointer left it.
+ * @returns Whether nothing moved.
+ */
+export function parallelUnmoved(
+  drag: ParallelBrushDrag,
+  band: ParallelBand,
+): boolean {
+  return (
+    drag.index !== -1 &&
+    band.top === drag.origin.top &&
+    band.bottom === drag.origin.bottom
+  );
 }

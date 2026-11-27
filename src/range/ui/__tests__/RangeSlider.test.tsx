@@ -10,6 +10,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { typeInto as typeText } from '../../../__tests__/dom.ts';
 import type { RangeBounds, RangeDomain } from '../../core/rangeBounds.ts';
 import { OPEN_RANGE } from '../../core/rangeBounds.ts';
 import { RangeSlider } from '../RangeSlider.tsx';
@@ -97,13 +98,7 @@ function typeInto(name: string, text: string): HTMLInputElement {
   click(named(name));
   const input = document.activeElement;
   if (!(input instanceof HTMLInputElement)) throw new Error('no box opened');
-  act(() => {
-    Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value',
-    )?.set?.call(input, text);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  typeText(input, text);
   return input;
 }
 

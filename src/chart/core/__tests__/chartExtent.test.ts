@@ -5,7 +5,6 @@ import { expect, test } from 'vitest';
 import {
   EMPTY_EXTENT,
   chartColumnExtent,
-  chartMergeExtents,
   chartPadExtent,
   chartValuesExtent,
 } from '../chartExtent.ts';
@@ -91,20 +90,6 @@ test('one value on its own is opened by a twentieth of itself', () => {
     min: 0,
     max: 1,
   });
-});
-
-test('merged ranges cover every one they were given', () => {
-  expect(
-    chartMergeExtents([
-      { min: -1, max: 2 },
-      { min: 0, max: 5 },
-      { min: -4, max: -3 },
-    ]),
-  ).toStrictEqual({ min: -4, max: 5 });
-  expect(chartMergeExtents([])).toStrictEqual({ min: 0, max: 1 });
-  expect(
-    chartMergeExtents([{ min: Number.NaN, max: Number.NaN }]),
-  ).toStrictEqual({ min: 0, max: 1 });
 });
 
 test('a run of numbers is read in place, past nothing that is not a number', () => {

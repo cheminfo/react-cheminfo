@@ -6,31 +6,12 @@ import type { ParallelBand, ParallelBrushDrag } from '../parallelBrush.ts';
 import {
   parallelBandAt,
   parallelBandOf,
-  parallelBrushGrip,
   parallelIsBand,
   parallelRangeOf,
 } from '../parallelBrush.ts';
 
 const HEIGHT = 200;
 const BAND: ParallelBand = { top: 60, bottom: 120 };
-
-test('a press on a bare axis starts a new band', () => {
-  expect(parallelBrushGrip(40, null)).toBe('create');
-  expect(parallelBrushGrip(200, null)).toBe('create');
-});
-
-test('a press within a few pixels of an edge takes that edge', () => {
-  expect(parallelBrushGrip(60, BAND)).toBe('top');
-  expect(parallelBrushGrip(63, BAND)).toBe('top');
-  expect(parallelBrushGrip(118, BAND)).toBe('bottom');
-  expect(parallelBrushGrip(124, BAND)).toBe('bottom');
-});
-
-test('a press inside the band moves it, and one outside starts afresh', () => {
-  expect(parallelBrushGrip(90, BAND)).toBe('move');
-  expect(parallelBrushGrip(20, BAND)).toBe('create');
-  expect(parallelBrushGrip(180, BAND)).toBe('create');
-});
 
 test('a band being drawn orders its edges and stops at both ends', () => {
   const drag = dragging('create', 80, { top: 80, bottom: 80 });

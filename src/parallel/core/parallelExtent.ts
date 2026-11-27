@@ -8,11 +8,13 @@
  * otherwise draw no axis and place every row on one pixel.
  */
 
+import { chartValuesExtent } from '../../chart/core/chartExtent.ts';
+
 /** How far a column with no spread at all is opened, on each side. */
-export const PARALLEL_DEGENERATE_PADDING = 0.5;
+const PARALLEL_DEGENERATE_PADDING = 0.5;
 
 /** The two ends of an axis, low first. */
-export interface ParallelExtent {
+interface ParallelExtent {
   /** The value at the bottom of the axis. */
   min: number;
   /** The value at its top. */
@@ -31,15 +33,7 @@ export function parallelExtent(
   values: ArrayLike<number>,
   count: number,
 ): ParallelExtent {
-  const rows = Math.min(count, values.length);
-  let min = Number.POSITIVE_INFINITY;
-  let max = Number.NEGATIVE_INFINITY;
-  for (let row = 0; row < rows; row++) {
-    const value = values[row] as number;
-    if (!Number.isFinite(value)) continue;
-    if (value < min) min = value;
-    if (value > max) max = value;
-  }
+  const { min, max } = chartValuesExtent(values, { limit: count });
   if (min > max) {
     return {
       min: -PARALLEL_DEGENERATE_PADDING,

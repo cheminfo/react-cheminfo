@@ -146,9 +146,9 @@ function sortedByWavenumber(
   const byAbsorbance = xySortX({ x: wavenumbers, y: absorbances });
   const byTransmittance = xySortX({ x: wavenumbers, y: transmittances });
   return {
-    wavenumber: Float64Array.from(byAbsorbance.x),
-    absorbance: Float64Array.from(byAbsorbance.y),
-    transmittance: Float64Array.from(byTransmittance.y),
+    wavenumber: byAbsorbance.x,
+    absorbance: byAbsorbance.y,
+    transmittance: byTransmittance.y,
   };
 }
 

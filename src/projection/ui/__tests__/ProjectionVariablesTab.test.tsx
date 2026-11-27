@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { matchCount as count } from '../../../__tests__/markup.ts';
 import { rowMatrix } from '../../../chart/core/index.ts';
 import {
   IRIS_AXIS,
@@ -278,10 +279,6 @@ function render(
       testId="variables"
     />,
   );
-}
-
-function count(html: string, pattern: RegExp): number {
-  return html.match(pattern)?.length ?? 0;
 }
 
 function pathOf(html: string, id: string): string {

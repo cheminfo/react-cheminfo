@@ -16,7 +16,6 @@ export type {
 export {
   chartAxisScale,
   chartExponentSuffix,
-  chartNiceDomain,
   chartTickDecimals,
   chartTickLabel,
 } from './chartAxisScale.ts';
@@ -32,7 +31,6 @@ export type {
 export {
   EMPTY_EXTENT,
   chartColumnExtent,
-  chartMergeExtents,
   chartPadExtent,
   chartValuesExtent,
 } from './chartExtent.ts';
@@ -49,15 +47,8 @@ export {
 } from './chartScale.ts';
 export type { ChartViewport } from './chartViewport.ts';
 export {
-  CHART_SMALLEST_ZOOM,
-  CHART_WHEEL_LINE,
-  CHART_WHEEL_PAGE,
-  CHART_WHEEL_SPEED,
-  CHART_WHEEL_TRAVEL,
   chartClampViewport,
   chartWheelFactor,
-  chartWheelTravel,
-  chartZoomDomain,
   chartZoomViewport,
 } from './chartViewport.ts';
 export type { MatrixLike } from './matrix.ts';
@@ -65,12 +56,11 @@ export { mappedMatrix, rowMatrix, stackedMatrix } from './matrix.ts';
 
 export {
   SCIENTIFIC_ABOVE,
-  SCIENTIFIC_BELOW,
   axisLabeller,
   formatNumber,
   formatScientific,
 } from './axisLabels.ts';
-export { MAXIMUM_DRIFT_STEPS, layoutAnnotationBoxes } from './boxLayout.ts';
+export { layoutAnnotationBoxes } from './boxLayout.ts';
 export type {
   ChartDomain,
   DragMode,
@@ -84,12 +74,7 @@ export {
   DEFAULT_ZOOM_GESTURES,
   sameChartDomain,
 } from './chartDomain.ts';
-export type {
-  ChartLayer,
-  ChartMargin,
-  ChartSize,
-  PlotRect,
-} from './chartGeometry.ts';
+export type { ChartMargin, ChartSize, PlotRect } from './chartGeometry.ts';
 export {
   CHART_LAYERS,
   MARGIN,
@@ -116,11 +101,7 @@ export type {
 } from './legendBox.ts';
 export {
   CLOSE_COLUMN,
-  MAXIMUM_CHARACTERS,
   PADDING,
-  ROW_HEIGHT,
-  SWATCH,
-  hiddenLabel,
   legendBox,
   legendLabel,
   legendNames,
@@ -128,7 +109,6 @@ export {
 export type { SelectionRectangle } from './selectionGeometry.ts';
 export { selectionRectangle } from './selectionGeometry.ts';
 export {
-  ALL_SPECTRUM_COLORS,
   EXTRA_SPECTRUM_COLORS,
   SPECTRUM_COLORS,
   nextSpectrumColor,
@@ -137,7 +117,6 @@ export {
   FOOT_FURNITURE,
   FOOT_MINIMUM,
   STACKED_MINIMUM,
-  STACK_LIMIT,
   stackCapacity,
   stackShares,
 } from './stackCapacity.ts';
@@ -146,20 +125,11 @@ export { svgPointAt } from './svgPoint.ts';
 export type { AreaPathOptions } from './tracePath.ts';
 export { areaPath, profilePath, stickPath } from './tracePath.ts';
 export type { ReadoutPlacement } from './trackerReadout.ts';
-export {
-  READOUT_GAP,
-  READOUT_LINES,
-  READOUT_WIDTH,
-  readoutPlacement,
-} from './trackerReadout.ts';
+export { readoutPlacement } from './trackerReadout.ts';
 export type { ViewBox, ViewState, ZoomBounds } from './viewTransform.ts';
 export {
   INITIAL_VIEW,
-  MAXIMUM_CONTENT_SCALE,
-  MAXIMUM_ZOOM,
-  MINIMUM_ZOOM,
   baseViewBox,
-  clampZoom,
   magnificationOf,
   panBy,
   viewBoxAttribute,
@@ -169,10 +139,8 @@ export {
 } from './viewTransform.ts';
 export type { DragBox, ZoomSelection } from './zoomDomain.ts';
 export {
-  DUAL_ZOOM_TRAVEL,
   MINIMUM_DRAG,
   draggedBeyondLevel,
-  releasedBeyondBaseline,
   scaledYAxis,
   zoomSelection,
   zoomedDomain,

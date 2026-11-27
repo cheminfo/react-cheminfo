@@ -2,6 +2,7 @@ import { getClasses } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { matchCount as count } from '../../../__tests__/markup.ts';
 import { rowMatrix } from '../../../chart/core/index.ts';
 import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import type { ProjectionResult, ProjectionSamples } from '../../core/index.ts';
@@ -143,8 +144,4 @@ function render(over: Partial<typeof DEFAULT_PROJECTION_OPTIONS> = {}): string {
       testId="pairs"
     />,
   );
-}
-
-function count(html: string, pattern: RegExp): number {
-  return html.match(pattern)?.length ?? 0;
 }

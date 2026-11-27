@@ -86,7 +86,7 @@ export function useFigureMoves(src: string | undefined): boolean {
  * @param src - The figure, as a `data:` URL.
  * @returns The moving image, or `undefined` for a picture that never moves.
  */
-export function movingFigureSource(src: string): Promise<string | undefined> {
+function movingFigureSource(src: string): Promise<string | undefined> {
   const known = made.get(src);
   if (known) return known.promise;
   const entry: Made = { promise: makeMoving(src) };

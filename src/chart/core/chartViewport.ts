@@ -22,16 +22,16 @@ export interface ChartViewport {
  * how far in the reader can go. Five hundred times is past the point where the
  * dots left on screen still stand for anything.
  */
-export const CHART_SMALLEST_ZOOM = 0.002;
+const CHART_SMALLEST_ZOOM = 0.002;
 
 /** How much one pixel of wheel travel zooms by, as a share. */
 export const CHART_WHEEL_SPEED = 0.0015;
 
 /** Pixels a wheel notch is worth where the browser reports lines. */
-export const CHART_WHEEL_LINE = 16;
+const CHART_WHEEL_LINE = 16;
 
 /** Pixels it is worth where the browser reports pages. */
-export const CHART_WHEEL_PAGE = 400;
+const CHART_WHEEL_PAGE = 400;
 
 /**
  * The most travel one wheel event is read as, in pixels.
@@ -175,7 +175,7 @@ export function chartWheelFactor(
  * @param mode - Its `deltaMode`: 0 pixels, 1 lines, 2 pages. Defaults to `0`.
  * @returns The travel, `0` for an event that says nothing.
  */
-export function chartWheelTravel(delta: number, mode = 0): number {
+function chartWheelTravel(delta: number, mode = 0): number {
   if (!Number.isFinite(delta) || delta === 0) return 0;
   const pixels = delta * wheelPixels(mode);
   return Math.min(CHART_WHEEL_TRAVEL, Math.max(-CHART_WHEEL_TRAVEL, pixels));

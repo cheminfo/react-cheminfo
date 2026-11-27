@@ -19,11 +19,7 @@ export type {
   Molecule3DFullscreen,
   Molecule3DToolbarProps,
 } from './Molecule3DToolbar.tsx';
-export type {
-  MoleculeImageRequest,
-  SceneCapture,
-} from './exportMoleculeImage.ts';
-export { exportMoleculeImage } from './exportMoleculeImage.ts';
+export type { SceneCapture } from './exportMoleculeImage.ts';
 export type { ImageExport } from './useImageExport.ts';
 export { usePolarSurfaceArea } from './usePolarSurfaceArea.ts';
 export { useImageExport } from './useImageExport.ts';

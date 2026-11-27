@@ -7,6 +7,7 @@
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
+import { isEditingField } from '../../panel/core/isEditingField.ts';
 import type { Measurement } from '../core/measurement.ts';
 import { removeMeasurement } from '../core/measurement.ts';
 
@@ -105,15 +106,5 @@ function isRemovalKey(event: KeyboardEvent): boolean {
   if (event.key !== 'Backspace' && event.key !== 'Delete') return false;
   if (event.defaultPrevented) return false;
   if (event.altKey || event.ctrlKey || event.metaKey) return false;
-  return !isEditable(event.target);
-}
-
-function isEditable(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  return (
-    target.isContentEditable ||
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
-  );
+  return !isEditingField(event.target);
 }

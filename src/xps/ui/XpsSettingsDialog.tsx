@@ -18,7 +18,7 @@ import {
 import { InstrumentEditor } from './InstrumentEditor.tsx';
 import { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
 
-export interface XpsSettingsDialogProps {
+interface XpsSettingsDialogProps {
   /** Whether the dialog is open. */
   isOpen: boolean;
   /** Called once it closes. */

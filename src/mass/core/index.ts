@@ -62,7 +62,6 @@ export {
   MZ_FRAME_HALF_WIDTH,
   X_DOMAIN_PADDING,
   Y_DOMAIN_HEADROOM,
-  basePeakOf,
   fittedTo,
   fullDomain,
   mzFrame,
@@ -129,7 +128,6 @@ export {
   DEFAULT_SIDE_PANELS,
   MAXIMUM_LABEL_LIMIT,
   createMassState,
-  isMassWindow,
   mergeMassSettings,
 } from './massState.ts';
 export type { SpectrumSubtitleOptions } from './massSummary.ts';

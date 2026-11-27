@@ -1,18 +1,10 @@
 import { expect, test } from 'vitest';
 
 import { dashCap, dashPattern, strokeDash, withDash } from '../dashes.ts';
+import { primitiveMarkup } from '../primitiveMarkup.ts';
 import type { PathPrimitive } from '../primitives.ts';
-import type { DrawingStyle } from '../style.ts';
-import { primitiveMarkup } from '../svg.ts';
 
-const STYLE: DrawingStyle = {
-  bondLength: 14.4,
-  lineWidth: 0.6,
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  captionSize: 10,
-  captionFamily: 'Arial, Helvetica, sans-serif',
-  color: '#000000',
-};
+import { STYLE } from './drawingStyle.ts';
 
 function line(): PathPrimitive {
   return { kind: 'path', d: 'M0 0L40 0', width: 2, extent: [] };

@@ -21,7 +21,7 @@ export const SHELL_FILL_OPACITY = 0.1;
 const RIM_WALLS = 6;
 
 /** One stop of the glass gradient. */
-export interface ShellGlassStop {
+interface ShellGlassStop {
   /** How far out it sits, from `0` at the middle to `1` at the rim. */
   offset: number;
   /** How solid the glass is there. */

@@ -17,7 +17,7 @@
 import type { XpsPeak } from './xpsSpectrum.ts';
 
 /** The window the labels are chosen for, and how many there is room for. */
-export interface LabelledPeaksOptions {
+interface LabelledPeaksOptions {
   /**
    * The lower end of the window in eV of binding energy.
    * @default Number.NEGATIVE_INFINITY

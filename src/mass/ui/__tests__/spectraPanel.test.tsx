@@ -12,12 +12,15 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { typeInto } from '../../../__tests__/dom.ts';
+import {
+  iconsLoaded,
+  stubViewerLayout,
+} from '../../../chart/ui/__tests__/viewerLayout.ts';
 import { massFixture } from '../../core/__tests__/massFixtures.ts';
 import type { MassEditorHandle } from '../../core/massEditorApi.ts';
 import type { MassSpectrum } from '../../core/massSpectrum.ts';
 import { MassEditor } from '../MassEditor.tsx';
-
-import { iconsLoaded, stubViewerLayout } from './massViewerStubs.ts';
 
 const TAXINE = 'Taxine B HCD53';
 const AFLATOXIN = 'Aflatoxin  (macfile.jdx)';
@@ -104,13 +107,7 @@ function renameTo(name: string, text: string, ending: string): void {
     `input[aria-label="Name of ${CSS.escape(name)}"]`,
   );
   if (box === null) throw new Error(`no box to rename ${name}`);
-  act(() => {
-    Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value',
-    )?.set?.call(box, text);
-    box.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  typeInto(box, text);
   act(() => {
     box.dispatchEvent(
       ending === 'blur'

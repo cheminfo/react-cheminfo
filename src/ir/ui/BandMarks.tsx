@@ -14,6 +14,7 @@ import type { IrBand } from '../core/irBand.ts';
 import { sameIrBand } from '../core/irBand.ts';
 import { bandsPointDown } from '../core/irMode.ts';
 import type { IrMode } from '../core/irSpectrum.ts';
+import { DEFAULT_LABEL_LIMIT } from '../core/irState.ts';
 
 export interface BandMarksProps {
   /** The bands to mark, with whatever the table said about them. */
@@ -33,7 +34,7 @@ export interface BandMarksProps {
   showAssignments?: boolean;
   /**
    * At most how many bands are named. Marks are drawn on all of them.
-   * @default 12
+   * @default DEFAULT_LABEL_LIMIT
    */
   limit?: number;
   /**
@@ -68,7 +69,7 @@ export function BandMarks(props: BandMarksProps): ReactElement {
     yScale,
     mode,
     showAssignments = false,
-    limit = 12,
+    limit = DEFAULT_LABEL_LIMIT,
     highlight = null,
   } = props;
 

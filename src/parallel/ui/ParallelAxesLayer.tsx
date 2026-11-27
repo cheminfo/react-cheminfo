@@ -15,7 +15,7 @@ import {
 } from './parallelStyles.ts';
 
 /** What {@link ParallelAxesLayer} draws. */
-export interface ParallelAxesLayerProps {
+interface ParallelAxesLayerProps {
   /** The axes, from left to right, already placed and graduated. */
   layouts: readonly ParallelAxisLayout[];
   /** Height of the drawing area, in pixels. */

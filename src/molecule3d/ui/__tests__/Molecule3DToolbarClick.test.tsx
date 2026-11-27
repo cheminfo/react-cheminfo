@@ -10,6 +10,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { NoResizeObserver } from '../../../__tests__/dom.ts';
 import type { MeasurementKind } from '../../core/measurement.ts';
 import { Molecule3DToolbar } from '../Molecule3DToolbar.tsx';
 
@@ -20,7 +21,7 @@ let asked: string[];
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   // The toolbar measures itself to wrap; the test's DOM has no layout to watch.
-  vi.stubGlobal('ResizeObserver', StillObserver);
+  vi.stubGlobal('ResizeObserver', NoResizeObserver);
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);
@@ -63,20 +64,6 @@ test('the measurements are cleared once there are some', () => {
 
   expect(asked).toStrictEqual(['clear measurements']);
 });
-
-class StillObserver {
-  observe(): void {
-    // Nothing is ever laid out, so nothing changes size.
-  }
-
-  unobserve(): void {
-    // Nothing was observed.
-  }
-
-  disconnect(): void {
-    // Nothing was observed.
-  }
-}
 
 interface ToolbarState {
   spinning?: boolean;

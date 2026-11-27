@@ -23,7 +23,7 @@ export interface CloudShell {
 }
 
 /** What {@link CloudShellLayer} draws. */
-export interface CloudShellLayerProps {
+interface CloudShellLayerProps {
   /** The shells, one per group that has one. */
   shells: readonly CloudShell[];
   /** Where the reader is standing. */

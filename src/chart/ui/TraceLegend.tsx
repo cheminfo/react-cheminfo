@@ -91,7 +91,7 @@ export interface TraceLegendProps {
  * What each curve on a chart is, written in the top right of the plot.
  *
  * Drawn **inside the SVG** and never as HTML beside it, which is not a style
- * choice: `stackDrawings` exports a picture by cloning the chart's own
+ * choice: a picture of the chart is exported by cloning its own
  * `SVGSVGElement`, so a legend living in a `<div>` would be missing from every
  * exported figure while looking perfectly correct on screen — a picture that is
  * wrong only once it leaves the application is the worst kind to ship.

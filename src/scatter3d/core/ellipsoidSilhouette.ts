@@ -14,7 +14,7 @@ import type { OrbitCamera } from './orbitCamera.ts';
 import { rotatePoint } from './orbitCamera.ts';
 
 /** Where a shell's outline sits, in cube units, for one camera. */
-export interface EllipsoidSilhouette {
+interface EllipsoidSilhouette {
   /** Half the outline's longest width, along the angle below. */
   rx: number;
   /** Half its width across that, never longer than `rx`. */

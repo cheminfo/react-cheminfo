@@ -37,7 +37,7 @@ export interface ScatterPixelLabel {
 }
 
 /** Which ink a label takes, worked out the way a dot's is. */
-export interface ScatterLabelInk {
+interface ScatterLabelInk {
   /**
    * Which group each point belongs to, as an index into `colors`. An entry of
    * `-1`, or one outside the range, is a point in no group.

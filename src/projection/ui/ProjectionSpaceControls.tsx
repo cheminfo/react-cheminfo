@@ -3,8 +3,6 @@ import type { ReactElement } from 'react';
 import type { OverlayTier } from '../../overlay/core/overlayTiers.ts';
 import { OverlayChip } from '../../overlay/ui/OverlayChip.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
-import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
-import { OverlayToggle } from '../../overlay/ui/OverlayToggle.tsx';
 import { OverlayValueMenu } from '../../overlay/ui/OverlayValueMenu.tsx';
 import type { CloudGesture } from '../../scatter3d/core/cloudGesture.ts';
 import type { ProjectionCopy } from '../core/projectionCopy.ts';
@@ -12,6 +10,10 @@ import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import { NO_GROUPING } from '../core/projectionOptions.ts';
 import type { ProjectionGrouping } from '../core/projectionSamples.ts';
 
+import {
+  ProjectionNameSwitches,
+  ProjectionOutlineSelect,
+} from './ProjectionFigureFields.tsx';
 import { ProjectionColourPicker } from './ProjectionGroupingPickers.tsx';
 import type { ProjectionReading } from './projectionBarReadings.ts';
 import { projectionChipSettings } from './projectionBarReadings.ts';
@@ -74,25 +76,12 @@ export function ProjectionSpaceControls(
   const hasGroups = groupings.length > 0;
   const uncoloured = !hasGroups || options.colorBy === NO_GROUPING;
   const names = (
-    <>
-      <OverlayToggle
-        label={bar.switches.showGroupLabels}
-        help={help.showGroupLabels}
-        icon={GROUP_LABELS_GLYPH}
-        hideLabel
-        checked={options.showGroupLabels}
-        disabled={uncoloured}
-        onChange={(showGroupLabels) => onChange({ showGroupLabels })}
-      />
-      <OverlayToggle
-        label={bar.switches.showIds}
-        help={help.showIds}
-        icon={IDS_GLYPH}
-        hideLabel
-        checked={options.showIds}
-        onChange={(showIds) => onChange({ showIds })}
-      />
-    </>
+    <ProjectionNameSwitches
+      options={options}
+      onChange={onChange}
+      copy={copy}
+      uncoloured={uncoloured}
+    />
   );
 
   if (tier === 'chip' || tier === 'tiny') {
@@ -158,7 +147,7 @@ interface SpaceSettingsProps {
  */
 function SpaceSettings(props: SpaceSettingsProps): ReactElement {
   const { options, onChange, copy, groupings } = props;
-  const { help, outline } = copy;
+  const { help } = copy;
 
   return (
     <>
@@ -176,21 +165,16 @@ function SpaceSettings(props: SpaceSettingsProps): ReactElement {
         copy={copy}
         groupings={groupings}
       />
-      <OverlaySelect
-        label={help.ellipse.title}
-        help={help.ellipse}
-        value={ellipseKey(options.ellipse)}
-        disabled={groupings.length === 0 || options.colorBy === NO_GROUPING}
-        options={ellipseChoices(options.ellipse, outline, 'space')}
-        onChange={(value) => onChange({ ellipse: ellipseSize(value) })}
+      <ProjectionOutlineSelect
+        options={options}
+        onChange={onChange}
+        copy={copy}
+        groupings={groupings}
+        figure="space"
       />
     </>
   );
 }
-
-/** The two glyphs the name switches ride as, the same pair the map uses. */
-const GROUP_LABELS_GLYPH = 'tag';
-const IDS_GLYPH = 'id-number';
 
 /** No readings at all, which is what the panel behind the cog is handed. */
 const NO_READINGS: readonly ProjectionReading[] = [];

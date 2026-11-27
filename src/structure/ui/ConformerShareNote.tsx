@@ -18,7 +18,7 @@ import {
   MMFF94_ENERGY_ERROR,
   shareFactor,
 } from '../core/conformerEnergyError.ts';
-import type { ConformerRanking } from '../core/conformers.ts';
+import type { ConformerRanking } from '../core/conformerTypes.ts';
 
 /** Props of {@link ConformerShareNote}. */
 export interface ConformerShareNoteProps {

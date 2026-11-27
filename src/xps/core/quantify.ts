@@ -59,7 +59,7 @@ export interface QuantifyComponentsOptions {
  * table — leaving it out would quietly rescale every other fraction upwards,
  * which is a worse answer than an honest one flagged as assumed.
  */
-export const ASSUMED_SENSITIVITY_FACTOR = 1;
+const ASSUMED_SENSITIVITY_FACTOR = 1;
 
 /**
  * The composition of everything the given spectra were fitted with.

@@ -9,6 +9,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { NoResizeObserver } from '../../../__tests__/dom.ts';
 import { plotRect } from '../../../chart/core/chartGeometry.ts';
 import {
   chartPixel,
@@ -111,18 +112,3 @@ const scaled: MassSpectrum = {
   },
   verticalScale: 0.5,
 };
-
-/** jsdom lays nothing out, so nothing is ever resized. */
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing was observed.
-  }
-}

@@ -22,11 +22,7 @@ import { useCapturedPointer } from '../../scatter/ui/useCapturedPointer.ts';
 import type { ParallelAxisLayout } from '../core/parallelAxes.ts';
 import { PARALLEL_MARGIN } from '../core/parallelAxes.ts';
 import type { ParallelBand, ParallelBrushDrag } from '../core/parallelBrush.ts';
-import {
-  parallelBandAt,
-  parallelBandOf,
-  parallelBrushTarget,
-} from '../core/parallelBrush.ts';
+import { parallelBandAt } from '../core/parallelBrush.ts';
 import { parallelNearestRow } from '../core/parallelHit.ts';
 import { parallelRangeList } from '../core/parallelSelection.ts';
 import type { ParallelRange, ParallelRanges } from '../core/parallelTypes.ts';
@@ -38,6 +34,8 @@ import {
   parallelBandsOf,
   parallelCommitOf,
   parallelPointOf,
+  parallelPressDrag,
+  parallelUnmoved,
 } from './parallelGestureModel.ts';
 
 /** What {@link useParallelGesture} needs. */
@@ -121,7 +119,7 @@ export function useParallelGesture(
       index: drag.index,
       band,
       layout,
-      still: unmoved(drag, band),
+      still: parallelUnmoved(drag, band),
       several,
     });
   }
@@ -151,24 +149,13 @@ export function useParallelGesture(
       claimedRef.current = false;
       return false;
     }
-    const list = parallelRangeList(ranges[layout.id]);
-    const bands: ParallelBand[] = [];
-    for (const range of list) bands.push(parallelBandOf(range, layout));
-    const target = parallelBrushTarget(point.y, bands);
-    const held = target.index === -1 ? undefined : bands[target.index];
-    const drag: ParallelBrushDrag = {
-      axis: layout.id,
-      index: target.index,
-      grip: target.grip,
-      originY: point.y,
-      origin: held ?? { top: point.y, bottom: point.y },
-    };
+    const drag = parallelPressDrag(point, layout, ranges);
     dragRef.current = drag;
     pointRef.current = point;
     claimedRef.current = true;
     setDraft({
       axis: layout.id,
-      index: target.index,
+      index: drag.index,
       band: parallelBandAt(drag, point.y, innerHeight),
     });
     return true;
@@ -242,19 +229,4 @@ export function useParallelGesture(
     pointer,
     brushing: draft !== null,
   };
-}
-
-/**
- * Whether a press took hold of an interval and let it go where it found it,
- * which is a click on that interval rather than a move of it.
- * @param drag - The drag, as it began.
- * @param band - The band as the pointer left it.
- * @returns Whether nothing moved.
- */
-function unmoved(drag: ParallelBrushDrag, band: ParallelBand): boolean {
-  return (
-    drag.index !== -1 &&
-    band.top === drag.origin.top &&
-    band.bottom === drag.origin.bottom
-  );
 }

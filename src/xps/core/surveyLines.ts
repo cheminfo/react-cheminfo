@@ -40,10 +40,10 @@ export interface XpsSurveyLine {
 }
 
 /** How far under the published level a window starts, in eV. */
-export const SURVEY_WINDOW_BELOW = 8;
+const SURVEY_WINDOW_BELOW = 8;
 
 /** How far over the published level a window ends, in eV. */
-export const SURVEY_WINDOW_ABOVE = 10;
+const SURVEY_WINDOW_ABOVE = 10;
 
 /**
  * The binding energy under which a level is valence rather than core, in eV.
@@ -52,7 +52,7 @@ export const SURVEY_WINDOW_ABOVE = 10;
  * lanthanides, the 2p of oxygen and the 3d of iron all sit under ten, inside
  * the valence band every element contributes to.
  */
-export const VALENCE_LIMIT = 10;
+const VALENCE_LIMIT = 10;
 
 /**
  * Where a level is published, in eV of binding energy.

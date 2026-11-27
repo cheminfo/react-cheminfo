@@ -1,7 +1,11 @@
 import type { ReactElement } from 'react';
+import { useMemo } from 'react';
 
 import type { PlotRect } from '../../chart/core/chartGeometry.ts';
 import type { ChartScale } from '../../chart/core/chartScale.ts';
+import { chartValue } from '../../chart/core/chartScale.ts';
+import { axisTrace } from '../core/energyAxis.ts';
+import { normalisationFactor, normalisedScale } from '../core/normalise.ts';
 import { TRACE_WIDTH } from '../core/xpsChartTheme.ts';
 import type { XpsHighlight } from '../core/xpsHighlight.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
@@ -54,6 +58,10 @@ export interface ChartDataProps {
  * disagree is the only thing a reader of a fit is looking for, and a translucent
  * fill painted over the measurement would hide exactly the discrepancy.
  *
+ * With `normalise` on, each spectrum is drawn against its own maximum in the
+ * window, read off the trace of the axis on screen; the trace, its fit and its
+ * labels are all handed that one scale, so they stay on the same counts.
+ *
  * The selected spectrum and the highlighted one are drawn thicker rather than
  * recoloured. A colour is a spectrum's identity here — the list, the legend and
  * the tables all read it — so changing it to say "this one" would say "a
@@ -75,10 +83,18 @@ export function ChartData(props: ChartDataProps): ReactElement {
     windows,
   } = props;
 
-  const drawn: XpsSpectrum[] = [];
-  for (const spectrum of spectra) {
-    if (spectrum.visible) drawn.push(spectrum);
-  }
+  const drawn = useMemo(() => visibleSpectra(spectra), [spectra]);
+  const from = chartValue(xScale, plot.left);
+  const to = chartValue(xScale, plot.right);
+  const low = Math.min(from, to);
+  const high = Math.max(from, to);
+  const scales = useMemo(
+    () =>
+      settings.normalise
+        ? normalisedScales(drawn, axis, low, high, yScale)
+        : null,
+    [settings.normalise, drawn, axis, low, high, yScale],
+  );
 
   return (
     <>
@@ -111,8 +127,7 @@ export function ChartData(props: ChartDataProps): ReactElement {
               axis={axis}
               plot={plot}
               xScale={xScale}
-              yScale={yScale}
-              normalise={settings.normalise}
+              yScale={scales?.get(spectrum.id) ?? yScale}
               highlight={highlight}
             />
           ))
@@ -122,10 +137,8 @@ export function ChartData(props: ChartDataProps): ReactElement {
           key={spectrum.id}
           spectrum={spectrum}
           axis={axis}
-          plot={plot}
           xScale={xScale}
-          yScale={yScale}
-          normalise={settings.normalise}
+          yScale={scales?.get(spectrum.id) ?? yScale}
           strokeWidth={traceWidth(spectrum.id, selectedId, highlight)}
           onSelect={onSelectSpectrum}
         />
@@ -138,15 +151,50 @@ export function ChartData(props: ChartDataProps): ReactElement {
               axis={axis}
               plot={plot}
               xScale={xScale}
-              yScale={yScale}
+              yScale={scales?.get(spectrum.id) ?? yScale}
               limit={settings.labelLimit}
-              normalise={settings.normalise}
               color={spectrum.color}
             />
           ))
         : null}
     </>
   );
+}
+
+function visibleSpectra(spectra: readonly XpsSpectrum[]): XpsSpectrum[] {
+  const drawn: XpsSpectrum[] = [];
+  for (const spectrum of spectra) {
+    if (spectrum.visible) drawn.push(spectrum);
+  }
+  return drawn;
+}
+
+/**
+ * The counts axis each spectrum is drawn against when every one is normalised
+ * to its own maximum in the window.
+ * @param spectra - The spectra drawn.
+ * @param axis - The axis the chart is drawn against, whose trace is measured.
+ * @param low - The lower end of the window, in the units of that axis.
+ * @param high - The upper end.
+ * @param yScale - The counts axis as it is currently zoomed.
+ * @returns Each spectrum's scale, by identity.
+ */
+function normalisedScales(
+  spectra: readonly XpsSpectrum[],
+  axis: EnergyAxis,
+  low: number,
+  high: number,
+  yScale: ChartScale,
+): Map<string, ChartScale> {
+  const scales = new Map<string, ChartScale>();
+  for (const spectrum of spectra) {
+    const trace = axisTrace(spectrum, axis);
+    scales.set(
+      spectrum.id,
+      normalisedScale(yScale, normalisationFactor(trace.x, trace.y, low, high)),
+    );
+  }
+  return scales;
 }
 
 /**

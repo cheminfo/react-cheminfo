@@ -51,7 +51,7 @@ export interface ScatterMatrixGrid {
 }
 
 /** What one diagonal cell of a `ScatterMatrix` draws. */
-export interface ScatterMatrixDiagonalProps {
+interface ScatterMatrixDiagonalProps {
   /** Everything the grid worked out once, including the counted spread. */
   grid: ScatterMatrixGrid;
   /** Which axis the cell stands on, both across and up. */

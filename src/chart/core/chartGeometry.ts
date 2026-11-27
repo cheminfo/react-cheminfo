@@ -119,9 +119,6 @@ export const CHART_LAYERS = [
   'tracker',
 ] as const;
 
-/** One band of the chart. */
-export type ChartLayer = (typeof CHART_LAYERS)[number];
-
 /**
  * Work out the plotting area for a chart of a given size.
  * @param size - The box the chart was given.

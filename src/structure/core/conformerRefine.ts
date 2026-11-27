@@ -10,7 +10,7 @@ import {
   rankByRefinedEnergy,
 } from './conformerRefineRank.ts';
 import { conformerShape } from './conformerShape.ts';
-import type { Conformer, ConformerSet } from './conformers.ts';
+import type { Conformer, ConformerSet } from './conformerTypes.ts';
 import type {
   GeometryRelaxer,
   RelaxableGeometry,
@@ -104,9 +104,6 @@ export interface RefineConformersOptions extends Omit<
  */
 export const REFINED_SAME_ENERGY_TOLERANCE = 1e-4;
 
-/** What is shown when a conformer set is ranked by the refined energies. */
-export const REFINED_RANKING = 'refined';
-
 /**
  * Relax every conformer of a set with a better method and rank the set by what
  * that method says.
@@ -142,7 +139,7 @@ export async function refineConformers(
   if (set.conformers.length === 0) {
     return {
       ...set,
-      rankedBy: REFINED_RANKING,
+      rankedBy: 'refined',
       refinement: { method, elapsedMilliseconds: 0, merged: 0, reordered: 0 },
     };
   }
@@ -239,7 +236,7 @@ export async function refineConformers(
       ...relaxerLogLines(relaxerLog.getLogs(), sources),
       ...own,
     ],
-    rankedBy: REFINED_RANKING,
+    rankedBy: 'refined',
     refinement: {
       method,
       elapsedMilliseconds: performance.now() - startedAt,

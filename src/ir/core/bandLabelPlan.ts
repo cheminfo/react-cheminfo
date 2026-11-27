@@ -22,6 +22,7 @@ import { bandHeight, bandValue } from './irBand.ts';
 import { formatWavenumber } from './irFormat.ts';
 import { bandsPointDown } from './irMode.ts';
 import type { IrMode } from './irSpectrum.ts';
+import { DEFAULT_LABEL_LIMIT } from './irState.ts';
 
 /** One band, and where everything about it is drawn. */
 export interface BandLabelPlan {
@@ -68,7 +69,7 @@ export interface BandLabelPlanOptions {
    *
    * Marks are drawn on every band regardless; this only bounds the labels, since
    * a mark costs three pixels and a two-line label costs sixty.
-   * @default 12
+   * @default DEFAULT_LABEL_LIMIT
    */
   limit?: number;
 }
@@ -97,7 +98,7 @@ export function planBandLabels(options: BandLabelPlanOptions): BandLabelPlan[] {
     yScale,
     mode,
     showAssignments = false,
-    limit = 12,
+    limit = DEFAULT_LABEL_LIMIT,
   } = options;
 
   const inside: NamedBand[] = [];

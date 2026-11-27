@@ -49,7 +49,7 @@ export interface EditorGuideLink {
 }
 
 /** The sections, in the order the guide lists them. */
-export const STRUCTURE_EDITOR_GUIDE: readonly EditorGuideSection[] = [
+const STRUCTURE_EDITOR_GUIDE: readonly EditorGuideSection[] = [
   {
     id: 'atom',
     title: 'Pointer on an atom',

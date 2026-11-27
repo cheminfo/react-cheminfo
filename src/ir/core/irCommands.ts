@@ -156,15 +156,6 @@ export type IrCommandHandlers = Partial<
 export type RunIrCommand = (id: IrCommandId) => void;
 
 /**
- * What a command is called, with its key, for a label and an `aria-label`.
- * @param id - Which command.
- * @returns The title, and the key in parentheses when it has one.
- */
-export function irCommandLabel(id: IrCommandId): string {
-  return irCommandEntryLabel(irCommands[id]);
-}
-
-/**
  * A command's title, with its key in parentheses when it has one.
  * @param entry - The command, as a table words it.
  * @returns The label.

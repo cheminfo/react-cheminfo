@@ -6,6 +6,7 @@ import type {
   ColorScale,
   ColorStop,
 } from './interpolate.ts';
+import { COLOR_INTERPOLATIONS } from './interpolate.ts';
 import type { NamedColorScale } from './scales.ts';
 import {
   COLOR_SCALES,
@@ -18,11 +19,6 @@ export const MAXIMUM_CUSTOM_STOPS = 12;
 
 const HEX_DIGITS = /^(?:[\da-f]{3}|[\da-f]{6})$/;
 const POSITION_DECIMALS = 3;
-const INTERPOLATIONS: readonly ColorInterpolation[] = [
-  'rgb',
-  'hsv',
-  'hsv-long',
-];
 
 /** The scale a piece of text names, whether it named one of ours or spelled out its own. */
 export interface ResolvedColorScale {
@@ -124,7 +120,7 @@ function parseStop(piece: string): ColorStop | null {
 }
 
 function isInterpolation(value: string): value is ColorInterpolation {
-  for (const interpolation of INTERPOLATIONS) {
+  for (const interpolation of COLOR_INTERPOLATIONS) {
     if (interpolation === value) return true;
   }
   return false;

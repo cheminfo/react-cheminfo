@@ -22,7 +22,7 @@ import {
 import type { Vector3 } from './orbitCamera.ts';
 
 /** How {@link cubePoints} stretches the runs it is given. */
-export interface CubePointsOptions {
+interface CubePointsOptions {
   /**
    * Share of each axis' span left empty at both ends, so the cloud does not
    * touch the frame.

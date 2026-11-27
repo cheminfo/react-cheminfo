@@ -30,39 +30,6 @@ interface ActiveRange {
 }
 
 /**
- * Whether one value falls inside an interval.
- * @param range - The interval, low value first.
- * @param value - The value to test.
- * @returns Whether it is kept. Both ends are inclusive, and a value that is
- * not a number is kept by no interval at all — a row whose property has not
- * been worked out yet cannot be said to be in range.
- */
-export function parallelRangeKeeps(
-  range: ParallelRange,
-  value: number,
-): boolean {
-  return value >= range[0] && value <= range[1];
-}
-
-/**
- * Whether one value falls inside any of an axis's intervals.
- * @param ranges - The intervals that axis keeps.
- * @param value - The value to test.
- * @returns Whether any of them keeps it. An axis keeping nothing keeps every
- * value, which is what an unbrushed axis means.
- */
-export function parallelSelectionKeeps(
-  ranges: readonly ParallelRange[],
-  value: number,
-): boolean {
-  if (ranges.length === 0) return true;
-  for (const range of ranges) {
-    if (value >= range[0] && value <= range[1]) return true;
-  }
-  return false;
-}
-
-/**
  * Which rows every brush keeps at once.
  * @param axes - The axes, whose ids the intervals are keyed by.
  * @param ranges - What each axis keeps: one interval, several, or none.
@@ -124,8 +91,8 @@ export function parallelIncludedMask(
  */
 export function parallelKeptCount(included: Uint8Array): number {
   let kept = 0;
-  for (const row of included) {
-    if (row !== 0) kept++;
+  for (let row = 0; row < included.length; row++) {
+    if (included[row] !== 0) kept++;
   }
   return kept;
 }

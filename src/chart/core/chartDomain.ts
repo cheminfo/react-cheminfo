@@ -209,3 +209,24 @@ export function sameChartDomain(
     current.y[1] === next.y[1]
   );
 }
+
+/**
+ * Whether a window is one a chart can be built on: both axes run from a finite
+ * lower bound to a higher one.
+ *
+ * A window failing either makes every scale built from it infinite, which the
+ * DOM refuses outright, and a window running backwards — or carrying the `NaN`
+ * an empty spectrum's extent computes to — draws an empty chart rather than
+ * raising anything. So a handle told to frame a band it worked out wrongly
+ * leaves the chart alone instead of blanking it.
+ * @param domain - The window to check.
+ * @returns Whether it can be shown.
+ */
+export function isChartWindow(domain: ChartDomain): boolean {
+  return isAxisWindow(domain.x) && isAxisWindow(domain.y);
+}
+
+function isAxisWindow(bounds: readonly [number, number]): boolean {
+  const [from, to] = bounds;
+  return Number.isFinite(from) && Number.isFinite(to) && from < to;
+}

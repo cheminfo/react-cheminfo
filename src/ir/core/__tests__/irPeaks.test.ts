@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { expect, test } from 'vitest';
 
 import {
@@ -10,22 +7,9 @@ import {
   ramanPeaksFromBands,
 } from '../irPeaks.ts';
 import type { IrSpectrum } from '../irSpectrum.ts';
-import { loadIrSpectra } from '../loadIrSpectra.ts';
 import { toIrSpectrum } from '../toIrSpectrum.ts';
 
-/**
- * The five-band film, read through the real reader, under a known id.
- * @returns The spectrum.
- */
-async function film(): Promise<IrSpectrum> {
-  const { spectra } = await loadIrSpectra(
-    readFileSync(join(import.meta.dirname, 'data/five-bands.jdx')),
-    { fileName: 'five-bands.jdx' },
-  );
-  const [loaded] = spectra;
-  if (loaded === undefined) throw new Error('The fixture holds no spectrum');
-  return toIrSpectrum(loaded, { id: 'film' });
-}
+import { filmSpectrum } from './irFixtures.ts';
 
 /**
  * A Raman spectrum of two bands over a baseline of 10 counts, one sample per
@@ -55,7 +39,7 @@ function silicon(): IrSpectrum {
 }
 
 test("a host's infrared bands stay where it put them, its fraction read as a percentage", async () => {
-  const spectrum = await film();
+  const spectrum = await filmSpectrum();
 
   const bands = bandsFromIrPeaks(spectrum, [
     {

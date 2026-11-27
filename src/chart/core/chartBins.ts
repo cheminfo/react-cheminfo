@@ -53,6 +53,7 @@ export function chartBinCounts(
   edges[binCount] = max;
 
   const counts = new Uint32Array(seriesCount * binCount);
+  let peak = 0;
   for (let row = 0; row < matrix.rows; row++) {
     const value = matrix.get(row, column);
     if (!Number.isFinite(value) || value < min || value > max) continue;
@@ -67,12 +68,9 @@ export function chartBinCounts(
       Math.floor(((value - min) / span) * binCount),
     );
     const slot = group * binCount + bin;
-    counts[slot] = (counts[slot] ?? 0) + 1;
-  }
-
-  let peak = 0;
-  for (const count of counts) {
-    if (count > peak) peak = count;
+    const next = (counts[slot] ?? 0) + 1;
+    counts[slot] = next;
+    if (next > peak) peak = next;
   }
 
   return { edges, counts, series: seriesCount, bins: binCount, peak };

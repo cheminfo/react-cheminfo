@@ -4,9 +4,11 @@ import { useId } from 'react';
 import { OverlayLayer } from '../../overlay/ui/OverlayLayer.tsx';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { ChartAxisScale } from '../core/chartAxisScale.ts';
+import type { ChartMargin, PlotRect } from '../core/chartGeometry.ts';
 import type { ChartScale } from '../core/chartScale.ts';
 
 import { ChartAxis } from './ChartAxis.tsx';
+import { PlotClip } from './PlotClip.tsx';
 import { chartFrameGeometry } from './chartFrameGeometry.ts';
 import { CHART_SVG_STYLE, chartFrameStyle } from './chartStyles.ts';
 
@@ -45,32 +47,10 @@ export interface ChartAxisSpec {
 }
 
 /** The rectangle the data is drawn in, in SVG pixels. */
-export interface ChartPlotArea {
-  /** Left edge. */
-  left: number;
-  /** Top edge. */
-  top: number;
-  /** Right edge. */
-  right: number;
-  /** Bottom edge. */
-  bottom: number;
-  /** Width. */
-  width: number;
-  /** Height. */
-  height: number;
-}
+export type ChartPlotArea = PlotRect;
 
 /** Room left around the plot, in pixels. */
-export interface ChartMargins {
-  /** Above the plot. */
-  top: number;
-  /** To the right of it. */
-  right: number;
-  /** Below it, where the horizontal axis is written. */
-  bottom: number;
-  /** To its left, where the vertical axis is written. */
-  left: number;
-}
+export type ChartMargins = ChartMargin;
 
 /** What a {@link ChartFrame} hands the function that draws inside it. */
 export interface ChartFrameRender {
@@ -211,16 +191,7 @@ export function ChartFrame(props: ChartFrameProps): ReactElement {
         aria-label={label === '' ? undefined : label}
         aria-hidden={label === '' ? true : undefined}
       >
-        <defs>
-          <clipPath id={clipId}>
-            <rect
-              x={plot.left}
-              y={plot.top}
-              width={plot.width}
-              height={plot.height}
-            />
-          </clipPath>
-        </defs>
+        <PlotClip id={clipId} plot={plot} />
         <ChartAxis {...horizontal} layer="grid" />
         <ChartAxis {...vertical} layer="grid" />
         <g clipPath={`url(#${clipId})`}>{children(frame)}</g>

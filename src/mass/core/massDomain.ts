@@ -104,22 +104,6 @@ export function fittedTo(
 }
 
 /**
- * The tallest intensity among the traces a set of spectra currently draws.
- *
- * What "how tall is this chart" comes to, in the units the spectra are in, with
- * the headroom `fullDomain` adds left off — so it answers a question about the
- * measurement rather than about the plot. A preview kept out of the extents is
- * kept out of this too, and a chart holding nothing but a preview is measured
- * by it rather than answering zero.
- * @param spectra - The spectra to measure, drawn or not.
- * @returns The tallest intensity drawn, or `0` when nothing is.
- */
-export function basePeakOf(spectra: readonly MassSpectrum[]): number {
-  const extent = traceExtent(spectra, false) ?? traceExtent(spectra, true);
-  return extent === null ? 0 : extent.yMaximum;
-}
-
-/**
  * How much of the axis framing a peak shows, either side of its mass.
  *
  * Wide enough to hold the isotopologue cluster of a singly charged ion, because

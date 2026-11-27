@@ -8,7 +8,7 @@ import { PARALLEL_LABELS_STYLE, parallelLabelStyle } from './parallelStyles.ts';
 import type { ParallelAxisDrag } from './useParallelAxisDrag.ts';
 
 /** What {@link ParallelLabels} writes. */
-export interface ParallelLabelsProps {
+interface ParallelLabelsProps {
   /** The axes as the caller described them, for a caller's own renderer. */
   axes: readonly ParallelAxis[];
   /** The same axes, placed, so each name sits over its own axis. */

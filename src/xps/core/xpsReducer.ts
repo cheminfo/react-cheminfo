@@ -7,6 +7,11 @@
  * take the chart down with it.
  */
 
+import {
+  isChartWindow,
+  sameChartDomain,
+} from '../../chart/core/chartDomain.ts';
+
 import { applyXpsDataAction } from './applyXpsDataAction.ts';
 import { indexOfXpsSpectrum, refuseXpsAction } from './changeXpsSpectrum.ts';
 import { loadXpsState } from './loadXpsState.ts';
@@ -18,7 +23,6 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_SIDE_PANELS,
   isUsableTolerance,
-  isXpsWindow,
   mergeXpsSettings,
   sameXpsSettings,
 } from './xpsState.ts';
@@ -171,13 +175,17 @@ export function xpsReducer(state: XpsState, action: XpsAction): XpsState {
  * @returns The new state, the same object when the chart already shows it.
  */
 function showWindow(state: XpsState, domain: XpsDomain): XpsState {
-  if (!isXpsWindow(domain)) {
+  if (!isChartWindow(domain)) {
     return refuseXpsAction(
       state,
       'A window runs from a lower bound to a higher one, so the chart kept the one it was showing',
     );
   }
-  if (sameDomain(state.view.domain, domain) && state.view.error === null) {
+  if (
+    state.view.domain !== null &&
+    sameChartDomain(state.view.domain, domain) &&
+    state.view.error === null
+  ) {
     return state;
   }
   return changeView(state, { domain });
@@ -222,20 +230,4 @@ function changeSettings(
     return state;
   }
   return { ...state, settings, view: { ...state.view, error: null } };
-}
-
-/**
- * Whether the chart is already showing a window.
- * @param current - The window it is showing, `null` while it fits what is drawn.
- * @param next - The window asked for.
- * @returns Whether all four bounds already agree.
- */
-function sameDomain(current: XpsDomain | null, next: XpsDomain): boolean {
-  if (current === null) return false;
-  return (
-    current.x[0] === next.x[0] &&
-    current.x[1] === next.x[1] &&
-    current.y[0] === next.y[0] &&
-    current.y[1] === next.y[1]
-  );
 }

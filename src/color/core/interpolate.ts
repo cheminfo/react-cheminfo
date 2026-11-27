@@ -41,6 +41,13 @@ export interface ColorStop {
  */
 export type ColorInterpolation = 'rgb' | 'hsv' | 'hsv-long';
 
+/** Every interpolation, in the order a picker lists them. */
+export const COLOR_INTERPOLATIONS: readonly ColorInterpolation[] = [
+  'rgb',
+  'hsv',
+  'hsv-long',
+];
+
 /** A colour scale: its anchors, and how it moves between them. */
 export interface ColorScale {
   /** The anchors, in ascending position order. */
@@ -99,7 +106,8 @@ export function colorAt(scale: ColorScale, position: number): string {
     const ratio = span <= 0 ? 0 : (at - start.position) / span;
     return mix(start.color, end.color, ratio, {
       interpolation,
-      turn: longTurn(first.color, last.color),
+      turn:
+        interpolation === 'hsv-long' ? longTurn(first.color, last.color) : 1,
       whole: stops.length === MINIMUM_SAMPLES,
     });
   }

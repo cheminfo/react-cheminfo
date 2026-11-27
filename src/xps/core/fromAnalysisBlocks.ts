@@ -36,6 +36,12 @@ export interface AnalysisBlocksOptions extends XpsReadOptions {
    * @default 'vamas'
    */
   format?: XpsFormat;
+  /**
+   * Whether the fit a block carries — its regions and components — is read.
+   * A JCAMP-DX block carries none.
+   * @default true
+   */
+  fit?: boolean;
 }
 
 /**
@@ -48,7 +54,7 @@ export function readAnalysisBlocks(
   blocks: readonly AnalysisSpectrum[],
   options: AnalysisBlocksOptions = {},
 ): XpsSpectrum[] {
-  const { format = 'vamas', taken, fileName } = options;
+  const { format = 'vamas', taken, fileName, fit = true } = options;
   const colors = [...(taken ?? [])];
 
   const spectra: XpsSpectrum[] = [];
@@ -60,22 +66,18 @@ export function readAnalysisBlocks(
     colors.push(color);
 
     const normalised = normalisedMetaOf(block);
-    const sourceEnergy = blockSourceEnergy(block, normalised);
-    const regions =
-      normalised === null ? [] : fitRegions(normalised, sourceEnergy);
-    const components =
-      normalised === null
-        ? []
-        : fitComponents(normalised, regions, sourceEnergy);
-
     const context: BlockContext = {
       format,
       normalised,
       id: spectrumIdentity(options, spectra.length),
       color,
-      components,
-      regions,
     };
+    if (fit && normalised !== null) {
+      const sourceEnergy = blockSourceEnergy(block, normalised);
+      const regions = fitRegions(normalised, sourceEnergy);
+      context.regions = regions;
+      context.components = fitComponents(normalised, regions, sourceEnergy);
+    }
     if (fileName !== undefined) context.fileName = fileName;
     if (blocks.length > 1) context.blockIndex = index;
     spectra.push(blockToSpectrum(block, context));

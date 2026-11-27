@@ -24,7 +24,7 @@ import {
 } from '../core/parallelOrder.ts';
 
 /** What {@link useParallelAxisDrag} needs. */
-export interface ParallelAxisDragOptions {
+interface ParallelAxisDragOptions {
   /** The axes, from left to right, already placed. */
   layouts: readonly ParallelAxisLayout[];
   /**
@@ -35,7 +35,7 @@ export interface ParallelAxisDragOptions {
 }
 
 /** The name being dragged, and where it would land. */
-export interface ParallelAxisDragState {
+interface ParallelAxisDragState {
   /** Which axis is moving, as an index into the axes. */
   from: number;
   /** How far its name has been dragged, in pixels. */
@@ -55,7 +55,7 @@ export interface ParallelAxisDrag {
 }
 
 /** What one axis name carries so it can be dragged and stepped with the keys. */
-export interface ParallelAxisHandleProps {
+interface ParallelAxisHandleProps {
   onPointerDown: (event: PointerEvent<HTMLElement>) => void;
   onPointerMove: (event: PointerEvent<HTMLElement>) => void;
   onPointerUp: (event: PointerEvent<HTMLElement>) => void;

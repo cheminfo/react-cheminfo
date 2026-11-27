@@ -11,11 +11,11 @@ import type {
   ParallelRanges,
 } from '../src/parallel/core/index.ts';
 import {
-  parallelExtent,
   parallelIncludedMask,
   parallelKeptCount,
-  parallelRangeList,
 } from '../src/parallel/core/index.ts';
+import { parallelExtent } from '../src/parallel/core/parallelExtent.ts';
+import { parallelRangeList } from '../src/parallel/core/parallelSelection.ts';
 import { ParallelCoordinates } from '../src/parallel/ui/ParallelCoordinates.tsx';
 import type { ParallelCoordinatesProps } from '../src/parallel/ui/parallelCoordinatesProps.ts';
 

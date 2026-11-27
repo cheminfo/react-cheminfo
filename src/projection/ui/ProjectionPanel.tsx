@@ -124,6 +124,25 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
           onSampleDoubleClick({ ...point, id });
         };
 
+  const hoverCard =
+    anchor.index < 0 ? null : (
+      <ProjectionReadout
+        index={anchor.index}
+        result={result}
+        samples={samples}
+        groups={state.groups}
+        colorBy={state.options.colorBy}
+        xAxis={state.options.xAxis}
+        yAxis={state.options.yAxis}
+        zAxis={state.tab === 'space' ? state.options.zAxis : undefined}
+        x={anchor.x}
+        y={anchor.y}
+        boxWidth={width}
+        boxHeight={height}
+        formatValue={formatValue}
+      />
+    );
+
   return (
     <div
       ref={box}
@@ -186,25 +205,7 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
           onSelectionChange={map.settle}
           onHoverChange={noteHover}
           onPointDoubleClick={openSample}
-          hoverCard={
-            anchor.index < 0 ? null : (
-              <ProjectionReadout
-                index={anchor.index}
-                result={result}
-                samples={samples}
-                groups={state.groups}
-                colorBy={state.options.colorBy}
-                xAxis={state.options.xAxis}
-                yAxis={state.options.yAxis}
-                zAxis={state.options.zAxis}
-                x={anchor.x}
-                y={anchor.y}
-                boxWidth={width}
-                boxHeight={height}
-                formatValue={formatValue}
-              />
-            )
-          }
+          hoverCard={hoverCard}
         />
       ) : null}
       {state.tab === 'map' ? (
@@ -227,24 +228,7 @@ export function ProjectionPanel(props: ProjectionPanelProps): ReactElement {
           onHoverChange={noteHover}
           onPointDoubleClick={openSample}
           touchLasso={touchLasso}
-          hoverCard={
-            anchor.index < 0 ? null : (
-              <ProjectionReadout
-                index={anchor.index}
-                result={result}
-                samples={samples}
-                groups={state.groups}
-                colorBy={state.options.colorBy}
-                xAxis={state.options.xAxis}
-                yAxis={state.options.yAxis}
-                x={anchor.x}
-                y={anchor.y}
-                boxWidth={width}
-                boxHeight={height}
-                formatValue={formatValue}
-              />
-            )
-          }
+          hoverCard={hoverCard}
         />
       ) : null}
     </div>

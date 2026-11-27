@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 
 import { NumberInput } from '../../number/ui/NumberInput.tsx';
 import { PanelEmpty } from '../../panel/ui/PanelMessage.tsx';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { assignElements } from '../core/assignElements.ts';
 import { levelText, signedEnergy } from '../core/panelFormat.ts';
 import { formatEnergy } from '../core/peakFormat.ts';
@@ -99,7 +100,7 @@ const itemStyle = {
   alignItems: 'baseline',
   gap: 6,
   padding: '2px 4px',
-  borderBottom: '1px solid rgb(237 240 243)',
+  borderBottom: `1px solid ${TOKEN.border}`,
 } as const;
 
 const levelStyle = { fontWeight: 600, whiteSpace: 'nowrap' } as const;

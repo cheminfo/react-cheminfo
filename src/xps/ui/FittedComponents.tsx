@@ -8,7 +8,6 @@ import { areaPath } from '../../chart/core/tracePath.ts';
 import type { ComponentPeak } from '../core/componentShape.ts';
 import { componentTrace, envelopeTrace } from '../core/componentTrace.ts';
 import { axisEnergy } from '../core/energyAxis.ts';
-import { normalisationFactor, normalisedScale } from '../core/normalise.ts';
 import { tracePath } from '../core/tracePath.ts';
 import { COMPONENT_STYLE, XPS_CHART_COLORS } from '../core/xpsChartTheme.ts';
 import type { XpsHighlight } from '../core/xpsHighlight.ts';
@@ -25,14 +24,11 @@ export interface FittedComponentsProps {
   plot: PlotRect;
   /** The energy axis as it is currently zoomed. */
   xScale: ChartScale;
-  /** The counts axis as it is currently zoomed. */
-  yScale: ChartScale;
   /**
-   * Whether the trace is drawn against its own maximum in the window, which the
-   * fit has to follow or it would float above a trace of another height.
-   * @default false
+   * The counts axis the spectrum's trace is drawn against, normalised or not,
+   * which the fit follows so it never floats above a trace of another height.
    */
-  normalise?: boolean;
+  yScale: ChartScale;
   /**
    * What the pointer is resting on, so the component under it is filled solidly.
    * @default undefined
@@ -64,15 +60,7 @@ export interface FittedComponentsProps {
 export function FittedComponents(
   props: FittedComponentsProps,
 ): ReactElement | null {
-  const {
-    spectrum,
-    axis,
-    plot,
-    xScale,
-    yScale,
-    normalise = false,
-    highlight,
-  } = props;
+  const { spectrum, axis, plot, xScale, yScale, highlight } = props;
 
   const from = chartValue(xScale, plot.left);
   const to = chartValue(xScale, plot.right);
@@ -82,32 +70,23 @@ export function FittedComponents(
 
   const peaks = useMemo(() => componentPeaks(spectrum, axis), [spectrum, axis]);
 
-  const drawnScale = useMemo(() => {
-    if (!normalise) return yScale;
-    const trace = spectrum.energy;
-    return normalisedScale(
-      yScale,
-      normalisationFactor(trace.x, trace.y, low, high),
-    );
-  }, [normalise, yScale, spectrum.energy, low, high]);
-
   const shapes = useMemo(() => {
     const drawn: Array<{ id: string; path: string }> = [];
     for (let index = 0; index < peaks.length; index++) {
       const peak = peaks[index] as ComponentPeak;
       const trace = componentTrace(peak, low, high, samples);
-      const path = areaPath(trace.x, trace.y, xScale, drawnScale);
+      const path = areaPath(trace.x, trace.y, xScale, yScale);
       if (path === '') continue;
       drawn.push({ id: spectrum.components[index]?.id ?? String(index), path });
     }
     return drawn;
-  }, [peaks, low, high, samples, xScale, drawnScale, spectrum.components]);
+  }, [peaks, low, high, samples, xScale, yScale, spectrum.components]);
 
   const envelope = useMemo(() => {
     if (peaks.length === 0) return '';
     const trace = envelopeTrace(peaks, low, high, samples);
-    return tracePath(trace.x, trace.y, xScale, drawnScale);
-  }, [peaks, low, high, samples, xScale, drawnScale]);
+    return tracePath(trace.x, trace.y, xScale, yScale);
+  }, [peaks, low, high, samples, xScale, yScale]);
 
   if (shapes.length === 0) return null;
 

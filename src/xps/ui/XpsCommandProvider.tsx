@@ -8,7 +8,7 @@ import type {
 } from './xpsCommandContext.tsx';
 import { xpsCommandContext } from './xpsCommandContext.tsx';
 
-export interface XpsCommandProviderProps {
+interface XpsCommandProviderProps {
   /** What to run for each command. */
   handlers: XpsCommandHandlers;
   /**

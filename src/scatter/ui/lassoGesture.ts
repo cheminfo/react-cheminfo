@@ -125,7 +125,7 @@ export interface LassoGesture {
 }
 
 /** The modifier keys the hand making a gesture is holding. */
-export interface GestureModifiers {
+interface GestureModifiers {
   /** Whether Alt is down, which always removes. */
   altKey: boolean;
   /** Whether Shift is down, which always adds. */
@@ -133,7 +133,7 @@ export interface GestureModifiers {
 }
 
 /** Where a booked animation frame is remembered between calls. */
-export interface FrameSlot {
+interface FrameSlot {
   /** The frame's handle, or `null` when none is booked. */
   current: number | null;
 }

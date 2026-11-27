@@ -1,10 +1,6 @@
 import { expect, test } from 'vitest';
 
-import {
-  irCommandEntryLabel,
-  irCommandLabel,
-  irCommands,
-} from '../irCommands.ts';
+import { irCommandEntryLabel, irCommands } from '../irCommands.ts';
 import { irReducer } from '../irReducer.ts';
 import { createIrState } from '../irState.ts';
 import { irCommandOffered, irCommandsFor } from '../irTechniqueCommands.ts';
@@ -109,5 +105,4 @@ test('a Raman command keeps its key and drops the infrared wording', () => {
   ]);
   expect(irCommandsFor('raman').about?.title).toBe('About the Raman viewer');
   expect(irCommandEntryLabel(readTool ?? irCommands.readTool)).toBe('Read (r)');
-  expect(irCommandLabel('about')).toBe('About the infrared viewer');
 });

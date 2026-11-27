@@ -13,6 +13,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { NoResizeObserver } from '../../../__tests__/dom.ts';
 import { installProbeStubs } from '../../../chart/ui/__tests__/zoomProbe.tsx';
 import type { IrEditorHandle } from '../../core/irEditorApi.ts';
 import {
@@ -108,18 +109,4 @@ test('the host’s actions are drawn in the header, after the mark', () => {
 
 function never(): never {
   throw new Error('Expected a value');
-}
-
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing to let go of.
-  }
 }

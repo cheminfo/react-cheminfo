@@ -13,26 +13,16 @@
  * truncated to a hundred looks exactly like a file that held a hundred.
  */
 
+import { errorMessage } from '../../error/core/toError.ts';
+
 import { detectFormat } from './detectFormat.ts';
 import { pickPeaks } from './pickPeaks.ts';
 import type { XpsReadOptions } from './readOptions.ts';
 import { describeSource } from './readOptions.ts';
 import type { XpsFormat, XpsSpectrum } from './xpsSpectrum.ts';
 
-/** How a file is read. */
-export interface LoadSpectraOptions {
-  /**
-   * Name of the file it came from, absent for a paste. It names the spectra
-   * and it is what an error message blames, so it is worth passing.
-   * @default undefined
-   */
-  fileName?: string;
-  /**
-   * The colours already on the chart, so a file dropped onto spectra that are
-   * open is drawn in hues of its own.
-   * @default []
-   */
-  taken?: readonly string[];
+/** How a file is read: what every reader is told, and how many blocks to keep. */
+export interface LoadSpectraOptions extends XpsReadOptions {
   /**
    * How many blocks of a multi-block file to keep.
    *
@@ -42,12 +32,6 @@ export interface LoadSpectraOptions {
    * @default 100
    */
   maxSpectra?: number;
-  /**
-   * What identities are built from, instead of a random one each. A caller that
-   * passes a prefix gets `prefix-0`, `prefix-1`, one per spectrum.
-   * @default undefined
-   */
-  idPrefix?: string;
 }
 
 /** What came out of one file. */
@@ -89,7 +73,7 @@ export async function loadSpectra(
   try {
     read = await readSpectra(format, data, { fileName, taken, idPrefix });
   } catch (error) {
-    return { spectra: [], error: messageOf(error) };
+    return { spectra: [], error: errorMessage(error) };
   }
   if (read.length === 0) {
     return {
@@ -163,7 +147,7 @@ function detectPeaks(
     }
     return null;
   } catch (error) {
-    return `${describeSource(fileName)} was read, but its peaks could not be detected: ${messageOf(error)}`;
+    return `${describeSource(fileName)} was read, but its peaks could not be detected: ${errorMessage(error)}`;
   }
 }
 
@@ -193,13 +177,4 @@ function spectrumLimit(maxSpectra: number | undefined): number {
     return DEFAULT_MAXIMUM_SPECTRA;
   }
   return maxSpectra < 1 ? DEFAULT_MAXIMUM_SPECTRA : Math.floor(maxSpectra);
-}
-
-/**
- * What a thrown reader was complaining about.
- * @param error - Whatever was thrown.
- * @returns Its message.
- */
-function messageOf(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

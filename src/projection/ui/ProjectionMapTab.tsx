@@ -162,6 +162,22 @@ export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
     [scores, yAxis],
   );
 
+  const xSpec = useMemo(
+    () => ({ domain: xDomain, label: projectionAxisTitle(result, xAxis) }),
+    [xDomain, result, xAxis],
+  );
+  const ySpec = useMemo(
+    () => ({ domain: yDomain, label: projectionAxisTitle(result, yAxis) }),
+    [yDomain, result, yAxis],
+  );
+  const scatterGroups = useMemo(
+    () => projectionScatterGroups(groups),
+    [groups],
+  );
+  const mapMarkers = useMemo(
+    () => projectionMapMarkers(markers ?? NO_MARKERS, groups, xAxis, yAxis),
+    [markers, groups, xAxis, yAxis],
+  );
   const shapeList = useMemo(() => projectionScatterShapes(shapes), [shapes]);
   const colored = colorBy !== NO_GROUPING && groups.entries.length > 0;
   const ellipse = colored ? outlines : null;
@@ -172,10 +188,10 @@ export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
       y={cloud.y}
       width={width}
       height={height}
-      xAxis={{ domain: xDomain, label: projectionAxisTitle(result, xAxis) }}
-      yAxis={{ domain: yDomain, label: projectionAxisTitle(result, yAxis) }}
+      xAxis={xSpec}
+      yAxis={ySpec}
       groupOf={colored ? groups.groupOf : undefined}
-      groups={colored ? projectionScatterGroups(groups) : undefined}
+      groups={colored ? scatterGroups : undefined}
       shapeOf={shapes?.shapeOf}
       shapes={shapeList}
       ellipse={ellipse}
@@ -183,12 +199,7 @@ export function ProjectionMapTab(props: ProjectionMapTabProps): ReactElement {
       showGroupMeans={colored && showGroupMeans}
       showGroupLabels={colored && showGroupLabels}
       pointLabels={showIds ? names : undefined}
-      markers={projectionMapMarkers(
-        markers ?? NO_MARKERS,
-        groups,
-        xAxis,
-        yAxis,
-      )}
+      markers={mapMarkers}
       pointRadius={pointRadius}
       outlinedFrom={fittedCount}
       selected={selected}

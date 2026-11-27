@@ -16,7 +16,7 @@ import type { XpsInstrument, XpsSensitivityFactor } from './xpsInstrument.ts';
 import { ORBITAL } from './xpsInstrument.ts';
 
 /** What a pasted table of factors says. */
-export interface SensitivityFactorReading {
+interface SensitivityFactorReading {
   /** The factors read, in the order of the lines. */
   factors: XpsSensitivityFactor[];
   /** The lines that could not be read as one, as they were written. */
@@ -62,19 +62,6 @@ export function removeInstrument(
   id: string,
 ): XpsInstrument[] {
   return instruments.filter((instrument) => instrument.id !== id);
-}
-
-/**
- * An instrument with one factor set, replacing the one of the same line.
- * @param instrument - The instrument.
- * @param factor - The line and its factor.
- * @returns The edited instrument.
- */
-export function withFactor(
-  instrument: XpsInstrument,
-  factor: XpsSensitivityFactor,
-): XpsInstrument {
-  return withFactors(instrument, [factor]);
 }
 
 /**

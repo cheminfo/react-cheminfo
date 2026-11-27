@@ -17,7 +17,7 @@ import type { Vector3 } from '../core/orbitCamera.ts';
 import type { CloudShell } from './CloudShellLayer.tsx';
 
 /** What {@link cloudShells} needs to fit one shell per group. */
-export interface CloudShellsInput {
+interface CloudShellsInput {
   /** Every sample, in cube units. */
   cube: readonly Vector3[];
   /** Which group each sample belongs to, as an index into `groups`. */

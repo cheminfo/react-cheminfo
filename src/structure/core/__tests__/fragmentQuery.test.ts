@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { fragmentQuery, sameFragmentQuery } from '../fragmentQuery.ts';
+import { fragmentQuery } from '../fragmentQuery.ts';
 
 import { BUTANE_V2000 } from './molfiles.ts';
 
@@ -38,11 +38,4 @@ test('a drawn query is read as the notation it is written in', () => {
     value: BUTANE_V2000,
     isEmpty: false,
   });
-});
-
-test('two values differing only by blanks are the same query', () => {
-  expect(sameFragmentQuery('CCO', '  CCO\n')).toBe(true);
-  expect(sameFragmentQuery('d@', '')).toBe(true);
-  expect(sameFragmentQuery('CCO', 'CCC')).toBe(false);
-  expect(sameFragmentQuery('CCO', 'd@')).toBe(false);
 });

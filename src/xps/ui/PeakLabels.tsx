@@ -11,7 +11,6 @@ import {
 } from '../../chart/core/labelStack.ts';
 import { axisEnergy, bindingFromAxis } from '../core/energyAxis.ts';
 import { selectLabelledPeaks } from '../core/labelledPeaks.ts';
-import { normalisationFactor, normalisedScale } from '../core/normalise.ts';
 import { peakLabelLines } from '../core/peakLabelLines.ts';
 import { XPS_PEAK_LABEL } from '../core/xpsChartTheme.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
@@ -26,16 +25,13 @@ export interface PeakLabelsProps {
   plot: PlotRect;
   /** The energy axis as it is currently zoomed. */
   xScale: ChartScale;
-  /** The counts axis as it is currently zoomed. */
+  /**
+   * The counts axis the spectrum's trace is drawn against, normalised or not,
+   * which the labels follow so they never float above peaks of another height.
+   */
   yScale: ChartScale;
   /** How many peaks are named at most, the most intense first. */
   limit: number;
-  /**
-   * Whether the trace is drawn against its own maximum in the window, which the
-   * labels have to follow or they would float above peaks of another height.
-   * @default false
-   */
-  normalise?: boolean;
   /**
    * The ink the stacks are written in — worth passing the spectrum's own colour
    * on a chart holding several, where an unattributed energy belongs to any of
@@ -73,7 +69,6 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement | null {
     xScale,
     yScale,
     limit,
-    normalise = false,
     color = CHART_COLORS.labelText,
   } = props;
 
@@ -81,15 +76,6 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement | null {
   const to = chartValue(xScale, plot.right);
   const low = Math.min(from, to);
   const high = Math.max(from, to);
-
-  const drawnScale = useMemo(() => {
-    if (!normalise) return yScale;
-    const trace = spectrum.energy;
-    return normalisedScale(
-      yScale,
-      normalisationFactor(trace.x, trace.y, low, high),
-    );
-  }, [normalise, yScale, spectrum.energy, low, high]);
 
   // A label is chosen in binding energy, which is what a peak records, so the
   // window is converted back rather than the peaks converted forward — one pair
@@ -112,9 +98,9 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement | null {
         to: bounds[1],
         limit,
         minimumSpacing: spacing,
-        maximumIntensity: chartValue(drawnScale, plot.top),
+        maximumIntensity: chartValue(yScale, plot.top),
       }),
-    [spectrum.peaks, bounds, limit, spacing, drawnScale, plot.top],
+    [spectrum.peaks, bounds, limit, spacing, yScale, plot.top],
   );
 
   const plotBounds = useMemo<[number, number]>(
@@ -135,7 +121,7 @@ export function PeakLabels(props: PeakLabelsProps): ReactElement | null {
 
   const stacks = peaks.map((peak) => {
     const lines = peakLabelLines(peak);
-    const tip = chartPixel(drawnScale, peak.intensity);
+    const tip = chartPixel(yScale, peak.intensity);
     const x = chartPixel(
       xScale,
       axisEnergy(peak.bindingEnergy, spectrum.sourceEnergy, axis),

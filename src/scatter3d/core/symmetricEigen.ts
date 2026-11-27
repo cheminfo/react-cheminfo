@@ -28,7 +28,7 @@ export interface SymmetricMatrix3 {
 }
 
 /** The axes of a symmetric three by three matrix, longest first. */
-export interface SymmetricEigen3 {
+interface SymmetricEigen3 {
   /** The three eigenvalues, largest first. Never below zero for a covariance. */
   values: readonly [number, number, number];
   /** A unit eigenvector per eigenvalue, in the same order, always orthonormal. */

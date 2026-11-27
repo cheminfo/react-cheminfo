@@ -18,7 +18,7 @@
  */
 
 /** How a fitted component is drawn. */
-export type ComponentShapeKind =
+type ComponentShapeKind =
   'gaussian' | 'lorentzian' | 'pseudoVoigt' | 'asymmetric';
 
 /** A shape, as the drawing needs it rather than as the file wrote it. */

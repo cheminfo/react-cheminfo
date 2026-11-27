@@ -19,7 +19,7 @@ import type { XpsInstrument } from './xpsInstrument.ts';
 import type { XpsSpectrum } from './xpsSpectrum.ts';
 
 /** What a list of elements typed into the panel says. */
-export interface ElementListReading {
+interface ElementListReading {
   /** The elements, in the order typed, each once and spelled as symbols are. */
   elements: string[];
   /** What was typed and is no element symbol. */
@@ -29,7 +29,7 @@ export interface ElementListReading {
 }
 
 /** What becomes of a list of elements once a line is chosen for each. */
-export interface SurveyLineChoice {
+interface SurveyLineChoice {
   /** The line of every element that has one, in the order of the elements. */
   lines: XpsSurveyLine[];
   /** The elements for which the instrument has no line inside the spectrum. */

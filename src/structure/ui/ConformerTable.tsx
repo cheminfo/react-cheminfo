@@ -15,26 +15,35 @@
  */
 
 import { HTMLTable } from '@blueprintjs/core';
-import type { CSSProperties, KeyboardEvent, ReactElement } from 'react';
+import type { KeyboardEvent, ReactElement } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 
 import { ClickToCopy } from '../../clipboard/ui/ClickToCopy.tsx';
-import { formatPercent } from '../../format/core/numbers.ts';
 import { handleListNavigationKey } from '../../hooks/ui/listNavigation.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import {
   ROOM_TEMPERATURE,
   boltzmannShares,
 } from '../core/conformerBoltzmann.ts';
 import type { ConformerRow } from '../core/conformerEnergy.ts';
-import { relativeEnergyOf, totalEnergyOf } from '../core/conformerEnergy.ts';
-import type { ConformerRanking } from '../core/conformers.ts';
+import { relativeEnergyOf } from '../core/conformerEnergy.ts';
+import type { ConformerRanking } from '../core/conformerTypes.ts';
 
+import { cellContent } from './conformerCells.tsx';
 import type { ConformerColumn } from './conformerColumns.ts';
 import {
+  CONFORMER_COLUMN_KEYS,
   CONFORMER_COLUMN_LABELS,
-  NUMERIC_CONFORMER_COLUMNS,
   PICKER_COLUMNS,
 } from './conformerColumns.ts';
+import {
+  CELL_TEST_IDS,
+  COPY_LABELS,
+  cellStyle,
+  headerStyle,
+  rowStyle,
+  tableStyle,
+} from './conformerTableStyles.ts';
 
 /** Props of {@link ConformerTable}. */
 export interface ConformerTableProps {
@@ -64,7 +73,7 @@ export interface ConformerTableProps {
   temperature?: number;
   /**
    * Accessible name of the table.
-   * @default 'Conformers, most stable first'
+   * @default 'Conformers, most stable first', in the page's language
    */
   label?: string;
   /**
@@ -107,12 +116,13 @@ export function ConformerTable(
     selectedId = null,
     onSelect,
     temperature = ROOM_TEMPERATURE,
-    label = 'Conformers, most stable first',
+    label,
     rowName = String,
     columnLabels,
     provisional = false,
   } = props;
 
+  const t = useChromeT();
   const bodyRef = useRef<HTMLTableSectionElement>(null);
 
   const shares = useMemo(() => {
@@ -165,7 +175,11 @@ export function ConformerTable(
         <tr>
           {columns.map((column) => (
             <th key={column} style={headerStyle(column)}>
-              {columnLabels?.[column] ?? CONFORMER_COLUMN_LABELS[column]}
+              {columnLabels?.[column] ??
+                t.or(
+                  CONFORMER_COLUMN_KEYS[column],
+                  CONFORMER_COLUMN_LABELS[column],
+                )}
             </th>
           ))}
         </tr>
@@ -177,7 +191,7 @@ export function ConformerTable(
         // conformer list read the arrows themselves.
         tabIndex={onSelect === undefined ? undefined : 0}
         role="listbox"
-        aria-label={label}
+        aria-label={label ?? t('conformers.table.label')}
       >
         {conformers.map((conformer, index) => {
           const active = conformer.id === selectedId;
@@ -219,7 +233,7 @@ export function ConformerTable(
                     as="td"
                     style={cellStyle(column, provisional)}
                     value={content}
-                    label={COPY_LABELS[column]}
+                    label={t(COPY_LABELS[column])}
                     testId={CELL_TEST_IDS[column]}
                   >
                     {content}
@@ -241,223 +255,3 @@ export function ConformerTable(
     </HTMLTable>
   );
 }
-
-/**
- * What a copyable column is called in the hover title, and which columns are
- * copyable at all.
- *
- * Only the relative energy: it is the number a chemist reads off the set and
- * quotes elsewhere. A total force-field energy is an internal quantity nobody
- * pastes, and a rank and a share are read on the page rather than taken away.
- */
-const COPY_LABELS: Partial<Record<ConformerColumn, string>> = {
-  relative: 'relative energy in kcal/mol',
-};
-
-/**
- * A stable hook per cell, so a suite can read one column without counting
- * table cells — which changes the moment a column is added.
- */
-const CELL_TEST_IDS: Record<ConformerColumn, string> = {
-  id: 'conformer-id',
-  population: 'conformer-population',
-  relative: 'conformer-relative-energy',
-  total: 'conformer-total-energy',
-  forceFieldRelative: 'conformer-force-field-relative',
-  forceFieldRank: 'conformer-force-field-rank',
-};
-
-/**
- * The share of a conformer, drawn as a bar.
- *
- * It takes its colour from the row it sits in — `currentColor` — so it is
- * legible on a plain row and on the selected one without a rule per state.
- *
- * It is drawn against the largest share rather than against the whole: the
- * column is narrow, and against the whole a set of twelve near-equal conformers
- * would be twelve bars of three pixels.
- * @param props - The share to draw, against the largest one in the set.
- * @param props.share - The share from 0 to 1, or `null` when there is no energy.
- * @param props.largest - The largest share in the set, which is the full width.
- * @returns The bar.
- */
-function ShareBar(props: {
-  share: number | null;
-  largest: number;
-}): ReactElement {
-  const { share, largest } = props;
-  const width =
-    share === null || largest <= 0
-      ? 0
-      : Math.max(0, Math.min(1, share / largest)) * 100;
-  return (
-    <span style={barTrackStyle} aria-hidden="true">
-      <span style={{ ...barFillStyle, width: `${width}%` }} />
-    </span>
-  );
-}
-
-function cellContent(
-  column: ConformerColumn,
-  conformer: ConformerRow,
-  ranking: ConformerRanking,
-  share: number | null,
-  largest: number,
-  rowName: (id: number) => string,
-): ReactElement | string {
-  switch (column) {
-    case 'id':
-      return rowName(conformer.id);
-    case 'population':
-      return (
-        <span style={populationStyle}>
-          <ShareBar share={share} largest={largest} />
-          <span>{shareLabel(share)}</span>
-        </span>
-      );
-    case 'relative':
-      return energyLabel(relativeEnergyOf(conformer, ranking));
-    case 'total':
-      return energyLabel(totalEnergyOf(conformer, ranking));
-    case 'forceFieldRelative':
-      return energyLabel(conformer.relativeEnergy);
-    case 'forceFieldRank':
-      return conformer.refinement == null
-        ? '—'
-        : String(conformer.refinement.forceFieldId);
-    default:
-      return '—';
-  }
-}
-
-/**
- * The share of molecules in a conformer, as a percentage.
- *
- * A share that rounds to zero is written as `<0.1 %` instead: a conformer the
- * search found and kept is populated by something, and `0 %` says it is not.
- * @param share - The share from 0 to 1, or `null` when there is no energy.
- * @returns The percentage, or a dash when it cannot be worked out.
- */
-function shareLabel(share: number | null): string {
-  if (share === null) return '—';
-  if (share > 0 && share < 0.001) return '<0.1 %';
-  return formatPercent(share);
-}
-
-/**
- * The energy to two decimals, or a dash when there is none.
- *
- * The unit is in the column header rather than in every cell, so the numbers
- * line up and a row stays readable in a narrow panel.
- * @param energy - kcal/mol, or `null`.
- * @returns The label.
- */
-function energyLabel(energy: number | null): string {
-  if (energy === null) return '—';
-  if (Math.abs(energy) < ENERGY_RESOLUTION) return '0.00';
-  return energy > 0 ? `+${energy.toFixed(2)}` : energy.toFixed(2);
-}
-
-/**
- * Below this, two force-field energies are the same number to anyone reading
- * them, and the duplicate-minimum test upstream has already decided they are
- * distinct shapes.
- */
-const ENERGY_RESOLUTION = 0.005;
-
-function headerStyle(column: ConformerColumn): CSSProperties | undefined {
-  return NUMERIC_CONFORMER_COLUMNS.has(column) ? numericStyle : undefined;
-}
-
-/**
- * A cell's own style: numbers are right-aligned and tabular, and every cell a
- * better method will restate is muted while it works. The rank is not one of
- * them — it names the row rather than measuring it, and it is what a reader
- * follows as the order changes under them.
- * @param column - The column the cell is in.
- * @param provisional - Whether the energies are still expected to change.
- * @returns The cell's inline style, or `undefined` when it needs none.
- */
-function cellStyle(
-  column: ConformerColumn,
-  provisional: boolean,
-): CSSProperties | undefined {
-  const numeric = NUMERIC_CONFORMER_COLUMNS.has(column);
-  if (!provisional || column === 'id') {
-    return numeric ? numericStyle : undefined;
-  }
-  return numeric ? provisionalNumericStyle : provisionalStyle;
-}
-
-const tableStyle = { width: '100%' } as const satisfies CSSProperties;
-
-const numericStyle = {
-  textAlign: 'right',
-  fontVariantNumeric: 'tabular-nums',
-} as const satisfies CSSProperties;
-
-const provisionalStyle = {
-  color: 'var(--text-muted)',
-} as const satisfies CSSProperties;
-
-const provisionalNumericStyle = {
-  ...numericStyle,
-  ...provisionalStyle,
-} as const satisfies CSSProperties;
-
-/**
- * The selected row is tinted with the site's own accent, so the table belongs
- * to whichever site draws it; a row is a pointer only where a click does
- * something.
- * @param active - Whether this row is the selected one.
- * @param selectable - Whether a click selects a row at all.
- * @returns The row's inline style, or `undefined` when it needs none.
- */
-function rowStyle(
-  active: boolean,
-  selectable: boolean,
-): CSSProperties | undefined {
-  if (active) return selectable ? SELECTED_ROW : SELECTED_ROW_STATIC;
-  return selectable ? SELECTABLE_ROW : undefined;
-}
-
-const SELECTED_ROW_STATIC = {
-  background: 'color-mix(in oklab, var(--accent) 12%, white)',
-  fontWeight: 600,
-} as const satisfies CSSProperties;
-
-const SELECTED_ROW = {
-  ...SELECTED_ROW_STATIC,
-  cursor: 'pointer',
-} as const satisfies CSSProperties;
-
-const SELECTABLE_ROW = { cursor: 'pointer' } as const satisfies CSSProperties;
-
-const populationStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  fontVariantNumeric: 'tabular-nums',
-} as const satisfies CSSProperties;
-
-/**
- * The track is tinted with `color-mix` rather than `opacity`, which the fill
- * would inherit: an opacity on the track composites its child too, so the bar
- * would be as faint as the groove it sits in.
- */
-const barTrackStyle = {
-  display: 'block',
-  flex: '1 1 auto',
-  minWidth: 24,
-  height: 5,
-  borderRadius: 3,
-  backgroundColor: 'color-mix(in srgb, currentColor 22%, transparent)',
-  overflow: 'hidden',
-} as const satisfies CSSProperties;
-
-const barFillStyle = {
-  display: 'block',
-  height: '100%',
-  borderRadius: 3,
-  backgroundColor: 'currentColor',
-} as const satisfies CSSProperties;

@@ -7,7 +7,7 @@ import {
   rankByRefinedEnergy,
 } from '../conformerRefineRank.ts';
 import type { ConformerShape } from '../conformerShape.ts';
-import type { Conformer } from '../conformers.ts';
+import type { Conformer } from '../conformerTypes.ts';
 
 test('the set is ordered by refined energy, renumbered, and measured from the lowest', () => {
   const ranked = rankByRefinedEnergy([

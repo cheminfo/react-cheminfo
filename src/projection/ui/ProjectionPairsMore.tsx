@@ -7,6 +7,7 @@ import type { ProjectionOptions } from '../core/projectionOptions.ts';
 import type { ProjectionGrouping } from '../core/projectionSamples.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
+import { ProjectionPointRadius } from './ProjectionFigureFields.tsx';
 import { ProjectionColourPicker } from './ProjectionGroupingPickers.tsx';
 import { projectionPairsCeiling } from './projectionPairsCeiling.ts';
 
@@ -69,16 +70,10 @@ export function ProjectionPairsMore(
         copy={copy}
         groupings={groupings}
       />
-      <OverlayNumber
-        label={panel.name.pointRadius}
-        help={help.pointRadius}
-        value={options.pointRadius}
-        min={1}
-        max={12}
-        step={0.5}
-        digits={1}
-        unit="px"
-        onChange={(pointRadius) => onChange({ pointRadius })}
+      <ProjectionPointRadius
+        options={options}
+        onChange={onChange}
+        copy={copy}
       />
     </OverlayPanel>
   );

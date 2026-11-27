@@ -6,16 +6,16 @@
  * user units for whatever window the test sets.
  */
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { act, createRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import { installProbeStubs } from '../../../chart/ui/__tests__/zoomProbe.tsx';
-import { massFixture } from '../../core/__tests__/massFixtures.ts';
+import { stubViewerLayout } from '../../../chart/ui/__tests__/viewerLayout.ts';
+import {
+  massFixture,
+  massFixtureFile,
+} from '../../core/__tests__/massFixtures.ts';
 import type {
   MassEditorHandle,
   MassPlotClick,
@@ -26,17 +26,7 @@ let host: HTMLDivElement;
 let root: Root;
 
 beforeEach(() => {
-  installProbeStubs();
-  // The list scrolls its selected row into view, which jsdom does not lay out.
-  Element.prototype.scrollIntoView = () => undefined;
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  vi.stubGlobal('ResizeObserver', NoResizeObserver);
-  // jsdom lays nothing out, so the box the chart measures is given a size.
-  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
-    new DOMRect(0, 0, 600, 400),
-  );
-  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(600);
-  vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(400);
+  stubViewerLayout();
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);
@@ -48,18 +38,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
-
-/**
- * A fixture as the browser would hand it over from a drop.
- * @param name - The fixture in the core tests' `data/`.
- * @returns The file.
- */
-function fixtureFile(name: string): File {
-  const bytes = readFileSync(
-    join(import.meta.dirname, '../../core/__tests__/data', name),
-  );
-  return new File([bytes], name);
-}
 
 /**
  * The box the chart is drawn in, which is where files are dropped.
@@ -104,7 +82,7 @@ test('files read through the handle are added, and a refusal is said', async () 
     'film.jdx',
   );
   await act(() =>
-    handle.current?.openFiles([fixtureFile('gcms-ntuples.jdx'), infrared]),
+    handle.current?.openFiles([massFixtureFile('gcms-ntuples.jdx'), infrared]),
   );
 
   const spectra = handle.current?.getSpectra() ?? [];
@@ -124,7 +102,10 @@ test('a file dropped on the chart is drawn', async () => {
 
   const drop = new Event('drop', { bubbles: true, cancelable: true });
   Object.defineProperty(drop, 'dataTransfer', {
-    value: { files: [fixtureFile('aflatoxin-peaks.jdx')], types: ['Files'] },
+    value: {
+      files: [massFixtureFile('aflatoxin-peaks.jdx')],
+      types: ['Files'],
+    },
   });
   act(() => {
     chartBox().dispatchEvent(drop);
@@ -174,18 +155,3 @@ test('a click reports the peak within reach, and nothing off one', async () => {
     },
   ]);
 });
-
-/** A `ResizeObserver` that observes nothing, for a DOM where nothing resizes. */
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing was observed.
-  }
-}

@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import { CHART_COLORS } from '../../chart/core/chartTheme.ts';
 import { SPECTRUM_COLORS } from '../../chart/core/spectrumColor.ts';
 
-export interface XpsLogoProps {
+interface XpsLogoProps {
   /**
    * Width and height of the mark, in pixels.
    * @default 32

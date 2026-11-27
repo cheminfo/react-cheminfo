@@ -13,7 +13,7 @@
 
 import type { MeasurementXY } from 'cheminfo-types';
 import { autoPeakPicking } from 'ir-spectrum';
-import { xMaxValue, xMinValue } from 'ml-spectra-processing';
+import { xMinMaxValues } from 'ml-spectra-processing';
 
 import type { IrBand, IrBandStrength } from './irBand.ts';
 import { bandHeight } from './irBand.ts';
@@ -133,13 +133,14 @@ export function infraredMeasurement(
   absorbance: Float64Array,
   transmittance: Float64Array,
 ): MeasurementXY {
+  const { min, max } = xMinMaxValues(transmittance);
   const percent = {
     label: 'Transmittance (%)',
     units: '%',
     symbol: 't' as const,
     data: transmittance,
-    min: xMinValue(transmittance),
-    max: xMaxValue(transmittance),
+    min,
+    max,
   };
   return {
     variables: {

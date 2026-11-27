@@ -8,6 +8,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { layer, occurrences } from '../../../__tests__/markup.ts';
 import { rowMatrix } from '../../../chart/core/index.ts';
 import type { ProjectionResult, ProjectionSamples } from '../../core/index.ts';
 import { ProjectionViewer } from '../ProjectionViewer.tsx';
@@ -146,26 +147,3 @@ test('the key names the groups and counts them, as it does on the map', () => {
 test('the panel is named, so the bar can offer to save the figure', () => {
   expect(draw()).toContain('role="tabpanel"');
 });
-
-/**
- * One drawing layer of the figure, on its own.
- *
- * Bounded by the next layer and by the end of the picture, because the key
- * floats *outside* the `<svg>` and draws a dot per group: a slice that ran to
- * the end of the markup would count those dots as samples.
- * @param html - The rendered figure.
- * @param name - The layer's `data-layer` value.
- * @returns That layer's markup, or the empty string when it was not drawn.
- */
-function layer(html: string, name: string): string {
-  const start = html.indexOf(`<g data-layer="${name}"`);
-  if (start === -1) return '';
-  const next = html.indexOf('<g data-layer=', start + 1);
-  const close = html.indexOf('</svg>', start);
-  const ends = [next, close].filter((at) => at !== -1);
-  return html.slice(start, ends.length === 0 ? undefined : Math.min(...ends));
-}
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
-}

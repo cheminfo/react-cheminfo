@@ -131,7 +131,7 @@ export function OverlayReadout(props: OverlayReadoutProps): ReactElement {
       {readoutLines(written)}
       {hidden === 0 ? null : (
         <div style={FOOTER_STYLE}>
-          {`+ ${hidden} more — click to keep this open`}
+          {t('overlay.moreRows', { count: hidden })}
         </div>
       )}
     </div>

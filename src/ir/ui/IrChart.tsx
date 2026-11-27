@@ -1,13 +1,15 @@
 import type { ReactElement } from 'react';
-import { useCallback, useId, useLayoutEffect, useMemo, useRef } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 
-import { sameChartDomain } from '../../chart/core/chartDomain.ts';
 import { MARGIN, plotRect } from '../../chart/core/chartGeometry.ts';
 import type { ChartPoint } from '../../chart/core/svgPoint.ts';
 import { Axes } from '../../chart/ui/Axes.tsx';
+import { PlotClip } from '../../chart/ui/PlotClip.tsx';
 import { SelectionRect } from '../../chart/ui/SelectionRect.tsx';
 import { chartSurfaceStyle } from '../../chart/ui/chartSurface.ts';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
+import { useReportedDomain } from '../../chart/ui/useReportedDomain.ts';
+import { useSvgId } from '../../chart/ui/useSvgId.ts';
 import type { AssignedBand } from '../core/assignBands.ts';
 import type { IrBand } from '../core/irBand.ts';
 import { IR_TECHNIQUE_RULES, irModeFor } from '../core/irTechnique.ts';
@@ -120,14 +122,7 @@ export function IrChart(props: IrChartProps): ReactElement {
     xFactor.current = xScale.factor;
   }, [xScale]);
 
-  const reported = useRef(shown);
-  // Before the browser paints, so a host that stores the window and hands it
-  // back does so in the frame the gesture landed in rather than the one after.
-  useLayoutEffect(() => {
-    if (sameChartDomain(reported.current, shown)) return;
-    reported.current = shown;
-    onDomainChange?.(shown);
-  }, [shown, onDomainChange]);
+  useReportedDomain(shown, onDomainChange, spectra.length === 0);
 
   const bands = useMemo(() => {
     const found: IrBand[] = [];
@@ -153,7 +148,7 @@ export function IrChart(props: IrChartProps): ReactElement {
 
   // React's generated id carries the punctuation it keeps its own ids apart
   // with, which a URL fragment is under no obligation to accept.
-  const clipId = `ir-plot-${useId().replaceAll(/\W/g, '')}`;
+  const clipId = useSvgId('ir-plot');
 
   return (
     <div ref={containerRef} style={containerStyle}>
@@ -169,16 +164,7 @@ export function IrChart(props: IrChartProps): ReactElement {
         style={chartSurfaceStyle(pointer.position !== null)}
         {...handlers}
       >
-        <defs>
-          <clipPath id={clipId}>
-            <rect
-              x={plot.left}
-              y={plot.top}
-              width={plot.width}
-              height={plot.height}
-            />
-          </clipPath>
-        </defs>
+        <PlotClip id={clipId} plot={plot} />
 
         <Axes
           plot={plot}
@@ -211,7 +197,7 @@ export function IrChart(props: IrChartProps): ReactElement {
           mode={mode}
           showAssignments={showAssignments}
           highlight={highlight}
-          {...(labelLimit === undefined ? {} : { limit: labelLimit })}
+          limit={labelLimit}
         />
         <SelectionRect selection={selection} plot={plot} />
         <IrPointerTracker

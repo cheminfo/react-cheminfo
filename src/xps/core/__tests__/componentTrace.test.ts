@@ -4,7 +4,6 @@ import type { ComponentPeak } from '../componentShape.ts';
 import { parseComponentShape } from '../componentShape.ts';
 import {
   componentAmplitude,
-  componentIntensity,
   componentTrace,
   envelopeTrace,
 } from '../componentTrace.ts';
@@ -34,18 +33,6 @@ test('a component with no width or no area has no height', () => {
 
   expect(componentAmplitude({ ...carbon, fwhm: 0 }, gaussian)).toBe(0);
   expect(componentAmplitude({ ...carbon, area: Number.NaN }, gaussian)).toBe(0);
-});
-
-test('a component reads its own height at its centre and half at its width', () => {
-  expect(componentIntensity(carbon, 285)).toBe(0.9394372786996513);
-  expect(componentIntensity(carbon, 285.5)).toBeCloseTo(
-    0.9394372786996513 / 2,
-    12,
-  );
-  expect(componentIntensity(carbon, 284.5)).toBeCloseTo(
-    0.9394372786996513 / 2,
-    12,
-  );
 });
 
 test('a component is drawn across the window on an ascending grid', () => {

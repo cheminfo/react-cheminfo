@@ -22,7 +22,7 @@ import { recordNumber, recordText } from './vamasRecord.ts';
 import type { XpsMeta, XpsMetaField } from './xpsSpectrum.ts';
 
 /** What a reader recovered about one block, in the two shapes it comes in. */
-export interface XpsMetaSource {
+interface XpsMetaSource {
   /**
    * The flat record, keyed by the standard's own field names.
    * @default undefined

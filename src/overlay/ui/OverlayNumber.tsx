@@ -3,6 +3,7 @@ import type { KeyboardEvent, ReactElement } from 'react';
 import { clamp } from '../../format/core/clamp.ts';
 import { formatDecimal } from '../../format/core/numbers.ts';
 import { roundTo } from '../../format/core/roundTo.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 
 import type { OverlayControlProps } from './OverlayRow.tsx';
 import { OverlayRow } from './OverlayRow.tsx';
@@ -68,6 +69,7 @@ export function OverlayNumber(props: OverlayNumberProps): ReactElement {
     digits = 0,
     unit = '',
   } = props;
+  const t = useChromeT();
   const { metrics } = useOverlaySurface();
 
   function move(steps: number): void {
@@ -94,7 +96,7 @@ export function OverlayNumber(props: OverlayNumberProps): ReactElement {
           type="button"
           style={overlayStepperButtonStyle(metrics, disabled || value <= min)}
           disabled={disabled || value <= min}
-          aria-label={`Decrease ${label}`}
+          aria-label={t('overlay.decrease', { label })}
           onClick={() => move(-1)}
           onKeyDown={onKeyDown}
         >
@@ -110,7 +112,7 @@ export function OverlayNumber(props: OverlayNumberProps): ReactElement {
           type="button"
           style={overlayStepperButtonStyle(metrics, disabled || value >= max)}
           disabled={disabled || value >= max}
-          aria-label={`Increase ${label}`}
+          aria-label={t('overlay.increase', { label })}
           onClick={() => move(1)}
           onKeyDown={onKeyDown}
         >

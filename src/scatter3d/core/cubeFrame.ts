@@ -49,7 +49,7 @@ export function cubeEdges(): Array<[Vector3, Vector3]> {
 }
 
 /** One labelled arm of the frame. */
-export interface CubeArm {
+interface CubeArm {
   /** Which of the three axes it stands for. */
   axis: 'x' | 'y' | 'z';
   /** The far end of the arm. */

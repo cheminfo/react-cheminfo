@@ -44,7 +44,7 @@ export const MAXIMUM_ZOOM = 8;
  * of pixels. A surface with its own idea of how big is big enough passes its
  * own maximum instead.
  */
-export const MAXIMUM_CONTENT_SCALE = 1.5;
+const MAXIMUM_CONTENT_SCALE = 1.5;
 
 /** The base view, seen as it comes: no zoom, no pan. */
 export const INITIAL_VIEW: ViewState = { zoom: 1, panX: 0, panY: 0 };

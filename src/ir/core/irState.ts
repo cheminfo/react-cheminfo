@@ -13,6 +13,8 @@
  * band be added or taken away, and a list be handed to a host and back.
  */
 
+import { clamp } from '../../format/core/clamp.ts';
+
 import type { IrPanelId, IrSidePanelId } from './irSidePanels.ts';
 import type { IrDomain, IrMode, IrSpectrum } from './irSpectrum.ts';
 import type { IrTechnique } from './irTechnique.ts';
@@ -213,36 +215,15 @@ export function mergeIrSettings(
       ? change.mode
       : irModeFor(current.technique, current.mode),
     picking: { ...current.picking, ...change.picking },
-    labelLimit: Number.isFinite(asked)
-      ? Math.min(MAXIMUM_LABEL_LIMIT, Math.max(0, Math.round(asked)))
-      : current.labelLimit,
+    labelLimit: clamp(
+      Math.round(asked),
+      0,
+      MAXIMUM_LABEL_LIMIT,
+      current.labelLimit,
+    ),
     assignmentTolerance:
       Number.isFinite(tolerance) && tolerance >= 0
         ? tolerance
         : current.assignmentTolerance,
   };
-}
-
-/**
- * Whether a window is one a chart can be built on.
- *
- * Both ends finite and the low one below the high one. A window failing either
- * makes every scale built from it infinite, which the DOM refuses outright — so
- * a handle told to frame a band it worked out wrongly leaves the chart alone
- * instead of blanking it.
- * @param domain - The window to check.
- * @returns Whether it can be shown.
- */
-export function isIrWindow(domain: IrDomain): boolean {
-  return isWindow(domain.x) && isWindow(domain.y);
-}
-
-/**
- * Whether one axis of a window runs from somewhere to somewhere else.
- * @param bounds - `[from, to]` on that axis.
- * @returns Whether it is usable.
- */
-function isWindow(bounds: [number, number]): boolean {
-  const [from, to] = bounds;
-  return Number.isFinite(from) && Number.isFinite(to) && from < to;
 }

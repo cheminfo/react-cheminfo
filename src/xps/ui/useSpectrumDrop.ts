@@ -28,7 +28,7 @@ import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
 import { carriesFiles, takePaste } from './dropEvents.ts';
 import { readSpectrumFiles } from './readSpectrumFiles.ts';
 
-export interface UseSpectrumDropOptions {
+interface UseSpectrumDropOptions {
   /**
    * Called with the spectra a drop or a paste produced, never with an empty
    * list. Whether they replace what is open or join it is the caller's to
@@ -69,7 +69,7 @@ export interface UseSpectrumDropOptions {
 }
 
 /** What the drop target is currently doing. */
-export interface SpectrumDrop {
+interface SpectrumDrop {
   /** Whether a file is being dragged over it, for the surface to say so. */
   isOver: boolean;
   /**
@@ -92,7 +92,7 @@ export interface SpectrumDrop {
 }
 
 /** The `ref` to put on the viewer's root, and what that root is doing. */
-export type SpectrumDropHandle = [
+type SpectrumDropHandle = [
   ref: (element: HTMLElement | null) => void,
   drop: SpectrumDrop,
 ];

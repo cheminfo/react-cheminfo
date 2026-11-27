@@ -4,6 +4,10 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
 import {
+  layerUntilClose as layer,
+  occurrences,
+} from '../../../__tests__/markup.ts';
+import {
   IRIS_PCA as model,
   IRIS_ROWS as rows,
 } from '../../core/__tests__/iris.ts';
@@ -61,13 +65,3 @@ test('keeping two components leaves the pair grid and the shares out', () => {
   expect(html).toContain('>Map</button>');
   expect(html).toContain('>What differs</button>');
 });
-
-function layer(html: string, name: string): string {
-  const start = html.indexOf(`<g data-layer="${name}"`);
-  if (start === -1) return '';
-  return html.slice(start, html.indexOf('</g>', start));
-}
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
-}

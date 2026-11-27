@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { occurrences } from '../../../__tests__/markup.ts';
 import type { ParallelAxis } from '../../core/parallelTypes.ts';
 import { ParallelCoordinates } from '../ParallelCoordinates.tsx';
 
@@ -165,14 +166,4 @@ function figure(
       {...props}
     />,
   );
-}
-
-function occurrences(html: string, needle: string): number {
-  let found = 0;
-  let index = html.indexOf(needle);
-  while (index >= 0) {
-    found++;
-    index = html.indexOf(needle, index + needle.length);
-  }
-  return found;
 }

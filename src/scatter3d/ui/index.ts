@@ -10,30 +10,5 @@
  * three sets of tick labels.
  */
 
-export type { CloudFrameLayerProps } from './CloudFrameLayer.tsx';
-export { CloudFrameLayer } from './CloudFrameLayer.tsx';
-export type { CloudShell, CloudShellLayerProps } from './CloudShellLayer.tsx';
-export { CloudShellLayer } from './CloudShellLayer.tsx';
-export type {
-  CloudCloud,
-  CloudOutline,
-  CloudSegment,
-  CloudView,
-} from './cloudGeometry.ts';
-export {
-  CLOUD_FILL,
-  CLOUD_MARGIN,
-  cloudView,
-  projectCloud,
-  projectSegments,
-  projectShellOutline,
-} from './cloudGeometry.ts';
-export type { ShellGlassStop } from './cloudShellStyles.ts';
-export { SHELL_FILL_OPACITY, shellGlassStops } from './cloudShellStyles.ts';
-export { CLOUD_ZOOM_RANGE, clampCloudZoom } from './cloudZoom.ts';
-export type { CloudShellsInput } from './scatterCloudModel.ts';
-export { cloudLabel, cloudShells } from './scatterCloudModel.ts';
 export type { ScatterCloudProps } from './scatterCloudProps.ts';
 export { ScatterCloud } from './ScatterCloud.tsx';
-export type { OrbitDrag, OrbitDragOptions } from './useOrbitDrag.ts';
-export { useOrbitDrag } from './useOrbitDrag.ts';

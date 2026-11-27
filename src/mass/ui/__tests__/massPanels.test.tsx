@@ -13,13 +13,15 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import {
+  iconsLoaded,
+  stubViewerLayout,
+} from '../../../chart/ui/__tests__/viewerLayout.ts';
 import { massFixture } from '../../core/__tests__/massFixtures.ts';
 import type { MassEditorHandle } from '../../core/massEditorApi.ts';
 import type { MassSpectrum } from '../../core/massSpectrum.ts';
 import type { MassEditorProps } from '../MassEditor.tsx';
 import { MassEditor } from '../MassEditor.tsx';
-
-import { iconsLoaded, stubViewerLayout } from './massViewerStubs.ts';
 
 let host: HTMLDivElement;
 let root: Root;

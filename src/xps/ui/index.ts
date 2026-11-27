@@ -19,11 +19,6 @@ export { XpsHighlightProvider } from './XpsHighlightProvider.tsx';
 // The chart, which holds nothing.
 export type { XpsChartProps, XpsChartWindows } from './xpsChartProps.ts';
 export { XpsChart } from './XpsChart.tsx';
-export type {
-  XpsPointerTrackerProps,
-  XpsReadout,
-} from './XpsPointerTracker.tsx';
-export { XpsPointerTracker } from './XpsPointerTracker.tsx';
 
 // The state, as a component reaches it.
 export type { UseXpsEditorOptions, XpsEditorApi } from './useXpsEditor.ts';
@@ -41,42 +36,9 @@ export { ElementsPanel } from './ElementsPanel.tsx';
 export { ComponentsPanel } from './ComponentsPanel.tsx';
 export { CompositionPanel } from './CompositionPanel.tsx';
 export { QuantificationPanel } from './QuantificationPanel.tsx';
-export type { XpsSettingsDialogProps } from './XpsSettingsDialog.tsx';
-export { XpsSettingsDialog } from './XpsSettingsDialog.tsx';
-export type { StoredQuantification } from './instrumentStorage.ts';
 export { DEFAULT_INSTRUMENT_STORAGE_KEY } from './instrumentStorage.ts';
 
 // The instrument around the chart.
 export type { XpsEditorProps } from './XpsEditor.tsx';
 export { XpsEditor } from './XpsEditor.tsx';
-export type { XpsHostPanel, XpsStackPanel } from './xpsHostPanels.ts';
-export { isXpsHostPanel, xpsStackPanels } from './xpsHostPanels.ts';
-export type {
-  RunXpsCommand,
-  XpsCommandHandlers,
-} from './xpsCommandContext.tsx';
-export {
-  useXpsCommand,
-  useXpsCommandProps,
-  xpsCommandLabel,
-} from './xpsCommandContext.tsx';
-export type { XpsCommandProviderProps } from './XpsCommandProvider.tsx';
-export { XpsCommandProvider } from './XpsCommandProvider.tsx';
-export type { XpsCommandTooltipProps } from './XpsCommandTooltip.tsx';
-export { XpsCommandTooltip } from './XpsCommandTooltip.tsx';
-export type { UseXpsCommandHandlersOptions } from './useXpsCommandHandlers.ts';
-export { useXpsCommandHandlers } from './useXpsCommandHandlers.ts';
-export { useXpsShortcuts } from './useXpsShortcuts.ts';
-export { XpsSidePanel } from './XpsSidePanel.tsx';
-export { XpsToolbar } from './XpsToolbar.tsx';
-export type { XpsDocumentationDialogProps } from './XpsDocumentationDialog.tsx';
-export { XpsDocumentationDialog } from './XpsDocumentationDialog.tsx';
-export { xpsDocumentationSections } from './xpsDocumentationSections.tsx';
-export type { XpsLogoProps } from './XpsLogo.tsx';
-export { XpsLogo } from './XpsLogo.tsx';
-export type {
-  SpectrumDrop,
-  SpectrumDropHandle,
-  UseSpectrumDropOptions,
-} from './useSpectrumDrop.ts';
-export { useSpectrumDrop } from './useSpectrumDrop.ts';
+export type { XpsHostPanel } from './xpsHostPanels.ts';

@@ -6,17 +6,9 @@ import { gradientId, gradientMarkup } from '../gradients.ts';
 import { gradientPaint } from '../graphicPaint.ts';
 import { graphicPrimitive } from '../graphics.ts';
 import type { Scene } from '../primitives.ts';
-import type { DrawingStyle } from '../style.ts';
 import { sceneBody } from '../svg.ts';
 
-const STYLE: DrawingStyle = {
-  bondLength: 14.4,
-  lineWidth: 0.6,
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  captionSize: 10,
-  captionFamily: 'Arial, Helvetica, sans-serif',
-  color: '#000000',
-};
+import { STYLE } from './drawingStyle.ts';
 
 const BOX: DrawGraphic = {
   type: 'graphic',

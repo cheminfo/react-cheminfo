@@ -9,26 +9,6 @@ export const CONFORMER_STRATEGIES = [
 /** One of {@link CONFORMER_STRATEGIES}. */
 export type ConformerStrategy = (typeof CONFORMER_STRATEGIES)[number];
 
-/** Short names for the strategy picker. */
-export const STRATEGY_LABELS: Record<ConformerStrategy, string> = {
-  'adaptive-random': 'Adaptive random',
-  'likely-random': 'Likely random',
-  'pure-random': 'Pure random',
-  'likely-systematic': 'Likely systematic',
-};
-
-/** One sentence per strategy, shown as help text next to the picker. */
-export const STRATEGY_DETAILS: Record<ConformerStrategy, string> = {
-  'adaptive-random':
-    'Draws torsions at random but steers away from the combinations that already collided, which covers a flexible molecule fastest.',
-  'likely-random':
-    'Draws torsions at random from the torsion database, weighted by how often each angle is seen in crystal structures.',
-  'pure-random':
-    'Draws every torsion uniformly at random, ignoring how likely the angle is — the widest spread and the least realistic set.',
-  'likely-systematic':
-    'Walks the torsion combinations in decreasing likelihood, so the first conformers are the most probable ones and the set is reproducible.',
-};
-
 /** Force fields offered for the optional minimisation step. */
 export const MINIMISATION_ALGORITHMS = [
   'none',
@@ -39,14 +19,6 @@ export const MINIMISATION_ALGORITHMS = [
 
 /** One of {@link MINIMISATION_ALGORITHMS}. */
 export type MinimisationAlgorithm = (typeof MINIMISATION_ALGORITHMS)[number];
-
-/** Short names for the minimisation picker. */
-export const MINIMISATION_LABELS: Record<MinimisationAlgorithm, string> = {
-  none: 'None (no energies)',
-  MMFF94: 'MMFF94',
-  MMFF94s: 'MMFF94s',
-  'MMFF94s+': 'MMFF94s+',
-};
 
 /** Everything a conformer run needs, in one serialisable object. */
 export interface ConformerOptions {

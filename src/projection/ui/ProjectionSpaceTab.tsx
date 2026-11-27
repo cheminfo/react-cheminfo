@@ -146,6 +146,10 @@ export function ProjectionSpaceTab(
   );
 
   const shapeList = useMemo(() => projectionScatterShapes(shapes), [shapes]);
+  const scatterGroups = useMemo(
+    () => projectionScatterGroups(groups),
+    [groups],
+  );
   const colored = colorBy !== NO_GROUPING && groups.entries.length > 0;
 
   return (
@@ -160,7 +164,7 @@ export function ProjectionSpaceTab(
         yLabel={axisName(result, yAxis)}
         zLabel={axisName(result, zAxis)}
         groupOf={colored ? groups.groupOf : undefined}
-        groups={colored ? projectionScatterGroups(groups) : undefined}
+        groups={colored ? scatterGroups : undefined}
         shapeOf={shapes?.shapeOf}
         shapes={shapeList}
         ellipsoid={colored ? shells : null}

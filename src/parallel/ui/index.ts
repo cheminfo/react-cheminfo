@@ -8,58 +8,10 @@
  * why it is its own domain rather than part of the first viewer to want one.
  */
 
-export { ParallelAxesLayer } from './ParallelAxesLayer.tsx';
-export type { ParallelAxesLayerProps } from './ParallelAxesLayer.tsx';
 export { ParallelCoordinates } from './ParallelCoordinates.tsx';
 export type {
   ParallelCoordinatesProps,
   ParallelHover,
   ParallelInk,
 } from './parallelCoordinatesProps.ts';
-export type {
-  ParallelInkBinding,
-  ParallelInkValues,
-  ParallelTokenInk,
-} from './parallelInk.ts';
-export {
-  parallelInkFrom,
-  readParallelInk,
-  readParallelTokens,
-  useParallelInk,
-} from './parallelInk.ts';
-export { ParallelLabels } from './ParallelLabels.tsx';
-export type { ParallelLabelsProps } from './ParallelLabels.tsx';
-export type { ParallelCommit, ParallelDraft } from './parallelGestureModel.ts';
-export {
-  parallelAxisById,
-  parallelAxisNear,
-  parallelBandsOf,
-  parallelCommitOf,
-  parallelPointOf,
-} from './parallelGestureModel.ts';
-export {
-  parallelColorOf,
-  parallelFigureLabel,
-  parallelHighlightsOf,
-  parallelIsBrushed,
-  parallelRowCount,
-} from './parallelPlotModel.ts';
-export { ParallelTooltip } from './ParallelTooltip.tsx';
-export type { ParallelTooltipProps } from './ParallelTooltip.tsx';
-export type {
-  ParallelCanvasOptions,
-  ParallelCanvases,
-} from './useParallelCanvas.ts';
-export { useParallelCanvas } from './useParallelCanvas.ts';
-export type {
-  ParallelAxisDrag,
-  ParallelAxisDragOptions,
-  ParallelAxisDragState,
-  ParallelAxisHandleProps,
-} from './useParallelAxisDrag.ts';
-export { useParallelAxisDrag } from './useParallelAxisDrag.ts';
-export type {
-  ParallelGesture,
-  ParallelGestureOptions,
-} from './useParallelGesture.ts';
-export { useParallelGesture } from './useParallelGesture.ts';
+export { readParallelInk } from './parallelInk.ts';

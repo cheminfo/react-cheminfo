@@ -14,11 +14,10 @@ export type {
   ConformerRanking,
   ConformerSet,
   StopReason,
-} from './structure/core/conformers.ts';
+} from './structure/core/conformerTypes.ts';
 export {
   continueConformers,
   generateConformers,
-  strategyConstant,
 } from './structure/core/conformers.ts';
 export type {
   ConformerRefinement,
@@ -26,32 +25,15 @@ export type {
   RefineConformersOptions,
 } from './structure/core/conformerRefine.ts';
 export {
-  REFINED_RANKING,
   REFINED_SAME_ENERGY_TOLERANCE,
   refineConformers,
 } from './structure/core/conformerRefine.ts';
-export type {
-  RefinedMinimum,
-  RefinedRanking,
-} from './structure/core/conformerRefineRank.ts';
-export {
-  isRefinedDuplicate,
-  rankByRefinedEnergy,
-} from './structure/core/conformerRefineRank.ts';
-export type { RankedConformer } from './structure/core/conformerMinimise.ts';
-export {
-  minimiseConformer,
-  rankByEnergy,
-} from './structure/core/conformerMinimise.ts';
-export type { KeptConformer } from './structure/core/conformerMinimum.ts';
 export {
   SAME_CHIRALITY_TOLERANCE,
   SAME_ENERGY_TOLERANCE,
   SAME_SHAPE_TOLERANCE,
-  isKeptMinimum,
   isSameMinimum,
   isSameShape,
-  minimisedShapes,
 } from './structure/core/conformerMinimum.ts';
 export type {
   ConformerOptions,
@@ -62,28 +44,16 @@ export {
   CONFORMER_STRATEGIES,
   DEFAULT_CONFORMER_OPTIONS,
   MINIMISATION_ALGORITHMS,
-  MINIMISATION_LABELS,
   ROTATABLE_BOND_WARNING,
-  STRATEGY_DETAILS,
-  STRATEGY_LABELS,
   isConformerStrategy,
   isMinimisationAlgorithm,
   sameConformerOptions,
 } from './structure/core/conformerOptions.ts';
-export type { ConformerSession } from './structure/core/conformerSession.ts';
-export {
-  keepConformerSession,
-  openConformerSession,
-  readPotentialCount,
-} from './structure/core/conformerSession.ts';
 export type {
   ConformerShape,
   PrincipalMoments,
 } from './structure/core/conformerShape.ts';
-export {
-  conformerShape,
-  hasFiniteCoordinates,
-} from './structure/core/conformerShape.ts';
+export { conformerShape } from './structure/core/conformerShape.ts';
 export { registerResources } from './structure/core/oclResources.ts';
 export {
   OCL_RESOURCES_FILE,

@@ -12,7 +12,7 @@ import { loadSpectra } from '../core/loadSpectra.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
 
 /** What the colours already on the chart are, and how much of a file to read. */
-export interface ReadSpectrumFilesOptions {
+interface ReadSpectrumFilesOptions {
   /**
    * The colours already taken, so what is dropped onto a chart that already
    * holds spectra is drawn in a colour of its own.
@@ -27,7 +27,7 @@ export interface ReadSpectrumFilesOptions {
 }
 
 /** What came out of one drop. */
-export interface ReadSpectrumFilesResult {
+interface ReadSpectrumFilesResult {
   /** The spectra, ready to draw. Empty when nothing could be read. */
   spectra: XpsSpectrum[];
   /**

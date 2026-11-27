@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { matchCount as count } from '../../../__tests__/markup.ts';
 import { chartSeriesColor } from '../../core/index.ts';
 import type { ChartSeries } from '../TrackedLineChart.tsx';
 import { TrackedLineChart } from '../TrackedLineChart.tsx';
@@ -147,10 +148,6 @@ function bars(index: number): ChartSeries {
 
 function hidden(index: number): ChartSeries {
   return { ...line(index), visible: false };
-}
-
-function count(html: string, pattern: RegExp): number {
-  return html.match(pattern)?.length ?? 0;
 }
 
 test('two sets of bars share a slot side by side rather than one hiding the other', () => {

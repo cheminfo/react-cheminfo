@@ -39,10 +39,10 @@ export interface MolfileExport {
  * field, so above 999 atoms OpenChemLib writes `?` where the count belongs and
  * the file becomes unreadable. V3000 is used from that size on.
  *
- * Coordinates are emitted exactly as OpenChemLib writes them — the whole
- * molecule is negated in y and z relative to `getAtomY/Z`, which is a rigid
- * rotation and therefore invisible to the viewer, to the energies and to any
- * other file consumer.
+ * Coordinates are written as they are, through {@link writeMolfile}, never
+ * rescaled — y and z negated relative to `getAtomY/Z` as OpenChemLib writes
+ * them, which is a rigid rotation and therefore invisible to the viewer, to the
+ * energies and to any other file consumer.
  *
  * Hydrogens are in the file only if they are explicit atoms, so call this on a
  * conformer, which always carries them.
@@ -51,11 +51,8 @@ export interface MolfileExport {
  * @throws {Error} When the molfile carries no atoms.
  */
 export function toMolfileExport(molecule: Molecule): MolfileExport {
-  const data =
-    molecule.getAllAtoms() > V2000_MAX_ATOMS
-      ? molecule.toMolfileV3()
-      : molecule.toMolfile();
-  return readMolfileExport(data);
+  const dialect = molecule.getAllAtoms() > V2000_MAX_ATOMS ? 'v3000' : 'v2000';
+  return readMolfileExport(writeMolfile(molecule, dialect));
 }
 
 /**

@@ -117,25 +117,6 @@ export function chartPadExtent(
 }
 
 /**
- * The range covering several — the shared scale a row or a column of a pair
- * grid draws against.
- * @param extents - The ranges to cover.
- * @returns The covering range, or `{ min: 0, max: 1 }` when none was given.
- */
-export function chartMergeExtents(
-  extents: readonly ChartExtent[],
-): ChartExtent {
-  let min = Number.POSITIVE_INFINITY;
-  let max = Number.NEGATIVE_INFINITY;
-  for (const extent of extents) {
-    if (Number.isFinite(extent.min) && extent.min < min) min = extent.min;
-    if (Number.isFinite(extent.max) && extent.max > max) max = extent.max;
-  }
-  if (min > max) return { min: 0, max: 1 };
-  return { min, max };
-}
-
-/**
  * A range covering nothing, which every scan starts from.
  *
  * `min` above `max` is what says it is empty, and it is deliberate: a range

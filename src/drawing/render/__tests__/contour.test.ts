@@ -9,12 +9,12 @@ import { bezierOf } from '../../core/curves.ts';
 import type { Point } from '../../core/types.ts';
 import type { Contour } from '../contour.ts';
 import {
-  Pen,
   contourBounds,
   contourEnd,
   isCubic,
   sampleContour,
 } from '../contour.ts';
+import { Pen } from '../pen.ts';
 
 test('a pen keeps where it is, and closes or leaves open what it drew', () => {
   const pen = new Pen(1, 2);

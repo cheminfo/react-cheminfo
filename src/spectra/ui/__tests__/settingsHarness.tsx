@@ -83,21 +83,8 @@ export function field(
   return input;
 }
 
-/**
- * One keystroke: what the box holds once the reader has typed `text`.
- * @param input - The box.
- * @param text - Its whole content afterwards.
- */
-export function type(input: HTMLInputElement, text: string): void {
-  act(() => {
-    const setValue = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value',
-    )?.set?.bind(input);
-    setValue?.(text);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  });
-}
+/** One keystroke: what the box holds once the reader has typed a text. */
+export { typeInto as type } from '../../../__tests__/dom.ts';
 
 /**
  * Pick an option of a menu.

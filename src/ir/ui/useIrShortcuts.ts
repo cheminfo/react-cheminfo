@@ -9,7 +9,6 @@
  * acted on goes no further.
  */
 
-import type { RefObject } from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { isEditingField } from '../../panel/core/isEditingField.ts';
@@ -27,11 +26,11 @@ import { irCommands } from '../core/irCommands.ts';
  * listener is attached once for the life of the viewer instead of being torn down
  * and rebuilt on every render — and the chart re-renders on every move of the
  * pointer across it.
- * @param root - The viewer's root, as it was handed to its `ref`.
+ * @param root - The viewer's root element, `null` until it is mounted.
  * @param handlers - What each command does.
  */
 export function useIrShortcuts(
-  root: RefObject<HTMLElement | null> | HTMLElement | null,
+  root: HTMLElement | null,
   handlers: IrCommandHandlers,
 ): void {
   const latest = useRef(handlers);
@@ -40,10 +39,8 @@ export function useIrShortcuts(
     latest.current = handlers;
   });
 
-  const element = root === null || root instanceof HTMLElement ? root : null;
-
   useEffect(() => {
-    if (element === null) return;
+    if (root === null) return;
 
     function onKeyDown(event: KeyboardEvent): void {
       // A key pressed with a modifier belongs to the browser or to the page:
@@ -64,11 +61,11 @@ export function useIrShortcuts(
       handler();
     }
 
-    element.addEventListener('keydown', onKeyDown);
+    root.addEventListener('keydown', onKeyDown);
     return () => {
-      element.removeEventListener('keydown', onKeyDown);
+      root.removeEventListener('keydown', onKeyDown);
     };
-  }, [element]);
+  }, [root]);
 }
 
 /**

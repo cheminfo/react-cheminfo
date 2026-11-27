@@ -39,7 +39,7 @@ export interface BackgroundOptions {
 }
 
 /** The counts a background is pinned to at each end of a window. */
-export interface EndpointLevels {
+interface EndpointLevels {
   /** Mean counts over the first points: the low-binding-energy end. */
   low: number;
   /** Mean counts over the last points: the high-binding-energy end. */

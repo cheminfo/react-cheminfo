@@ -59,7 +59,7 @@ export const SCIENTIFIC_ABOVE = 1e5;
  * The mirror of `SCIENTIFIC_ABOVE`: `0.00002` is four characters of nothing
  * followed by the one digit that was measured.
  */
-export const SCIENTIFIC_BELOW = 1e-4;
+const SCIENTIFIC_BELOW = 1e-4;
 
 /**
  * Write a number as a mantissa and a power of ten.

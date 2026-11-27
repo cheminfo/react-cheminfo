@@ -31,7 +31,7 @@ const HALO_ALPHA = 0.85;
 const WHITE_HALO = `rgba(255, 255, 255, ${HALO_ALPHA})`;
 
 /** The four tokens the figure paints from, as the page resolved them. */
-export interface ParallelTokenInk {
+interface ParallelTokenInk {
   /** What `--text` resolved to. */
   text: string;
   /** What `--text-muted` resolved to. */
@@ -116,7 +116,7 @@ export function readParallelInk(
 }
 
 /** The inks, and the ref that has to reach the figure for them to be read. */
-export interface ParallelInkBinding {
+interface ParallelInkBinding {
   /** The colours to paint with. */
   ink: ParallelInkValues;
   /** Put on the figure's outermost element. */

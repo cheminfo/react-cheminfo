@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayValueButton } from '../../overlay/ui/OverlayValueButton.tsx';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
-import { normalizeHexColor } from '../core/hex.ts';
+import { colorInputValue } from '../core/hex.ts';
 import { sampleScale } from '../core/interpolate.ts';
 import { formatColorScale, resolveColorScale } from '../core/scaleText.ts';
 import { COLOR_SCALES } from '../core/scales.ts';
@@ -29,8 +29,6 @@ import { ColorScaleEntry } from './ColorScaleEntry.tsx';
 const BUTTON_BAR_WIDTH = 72;
 // Its two ends and its middle: the most dots `OverlaySwatchIcon` draws.
 const BAR_SWATCHES = 3;
-// A `type="color"` input only takes six hex digits.
-const UNREADABLE_COLOR = '#000000';
 
 /** What {@link ColorScaleSelect} chooses. */
 export interface ColorScaleSelectProps {
@@ -149,7 +147,7 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
                 type="color"
                 aria-label={t('color.uniformColour')}
                 title={t('color.uniformColour')}
-                value={normalizeHexColor(oneColor) ?? UNREADABLE_COLOR}
+                value={colorInputValue(oneColor)}
                 style={UNIFORM_INPUT_STYLE}
                 // The swatch picks the colour; the rest of the row chooses
                 // one colour and closes the menu.

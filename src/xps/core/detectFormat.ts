@@ -14,6 +14,12 @@
  * megabytes of digits that nothing would be learned from.
  */
 
+import {
+  formatFromExtension,
+  readFileHeader,
+  stripByteOrderMark,
+} from '../../format/core/fileHeader.ts';
+
 import type { XpsFormat } from './xpsSpectrum.ts';
 
 /** How much of the file the decision is taken on. */
@@ -78,9 +84,6 @@ export const XPS_FILE_ACCEPT = [...EXTENSIONS.keys()]
   .map((extension) => `.${extension}`)
   .join(',');
 
-/** The one decoder the header is read through, kept rather than rebuilt. */
-const DECODER = new TextDecoder();
-
 /**
  * Decide what a dropped file is, from its first bytes and only then its name.
  *
@@ -96,40 +99,16 @@ export function detectFormat(
   data: ArrayBuffer | Uint8Array | string,
   fileName?: string,
 ): XpsFormat | null {
-  const header = stripByteOrderMark(readHeader(data)).trimStart();
+  const header = stripByteOrderMark(
+    readFileHeader(data, HEADER_BYTES),
+  ).trimStart();
   if (header.startsWith(VAMAS_MAGIC)) return 'vamas';
   if (startsJcamp(header)) return 'jcamp';
 
-  const named = formatFromExtension(fileName);
+  const named = formatFromExtension(EXTENSIONS, fileName);
   if (named !== undefined) return named;
   if (hasNumberColumns(header)) return 'text';
   return null;
-}
-
-/**
- * The first bytes of the file, as text.
- * @param data - The file, or the pasted text.
- * @returns The decoded prefix; a byte sequence cut in half at the end decodes
- * to a replacement character, which no marker looked for here contains.
- */
-function readHeader(data: ArrayBuffer | Uint8Array | string): string {
-  if (typeof data === 'string') return data.slice(0, HEADER_BYTES);
-  const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
-  return DECODER.decode(bytes.subarray(0, HEADER_BYTES));
-}
-
-/**
- * Drop a leading UTF-8 byte order mark.
- *
- * This is the whole reason the header is normalised before it is tested: a
- * `U+FEFF` in front of `VAMAS Surface…` makes a plain `startsWith` fail, and
- * the file then goes to whichever reader the extension names, which for a
- * `.txt` export is the text reader reading a VAMAS header as columns.
- * @param header - The decoded prefix.
- * @returns The prefix without its mark.
- */
-function stripByteOrderMark(header: string): string {
-  return header.startsWith('\uFEFF') ? header.slice(1) : header;
 }
 
 /**
@@ -182,16 +161,4 @@ function isNumberRow(line: string): boolean {
     if (field.length === 0 || !Number.isFinite(Number(field))) return false;
   }
   return true;
-}
-
-/**
- * The format a file name claims, used only once the content has said nothing.
- * @param fileName - The name, when the file has one.
- * @returns The format, or `undefined` when the extension names none.
- */
-function formatFromExtension(fileName?: string): XpsFormat | undefined {
-  if (fileName === undefined) return undefined;
-  const extension = fileName.split('.').pop();
-  if (extension === undefined || extension === fileName) return undefined;
-  return EXTENSIONS.get(extension.toLowerCase());
 }

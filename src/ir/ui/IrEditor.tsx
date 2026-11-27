@@ -1,82 +1,8 @@
-import type { ReactNode, Ref } from 'react';
-
-import type { IrEditorHandle, IrPlotClick } from '../core/irEditorApi.ts';
-import type { IrPanelId } from '../core/irSidePanels.ts';
-import type { IrMode, IrSpectrum } from '../core/irSpectrum.ts';
-
+import type { SpectrumViewerProps } from './VibrationalEditor.tsx';
 import { VibrationalEditor } from './VibrationalEditor.tsx';
-import type { IrHostPanel } from './irHostPanels.ts';
 
-export interface IrEditorProps {
-  /**
-   * The spectra to open on. Read when the viewer opens and never again: what is
-   * on the chart belongs to the viewer from then on, so a host re-rendering with
-   * another array does not silently replace what somebody is looking at. The
-   * `ref` handle is how spectra arrive afterwards.
-   * @default []
-   */
-  data?: IrSpectrum[];
-  /**
-   * Called whenever the spectra open change — one loaded, one closed, the chart
-   * cleared, the bands of one picked — with the spectra now open, each carrying
-   * its bands.
-   *
-   * The document only. A zoom, a selection, a rename and a colour change what is
-   * being looked at rather than what is loaded, and a host told about those would
-   * be told on every drag of the mouse.
-   * @default undefined
-   */
-  onChange?: (spectra: IrSpectrum[]) => void;
-  /**
-   * Whether the Bands panel says what each band could be. An exercise switches
-   * it off, so the reading of the bands is the student's; the table's ranges
-   * can still be offered to look up, in a panel of the host's.
-   * @default true
-   */
-  assignments?: boolean;
-  /**
-   * Which value axis to open in: transmittance or absorbance. Intensity, which
-   * infrared does not offer, opens transmittance instead.
-   * @default 'transmittance'
-   */
-  mode?: IrMode;
-  /**
-   * The side panels open to begin with: the viewer's own — `'spectra'`,
-   * `'bands'`, `'metadata'` — or the id of one of `panels`. An id no panel
-   * answers to is ignored.
-   * @default DEFAULT_SIDE_PANELS
-   */
-  defaultPanelIds?: readonly IrPanelId[];
-  /**
-   * Panels the host adds to the viewer's own — a structure to predict a
-   * spectrum from, say. Their icons come first in the activity bar, in the
-   * order given, and each then behaves as a built-in panel does: toggled on its
-   * own, stacked in the same column with a share of its height, folded and
-   * closed from its header.
-   * @default []
-   */
-  panels?: readonly IrHostPanel[];
-  /**
-   * The plot was clicked at this wavenumber (a press that did not travel, i.e.
-   * not a zoom drag), with the spectrum selected at that moment. Not called
-   * while bands are picked by hand: a click is a band then.
-   * @default undefined
-   */
-  onPlotClick?: (click: IrPlotClick) => void;
-  /**
-   * The host's own actions on what it keeps — open a file, save a document —
-   * as `Toolbar.Item`s of `react-science/ui`, drawn in the header after the
-   * viewer's mark.
-   * @default undefined
-   */
-  actions?: ReactNode;
-  /**
-   * The handle a host drives the viewer through: take these spectra, frame this
-   * wavenumber, select that one.
-   * @default undefined
-   */
-  ref?: Ref<IrEditorHandle>;
-}
+/** What the infrared viewer takes. */
+export type IrEditorProps = SpectrumViewerProps;
 
 /**
  * An infrared spectrum viewer: a header across the top, the chart in the middle,
@@ -94,6 +20,9 @@ export interface IrEditorProps {
  * through `onChange`, and everything else a host wants — frame this band, take
  * these spectra — is a gesture on the `ref` rather than a prop that has to change
  * to be obeyed.
+ *
+ * It opens in transmittance unless `mode` says absorbance; intensity, which
+ * infrared does not offer, opens transmittance too.
  * @param props - Component props.
  * @returns The viewer.
  */

@@ -52,7 +52,7 @@ export interface ChartClickModifiers {
 }
 
 /** No key held, which is what a plain click reports. */
-export const NO_MODIFIERS: ChartClickModifiers = { shift: false, alt: false };
+const NO_MODIFIERS: ChartClickModifiers = { shift: false, alt: false };
 
 /** What to spread onto the SVG for it to be zoomed. */
 export interface ChartZoomHandlers {
@@ -175,7 +175,7 @@ export interface Drag extends DragBox {
  * @param yScale - The y axis, likewise.
  * @param rules - How the y axis behaves and what a drag means.
  * @param reports - What the host asked to be told.
- * @param modifiers
+ * @param modifiers - Which keys were held as the button came up.
  * @returns The window to show, `null` when the chart stays where it is.
  */
 export function answeredRelease(

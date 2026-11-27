@@ -18,7 +18,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import {
   iconsLoaded,
   stubViewerLayout,
-} from '../../../mass/ui/__tests__/massViewerStubs.ts';
+} from '../../../chart/ui/__tests__/viewerLayout.ts';
 import type { XpsEditorHandle } from '../../core/xpsEditorApi.ts';
 import { XpsEditor } from '../XpsEditor.tsx';
 

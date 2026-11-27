@@ -55,11 +55,7 @@ export type {
   IrShortcut,
   RunIrCommand,
 } from './irCommands.ts';
-export {
-  irCommandEntryLabel,
-  irCommandLabel,
-  irCommands,
-} from './irCommands.ts';
+export { irCommandEntryLabel, irCommands } from './irCommands.ts';
 export { irCommandOffered, irCommandsFor } from './irTechniqueCommands.ts';
 export {
   LABEL_HEADROOM,
@@ -84,7 +80,6 @@ export {
   shortModeLabel,
 } from './irFormat.ts';
 export {
-  IR_MODES,
   IR_MODE_RULES,
   bandsPointDown,
   boxZoomOnly,
@@ -123,7 +118,6 @@ export {
   DEFAULT_SIDE_PANELS,
   MAXIMUM_LABEL_LIMIT,
   createIrState,
-  isIrWindow,
   mergeIrSettings,
 } from './irState.ts';
 export type { IrTechnique, IrTechniqueRules } from './irTechnique.ts';
@@ -154,7 +148,6 @@ export {
   withBands,
 } from './spectrumBands.ts';
 export {
-  DEFAULT_DATA_TYPE,
   JCAMP_EXTENSION,
   JCAMP_MIME_TYPE,
   irSpectraToJcamp,

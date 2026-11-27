@@ -9,6 +9,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 
+import { typeInto } from '../../../__tests__/dom.ts';
 import { CHROME_CATALOG } from '../../../i18n/core/chromeCatalog.ts';
 import { SiteLanguage } from '../../../language/ui/SiteLanguage.tsx';
 import { NumberInput } from '../NumberInput.tsx';
@@ -63,14 +64,7 @@ function render(language: string, initial = 0.25): HTMLInputElement {
 }
 
 function type(input: HTMLInputElement, text: string) {
-  act(() => {
-    const setValue = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value',
-    )?.set?.bind(input);
-    setValue?.(text);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  typeInto(input, text);
 }
 
 test('a French box shows a decimal comma and reads one typed', () => {

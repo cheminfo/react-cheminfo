@@ -13,6 +13,7 @@
  * refused whole.
  */
 
+import { isChartWindow } from '../../chart/core/chartDomain.ts';
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 import type { IrBand } from './irBand.ts';
@@ -24,7 +25,6 @@ import type {
   IrSpectrum,
 } from './irSpectrum.ts';
 import type { IrSettings, IrState, PartialIrState } from './irState.ts';
-import { isIrWindow } from './irState.ts';
 import type { IrTechnique } from './irTechnique.ts';
 import { IR_TECHNIQUES } from './irTechnique.ts';
 import type { PickBandsOptions } from './pickBands.ts';
@@ -256,7 +256,7 @@ function readDomain(value: unknown): IrDomain | null {
   const { x, y } = value;
   if (!isPair(x) || !isPair(y)) return null;
   const domain: IrDomain = { x: [x[0], x[1]], y: [y[0], y[1]] };
-  return isIrWindow(domain) ? domain : null;
+  return isChartWindow(domain) ? domain : null;
 }
 
 function isPair(value: unknown): value is [number, number] {

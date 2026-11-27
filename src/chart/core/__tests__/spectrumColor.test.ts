@@ -1,7 +1,6 @@
 import { expect, test } from 'vitest';
 
 import {
-  ALL_SPECTRUM_COLORS,
   EXTRA_SPECTRUM_COLORS,
   SPECTRUM_COLORS,
   nextSpectrumColor,
@@ -28,14 +27,7 @@ test('the offered tier is six more, none of them repeating the first', () => {
     '#804000',
     '#7f878f',
   ]);
-  expect(new Set(ALL_SPECTRUM_COLORS).size).toBe(12);
-});
-
-test('a picker shows both tiers, the handed-out one first', () => {
-  expect(ALL_SPECTRUM_COLORS).toStrictEqual([
-    ...SPECTRUM_COLORS,
-    ...EXTRA_SPECTRUM_COLORS,
-  ]);
+  expect(new Set([...SPECTRUM_COLORS, ...EXTRA_SPECTRUM_COLORS]).size).toBe(12);
 });
 
 test('the first spectrum is drawn in the first hue', () => {

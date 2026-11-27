@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { expect, test } from 'vitest';
 
 import {
@@ -11,24 +8,9 @@ import {
 } from '../handPicking.ts';
 import type { IrBand } from '../irBand.ts';
 import type { IrSpectrum } from '../irSpectrum.ts';
-import { loadIrSpectra } from '../loadIrSpectra.ts';
-import { toIrSpectrum } from '../toIrSpectrum.ts';
 
+import { filmSpectrum } from './irFixtures.ts';
 import { calciteSpectrum } from './ramanFixture.ts';
-
-/**
- * The five-band film, read through the real reader, under a known id.
- * @returns The spectrum.
- */
-async function film(): Promise<IrSpectrum> {
-  const { spectra } = await loadIrSpectra(
-    readFileSync(join(import.meta.dirname, 'data/five-bands.jdx')),
-    { fileName: 'five-bands.jdx' },
-  );
-  const [loaded] = spectra;
-  if (loaded === undefined) throw new Error('The fixture holds no spectrum');
-  return toIrSpectrum(loaded, { id: 'film' });
-}
 
 /** The carbonyl of the film, as automatic picking reports it. */
 const CARBONYL: IrBand = {
@@ -49,14 +31,14 @@ function at(wavenumber: number): IrBand {
 }
 
 test('a click on either flank of a band picks its top, read as automatic picking reads it', async () => {
-  const spectrum = await film();
+  const spectrum = await filmSpectrum();
 
   expect(pickBandAt(spectrum, 1700, 8)).toStrictEqual(CARBONYL);
   expect(pickBandAt(spectrum, 1730, 8)).toStrictEqual(CARBONYL);
 });
 
 test('a click on a mark takes its band away, and anywhere else adds the band under it', async () => {
-  const spectrum: IrSpectrum = { ...(await film()), bands: [] };
+  const spectrum: IrSpectrum = { ...(await filmSpectrum()), bands: [] };
 
   const picked = editBandsAt(spectrum, 1730, 8);
 
@@ -85,7 +67,7 @@ test('a Raman band is picked on its intensity, and a flat stretch gives none', (
 
 test('a spectrum with no axis a band is a maximum of gives no band', async () => {
   const { id, name, color, wavenumber, transmittance, meta, origin } =
-    await film();
+    await filmSpectrum();
   const transmittanceOnly: IrSpectrum = {
     id,
     name,

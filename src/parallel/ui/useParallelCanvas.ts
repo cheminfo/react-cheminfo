@@ -21,7 +21,7 @@ import {
 import type { ParallelInkValues } from './parallelInk.ts';
 
 /** What {@link useParallelCanvas} needs. */
-export interface ParallelCanvasOptions {
+interface ParallelCanvasOptions {
   /** Total width of the figure, in CSS pixels. */
   width: number;
   /** Its total height. */
@@ -45,7 +45,7 @@ export interface ParallelCanvasOptions {
 }
 
 /** The two canvases a figure stacks. */
-export interface ParallelCanvases {
+interface ParallelCanvases {
   /** The mass of lines, underneath. */
   lines: RefObject<HTMLCanvasElement | null>;
   /** The singled-out rows, over them. */

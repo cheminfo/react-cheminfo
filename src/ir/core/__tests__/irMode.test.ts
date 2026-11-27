@@ -1,7 +1,6 @@
 import { expect, test } from 'vitest';
 
 import {
-  IR_MODES,
   bandsPointDown,
   boxZoomOnly,
   otherIrMode,
@@ -23,10 +22,6 @@ const spectrum: IrSpectrum = {
   origin: { format: 'jcamp' },
   visible: true,
 };
-
-test('transmittance is offered first, being what instruments export', () => {
-  expect(IR_MODES).toStrictEqual(['transmittance', 'absorbance']);
-});
 
 test('percent transmittance hangs from a baseline of 100, absorbance from zero', () => {
   // `pointsDown` is which side of the baseline the data is on, and it is what

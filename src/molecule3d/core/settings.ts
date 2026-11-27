@@ -3,6 +3,9 @@
  * a site can persist and validate them.
  */
 
+import { normalizeHexColor } from '../../color/core/hex.ts';
+import { clamp } from '../../format/core/clamp.ts';
+
 import type { PartialBondMode } from './partialBondMode.ts';
 import { isPartialBondMode } from './partialBondMode.ts';
 
@@ -160,18 +163,18 @@ export function normalizeMolecule3DSettings(
       typeof representation === 'string' && isRepresentationId(representation)
         ? representation
         : defaults.representation,
-    sizeFactor: clamp(sizeFactor, 'sizeFactor'),
-    bondSizeFactor: clamp(bondSizeFactor, 'bondSizeFactor'),
+    sizeFactor: inRange(sizeFactor, 'sizeFactor'),
+    bondSizeFactor: inRange(bondSizeFactor, 'bondSizeFactor'),
     showSurface:
       typeof showSurface === 'boolean' ? showSurface : defaults.showSurface,
-    surfaceAlpha: clamp(surfaceAlpha, 'surfaceAlpha'),
-    probeRadius: clamp(probeRadius, 'probeRadius'),
+    surfaceAlpha: inRange(surfaceAlpha, 'surfaceAlpha'),
+    probeRadius: inRange(probeRadius, 'probeRadius'),
     surfaceColoring:
       typeof surfaceColoring === 'string' &&
       isSurfaceColoringId(surfaceColoring)
         ? surfaceColoring
         : defaults.surfaceColoring,
-    surfaceColor: hexColor(surfaceColor, defaults.surfaceColor),
+    surfaceColor: normalizeHexColor(surfaceColor) ?? defaults.surfaceColor,
     partialBonds: isPartialBondMode(partialBonds)
       ? partialBonds
       : defaults.partialBonds,
@@ -240,19 +243,15 @@ export function sameMolecule3DSettings(
   );
 }
 
-function hexColor(value: string | undefined, fallback: string): string {
-  return typeof value === 'string' && /^#[\da-f]{6}$/i.test(value)
-    ? value.toLowerCase()
-    : fallback;
-}
-
-function clamp(
+function inRange(
   value: number | undefined,
   key: keyof typeof MOLECULE_3D_RANGES,
 ): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
-    return DEFAULT_MOLECULE_3D_SETTINGS[key];
-  }
   const { minimum, maximum } = MOLECULE_3D_RANGES[key];
-  return Math.min(Math.max(value, minimum), maximum);
+  return clamp(
+    typeof value === 'number' ? value : Number.NaN,
+    minimum,
+    maximum,
+    DEFAULT_MOLECULE_3D_SETTINGS[key],
+  );
 }

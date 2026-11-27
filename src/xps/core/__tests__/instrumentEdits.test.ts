@@ -6,7 +6,6 @@ import {
   putInstrument,
   readSensitivityFactors,
   removeInstrument,
-  withFactor,
   withFactors,
   withoutFactor,
 } from '../instrumentEdits.ts';
@@ -66,12 +65,6 @@ test('a first line holding a number is no header, and is handed back', () => {
 });
 
 test('a factor replaces the one of its line, or is added after the others', () => {
-  expect(
-    withFactor(KRATOS, { element: 'O', orbital: '1s', factor: 0.711 }).factors,
-  ).toStrictEqual([
-    { element: 'C', orbital: '1s', factor: 0.278 },
-    { element: 'O', orbital: '1s', factor: 0.711 },
-  ]);
   expect(
     withFactors(KRATOS, [
       { element: 'N', orbital: '1s', factor: 0.477 },

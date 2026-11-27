@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
 import { Button, Toolbar } from 'react-science/ui';
 
-import { useCopyToClipboard } from '../../clipboard/ui/useCopyToClipboard.ts';
+import { TableDataButton } from '../../delimited/ui/TableDataButton.tsx';
+import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { panelToolbarStyle } from '../../panel/core/panelStyles.ts';
 
-import { bandsToTsv } from './bandsTsv.ts';
+import { bandCells, bandTableHeader } from './bandTable.ts';
 import { useIrCommandProps } from './irCommandContext.tsx';
 import { useIrActions, useIrEditorState } from './irStateContext.ts';
 
@@ -12,7 +13,7 @@ import { useIrActions, useIrEditorState } from './irStateContext.ts';
  * The row at the top of the bands panel: the switches — picking at all,
  * picking by hand, naming the assignments — then the threshold, then what
  * acts at once, apart from them on the right: finding the bands automatically
- * again, taking every band away, copying the table.
+ * again, taking every band away, taking the table away.
  * @returns The row.
  */
 export function BandsToolbar() {
@@ -23,11 +24,8 @@ export function BandsToolbar() {
   const { mode, pickBands, showAssignments } = state.settings;
   const byHand = selectedSpectrum?.bandsByHand === true;
 
-  const tsv = useMemo(
-    () => bandsToTsv(assigned, mode, assignments),
-    [assigned, mode, assignments],
-  );
-  const { copy } = useCopyToClipboard();
+  const t = useChromeT();
+  const name = selectedSpectrum?.name ?? '';
 
   return (
     <div className="no-print" style={panelToolbarStyle}>
@@ -87,13 +85,23 @@ export function BandsToolbar() {
           }
         }}
       />
-      <Button
-        variant="minimal"
-        icon="clipboard"
+      <TableDataButton
+        header={bandTableHeader(mode, assignments)}
+        rows={() => bandCells(assigned, mode, assignments)}
+        title={`Bands of ${name || 'the spectrum'}`}
+        description="One line per band: its wavenumber, its strength, its value on the axis read and, where the correlation table covers the technique, what it could be."
+        fileName={`${sanitizeFileName(name, 'spectrum')}-bands`}
         disabled={assigned.length === 0}
-        tooltipProps={{ content: 'Copy the table' }}
-        aria-label="Copy the table"
-        onClick={() => void copy(tsv)}
+        trigger={(open) => (
+          <Button
+            variant="minimal"
+            icon="th"
+            disabled={assigned.length === 0}
+            tooltipProps={{ content: t('delimited.copyOrDownload') }}
+            aria-label={t('delimited.copyOrDownload')}
+            onClick={open}
+          />
+        )}
       />
     </div>
   );

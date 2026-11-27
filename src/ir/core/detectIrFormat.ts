@@ -7,6 +7,12 @@
  * the name is consulted only when the content stayed silent.
  */
 
+import {
+  formatFromExtension,
+  readFileHeader,
+  stripByteOrderMark,
+} from '../../format/core/fileHeader.ts';
+
 import type { IrFormat } from './irSpectrum.ts';
 
 /** What a file is recognised as from its own bytes, or else from its name. */
@@ -42,12 +48,6 @@ const EXTENSIONS = new Map<string, DetectedIrFormat>([
 ]);
 
 /**
- * The one decoder the header is read through, kept because a drop of fifty
- * files would otherwise build a hundred of them for four kilobytes each.
- */
-const DECODER = new TextDecoder();
-
-/**
  * Decide what a dropped file is, from its first bytes and only then its name.
  *
  * Returns `'unknown'` rather than guessing `'text'` for the two cases the
@@ -65,10 +65,12 @@ export function detectIrFormat(
 ): DetectedIrFormat | 'unknown' {
   if (isSpc(data)) return 'spc';
 
-  const header = stripByteOrderMark(readHeader(data)).trimStart();
+  const header = stripByteOrderMark(
+    readFileHeader(data, HEADER_BYTES),
+  ).trimStart();
   if (header.startsWith('##')) return 'jcamp';
 
-  const named = formatFromExtension(fileName);
+  const named = formatFromExtension(EXTENSIONS, fileName);
   if (named !== undefined) return named;
   if (header.length === 0) return 'unknown';
   // A binary file the SPC check did not claim decodes to replacement characters;
@@ -102,41 +104,3 @@ function isSpc(data: Uint8Array | string): boolean {
  * the old format still exported by instruments of a certain age.
  */
 const SPC_VERSIONS = new Set([0x4b, 0x4c, 0x4d]);
-
-/**
- * The first bytes of the file, as text.
- * @param data - The file, or the pasted text.
- * @param length - How many bytes to read, defaulting to the whole header.
- * @returns The decoded prefix; a byte sequence cut in half at the end decodes
- * to a replacement character, which no marker looked for here contains.
- */
-function readHeader(data: Uint8Array | string, length = HEADER_BYTES): string {
-  if (typeof data === 'string') return data.slice(0, length);
-  return DECODER.decode(data.subarray(0, length));
-}
-
-/**
- * Drop a leading UTF-8 byte order mark.
- *
- * This is the whole reason the header is normalised before it is tested: a
- * `U+FEFF` in front of `##TITLE=` makes a plain `startsWith('##')` fail, and a
- * BOM-prefixed JCAMP then goes silently to the text reader, which reads its
- * records as unparsable lines and reports two columns of nothing.
- * @param header - The decoded prefix.
- * @returns The prefix without its mark.
- */
-function stripByteOrderMark(header: string): string {
-  return header.startsWith('\uFEFF') ? header.slice(1) : header;
-}
-
-/**
- * The format a file name claims, used only once the content has said nothing.
- * @param fileName - The name, when the file has one.
- * @returns The format, or `undefined` when the extension names none.
- */
-function formatFromExtension(fileName?: string): DetectedIrFormat | undefined {
-  if (fileName === undefined) return undefined;
-  const extension = fileName.split('.').pop();
-  if (extension === undefined || extension === fileName) return undefined;
-  return EXTENSIONS.get(extension.toLowerCase());
-}

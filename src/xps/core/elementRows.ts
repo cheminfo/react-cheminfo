@@ -38,7 +38,7 @@ export interface ElementRow {
 }
 
 /** How wide a window the elements are looked up in. */
-export interface ElementRowsOptions {
+interface ElementRowsOptions {
   /**
    * How far in eV a published level may sit from a measurement.
    * @default the default of `assignElements`

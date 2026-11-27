@@ -90,7 +90,11 @@ export interface ScatterFrame extends ScatterPlotView {
  * @returns The frame. See {@link ScatterFrame}.
  */
 export function useScatterFrame(options: ScatterFrameOptions): ScatterFrame {
-  const { x, y, width, height, xAxis, yAxis } = options;
+  const { x, y, width, height } = options;
+  // Held by value, so the inline `xAxis={{ … }}` a caller writes does not
+  // rebuild the whole frame on every render.
+  const xAxis = useAxisSpec(options.xAxis);
+  const yAxis = useAxisSpec(options.yAxis);
   const { viewport, onViewportChange, wheelZoom = false } = options;
   const { wheelZoomDelay } = options;
 
@@ -169,4 +173,25 @@ function nicedDomain(axis: ChartAxisSpec): readonly [number, number] {
     count: axis.tickCount,
     nice: axis.nice,
   }).domain;
+}
+
+/**
+ * An axis spec that keeps its identity while its fields keep their values.
+ * @param spec - The spec as the caller wrote it.
+ * @returns The same fields, in an object rebuilt only when one changes.
+ */
+function useAxisSpec(spec: ChartAxisSpec): ChartAxisSpec {
+  const { domain, label, tickCount, showGrid, showTicks, nice } = spec;
+  const [low, high] = domain;
+  return useMemo(
+    () => ({
+      domain: [low, high],
+      label,
+      tickCount,
+      showGrid,
+      showTicks,
+      nice,
+    }),
+    [low, high, label, tickCount, showGrid, showTicks, nice],
+  );
 }

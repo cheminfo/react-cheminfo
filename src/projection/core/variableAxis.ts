@@ -84,17 +84,6 @@ export function variableCount(axis: VariableAxis): number {
 }
 
 /**
- * Where each measurement sits, for an axis that is a number line.
- * @param axis - The axis.
- * @returns The positions, or `null` for a named axis, which has none.
- */
-export function variablePositions(
-  axis: VariableAxis,
-): readonly number[] | null {
-  return axis.kind === 'named' ? null : axis.values;
-}
-
-/**
  * What one measurement is called, written out.
  * @param axis - The axis.
  * @param index - Which measurement, from 0.

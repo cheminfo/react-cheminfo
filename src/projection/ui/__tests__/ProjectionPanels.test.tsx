@@ -10,6 +10,7 @@ import type { ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { occurrences } from '../../../__tests__/markup.ts';
 import { OverlayLayer } from '../../../overlay/ui/OverlayLayer.tsx';
 import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import { mergeProjectionCopy } from '../../core/mergeProjectionCopy.ts';
@@ -194,10 +195,6 @@ function draw(panel: ReactNode): string {
   return renderToStaticMarkup(
     <OverlayLayer density="compact">{panel}</OverlayLayer>,
   );
-}
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
 }
 
 function doNothing(): void {

@@ -76,19 +76,6 @@ export const EXTRA_SPECTRUM_COLORS: readonly string[] = [
 ];
 
 /**
- * Both tiers in one list, the handed-out six first.
- *
- * What a picker shows. The order is the tiers in order and never sorted by hue:
- * a reader who has learnt that the first chip is the blue their blank is drawn
- * in must find it in the same place in every viewer, and the row a colour sits
- * in is itself the answer to "will this survive whoever reads the figure".
- */
-export const ALL_SPECTRUM_COLORS: readonly string[] = [
-  ...SPECTRUM_COLORS,
-  ...EXTRA_SPECTRUM_COLORS,
-];
-
-/**
  * The colour to give the next spectrum, given the ones already in use.
  *
  * The lowest unused hue, never one derived from how many spectra there are:

@@ -95,3 +95,48 @@ export function peakListSpectrum(
     showCentroid,
   };
 }
+
+/**
+ * A centroided spectrum, which is what most files hand over: the peaks a test
+ * names, read from a text file.
+ * @param id - Its identity, which is also its name.
+ * @param mz - The m/z of each peak, ascending.
+ * @param intensity - The intensity of each.
+ * @param charge - The charge established for each, `0` for none.
+ * @returns The spectrum, with its centroid drawn and no profile.
+ */
+export function centroidedSpectrum(
+  id: string,
+  mz: number[],
+  intensity: number[],
+  charge?: number[],
+): MassSpectrum {
+  return {
+    id,
+    name: id,
+    color: '#000000',
+    profile: null,
+    centroid: {
+      x: Float64Array.from(mz),
+      y: Float64Array.from(intensity),
+      charge:
+        charge === undefined
+          ? new Int16Array(mz.length)
+          : Int16Array.from(charge),
+    },
+    meta: null,
+    origin: { format: 'text' },
+    showProfile: false,
+    showCentroid: true,
+  };
+}
+
+/**
+ * A fixture as a file a reader drops or picks.
+ * @param name - The fixture.
+ * @returns The file, holding the fixture's bytes.
+ */
+export function massFixtureFile(name: MassFixture): File {
+  const bytes = readFileSync(join(import.meta.dirname, 'data', name));
+  return new File([bytes], name);
+}

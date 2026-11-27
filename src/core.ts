@@ -24,7 +24,19 @@ export * from './moleculesSources/core/index.ts';
 export * from './moleculesToken/core/index.ts';
 export * from './number/core/index.ts';
 export * from './orbital/core/index.ts';
-export * from './overlay/core/index.ts';
+// Only what the overlay ui's own props point a caller at: the rest of the
+// geometry of the floating cards is the ui's.
+export type {
+  EmptiestCornerOptions,
+  OverlayBarFoldOptions,
+  OverlayCorner,
+  OverlayDensity,
+  OverlayMarkShape,
+  OverlayMetrics,
+  OverlayPlacement,
+  OverlayPointerKind,
+} from './overlay/core/index.ts';
+export { emptiestCorner, overlayBarFolded } from './overlay/core/index.ts';
 export * from './panel/core/index.ts';
 export * from './parallel/core/index.ts';
 export * from './pedagogy/core/index.ts';

@@ -6,18 +6,10 @@
 
 import { expect, test } from 'vitest';
 
+import { primitiveMarkup } from '../primitiveMarkup.ts';
 import type { CaptionPrimitive, PathPrimitive } from '../primitives.ts';
-import type { DrawingStyle } from '../style.ts';
-import { primitiveMarkup } from '../svg.ts';
 
-const STYLE: DrawingStyle = {
-  bondLength: 14.4,
-  lineWidth: 0.6,
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  captionSize: 10,
-  captionFamily: 'Arial, Helvetica, sans-serif',
-  color: '#000000',
-};
+import { STYLE } from './drawingStyle.ts';
 
 function path(extra: Partial<PathPrimitive> = {}): PathPrimitive {
   return { kind: 'path', d: 'M0 0L1 1', width: 0.6, extent: [], ...extra };

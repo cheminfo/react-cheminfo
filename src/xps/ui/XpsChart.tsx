@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react';
-import { useId, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { MARGIN, plotRect } from '../../chart/core/chartGeometry.ts';
 import { chartScale } from '../../chart/core/chartScale.ts';
 import { Axes } from '../../chart/ui/Axes.tsx';
 import { AxisGuide } from '../../chart/ui/AxisGuide.tsx';
+import { PlotClip } from '../../chart/ui/PlotClip.tsx';
 import { SelectionRect } from '../../chart/ui/SelectionRect.tsx';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
+import { useSvgId } from '../../chart/ui/useSvgId.ts';
 import {
   axisEnergy,
   axisTitle,
@@ -137,7 +139,7 @@ export function XpsChart(props: XpsChartProps): ReactNode {
 
   // React's generated id carries the punctuation it keeps its own ids apart
   // with, which a URL fragment is under no obligation to accept.
-  const clipId = `xps-plot-${useId().replaceAll(/\W/g, '')}`;
+  const clipId = useSvgId('xps-plot');
 
   return (
     <div ref={containerRef} style={containerStyle}>
@@ -151,16 +153,7 @@ export function XpsChart(props: XpsChartProps): ReactNode {
         style={svgStyle}
         {...gestures.handlers}
       >
-        <defs>
-          <clipPath id={clipId}>
-            <rect
-              x={plot.left}
-              y={plot.top}
-              width={plot.width}
-              height={plot.height}
-            />
-          </clipPath>
-        </defs>
+        <PlotClip id={clipId} plot={plot} />
 
         <Axes
           plot={plot}

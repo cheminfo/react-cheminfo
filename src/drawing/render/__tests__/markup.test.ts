@@ -5,7 +5,6 @@
 
 import { expect, test } from 'vitest';
 
-import { Pen } from '../contour.ts';
 import {
   ellipsePath,
   escapeAttribute,
@@ -15,6 +14,7 @@ import {
   pointText,
   unescapeXml,
 } from '../markup.ts';
+import { Pen } from '../pen.ts';
 
 test('a number is written with two decimals at most, and never as -0', () => {
   expect(number(3.14159)).toBe('3.14');

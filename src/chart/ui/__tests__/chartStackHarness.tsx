@@ -19,6 +19,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { vi } from 'vitest';
 
+import { NoResizeObserver } from '../../../__tests__/dom.ts';
 import { CHART_PANE_ATTRIBUTE } from '../../core/chartPane.ts';
 import type { ChartStackPane } from '../ChartStack.tsx';
 import { ChartStack } from '../ChartStack.tsx';
@@ -197,18 +198,3 @@ const rested: Array<[string, number]> = [];
 
 let host: HTMLDivElement | null = null;
 let root: Root | null = null;
-
-/** A `ResizeObserver` that observes nothing, for a DOM where nothing resizes. */
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    /* nothing is ever measured */
-  }
-
-  public unobserve(): void {
-    /* nothing was ever measured */
-  }
-
-  public disconnect(): void {
-    /* nothing to stop watching */
-  }
-}

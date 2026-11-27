@@ -25,7 +25,7 @@ import { describeSource, spectrumIdentity } from './readOptions.ts';
 import type { XpsOrigin, XpsSpectrum, XpsTrace } from './xpsSpectrum.ts';
 
 /** How two columns of numbers are read. */
-export interface TextReadOptions extends XpsReadOptions {
+interface TextReadOptions extends XpsReadOptions {
   /**
    * What to call the spectrum, for a paste that has no file name.
    * @default undefined

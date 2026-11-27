@@ -32,6 +32,11 @@
 
   --header-height: 3rem;
   --page-max: 84rem;
+
+  /* Status colours: semantic and shared, never retuned per site. */
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
 }
 
 /* The size goes on `body`, never on `html`: `rem` has to stay the browser's

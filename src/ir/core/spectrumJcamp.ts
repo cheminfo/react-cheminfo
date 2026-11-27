@@ -31,9 +31,6 @@ export const JCAMP_EXTENSION = '.jdx';
 /** What a JCAMP-DX file is served as. */
 export const JCAMP_MIME_TYPE = 'chemical/x-jcamp-dx';
 
-/** The infrared data type, written when the file that was read named none. */
-export const DEFAULT_DATA_TYPE = IR_TECHNIQUE_RULES.infrared.dataType;
-
 /**
  * Write one spectrum as a JCAMP-DX block.
  *

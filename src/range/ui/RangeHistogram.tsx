@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
-import { useId, useMemo } from 'react';
+import { useMemo } from 'react';
 
+import { useSvgId } from '../../chart/ui/useSvgId.ts';
 import { rangeHistogramPath } from '../core/rangeHistogram.ts';
 
 /** What the histogram over a range slider needs. */
@@ -23,7 +24,7 @@ export interface RangeHistogramProps {
  */
 export function RangeHistogram(props: RangeHistogramProps): ReactElement {
   const { counts, start, end } = props;
-  const clip = `range-histogram-${useId().replaceAll(/\W/g, '')}`;
+  const clip = useSvgId('range-histogram');
   const outline = useMemo(() => rangeHistogramPath(counts), [counts]);
 
   return (

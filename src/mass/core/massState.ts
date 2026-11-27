@@ -11,6 +11,8 @@
  * when the spectrum was read, so nothing about drawing it ever picks again.
  */
 
+import { clamp } from '../../format/core/clamp.ts';
+
 import type { MassPanelId, MassSidePanelId } from './massSidePanels.ts';
 import type { MassDomain, MassSpectrum } from './massSpectrum.ts';
 import type { MzDecimalsSetting } from './mzDecimalsSetting.ts';
@@ -174,33 +176,12 @@ export function mergeMassSettings(
   return {
     ...current,
     ...change,
-    labelLimit: Number.isFinite(asked)
-      ? Math.min(MAXIMUM_LABEL_LIMIT, Math.max(0, Math.round(asked)))
-      : current.labelLimit,
+    labelLimit: clamp(
+      Math.round(asked),
+      0,
+      MAXIMUM_LABEL_LIMIT,
+      current.labelLimit,
+    ),
     mzDecimals: readMzDecimalsSetting(change.mzDecimals) ?? current.mzDecimals,
   };
-}
-
-/**
- * Whether a window is one a chart can be built on.
- *
- * Both ends finite and the low one below the high one. A window failing either
- * makes every scale built from it infinite, which the DOM refuses outright — so
- * a handle told to frame a peak it worked out wrongly leaves the chart alone
- * instead of blanking it.
- * @param domain - The window to check.
- * @returns Whether it can be shown.
- */
-export function isMassWindow(domain: MassDomain): boolean {
-  return isWindow(domain.x) && isWindow(domain.y);
-}
-
-/**
- * Whether one axis of a window runs from somewhere to somewhere else.
- * @param bounds - `[from, to]` on that axis.
- * @returns Whether it is usable.
- */
-function isWindow(bounds: readonly [number, number]): boolean {
-  const [from, to] = bounds;
-  return Number.isFinite(from) && Number.isFinite(to) && from < to;
 }

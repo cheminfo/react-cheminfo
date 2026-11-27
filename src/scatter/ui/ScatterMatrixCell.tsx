@@ -3,6 +3,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { chartAxisTitle } from '../../chart/core/chartLabels.ts';
 import type { ChartFrameProps } from '../../chart/ui/ChartFrame.tsx';
 import { ChartFrame } from '../../chart/ui/ChartFrame.tsx';
+import { onActivateKey } from '../../hooks/ui/activationKey.ts';
 
 import type { ScatterMatrixGrid } from './ScatterMatrixDiagonal.tsx';
 import { ScatterMatrixDiagonal } from './ScatterMatrixDiagonal.tsx';
@@ -15,7 +16,7 @@ import {
 import { scatterMatrixOutlines } from './scatterMatrixOutlines.tsx';
 
 /** What one cell of a `ScatterMatrix` needs. */
-export interface ScatterMatrixCellProps {
+interface ScatterMatrixCellProps {
   /** Everything the grid worked out once and every cell reads. */
   grid: ScatterMatrixGrid;
   /** Which row it sits in, which is the axis up its side. */
@@ -48,12 +49,7 @@ export function ScatterMatrixCell(props: ScatterMatrixCellProps): ReactElement {
       aria-label={open === undefined ? pair : `${pair} — open`}
       style={open === undefined ? undefined : CLICKABLE_STYLE}
       onClick={open}
-      onKeyDown={(event) => {
-        if (open === undefined) return;
-        if (event.key !== 'Enter' && event.key !== ' ') return;
-        event.preventDefault();
-        open();
-      }}
+      onKeyDown={open === undefined ? undefined : onActivateKey(open)}
     >
       <ChartFrame {...frameProps(grid, row, column)}>
         {(frame) =>

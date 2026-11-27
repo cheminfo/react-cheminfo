@@ -18,7 +18,7 @@ import { xpsStackPanels } from './xpsHostPanels.ts';
 import { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
 
 /** The side, as the shell lays it out. */
-export interface XpsSide extends CollapsedPanels<XpsPanelId> {
+interface XpsSide extends CollapsedPanels<XpsPanelId> {
   /** Every panel on offer, in the order their icons are stacked. */
   panels: readonly XpsStackPanel[];
   /** Whether a panel on offer is open, which is whether the side is. */

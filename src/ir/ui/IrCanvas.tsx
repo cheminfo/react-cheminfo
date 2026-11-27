@@ -22,13 +22,6 @@ export interface IrCanvasProps {
    */
   onHighlight?: (band: IrBand | null) => void;
   /**
-   * Put on the box the chart is drawn in, so a picture can be taken of it. The
-   * box rather than the chart itself, because the chart is laid out again on
-   * every resize.
-   * @default undefined
-   */
-  attachChart?: (element: HTMLDivElement | null) => void;
-  /**
    * The `id` put on the box the chart is drawn in, which the "Save figure"
    * panel is pointed at.
    * @default undefined
@@ -59,13 +52,7 @@ export interface IrCanvasProps {
  * @returns The canvas.
  */
 export function IrCanvas(props: IrCanvasProps) {
-  const {
-    highlight = null,
-    onHighlight,
-    attachChart,
-    chartId,
-    onPlotClick,
-  } = props;
+  const { highlight = null, onHighlight, chartId, onPlotClick } = props;
   const { state, visibleSpectra, selectedSpectrum, assigned } =
     useIrEditorState();
   const actions = useIrActions();
@@ -100,7 +87,7 @@ export function IrCanvas(props: IrCanvasProps) {
 
   return (
     <div style={rootStyle}>
-      <div ref={attachChart} id={chartId} data-ir-figure="" style={chartStyle}>
+      <div id={chartId} data-ir-figure="" style={chartStyle}>
         <IrChart
           spectra={visibleSpectra}
           technique={technique}

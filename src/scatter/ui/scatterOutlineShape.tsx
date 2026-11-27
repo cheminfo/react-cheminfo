@@ -17,7 +17,7 @@ import type { PixelEllipse } from '../core/ellipseProjection.ts';
 import { ellipsePolygon, projectEllipse } from '../core/ellipseProjection.ts';
 
 /** How one outline is inked. */
-export interface ScatterOutlineInk {
+interface ScatterOutlineInk {
   /** The group's own colour, which the region is filled with. */
   color: string;
   /**

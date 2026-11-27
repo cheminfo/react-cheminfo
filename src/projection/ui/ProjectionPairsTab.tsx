@@ -19,7 +19,10 @@ import type { ProjectionResult } from '../core/projectionResult.ts';
 import type { ResolvedProjectionGroups } from '../core/projectionSamples.ts';
 
 import { ProjectionSurface } from './ProjectionSurface.tsx';
-import { MINIMUM_OUTLINE_POINTS } from './projectionMapModel.ts';
+import {
+  MINIMUM_OUTLINE_POINTS,
+  projectionScatterGroups,
+} from './projectionMapModel.ts';
 import { PROJECTION_TAB_HEIGHT } from './projectionTabStyles.ts';
 
 /** What {@link ProjectionPairsTab} needs. */
@@ -95,7 +98,7 @@ export function ProjectionPairsTab(
     [result.axes],
   );
   const inks = useMemo<ScatterGroup[]>(
-    () => groups.entries.map(({ id, label, color }) => ({ id, label, color })),
+    () => projectionScatterGroups(groups),
     [groups],
   );
 
@@ -144,12 +147,16 @@ export function ProjectionPairsTab(
  * @returns The entries.
  */
 function legendEntries(groups: ResolvedProjectionGroups): OverlayLegendEntry[] {
-  return groups.entries.map((entry) => ({
-    id: entry.id,
-    label: entry.label,
-    color: entry.color,
-    count: entry.count,
-  }));
+  const entries: OverlayLegendEntry[] = [];
+  for (const entry of groups.entries) {
+    entries.push({
+      id: entry.id,
+      label: entry.label,
+      color: entry.color,
+      count: entry.count,
+    });
+  }
+  return entries;
 }
 
 /**

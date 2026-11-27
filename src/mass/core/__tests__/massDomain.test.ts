@@ -1,10 +1,11 @@
 import { expect, test } from 'vitest';
 
 import { fittedTo, fullDomain } from '../massDomain.ts';
-import type { MassSpectrum } from '../massSpectrum.ts';
+
+import { centroidedSpectrum } from './massFixtures.ts';
 
 test('the window covers the peaks with air either side and room above', () => {
-  const spectrum = centroided('a', [100, 200, 300], [10, 50, 20]);
+  const spectrum = centroidedSpectrum('a', [100, 200, 300], [10, 50, 20]);
 
   expect(fullDomain([spectrum])).toStrictEqual({
     x: [96, 304],
@@ -13,7 +14,7 @@ test('the window covers the peaks with air either side and room above', () => {
 });
 
 test('a profile and a centroid of one spectrum are covered together', () => {
-  const spectrum = centroided('a', [200, 300], [10, 20]);
+  const spectrum = centroidedSpectrum('a', [200, 300], [10, 20]);
   spectrum.profile = {
     x: Float64Array.from([100, 400]),
     y: Float64Array.from([5, 80]),
@@ -24,8 +25,8 @@ test('a profile and a centroid of one spectrum are covered together', () => {
 });
 
 test('a trace nobody asked to see does not move the axes', () => {
-  const shown = centroided('a', [100, 200], [10, 50]);
-  const hidden = centroided('b', [1000, 2000], [10, 500]);
+  const shown = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const hidden = centroidedSpectrum('b', [1000, 2000], [10, 500]);
   hidden.showCentroid = false;
 
   expect(fullDomain([shown, hidden])).toStrictEqual({
@@ -35,8 +36,8 @@ test('a trace nobody asked to see does not move the axes', () => {
 });
 
 test('a previewed distribution is left out of the window', () => {
-  const measured = centroided('a', [100, 200], [10, 50]);
-  const preview = centroided('preview', [1000, 2000], [10, 500]);
+  const measured = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const preview = centroidedSpectrum('preview', [1000, 2000], [10, 500]);
   preview.excludeFromDomain = true;
 
   expect(fullDomain([measured, preview])).toStrictEqual({
@@ -46,15 +47,15 @@ test('a previewed distribution is left out of the window', () => {
 });
 
 test('a previewed distribution alone is shown rather than nothing', () => {
-  const preview = centroided('preview', [1000, 2000], [10, 500]);
+  const preview = centroidedSpectrum('preview', [1000, 2000], [10, 500]);
   preview.excludeFromDomain = true;
 
   expect(fullDomain([preview])).toStrictEqual({ x: [980, 2020], y: [0, 600] });
 });
 
 test('the mirrored half is the reflection of the drawn one', () => {
-  const top = centroided('a', [100, 200], [10, 50]);
-  const bottom = centroided('b', [150, 300], [40, 20]);
+  const top = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const bottom = centroidedSpectrum('b', [150, 300], [40, 20]);
 
   expect(fullDomain([top, bottom], true)).toStrictEqual({
     x: [96, 304],
@@ -63,22 +64,26 @@ test('the mirrored half is the reflection of the drawn one', () => {
 });
 
 test('a spectrum of one peak is given a window to sit in', () => {
-  expect(fullDomain([centroided('a', [500.25], [1000])])).toStrictEqual({
-    x: [499.25, 501.25],
-    y: [0, 1200],
-  });
+  expect(fullDomain([centroidedSpectrum('a', [500.25], [1000])])).toStrictEqual(
+    {
+      x: [499.25, 501.25],
+      y: [0, 1200],
+    },
+  );
 });
 
 test('a spectrum of nothing but zeros keeps a usable intensity axis', () => {
-  expect(fullDomain([centroided('a', [100, 200], [0, 0])])).toStrictEqual({
+  expect(
+    fullDomain([centroidedSpectrum('a', [100, 200], [0, 0])]),
+  ).toStrictEqual({
     x: [98, 202],
     y: [0, 1],
   });
 });
 
 test('a spectrum whose peak picking found nothing does not collapse the window', () => {
-  const measured = centroided('a', [100, 200], [10, 50]);
-  const nothingPicked = centroided('b', [], []);
+  const measured = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const nothingPicked = centroidedSpectrum('b', [], []);
 
   expect(fullDomain([nothingPicked, measured])).toStrictEqual({
     x: [98, 202],
@@ -93,22 +98,22 @@ test('an empty chart still has a window', () => {
 });
 
 test('a spectrum with nothing drawn is an empty chart', () => {
-  const spectrum = centroided('a', [100, 200], [10, 50]);
+  const spectrum = centroidedSpectrum('a', [100, 200], [10, 50]);
   spectrum.showCentroid = false;
 
   expect(fullDomain([spectrum])).toStrictEqual({ x: [0, 1], y: [0, 1] });
 });
 
 test('the same spectra drawn differently were fitted to the same thing', () => {
-  const sticks = centroided('a', [100, 200], [10, 50]);
-  const profiled = centroided('a', [100, 200], [10, 50]);
+  const sticks = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const profiled = centroidedSpectrum('a', [100, 200], [10, 50]);
   profiled.profile = {
     x: Float64Array.from([90, 210]),
     y: Float64Array.from([1, 60]),
   };
   profiled.showProfile = true;
   profiled.showCentroid = false;
-  const off = centroided('a', [100, 200], [10, 50]);
+  const off = centroidedSpectrum('a', [100, 200], [10, 50]);
   off.showCentroid = false;
 
   expect(fittedTo([profiled])).toBe(fittedTo([sticks]));
@@ -118,8 +123,8 @@ test('the same spectra drawn differently were fitted to the same thing', () => {
 });
 
 test('a spectrum loaded, one closed and the mirror are each a different fit', () => {
-  const first = centroided('a', [100, 200], [10, 50]);
-  const second = centroided('b', [300, 400], [20, 30]);
+  const first = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const second = centroidedSpectrum('b', [300, 400], [20, 30]);
 
   expect(fittedTo([first, second])).not.toBe(fittedTo([first]));
   expect(fittedTo([first])).not.toBe(fittedTo([]));
@@ -127,16 +132,16 @@ test('a spectrum loaded, one closed and the mirror are each a different fit', ()
 });
 
 test('a previewed distribution is left out of the fit as it is out of the window', () => {
-  const measured = centroided('a', [100, 200], [10, 50]);
-  const preview = centroided('preview', [1000, 2000], [10, 500]);
+  const measured = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const preview = centroidedSpectrum('preview', [1000, 2000], [10, 500]);
   preview.excludeFromDomain = true;
 
   expect(fittedTo([measured, preview])).toBe(fittedTo([measured]));
 });
 
 test('a spectrum drawn taller is covered at the height it is drawn', () => {
-  const measured = centroided('a', [100, 200], [10, 50]);
-  const scaled = centroided('b', [150], [40]);
+  const measured = centroidedSpectrum('a', [100, 200], [10, 50]);
+  const scaled = centroidedSpectrum('b', [150], [40]);
   scaled.verticalScale = 3;
 
   expect(fullDomain([measured, scaled])).toStrictEqual({
@@ -146,45 +151,16 @@ test('a spectrum drawn taller is covered at the height it is drawn', () => {
 });
 
 test('a scale that is no positive number draws the spectrum as measured', () => {
-  const spectrum = centroided('a', [100, 200], [10, 50]);
+  const spectrum = centroidedSpectrum('a', [100, 200], [10, 50]);
   spectrum.verticalScale = -2;
 
   expect(fullDomain([spectrum]).y).toStrictEqual([0, 60]);
 });
 
 test('scaling a spectrum is no new fit', () => {
-  const spectrum = centroided('a', [100, 200], [10, 50]);
+  const spectrum = centroidedSpectrum('a', [100, 200], [10, 50]);
   const before = fittedTo([spectrum]);
   spectrum.verticalScale = 4;
 
   expect(fittedTo([spectrum])).toBe(before);
 });
-
-/**
- * A centroided spectrum, which is what most files hand over.
- * @param id - Its identity.
- * @param mz - The m/z of each peak, ascending.
- * @param intensity - The intensity of each.
- * @returns The spectrum, with its centroid drawn and no profile.
- */
-function centroided(
-  id: string,
-  mz: number[],
-  intensity: number[],
-): MassSpectrum {
-  return {
-    id,
-    name: id,
-    color: '#000000',
-    profile: null,
-    centroid: {
-      x: Float64Array.from(mz),
-      y: Float64Array.from(intensity),
-      charge: new Int16Array(mz.length),
-    },
-    meta: null,
-    origin: { format: 'text' },
-    showProfile: false,
-    showCentroid: true,
-  };
-}

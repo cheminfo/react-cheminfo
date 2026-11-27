@@ -3,9 +3,11 @@
  * the reducer reads as the list of what can be asked of the viewer.
  */
 
+import { isChartWindow } from '../../chart/core/chartDomain.ts';
+
 import type { MassSpectrum } from './massSpectrum.ts';
 import type { MassState, PartialMassState } from './massState.ts';
-import { isMassWindow, mergeMassSettings } from './massState.ts';
+import { mergeMassSettings } from './massState.ts';
 
 /**
  * Change one spectrum, leaving the state itself when nothing changed.
@@ -86,7 +88,7 @@ export function restoreState(
       ...view,
       selectedId: selectable ? view.selectedId : (spectra[0]?.id ?? null),
       domain:
-        view.domain !== null && isMassWindow(view.domain) ? view.domain : null,
+        view.domain !== null && isChartWindow(view.domain) ? view.domain : null,
       openPanelIds: [...view.openPanelIds],
     },
     settings: mergeMassSettings(state.settings, partial.settings),

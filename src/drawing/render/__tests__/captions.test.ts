@@ -15,16 +15,8 @@ import {
   captionTransform,
   labelPrimitive,
 } from '../captions.ts';
-import type { DrawingStyle } from '../style.ts';
 
-const STYLE: DrawingStyle = {
-  bondLength: 14.4,
-  lineWidth: 0.6,
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  captionSize: 10,
-  captionFamily: 'Arial, Helvetica, sans-serif',
-  color: '#000000',
-};
+import { STYLE } from './drawingStyle.ts';
 
 const CAPTION: DrawText = {
   type: 'text',

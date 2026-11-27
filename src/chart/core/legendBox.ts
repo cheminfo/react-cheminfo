@@ -254,7 +254,7 @@ export const FONT_SIZE = 12;
 export const CHARACTER_WIDTH = 6.7;
 
 /** The longest name the box is widened for; past it a name simply overruns. */
-export const MAXIMUM_CHARACTERS = 28;
+const MAXIMUM_CHARACTERS = 28;
 
 /** The strip kept at the right of a row for a control, when one is asked for. */
 export const CLOSE_COLUMN = 12;

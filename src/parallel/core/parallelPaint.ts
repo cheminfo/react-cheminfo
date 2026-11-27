@@ -71,7 +71,7 @@ export interface ParallelHighlight {
 }
 
 /** What the highlight pass needs. */
-export interface ParallelHighlightPaint {
+interface ParallelHighlightPaint {
   /** The rows to draw, the last one on top. */
   highlights: readonly ParallelHighlight[];
   /** The axes, from left to right. */

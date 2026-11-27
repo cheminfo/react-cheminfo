@@ -9,10 +9,9 @@
  */
 
 import type { MeasurementXY } from 'cheminfo-types';
-import { xySortX } from 'ml-spectra-processing';
 
 import type { LoadedIrSpectrum } from './analysisSpectra.ts';
-import { blockMeta, blockTitle } from './analysisSpectra.ts';
+import { intensitySpectra } from './intensitySpectra.ts';
 import type { IrOrigin } from './irSpectrum.ts';
 
 /**
@@ -26,34 +25,7 @@ export function ramanSpectra(
   blocks: readonly MeasurementXY[],
   origin: IrOrigin,
 ): LoadedIrSpectrum[] {
-  const spectra: LoadedIrSpectrum[] = [];
-  for (let index = 0; index < blocks.length; index++) {
-    const block = blocks[index];
-    if (block === undefined || !isRaman(block)) continue;
-    const shifts = block.variables.x?.data;
-    const intensities = block.variables.y?.data;
-    if (
-      shifts === undefined ||
-      intensities === undefined ||
-      shifts.length < 2
-    ) {
-      continue;
-    }
-    const sorted = xySortX({ x: shifts, y: intensities });
-    const blockOrigin: IrOrigin = { ...origin, recorded: 'intensity' };
-    // A file holding one spectrum has no index worth showing.
-    if (blocks.length > 1) blockOrigin.blockIndex = index;
-    const spectrum: LoadedIrSpectrum = {
-      wavenumber: Float64Array.from(sorted.x),
-      intensity: Float64Array.from(sorted.y),
-      meta: blockMeta(block),
-      origin: blockOrigin,
-    };
-    const title = blockTitle(block);
-    if (title) spectrum.name = title;
-    spectra.push(spectrum);
-  }
-  return spectra;
+  return intensitySpectra(blocks, origin, isRaman, 'intensity');
 }
 
 /**

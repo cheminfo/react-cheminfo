@@ -29,7 +29,7 @@ export interface ScatterGroupSpread extends ScatterGroupMoments {
 }
 
 /** How {@link scatterGroupSpread} measures the groups. */
-export interface ScatterGroupSpreadOptions {
+interface ScatterGroupSpreadOptions {
   /** The coordinates: one row per sample, one column per axis, read in place. */
   scores: MatrixLike;
   /** Which group each row belongs to; a row outside the range is left out. */

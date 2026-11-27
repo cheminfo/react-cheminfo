@@ -13,11 +13,11 @@ import {
   isClosedGraphic,
 } from '../core/graphics.ts';
 
-import { Pen } from './contour.ts';
 import { strokeDash, withDash } from './dashes.ts';
 import { gradientPaint } from './graphicPaint.ts';
 import { ellipsePath, pathData } from './markup.ts';
 import { mapContour, polygonContour, roundedRect } from './outlines.ts';
+import { Pen } from './pen.ts';
 import type { PathPrimitive } from './primitives.ts';
 
 /**

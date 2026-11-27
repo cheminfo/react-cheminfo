@@ -5,7 +5,11 @@ import { Button } from 'react-science/ui';
 import { NumberInput } from '../../number/ui/NumberInput.tsx';
 import { countLabel } from '../../panel/core/statusBar.ts';
 import { PanelEmpty } from '../../panel/ui/PanelMessage.tsx';
-import { MINIMUM_PICKING_POINTS, pickPeaks } from '../core/pickPeaks.ts';
+import {
+  DEFAULT_MINIMUM_PROMINENCE_RATIO,
+  MINIMUM_PICKING_POINTS,
+  pickPeaks,
+} from '../core/pickPeaks.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
 
 import { labelStyle, panelFieldStyle as fieldStyle } from './panelStyles.ts';
@@ -40,7 +44,9 @@ export function PeakDetectionControls(
   const { spectrum } = props;
   const actions = useXpsActions();
   const [noiseLevel, setNoiseLevel] = useState<number | undefined>(undefined);
-  const [prominence, setProminence] = useState(DEFAULT_PROMINENCE_RATIO);
+  const [prominence, setProminence] = useState(
+    DEFAULT_MINIMUM_PROMINENCE_RATIO,
+  );
 
   const points = spectrum.energy.x.length;
   const enough = points >= MINIMUM_PICKING_POINTS;
@@ -112,9 +118,6 @@ export function PeakDetectionControls(
     </div>
   );
 }
-
-/** The prominence `pickPeaks` uses when it is not told another one. */
-const DEFAULT_PROMINENCE_RATIO = 0.02;
 
 /** The two numbers and the button that applies them, on one line each. */
 const rowStyle = {

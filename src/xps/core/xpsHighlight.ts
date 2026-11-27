@@ -39,7 +39,7 @@ export const NO_HIGHLIGHT: XpsHighlight = {
  * the same place on the axis as far as a reader is concerned, and re-rendering
  * every view for it would be a render per mouse move.
  */
-export const HIGHLIGHT_ENERGY_EPSILON = 0.01;
+const HIGHLIGHT_ENERGY_EPSILON = 0.01;
 
 /**
  * Whether two highlights say the same thing.

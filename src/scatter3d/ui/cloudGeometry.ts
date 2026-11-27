@@ -18,7 +18,7 @@ import type {
 import { depthFraction, projectPoint } from '../core/orbitCamera.ts';
 
 /** Room kept between the figure's edge and the cube, in pixels. */
-export const CLOUD_MARGIN = 16;
+const CLOUD_MARGIN = 16;
 
 /**
  * How much of the shorter side the cube spans before the reader zooms.
@@ -27,10 +27,10 @@ export const CLOUD_MARGIN = 16;
  * hexagon as wide as its body diagonal, and a cube sized to the box edge-on
  * would push two of its corners past the frame the moment it was turned.
  */
-export const CLOUD_FILL = 0.62;
+const CLOUD_FILL = 0.62;
 
 /** The rectangle the cloud is drawn in, and how the cube maps into it. */
-export interface CloudView {
+interface CloudView {
   /** The drawing area, ready to spread onto a `<rect>`. */
   rect: { x: number; y: number; width: number; height: number };
   /** Where the middle of the cube sits, and how large it is drawn. */
@@ -94,18 +94,27 @@ export function projectCloud(
   const x = new Float64Array(count);
   const y = new Float64Array(count);
   const depths = new Float64Array(count);
+  const order = new Uint32Array(count);
+  // `rotatePoint` and `projectPoint` written out with the trigonometry taken
+  // once for the whole cloud: this runs on every frame of an orbit drag.
+  const cosPitch = Math.cos(camera.pitch);
+  const sinPitch = Math.sin(camera.pitch);
+  const cosYaw = Math.cos(camera.yaw);
+  const sinYaw = Math.sin(camera.yaw);
+  const { scale, centerX, centerY } = viewport;
   for (let index = 0; index < count; index++) {
-    const at = projectPoint(cube[index] as Vector3, camera, viewport);
-    x[index] = at.x;
-    y[index] = at.y;
-    depths[index] = at.depth;
+    const point = cube[index] as Vector3;
+    const across = point[0];
+    const up = point[1];
+    const away = point[2];
+    const upright = up * cosPitch - away * sinPitch;
+    const tipped = up * sinPitch + away * cosPitch;
+    x[index] = centerX + (across * cosYaw + tipped * sinYaw) * scale;
+    y[index] = centerY - upright * scale;
+    depths[index] = -across * sinYaw + tipped * cosYaw;
+    order[index] = index;
   }
-
-  const rows = new Uint32Array(count);
-  for (let index = 0; index < count; index++) rows[index] = index;
-  const order = rows.toSorted(
-    (a, b) => (depths[a] as number) - (depths[b] as number),
-  );
+  order.sort((a, b) => (depths[a] as number) - (depths[b] as number));
 
   return { points: { x, y }, depths, order };
 }
@@ -141,7 +150,7 @@ const NEAREST_SHRINK = 0.9;
 const DEPTH_RANGE = 0.4;
 
 /** One shell's outline, ready to be filled. */
-export interface CloudOutline {
+interface CloudOutline {
   /** Where its middle landed, in pixels from the left. */
   cx: number;
   /** And from the top. */
@@ -185,7 +194,7 @@ export function projectShellOutline(
 }
 
 /** A segment of the frame, in pixels. */
-export interface CloudSegment {
+interface CloudSegment {
   /** Where it starts. */
   x1: number;
   /** Where it starts. */

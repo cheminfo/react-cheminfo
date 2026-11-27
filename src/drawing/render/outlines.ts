@@ -6,7 +6,8 @@
 import type { Point } from '../core/types.ts';
 
 import type { Contour } from './contour.ts';
-import { Pen, isCubic } from './contour.ts';
+import { isCubic } from './contour.ts';
+import { Pen } from './pen.ts';
 
 /**
  * A closed polygon.

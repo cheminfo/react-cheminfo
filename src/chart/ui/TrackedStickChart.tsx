@@ -27,6 +27,7 @@ import { useState } from 'react';
 import type { ChartAxisSpec, ChartFrameRender } from './ChartFrame.tsx';
 import { ChartFrame } from './ChartFrame.tsx';
 import type { ChartTrackEvent } from './TrackedLineChart.tsx';
+import { plotPointer, trackedValues } from './chartTracking.ts';
 import type { ChartStickSeries } from './stickChartModel.ts';
 import {
   nearestPosition,
@@ -116,24 +117,16 @@ export function TrackedStickChart(props: TrackedStickChartProps): ReactElement {
 
   function report(frame: ChartFrameRender, event: MouseEvent<SVGRectElement>) {
     const { plot, x } = frame;
-    const box = event.currentTarget.getBoundingClientRect();
-    const scaleX = box.width === 0 ? 1 : plot.width / box.width;
-    const scaleY = box.height === 0 ? 1 : plot.height / box.height;
-    const pixel = plot.left + (event.clientX - box.left) * scaleX;
-    const found = nearestPosition(positions, valueAt(x, pixel));
+    const pointer = plotPointer(event, plot);
+    const found = nearestPosition(positions, valueAt(x, pointer.x));
     if (found === -1) return;
     if (trackedIndex === undefined) setOwnIndex(found);
     onTrack?.({
       index: found,
       label: categories[found] ?? '',
       x: x.offset + (positions[found] as number) * x.factor,
-      y: plot.top + (event.clientY - box.top) * scaleY,
-      values: drawn.map((item) => ({
-        id: item.id,
-        label: item.label,
-        value: item.values[found] ?? Number.NaN,
-        color: item.color,
-      })),
+      y: pointer.y,
+      values: trackedValues(drawn, found),
     });
   }
 

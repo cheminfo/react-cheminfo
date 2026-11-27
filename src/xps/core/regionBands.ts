@@ -24,7 +24,7 @@ import type { XpsRegion } from './xpsSpectrum.ts';
 import type { EnergyAxis } from './xpsState.ts';
 
 /** One region, as the chart draws it. */
-export interface RegionBand {
+interface RegionBand {
   /** Identity of the region, and the key of the rectangle drawn for it. */
   id: string;
   /** What the file calls it, written at the top of the band. */

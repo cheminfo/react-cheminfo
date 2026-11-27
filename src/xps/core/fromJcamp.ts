@@ -16,17 +16,15 @@
 import type { AnalysisSpectrum } from 'xps-analysis';
 import { fromJcamp as jcampAnalysis } from 'xps-analysis';
 
-import { nextSpectrumColor } from '../../chart/core/spectrumColor.ts';
+import { errorMessage } from '../../error/core/toError.ts';
 
-import type { BlockContext } from './analysisSpectrum.ts';
-import { blockToSpectrum } from './analysisSpectrum.ts';
+import {
+  MINIMUM_BLOCK_POINTS,
+  readAnalysisBlocks,
+} from './fromAnalysisBlocks.ts';
 import type { XpsReadOptions } from './readOptions.ts';
-import { describeSource, spectrumIdentity } from './readOptions.ts';
-import { normalisedMetaOf } from './vamasRecord.ts';
+import { describeSource } from './readOptions.ts';
 import type { XpsSpectrum } from './xpsSpectrum.ts';
-
-/** The fewest points a block has to carry to be a spectrum. */
-const MINIMUM_POINTS = 2;
 
 /**
  * Read every spectrum a JCAMP-DX file holds.
@@ -44,31 +42,15 @@ export function readJcamp(
   data: ArrayBuffer | Uint8Array | string,
   options: XpsReadOptions = {},
 ): XpsSpectrum[] {
-  const { fileName, taken } = options;
-  const blocks = readBlocks(data, fileName);
-  const colors = [...(taken ?? [])];
-
-  const spectra: XpsSpectrum[] = [];
-  for (let index = 0; index < blocks.length; index++) {
-    const block = blocks[index] as AnalysisSpectrum;
-    if (block.variables.x.data.length < MINIMUM_POINTS) continue;
-
-    const color = nextSpectrumColor(colors);
-    colors.push(color);
-    const context: BlockContext = {
-      format: 'jcamp',
-      normalised: normalisedMetaOf(block),
-      id: spectrumIdentity(options, spectra.length),
-      color,
-    };
-    if (fileName !== undefined) context.fileName = fileName;
-    if (blocks.length > 1) context.blockIndex = index;
-    spectra.push(blockToSpectrum(block, context));
-  }
-
+  const { fileName } = options;
+  const spectra = readAnalysisBlocks(readBlocks(data, fileName), {
+    ...options,
+    format: 'jcamp',
+    fit: false,
+  });
   if (spectra.length === 0) {
     throw new Error(
-      `${describeSource(fileName)} was read as JCAMP-DX but holds no spectrum — no block in it carries an XY data record of at least ${MINIMUM_POINTS} points.`,
+      `${describeSource(fileName)} was read as JCAMP-DX but holds no spectrum — no block in it carries an XY data record of at least ${MINIMUM_BLOCK_POINTS} points.`,
     );
   }
   return spectra;
@@ -88,7 +70,7 @@ function readBlocks(
   try {
     return jcampAnalysis(data).spectra;
   } catch (error) {
-    const said = error instanceof Error ? error.message : String(error);
+    const said = errorMessage(error);
     throw new Error(
       `${describeSource(fileName)} could not be read as JCAMP-DX — the converter stopped on it with: ${said}`,
       { cause: error },

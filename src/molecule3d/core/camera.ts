@@ -49,7 +49,7 @@ export const DEFAULT_MOLECULE_3D_CAMERA: Molecule3DCamera = {
 };
 
 /** The closest and furthest a link may ask the camera to stand. */
-export const MOLECULE_3D_ZOOM_RANGE = { minimum: 0.01, maximum: 100 } as const;
+const MOLECULE_3D_ZOOM_RANGE = { minimum: 0.01, maximum: 100 } as const;
 
 /** Furthest a link may push the target from the centre, in radii. */
 const MAX_OFFSET = 100;

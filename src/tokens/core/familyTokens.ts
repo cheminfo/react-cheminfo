@@ -25,6 +25,9 @@ export const FAMILY_TOKEN_VALUES = {
   '--shadow-lg': '0 12px 32px rgb(16 32 48 / 16%)',
   '--header-height': '3rem',
   '--page-max': '84rem',
+  '--danger': '#dc2626',
+  '--success': '#16a34a',
+  '--warning': '#d97706',
 } as const;
 
 /** The name of one of the family's tokens, `--border` for instance. */
@@ -66,4 +69,7 @@ export const TOKEN = {
   shadowLarge: tokenReference('--shadow-lg'),
   headerHeight: tokenReference('--header-height'),
   pageMax: tokenReference('--page-max'),
+  danger: tokenReference('--danger'),
+  success: tokenReference('--success'),
+  warning: tokenReference('--warning'),
 } as const;

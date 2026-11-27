@@ -17,16 +17,8 @@ export { FrameMarks } from './FrameMarks.tsx';
 export type { FullscreenStageProps } from './FullscreenStage.tsx';
 export { FullscreenStage } from './FullscreenStage.tsx';
 export { GradientDefs } from './GradientDefs.tsx';
-export type { FillKind } from './GradientPickers.tsx';
-export {
-  CentreGrid,
-  DirectionGrid,
-  GradientKindRow,
-} from './GradientPickers.tsx';
 export type { GraphicFieldsProps } from './GraphicFields.tsx';
 export { GraphicFields } from './GraphicFields.tsx';
-export { GraphicFillFields } from './GraphicFillFields.tsx';
-export { GraphicGradientFields } from './GraphicGradientFields.tsx';
 export { MeasuredSlider } from './MeasuredSlider.tsx';
 export type {
   ChoiceFieldProps,
@@ -44,7 +36,6 @@ export {
 } from './MixedFields.tsx';
 export {
   FIGURE_MARK_GLYPHS,
-  movingFigureSource,
   useFigureMoves,
   useMovingFigureSource,
 } from './movingFigure.ts';
@@ -52,7 +43,7 @@ export type { PageChange, PageFieldProps } from './PageField.tsx';
 export { PageField } from './PageField.tsx';
 export { PageGrid } from './PageGrid.tsx';
 export { PageMask } from './PageMask.tsx';
-export { FigureSideInput, PageSideInput } from './PageSideInput.tsx';
+export { FigureSideInput } from './PageSideInput.tsx';
 export { PageToolbar } from './PageToolbar.tsx';
 export type { LineWidthStyle } from './pathProps.ts';
 export { fillProps, strokeProps } from './pathProps.ts';

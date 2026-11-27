@@ -8,6 +8,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { occurrences as countOf } from '../../../__tests__/markup.ts';
 import { rowMatrix } from '../../../chart/core/index.ts';
 import {
   CHART_TICK_ROOM,
@@ -248,8 +249,4 @@ function draw(overrides: DrawOverrides = {}): string {
       selected={overrides.selected}
     />,
   );
-}
-
-function countOf(html: string, needle: string): number {
-  return html.split(needle).length - 1;
 }

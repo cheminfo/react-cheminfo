@@ -19,7 +19,7 @@ export interface XpsReadout {
   peak: NearestPeak | null;
 }
 
-export interface XpsPointerTrackerProps {
+interface XpsPointerTrackerProps {
   /** Where the pointer is, `null` whenever it is off the plot. */
   position: ChartPoint | null;
   /** What the axes read under it, `null` whenever it is off the plot. */

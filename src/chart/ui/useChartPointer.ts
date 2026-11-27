@@ -161,10 +161,7 @@ export function useChartPointer<TReadout>(
  * altogether.
  * @returns Whether the chart no longer has the pointer.
  */
-export function leftChart(
-  svg: Element | null,
-  related: EventTarget | null,
-): boolean {
+function leftChart(svg: Element | null, related: EventTarget | null): boolean {
   if (svg === null) return true;
   return !(related instanceof Node) || !svg.contains(related);
 }

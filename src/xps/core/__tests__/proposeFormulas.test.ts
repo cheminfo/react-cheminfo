@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 
-import { defaultFormulaRanges, proposeFormulas } from '../proposeFormulas.ts';
+import { defaultFormulaRanges } from '../formulaRanges.ts';
+import { proposeFormulas } from '../proposeFormulas.ts';
 
 test('the composition of poly(ethylene glycol) proposes C2O first', async () => {
   const proposals = await proposeFormulas([

@@ -9,21 +9,16 @@
  * quarter of the way across is x 194, three quarters x 454.
  */
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { act, createRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import type { ChartPoint } from '../../../chart/core/svgPoint.ts';
-import { installProbeStubs } from '../../../chart/ui/__tests__/zoomProbe.tsx';
+import { stubViewerLayout } from '../../../chart/ui/__tests__/viewerLayout.ts';
+import { filmSpectrum } from '../../core/__tests__/irFixtures.ts';
 import { calciteSpectrum as calcite } from '../../core/__tests__/ramanFixture.ts';
 import type { IrEditorHandle, IrPlotClick } from '../../core/irEditorApi.ts';
-import type { IrSpectrum } from '../../core/irSpectrum.ts';
-import { loadIrSpectra } from '../../core/loadIrSpectra.ts';
-import { toIrSpectrum } from '../../core/toIrSpectrum.ts';
 import { IrEditor } from '../IrEditor.tsx';
 import { RamanEditor } from '../RamanEditor.tsx';
 
@@ -32,15 +27,7 @@ let root: Root;
 const clicks: IrPlotClick[] = [];
 
 beforeEach(() => {
-  installProbeStubs();
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  vi.stubGlobal('ResizeObserver', NoResizeObserver);
-  // jsdom lays nothing out, so the box the chart measures is given a size.
-  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
-    new DOMRect(0, 0, 600, 400),
-  );
-  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(600);
-  vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(400);
+  stubViewerLayout();
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);
@@ -53,22 +40,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
-
-/**
- * The five-band film, read through the real reader, under a known id.
- * @returns The spectrum.
- */
-async function film(): Promise<IrSpectrum> {
-  const { spectra } = await loadIrSpectra(
-    readFileSync(
-      join(import.meta.dirname, '../../core/__tests__/data/five-bands.jdx'),
-    ),
-    { fileName: 'five-bands.jdx' },
-  );
-  const [loaded] = spectra;
-  if (loaded === undefined) throw new Error('The fixture holds no spectrum');
-  return toIrSpectrum(loaded, { id: 'film' });
-}
 
 /**
  * Press on the chart, move, and let go.
@@ -106,7 +77,7 @@ function click(at: ChartPoint): void {
 
 test('a click reports the wavenumber under it and the spectrum selected', async () => {
   const handle = createRef<IrEditorHandle>();
-  const spectrum = await film();
+  const spectrum = await filmSpectrum();
   act(() =>
     root.render(
       <IrEditor
@@ -131,7 +102,7 @@ test('a click reports the wavenumber under it and the spectrum selected', async 
 
 test('a drag zooms and is not reported as a click', async () => {
   const handle = createRef<IrEditorHandle>();
-  const spectrum = await film();
+  const spectrum = await filmSpectrum();
   act(() =>
     root.render(
       <IrEditor
@@ -175,18 +146,3 @@ test('a Raman click reports the shift, read low to high', () => {
     { wavenumber: expect.closeTo(1500, 9), spectrumId: 'calcite' },
   ]);
 });
-
-/** A `ResizeObserver` that observes nothing, for a DOM where nothing resizes. */
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing was observed.
-  }
-}

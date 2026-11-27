@@ -46,7 +46,7 @@ export interface XpsInstrument {
 }
 
 /** The instruments the viewer ships, which nobody edits. */
-export const BUILT_IN_INSTRUMENTS: readonly XpsInstrument[] = [
+const BUILT_IN_INSTRUMENTS: readonly XpsInstrument[] = [
   KRATOS_AL_KA,
   SCOFIELD_AL_KA,
 ];

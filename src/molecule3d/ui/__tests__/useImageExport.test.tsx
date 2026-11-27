@@ -150,6 +150,16 @@ test('a page handing the picture on gets the figure as an SVG and the picture as
   ).toBe(288);
 });
 
+test('a saved picture states the resolution it was rendered at, as its copy does', async () => {
+  mount(container);
+
+  const file = await exported()?.imageFile('png', 3);
+
+  expect(
+    pngDpi(new Uint8Array((await file?.arrayBuffer()) ?? new ArrayBuffer(0))),
+  ).toBe(288);
+});
+
 test('with no viewer, every action says there is nothing to picture yet', async () => {
   viewerRef.current = null;
   mount(container);

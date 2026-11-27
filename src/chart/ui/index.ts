@@ -46,23 +46,15 @@ export type { SelectionRectProps } from './SelectionRect.tsx';
 export { SelectionRect } from './SelectionRect.tsx';
 export type { LegendEntry, TraceLegendProps } from './TraceLegend.tsx';
 export { TraceLegend } from './TraceLegend.tsx';
-export type { ChartClickModifiers } from './chartGestures.ts';
-export { FIT_KEY, NO_MODIFIERS, asksToFit } from './chartGestures.ts';
+export type {
+  ChartClickModifiers,
+  ChartZoomHandlers,
+} from './chartGestures.ts';
 export { chartSurfaceStyle } from './chartSurface.ts';
 export type { ChartPointer, ChartPointerOptions } from './useChartPointer.ts';
-export {
-  isInsidePlot,
-  leftChart,
-  nextChartPointer,
-  sameReading,
-  useChartPointer,
-} from './useChartPointer.ts';
+export { useChartPointer } from './useChartPointer.ts';
 export type { ChartSizeHandle } from './useChartSize.ts';
-export { nextChartSize, useChartSize } from './useChartSize.ts';
-export type {
-  ChartZoom,
-  ChartZoomHandlers,
-  ChartZoomOptions,
-} from './useChartZoom.ts';
+export { useChartSize } from './useChartSize.ts';
+export type { ChartZoom, ChartZoomOptions } from './useChartZoom.ts';
 export { useChartZoom } from './useChartZoom.ts';
 export { useWheelListener } from './useWheelListener.ts';

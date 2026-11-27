@@ -8,6 +8,7 @@
  */
 
 import { withDecimalSeparator } from '../../format/core/numbers.ts';
+import { roundTo } from '../../format/core/roundTo.ts';
 import type { Language } from '../../i18n/core/languages.ts';
 import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
 
@@ -82,11 +83,10 @@ export function numberText(
  * @returns The number the box moves to.
  */
 export function stepNumber(value: number, delta: number): number {
-  const decimals = Math.max(decimalsOf(value), decimalsOf(delta));
-  const moved = value + delta;
-  if (decimals === 0) return moved;
-  const factor = 10 ** decimals;
-  return Math.round(moved * factor) / factor;
+  return roundedTo(
+    value + delta,
+    Math.max(decimalsOf(value), decimalsOf(delta)),
+  );
 }
 
 /**
@@ -104,19 +104,39 @@ export function stepNumber(value: number, delta: number): number {
 export function snapToStep(value: number, step: number, origin = 0): number {
   if (!(step > 0) || !Number.isFinite(value)) return value;
   const snapped = origin + Math.round((value - origin) / step) * step;
-  const decimals = Math.max(decimalsOf(step), decimalsOf(origin));
-  const factor = 10 ** decimals;
-  return Math.round(snapped * factor) / factor;
+  return roundedTo(snapped, Math.max(decimalsOf(step), decimalsOf(origin)));
+}
+
+/**
+ * A number rounded to the decimals its operands carry — left as it is when they
+ * carry none, or more than a number holds, where rounding would erase it.
+ * @param value - The number.
+ * @param decimals - The decimals its operands are written with.
+ * @returns The number, rounded when there is something to round to.
+ */
+function roundedTo(value: number, decimals: number): number {
+  if (decimals === 0 || decimals > MAXIMUM_DECIMALS) return value;
+  return roundTo(value, decimals);
 }
 
 /**
  * How many decimals a number is written with.
+ *
+ * A number written out is held to fifteen, the most a double keeps; one written
+ * in exponent form counts the decimals it stands for — `1e-7` seven, `1.5e-7`
+ * eight, `1e21` none — however many that is.
  * @param value - The number.
- * @returns Its count of decimals, `0` for anything written in exponent form.
+ * @returns Its count of decimals.
  */
 function decimalsOf(value: number): number {
   const text = String(Math.abs(value));
-  const dot = text.indexOf('.');
-  if (dot === -1 || text.includes('e')) return 0;
-  return Math.min(text.length - dot - 1, MAXIMUM_DECIMALS);
+  const exponentAt = text.indexOf('e');
+  if (exponentAt === -1) {
+    const dot = text.indexOf('.');
+    return dot === -1 ? 0 : Math.min(text.length - dot - 1, MAXIMUM_DECIMALS);
+  }
+  const mantissa = text.slice(0, exponentAt);
+  const dot = mantissa.indexOf('.');
+  const written = dot === -1 ? 0 : mantissa.length - dot - 1;
+  return Math.max(0, written - Number(text.slice(exponentAt + 1)));
 }

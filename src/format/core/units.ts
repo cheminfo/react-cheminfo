@@ -2,7 +2,7 @@ import type { Language } from '../../i18n/core/languages.ts';
 import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
 
 import { MISSING_VALUE } from './missing.ts';
-import { formatDecimal } from './numbers.ts';
+import { formatDecimal, withDecimalSeparator } from './numbers.ts';
 
 const BYTE_UNITS = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'] as const;
 const BYTES_PER_UNIT = 1024;
@@ -46,9 +46,13 @@ export interface FormatDurationOptions {
  * Bytes are whole; every larger unit keeps one decimal until the number
  * reaches a hundred, where the decimal stops carrying information.
  * @param bytes - The size in bytes.
+ * @param language - The language of the page, which writes the decimal separator. Defaults to English.
  * @returns The size and its unit, or the missing marker when there is no finite, non-negative size.
  */
-export function formatBytes(bytes: number | undefined): string {
+export function formatBytes(
+  bytes: number | undefined,
+  language: Language = DEFAULT_LANGUAGE,
+): string {
   if (bytes === undefined || !Number.isFinite(bytes) || bytes < 0) {
     return MISSING_VALUE;
   }
@@ -59,7 +63,7 @@ export function formatBytes(bytes: number | undefined): string {
     unitIndex += 1;
   }
   const digits = unitIndex === 0 || value >= 100 ? 0 : 1;
-  return `${value.toFixed(digits)} ${BYTE_UNITS[unitIndex] ?? 'B'}`;
+  return `${withDecimalSeparator(value.toFixed(digits), language)} ${BYTE_UNITS[unitIndex] ?? 'B'}`;
 }
 
 /**

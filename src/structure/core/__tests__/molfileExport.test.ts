@@ -20,6 +20,25 @@ test('coordinates are written exactly as OpenChemLib writes them', () => {
   expect(atomCoordinates(data)[2]).toStrictEqual([2, -1.4, -0.3]);
 });
 
+test('a conformer with bonds under 1 Å keeps its own bond lengths', () => {
+  const { data } = toMolfileExport(water(0.9572, 104.52));
+  const read = Molecule.fromMolfile(data);
+
+  expect([
+    data.split('\n').slice(4, 7),
+    distance(read, 0, 1).toFixed(3),
+    distance(read, 0, 2).toFixed(3),
+  ]).toStrictEqual([
+    [
+      '    0.1000   -0.2000   -0.3000 O   0  0  0  0  0  0  0  0  0  0  0  0',
+      '    1.0572   -0.2000   -0.3000 H   0  0  0  0  0  0  0  0  0  0  0  0',
+      '   -0.1400   -1.1266   -0.3000 H   0  0  0  0  0  0  0  0  0  0  0  0',
+    ],
+    '0.957',
+    '0.957',
+  ]);
+});
+
 test('the header advertises 3D as soon as the molecule has depth', () => {
   expect(toMolfileExport(ethanol()).data).toContain('OCL MolfileCreator  3D');
 });
@@ -91,6 +110,38 @@ function ethanol(): Molecule {
     molecule.setAtomZ(atom, position[2] as number);
   }
   return molecule;
+}
+
+/**
+ * A water with its oxygen at (0.1, 0.2, 0.3) and both hydrogens in its z plane.
+ * @param length - Both O–H bonds, in ångström.
+ * @param degrees - The H–O–H angle.
+ * @returns The molecule.
+ */
+function water(length: number, degrees: number): Molecule {
+  const molecule = Molecule.fromSmiles('O');
+  molecule.addImplicitHydrogens();
+  const radians = (degrees * Math.PI) / 180;
+  const positions = [
+    [0.1, 0.2, 0.3],
+    [0.1 + length, 0.2, 0.3],
+    [0.1 + length * Math.cos(radians), 0.2 + length * Math.sin(radians), 0.3],
+  ] as const;
+  for (let atom = 0; atom < positions.length; atom++) {
+    const [x, y, z] = positions[atom] as readonly [number, number, number];
+    molecule.setAtomX(atom, x);
+    molecule.setAtomY(atom, y);
+    molecule.setAtomZ(atom, z);
+  }
+  return molecule;
+}
+
+function distance(molecule: Molecule, first: number, second: number): number {
+  return Math.hypot(
+    molecule.getAtomX(first) - molecule.getAtomX(second),
+    molecule.getAtomY(first) - molecule.getAtomY(second),
+    molecule.getAtomZ(first) - molecule.getAtomZ(second),
+  );
 }
 
 function chain(atomCount: number) {

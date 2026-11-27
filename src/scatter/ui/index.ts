@@ -11,19 +11,10 @@
 
 export type { ScatterEllipseLayerProps } from './ScatterEllipseLayer.tsx';
 export { ScatterEllipseLayer } from './ScatterEllipseLayer.tsx';
-export type { ScatterLabelLayerProps } from './ScatterLabelLayer.tsx';
-export { ScatterLabelLayer } from './ScatterLabelLayer.tsx';
 export type { ScatterMarkLayerProps } from './ScatterMarkLayer.tsx';
 export type { ScatterPixelMark } from './scatterMarkGlyph.tsx';
 export { ScatterMarkLayer } from './ScatterMarkLayer.tsx';
 export { ScatterMatrix } from './ScatterMatrix.tsx';
-export type { ScatterMatrixCellProps } from './ScatterMatrixCell.tsx';
-export { ScatterMatrixCell } from './ScatterMatrixCell.tsx';
-export type {
-  ScatterMatrixDiagonalProps,
-  ScatterMatrixGrid,
-} from './ScatterMatrixDiagonal.tsx';
-export { ScatterMatrixDiagonal } from './ScatterMatrixDiagonal.tsx';
 export { ScatterPlot } from './ScatterPlot.tsx';
 export type {
   ScatterGroup,
@@ -31,65 +22,20 @@ export type {
   ScatterInteractionProps,
   ScatterPointOpen,
 } from './scatterFigureProps.ts';
-export type { ScatterGroupInk, ScatterPlotView } from './scatterPlotModel.ts';
+export type { ScatterPlotView } from './scatterPlotModel.ts';
 export type { ScatterMarker, ScatterPlotProps } from './scatterPlotProps.ts';
 export type { ScatterPointLayerProps } from './ScatterPointLayer.tsx';
 export { ScatterPointLayer } from './ScatterPointLayer.tsx';
 export type {
-  FrameSlot,
-  GestureModifiers,
   LassoGesture,
   LassoGestureOptions,
   ScatterSurfaceProps,
   SurfaceEvent,
 } from './lassoGesture.ts';
-export {
-  DEFAULT_LASSO_MIN_DISTANCE,
-  MINIMUM_RING_VERTICES,
-  capturePointer,
-  dropFrame,
-  modifierMode,
-  scheduleFrame,
-  surfacePosition,
-} from './lassoGesture.ts';
-export type { LabelBox } from './scatterLabelBoxes.ts';
-export {
-  LabelBoxField,
-  SCATTER_GROUP_LABEL_SIZE,
-  SCATTER_LABEL_SIZE,
-  labelBoxHeight,
-  labelBoxWidth,
-  labelBoxesOverlap,
-} from './scatterLabelBoxes.ts';
-export type { ScatterLabelInk, ScatterPixelLabel } from './scatterLabels.ts';
-export { scatterGroupLabels, scatterPointLabels } from './scatterLabels.ts';
-export type {
-  PlacedScatterLabel,
-  ScatterLabelPlacementOptions,
-} from './scatterLabelPlacement.ts';
-export { placeScatterLabels } from './scatterLabelPlacement.ts';
-export { scatterMatrixDots } from './scatterMatrixDots.tsx';
-export {
-  SCATTER_MATRIX_GAP,
-  SCATTER_MATRIX_MARGINS,
-  SCATTER_MATRIX_MOST_AXES,
-  SCATTER_MATRIX_ROOM,
-  SCATTER_MATRIX_SMALLEST_OUTLINE,
-  SCATTER_MATRIX_SMALLEST_PLOT,
-  scatterMatrixAxesThatFit,
-  scatterMatrixPlotSide,
-  scatterMatrixTickCount,
-} from './scatterMatrixLayout.ts';
-export { scatterMatrixOutlines } from './scatterMatrixOutlines.tsx';
 export type {
   ScatterMatrixAxis,
   ScatterMatrixProps,
 } from './scatterMatrixProps.ts';
-export type { ScatterOutlineInk } from './scatterOutlineShape.tsx';
-export {
-  SCATTER_OUTLINE_FILL_OPACITY,
-  scatterOutlineShape,
-} from './scatterOutlineShape.tsx';
 export { useLassoGesture } from './useLassoGesture.ts';
 export type {
   HoverAnchor,

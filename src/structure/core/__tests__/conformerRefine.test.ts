@@ -4,7 +4,7 @@ import { beforeAll, expect, test, vi } from 'vitest';
 import type { ConformerOptions } from '../conformerOptions.ts';
 import { DEFAULT_CONFORMER_OPTIONS } from '../conformerOptions.ts';
 import { refineConformers } from '../conformerRefine.ts';
-import type { Conformer, ConformerSet } from '../conformers.ts';
+import type { Conformer, ConformerSet } from '../conformerTypes.ts';
 import { continueConformers, generateConformers } from '../conformers.ts';
 import type {
   GeometryRelaxer,

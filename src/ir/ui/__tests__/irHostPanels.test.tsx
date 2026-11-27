@@ -13,6 +13,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { NoResizeObserver } from '../../../__tests__/dom.ts';
 import { calciteSpectrum as calcite } from '../../core/__tests__/ramanFixture.ts';
 import { IrEditor } from '../IrEditor.tsx';
 import { RamanEditor } from '../RamanEditor.tsx';
@@ -245,19 +246,4 @@ test('a host panel claiming an id already taken is left out', () => {
 function SelectedName() {
   const { selectedSpectrum } = useIrEditorState();
   return <p>{`Predicting for ${selectedSpectrum?.name ?? 'nothing'}`}</p>;
-}
-
-/** A `ResizeObserver` that observes nothing, for a DOM where nothing resizes. */
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing was observed.
-  }
 }

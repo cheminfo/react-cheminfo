@@ -104,7 +104,7 @@ export function layoutAnnotationBoxes(
  * the leader is longer than the box is wide and reaches across other peaks, so
  * the picture reads as answering for one of them instead.
  */
-export const MAXIMUM_DRIFT_STEPS = 2;
+const MAXIMUM_DRIFT_STEPS = 2;
 
 /**
  * The indices of the boxes, ordered by where they want to be.

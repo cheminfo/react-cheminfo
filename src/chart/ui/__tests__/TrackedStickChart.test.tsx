@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { occurrences } from '../../../__tests__/markup.ts';
 import { TrackedStickChart } from '../TrackedStickChart.tsx';
 
 /** Four peaks with a wide gap in the middle, the shape a peak list has. */
@@ -194,10 +195,6 @@ function endsOf(path: string): { from: number; to: number } {
 function ruleAt(html: string): number {
   const match = /data-chart-rule="zero"[^>]*y1="(?<y>[\d.]+)"/.exec(html);
   return Number(match?.groups?.y);
-}
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
 }
 
 test('the axis covers the peaks, not a stretch of masses nothing was measured at', () => {

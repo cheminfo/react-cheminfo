@@ -34,17 +34,3 @@ export function fragmentQuery(text: string): FragmentQuery {
     isEmpty: read.kind === 'empty',
   };
 }
-
-/**
- * Whether two field values describe the same query, so a search is not run
- * again for a value that only changed by its surrounding blanks.
- * @param left - One field value.
- * @param right - The other field value.
- * @returns True when both would be read as the same query.
- */
-export function sameFragmentQuery(left: string, right: string): boolean {
-  const first = fragmentQuery(left);
-  const second = fragmentQuery(right);
-  if (first.isEmpty || second.isEmpty) return first.isEmpty === second.isEmpty;
-  return first.kind === second.kind && first.value === second.value;
-}

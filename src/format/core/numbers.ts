@@ -4,11 +4,6 @@ import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
 import { clamp } from './clamp.ts';
 import { MISSING_VALUE } from './missing.ts';
 
-const COMPACT_FORMATTER = new Intl.NumberFormat('en-US', {
-  notation: 'compact',
-  maximumFractionDigits: 1,
-});
-
 const MAXIMUM_DIGITS = 20;
 const MAXIMUM_SIGNIFICANT = 21;
 const DEFAULT_DIGITS = 2;
@@ -29,6 +24,7 @@ const NUMBER_LOCALES: Readonly<Record<Language, string>> = {
 };
 
 const integerFormatters = new Map<Language, Intl.NumberFormat>();
+const compactFormatters = new Map<Language, Intl.NumberFormat>();
 const decimalFormatters = new Map<string, Intl.NumberFormat>();
 const decimalSeparators = new Map<Language, string>();
 
@@ -148,11 +144,23 @@ export function formatPercent(
 /**
  * A number shortened for a cramped axis or a badge: `999`, `1.2K`, `3.4M`.
  * @param value - The number to write.
+ * @param language - The language of the page. Defaults to English.
  * @returns The shortened number, or the missing marker when it is not finite.
  */
-export function formatCompact(value: number): string {
+export function formatCompact(
+  value: number,
+  language: Language = DEFAULT_LANGUAGE,
+): string {
   if (!Number.isFinite(value)) return MISSING_VALUE;
-  return COMPACT_FORMATTER.format(value);
+  let formatter = compactFormatters.get(language);
+  if (formatter === undefined) {
+    formatter = new Intl.NumberFormat(NUMBER_LOCALES[language], {
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    });
+    compactFormatters.set(language, formatter);
+  }
+  return formatter.format(value);
 }
 
 /**

@@ -28,7 +28,7 @@ export interface OrbitCamera {
 }
 
 /** Where a point of the cube landed, in pixels, and how near the reader it is. */
-export interface ProjectedPoint {
+interface ProjectedPoint {
   /** Pixels from the left of the drawing area. */
   x: number;
   /** Pixels from its top. */
@@ -61,7 +61,7 @@ export const DEFAULT_ORBIT_CAMERA: OrbitCamera = { yaw: 0.6, pitch: 0.5 };
 export const ORBIT_PITCH_LIMIT = 1.4;
 
 /** How many radians one pixel of drag turns the scene. */
-export const ORBIT_RADIANS_PER_PIXEL = 0.01;
+const ORBIT_RADIANS_PER_PIXEL = 0.01;
 
 /**
  * Turn a point of the cube into the reader's own frame.

@@ -13,6 +13,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { typeInto } from '../../../__tests__/dom.ts';
 import { NumberInput } from '../NumberInput.tsx';
 
 let host: HTMLDivElement;
@@ -85,18 +86,11 @@ function fire(target: EventTarget | null | undefined, event: Event) {
 
 /**
  * One keystroke: what the box holds once the reader has typed `text`.
- * @param input
- * @param text
+ * @param input - The box.
+ * @param text - Its whole content afterwards.
  */
 function type(input: HTMLInputElement, text: string) {
-  act(() => {
-    const setValue = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value',
-    )?.set?.bind(input);
-    setValue?.(text);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  typeInto(input, text);
 }
 
 test('a decimal can be typed one keystroke at a time', () => {

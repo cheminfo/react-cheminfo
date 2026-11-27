@@ -14,7 +14,7 @@ import { fullDomain } from '../core/xpsDomain.ts';
 import type { XpsCommandHandlers } from './xpsCommandContext.tsx';
 import { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
 
-export interface UseXpsCommandHandlersOptions {
+interface UseXpsCommandHandlersOptions {
   /** Called when the mark in the header is asked about. */
   onAbout: () => void;
   /** Called when the help in the header, or the key that does the same, asks. */

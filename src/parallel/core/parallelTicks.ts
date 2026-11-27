@@ -18,7 +18,7 @@ import { roundTo } from '../../format/core/roundTo.ts';
 import type { ParallelAxis, ParallelTick } from './parallelTypes.ts';
 
 /** How many graduations an axis carries when the caller asks for no number. */
-export const PARALLEL_TICK_COUNT = 5;
+const PARALLEL_TICK_COUNT = 5;
 
 /** The most decimals a graduation is ever written with. */
 const MOST_TICK_DECIMALS = 6;
@@ -27,7 +27,7 @@ const MOST_TICK_DECIMALS = 6;
 const LABEL_TOLERANCE = 10;
 
 /** An axis's ends and the graduations written along it. */
-export interface ParallelGraduation {
+interface ParallelGraduation {
   /** The two ends of the axis, low first, after any nicing. */
   domain: readonly [number, number];
   /** The graduations, from the bottom of the axis to the top. */

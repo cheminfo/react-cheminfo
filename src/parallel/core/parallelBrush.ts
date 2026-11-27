@@ -39,10 +39,10 @@ export interface ParallelBrushDrag {
 }
 
 /** How close to an edge a press has to land to take hold of it, in pixels. */
-export const PARALLEL_BRUSH_HANDLE_REACH = 4;
+const PARALLEL_BRUSH_HANDLE_REACH = 4;
 
 /** How tall a released band has to be to count as a band rather than a click. */
-export const PARALLEL_BRUSH_SMALLEST = 1;
+const PARALLEL_BRUSH_SMALLEST = 1;
 
 /** How far either side of an axis a press still reaches it, in pixels. */
 export const PARALLEL_BRUSH_HALF_WIDTH = 9;
@@ -56,27 +56,8 @@ export const PARALLEL_BRUSH_HALF_WIDTH = 9;
  */
 const END_REACH = 0.5;
 
-/**
- * What a press at that height takes hold of.
- * @param y - Where the press landed, in pixels from the top of the drawing area.
- * @param band - The band already on that axis, or `null` when it carries none.
- * @returns The grip. A press within {@link PARALLEL_BRUSH_HANDLE_REACH} of an
- * edge takes that edge, a press inside the band moves it, and anything else —
- * including a press on a bare axis — starts a new one.
- */
-export function parallelBrushGrip(
-  y: number,
-  band: ParallelBand | null,
-): ParallelBrushGrip {
-  if (band === null) return 'create';
-  if (Math.abs(y - band.top) <= PARALLEL_BRUSH_HANDLE_REACH) return 'top';
-  if (Math.abs(y - band.bottom) <= PARALLEL_BRUSH_HANDLE_REACH) return 'bottom';
-  if (y > band.top && y < band.bottom) return 'move';
-  return 'create';
-}
-
 /** Which of an axis's bands a press took hold of, and by what. */
-export interface ParallelBrushTarget {
+interface ParallelBrushTarget {
   /** The band, as an index into the list, or `-1` when none was under it. */
   index: number;
   /** What the press took hold of. */

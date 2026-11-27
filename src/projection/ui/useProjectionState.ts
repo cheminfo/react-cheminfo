@@ -172,6 +172,16 @@ export function useProjectionState(
     [setOptions, setTab],
   );
 
+  // Held across renders, so the selection masks memoised on it below stay
+  // valid while only the hover changes.
+  const selectedRows = useMemo(
+    () =>
+      selected === undefined
+        ? ownSelected
+        : projectionRowsOf(selected, rowOfId),
+    [selected, ownSelected, rowOfId],
+  );
+
   return {
     tabs,
     // The last resort is the first tab offered, never the map: a site that
@@ -184,10 +194,7 @@ export function useProjectionState(
     groupings,
     options: settled,
     setOptions,
-    selected:
-      selected === undefined
-        ? ownSelected
-        : projectionRowsOf(selected, rowOfId),
+    selected: selectedRows,
     settleSelection,
     selectRows,
     selectPair,

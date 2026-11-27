@@ -10,19 +10,15 @@
  * hit radius of 8 units is then 30.8 cm⁻¹.
  */
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { act, createRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import { installProbeStubs } from '../../../chart/ui/__tests__/zoomProbe.tsx';
+import { stubViewerLayout } from '../../../chart/ui/__tests__/viewerLayout.ts';
+import { filmSpectrum } from '../../core/__tests__/irFixtures.ts';
 import type { IrEditorHandle, IrPlotClick } from '../../core/irEditorApi.ts';
 import type { IrSpectrum } from '../../core/irSpectrum.ts';
-import { loadIrSpectra } from '../../core/loadIrSpectra.ts';
-import { toIrSpectrum } from '../../core/toIrSpectrum.ts';
 import { IrEditor } from '../IrEditor.tsx';
 
 let host: HTMLDivElement;
@@ -31,14 +27,7 @@ const clicks: IrPlotClick[] = [];
 const reported: IrSpectrum[][] = [];
 
 beforeEach(() => {
-  installProbeStubs();
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  vi.stubGlobal('ResizeObserver', NoResizeObserver);
-  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
-    new DOMRect(0, 0, 600, 400),
-  );
-  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(600);
-  vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(400);
+  stubViewerLayout();
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);
@@ -54,28 +43,12 @@ afterEach(() => {
 });
 
 /**
- * The five-band film, read through the real reader, under a known id.
- * @returns The spectrum.
- */
-async function film(): Promise<IrSpectrum> {
-  const { spectra } = await loadIrSpectra(
-    readFileSync(
-      join(import.meta.dirname, '../../core/__tests__/data/five-bands.jdx'),
-    ),
-    { fileName: 'five-bands.jdx' },
-  );
-  const [loaded] = spectra;
-  if (loaded === undefined) throw new Error('The fixture holds no spectrum');
-  return toIrSpectrum(loaded, { id: 'film' });
-}
-
-/**
  * Open the film in a viewer framed on 3000 to 1000 cm⁻¹.
  * @returns Nothing; the viewer is in `host`.
  */
 async function openFilm(): Promise<void> {
   const handle = createRef<IrEditorHandle>();
-  const spectrum = await film();
+  const spectrum = await filmSpectrum();
   act(() =>
     root.render(
       <IrEditor
@@ -185,18 +158,3 @@ test('back on the read tool, a click is the host’s again', async () => {
   ]);
   expect(reported).toStrictEqual([]);
 });
-
-/** A `ResizeObserver` that observes nothing, for a DOM where nothing resizes. */
-class NoResizeObserver implements ResizeObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public unobserve(): void {
-    // Nothing was observed.
-  }
-
-  public disconnect(): void {
-    // Nothing was observed.
-  }
-}

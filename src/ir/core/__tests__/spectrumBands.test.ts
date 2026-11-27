@@ -1,29 +1,12 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { expect, test } from 'vitest';
 
 import type { IrBand } from '../irBand.ts';
 import { irReducer } from '../irReducer.ts';
 import type { IrSpectrum } from '../irSpectrum.ts';
 import { createIrState } from '../irState.ts';
-import { loadIrSpectra } from '../loadIrSpectra.ts';
 import { orderedBands } from '../spectrumBands.ts';
-import { toIrSpectrum } from '../toIrSpectrum.ts';
 
-/**
- * The five-band film, read through the real reader, under a known id.
- * @returns The spectrum, with no bands yet.
- */
-async function film(): Promise<IrSpectrum> {
-  const { spectra } = await loadIrSpectra(
-    readFileSync(join(import.meta.dirname, 'data/five-bands.jdx')),
-    { fileName: 'five-bands.jdx' },
-  );
-  const [loaded] = spectra;
-  if (loaded === undefined) throw new Error('The fixture holds no spectrum');
-  return toIrSpectrum(loaded, { id: 'film' });
-}
+import { filmSpectrum } from './irFixtures.ts';
 
 /**
  * Where the bands of the first spectrum sit.
@@ -35,7 +18,7 @@ function bandsOf(spectra: readonly IrSpectrum[]): number[] | undefined {
 }
 
 test('a spectrum arriving without bands is picked, with the settings in force', async () => {
-  const state = createIrState({ spectra: [await film()] });
+  const state = createIrState({ spectra: [await filmSpectrum()] });
 
   expect(bandsOf(state.data.spectra)).toStrictEqual([
     1048, 1600, 1708, 2948, 3328,
@@ -44,7 +27,7 @@ test('a spectrum arriving without bands is picked, with the settings in force', 
 });
 
 test('the threshold picks automatic bands again, and leaves hand-picked ones alone', async () => {
-  const spectrum = await film();
+  const spectrum = await filmSpectrum();
   const handPicked: IrSpectrum = {
     ...spectrum,
     id: 'hand',
@@ -70,7 +53,7 @@ test('the threshold picks automatic bands again, and leaves hand-picked ones alo
 });
 
 test('bands set by hand are kept in order, and found automatically again on asking', async () => {
-  const state = createIrState({ spectra: [await film()] });
+  const state = createIrState({ spectra: [await filmSpectrum()] });
   const bands: IrBand[] = [
     { spectrumId: 'film', wavenumber: 2948, strength: 'm' },
     { spectrumId: 'other', wavenumber: 1708, strength: 'S' },

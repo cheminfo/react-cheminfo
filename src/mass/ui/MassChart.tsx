@@ -1,13 +1,15 @@
 import type { ReactElement } from 'react';
-import { useId, useLayoutEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
-import { sameChartDomain } from '../../chart/core/chartDomain.ts';
 import { MARGIN, plotRect } from '../../chart/core/chartGeometry.ts';
 import { Axes } from '../../chart/ui/Axes.tsx';
 import { AxisGuide } from '../../chart/ui/AxisGuide.tsx';
+import { PlotClip } from '../../chart/ui/PlotClip.tsx';
 import { SelectionRect } from '../../chart/ui/SelectionRect.tsx';
 import { chartSurfaceStyle } from '../../chart/ui/chartSurface.ts';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
+import { useReportedDomain } from '../../chart/ui/useReportedDomain.ts';
+import { useSvgId } from '../../chart/ui/useSvgId.ts';
 import { DEFAULT_LABEL_LIMIT } from '../core/massState.ts';
 import { mzDecimalsOf } from '../core/resolutionOf.ts';
 
@@ -94,18 +96,7 @@ export function MassChart(props: MassChartProps): ReactElement {
   });
   const { domain: shown, xScale, yScale, selection, handlers } = zoom;
 
-  // A chart holding nothing still builds scales on a placeholder window, and a
-  // placeholder reported would become a window the host imposes on whatever is
-  // dropped next — drawn entirely off screen.
-  const holdsNothing = spectra.length === 0;
-  const reported = useRef(shown);
-  // Before the browser paints, so a host that stores the window and hands it
-  // back does so in the frame the gesture landed in rather than the one after.
-  useLayoutEffect(() => {
-    if (holdsNothing || sameChartDomain(reported.current, shown)) return;
-    reported.current = shown;
-    onDomainChange?.(shown);
-  }, [holdsNothing, shown, onDomainChange]);
+  useReportedDomain(shown, onDomainChange, spectra.length === 0);
 
   const pointer = useMassPointer({
     svgRef,
@@ -145,7 +136,7 @@ export function MassChart(props: MassChartProps): ReactElement {
 
   // React's generated id carries the punctuation it keeps its own ids apart
   // with, which a URL fragment is under no obligation to accept.
-  const clipId = `mass-plot-${useId().replaceAll(/\W/g, '')}`;
+  const clipId = useSvgId('mass-plot');
 
   return (
     <div ref={containerRef} style={containerStyle}>
@@ -159,16 +150,7 @@ export function MassChart(props: MassChartProps): ReactElement {
         style={chartSurfaceStyle(pointer.position !== null)}
         {...handlers}
       >
-        <defs>
-          <clipPath id={clipId}>
-            <rect
-              x={plot.left}
-              y={plot.top}
-              width={plot.width}
-              height={plot.height}
-            />
-          </clipPath>
-        </defs>
+        <PlotClip id={clipId} plot={plot} />
 
         <Axes
           plot={plot}

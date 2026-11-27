@@ -11,7 +11,8 @@ import {
   OverlayLegend,
   OverlayReadout,
 } from '../src/overlay/ui/index.ts';
-import { PROJECTION_COPY, fillCopy } from '../src/projection/core/index.ts';
+import { fillCopy } from '../src/projection/core/fillCopy.ts';
+import { PROJECTION_COPY } from '../src/projection/core/index.ts';
 import { ellipseCoverageText } from '../src/projection/ui/projectionEllipse.ts';
 import { projectionSelectionSentence } from '../src/projection/ui/projectionSelectionSentence.ts';
 import type { EllipseSize } from '../src/scatter/core/index.ts';

@@ -8,8 +8,8 @@ import {
   overlayBarGroupStyle,
   overlayBarRestStyle,
   overlayBarSideStyle,
-  overlayCardStyle,
-} from './overlayStyles.ts';
+} from './overlayBarStyles.ts';
+import { overlayCardStyle } from './overlayStyles.ts';
 import { useOverlaySurface } from './overlaySurface.ts';
 
 /**

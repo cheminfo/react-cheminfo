@@ -51,7 +51,7 @@ export interface PeakRow {
 }
 
 /** How wide a window the elements are looked up in. */
-export interface PeakRowsOptions {
+interface PeakRowsOptions {
   /**
    * How far in eV a published level may sit from the measurement.
    * @default the default of `assignElements`
@@ -96,22 +96,18 @@ export function buildPeakRows(
 }
 
 /**
- * The rows as a spreadsheet takes them.
- *
- * Tab-separated rather than comma-separated because the numbers are what is
- * being carried: a locale that writes `284,60` turns a CSV into gibberish, while
- * a tab survives every spreadsheet and every chat window. Only the rows on
- * screen are written, filter and order included — what is copied is what was
- * being looked at, which is the only rule that needs no explaining.
+ * The rows as the cells of the table a visitor takes away, under
+ * {@link PEAK_TABLE_HEADER}. Only the rows on screen are written, filter and
+ * order included — what is taken is what was being looked at, which is the only
+ * rule that needs no explaining.
  * @param rows - The rows as the table shows them, in the order it shows them.
- * @returns The header line and one line per row, separated by newlines.
+ * @returns One line of cells per row, an absent value as an empty cell.
  */
-export function peakRowsToTsv(rows: readonly PeakRow[]): string {
-  const lines = new Array<string>(rows.length + 1);
-  lines[0] = TSV_COLUMNS.join('\t');
+export function peakCells(rows: readonly PeakRow[]): string[][] {
+  const cells = new Array<string[]>(rows.length);
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index] as PeakRow;
-    lines[index + 1] = [
+    cells[index] = [
       formatEnergy(row.bindingEnergy),
       row.kineticEnergy === null ? '' : formatEnergy(row.kineticEnergy),
       formatCounts(row.intensity),
@@ -119,9 +115,9 @@ export function peakRowsToTsv(rows: readonly PeakRow[]): string {
       row.element ?? '',
       row.orbital ?? '',
       row.delta === null ? '' : signedEnergy(row.delta),
-    ].join('\t');
+    ];
   }
-  return lines.join('\n');
+  return cells;
 }
 
 /**
@@ -138,8 +134,8 @@ export function peakElementText(row: PeakRow): string {
   return row.candidates > 1 ? `${level} +${row.candidates - 1}` : level;
 }
 
-/** What the copied table says its columns are, in the order it writes them. */
-const TSV_COLUMNS = [
+/** What the peak table says its columns are, in the order it writes them. */
+export const PEAK_TABLE_HEADER: readonly string[] = [
   'binding energy (eV)',
   'kinetic energy (eV)',
   'counts',

@@ -6,6 +6,8 @@
  * else, which is what keeps fast refresh working on the sites that render it.
  */
 
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+
 /** One column of a conformer table. */
 export type ConformerColumn =
   /** The 1-based rank, which is also the conformer's id. */
@@ -44,6 +46,16 @@ export const CONFORMER_COLUMN_LABELS: Record<ConformerColumn, string> = {
   total: 'total kcal/mol',
   forceFieldRelative: 'force field ΔE',
   forceFieldRank: 'force field rank',
+};
+
+/** The catalog key each heading is translated under. */
+export const CONFORMER_COLUMN_KEYS: Record<ConformerColumn, ChromeKey> = {
+  id: 'conformers.table.column.id',
+  population: 'conformers.table.column.population',
+  relative: 'conformers.table.column.relative',
+  total: 'conformers.table.column.total',
+  forceFieldRelative: 'conformers.table.column.forceFieldRelative',
+  forceFieldRank: 'conformers.table.column.forceFieldRank',
 };
 
 /** The columns whose cells are numbers, and so are right-aligned and tabular. */

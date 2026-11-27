@@ -9,7 +9,7 @@ import {
   zoomedDomain,
 } from '../../../chart/core/zoomDomain.ts';
 import type { XpsDomain } from '../xpsSpectrum.ts';
-import { XPS_ZOOM_RULES, pannedDomain, sameXpsDomain } from '../xpsZoom.ts';
+import { XPS_ZOOM_RULES, pannedDomain } from '../xpsZoom.ts';
 
 /** An 800 × 400 chart, 64 pixels kept on the left and 16 on the top. */
 const plot: PlotRect = {
@@ -115,14 +115,6 @@ test('a factor no window survives leaves the window alone', () => {
   expect(scaledYAxis(current, 0)).toBe(current);
   expect(scaledYAxis(current, -1)).toBe(current);
   expect(scaledYAxis(current, Number.NaN)).toBe(current);
-});
-
-test('two windows of the same four numbers are the same window', () => {
-  expect(sameXpsDomain(current, { x: [280, 300], y: [0, 1000] })).toBe(true);
-  expect(sameXpsDomain(current, { x: [280, 300.1], y: [0, 1000] })).toBe(false);
-  expect(sameXpsDomain(current, { x: [280, 300], y: [0, 1001] })).toBe(false);
-  expect(sameXpsDomain(null, null)).toBe(true);
-  expect(sameXpsDomain(current, null)).toBe(false);
 });
 
 test('a selection frames energies only, as tall as the plot', () => {

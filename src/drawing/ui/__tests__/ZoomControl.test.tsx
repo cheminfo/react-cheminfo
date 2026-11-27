@@ -9,25 +9,16 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { NoResizeObserver } from '../../../__tests__/dom.ts';
 import { PIXELS_PER_POINT } from '../../core/camera.ts';
 import { ZoomControl } from '../ZoomControl.tsx';
 
 let host: HTMLDivElement;
 let root: Root;
 
-class StandInObserver {
-  public observe(): void {
-    // Nothing is measured here.
-  }
-
-  public disconnect(): void {
-    // Nothing to stop.
-  }
-}
-
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  vi.stubGlobal('ResizeObserver', StandInObserver);
+  vi.stubGlobal('ResizeObserver', NoResizeObserver);
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);

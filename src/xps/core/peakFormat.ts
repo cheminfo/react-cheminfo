@@ -9,10 +9,10 @@
  */
 
 /** Decimals an energy in eV is written with. */
-export const ENERGY_DECIMALS = 2;
+const ENERGY_DECIMALS = 2;
 
 /** Decimals an atomic percentage is written with. */
-export const PERCENT_DECIMALS = 1;
+const PERCENT_DECIMALS = 1;
 
 /**
  * An energy in eV, as every table and label writes it.

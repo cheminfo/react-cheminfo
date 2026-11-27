@@ -18,6 +18,7 @@ import { chartRoundPixel } from '../core/chartScale.ts';
 import { ChartAxis } from './ChartAxis.tsx';
 import type { ChartPlotArea } from './ChartFrame.tsx';
 import type { ChartSeries, ChartTrackEvent } from './TrackedLineChart.tsx';
+import { plotPointer, trackedValues } from './chartTracking.ts';
 
 /** What {@link ChartTrackingLayer} needs. */
 export interface ChartTrackingLayerProps {
@@ -79,24 +80,15 @@ export function ChartTrackingLayer(
       label: categories[found] ?? '',
       x,
       y: pointer,
-      values: series.map((item) => ({
-        id: item.id,
-        label: item.label,
-        value: item.values[found] ?? Number.NaN,
-        color: item.color,
-      })),
+      values: trackedValues(series, found),
     });
   }
 
   function move(event: MouseEvent<SVGRectElement>): void {
-    const box = event.currentTarget.getBoundingClientRect();
-    const across = box.width === 0 ? 1 : plot.width / box.width;
-    const down = box.height === 0 ? 1 : plot.height / box.height;
-    const x = plot.left + (event.clientX - box.left) * across;
-    const found = chartBandIndexAt(band, x);
+    const pointer = plotPointer(event, plot);
+    const found = chartBandIndexAt(band, pointer.x);
     if (found === -1 || found === entered.current) return;
-    const height = plot.top + (event.clientY - box.top) * down;
-    report(found, chartBandCenter(band, found), height);
+    report(found, chartBandCenter(band, found), pointer.y);
   }
 
   function leave(): void {

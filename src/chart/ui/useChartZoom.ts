@@ -275,5 +275,3 @@ export function useChartZoom(options: ChartZoomOptions): ChartZoom {
     },
   };
 }
-
-export { type ChartZoomHandlers } from './chartGestures.ts';

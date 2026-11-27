@@ -14,6 +14,8 @@
  * never do.
  */
 
+import { filterNeedle, matchesNeedle } from '../../panel/core/textFilter.ts';
+
 import type { ComponentRow } from './componentRows.ts';
 import { formatEnergy } from './peakFormat.ts';
 import type { PeakRow } from './peakRows.ts';
@@ -29,14 +31,7 @@ export function filterPeakRows(
   rows: readonly PeakRow[],
   query: string,
 ): readonly PeakRow[] {
-  const needle = query.trim().toLowerCase();
-  if (needle === '') return rows;
-
-  const kept: PeakRow[] = [];
-  for (const row of rows) {
-    if (matchesPeak(row, needle)) kept.push(row);
-  }
-  return kept;
+  return keepMatching(rows, query, peakFields);
 }
 
 /**
@@ -50,44 +45,50 @@ export function filterComponentRows(
   rows: readonly ComponentRow[],
   query: string,
 ): readonly ComponentRow[] {
-  const needle = query.trim().toLowerCase();
+  return keepMatching(rows, query, componentFields);
+}
+
+function keepMatching<Row>(
+  rows: readonly Row[],
+  query: string,
+  fieldsOf: (row: Row) => ReadonlyArray<string | undefined>,
+): readonly Row[] {
+  const needle = filterNeedle(query);
   if (needle === '') return rows;
 
-  const kept: ComponentRow[] = [];
+  const kept: Row[] = [];
   for (const row of rows) {
-    if (matchesComponent(row, needle)) kept.push(row);
+    if (matchesNeedle(needle, ...fieldsOf(row))) kept.push(row);
   }
   return kept;
 }
 
 /**
- * Whether one peak row answers a query.
+ * What a peak row is found by: either energy as written, the element and the
+ * level.
  * @param row - The row.
- * @param needle - What was typed, trimmed and lowercased.
- * @returns Whether either energy as written, the element or the level holds it.
+ * @returns The fields, an absent one as `undefined`.
  */
-function matchesPeak(row: PeakRow, needle: string): boolean {
-  if (formatEnergy(row.bindingEnergy).includes(needle)) return true;
-  if (
-    row.kineticEnergy !== null &&
-    formatEnergy(row.kineticEnergy).includes(needle)
-  ) {
-    return true;
-  }
-  if (row.element?.toLowerCase().includes(needle)) return true;
-  return row.orbital?.toLowerCase().includes(needle) ?? false;
+function peakFields(row: PeakRow): Array<string | undefined> {
+  return [
+    formatEnergy(row.bindingEnergy),
+    row.kineticEnergy === null ? undefined : formatEnergy(row.kineticEnergy),
+    row.element ?? undefined,
+    row.orbital ?? undefined,
+  ];
 }
 
 /**
- * Whether one fit row answers a query.
+ * What a fit row is found by: the label, the energy as written, the shape and
+ * the region.
  * @param row - The row.
- * @param needle - What was typed, trimmed and lowercased.
- * @returns Whether the label, the energy as written, the shape or the region
- * holds it.
+ * @returns The fields, an absent one as `undefined`.
  */
-function matchesComponent(row: ComponentRow, needle: string): boolean {
-  if (row.label.toLowerCase().includes(needle)) return true;
-  if (formatEnergy(row.bindingEnergy).includes(needle)) return true;
-  if (row.shape.toLowerCase().includes(needle)) return true;
-  return row.regionLabel?.toLowerCase().includes(needle) ?? false;
+function componentFields(row: ComponentRow): Array<string | undefined> {
+  return [
+    row.label,
+    formatEnergy(row.bindingEnergy),
+    row.shape,
+    row.regionLabel ?? undefined,
+  ];
 }

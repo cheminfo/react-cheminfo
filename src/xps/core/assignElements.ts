@@ -73,13 +73,13 @@ export interface ElementPeakCount {
 }
 
 /** How far a published level may sit from a peak unless asked otherwise. */
-export const DEFAULT_ASSIGNMENT_TOLERANCE = 2;
+const DEFAULT_ASSIGNMENT_TOLERANCE = 2;
 
 /** How many candidates a peak is offered unless asked otherwise. */
-export const DEFAULT_ASSIGNMENT_LIMIT = 5;
+const DEFAULT_ASSIGNMENT_LIMIT = 5;
 
 /** The weakest line put forward as what a peak is, unless asked otherwise. */
-export const DEFAULT_MINIMUM_STRENGTH: LineStrength = 1;
+const DEFAULT_MINIMUM_STRENGTH: LineStrength = 1;
 
 /**
  * The published levels that could account for one binding energy.

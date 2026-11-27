@@ -6,7 +6,6 @@
 import { expect, test } from 'vitest';
 
 import {
-  MOTION_CSS,
   MOTION_STYLE,
   bubbleDelay,
   figureMoves,
@@ -14,6 +13,7 @@ import {
   runTiming,
   sceneMoves,
 } from '../motion.ts';
+import { MOTION_CSS } from '../motionCss.ts';
 import type { PathPrimitive, Scene, SceneItem } from '../primitives.ts';
 
 function path(extra: Partial<PathPrimitive> = {}): PathPrimitive {

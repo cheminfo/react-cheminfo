@@ -1,6 +1,7 @@
 import { Icon } from '@blueprintjs/core';
 import type { ReactNode } from 'react';
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { CompositionRow } from '../core/compositionRows.ts';
 import { formatCounts, formatPercent } from '../core/peakFormat.ts';
 
@@ -61,7 +62,7 @@ export function CompositionTable(props: CompositionTableProps): ReactNode {
                     <Icon
                       icon="warning-sign"
                       size={11}
-                      color="rgb(191 115 0)"
+                      intent="warning"
                       title="The file states no sensitivity factor for this component, so it was quantified at 1"
                     />
                   ) : null}
@@ -73,7 +74,7 @@ export function CompositionTable(props: CompositionTableProps): ReactNode {
                         ...panelBarFillStyle,
                         width: `${row.share * 100}%`,
                         background: row.assumedSensitivity
-                          ? 'rgb(191 115 0)'
+                          ? TOKEN.warning
                           : panelBarFillStyle.background,
                       }}
                     />

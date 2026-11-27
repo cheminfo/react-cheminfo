@@ -71,10 +71,7 @@ export async function captureMoleculePng(
   if (dataUri === undefined) {
     throw new Error('There is no picture to copy yet.');
   }
-  // It states its resolution, so a document places it at its size on screen.
-  return new Blob([withPngDpi(dataUriBytes(dataUri), figureDpi(scale))], {
-    type: FIGURE_PNG_TYPE,
-  });
+  return new Blob([stampedPng(dataUri, scale)], { type: FIGURE_PNG_TYPE });
 }
 
 /**
@@ -144,7 +141,7 @@ export async function moleculeImageFile(
   const dataUri = await viewer.captureImage(pixels);
   if (dataUri === undefined) return undefined;
   if (format === 'png') {
-    return new File([dataUriBytes(dataUri)], `${base}.png`, {
+    return new File([stampedPng(dataUri, scale)], `${base}.png`, {
       type: FIGURE_PNG_TYPE,
     });
   }
@@ -154,4 +151,15 @@ export async function moleculeImageFile(
   return new File([markup], figureFileName(base, markup), {
     type: FIGURE_SVG_TYPE,
   });
+}
+
+/**
+ * The PNG a capture holds, stating its resolution, so a document places it at
+ * its size on screen.
+ * @param dataUri - The capture, as a PNG data URI.
+ * @param scale - Multiple of the canvas on screen it was rendered at.
+ * @returns The PNG bytes.
+ */
+function stampedPng(dataUri: string, scale: number): Uint8Array<ArrayBuffer> {
+  return withPngDpi(dataUriBytes(dataUri), figureDpi(scale));
 }

@@ -1,5 +1,4 @@
-export type { RgbaFrame } from './animatedPng.ts';
-export { DEFAULT_FRAMES_PER_SECOND, encodeAnimatedPng } from './animatedPng.ts';
+export { DEFAULT_FRAMES_PER_SECOND } from './animatedPng.ts';
 export type {
   Molecule3DCamera,
   Molecule3DRotation,
@@ -7,7 +6,6 @@ export type {
 } from './camera.ts';
 export {
   DEFAULT_MOLECULE_3D_CAMERA,
-  MOLECULE_3D_ZOOM_RANGE,
   formatMolecule3DCamera,
   molecule3DCameraParam,
   normalizeMolecule3DCamera,
@@ -15,27 +13,11 @@ export {
   sameMolecule3DCamera,
 } from './camera.ts';
 export type { ImageSize } from './exportImage.ts';
-export { dataUriBytes, rasterSvgMarkup } from './exportImage.ts';
-export type {
-  FigureFrame,
-  PixelBox,
-  RelativeCrop,
-  RenderedFigure,
-} from './figureFrame.ts';
-export {
-  FIGURE_IMAGE_QUALITY,
-  FIGURE_IMAGE_TYPE,
-  FIGURE_LONGEST_SIDE,
-  figureFrame,
-} from './figureFrame.ts';
-export type { Molecule3DGesture, Molecule3DGestureKey } from './gestures.ts';
-export { MOLECULE_3D_GESTURES } from './gestures.ts';
-export type {
-  HighlightedBond,
-  HighlightedParts,
-  Molecule3DHighlight,
-} from './highlight.ts';
-export { highlightedParts, sameHighlights } from './highlight.ts';
+export { rasterSvgMarkup } from './exportImage.ts';
+export type { RenderedFigure } from './figureFrame.ts';
+export { FIGURE_LONGEST_SIDE } from './figureFrame.ts';
+export type { Molecule3DHighlight } from './highlight.ts';
+export { sameHighlights } from './highlight.ts';
 export type {
   AtomReference,
   Measurement,
@@ -49,7 +31,6 @@ export {
   sameMeasurements,
 } from './measurement.ts';
 export type { Molecule3DFile } from './file.ts';
-export { isMolfileFormat } from './file.ts';
 export type { PartialBondMode } from './partialBondMode.ts';
 export {
   PARTIAL_BOND_MODES,

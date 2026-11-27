@@ -3,7 +3,7 @@ import { TooltipHelpContent } from 'react-science/ui';
 import type { XpsCommandId } from '../core/xpsCommands.ts';
 import { xpsCommand, xpsShortcutLabels } from '../core/xpsCommands.ts';
 
-export interface XpsCommandTooltipProps {
+interface XpsCommandTooltipProps {
   /** The command the tooltip is for. */
   command: XpsCommandId;
 }

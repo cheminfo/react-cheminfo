@@ -56,7 +56,7 @@ export interface IrChartProps {
   showAssignments?: boolean;
   /**
    * At most how many bands are labelled; all of them are still marked.
-   * @default 12
+   * @default DEFAULT_LABEL_LIMIT
    */
   labelLimit?: number;
   /**

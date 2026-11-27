@@ -1,7 +1,6 @@
 export type { AtomLabelPlacement, LabelledMolecule } from './atomLabels.ts';
 export { applyAtomLabels, customAtomLabel } from './atomLabels.ts';
 export {
-  GAS_CONSTANT,
   ROOM_TEMPERATURE,
   boltzmannConfidence,
   boltzmannShares,
@@ -21,40 +20,11 @@ export {
   relativeEnergyOf,
   totalEnergyOf,
 } from './conformerEnergy.ts';
-export type {
-  EditorGesture,
-  EditorGuideKey,
-  EditorGuideLink,
-  EditorGuideOptions,
-  EditorGuideScope,
-  EditorGuideSection,
-} from './editorGuide.ts';
-export {
-  STRUCTURE_EDITOR_DOCS,
-  STRUCTURE_EDITOR_GUIDE,
-  editorGuideSections,
-  editorKeyLabel,
-} from './editorGuide.ts';
-export type {
-  EditorToolbarAvailability,
-  EditorToolbarButton,
-} from './editorToolbar.ts';
-export {
-  EDITOR_TOOLBAR_BUTTONS,
-  isEditorToolbarButtonAvailable,
-} from './editorToolbar.ts';
-export type { EditorToolbarButtonBox } from './editorToolbarGeometry.ts';
-export {
-  EDITOR_TOOLBAR_COLUMNS,
-  EDITOR_TOOLBAR_ROWS,
-  editorToolbarButtonAt,
-  editorToolbarButtonBox,
-} from './editorToolbarGeometry.ts';
 export type { EditorLine, EditorValue } from './editorValue.ts';
 export type { IdCodeValue } from './editorValue.ts';
 export { isEmptyIdCode, splitEditorValue, splitIdCode } from './editorValue.ts';
 export type { FragmentQuery } from './fragmentQuery.ts';
-export { fragmentQuery, sameFragmentQuery } from './fragmentQuery.ts';
+export { fragmentQuery } from './fragmentQuery.ts';
 export type {
   GeometryRelaxer,
   RelaxableGeometry,

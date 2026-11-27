@@ -7,17 +7,9 @@
 import { expect, test } from 'vitest';
 
 import type { Primitive, Scene, SceneItem } from '../primitives.ts';
-import type { DrawingStyle } from '../style.ts';
 import { sceneBody, sheetBody } from '../svg.ts';
 
-const STYLE: DrawingStyle = {
-  bondLength: 14.4,
-  lineWidth: 0.6,
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  captionSize: 10,
-  captionFamily: 'Arial, Helvetica, sans-serif',
-  color: '#000000',
-};
+import { STYLE } from './drawingStyle.ts';
 
 const OPEN =
   '<g fill="none" stroke="#000000" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round" font-family="Arial, Helvetica, sans-serif">';

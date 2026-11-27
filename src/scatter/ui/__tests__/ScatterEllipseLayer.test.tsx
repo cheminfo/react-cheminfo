@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { occurrences } from '../../../__tests__/markup.ts';
 import { chartScale } from '../../../chart/core/index.ts';
 import type { ScatterEllipseLayerProps } from '../ScatterEllipseLayer.tsx';
 import { ScatterEllipseLayer } from '../ScatterEllipseLayer.tsx';
@@ -98,7 +99,3 @@ test('a group nobody belongs to is skipped rather than drawn empty', () => {
   expect(occurrences(html, '<ellipse')).toBe(1);
   expect(html).toContain('<g data-layer="ellipses">');
 });
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
-}

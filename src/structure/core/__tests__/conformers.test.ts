@@ -3,7 +3,8 @@ import { beforeAll, expect, test, vi } from 'vitest';
 
 import type { ConformerOptions } from '../conformerOptions.ts';
 import { DEFAULT_CONFORMER_OPTIONS } from '../conformerOptions.ts';
-import { generateConformers, strategyConstant } from '../conformers.ts';
+import { strategyConstant } from '../conformerSession.ts';
+import { generateConformers } from '../conformers.ts';
 import { molfileAtomCount } from '../molfile.ts';
 import { registerResources } from '../oclResources.ts';
 

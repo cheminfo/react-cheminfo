@@ -17,6 +17,8 @@
 import type { AnalysisSpectrum } from 'xps-analysis';
 import { fromVamas as vamasAnalysis } from 'xps-analysis';
 
+import { errorMessage } from '../../error/core/toError.ts';
+
 import {
   MINIMUM_BLOCK_POINTS,
   readAnalysisBlocks,
@@ -67,7 +69,7 @@ function readBlocks(
   try {
     return vamasAnalysis(data).spectra;
   } catch (error) {
-    const said = error instanceof Error ? error.message : String(error);
+    const said = errorMessage(error);
     throw new Error(
       `${describeSource(fileName)} could not be read as VAMAS — the reader stopped on it with: ${said}`,
       { cause: error },

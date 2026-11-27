@@ -18,6 +18,7 @@ import {
   panelColumnButtonStyle,
   panelHeadingStyle,
 } from '../../panel/core/panelStyles.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
 // The parts every editor of the family shares, so a panel here reads exactly
 // like one of the infrared or mass viewer.
@@ -67,7 +68,9 @@ export const panelTextCellStyle = {
  * A plain row carries no style at all — the hairline between rows is the
  * shared cell's own.
  */
-export const panelLitRowStyle = { background: 'rgb(215 227 245)' } as const;
+export const panelLitRowStyle = {
+  background: 'color-mix(in oklab, var(--accent) 10%, var(--surface))',
+} as const;
 
 /** One labelled control of a small form inside a panel body. */
 export const panelFieldStyle = {
@@ -99,7 +102,7 @@ export const panelBarTrackStyle = {
   width: '100%',
   height: 6,
   borderRadius: 3,
-  background: 'rgb(237 240 243)',
+  background: TOKEN.surfaceSunken,
   overflow: 'hidden',
 } as const;
 

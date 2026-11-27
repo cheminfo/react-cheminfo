@@ -14,11 +14,10 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { stubViewerLayout } from '../../../chart/ui/__tests__/viewerLayout.ts';
 import { massFixture } from '../../core/__tests__/massFixtures.ts';
 import type { MassEditorHandle } from '../../core/massEditorApi.ts';
 import { MassEditor } from '../MassEditor.tsx';
-
-import { stubViewerLayout } from './massViewerStubs.ts';
 
 let host: HTMLDivElement;
 let root: Root;

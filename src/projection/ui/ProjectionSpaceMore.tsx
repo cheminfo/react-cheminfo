@@ -1,23 +1,22 @@
 import type { ReactElement } from 'react';
 
-import { OverlayAction } from '../../overlay/ui/OverlayAction.tsx';
 import { OverlayGroup } from '../../overlay/ui/OverlayGroup.tsx';
-import { OverlayNumber } from '../../overlay/ui/OverlayNumber.tsx';
 import { OverlayPanel } from '../../overlay/ui/OverlayPanel.tsx';
 import { OverlaySegmented } from '../../overlay/ui/OverlaySegmented.tsx';
-import { OverlaySelect } from '../../overlay/ui/OverlaySelect.tsx';
-import type { ScatterSelectionMode } from '../../scatter/core/scatterSelection.ts';
 import type { CloudGesture } from '../../scatter3d/core/cloudGesture.ts';
 import type { ProjectionResult } from '../core/projectionResult.ts';
 import { PROJECTION_TAB_DEFAULTS } from '../core/projectionTabDefaults.ts';
 
+import type { ProjectionAxisKey } from './ProjectionFigureFields.tsx';
+import {
+  ProjectionAxisPickers,
+  ProjectionPointRadius,
+  ProjectionSelectModePicker,
+} from './ProjectionFigureFields.tsx';
 import { ProjectionShapePicker } from './ProjectionGroupingPickers.tsx';
 import type { ProjectionSpaceControlsProps } from './ProjectionSpaceControls.tsx';
-import { projectionAxisChoices } from './projectionAxisChoices.ts';
-import {
-  projectionCloudGestureChoices,
-  projectionSelectModeChoices,
-} from './projectionWordChoices.ts';
+import { ProjectionViewActions } from './ProjectionViewActions.tsx';
+import { projectionCloudGestureChoices } from './projectionWordChoices.ts';
 
 /** What {@link ProjectionSpaceMore} needs beyond the cloud's own controls. */
 interface ProjectionSpaceMoreProps extends ProjectionSpaceControlsProps {
@@ -52,7 +51,7 @@ export function ProjectionSpaceMore(
 ): ReactElement {
   const { result, options, onChange, copy, groupings } = props;
   const { selectedCount = 0, onResetView, onClearSelection } = props;
-  const { action, help, panel, reason, tab } = copy;
+  const { help, panel, reason, tab } = copy;
 
   const nothingPicked = selectedCount === 0;
 
@@ -61,67 +60,29 @@ export function ProjectionSpaceMore(
       title={tab.space}
       onReset={() => onChange(PROJECTION_TAB_DEFAULTS.space)}
       actions={
-        <>
-          <OverlayAction
-            text={action.resetView}
-            icon="reset"
-            onClick={onResetView}
-          />
-          <OverlayAction
-            text={action.clearSelection}
-            icon="cross"
-            disabled={nothingPicked}
-            onClick={onClearSelection}
-          />
-        </>
+        <ProjectionViewActions
+          copy={copy}
+          nothingPicked={nothingPicked}
+          onResetView={onResetView}
+          onClearSelection={onClearSelection}
+        />
       }
     >
       <OverlayGroup label={panel.section.axes} divider={false}>
-        <OverlaySelect
-          label={panel.name.xAxis}
-          help={help.xAxis}
-          value={String(options.xAxis)}
-          options={projectionAxisChoices(
-            result,
-            [options.yAxis, options.zAxis],
-            reason.axisTakenInSpace,
-          )}
-          onChange={(value) => onChange({ xAxis: Number(value) })}
-        />
-        <OverlaySelect
-          label={panel.name.yAxis}
-          help={help.yAxis}
-          value={String(options.yAxis)}
-          options={projectionAxisChoices(
-            result,
-            [options.xAxis, options.zAxis],
-            reason.axisTakenInSpace,
-          )}
-          onChange={(value) => onChange({ yAxis: Number(value) })}
-        />
-        <OverlaySelect
-          label={panel.name.zAxis}
-          help={help.zAxis}
-          value={String(options.zAxis)}
-          options={projectionAxisChoices(
-            result,
-            [options.xAxis, options.yAxis],
-            reason.axisTakenInSpace,
-          )}
-          onChange={(value) => onChange({ zAxis: Number(value) })}
+        <ProjectionAxisPickers
+          result={result}
+          options={options}
+          onChange={onChange}
+          copy={copy}
+          axes={SPACE_AXES}
+          reason={reason.axisTakenInSpace}
         />
       </OverlayGroup>
       <OverlayGroup label={panel.section.drawing}>
-        <OverlayNumber
-          label={panel.name.pointRadius}
-          help={help.pointRadius}
-          value={options.pointRadius}
-          min={1}
-          max={12}
-          step={0.5}
-          digits={1}
-          unit="px"
-          onChange={(pointRadius) => onChange({ pointRadius })}
+        <ProjectionPointRadius
+          options={options}
+          onChange={onChange}
+          copy={copy}
         />
         <ProjectionShapePicker
           label={panel.name.shapeBy}
@@ -142,14 +103,15 @@ export function ProjectionSpaceMore(
         />
       </OverlayGroup>
       <OverlayGroup label={panel.section.selecting}>
-        <OverlaySegmented<ScatterSelectionMode>
-          label={panel.name.selectMode}
-          help={help.selectMode}
-          value={options.selectMode}
-          options={projectionSelectModeChoices(copy)}
-          onChange={(selectMode) => onChange({ selectMode })}
+        <ProjectionSelectModePicker
+          options={options}
+          onChange={onChange}
+          copy={copy}
         />
       </OverlayGroup>
     </OverlayPanel>
   );
 }
+
+/** The three axes the cloud is laid out on. */
+const SPACE_AXES: readonly ProjectionAxisKey[] = ['xAxis', 'yAxis', 'zAxis'];

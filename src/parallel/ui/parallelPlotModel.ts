@@ -17,6 +17,12 @@ import type {
   ParallelRanges,
 } from '../core/parallelTypes.ts';
 
+/** Height the figure takes when the caller names none. */
+export const PARALLEL_DEFAULT_HEIGHT = 320;
+
+/** The smallest drawing area the figure will lay out, in pixels. */
+export const PARALLEL_SMALLEST_SIDE = 10;
+
 /**
  * How many rows the figure draws.
  * @param axes - The axes, whose columns are read.
@@ -127,4 +133,17 @@ export function parallelFigureLabel(
   const rows = count === 1 ? '1 row' : `${formatInteger(count)} rows`;
   if (names.length === 0) return `Parallel coordinates of ${rows}.`;
   return `Parallel coordinates of ${rows}, on ${names.join(', ')}.`;
+}
+
+/**
+ * Each axis's column, in the order of the axes.
+ * @param axes - The axes.
+ * @returns Their columns.
+ */
+export function parallelColumnsOf(
+  axes: readonly ParallelAxis[],
+): Array<ArrayLike<number>> {
+  const columns: Array<ArrayLike<number>> = [];
+  for (const axis of axes) columns.push(axis.values);
+  return columns;
 }

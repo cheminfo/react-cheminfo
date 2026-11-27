@@ -14,7 +14,7 @@ import type { XpsSettings } from '../core/xpsState.ts';
 import { DEFAULT_SETTINGS } from '../core/xpsState.ts';
 
 /** The settings kept between visits. */
-export type StoredQuantification = Pick<
+type StoredQuantification = Pick<
   XpsSettings,
   'instrumentId' | 'instruments' | 'surveyBackground'
 >;
@@ -41,7 +41,7 @@ export function instrumentBucket(
  * @param settings - The workspace.
  * @returns The instruments, the one chosen and the background.
  */
-export function storedPart(settings: XpsSettings): StoredQuantification {
+function storedPart(settings: XpsSettings): StoredQuantification {
   const { instrumentId, instruments, surveyBackground } = settings;
   return { instrumentId, instruments, surveyBackground };
 }

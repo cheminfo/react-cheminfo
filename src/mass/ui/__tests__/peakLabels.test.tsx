@@ -4,7 +4,7 @@ import { expect, test } from 'vitest';
 import { plotRect } from '../../../chart/core/chartGeometry.ts';
 import { chartPixel, chartScale } from '../../../chart/core/chartScale.ts';
 import { PEAK_LABEL } from '../../../chart/core/chartTheme.ts';
-import type { MassSpectrum } from '../../core/massSpectrum.ts';
+import { centroidedSpectrum } from '../../core/__tests__/massFixtures.ts';
 import { PeakLabels } from '../PeakLabels.tsx';
 
 const plot = plotRect({ width: 600, height: 400 });
@@ -17,7 +17,7 @@ test('a named peak carries a mark on the top of its stick', () => {
   const markup = renderToStaticMarkup(
     <svg>
       <PeakLabels
-        spectrum={centroided('a', [FIRST], [100])}
+        spectrum={centroidedSpectrum('a', [FIRST], [100])}
         plot={plot}
         xScale={xScale}
         yScale={yScale}
@@ -40,7 +40,7 @@ test('the numbers are haloed, and the halo is painted under them', () => {
   const markup = renderToStaticMarkup(
     <svg>
       <PeakLabels
-        spectrum={centroided('a', [FIRST], [100])}
+        spectrum={centroidedSpectrum('a', [FIRST], [100])}
         plot={plot}
         xScale={xScale}
         yScale={yScale}
@@ -60,7 +60,7 @@ test('the peak crowded out of its numbers keeps the mark on its tip', () => {
       <PeakLabels
         // Clear of the selection's own slots, and still closer than a label is
         // wide on a plot this size.
-        spectrum={centroided('a', [200, 231], [40, 100])}
+        spectrum={centroidedSpectrum('a', [200, 231], [40, 100])}
         plot={plot}
         xScale={xScale}
         yScale={yScale}
@@ -77,7 +77,7 @@ test('the peak crowded out of its numbers keeps the mark on its tip', () => {
 test('a stack answers the pointer only where somebody asked it to', () => {
   const labels = (
     <PeakLabels
-      spectrum={centroided('a', [FIRST], [100])}
+      spectrum={centroidedSpectrum('a', [FIRST], [100])}
       plot={plot}
       xScale={xScale}
       yScale={yScale}
@@ -93,7 +93,7 @@ test('a stack answers the pointer only where somebody asked it to', () => {
   const hoverable = renderToStaticMarkup(
     <svg>
       <PeakLabels
-        spectrum={centroided('a', [FIRST], [100])}
+        spectrum={centroidedSpectrum('a', [FIRST], [100])}
         plot={plot}
         xScale={xScale}
         yScale={yScale}
@@ -121,7 +121,7 @@ test('the mark hangs under the tip on the mirrored half', () => {
     <svg>
       <PeakLabels
         below
-        spectrum={centroided('a', [FIRST], [100])}
+        spectrum={centroidedSpectrum('a', [FIRST], [100])}
         plot={plot}
         xScale={xScale}
         yScale={invertedScale}
@@ -133,32 +133,3 @@ test('the mark hangs under the tip on the mirrored half', () => {
 
   expect(markup).toContain(`y2="${tip - PEAK_LABEL.topMark}"`);
 });
-
-/**
- * A centroided spectrum with the peaks the test asks for.
- * @param id - Its identity.
- * @param mz - The m/z of each peak, ascending.
- * @param intensity - The intensity of each.
- * @returns The spectrum, drawn as its sticks.
- */
-function centroided(
-  id: string,
-  mz: number[],
-  intensity: number[],
-): MassSpectrum {
-  return {
-    id,
-    name: id,
-    color: '#000000',
-    profile: null,
-    centroid: {
-      x: Float64Array.from(mz),
-      y: Float64Array.from(intensity),
-      charge: new Int16Array(mz.length),
-    },
-    meta: null,
-    origin: { format: 'text' },
-    showProfile: false,
-    showCentroid: true,
-  };
-}

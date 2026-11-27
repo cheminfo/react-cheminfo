@@ -33,7 +33,7 @@ export {
 } from './captions.ts';
 export type { ChemicalRange } from './chemicalText.ts';
 export type { DashPattern, LineDash } from './dashes.ts';
-export { LINE_DASHES, isLineDash } from './dashes.ts';
+export { isLineDash } from './dashes.ts';
 export { chemicalRanges } from './chemicalText.ts';
 export type { CubicPiece, CurveControl } from './curves.ts';
 export {
@@ -58,7 +58,6 @@ export {
 } from '../../storage/core/fileAccess.ts';
 export type { FontChoice } from './fonts.ts';
 export { CAPTION_FAMILIES, CAPTION_FONTS, FONTS } from './fonts.ts';
-export { formulaParts } from './formulaText.ts';
 export {
   angleTo,
   boundsOf,
@@ -91,12 +90,6 @@ export {
   transformGraphic,
 } from './graphicEdits.ts';
 export type { GradientKind, GraphicGradient } from './graphicGradients.ts';
-export {
-  gradientAngle,
-  gradientCentre,
-  movedGradientCentre,
-  parseGradient,
-} from './graphicGradients.ts';
 export { distanceToGraphic } from './graphicOutline.ts';
 export type {
   DrawBoxGraphic,
@@ -107,7 +100,6 @@ export type {
   NewGraphic,
 } from './graphics.ts';
 export {
-  boxTurn,
   graphicCorners,
   isBoxGraphic,
   isClosedGraphic,
@@ -124,7 +116,6 @@ export type {
   ObjectSelection,
 } from './objects.ts';
 export {
-  isObjectOf,
   mapObjects,
   objectOf,
   objectsOf,
@@ -161,7 +152,7 @@ export {
 export type { PageDirection, PageStops, PageStopsInput } from './pageStops.ts';
 export { NO_STOPS, pageStops, pagesInOrder } from './pageStops.ts';
 export type { LabelReferent } from './labelReferent.ts';
-export { isReferentKey, parseLabelReferent } from './labelReferent.ts';
+export { isReferentKey } from './labelReferent.ts';
 export { PALETTE, isColor, joinColor, shadeOf, splitColor } from './palette.ts';
 export type { DrawPicture, PicturePatch, TurnedBox } from './pictures.ts';
 export {
@@ -184,18 +175,11 @@ export {
   IS_MAC,
   MOD_KEY,
   hasModifier,
-  isApplePlatform,
   shortcutText,
 } from './platform.ts';
 export type { Script, Span } from './richText.ts';
-export {
-  applyChemistry,
-  mergeGlyphs,
-  parseRichText,
-  readRichText,
-} from './richText.ts';
+export { applyChemistry, mergeGlyphs, parseRichText } from './richText.ts';
 export type { Glyph } from './richTextMarks.ts';
-export { MAX_RUN_SIZE, readMarks } from './richTextMarks.ts';
 export { writeRichText } from './richTextWriter.ts';
 export type { CurveDragOptions, CurveHandle } from './shapeHandles.ts';
 export {
@@ -228,11 +212,7 @@ export {
   frameTransform,
   framedBox,
 } from './selectionFrame.ts';
-export {
-  hasLatinLetter,
-  latinToGreek,
-  symbolFontToUnicode,
-} from './symbolFont.ts';
+export { symbolFontToUnicode } from './symbolFont.ts';
 export type { Similarity } from './transform.ts';
 export {
   mapCurve,

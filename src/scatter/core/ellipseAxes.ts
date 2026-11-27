@@ -30,7 +30,7 @@ export interface EllipseCovariance {
 }
 
 /** The drawable shape of a covariance. */
-export interface EllipseAxes {
+interface EllipseAxes {
   /** Semi-major axis length. */
   rx: number;
   /** Semi-minor axis length; exactly `0` when the spread is collinear. */

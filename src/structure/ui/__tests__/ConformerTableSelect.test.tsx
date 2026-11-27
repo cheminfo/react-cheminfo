@@ -13,7 +13,7 @@ import { createRoot } from 'react-dom/client';
 import type { Mock } from 'vitest';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import type { Conformer } from '../../core/conformers.ts';
+import type { Conformer } from '../../core/conformerTypes.ts';
 import type { MolfileExport } from '../../core/molfileExport.ts';
 import type { ConformerTableProps } from '../ConformerTable.tsx';
 import { ConformerTable } from '../ConformerTable.tsx';

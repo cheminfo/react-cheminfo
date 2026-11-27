@@ -28,12 +28,6 @@ import type { IrTechnique } from './irTechnique.ts';
 import { IR_TECHNIQUE_RULES, irModeTechnique } from './irTechnique.ts';
 
 /**
- * The two ways an infrared spectrum is read, in the order a control offers
- * them.
- */
-export const IR_MODES: readonly IrMode[] = IR_TECHNIQUE_RULES.infrared.modes;
-
-/**
  * How each mode behaves, every fact in one place.
  *
  * `transmittance` comes first because it is what the majority of instruments

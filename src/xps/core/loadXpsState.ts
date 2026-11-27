@@ -17,6 +17,8 @@
  * because a file is nobody's gesture to be told off for.
  */
 
+import { isChartWindow } from '../../chart/core/chartDomain.ts';
+
 import { indexOfXpsSpectrum } from './changeXpsSpectrum.ts';
 import type { XpsPanelId } from './xpsSidePanels.ts';
 import { xpsSidePanels } from './xpsSidePanels.ts';
@@ -25,7 +27,6 @@ import type { PartialXpsState, XpsState } from './xpsState.ts';
 import {
   DEFAULT_SETTINGS,
   DEFAULT_SIDE_PANELS,
-  isXpsWindow,
   mergeXpsSettings,
 } from './xpsState.ts';
 
@@ -75,7 +76,7 @@ function heldOrFirst(
 function showableWindow(
   domain: XpsDomain | null | undefined,
 ): XpsDomain | null {
-  if (!domain || !isXpsWindow(domain)) return null;
+  if (!domain || !isChartWindow(domain)) return null;
   return domain;
 }
 

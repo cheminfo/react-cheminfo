@@ -2,6 +2,10 @@ import { getClasses } from 'ml-dataset-iris';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import {
+  layerUntilClose as layer,
+  occurrences,
+} from '../../../__tests__/markup.ts';
 import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import type { ProjectionResult, ProjectionSamples } from '../../core/index.ts';
 import { embeddingResult, pcaResult } from '../../core/index.ts';
@@ -160,13 +164,3 @@ test('the options a caller owns are the ones the figure is drawn from', () => {
   expect(html).toContain('PC3 — 3.7 %');
   expect(html).toContain('PC4 — 0.5 %');
 });
-
-function layer(html: string, name: string): string {
-  const start = html.indexOf(`<g data-layer="${name}"`);
-  if (start === -1) return '';
-  return html.slice(start, html.indexOf('</g>', start));
-}
-
-function occurrences(html: string, needle: string): number {
-  return html.split(needle).length - 1;
-}

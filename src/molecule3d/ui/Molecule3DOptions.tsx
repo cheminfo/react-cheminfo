@@ -10,6 +10,7 @@ import type { CSSProperties, ReactElement } from 'react';
 
 import { formatDecimal } from '../../format/core/numbers.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { Molecule3DFile } from '../core/file.ts';
 import type { Molecule3DSettings } from '../core/settings.ts';
 import {
@@ -239,7 +240,7 @@ const SURFACE_OFF_STYLE: CSSProperties = {
   gridColumn: '1 / -1',
   alignItems: 'center',
   justifyContent: 'space-between',
-  color: 'var(--text-muted)',
+  color: TOKEN.textMuted,
   fontSize: 12,
 };
 

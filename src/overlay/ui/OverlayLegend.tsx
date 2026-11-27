@@ -2,6 +2,7 @@ import type { CSSProperties, ReactElement } from 'react';
 import { useId } from 'react';
 
 import { formatInteger } from '../../format/core/numbers.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { OverlayMarkShape } from '../core/overlayMarks.ts';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 import type { OverlayPlacement } from '../core/overlayPlacement.ts';
@@ -97,6 +98,7 @@ export function OverlayLegend(props: OverlayLegendProps): ReactElement {
     testId,
   } = props;
   const { metrics, awake, busy } = useOverlaySurface();
+  const t = useChromeT();
   const titleId = useId();
 
   const room = Math.max(1, maxEntries);
@@ -124,7 +126,9 @@ export function OverlayLegend(props: OverlayLegendProps): ReactElement {
           <LegendEntry key={entry.id} entry={entry} onToggle={onToggle} />
         ))}
         {folded === 0 ? null : (
-          <span style={foldStyle(metrics)}>{`+ ${folded} more`}</span>
+          <span style={foldStyle(metrics)}>
+            {t('overlay.moreEntries', { count: folded })}
+          </span>
         )}
       </div>
     </div>

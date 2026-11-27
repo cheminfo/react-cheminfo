@@ -18,42 +18,11 @@ export type {
   EllipseSize,
   EllipseStandardDeviationSize,
 } from './confidenceEllipse.ts';
-export {
-  confidenceEllipse,
-  ellipseStandardDeviations,
-} from './confidenceEllipse.ts';
-export type { EllipseAxes, EllipseCovariance } from './ellipseAxes.ts';
-export { ellipseAxes } from './ellipseAxes.ts';
-export {
-  coverageForStandardDeviations,
-  standardDeviationsForCoverage,
-} from './ellipseCoverage.ts';
+export { confidenceEllipse } from './confidenceEllipse.ts';
+export type { EllipseCovariance } from './ellipseAxes.ts';
 export type { PixelEllipse } from './ellipseProjection.ts';
-export { ellipsePolygon, projectEllipse } from './ellipseProjection.ts';
+export { projectEllipse } from './ellipseProjection.ts';
 export type { LassoPath } from './lassoPath.ts';
-export {
-  appendLassoPoint,
-  createLassoPath,
-  lassoPathData,
-  resetLassoPath,
-} from './lassoPath.ts';
-export { pointInPolygon, pointsInPolygon, polygonBounds } from './polygon.ts';
-export { pointShapePath } from './pointShape.ts';
-export type { ScatterGroupMoments } from './scatterGroupMoments.ts';
-export type {
-  ScatterGroupSpread,
-  ScatterGroupSpreadOptions,
-} from './scatterGroupSpread.ts';
-export {
-  scatterGroupSpread,
-  scatterPairEllipse,
-  scatterSkippedGroups,
-} from './scatterGroupSpread.ts';
+export { pointsInPolygon } from './polygon.ts';
 export type { ScatterSelectionMode } from './scatterSelection.ts';
-export {
-  mergeScatterSelection,
-  scatterSelectedIndices,
-  scatterSelectionMask,
-} from './scatterSelection.ts';
-export type { PixelBounds, ScreenPoints } from './screenPoints.ts';
-export { nearestPointIndex, pointsWithinBounds } from './screenPoints.ts';
+export type { ScreenPoints } from './screenPoints.ts';

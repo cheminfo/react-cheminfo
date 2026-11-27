@@ -109,27 +109,3 @@ export const DEFAULT_SIDE_PANEL: XpsSidePanelId = 'spectra';
  * it.
  */
 export const DEFAULT_SIDE_PANELS: XpsSidePanelId[] = ['spectra', 'peaks'];
-
-/**
- * Whether a window is one the chart can show.
- *
- * Both axes are checked, and both bounds of each. A window running backwards,
- * or carrying the `NaN` an empty spectrum's extent computes to, draws an empty
- * chart rather than raising anything, so it is caught on the way in rather than
- * puzzled over from the far end.
- * @param domain - The window asked for.
- * @returns Whether both axes run from a finite lower bound to a higher one.
- */
-export function isXpsWindow(domain: XpsDomain): boolean {
-  return isWindow(domain.x) && isWindow(domain.y);
-}
-
-/**
- * Whether a pair of bounds runs from a lower one to a higher one.
- * @param bounds - The lower and the upper bound.
- * @returns Whether both are finite and the first is below the second.
- */
-function isWindow(bounds: [number, number]): boolean {
-  const [from, to] = bounds;
-  return Number.isFinite(from) && Number.isFinite(to) && from < to;
-}

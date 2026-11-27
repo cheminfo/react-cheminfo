@@ -27,7 +27,6 @@ export type {
   LoadingProfilesOptions,
 } from './loadingProfiles.ts';
 export { loadingProfiles } from './loadingProfiles.ts';
-export { fillCopy } from './fillCopy.ts';
 export type { PcaLike, PcaModelRecord } from './pcaLike.ts';
 export type { PcaResultOptions } from './pcaResult.ts';
 export { pcaResult } from './pcaResult.ts';
@@ -39,7 +38,6 @@ export type {
   ProjectionOptions,
   ProjectionVariablesView,
 } from './projectionOptions.ts';
-export { mergeProjectionCopy } from './mergeProjectionCopy.ts';
 export {
   DEFAULT_PROJECTION_OPTIONS,
   NO_GROUPING,
@@ -64,7 +62,6 @@ export type {
   ResolvedProjectionShapes,
 } from './projectionSamples.ts';
 export {
-  projectionGrouping,
   resolveProjectionGroups,
   resolveProjectionShapes,
 } from './projectionGroupings.ts';
@@ -73,19 +70,11 @@ export type {
   ProjectionHelp,
   ProjectionHelpExample,
 } from './projectionStrings.ts';
-export { PROJECTION_HELP } from './projectionStrings.ts';
 export type { ProjectionTab } from './projectionTabs.ts';
 export { projectionTabs } from './projectionTabs.ts';
-export { resolveProjectionOptions } from './resolveProjectionOptions.ts';
 export type {
   ContinuousVariableAxis,
   NamedVariableAxis,
   PeaksVariableAxis,
   VariableAxis,
-} from './variableAxis.ts';
-export {
-  variableCount,
-  variableDecimals,
-  variableLabel,
-  variablePositions,
 } from './variableAxis.ts';

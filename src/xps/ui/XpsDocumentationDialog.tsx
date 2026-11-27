@@ -2,7 +2,7 @@ import { DocumentationDialogFrame } from '../../panel/ui/DocumentationDialogFram
 
 import { xpsDocumentationSections } from './xpsDocumentationSections.tsx';
 
-export interface XpsDocumentationDialogProps {
+interface XpsDocumentationDialogProps {
   /** Whether the dialog is showing. */
   isOpen: boolean;
   /** Called when it is dismissed. */

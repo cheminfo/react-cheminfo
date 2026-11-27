@@ -62,6 +62,17 @@ export function normalizeHexColor(value: unknown): string | null {
   return toHexColor(parseHexColor(text));
 }
 
+/**
+ * What a `type="color"` input is given for a colour: the six hex digits it
+ * takes, or a stand-in when the colour is not a hex one.
+ * @param color - The colour, in any form.
+ * @param fallback - What a colour that is not a hex one is shown as.
+ * @returns A lower-case `#rrggbb`.
+ */
+export function colorInputValue(color: string, fallback = '#000000'): string {
+  return normalizeHexColor(color) ?? fallback;
+}
+
 function channelAt(digits: string, index: number, size: number): number {
   const part = digits.slice(index * size, index * size + size);
   return Number.parseInt(size === 1 ? `${part}${part}` : part, 16);

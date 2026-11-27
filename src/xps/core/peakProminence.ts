@@ -15,6 +15,8 @@
  * still stand out if the landscape around it were flooded to that level.
  */
 
+import { xMinMaxValues } from 'ml-spectra-processing';
+
 /**
  * The prominence of the maximum a detection reported, in counts.
  *
@@ -101,11 +103,6 @@ export function summitIndex(intensities: Float64Array, from: number): number {
  */
 export function intensitySpan(intensities: Float64Array): number {
   if (intensities.length === 0) return 0;
-  let minimum = Infinity;
-  let maximum = -Infinity;
-  for (const value of intensities) {
-    if (value < minimum) minimum = value;
-    if (value > maximum) maximum = value;
-  }
-  return maximum - minimum;
+  const { min, max } = xMinMaxValues(intensities);
+  return max - min;
 }

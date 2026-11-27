@@ -35,30 +35,19 @@ export type RunXpsCommand = (id: XpsCommandId) => boolean;
 export const xpsCommandContext = createContext<RunXpsCommand | null>(null);
 
 /**
- * Ask for commands from inside the viewer.
- * @returns The way to run one, stable for the life of the viewer.
- */
-export function useXpsCommand(): RunXpsCommand {
-  const run = useContext(xpsCommandContext);
-  if (run === null) {
-    throw new Error(
-      'An XPS command was asked for outside an XpsCommandProvider',
-    );
-  }
-  return run;
-}
-
-/**
  * Everything a button needs to be a command: what it says, and what it does.
+ *
+ * Outside a provider — a panel mounted on its own — the button still says what
+ * it is, and is disabled, since nothing would answer it.
  * @returns The props for one command, per command.
  */
 export function useXpsCommandProps() {
-  const run = useXpsCommand();
+  const run = useContext(xpsCommandContext);
   return useCallback(
-    (id: XpsCommandId) => ({
-      ...xpsCommandLabel(id),
-      onClick: () => run(id),
-    }),
+    (id: XpsCommandId) =>
+      run === null
+        ? { ...xpsCommandLabel(id), disabled: true }
+        : { ...xpsCommandLabel(id), onClick: () => run(id) },
     [run],
   );
 }
@@ -69,7 +58,7 @@ export function useXpsCommandProps() {
  * @param id - The command.
  * @returns The tooltip and the label, off the same table the keys read.
  */
-export function xpsCommandLabel(id: XpsCommandId) {
+function xpsCommandLabel(id: XpsCommandId) {
   return {
     tooltip: <XpsCommandTooltip command={id} />,
     'aria-label': xpsCommand(id).title,

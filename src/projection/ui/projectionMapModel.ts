@@ -14,7 +14,10 @@ import {
 import { chartAxisTitle } from '../../chart/core/chartLabels.ts';
 import type { ChartViewport } from '../../chart/core/chartViewport.ts';
 import type { MatrixLike } from '../../chart/core/matrix.ts';
-import type { OverlaySampleShape } from '../../overlay/core/overlayMarks.ts';
+import type {
+  OverlayMarkShape,
+  OverlaySampleShape,
+} from '../../overlay/core/overlayMarks.ts';
 import type { ScatterGroup } from '../../scatter/ui/scatterFigureProps.ts';
 import type { ScatterMarker } from '../../scatter/ui/scatterPlotProps.ts';
 import type {
@@ -144,11 +147,34 @@ export function projectionMapMarkers(
       label: marker.label,
       x,
       y,
-      color: groups.entries[marker.group ?? -1]?.color ?? UNGROUPED_INK,
-      shape: marker.shape ?? 'cross',
+      color: markerInk(marker, groups),
+      shape: markerShape(marker),
     });
   }
   return placed;
+}
+
+/**
+ * The ink a marker is drawn in: its group's colour, the ungrouped ink when it
+ * names no group.
+ * @param marker - The marker.
+ * @param groups - The groups as the viewer resolved them.
+ * @returns The colour.
+ */
+export function markerInk(
+  marker: ProjectionMarker,
+  groups: ResolvedProjectionGroups,
+): string {
+  return groups.entries[marker.group ?? -1]?.color ?? UNGROUPED_INK;
+}
+
+/**
+ * The shape a marker is drawn as, a cross unless it names one.
+ * @param marker - The marker.
+ * @returns The shape.
+ */
+export function markerShape(marker: ProjectionMarker): OverlayMarkShape {
+  return marker.shape ?? 'cross';
 }
 
 /**

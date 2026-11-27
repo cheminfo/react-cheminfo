@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
+import { matchCount as count } from '../../../__tests__/markup.ts';
 import { IRIS_PCA, IRIS_ROWS as rows } from '../../core/__tests__/iris.ts';
 import { explainedShares, pcaResult } from '../../core/index.ts';
 import { ProjectionSharesTab } from '../ProjectionSharesTab.tsx';
@@ -74,8 +75,4 @@ function render(target = 0.95): string {
       testId="shares"
     />,
   );
-}
-
-function count(html: string, pattern: RegExp): number {
-  return html.match(pattern)?.length ?? 0;
 }

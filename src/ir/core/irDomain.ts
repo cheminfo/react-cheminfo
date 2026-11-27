@@ -11,7 +11,7 @@
  * in order.
  */
 
-import { xMaxValue, xMinValue } from 'ml-spectra-processing';
+import { xMinMaxValues } from 'ml-spectra-processing';
 
 import { bandsPointDown } from './irMode.ts';
 import type { IrDomain, IrMode, IrSpectrum } from './irSpectrum.ts';
@@ -144,8 +144,7 @@ function traceExtent(
     // every point of the spectrum to learn what index zero already says.
     const first = x[0] as number;
     const last = x.at(-1) as number;
-    const lowest = xMinValue(y);
-    const highest = xMaxValue(y);
+    const { min: lowest, max: highest } = xMinMaxValues(y);
     extent =
       extent === null
         ? {

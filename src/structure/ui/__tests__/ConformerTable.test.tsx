@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, test } from 'vitest';
 
-import type { Conformer } from '../../core/conformers.ts';
+import type { Conformer } from '../../core/conformerTypes.ts';
 import type { MolfileExport } from '../../core/molfileExport.ts';
 import { ConformerTable } from '../ConformerTable.tsx';
 import { RANKING_COLUMNS } from '../conformerColumns.ts';

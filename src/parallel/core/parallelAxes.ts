@@ -126,7 +126,7 @@ export function parallelAxisLayouts(
  * all, comes back flat, which pins every value to the top rather than dividing
  * by zero.
  */
-export function parallelAxisPixels(
+function parallelAxisPixels(
   min: number,
   max: number,
   scale: ParallelAxisScale,
