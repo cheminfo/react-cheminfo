@@ -1,0 +1,35 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-BWTG3juY.js";import{n,t as r}from"./icon-R4U5QT4q.js";import{i,n as a}from"./overlaySurface-BxXYbL_T.js";import{n as o,t as s}from"./useOverlayInteraction-CwhgaILL.js";function c(e){let{colors:t}=e,{metrics:n}=i(),r=t.length>p?p-1:t.length,a=t.length-r,o=d(n),s=[];for(let e=0;e<r;e++){let n=t[e];n!==void 0&&s.push((0,f.jsx)(`span`,{style:l(n,o)},`${e}:${n}`))}return(0,f.jsxs)(`span`,{"aria-hidden":`true`,style:m,children:[s,a>0?(0,f.jsx)(`span`,{style:u(n),children:`+${a}`}):null]})}function l(e,t){return{display:`inline-block`,width:t,height:t,borderRadius:`50%`,background:e,boxShadow:t>=6?`inset 0 0 0 1px var(--border)`:void 0}}function u(e){return{fontSize:Math.max(9,e.labelSize-1),fontVariantNumeric:`tabular-nums`,fontWeight:600,lineHeight:1}}function d(e){return Math.max(4,Math.round(e.buttonSize/6))}var f,p,m;function h(){return(h=e((()=>{a(),f=t(),p=4,m={display:`inline-flex`,alignItems:`center`,gap:2},c.__docgenInfo={description:`The colours of a figure, as the glyph of the control that changes them.
+
+Every other icon on a bar has to be learned before it means anything. This
+one does not: a reader who has just looked at four groups of dots knows what
+a row of those four colours opens, which is why the control that picks what
+the figure is coloured by wears its palette rather than a paint-pot.
+
+Past four colours it becomes three and a count. Eight dots inside a
+twenty-four pixel button is a smear, and a smear says less about the figure
+than three honest colours and the news that there are more.
+@param props - See {@link OverlaySwatchIconProps}.
+@returns The row of dots.`,methods:[],displayName:`OverlaySwatchIcon`,props:{colors:{required:!0,tsType:{name:`unknown`},description:`The colours the figure is drawn in, in the order it draws them. Hand it
+the very colours on the chart: the whole point of this glyph is that a
+reader recognises the plot in it without being taught anything.`}}}})))()}function g(e,t){return S(e,t,{padding:`0 ${e.paddingX}px`,borderRadius:e.controlRadius+1,background:C(t)?`var(--surface-sunken)`:`transparent`})}function _(e,t){return S(e,t,{padding:`0 ${e.paddingX+2}px`,borderRadius:e.controlHeight/2,background:`var(--surface-sunken)`,hairline:{boxShadow:C(t)?`inset 0 0 0 1px var(--border)`:void 0}})}function v(){return{color:`var(--text)`,fontWeight:600}}function y(){return{color:`var(--text-muted)`,fontWeight:500}}function b(e){return{width:1,height:Math.max(10,e.controlHeight-14),background:`var(--border)`,margin:`0 ${w}px`}}function x(){return{display:`inline-flex`,color:`var(--text-faint)`}}function S(e,t,n){let{disabled:r=!1}=t;return{boxSizing:`border-box`,display:`inline-flex`,alignItems:`center`,gap:w,minWidth:e.buttonSize,height:e.controlHeight,padding:n.padding,border:`none`,borderRadius:n.borderRadius,background:n.background,color:`var(--text)`,...n.hairline,font:`inherit`,fontSize:e.fontSize,lineHeight:1,whiteSpace:`nowrap`,cursor:r?`default`:`pointer`,opacity:r?.6:1}}function C(e){let{hovered:t=!1,active:n=!1,disabled:r=!1}=e;return!r&&(t||n)}var w;function T(){return(T=e((()=>{w=4})))()}function E(e){let{label:t,value:n,keyWord:a=t,showKey:s=!0,swatches:l}=e,{active:u=!1,disabled:d=!1,disabledReason:f}=e,{opensMenu:p=!1,onClick:m,testId:h}=e,{metrics:_}=i(),{hovered:b,handlers:S}=o(),C=`${t} — ${n}`;return(0,O.jsxs)(`button`,{type:`button`,title:d&&f!==void 0?f:C,"aria-label":C,"aria-haspopup":p?`menu`:void 0,"aria-expanded":p?u:void 0,disabled:d,"data-testid":h,style:g(_,{hovered:b,active:u,disabled:d}),onClick:m,...S,children:[l===void 0||l.length===0?null:(0,O.jsx)(c,{colors:l}),s?(0,O.jsx)(`span`,{style:y(),children:a}):null,(0,O.jsx)(`span`,{style:v(),children:n}),(0,O.jsx)(`span`,{"aria-hidden":`true`,style:x(),children:(0,O.jsx)(r,{icon:`caret-down`,size:D(_.fontSize)})})]})}function D(e){return e+2}var O;function k(){return(k=e((()=>{n(),h(),a(),T(),s(),O=t(),E.__docgenInfo={description:`A setting written as its own value, with a caret saying it can be changed.
+
+It does the job of a caption beside a segmented control or a native select
+at the cost of no box at all. The reader scans the bar and reads
+\`Species\` and \`95%\`, which is how the figure is drawn; the names of the two
+settings are one press away and in every announcement.
+@param props - See {@link OverlayValueButtonProps}.
+@returns The button.`,methods:[],displayName:`OverlayValueButton`,props:{label:{required:!0,tsType:{name:`string`},description:"What the setting is called, in full and phrased as the question the reader\nalready has: `Colour by`, `Group outlines`. It is never the thing written\non the bar — it goes into `title` and `aria-label` with the value after\nit, so a button showing `Species` still announces `Colour by — Species`."},value:{required:!0,tsType:{name:`string`},description:"What the setting is currently on, which is the thing actually written:\n`Species`, `95%`. Write the answer rather than the jargon."},keyWord:{required:!1,tsType:{name:`string`},description:`The one word written in front of the value on a roomy bar.
+@default the label, which is right wherever the name is already one word`},showKey:{required:!1,tsType:{name:`boolean`},description:`Whether that key word is written. This is the first thing a narrowing bar
+turns off: the name of a setting is read once and its value every time.
+@default true`},swatches:{required:!1,tsType:{name:`unknown`},description:`The figure's own colours, drawn as a row of dots in front of the words. A
+reader who has just looked at four groups of dots recognises them without
+being taught anything, which is worth more than any paint-pot glyph.
+@default undefined — no dots are drawn`},active:{required:!1,tsType:{name:`boolean`},description:`Whether the choices behind it are showing.
+@default false`},disabled:{required:!1,tsType:{name:`boolean`},description:`Whether it cannot be pressed.
+@default false`},disabledReason:{required:!1,tsType:{name:`string`},description:`Why it cannot be pressed, which the pointer is told in place of the name.
+A greyed control that does not say why is worse than one that is missing.
+@default undefined — the pointer is still told the name and the value`},opensMenu:{required:!1,tsType:{name:`boolean`},description:`Whether pressing it opens a menu, which is what tells a screen reader
+there is more behind the words than a press.
+@default false`},onClick:{required:!1,tsType:{name:`signature`,type:`function`,raw:`() => void`,signature:{arguments:[],return:{name:`void`}}},description:`Called when it is pressed. Leave it out inside a popover, which listens on
+the wrapper it puts around the button and would otherwise be told twice.
+@default undefined — nothing of its own happens`},testId:{required:!1,tsType:{name:`string`},description:"Value of the `data-testid` attribute.\n@default undefined"}}}})))()}export{b as a,c,x as i,h as l,k as n,_ as o,T as r,v as s,E as t};

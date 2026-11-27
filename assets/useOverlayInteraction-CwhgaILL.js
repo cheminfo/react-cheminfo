@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t}from"./iframe-BWTG3juY.js";function n(){let[e,t]=(0,r.useState)(!1);return{hovered:e,handlers:(0,r.useMemo)(()=>({onPointerEnter:()=>t(!0),onPointerLeave:()=>t(!1)}),[])}}var r;function i(){return(i=e((()=>{r=t()})))()}export{n,i as t};
