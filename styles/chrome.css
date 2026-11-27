@@ -1877,20 +1877,26 @@ span.taxon-lineage__name {
 /* ── A guided tour ──────────────────────────────────────────────────────── */
 
 /*
-  `<GuidedTour>`: the help card's surface beside what to do next, and a ring
-  round it. Nothing is dimmed and nothing takes the pointer, so the page stays
-  in use. Under the overlays (20), so a dialog opened during a tour covers it.
+  `<GuidedTour>`: a note beside what to do next, and a ring round it. A help
+  card is looked up, so it may be white; a tour's note has to be noticed on a
+  white page, so it is the pale yellow of a sticky note, the same on every
+  site, with ink at 15:1 on it. Nothing is dimmed and nothing takes the
+  pointer, so the page stays in use. Under the overlays (20), so a dialog
+  opened during a tour covers it.
 */
 .guided-tour {
+  --guided-tour-note: #fff6c7;
+  --guided-tour-edge: #e2c044;
+
   z-index: 19;
-  width: 260px;
+  width: 270px;
   padding: 8px 12px 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--guided-tour-edge);
   border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-md);
+  background: var(--guided-tour-note);
+  box-shadow: var(--shadow-lg);
   color: var(--text);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.55;
   text-wrap: pretty;
 }
@@ -1920,12 +1926,12 @@ span.taxon-lineage__name {
   border: 0;
   border-radius: 4px;
   background: none;
-  color: var(--text-faint);
+  color: var(--text-muted);
   cursor: pointer;
 }
 
 .guided-tour__close:hover {
-  background: var(--surface-sunken);
+  background: color-mix(in oklab, var(--guided-tour-edge) 30%, transparent);
   color: var(--text);
 }
 
@@ -1936,7 +1942,6 @@ span.taxon-lineage__name {
 
 .guided-tour__body {
   margin-top: 2px;
-  color: var(--text-muted);
 }
 
 .guided-tour button.guided-tour__next {
@@ -1955,13 +1960,13 @@ span.taxon-lineage__name {
   background: color-mix(in oklab, var(--accent) 85%, black);
 }
 
-/* A corner of the same card, so it carries the same two colours. */
+/* A corner of the same note, so it carries the same two colours. */
 .guided-tour__arrow {
   position: absolute;
   width: 10px;
   height: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid var(--guided-tour-edge);
+  background: var(--guided-tour-note);
   transform: rotate(45deg);
 }
 
