@@ -5,7 +5,6 @@ import {
   figurePixels,
   figureScaleFits,
   figureScaleLabel,
-  formatFigurePixels,
 } from '../figureScale.ts';
 
 const FIGURE = { width: 640, height: 460 };
@@ -35,9 +34,6 @@ test('a multiple a browser could not paint is reported as not fitting', () => {
   expect(figureScaleFits(wide, 3)).toBe(false);
 });
 
-test('a multiple reads as a multiple, and a size as a measurement', () => {
+test('a multiple reads as a multiple', () => {
   expect(figureScaleLabel(2)).toBe('2×');
-  expect(formatFigurePixels({ width: 1280, height: 920 })).toBe(
-    '1280 × 920 pixels',
-  );
 });

@@ -13,7 +13,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useCallback, useContext, useState } from 'react';
 import { FullScreenProvider, useFullscreen } from 'react-science/ui';
 
-import { canFillScreen } from './canFillScreen.ts';
+import { canFillScreen } from '../core/canFillScreen.ts';
 
 /** Whether a box fills the screen, and how to change that. */
 export interface StageFullscreen {
@@ -28,8 +28,14 @@ export interface FullscreenStageProps {
   /**
    * Style of the box, or a function handed whether the box fills the screen,
    * for a box shaped differently while it does.
+   * @default undefined
    */
-  style: CSSProperties | ((fillsScreen: boolean) => CSSProperties);
+  style?: CSSProperties | ((fillsScreen: boolean) => CSSProperties);
+  /**
+   * The class of the box, for a box styled by a stylesheet.
+   * @default undefined
+   */
+  className?: string;
   /**
    * Called with the box once it is mounted, and with `null` once it is gone.
    * It must keep its identity across renders.
@@ -37,10 +43,12 @@ export interface FullscreenStageProps {
    */
   onStage?: (element: HTMLDivElement | null) => void;
   /**
-   * What is drawn in the box, handed whether it fills the screen and the
-   * toggle, or `undefined` where the browser cannot fill the screen.
+   * What is drawn in the box. As a function it is handed whether the box fills
+   * the screen and the toggle, or `undefined` where the browser cannot fill
+   * the screen; otherwise `useFullscreen()` inside it toggles the box.
    */
-  children: (fullscreen: StageFullscreen | undefined) => ReactNode;
+  children:
+    ReactNode | ((fullscreen: StageFullscreen | undefined) => ReactNode);
 }
 
 /**
@@ -62,7 +70,7 @@ interface StageProps extends FullscreenStageProps {
 }
 
 function Stage(props: StageProps): ReactElement {
-  const { style, onStage, children, fullscreenRef } = props;
+  const { style, className, onStage, children, fullscreenRef } = props;
   const { isFullScreen, toggle } = useFullscreen();
   const portal = useContext(PortalContext);
   const [canFill] = useState(canFillScreen);
@@ -81,6 +89,7 @@ function Stage(props: StageProps): ReactElement {
   return (
     <div
       ref={stageRef}
+      className={className}
       style={typeof style === 'function' ? style(isFullScreen) : style}
     >
       <PortalProvider
@@ -89,7 +98,9 @@ function Stage(props: StageProps): ReactElement {
           isFullScreen && stage !== null ? stage : portal.portalContainer
         }
       >
-        {children(canFill ? { active: isFullScreen, toggle } : undefined)}
+        {typeof children === 'function'
+          ? children(canFill ? { active: isFullScreen, toggle } : undefined)
+          : children}
       </PortalProvider>
     </div>
   );

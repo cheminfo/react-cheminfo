@@ -12,13 +12,9 @@
  */
 
 import type { CitedWork } from '../../citation/core/works.ts';
+import { isRecord } from '../../values/core/values.ts';
 
-import {
-  isRecord,
-  readItems,
-  readSettings,
-  readStrings,
-} from './messageValues.ts';
+import { readItems, readSettings, readStrings } from './messageValues.ts';
 import type { ToolHelp } from './toolCredits.ts';
 import type { SettingsRequest } from './toolSettings.ts';
 

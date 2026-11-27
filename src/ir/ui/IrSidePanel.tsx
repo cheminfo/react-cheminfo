@@ -1,31 +1,15 @@
-import { useMemo } from 'react';
-
-import { panelStyle } from '../../panel/core/panelStyles.ts';
-import { SidePanelStack } from '../../panel/ui/SidePanelStack.tsx';
-import type { CollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
+import { EditorSidePanels } from '../../panel/ui/EditorSidePanels.tsx';
 import type { IrBand } from '../core/irBand.ts';
-import type { IrPanelId, IrSidePanelId } from '../core/irSidePanels.ts';
+import type { IrSidePanelId } from '../core/irSidePanels.ts';
 
 import { BandsPanel } from './BandsPanel.tsx';
 import { MetadataPanel } from './MetadataPanel.tsx';
 import { SpectraPanel } from './SpectraPanel.tsx';
-import type { IrHostPanel } from './irHostPanels.ts';
-import { irStackPanels, isIrHostPanel } from './irHostPanels.ts';
-import { useIrActions, useIrEditorState } from './irStateContext.ts';
+import type { IrSide } from './useIrSide.ts';
 
 export interface IrSidePanelProps {
-  /**
-   * What to draw and what closes a panel, for a viewer whose panels may be
-   * collapsed.
-   * @default every panel the state has open
-   */
-  side?: Pick<CollapsedPanels<IrPanelId>, 'shownIds' | 'toggle' | 'folds'>;
-  /**
-   * The panels the host adds to the viewer's own, stacked above them in the
-   * order given.
-   * @default []
-   */
-  panels?: readonly IrHostPanel[];
+  /** The side, as `useIrSide` holds it: the host's panels and the viewer's own. */
+  side: IrSide;
   /**
    * The band the pointer is resting on.
    * @default null
@@ -54,36 +38,19 @@ export interface IrSidePanelProps {
  * @returns The panel stack.
  */
 export function IrSidePanel(props: IrSidePanelProps) {
-  const {
-    panels: hostPanels = NO_PANELS,
-    side,
-    highlight = null,
-    onHighlight,
-  } = props;
-  const { state } = useIrEditorState();
-  const actions = useIrActions();
-  const { openPanelIds } = state.view;
-  const panels = useMemo(() => irStackPanels(hostPanels), [hostPanels]);
+  const { side, highlight = null, onHighlight } = props;
 
   return (
-    <SidePanelStack
-      panels={panels}
-      openPanelIds={side?.shownIds ?? openPanelIds}
-      onClose={side?.toggle ?? actions.togglePanel}
-      {...side?.folds}
-    >
-      {(panel) =>
-        isIrHostPanel(panel) ? (
-          <div style={panelStyle}>{panel.content}</div>
-        ) : (
-          <PanelBody
-            panelId={panel.id}
-            highlight={highlight}
-            onHighlight={onHighlight}
-          />
-        )
-      }
-    </SidePanelStack>
+    <EditorSidePanels
+      side={side}
+      renderPanel={(panel) => (
+        <PanelBody
+          panelId={panel.id}
+          highlight={highlight}
+          onHighlight={onHighlight}
+        />
+      )}
+    />
   );
 }
 
@@ -108,6 +75,3 @@ function PanelBody(props: PanelBodyProps) {
   if (panelId === 'metadata') return <MetadataPanel />;
   return <BandsPanel highlight={highlight} onHighlight={onHighlight} />;
 }
-
-/** What a stack the host adds nothing to holds, kept stable for the memo. */
-const NO_PANELS: readonly IrHostPanel[] = [];

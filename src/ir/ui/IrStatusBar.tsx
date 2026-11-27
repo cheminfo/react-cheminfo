@@ -1,12 +1,14 @@
-import { Icon } from '@blueprintjs/core';
-
 import {
   countLabel,
   statusBarStyle as barStyle,
   statusItemStyle as itemStyle,
   statusMutedStyle as mutedStyle,
-  statusSpacerStyle as spacerStyle,
 } from '../../panel/core/statusBar.ts';
+import {
+  StatusCount,
+  StatusError,
+  StatusName,
+} from '../../panel/ui/StatusItems.tsx';
 import { countAssigned } from '../core/assignBands.ts';
 import { formatWavenumberRange } from '../core/irFormat.ts';
 import { boxZoomOnly } from '../core/irMode.ts';
@@ -44,19 +46,11 @@ export function IrStatusBar() {
 
   return (
     <div style={barStyle}>
-      <span style={itemStyle}>
-        {spectra.length === 0
-          ? 'no spectrum open'
-          : `${countLabel(visibleSpectra.length, 'spectrum', 'spectra')} drawn of ${spectra.length}`}
-      </span>
+      <StatusCount open={spectra.length} drawn={visibleSpectra.length} />
 
       <span style={itemStyle}>{text.yTitle(mode)}</span>
 
-      {selectedSpectrum === null ? null : (
-        <span style={nameStyle} title={selectedSpectrum.name}>
-          {selectedSpectrum.name}
-        </span>
-      )}
+      <StatusName name={selectedSpectrum?.name ?? null} />
 
       {range === '' ? null : <span style={mutedStyle}>{range}</span>}
 
@@ -74,32 +68,7 @@ export function IrStatusBar() {
         <span style={mutedStyle}>square zoom: drag a rectangle</span>
       ) : null}
 
-      <span style={spacerStyle} />
-
-      {error === null ? null : (
-        <span style={errorStyle} title={error}>
-          <Icon icon="warning-sign" size={12} />
-          {error}
-        </span>
-      )}
+      <StatusError error={error} />
     </div>
   );
 }
-
-const nameStyle = {
-  ...itemStyle,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  maxWidth: '32%',
-  fontWeight: 600,
-} as const;
-
-/** The one red in the shell: a refusal, and nothing else, is written in it. */
-const errorStyle = {
-  ...itemStyle,
-  gap: 4,
-  color: '#C0392B',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  maxWidth: '60%',
-} as const;

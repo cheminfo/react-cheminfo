@@ -37,7 +37,7 @@ export function parseCifNumber(
  * @returns `0.30475(3)` for `{ value: 0.30475, su: 0.00003 }`.
  */
 export function formatCifNumber(number: CifNumber): string {
-  const text = formatNumber(number.value);
+  const text = formatCifValue(number.value);
   if (number.su === null) return text;
   const dot = text.indexOf('.');
   const decimals = dot === -1 ? 0 : text.length - dot - 1;
@@ -52,7 +52,7 @@ export function formatCifNumber(number: CifNumber): string {
  * @param value - the value to write.
  * @returns the field text.
  */
-export function formatNumber(value: number): string {
+export function formatCifValue(value: number): string {
   return Object.is(value, -0) ? '0' : String(value);
 }
 

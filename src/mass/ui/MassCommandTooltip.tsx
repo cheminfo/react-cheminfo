@@ -1,6 +1,5 @@
-import { TooltipHelpContent } from 'react-science/ui';
-
-import type { MassCommand, MassCommandId } from '../core/massCommands.ts';
+import { CommandTooltip } from '../../panel/ui/CommandTooltip.tsx';
+import type { MassCommandId } from '../core/massCommands.ts';
 import { massCommands } from '../core/massCommands.ts';
 
 export interface MassCommandTooltipProps {
@@ -18,19 +17,5 @@ export interface MassCommandTooltipProps {
  * @returns The tooltip's content.
  */
 export function MassCommandTooltip(props: MassCommandTooltipProps) {
-  const { id } = props;
-  const entry: MassCommand = massCommands[id];
-  const shortcuts = entry.shortcut?.label ?? entry.shortcut?.keys;
-
-  return (
-    <TooltipHelpContent
-      title={entry.title}
-      description={entry.description}
-      shortcuts={shortcuts === undefined ? undefined : [...shortcuts]}
-      subTitles={entry.gestures?.map((gesture) => ({
-        title: gesture.title,
-        shortcuts: [...gesture.shortcuts],
-      }))}
-    />
-  );
+  return <CommandTooltip entry={massCommands[props.id]} />;
 }

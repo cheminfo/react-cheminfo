@@ -1,8 +1,9 @@
-import { InputGroup } from '@blueprintjs/core';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Button } from 'react-science/ui';
 
+import { SELECTED_ROW_TINT } from '../../panel/core/panelStyles.ts';
 import { SpectrumColorSwatch } from '../../panel/ui/SpectrumColorSwatch.tsx';
+import { SpectrumNameCell } from '../../panel/ui/SpectrumNameCell.tsx';
 import { downloadMassSpectrum } from '../core/downloadSpectra.ts';
 import type { MassSpectrum } from '../core/massSpectrum.ts';
 import { spectrumSubtitle } from '../core/massSummary.ts';
@@ -38,7 +39,6 @@ export interface SpectrumRowProps {
 export function SpectrumRow(props: SpectrumRowProps) {
   const { spectrum, isSelected } = props;
   const actions = useMassActions();
-  const [draftName, setDraftName] = useState<string | null>(null);
 
   const subtitle = useMemo(
     () => spectrumSubtitle(spectrum, { describeKind: true }),
@@ -56,13 +56,6 @@ export function SpectrumRow(props: SpectrumRowProps) {
     const click = nextTraceIconClick(kind, state);
     actions.setSpectrumVisibility(spectrum.id, click.visibility);
     if (click.select) actions.selectSpectrum(spectrum.id);
-  }
-
-  /** Take the name typed, unless it was emptied — a rename abandoned. */
-  function commitRename(): void {
-    const name = draftName?.trim() ?? '';
-    setDraftName(null);
-    if (name !== '') actions.renameSpectrum(spectrum.id, name);
   }
 
   return (
@@ -113,35 +106,12 @@ export function SpectrumRow(props: SpectrumRowProps) {
         onClick={() => clickTrace('centroid', centroidState)}
       />
 
-      {draftName === null ? (
-        <button
-          type="button"
-          style={nameStyle}
-          title="Click to work on this spectrum, double click to rename it"
-          onClick={() => actions.selectSpectrum(spectrum.id)}
-          onDoubleClick={() => setDraftName(spectrum.name)}
-        >
-          <span style={nameTextStyle}>{spectrum.name}</span>
-          <span style={subtitleStyle}>{subtitle}</span>
-        </button>
-      ) : (
-        <InputGroup
-          autoFocus
-          size="small"
-          value={draftName}
-          spellCheck={false}
-          autoCapitalize="off"
-          autoCorrect="off"
-          autoComplete="off"
-          aria-label={`Name of ${spectrum.name}`}
-          onValueChange={setDraftName}
-          onBlur={commitRename}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') commitRename();
-            if (event.key === 'Escape') setDraftName(null);
-          }}
-        />
-      )}
+      <SpectrumNameCell
+        name={spectrum.name}
+        subtitle={subtitle}
+        onSelect={() => actions.selectSpectrum(spectrum.id)}
+        onRename={(name) => actions.renameSpectrum(spectrum.id, name)}
+      />
 
       <Button
         className="no-print"
@@ -210,41 +180,7 @@ const rowStyle = {
 } as const;
 
 /** The selected row, which is the one every other panel is about. */
-const selectedRowStyle = { ...rowStyle, background: '#e8f1fb' } as const;
-
-const nameStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  gap: 1,
-  flex: '1 1 1px',
-  minWidth: 0,
-  padding: '1px 2px',
-  border: 'none',
-  background: 'none',
-  color: 'inherit',
-  font: 'inherit',
-  textAlign: 'left',
-  cursor: 'pointer',
-} as const;
-
-/** One line, cut short rather than wrapped: the rows stay a fixed height. */
-const nameTextStyle = {
-  maxWidth: '100%',
-  fontSize: 12,
-  fontWeight: 600,
-  lineHeight: 1.2,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-} as const;
-
-const subtitleStyle = {
-  maxWidth: '100%',
-  fontSize: 10,
-  lineHeight: 1.2,
-  opacity: 0.7,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+const selectedRowStyle = {
+  ...rowStyle,
+  background: SELECTED_ROW_TINT,
 } as const;

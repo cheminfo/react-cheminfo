@@ -5,7 +5,7 @@
  * drag is one step back.
  */
 
-import type { Cell, SignalTools } from '../../storage/core/documentFile.ts';
+import type { Cell, SignalTools } from '../../state/core/cells.ts';
 
 /** What an undo history is kept on. */
 export interface UndoHistoryOptions<D> {

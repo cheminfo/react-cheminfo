@@ -1,7 +1,6 @@
-import { TooltipHelpContent } from 'react-science/ui';
-
+import { CommandTooltip } from '../../panel/ui/CommandTooltip.tsx';
 import type { XpsCommandId } from '../core/xpsCommands.ts';
-import { xpsCommand, xpsShortcutLabels } from '../core/xpsCommands.ts';
+import { xpsCommand } from '../core/xpsCommands.ts';
 
 interface XpsCommandTooltipProps {
   /** The command the tooltip is for. */
@@ -19,22 +18,5 @@ interface XpsCommandTooltipProps {
  * @returns The tooltip.
  */
 export function XpsCommandTooltip(props: XpsCommandTooltipProps) {
-  const { title, description, gestures } = xpsCommand(props.command);
-
-  return (
-    <TooltipHelpContent
-      title={title}
-      shortcuts={xpsShortcutLabels(props.command)}
-      description={description}
-      subTitles={gestures?.map((gesture) => ({
-        title: gesture.title,
-        shortcuts: [...gesture.shortcuts],
-      }))}
-      style={tooltipStyle}
-    />
-  );
+  return <CommandTooltip entry={xpsCommand(props.command)} />;
 }
-
-// The component is 250px wide by default, which is a lot of tooltip for a
-// three-word title; the ones carrying a description still get the room.
-const tooltipStyle = { width: 'auto', maxWidth: 260 } as const;

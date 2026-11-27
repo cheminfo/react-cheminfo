@@ -1,12 +1,15 @@
-import { Icon } from '@blueprintjs/core';
-
+import { formatValueRange } from '../../format/core/valueRange.ts';
 import {
   countLabel,
   statusBarStyle as barStyle,
   statusItemStyle as itemStyle,
   statusMutedStyle as mutedStyle,
-  statusSpacerStyle as spacerStyle,
 } from '../../panel/core/statusBar.ts';
+import {
+  StatusCount,
+  StatusError,
+  StatusName,
+} from '../../panel/ui/StatusItems.tsx';
 import {
   axisTitle,
   axisTrace,
@@ -57,19 +60,11 @@ export function XpsStatusBar(props: XpsStatusBarProps) {
 
   return (
     <div style={barStyle}>
-      <span style={itemStyle}>
-        {spectra.length === 0
-          ? 'no spectrum open'
-          : `${countLabel(countVisible(spectra), 'spectrum', 'spectra')} drawn of ${spectra.length}`}
-      </span>
+      <StatusCount open={spectra.length} drawn={countVisible(spectra)} />
 
       <span style={itemStyle}>{axisTitle(axis)}</span>
 
-      {selected === null ? null : (
-        <span style={nameStyle} title={selected.name}>
-          {selected.name}
-        </span>
-      )}
+      <StatusName name={selected?.name ?? null} />
 
       {range === '' ? null : <span style={mutedStyle}>{range}</span>}
 
@@ -79,14 +74,7 @@ export function XpsStatusBar(props: XpsStatusBarProps) {
 
       {isReading ? <span style={mutedStyle}>reading…</span> : null}
 
-      <span style={spacerStyle} />
-
-      {error === null ? null : (
-        <span style={errorStyle} title={error}>
-          <Icon icon="warning-sign" size={12} />
-          {error}
-        </span>
-      )}
+      <StatusError error={error} />
     </div>
   );
 }
@@ -106,24 +94,10 @@ function energyRange(spectrum: XpsSpectrum, axis: EnergyAxis): string {
   if (first === undefined || last === undefined) return '';
   const low = Math.min(first, last);
   const high = Math.max(first, last);
-  const [from, to] = isAxisReversed(axis) ? [high, low] : [low, high];
-  return `${formatEnergy(from)}–${formatEnergy(to)} eV`;
+  return formatValueRange(
+    [low, high],
+    formatEnergy,
+    isAxisReversed(axis),
+    'eV',
+  );
 }
-
-const nameStyle = {
-  ...itemStyle,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  maxWidth: '32%',
-  fontWeight: 600,
-} as const;
-
-/** The one red in the shell: a refusal, and nothing else, is written in it. */
-const errorStyle = {
-  ...itemStyle,
-  gap: 4,
-  color: '#C0392B',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  maxWidth: '60%',
-} as const;

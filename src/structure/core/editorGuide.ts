@@ -4,22 +4,16 @@
  * pointer, the selection gestures and the stereo conventions.
  */
 
+import type { Gesture, GestureKey } from '../../help/core/gestures.ts';
+
 /** A key, drawn as a key cap. `Mod` is ⌘ on a Mac and Ctrl elsewhere. */
-export interface EditorGuideKey {
-  key: string;
-}
+export type EditorGuideKey = GestureKey;
 
 /** Which editors a gesture applies to. */
 export type EditorGuideScope = 'fragment' | 'molecule' | 'reaction';
 
 /** One gesture and what it does. */
-export interface EditorGesture {
-  /** How the guide's catalog names it, unique within its section. */
-  id: string;
-  /** Keys, and plain text for the mouse part; unique within one gesture. */
-  input: ReadonlyArray<string | EditorGuideKey>;
-  /** What it does, in English; the catalog answers for the other languages. */
-  action: string;
+export interface EditorGesture extends Gesture {
   /**
    * The only editor the gesture works in.
    * @default undefined — every editor
@@ -325,4 +319,17 @@ export function editorInputWordId(text: string): string | undefined {
 export function editorKeyLabel(key: string, isMac: boolean): string {
   if (key !== 'Mod') return key;
   return isMac ? '⌘' : 'Ctrl';
+}
+
+/**
+ * What a cap of the structure editor shows on this page: `Mod` as ⌘ on a Mac,
+ * decided as openchemlib decides it, so the cap is the modifier the editor
+ * actually reads.
+ * @param key - The key.
+ * @returns The cap's text.
+ */
+export function editorKeyCap(key: string): string {
+  const isMac =
+    typeof navigator !== 'undefined' && navigator.platform === 'MacIntel';
+  return editorKeyLabel(key, isMac);
 }

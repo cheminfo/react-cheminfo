@@ -18,10 +18,10 @@ export {
 export type {
   BlockLabel,
   BlockRange,
-  Cell,
   ElementPick,
   ElementRange,
   GridBlock,
+  GridCell,
   InnerTransitionMarker,
   InnerTransitionRow,
   NumberedRange,

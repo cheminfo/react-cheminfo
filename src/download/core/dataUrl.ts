@@ -1,6 +1,6 @@
 /**
  * Pictures as `data:` URLs, the way a document holds them: a file read into
- * one, an SVG written into one, and an SVG read back out of one — without a
+ * one, an SVG written into one, an SVG or the bytes read back out of one — without a
  * `FileReader` or a `fetch`, so it runs in a worker, under a content security
  * policy forbidding `data:` fetches, and in Node.
  */
@@ -52,6 +52,21 @@ export function svgOfDataUrl(src: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * The bytes a base64 `data:` URL holds, decoded without `fetch`, which a
+ * page's content security policy may forbid for `data:` addresses.
+ * @param src - A base64 data URL, e.g. `data:image/png;base64,iVBOR…`.
+ * @returns The decoded bytes.
+ * @throws {Error} When the URL is not base64-encoded.
+ */
+export function dataUrlBytes(src: string): Uint8Array {
+  const comma = src.indexOf(',');
+  if (comma === -1 || !src.slice(0, comma).endsWith(';base64')) {
+    throw new Error('Expected a base64 data URI.');
+  }
+  return decode(new TextEncoder().encode(src.slice(comma + 1)));
 }
 
 function base64(bytes: Uint8Array): string {

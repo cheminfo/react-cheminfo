@@ -24,7 +24,7 @@ import type { ElementBlock, ElementCategory } from './elements.ts';
 export type TableColumns = 18 | 32;
 
 /** A cell of the grid, one-based as CSS grid lines are. */
-export interface Cell {
+export interface GridCell {
   /** Grid column, one-based. */
   column: number;
   /** Grid row, one-based. */
@@ -46,7 +46,7 @@ export interface GridBlock {
 /** The cell an inner-transition series was lifted out of, and what it reads. */
 export interface InnerTransitionMarker {
   /** The cell in the main block. */
-  cell: Cell;
+  cell: GridCell;
   /** The atomic numbers of the series, e.g. `57–71`. */
   label: string;
   /** The family of the series. */
@@ -58,7 +58,7 @@ export interface BlockLabel {
   /** The block. */
   block: ElementBlock;
   /** The first cell of the label. */
-  cell: Cell;
+  cell: GridCell;
   /** How many columns the label runs along. */
   columnSpan: number;
   /** How many rows it runs down; more than one stands it on its side. */

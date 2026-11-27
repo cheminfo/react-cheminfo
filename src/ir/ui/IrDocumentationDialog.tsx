@@ -1,17 +1,17 @@
-import { Dialog, DialogBody } from '@blueprintjs/core';
-import type { ReactElement } from 'react';
-
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import { Prose } from '../../i18n/ui/Prose.tsx';
+import type { Translate } from '../../i18n/ui/useT.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import { TOKEN } from '../../tokens/core/familyTokens.ts';
-import type { IrCommand, IrCommandId } from '../core/irCommands.ts';
+import type { EditorCommand } from '../../panel/core/editorCommands.ts';
+import { CommandKeysTable } from '../../panel/ui/CommandKeysTable.tsx';
+import type { DocumentationSection } from '../../panel/ui/DocumentationDialogFrame.tsx';
+import { DocumentationDialogFrame } from '../../panel/ui/DocumentationDialogFrame.tsx';
+import type { IrCommandId } from '../core/irCommands.ts';
 import { IR_MODE_RULES } from '../core/irMode.ts';
 import type { IrTechnique } from '../core/irTechnique.ts';
 import { irCommandsFor } from '../core/irTechniqueCommands.ts';
 
-import { IrLogo } from './IrLogo.tsx';
-import { FluorescenceGuide, UvVisGuide } from './WavelengthGuides.tsx';
-import { headingStyle, paragraphStyle } from './guideStyles.ts';
+import { FLUORESCENCE_GUIDE, UV_VIS_GUIDE } from './WavelengthGuides.tsx';
 import { useIrText } from './useIrText.ts';
 
 export interface IrDocumentationDialogProps {
@@ -39,69 +39,63 @@ export interface IrDocumentationDialogProps {
  */
 export function IrDocumentationDialog(props: IrDocumentationDialogProps) {
   const { isOpen, onClose, technique = 'infrared' } = props;
+  const t = useChromeT();
   const text = useIrText(technique);
-  const ids = Object.keys(irCommandsFor(technique)) as IrCommandId[];
+  const commands: EditorCommand[] = [];
+  for (const id of Object.keys(irCommandsFor(technique)) as IrCommandId[]) {
+    const entry = text.command(id);
+    if (entry !== undefined) commands.push(entry);
+  }
+  const sections: DocumentationSection[] = [
+    ...(technique === 'raman' ? ramanGuide(t) : GUIDES[technique]),
+    {
+      id: 'keys',
+      title: 'Gestures and keys',
+      body: <CommandKeysTable commands={commands} />,
+    },
+  ];
 
   return (
-    <Dialog
+    <DocumentationDialogFrame
       isOpen={isOpen}
       onClose={onClose}
       title={text.documentation}
-      icon={<IrLogo size={20} technique={technique} />}
-      style={dialogStyle}
-    >
-      <DialogBody>
-        {GUIDES[technique]}
-
-        <h4 style={headingStyle}>Gestures and keys</h4>
-        <table style={tableStyle}>
-          <tbody>
-            {ids.map((id) => {
-              const entry = text.command(id);
-              return entry === undefined ? null : (
-                <CommandRow key={id} entry={entry} />
-              );
-            })}
-          </tbody>
-        </table>
-      </DialogBody>
-    </Dialog>
+      sections={sections}
+    />
   );
 }
 
-/** The guide each technique's documentation opens on. */
-const GUIDES: Record<IrTechnique, ReactElement> = {
-  infrared: <InfraredGuide />,
-  raman: <RamanGuide />,
-  uvvis: <UvVisGuide />,
-  fluorescence: <FluorescenceGuide />,
-};
-
-/**
- * What is true of reading an infrared spectrum here.
- * @returns The sections.
- */
-function InfraredGuide() {
-  return (
-    <>
-      <h4 style={headingStyle}>Opening a spectrum</h4>
-      <p style={paragraphStyle}>
+/** What is true of reading an infrared spectrum here. */
+const INFRARED_GUIDE: readonly DocumentationSection[] = [
+  {
+    id: 'open',
+    title: 'Opening a spectrum',
+    body: (
+      <p>
         JCAMP-DX (<code>.jdx</code>, <code>.dx</code>) and Thermo Galactic SPC (
         <code>.spc</code>) are read. A file holding several blocks — a sample
         beside its background, or an infrared spectrum beside a Raman one —
         gives one spectrum per infrared block; the others are left to their own
         viewers. Two columns of numbers are not read yet.
       </p>
-
-      <h4 style={headingStyle}>The axis runs backwards</h4>
-      <p style={paragraphStyle}>
+    ),
+  },
+  {
+    id: 'axis',
+    title: 'The axis runs backwards',
+    body: (
+      <p>
         Wavenumber decreases to the right, from 4000 cm⁻¹ down to 400, which is
         how infrared spectra have been printed since the instruments scanned
         that way. Every window is still stated low end first.
       </p>
-
-      <h4 style={headingStyle}>Absorbance or transmittance</h4>
-      <p style={paragraphStyle}>
+    ),
+  },
+  {
+    id: 'modes',
+    title: 'Absorbance or transmittance',
+    body: (
+      <p>
         The same measurement, read the other way up — the file carries both,
         whichever it was written in. In{' '}
         <strong>{IR_MODE_RULES.transmittance.title}</strong> the bands hang down
@@ -110,123 +104,69 @@ function InfraredGuide() {
         zero. The labels and the marks follow, so the pair reads the same way up
         in either.
       </p>
+    ),
+  },
+  {
+    id: 'bands',
+    title: 'Reading the bands',
+    body: (
+      <>
+        <p>
+          The bands of the <em>selected</em> spectrum are picked, marked on the
+          chart, and listed in the bands panel with{' '}
+          <strong>every vibration whose range contains them</strong> — narrowest
+          claim first. That is deliberate: a band at 1715 cm⁻¹ really is a
+          ketone, an aldehyde and a carboxylic acid until something else decides
+          between them, and the note on each candidate is what tells them apart.
+          Hovering a row marks the band on the chart, and hovering the chart
+          lights the row.
+        </p>
+        <p>
+          The bands are found automatically until you pick them by hand: with
+          the hand tool a click on the chart adds the band under it, at its top,
+          and a click on a mark takes it away, as does the cross at the end of
+          its row. From then on the threshold leaves the list alone, until it is
+          found automatically again.
+        </p>
+        <p>
+          A band is reported at the sampled point it peaked on, so on a 4 cm⁻¹
+          grid a carbonyl centred at 1710 reads 1708 or 1712. Do not quote one
+          as though it were measured to the wavenumber.
+        </p>
+      </>
+    ),
+  },
+];
 
-      <h4 style={headingStyle}>Reading the bands</h4>
-      <p style={paragraphStyle}>
-        The bands of the <em>selected</em> spectrum are picked, marked on the
-        chart, and listed in the bands panel with{' '}
-        <strong>every vibration whose range contains them</strong> — narrowest
-        claim first. That is deliberate: a band at 1715 cm⁻¹ really is a ketone,
-        an aldehyde and a carboxylic acid until something else decides between
-        them, and the note on each candidate is what tells them apart. Hovering
-        a row marks the band on the chart, and hovering the chart lights the
-        row.
-      </p>
-      <p style={paragraphStyle}>
-        The bands are found automatically until you pick them by hand: with the
-        hand tool a click on the chart adds the band under it, at its top, and a
-        click on a mark takes it away, as does the cross at the end of its row.
-        From then on the threshold leaves the list alone, until it is found
-        automatically again.
-      </p>
-      <p style={paragraphStyle}>
-        A band is reported at the sampled point it peaked on, so on a 4 cm⁻¹
-        grid a carbonyl centred at 1710 reads 1708 or 1712. Do not quote one as
-        though it were measured to the wavenumber.
-      </p>
-    </>
-  );
-}
+/** The guide each technique's documentation opens on, Raman's aside. */
+const GUIDES: Record<
+  Exclude<IrTechnique, 'raman'>,
+  readonly DocumentationSection[]
+> = {
+  infrared: INFRARED_GUIDE,
+  uvvis: UV_VIS_GUIDE,
+  fluorescence: FLUORESCENCE_GUIDE,
+};
 
 /**
  * What is true of reading a Raman spectrum here: only the bands, since it has
  * one value axis, runs the usual way, and is not assigned.
+ * @param t - The chrome's formatter.
  * @returns The section.
  */
-function RamanGuide() {
-  const t = useChromeT();
-  return (
-    <>
-      <h4 style={headingStyle}>Reading the bands</h4>
-      <p style={paragraphStyle}>
-        <Prose text={t('ir.raman.doc.bands')} />
-      </p>
-      <p style={paragraphStyle}>{t('ir.raman.doc.sampled')}</p>
-    </>
-  );
+function ramanGuide(t: Translate<ChromeKey>): readonly DocumentationSection[] {
+  return [
+    {
+      id: 'bands',
+      title: 'Reading the bands',
+      body: (
+        <>
+          <p>
+            <Prose text={t('ir.raman.doc.bands')} />
+          </p>
+          <p>{t('ir.raman.doc.sampled')}</p>
+        </>
+      ),
+    },
+  ];
 }
-
-interface CommandRowProps {
-  /** The command, as the viewer words it. */
-  entry: IrCommand;
-}
-
-/**
- * One command: what it is called, its key, and what it does.
- * @param props - Component props.
- * @returns The row.
- */
-function CommandRow(props: CommandRowProps) {
-  const { entry } = props;
-  const keys = entry.shortcut?.label ?? entry.shortcut?.keys;
-
-  return (
-    <tr>
-      <th style={commandCellStyle}>{entry.title}</th>
-      <td style={keyCellStyle}>
-        {keys === undefined
-          ? null
-          : keys.map((key) => (
-              <kbd key={key} style={keyStyle}>
-                {key}
-              </kbd>
-            ))}
-        {entry.gestures?.map((gesture) => (
-          <span key={gesture.title} style={gestureStyle}>
-            {gesture.shortcuts.join(', ')}
-          </span>
-        ))}
-      </td>
-      <td style={descriptionCellStyle}>{entry.description}</td>
-    </tr>
-  );
-}
-
-const dialogStyle = { width: 'min(760px, 92vw)' } as const;
-
-const tableStyle = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  fontSize: 13,
-} as const;
-
-const commandCellStyle = {
-  textAlign: 'left',
-  fontWeight: 600,
-  verticalAlign: 'top',
-  padding: '3px 8px 3px 0',
-  whiteSpace: 'nowrap',
-} as const;
-
-const keyCellStyle = {
-  verticalAlign: 'top',
-  padding: '3px 8px 3px 0',
-  whiteSpace: 'nowrap',
-} as const;
-
-const descriptionCellStyle = {
-  verticalAlign: 'top',
-  padding: '3px 0',
-} as const;
-
-const keyStyle = {
-  display: 'inline-block',
-  marginRight: 3,
-  padding: '0 4px',
-  border: `1px solid ${TOKEN.border}`,
-  borderRadius: 3,
-  background: TOKEN.surfaceSunken,
-  fontSize: 11,
-} as const;
-
-const gestureStyle = { opacity: 0.7, fontSize: 12 } as const;

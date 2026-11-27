@@ -8,9 +8,8 @@
  * wide, where 1920 pixels is several times print resolution.
  */
 
+import type { ImageSize } from '../../download/core/croppedMarkup.ts';
 import { clamp } from '../../format/core/clamp.ts';
-
-import type { ImageSize } from './exportImage.ts';
 
 /** The longest side of a figure's image, in pixels. */
 export const FIGURE_LONGEST_SIDE = 1920;

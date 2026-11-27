@@ -14,7 +14,7 @@ test('a pasted peak list is described by what the viewer knows of it', () => {
     { label: 'Source', value: 'Pasted, not read from a file' },
     { label: 'Format', value: 'Text, two columns' },
     { label: 'Peaks', value: '3' },
-    { label: 'm/z range', value: '138.0662 – 210.1112' },
+    { label: 'm/z range', value: '138.0662–210.1112' },
   ]);
 });
 
@@ -30,7 +30,7 @@ test('a scan out of a run carries every fact that tells it from its neighbours',
     { label: 'Retention time', value: '3.42 min' },
     { label: 'Peaks', value: '3' },
     { label: 'Profile points', value: '4' },
-    { label: 'm/z range', value: '138.0662 – 210.1112' },
+    { label: 'm/z range', value: '138.0662–210.1112' },
   ]);
 });
 

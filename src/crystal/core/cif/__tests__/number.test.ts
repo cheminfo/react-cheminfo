@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { formatCifNumber, formatNumber, parseCifNumber } from '../number.ts';
+import { formatCifNumber, formatCifValue, parseCifNumber } from '../number.ts';
 
 test('a standard uncertainty is read out of the parentheses', () => {
   expect(parseCifNumber('0.30475(3)')).toStrictEqual({
@@ -87,12 +87,12 @@ test('formatCifNumber writes the standard uncertainty back', () => {
   expect(formatCifNumber({ value: 90, su: null, raw: '' })).toBe('90');
 });
 
-test('formatNumber reads back as the same double', () => {
+test('formatCifValue reads back as the same double', () => {
   const values = [0, 0.5, 5.6402, 3.61491, 0.333333, -0.0625, 1e-7, 1 / 3];
   for (const value of values) {
-    expect(parseCifNumber(formatNumber(value))?.value).toBe(value);
+    expect(parseCifNumber(formatCifValue(value))?.value).toBe(value);
   }
 
-  expect(formatNumber(-0)).toBe('0');
-  expect(formatNumber(6.709)).toBe('6.709');
+  expect(formatCifValue(-0)).toBe('0');
+  expect(formatCifValue(6.709)).toBe('6.709');
 });

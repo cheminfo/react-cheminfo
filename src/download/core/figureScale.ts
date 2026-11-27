@@ -85,12 +85,3 @@ export function figureScaleFits(size: FigurePixels, scale: number): boolean {
 export function figureScaleLabel(scale: number): string {
   return `${scale}×`;
 }
-
-/**
- * What a size reads in a sentence: `1280 × 920 pixels`.
- * @param pixels - The size of the saved file.
- * @returns The measurement, written out.
- */
-export function formatFigurePixels(pixels: FigurePixels): string {
-  return `${pixels.width} × ${pixels.height} pixels`;
-}

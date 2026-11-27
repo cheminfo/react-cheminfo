@@ -7,6 +7,7 @@ import { Axes } from '../../chart/ui/Axes.tsx';
 import { AxisGuide } from '../../chart/ui/AxisGuide.tsx';
 import { PlotClip } from '../../chart/ui/PlotClip.tsx';
 import { SelectionRect } from '../../chart/ui/SelectionRect.tsx';
+import { chartSurfaceStyle } from '../../chart/ui/chartSurface.ts';
 import { useChartSize } from '../../chart/ui/useChartSize.ts';
 import { useSvgId } from '../../chart/ui/useSvgId.ts';
 import {
@@ -150,7 +151,7 @@ export function XpsChart(props: XpsChartProps): ReactNode {
         width={frameWidth}
         height={frameHeight}
         viewBox={`0 0 ${frameWidth} ${frameHeight}`}
-        style={svgStyle}
+        style={chartSurfaceStyle(pointer.position !== null)}
         {...gestures.handlers}
       >
         <PlotClip id={clipId} plot={plot} />
@@ -215,9 +216,3 @@ const EMPTY_DOMAIN: XpsDomain = { x: [0, 1], y: [0, 1] };
 
 /** The box the chart is measured against, and fills. */
 const containerStyle = { width: '100%', height: '100%' } as const;
-
-const svgStyle = {
-  display: 'block',
-  touchAction: 'none',
-  userSelect: 'none',
-} as const;

@@ -12,10 +12,10 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { hideClipboardNotice } from '../../../clipboard/core/showClipboardNotice.ts';
-import { rasterSvgMarkup } from '../../../molecule3d/core/exportImage.ts';
 import type { PaintRecord } from '../../core/__tests__/paintStubs.ts';
 import { stubPainting } from '../../core/__tests__/paintStubs.ts';
 import type { PageFigureWriter } from '../../core/copyPageFigure.ts';
+import { rasterSvgMarkup } from '../../core/croppedMarkup.ts';
 import { readClipboardFigure } from '../../core/figureClipboard.ts';
 import { readFigureSource } from '../../core/figureSource.ts';
 import { setPageFigureSource } from '../../core/pageFigureSource.ts';

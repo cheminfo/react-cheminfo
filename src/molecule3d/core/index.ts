@@ -12,8 +12,8 @@ export {
   parseMolecule3DCamera,
   sameMolecule3DCamera,
 } from './camera.ts';
-export type { ImageSize } from './exportImage.ts';
-export { rasterSvgMarkup } from './exportImage.ts';
+export type { ImageSize } from '../../download/core/croppedMarkup.ts';
+export { rasterSvgMarkup } from '../../download/core/croppedMarkup.ts';
 export type { RenderedFigure } from './figureFrame.ts';
 export { FIGURE_LONGEST_SIDE } from './figureFrame.ts';
 export type { Molecule3DHighlight } from './highlight.ts';

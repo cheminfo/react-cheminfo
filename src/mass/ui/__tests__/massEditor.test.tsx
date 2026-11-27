@@ -48,7 +48,7 @@ test('a nominal-mass table is written in whole numbers', async () => {
   );
 
   expect(markup).toContain('nominal mass');
-  expect(markup).toContain('m/z 0 – 331');
+  expect(markup).toContain('m/z 0–331');
 });
 
 test('the chart alone labels the peaks of the first spectrum it draws', async () => {
@@ -97,6 +97,6 @@ test('the selected spectrum is written to its own decimals beside a resolved one
   );
 
   expect(markup).toContain('2 spectra drawn of 2');
-  expect(markup).toContain('m/z 0 – 331');
-  expect(markup).not.toContain('m/z 0.0000 – 331.0000');
+  expect(markup).toContain('m/z 0–331');
+  expect(markup).not.toContain('m/z 0.0000–331.0000');
 });

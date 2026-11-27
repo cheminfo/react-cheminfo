@@ -60,4 +60,5 @@ export * from './state/core/index.ts';
 export * from './structure/core/index.ts';
 export * from './taxonomy/core/index.ts';
 export * from './tokens/core/index.ts';
+export * from './values/core/index.ts';
 export * from './worker/core/index.ts';

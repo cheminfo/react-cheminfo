@@ -12,8 +12,8 @@ import { createRoot } from 'react-dom/client';
 import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import type { ImageSize } from '../../../download/core/croppedMarkup.ts';
 import { pngDpi } from '../../../download/core/pngDpi.ts';
-import type { ImageSize } from '../../core/exportImage.ts';
 import type { SceneCapture } from '../exportMoleculeImage.ts';
 import type { ImageExport } from '../useImageExport.ts';
 import { useImageExport } from '../useImageExport.ts';

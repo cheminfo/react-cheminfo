@@ -1,3 +1,5 @@
+import { isRecord } from '../../values/core/values.ts';
+
 /** Where molecules.cheminfo.org answers, which holds the family's sources. */
 export const MOLECULES_URL = 'https://molecules.cheminfo.org';
 
@@ -95,8 +97,4 @@ function absolute(address: string, baseUrl: string): string | null {
   } catch {
     return null;
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }

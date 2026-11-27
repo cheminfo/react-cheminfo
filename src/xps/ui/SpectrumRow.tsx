@@ -1,10 +1,10 @@
-import { InputGroup } from '@blueprintjs/core';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 import { Button, Toolbar } from 'react-science/ui';
 
+import { SELECTED_ROW_TINT } from '../../panel/core/panelStyles.ts';
 import { countLabel } from '../../panel/core/statusBar.ts';
 import { SpectrumColorSwatch } from '../../panel/ui/SpectrumColorSwatch.tsx';
+import { SpectrumNameCell } from '../../panel/ui/SpectrumNameCell.tsx';
 import { transitionText } from '../core/panelFormat.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
 
@@ -36,18 +36,9 @@ export interface SpectrumRowProps {
 export function SpectrumRow(props: SpectrumRowProps): ReactNode {
   const { spectrum, isSelected } = props;
   const actions = useXpsActions();
-  const [draftName, setDraftName] = useState<string | null>(null);
 
   const points = countLabel(spectrum.energy.x.length, 'point', 'points');
   const subtitle = `${transitionText(spectrum.transition)} · ${points}`;
-
-  function commitRename(): void {
-    const name = draftName?.trim() ?? '';
-    setDraftName(null);
-    // An empty box is a rename abandoned rather than a request for a nameless
-    // spectrum, which nothing in the list could then be told apart by.
-    if (name !== '') actions.renameSpectrum(spectrum.id, name);
-  }
 
   return (
     <div
@@ -77,35 +68,12 @@ export function SpectrumRow(props: SpectrumRowProps): ReactNode {
         />
       </Toolbar>
 
-      {draftName === null ? (
-        <button
-          type="button"
-          style={nameStyle}
-          title="Click to work on this spectrum, double click to rename it"
-          onClick={() => actions.selectSpectrum(spectrum.id)}
-          onDoubleClick={() => setDraftName(spectrum.name)}
-        >
-          <span style={nameTextStyle}>{spectrum.name}</span>
-          <span style={subtitleStyle}>{subtitle}</span>
-        </button>
-      ) : (
-        <InputGroup
-          autoFocus
-          size="small"
-          value={draftName}
-          spellCheck={false}
-          autoCapitalize="off"
-          autoCorrect="off"
-          autoComplete="off"
-          aria-label={`Name of ${spectrum.name}`}
-          onValueChange={setDraftName}
-          onBlur={commitRename}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') commitRename();
-            if (event.key === 'Escape') setDraftName(null);
-          }}
-        />
-      )}
+      <SpectrumNameCell
+        name={spectrum.name}
+        subtitle={subtitle}
+        onSelect={() => actions.selectSpectrum(spectrum.id)}
+        onRename={(name) => actions.renameSpectrum(spectrum.id, name)}
+      />
 
       <Button
         variant="minimal"
@@ -135,41 +103,5 @@ const selectedRowStyle = {
   // longhand back off a shorthand, so the border stayed lit on the row the
   // selection had left.
   border: '1px solid var(--accent)',
-  background: 'color-mix(in oklab, var(--accent) 10%, var(--surface))',
-} as const;
-
-const nameStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  gap: 1,
-  flex: '1 1 1px',
-  minWidth: 0,
-  padding: '1px 2px',
-  border: 'none',
-  background: 'none',
-  color: 'inherit',
-  textAlign: 'left',
-  cursor: 'pointer',
-} as const;
-
-/** One line, cut short rather than wrapped: the rows stay a fixed height. */
-const nameTextStyle = {
-  maxWidth: '100%',
-  fontSize: 12,
-  fontWeight: 600,
-  lineHeight: 1.2,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-} as const;
-
-const subtitleStyle = {
-  maxWidth: '100%',
-  fontSize: 10,
-  lineHeight: 1.2,
-  opacity: 0.7,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  background: SELECTED_ROW_TINT,
 } as const;

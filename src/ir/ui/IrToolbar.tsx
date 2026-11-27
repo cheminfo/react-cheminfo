@@ -1,6 +1,8 @@
 import { Toolbar } from 'react-science/ui';
 
+import { FigureToolbarItem } from '../../download/ui/FigureToolbarItem.tsx';
 import type { FigureDownloadState } from '../../download/ui/useFigureDownload.tsx';
+import { ZoomToolbarItems } from '../../panel/ui/ZoomToolbarItems.tsx';
 import { bandsPointDown, boxZoomOnly } from '../core/irMode.ts';
 import { defaultIrMode } from '../core/irTechnique.ts';
 import { irCommandOffered } from '../core/irTechniqueCommands.ts';
@@ -22,12 +24,12 @@ export interface IrToolbarProps {
  * The tools, down the left of the chart.
  *
  * Only what is done to the spectra: what is asked of the viewer itself — the
- * mark, help, full screen — is in the header. The **tools** — read and square
- * zoom, which say what a drag is running, and picking by hand, which says what
- * a click is — come first, then the zoom commands that act at once, then what
- * is being read: the
- * value axis, the picking, the assignments. Closing every spectrum is last and
- * alone, being the only one that throws something away.
+ * mark, help, full screen — is in the header. Closing every spectrum comes
+ * first and red, being the only one that throws something away; then the
+ * **tools** — read and square zoom, which say what a drag is running, and
+ * picking by hand, which says what a click is — then the zoom commands that act
+ * at once, then what is being read: the value axis, the picking, the
+ * assignments.
  *
  * Reading percent transmittance, the pair is settled rather than chosen: every
  * drag on that axis is a rectangle, so both buttons go dead with the square zoom
@@ -49,8 +51,6 @@ export function IrToolbar(props: IrToolbarProps) {
   const text = useIrText(technique);
 
   const isEmpty = spectra.length === 0;
-  // The popover opens the panel itself, so the command's own click is left out.
-  const exportCommand = command('exportImage');
   const settled = boxZoomOnly(mode);
 
   return (
@@ -87,16 +87,10 @@ export function IrToolbar(props: IrToolbarProps) {
         disabled={selectedSpectrum === null}
       />
 
-      <Toolbar.Item icon="zoom-in" {...command('zoomIn')} disabled={isEmpty} />
-      <Toolbar.Item
-        icon="zoom-out"
-        {...command('zoomOut')}
-        disabled={isEmpty}
-      />
-      <Toolbar.Item
-        icon="zoom-to-fit"
-        {...command('resetZoom')}
-        disabled={domain === null}
+      <ZoomToolbarItems
+        command={command}
+        isEmpty={isEmpty}
+        fitted={domain === null}
       />
 
       {irCommandOffered(technique, 'toggleMode') ? (
@@ -126,27 +120,11 @@ export function IrToolbar(props: IrToolbarProps) {
           window it was dragged to, the way up it is being read, the
           assignments written under the bands — so the picture is taken here
           rather than rebuilt from the spectra in a panel. */}
-      {figure === undefined ? (
-        <Toolbar.Item
-          icon="media"
-          {...command('exportImage')}
-          disabled={isEmpty}
-        />
-      ) : (
-        <Toolbar.PopoverItem
-          isOpen={figure.isOpen}
-          onInteraction={figure.setOpen}
-          content={figure.panel}
-          disabled={isEmpty}
-          itemProps={{
-            icon: 'media',
-            tooltip: exportCommand.tooltip,
-            'aria-label': exportCommand['aria-label'],
-            active: figure.isOpen,
-            disabled: isEmpty,
-          }}
-        />
-      )}
+      <FigureToolbarItem
+        figure={figure}
+        command={command('exportImage')}
+        disabled={isEmpty}
+      />
     </Toolbar>
   );
 }

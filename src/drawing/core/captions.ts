@@ -3,6 +3,8 @@
  * rules. A drawing holding captions holds `DrawText` among its objects.
  */
 
+import { isFiniteNumber, isRecord } from '../../values/core/values.ts';
+
 import { CAPTION_FAMILIES } from './fonts.ts';
 import { roundCoordinate } from './geometry.ts';
 import { nextId } from './ids.ts';
@@ -13,7 +15,6 @@ import { isColor } from './palette.ts';
 import { normalizeDegrees } from './pictures.ts';
 import { MAX_RUN_SIZE } from './richTextMarks.ts';
 import type { Point } from './types.ts';
-import { isFiniteNumber, isRecord } from './values.ts';
 
 /** How the lines of a caption line up on its anchor. */
 export type TextAlign = 'left' | 'center' | 'right';

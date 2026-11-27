@@ -11,7 +11,9 @@
  * molecule on screen.
  */
 
-import { MAX_ITEMS, MAX_LABEL_LENGTH, isRecord } from './messageValues.ts';
+import { isFiniteNumber, isRecord } from '../../values/core/values.ts';
+
+import { MAX_ITEMS, MAX_LABEL_LENGTH } from './messageValues.ts';
 
 /**
  * What a tool's visitor could set inside it, by name, each value written as a
@@ -204,8 +206,4 @@ function readNumberField(
   return low !== undefined && high !== undefined && low > high
     ? undefined
     : field;
-}
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value);
 }

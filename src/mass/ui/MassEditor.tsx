@@ -1,4 +1,4 @@
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { RootLayout } from 'react-science/ui';
 
 import type { MassEditorHandle, MassPlotClick } from '../core/massEditorApi.ts';
@@ -58,6 +58,13 @@ export interface MassEditorProps {
    */
   onPlotClick?: (click: MassPlotClick) => void;
   /**
+   * The host's own actions on what it keeps — open a file, save a document —
+   * as `Toolbar.Item`s of `react-science/ui`, drawn in the header after the
+   * viewer's mark.
+   * @default undefined
+   */
+  actions?: ReactNode;
+  /**
    * The handle a host drives the viewer through: take these spectra, read
    * these files, frame this mass, select that one.
    * @default undefined
@@ -90,6 +97,7 @@ export function MassEditor(props: MassEditorProps) {
     defaultPanelIds,
     panels = NO_PANELS,
     onPlotClick,
+    actions,
     ref,
   } = props;
 
@@ -110,6 +118,7 @@ export function MassEditor(props: MassEditorProps) {
         <MassShell
           handle={ref}
           panels={panels}
+          actions={actions}
           {...(onPlotClick === undefined ? {} : { onPlotClick })}
         />
       </RootLayout>

@@ -1,11 +1,11 @@
 import { Toolbar } from 'react-science/ui';
 
 import {
-  panelBodyStyle,
   panelEmptyStyle,
   panelStyle,
   panelToolbarStyle,
 } from '../../panel/core/panelStyles.ts';
+import { SpectrumList } from '../../panel/ui/SpectrumList.tsx';
 import {
   downloadIrSpectra,
   downloadIrSpectrum,
@@ -85,31 +85,35 @@ export function SpectraPanel() {
         </Toolbar>
       </div>
 
-      <div style={panelBodyStyle}>
-        {spectra.length === 0 ? (
+      <SpectrumList
+        spectra={spectra}
+        selectedId={selectedId}
+        onSelect={actions.selectSpectrum}
+        label="Open spectra"
+        empty={
           <p style={panelEmptyStyle}>
             No spectrum is open. Open one of the examples, or drop a JCAMP-DX
             file on the chart.
           </p>
-        ) : (
-          spectra.map((spectrum) => (
-            <SpectrumRow
-              key={spectrum.id}
-              spectrum={spectrum}
-              technique={technique}
-              selected={spectrum.id === selectedId}
-              onSelect={() => actions.selectSpectrum(spectrum.id)}
-              onToggle={() =>
-                actions.setSpectrumVisible(spectrum.id, !spectrum.visible)
-              }
-              onColor={(color) => actions.setSpectrumColor(spectrum.id, color)}
-              onDownload={() => downloadIrSpectrum(spectrum, mode, technique)}
-              onRemove={() => actions.removeSpectrum(spectrum.id)}
-              onRename={(name) => actions.renameSpectrum(spectrum.id, name)}
-            />
-          ))
+        }
+      >
+        {(spectrum) => (
+          <SpectrumRow
+            key={spectrum.id}
+            spectrum={spectrum}
+            technique={technique}
+            selected={spectrum.id === selectedId}
+            onSelect={() => actions.selectSpectrum(spectrum.id)}
+            onToggle={() =>
+              actions.setSpectrumVisible(spectrum.id, !spectrum.visible)
+            }
+            onColor={(color) => actions.setSpectrumColor(spectrum.id, color)}
+            onDownload={() => downloadIrSpectrum(spectrum, mode, technique)}
+            onRemove={() => actions.removeSpectrum(spectrum.id)}
+            onRename={(name) => actions.renameSpectrum(spectrum.id, name)}
+          />
         )}
-      </div>
+      </SpectrumList>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Button } from 'react-science/ui';
 
+import { SELECTED_ROW_TINT } from '../../panel/core/panelStyles.ts';
 import { SpectrumColorSwatch } from '../../panel/ui/SpectrumColorSwatch.tsx';
 import { formatWavenumberRange } from '../core/irFormat.ts';
 import type { IrSpectrum } from '../core/irSpectrum.ts';
@@ -56,7 +57,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
   );
 
   return (
-    <div
+    <li
       style={selected ? selectedRowStyle : rowStyle}
       data-selected={selected ? 'true' : undefined}
     >
@@ -107,7 +108,7 @@ export function SpectrumRow(props: SpectrumRowProps) {
         aria-label="Close this spectrum"
         onClick={onRemove}
       />
-    </div>
+    </li>
   );
 }
 
@@ -119,7 +120,10 @@ const rowStyle = {
   borderRadius: 3,
 } as const;
 
-const selectedRowStyle = { ...rowStyle, background: '#e8f1fb' } as const;
+const selectedRowStyle = {
+  ...rowStyle,
+  background: SELECTED_ROW_TINT,
+} as const;
 
 const nameStyle = {
   flex: '1 1 1px',

@@ -20,6 +20,8 @@
 
 import type { AnalysisSpectrum, NormalisedMeta } from 'xps-analysis';
 
+import { isRecord } from '../../values/core/values.ts';
+
 import { isUsableSourceEnergy } from './energy.ts';
 
 /**
@@ -105,15 +107,6 @@ export function blockSourceEnergy(
     normalised?.analysisSource.characteristicEnergy.value ??
     null;
   return isUsableSourceEnergy(stated) ? stated : null;
-}
-
-/**
- * Whether a value is an object worth reading properties off.
- * @param value - Whatever the file carried.
- * @returns Whether it is a non-null object.
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }
 
 /**

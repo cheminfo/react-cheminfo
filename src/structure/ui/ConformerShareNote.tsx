@@ -5,15 +5,17 @@
  * error of the method behind the energies into the factor a share is good to.
  * The force field's line also calls the column an ordering: off by 3.6
  * kcal/mol, a share is not a percentage anybody should quote.
- *
- * English only, like the table's own column headings.
  */
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Translate } from '../../i18n/ui/useT.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { ROOM_TEMPERATURE } from '../core/conformerBoltzmann.ts';
 import {
+  GFN2_DRUGLIKE_ENERGY_ERROR,
   GFN2_ENERGY_ERROR,
   MMFF94_ENERGY_ERROR,
   shareFactor,
@@ -45,29 +47,32 @@ export function ConformerShareNote(
   props: ConformerShareNoteProps,
 ): ReactElement {
   const { ranking = 'force-field', temperature = ROOM_TEMPERATURE } = props;
+  const t = useChromeT();
   return (
     <p style={noteStyle} data-testid="conformer-share-note">
-      {noteText(ranking, temperature)}
+      {noteText(ranking, temperature, t)}
     </p>
   );
 }
 
-function noteText(ranking: ConformerRanking, temperature: number): string {
+function noteText(
+  ranking: ConformerRanking,
+  temperature: number,
+  t: Translate<ChromeKey>,
+): string {
   if (ranking === 'refined') {
-    return (
-      `Shares at ${temperature} K, from GFN2-xTB energies alone: no entropy, ` +
-      `no solvent. GFN2-xTB is typically off by ${GFN2_ENERGY_ERROR} kcal/mol, ` +
-      `which places a share within a factor of ` +
-      `${shareFactor(GFN2_ENERGY_ERROR, temperature)}.`
-    );
+    return t('conformers.share.refined', {
+      temperature,
+      error: GFN2_ENERGY_ERROR,
+      factor: shareFactor(GFN2_ENERGY_ERROR, temperature),
+    });
   }
-  return (
-    `Shares at ${temperature} K, from MMFF94 energies alone: no entropy, no ` +
-    `solvent. On drug-like molecules MMFF94 is off by ${MMFF94_ENERGY_ERROR} ` +
-    `kcal/mol, which places a share only within a factor of ` +
-    `${shareFactor(MMFF94_ENERGY_ERROR, temperature)}: read the column as an ` +
-    `ordering.`
-  );
+  return t('conformers.share.forceField', {
+    temperature,
+    error: MMFF94_ENERGY_ERROR,
+    refinedError: GFN2_DRUGLIKE_ENERGY_ERROR,
+    factor: shareFactor(MMFF94_ENERGY_ERROR, temperature),
+  });
 }
 
 const noteStyle = {

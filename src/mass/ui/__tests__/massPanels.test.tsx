@@ -136,7 +136,9 @@ test('the pointer resting on a row lights it, and leaving the table puts it out'
     row?.dispatchEvent(new Event('pointerover', { bubbles: true }));
   });
 
-  expect(rows()[3]?.style.background).toBe('rgb(232, 241, 251)');
+  expect(rows()[3]?.style.background).toBe(
+    'color-mix(in oklab, var(--accent) 10%, var(--surface))',
+  );
 
   act(() => {
     row?.parentElement?.dispatchEvent(

@@ -90,7 +90,7 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
   const { disabledReason, opensMenu = false, onClick, testId } = props;
   const { untitled = false } = props;
   const { metrics } = useOverlaySurface();
-  const { hovered, focused, handlers } = useOverlayInteraction();
+  const { hovered, handlers } = useOverlayInteraction();
 
   const name = value === undefined ? label : `${label} — ${value}`;
   const told = disabled && disabledReason !== undefined ? disabledReason : name;
@@ -108,7 +108,6 @@ export function OverlayIconButton(props: OverlayIconButtonProps): ReactElement {
       data-testid={testId}
       style={overlayIconButtonStyle(metrics, {
         hovered,
-        focused,
         active,
         disabled,
       })}

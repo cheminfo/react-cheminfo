@@ -6,7 +6,7 @@
 
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 
-import type { ImageSize } from '../../molecule3d/core/exportImage.ts';
+import type { ImageSize } from '../../download/core/croppedMarkup.ts';
 import type { SceneCapture } from '../../molecule3d/ui/exportMoleculeImage.ts';
 import {
   captureMoleculePng,

@@ -4,12 +4,13 @@
  * centre as on a sphere, lit from the middle or from a side.
  */
 
+import { isFiniteNumber, isRecord } from '../../values/core/values.ts';
+
 import { boundsOf } from './geometry.ts';
 import type { DrawPathGraphic } from './graphics.ts';
 import { graphicCorners } from './graphics.ts';
 import { isColor } from './palette.ts';
 import type { Point } from './types.ts';
-import { isFiniteNumber, isRecord } from './values.ts';
 
 /** How a gradient runs between the fill and its second colour. */
 export type GradientKind = 'linear' | 'reflected' | 'radial';

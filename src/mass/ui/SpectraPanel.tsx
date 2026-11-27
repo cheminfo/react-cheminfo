@@ -1,14 +1,12 @@
-import { useEffect, useRef } from 'react';
 import { SelectedTotal, Toolbar } from 'react-science/ui';
 
-import { useListKeyboardNavigation } from '../../hooks/ui/useListKeyboardNavigation.ts';
 import {
-  panelBodyStyle,
   panelEmptyStyle,
   panelStyle,
   panelToolbarCountStyle,
   panelToolbarStyle,
 } from '../../panel/core/panelStyles.ts';
+import { SpectrumList } from '../../panel/ui/SpectrumList.tsx';
 import { downloadMassSpectra } from '../core/downloadSpectra.ts';
 import { massCommandLabel } from '../core/massCommands.ts';
 
@@ -37,26 +35,6 @@ export function SpectraPanel() {
   const run = useMassCommand();
   const { spectra } = state.data;
   const { selectedId } = state.view;
-  const listRef = useRef<HTMLDivElement>(null);
-
-  const selectedIndex = spectra.findIndex(
-    (spectrum) => spectrum.id === selectedId,
-  );
-  const onKeyDown = useListKeyboardNavigation({
-    length: spectra.length,
-    selectedIndex,
-    onSelect: (index) => {
-      const spectrum = spectra[index];
-      if (spectrum !== undefined) actions.selectSpectrum(spectrum.id);
-    },
-  });
-
-  useEffect(() => {
-    if (listRef.current === null || selectedId === null) return;
-    listRef.current
-      .querySelector('[data-selected="true"]')
-      ?.scrollIntoView({ block: 'nearest' });
-  }, [selectedId]);
 
   const allDrawn = spectra.every(
     (spectrum) => spectrum.showProfile || spectrum.showCentroid,
@@ -111,31 +89,26 @@ export function SpectraPanel() {
         </div>
       </div>
 
-      <div ref={listRef} style={panelBodyStyle}>
-        {spectra.length === 0 ? (
+      <SpectrumList
+        spectra={spectra}
+        selectedId={selectedId}
+        onSelect={actions.selectSpectrum}
+        label="Open spectra"
+        empty={
           <p style={panelEmptyStyle}>
             No spectrum is open. Drop a JCAMP-DX file, or two columns of m/z and
             intensity, on the chart.
           </p>
-        ) : (
-          <ul
-            aria-label="Open spectra"
-            // Reached by Tab, or by clicking a row, and then walked with the
-            // arrows.
-            tabIndex={0}
-            style={listStyle}
-            onKeyDown={onKeyDown}
-          >
-            {spectra.map((spectrum) => (
-              <SpectrumRow
-                key={spectrum.id}
-                spectrum={spectrum}
-                isSelected={spectrum.id === selectedId}
-              />
-            ))}
-          </ul>
+        }
+      >
+        {(spectrum) => (
+          <SpectrumRow
+            key={spectrum.id}
+            spectrum={spectrum}
+            isSelected={spectrum.id === selectedId}
+          />
         )}
-      </div>
+      </SpectrumList>
     </div>
   );
 }
@@ -144,10 +117,3 @@ export function SpectraPanel() {
  * The rows, flush against one another: a gap between every pair reads as a
  * stack of cards rather than as one list to run an eye down.
  */
-const listStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  margin: 0,
-  padding: 0,
-  listStyle: 'none',
-} as const;

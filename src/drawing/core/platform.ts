@@ -4,6 +4,8 @@
  * so a Mac never takes Ctrl for ⌘.
  */
 
+import { canFillScreen } from '../../shared/core/canFillScreen.ts';
+
 /** Whether the page runs on a Mac, an iPad or an iPhone. */
 export const IS_MAC = isApplePlatform(
   typeof navigator === 'undefined' ? '' : navigator.userAgent,
@@ -19,8 +21,7 @@ export const ALT_KEY = IS_MAC ? '⌥' : 'Alt';
  * Whether the page may fill the screen: a frame without `allowfullscreen`, or
  * a phone browser, may not.
  */
-export const CAN_FILL_SCREEN =
-  typeof document !== 'undefined' && document.fullscreenEnabled;
+export const CAN_FILL_SCREEN = canFillScreen();
 
 /**
  * Whether a user agent names an Apple platform. An iPad asks for the desktop

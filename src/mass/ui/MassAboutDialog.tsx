@@ -1,7 +1,8 @@
-import { Dialog, DialogBody } from '@blueprintjs/core';
-
 import { credits } from '../../credits/core/credits.ts';
 import { CreditsList } from '../../credits/ui/CreditsList.tsx';
+import { paragraphStyle } from '../../panel/core/dialogStyles.ts';
+import { AboutDialogFrame } from '../../panel/ui/AboutDialogFrame.tsx';
+import { Section } from '../../panel/ui/Section.tsx';
 import { massCommands } from '../core/massCommands.ts';
 
 import { MassLogo } from './MassLogo.tsx';
@@ -25,35 +26,30 @@ export function MassAboutDialog(props: MassAboutDialogProps) {
   const { isOpen, onClose } = props;
 
   return (
-    <Dialog
+    <AboutDialogFrame
       isOpen={isOpen}
       onClose={onClose}
       title={massCommands.about.title}
-      icon={<MassLogo size={20} />}
-      style={dialogStyle}
+      mark={<MassLogo size={20} />}
+      logo={<MassLogo size={64} />}
+      name="react-cheminfo/mass"
+      intro={
+        <p style={paragraphStyle}>
+          Draws mass spectra read from JCAMP-DX and text files, picks the peaks
+          of a profile, labels them as you zoom, and says whether each spectrum
+          is high resolution.
+        </p>
+      }
     >
-      <DialogBody>
-        <div style={brandStyle}>
-          <MassLogo size={64} />
-          <div>
-            <p style={leadStyle}>react-cheminfo/mass</p>
-            <p style={paragraphStyle}>
-              Draws mass spectra read from JCAMP-DX and text files, picks the
-              peaks of a profile, labels them as you zoom, and says whether each
-              spectrum is high resolution.
-            </p>
-          </div>
-        </div>
-
-        <h4 style={headingStyle}>Built on</h4>
+      <Section title="Built on">
         <CreditsList entries={MASS_CREDITS} />
         <p style={paragraphStyle}>
           The <strong>colours</strong> are Okabe and Ito&apos;s colour-universal
           palette, so two traces stay distinguishable for a reader with a colour
           vision deficiency.
         </p>
-      </DialogBody>
-    </Dialog>
+      </Section>
+    </AboutDialogFrame>
   );
 }
 
@@ -69,21 +65,3 @@ const MASS_CREDITS = credits([
   'react-science',
   'blueprint',
 ]);
-
-const dialogStyle = { width: 'min(680px, 92vw)' } as const;
-
-const brandStyle = {
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: 16,
-} as const;
-
-const leadStyle = {
-  margin: '0 0 4px',
-  fontWeight: 600,
-  fontSize: 16,
-} as const;
-
-const paragraphStyle = { margin: '0 0 6px' } as const;
-
-const headingStyle = { margin: '14px 0 4px' } as const;

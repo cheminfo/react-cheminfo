@@ -6,8 +6,8 @@
 
 import { afterEach, expect, test, vi } from 'vitest';
 
-import { rasterSvgMarkup } from '../../../molecule3d/core/exportImage.ts';
 import { cropFigure } from '../cropFigure.ts';
+import { rasterSvgMarkup } from '../croppedMarkup.ts';
 import { readFigureSource, withFigureSource } from '../figureSource.ts';
 import { readFigureStates } from '../figureState.ts';
 

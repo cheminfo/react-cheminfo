@@ -1,3 +1,5 @@
+import { isRecord } from '../../values/core/values.ts';
+
 import type { ProjectionCopy } from './projectionCopy.ts';
 import { PROJECTION_COPY } from './projectionCopy.ts';
 import type { ProjectionCopyPatch } from './projectionCopyPatch.ts';
@@ -27,13 +29,9 @@ function mergeBranch(base: Branch, overrides: Branch): Branch {
     if (value === undefined) continue;
     const current = merged[key];
     merged[key] =
-      isBranch(current) && isBranch(value)
+      isRecord(current) && isRecord(value)
         ? mergeBranch(current, value)
         : value;
   }
   return merged;
-}
-
-function isBranch(value: unknown): value is Branch {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

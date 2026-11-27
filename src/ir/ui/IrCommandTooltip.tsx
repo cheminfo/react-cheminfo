@@ -1,6 +1,5 @@
-import { TooltipHelpContent } from 'react-science/ui';
-
-import type { IrCommand, IrCommandId } from '../core/irCommands.ts';
+import { CommandTooltip } from '../../panel/ui/CommandTooltip.tsx';
+import type { IrCommandId } from '../core/irCommands.ts';
 import { irCommands } from '../core/irCommands.ts';
 import type { IrTechnique } from '../core/irTechnique.ts';
 
@@ -28,18 +27,9 @@ export interface IrCommandTooltipProps {
  */
 export function IrCommandTooltip(props: IrCommandTooltipProps) {
   const { id, technique = 'infrared' } = props;
-  const entry: IrCommand = useIrText(technique).command(id) ?? irCommands[id];
-  const shortcuts = entry.shortcut?.label ?? entry.shortcut?.keys;
-
   return (
-    <TooltipHelpContent
-      title={entry.title}
-      description={entry.description}
-      shortcuts={shortcuts === undefined ? undefined : [...shortcuts]}
-      subTitles={entry.gestures?.map((gesture) => ({
-        title: gesture.title,
-        shortcuts: [...gesture.shortcuts],
-      }))}
+    <CommandTooltip
+      entry={useIrText(technique).command(id) ?? irCommands[id]}
     />
   );
 }

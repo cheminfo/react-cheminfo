@@ -1,6 +1,7 @@
 import { memo, useMemo, useRef } from 'react';
 
 import {
+  SELECTED_ROW_TINT,
   panelCellStyle,
   panelColumnButtonStyle,
   panelNumberCellStyle,
@@ -196,4 +197,7 @@ const ROW_HEIGHT = 18;
 const rowStyle = { cursor: 'pointer' } as const;
 
 /** The row of the peak being looked at, wherever it was pointed at. */
-const highlightedRowStyle = { ...rowStyle, background: '#e8f1fb' } as const;
+const highlightedRowStyle = {
+  ...rowStyle,
+  background: SELECTED_ROW_TINT,
+} as const;

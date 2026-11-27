@@ -10,7 +10,7 @@ import { useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayValueButton } from '../../overlay/ui/OverlayValueButton.tsx';
-import { TOKEN } from '../../tokens/core/familyTokens.ts';
+import { FAMILY_TOKEN_VALUES, TOKEN } from '../../tokens/core/familyTokens.ts';
 import { colorInputValue } from '../core/hex.ts';
 import { sampleScale } from '../core/interpolate.ts';
 import { formatColorScale, resolveColorScale } from '../core/scaleText.ts';
@@ -147,7 +147,10 @@ export function ColorScaleSelect(props: ColorScaleSelectProps): ReactElement {
                 type="color"
                 aria-label={t('color.uniformColour')}
                 title={t('color.uniformColour')}
-                value={colorInputValue(oneColor)}
+                value={colorInputValue(
+                  oneColor,
+                  FAMILY_TOKEN_VALUES['--border'],
+                )}
                 style={UNIFORM_INPUT_STYLE}
                 // The swatch picks the colour; the rest of the row chooses
                 // one colour and closes the menu.

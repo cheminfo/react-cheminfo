@@ -10,6 +10,7 @@
 import {
   formatFromExtension,
   readFileHeader,
+  startsJcamp,
   stripByteOrderMark,
 } from '../../format/core/fileHeader.ts';
 
@@ -68,7 +69,7 @@ export function detectIrFormat(
   const header = stripByteOrderMark(
     readFileHeader(data, HEADER_BYTES),
   ).trimStart();
-  if (header.startsWith('##')) return 'jcamp';
+  if (startsJcamp(header)) return 'jcamp';
 
   const named = formatFromExtension(EXTENSIONS, fileName);
   if (named !== undefined) return named;

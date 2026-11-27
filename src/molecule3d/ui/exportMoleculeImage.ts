@@ -1,3 +1,6 @@
+import type { ImageSize } from '../../download/core/croppedMarkup.ts';
+import { rasterSvgMarkup } from '../../download/core/croppedMarkup.ts';
+import { dataUrlBytes } from '../../download/core/dataUrl.ts';
 import { downloadBlob } from '../../download/core/downloadBlob.ts';
 import type { FigureFormat } from '../../download/core/downloadFigure.ts';
 import { figureDpi } from '../../download/core/figureDpi.ts';
@@ -9,8 +12,6 @@ import { withPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import { withPngDpi } from '../../download/core/pngDpi.ts';
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { encodeAnimatedPng } from '../core/animatedPng.ts';
-import type { ImageSize } from '../core/exportImage.ts';
-import { dataUriBytes, rasterSvgMarkup } from '../core/exportImage.ts';
 import type { RenderedFigure } from '../core/figureFrame.ts';
 import { FIGURE_LONGEST_SIDE } from '../core/figureFrame.ts';
 
@@ -161,5 +162,5 @@ export async function moleculeImageFile(
  * @returns The PNG bytes.
  */
 function stampedPng(dataUri: string, scale: number): Uint8Array<ArrayBuffer> {
-  return withPngDpi(dataUriBytes(dataUri), figureDpi(scale));
+  return withPngDpi(dataUrlBytes(dataUri), figureDpi(scale));
 }

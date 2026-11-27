@@ -5,11 +5,9 @@ import type { OverlayOption } from '../../overlay/ui/OverlayRow.tsx';
 import type { FigureResolutionUnit } from '../core/figureDpi.ts';
 import { figureResolutionLabel } from '../core/figureDpi.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
-import {
-  figurePixels,
-  figureScaleFits,
-  formatFigurePixels,
-} from '../core/figureScale.ts';
+import { figurePixels, figureScaleFits } from '../core/figureScale.ts';
+
+import { figurePixelsText } from './figureDownloadHint.ts';
 
 /**
  * The resolutions offered, each saying what it would actually produce.
@@ -21,6 +19,7 @@ import {
  * @param size - How big the figure is drawn for the file.
  * @param painted - Whether the file is painted into pixels.
  * @param unit - How the resolution reads.
+ * @param t - The chrome's formatter, for the size each choice produces.
  * @returns The choices, in the order offered.
  */
 export function scaleChoices(
@@ -28,6 +27,7 @@ export function scaleChoices(
   size: FigurePixels | null,
   painted: boolean,
   unit: FigureResolutionUnit,
+  t: Translate<ChromeKey>,
 ): readonly OverlayOption[] {
   const choices: OverlayOption[] = [];
   for (const scale of scales) {
@@ -35,7 +35,7 @@ export function scaleChoices(
     choices.push({
       value: String(scale),
       label: figureResolutionLabel(scale, unit),
-      title: pixels === null ? undefined : formatFigurePixels(pixels),
+      title: pixels === null ? undefined : figurePixelsText(pixels, t),
       disabled: painted && size !== null && !figureScaleFits(size, scale),
     });
   }

@@ -7,8 +7,13 @@
  * per reader.
  */
 
-import { useEffect, useMemo, useReducer, useRef } from 'react';
+import { useMemo, useReducer } from 'react';
 
+import {
+  useReportedSpectra,
+  useSelectedSpectrum,
+  useVisibleSpectra,
+} from '../../panel/ui/spectrumHooks.ts';
 import { massReducer } from '../core/massReducer.ts';
 import type { MassSpectrum } from '../core/massSpectrum.ts';
 import { isSpectrumDrawn } from '../core/massSpectrum.ts';
@@ -72,21 +77,8 @@ export function useMassEditor(
   const { spectra } = state.data;
   const { selectedId } = state.view;
 
-  const visibleSpectra = useMemo(() => {
-    const visible: MassSpectrum[] = [];
-    for (const spectrum of spectra) {
-      if (isSpectrumDrawn(spectrum)) visible.push(spectrum);
-    }
-    return visible;
-  }, [spectra]);
-
-  const selectedSpectrum = useMemo(() => {
-    if (selectedId === null) return null;
-    for (const spectrum of spectra) {
-      if (spectrum.id === selectedId) return spectrum;
-    }
-    return null;
-  }, [spectra, selectedId]);
+  const visibleSpectra = useVisibleSpectra(spectra, isSpectrumDrawn);
+  const selectedSpectrum = useSelectedSpectrum(spectra, selectedId);
 
   const decimalsSetting = state.settings.mzDecimals;
   const shownSpectra = useMemo(
@@ -102,16 +94,7 @@ export function useMassEditor(
     [decimalsSetting, shownSpectra],
   );
 
-  // What was reported last, so a host passing a fresh callback on every render
-  // is not told about spectra that did not change. The identities are compared
-  // rather than the array: a rename or a colour builds a new spectrum around
-  // the same peaks, and that is not a change of what is loaded.
-  const reported = useRef(spectra);
-  useEffect(() => {
-    if (sameSpectra(reported.current, spectra)) return;
-    reported.current = spectra;
-    onChange?.(spectra);
-  }, [spectra, onChange]);
+  useReportedSpectra(spectra, onChange);
 
   return useMemo(
     () => ({
@@ -131,26 +114,4 @@ export function useMassEditor(
       actions,
     ],
   );
-}
-
-/**
- * Whether two lists hold the same spectra, in order.
- * @param current - What was reported last.
- * @param next - What is open now.
- * @returns Whether the report can be skipped.
- */
-function sameSpectra(
-  current: readonly MassSpectrum[],
-  next: readonly MassSpectrum[],
-): boolean {
-  if (current === next) return true;
-  if (current.length !== next.length) return false;
-  for (let index = 0; index < current.length; index++) {
-    if (
-      (current[index] as MassSpectrum).id !== (next[index] as MassSpectrum).id
-    ) {
-      return false;
-    }
-  }
-  return true;
 }

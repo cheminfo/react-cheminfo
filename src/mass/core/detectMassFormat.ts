@@ -8,8 +8,10 @@
  */
 
 import {
+  acceptOf,
   formatFromExtension,
   readFileHeader,
+  startsJcamp,
   stripByteOrderMark,
 } from '../../format/core/fileHeader.ts';
 
@@ -44,6 +46,9 @@ const EXTENSIONS = new Map<string, DetectedMassFormat>([
   ['dat', 'text'],
 ]);
 
+/** What the viewer's file input accepts: every extension the table knows. */
+export const MASS_FILE_ACCEPT = acceptOf(EXTENSIONS);
+
 /**
  * Decide what a dropped file is, from its first bytes and only then its name.
  *
@@ -63,7 +68,7 @@ export function detectMassFormat(
   const header = stripByteOrderMark(
     readFileHeader(data, HEADER_BYTES),
   ).trimStart();
-  if (header.startsWith('##')) return 'jcamp';
+  if (startsJcamp(header)) return 'jcamp';
 
   const named = formatFromExtension(EXTENSIONS, fileName);
   if (named !== undefined && named !== 'text') return named;

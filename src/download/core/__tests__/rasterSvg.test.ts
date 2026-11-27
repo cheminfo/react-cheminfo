@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 
-import { dataUriBytes, rasterSvgMarkup } from '../exportImage.ts';
+import { rasterSvgMarkup } from '../croppedMarkup.ts';
+import { dataUrlBytes } from '../dataUrl.ts';
 
 test('an image is embedded at its own size', () => {
   expect(
@@ -18,12 +19,12 @@ test('quotes in the address cannot close the attribute', () => {
 
 test('a base64 data URI decodes to its bytes', () => {
   expect(
-    Array.from(dataUriBytes('data:image/png;base64,iVBORw==')),
+    Array.from(dataUrlBytes('data:image/png;base64,iVBORw==')),
   ).toStrictEqual([0x89, 0x50, 0x4e, 0x47]);
 });
 
 test('a data URI that is not base64 is refused', () => {
-  expect(() => dataUriBytes('data:text/plain,hello')).toThrow(
+  expect(() => dataUrlBytes('data:text/plain,hello')).toThrow(
     'Expected a base64 data URI.',
   );
 });

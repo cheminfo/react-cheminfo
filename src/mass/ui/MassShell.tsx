@@ -1,4 +1,4 @@
-import type { ChangeEvent, Ref } from 'react';
+import type { ChangeEvent, ReactNode, Ref } from 'react';
 import { useId, useMemo, useRef, useState } from 'react';
 import { useFullscreen } from 'react-science/ui';
 
@@ -6,6 +6,7 @@ import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 import { useFigureDownload } from '../../download/ui/useFigureDownload.tsx';
 import { FixedPanelRow } from '../../panel/ui/FixedPanelRow.tsx';
 import { PanelRail } from '../../panel/ui/PanelRail.tsx';
+import { MASS_FILE_ACCEPT } from '../core/detectMassFormat.ts';
 import type { MassCommandHandlers } from '../core/massCommands.ts';
 import type { MassEditorHandle, MassPlotClick } from '../core/massEditorApi.ts';
 import type { MassSpectrum } from '../core/massSpectrum.ts';
@@ -38,6 +39,12 @@ export interface MassShellProps {
    * @default undefined
    */
   onPlotClick?: (click: MassPlotClick) => void;
+  /**
+   * The host's own actions, as toolbar items, drawn in the header after the
+   * mark.
+   * @default undefined
+   */
+  actions?: ReactNode;
 }
 
 /**
@@ -51,7 +58,7 @@ export interface MassShellProps {
  * @returns The screen.
  */
 export function MassShell(props: MassShellProps) {
-  const { handle, panels, onPlotClick } = props;
+  const { handle, panels, onPlotClick, actions: hostActions } = props;
 
   const { state, visibleSpectra, selectedSpectrum } = useMassEditorState();
   const actions = useMassActions();
@@ -123,7 +130,7 @@ export function MassShell(props: MassShellProps) {
           and an SVG never does. */}
       <div ref={setRoot} tabIndex={-1} style={rootStyle}>
         <div className="no-print" style={contentsStyle}>
-          <MassHeader />
+          <MassHeader actions={hostActions} />
         </div>
 
         <div style={mainStyle}>
@@ -146,7 +153,6 @@ export function MassShell(props: MassShellProps) {
             }
             panels={
               <MassSidePanel
-                panels={panels}
                 side={side}
                 highlightMz={highlightMz}
                 onHighlight={setHighlightMz}
@@ -169,7 +175,7 @@ export function MassShell(props: MassShellProps) {
           ref={fileInput}
           type="file"
           multiple
-          accept={ACCEPTED_FILES}
+          accept={MASS_FILE_ACCEPT}
           style={hiddenStyle}
           aria-label="Open spectra"
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -212,7 +218,6 @@ function pictureName(
 }
 
 /** What the file dialog offers, which is what the readers understand. */
-const ACCEPTED_FILES = '.jdx,.dx,.jcamp,.txt,.csv,.tsv,.xy,.asc,.dat';
 
 const rootStyle = {
   display: 'flex',

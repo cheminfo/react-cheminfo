@@ -111,12 +111,9 @@ test('a chip nothing can change is greyed rather than removed', () => {
 test('the pointer deepens the chip with a hairline instead of a second ground', () => {
   const metrics = overlayMetrics('compact');
   const hovered = overlayChipStyle(metrics, { hovered: true });
-  const focused = overlayChipStyle(metrics, { focused: true });
 
   expect(hovered.boxShadow).toBe('inset 0 0 0 1px var(--border)');
   expect(hovered.background).toBe('var(--surface-sunken)');
-  expect(focused.outline).toBe('2px solid var(--accent, var(--text))');
-  expect(focused.boxShadow).toBeUndefined();
 });
 
 test('the chip is still a forty pixel target under a fingertip', () => {

@@ -2,7 +2,7 @@
 /**
  * The controls of a floating bar, pressed rather than read: a stepper nudged
  * by its buttons and its arrows, a strip of pills walked with the keys, a
- * glyph button lit by the pointer and the focus, and the coarse pointer a
+ * glyph button lit by the pointer, and the coarse pointer a
  * phone reports.
  */
 
@@ -156,7 +156,7 @@ test('the arrows walk the strip, carrying the focus, and skip a dead pill', () =
   expect(document.activeElement).toBe(map);
 });
 
-test('a glyph button is lit while pointed at and ringed while it holds the focus', () => {
+test('a glyph button is lit while pointed at, and the focus draws no ring', () => {
   act(() =>
     root.render(
       <OverlayIconButton icon="cog" label="Settings" onClick={() => null} />,
@@ -176,15 +176,15 @@ test('a glyph button is lit while pointed at and ringed while it holds the focus
     );
     glyph.focus();
   });
-  const ringed = glyph.style.outline;
+  const focusedOutline = glyph.style.outline;
   act(() => {
     glyph.blur();
   });
 
-  expect([resting, lit, ringed, glyph.style.outline]).toStrictEqual([
+  expect([resting, lit, focusedOutline, glyph.style.outline]).toStrictEqual([
     'transparent',
     'var(--surface-sunken)',
-    '2px solid var(--accent, var(--text))',
+    '',
     '',
   ]);
 });

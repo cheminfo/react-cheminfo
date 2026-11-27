@@ -10,8 +10,9 @@ import type {
   ReferenceAuthor,
 } from '../../citation/core/reference.ts';
 import type { CitedWork } from '../../citation/core/works.ts';
+import { isRecord } from '../../values/core/values.ts';
 
-import { isRecord, readStrings } from './messageValues.ts';
+import { readStrings } from './messageValues.ts';
 
 /**
  * Help on the page a host frames, as a help card draws it: plain text only,

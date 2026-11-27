@@ -7,7 +7,7 @@
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import { Task } from 'molstar/lib/mol-task/index.js';
 
-import type { ImageSize } from '../../molecule3d/core/exportImage.ts';
+import type { ImageSize } from '../../download/core/croppedMarkup.ts';
 import type { RenderedFigure } from '../../molecule3d/core/figureFrame.ts';
 import {
   FIGURE_IMAGE_QUALITY,

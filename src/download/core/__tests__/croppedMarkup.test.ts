@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
 
-import { rasterSvgMarkup } from '../../../molecule3d/core/exportImage.ts';
 import {
   croppedSvgMarkup,
   rasterFigureSource,
+  rasterSvgMarkup,
   resizedSvgFigure,
   svgFigure,
 } from '../croppedMarkup.ts';

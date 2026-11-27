@@ -8,6 +8,8 @@
  * of them needs.
  */
 
+import { TOKEN } from '../../tokens/core/familyTokens.ts';
+
 /** The strip itself: one row, a rule above it, nothing wrapping. */
 export const statusBarStyle = {
   display: 'flex',
@@ -31,6 +33,25 @@ export const statusMutedStyle = { ...statusItemStyle, opacity: 0.6 } as const;
 
 /** What pushes the items after it to the far end of the bar. */
 export const statusSpacerStyle = { flex: 1 } as const;
+
+/** The name of the spectrum selected, cut short rather than wrapped. */
+export const statusNameStyle = {
+  ...statusItemStyle,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  maxWidth: '32%',
+  fontWeight: 600,
+} as const;
+
+/** The one red in the shell: a refusal, and nothing else, is written in it. */
+export const statusErrorStyle = {
+  ...statusItemStyle,
+  gap: 4,
+  color: TOKEN.danger,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  maxWidth: '60%',
+} as const;
 
 /**
  * A count with the noun it counts, singular where it has to be.

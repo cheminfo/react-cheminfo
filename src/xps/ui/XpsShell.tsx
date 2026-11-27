@@ -149,7 +149,7 @@ export function XpsShell(props: XpsShellProps) {
                 guide={guide}
               />
             }
-            panels={<XpsSidePanel panels={panels} side={side} />}
+            panels={<XpsSidePanel side={side} />}
           />
 
           {/* Outside the split, so the icons stay put against the right edge

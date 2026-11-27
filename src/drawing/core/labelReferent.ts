@@ -3,7 +3,7 @@
  * key that stays as long as the compound exists, never by its number.
  */
 
-import { isRecord } from './values.ts';
+import { isRecord } from '../../values/core/values.ts';
 
 /** The compound a label names. */
 export interface LabelReferent {

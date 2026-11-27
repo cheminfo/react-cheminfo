@@ -5,8 +5,9 @@
  * otherwise.
  */
 
+import { isFiniteNumber, isRecord } from '../../values/core/values.ts';
+
 import type { Box, DrawPage, FigureSize } from './types.ts';
-import { isFiniteNumber, isRecord } from './values.ts';
 
 /** Points in a centimetre. */
 export const POINTS_PER_CM = 72 / 2.54;

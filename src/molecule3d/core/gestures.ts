@@ -4,20 +4,10 @@
  * measurement, which the viewer adds.
  */
 
-/** A key, drawn as a key cap. */
-export interface Molecule3DGestureKey {
-  key: string;
-}
+import type { Gesture } from '../../help/core/gestures.ts';
 
-/** One gesture and what it does. */
-export interface Molecule3DGesture {
-  /** How the help's catalog names the gesture. */
-  id: string;
-  /** Keys, and plain text for the mouse part; unique within one gesture. */
-  input: ReadonlyArray<string | Molecule3DGestureKey>;
-  /** What it does, in English; the catalog answers for the other languages. */
-  action: string;
-}
+/** One gesture of the molecule canvas and what it does. */
+export type Molecule3DGesture = Gesture;
 
 /** The gestures, in the order the help popover lists them. */
 export const MOLECULE_3D_GESTURES: readonly Molecule3DGesture[] = [

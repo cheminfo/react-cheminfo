@@ -7,8 +7,13 @@
  * is what each band could be, which the correlation table answers per band.
  */
 
-import { useEffect, useMemo, useReducer, useRef } from 'react';
+import { useMemo, useReducer } from 'react';
 
+import {
+  useReportedSpectra,
+  useSelectedSpectrum,
+  useVisibleSpectra,
+} from '../../panel/ui/spectrumHooks.ts';
 import type { AssignedBand } from '../core/assignBands.ts';
 import { assignBands } from '../core/assignBands.ts';
 import type { BandAssignment } from '../core/bandAssignments.ts';
@@ -78,21 +83,8 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
   const { selectedId } = state.view;
   const { pickBands: picking, assignmentTolerance, technique } = state.settings;
 
-  const visibleSpectra = useMemo(() => {
-    const visible: IrSpectrum[] = [];
-    for (const spectrum of spectra) {
-      if (spectrum.visible) visible.push(spectrum);
-    }
-    return visible;
-  }, [spectra]);
-
-  const selectedSpectrum = useMemo(() => {
-    if (selectedId === null) return null;
-    for (const spectrum of spectra) {
-      if (spectrum.id === selectedId) return spectrum;
-    }
-    return null;
-  }, [spectra, selectedId]);
+  const visibleSpectra = useVisibleSpectra(spectra, isIrSpectrumDrawn);
+  const selectedSpectrum = useSelectedSpectrum(spectra, selectedId);
 
   const bands = useMemo(
     () =>
@@ -115,16 +107,9 @@ export function useIrEditor(options: UseIrEditorOptions = {}): IrEditorApi {
     [bands, assignmentTolerance, assignments],
   );
 
-  // What was reported last, so a host passing a fresh callback on every render
-  // is not told about spectra that did not change. The identities are compared
-  // rather than the array: every edit replaces it, including the ones that only
-  // change how a spectrum is drawn.
-  const reported = useRef(spectra);
-  useEffect(() => {
-    if (sameSpectra(reported.current, spectra)) return;
-    reported.current = spectra;
-    onChange?.(spectra);
-  }, [spectra, onChange]);
+  // The identities are compared, and the bands by reference: a band picked
+  // builds a new list, a rename or a colour does not.
+  useReportedSpectra(spectra, onChange, sameSpectra);
 
   return useMemo(
     () => ({
@@ -167,4 +152,13 @@ function sameSpectra(
     if (before.id !== after.id || before.bands !== after.bands) return false;
   }
   return true;
+}
+
+/**
+ * Whether a spectrum is drawn.
+ * @param spectrum - The spectrum.
+ * @returns Its visibility.
+ */
+function isIrSpectrumDrawn(spectrum: IrSpectrum): boolean {
+  return spectrum.visible;
 }

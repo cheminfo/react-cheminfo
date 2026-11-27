@@ -1,30 +1,14 @@
-import { useMemo } from 'react';
-
-import { panelStyle } from '../../panel/core/panelStyles.ts';
-import { SidePanelStack } from '../../panel/ui/SidePanelStack.tsx';
-import type { CollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
-import type { MassPanelId, MassSidePanelId } from '../core/massSidePanels.ts';
+import { EditorSidePanels } from '../../panel/ui/EditorSidePanels.tsx';
+import type { MassSidePanelId } from '../core/massSidePanels.ts';
 
 import { MetadataPanel } from './MetadataPanel.tsx';
 import { PeaksPanel } from './PeaksPanel.tsx';
 import { SpectraPanel } from './SpectraPanel.tsx';
-import type { MassHostPanel } from './massHostPanels.ts';
-import { isMassHostPanel, massStackPanels } from './massHostPanels.ts';
-import { useMassActions, useMassEditorState } from './massStateContext.ts';
+import type { MassSide } from './useMassSide.ts';
 
 export interface MassSidePanelProps {
-  /**
-   * What to draw and what closes a panel, for a viewer whose panels may be
-   * collapsed.
-   * @default every panel the state has open
-   */
-  side?: Pick<CollapsedPanels<MassPanelId>, 'shownIds' | 'toggle' | 'folds'>;
-  /**
-   * The panels the host adds to the viewer's own, stacked above them in the
-   * order given.
-   * @default []
-   */
-  panels?: readonly MassHostPanel[];
+  /** The side, as `useMassSide` holds it: the host's panels and the viewer's own. */
+  side: MassSide;
   /**
    * The m/z of the peak the pointer is resting on.
    * @default null
@@ -49,36 +33,19 @@ export interface MassSidePanelProps {
  * @returns The panel stack.
  */
 export function MassSidePanel(props: MassSidePanelProps) {
-  const {
-    panels: hostPanels = NO_PANELS,
-    side,
-    highlightMz = null,
-    onHighlight,
-  } = props;
-  const { state } = useMassEditorState();
-  const actions = useMassActions();
-  const { openPanelIds } = state.view;
-  const panels = useMemo(() => massStackPanels(hostPanels), [hostPanels]);
+  const { side, highlightMz = null, onHighlight } = props;
 
   return (
-    <SidePanelStack
-      panels={panels}
-      openPanelIds={side?.shownIds ?? openPanelIds}
-      onClose={side?.toggle ?? actions.togglePanel}
-      {...side?.folds}
-    >
-      {(panel) =>
-        isMassHostPanel(panel) ? (
-          <div style={panelStyle}>{panel.content}</div>
-        ) : (
-          <PanelBody
-            panelId={panel.id}
-            highlightMz={highlightMz}
-            {...(onHighlight === undefined ? {} : { onHighlight })}
-          />
-        )
-      }
-    </SidePanelStack>
+    <EditorSidePanels
+      side={side}
+      renderPanel={(panel) => (
+        <PanelBody
+          panelId={panel.id}
+          highlightMz={highlightMz}
+          {...(onHighlight === undefined ? {} : { onHighlight })}
+        />
+      )}
+    />
   );
 }
 
@@ -111,6 +78,3 @@ function PanelBody(props: PanelBodyProps) {
     />
   );
 }
-
-/** What a stack the host adds nothing to holds, kept stable for the memo. */
-const NO_PANELS: readonly MassHostPanel[] = [];

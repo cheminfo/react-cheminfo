@@ -6,18 +6,17 @@
 import { Classes } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
-import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
-import type { Translate } from '../../i18n/ui/useT.ts';
+import { gestureRowKey } from '../../help/core/gestures.ts';
+import { GestureInput } from '../../help/ui/GestureInput.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
-import type { EditorGesture, EditorGuideOptions } from '../core/editorGuide.ts';
+import type { EditorGuideOptions } from '../core/editorGuide.ts';
 import {
   STRUCTURE_EDITOR_DOCS,
   editorGuideSections,
   editorInputWordId,
+  editorKeyCap,
 } from '../core/editorGuide.ts';
-
-import { KeyCaps } from './KeyCaps.tsx';
 
 /** What {@link StructureEditorHelp} is written for. */
 export type StructureEditorHelpProps = EditorGuideOptions;
@@ -49,8 +48,13 @@ export function StructureEditorHelp(
               {t.or(`structure.guide.${section.id}.title`, section.title)}
             </h4>
             {section.gestures.map((gesture) => (
-              <div key={gestureKey(gesture)} style={ROW_STYLE}>
-                <GestureInput input={gesture.input} t={t} />
+              <div key={gestureRowKey(gesture)} style={ROW_STYLE}>
+                <GestureInput
+                  input={gesture.input}
+                  wordId={editorInputWordId}
+                  prefix="structure.input"
+                  label={editorKeyCap}
+                />
                 <span>
                   {t.or(
                     `structure.guide.${section.id}.${gesture.id}`,
@@ -80,38 +84,6 @@ export function StructureEditorHelp(
       </p>
     </div>
   );
-}
-
-function GestureInput(props: {
-  input: EditorGesture['input'];
-  t: Translate<ChromeKey>;
-}): ReactElement {
-  const { input, t } = props;
-  return (
-    <span style={INPUT_STYLE}>
-      {input.map((part) =>
-        typeof part === 'string' ? (
-          <span key={part}>{word(part, t)}</span>
-        ) : (
-          <KeyCaps key={part.key} keys={[part.key]} />
-        ),
-      )}
-    </span>
-  );
-}
-
-// A word between two key caps is one catalog entry, shared by every gesture
-// that writes it; punctuation such as `…` is left exactly as it is.
-function word(text: string, t: Translate<ChromeKey>): string {
-  const id = editorInputWordId(text);
-  return id === undefined ? text : t.or(`structure.input.${id}`, text);
-}
-
-function gestureKey(gesture: EditorGesture): string {
-  const input = gesture.input
-    .map((part) => (typeof part === 'string' ? part : part.key))
-    .join(' ');
-  return `${input} ${gesture.action}`;
 }
 
 const PANEL_STYLE: CSSProperties = {
@@ -145,13 +117,6 @@ const HEADING_STYLE: CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.04em',
   textTransform: 'uppercase',
-};
-
-const INPUT_STYLE: CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-  whiteSpace: 'nowrap',
 };
 
 const PARAGRAPH_STYLE: CSSProperties = { margin: 0, lineHeight: 1.45 };

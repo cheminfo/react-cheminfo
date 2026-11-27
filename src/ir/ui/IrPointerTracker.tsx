@@ -1,13 +1,8 @@
 import type { ReactElement } from 'react';
 
 import type { PlotRect } from '../../chart/core/chartGeometry.ts';
-import {
-  CHART_COLORS,
-  CHART_FONT,
-  LABEL_HALO,
-} from '../../chart/core/chartTheme.ts';
 import type { ChartPoint } from '../../chart/core/svgPoint.ts';
-import { readoutPlacement } from '../../chart/core/trackerReadout.ts';
+import { ChartTracker } from '../../chart/ui/ChartTracker.tsx';
 import {
   formatIrValue,
   formatWavenumber,
@@ -34,10 +29,8 @@ export interface IrPointerTrackerProps {
  * The crosshair, and what the axes say under it.
  *
  * Drawn last of everything, so it is never occluded by what it is being used to
- * read. Where the text goes is `readoutPlacement` in the shared chart, which
- * flips it to the left of the pointer near the right edge and holds it inside the
- * plot at the top — the same placement the mass viewer uses, because the awkward
- * places are the same places in any chart.
+ * read, by the family's `ChartTracker`: the same rules, dashes and placement as
+ * the mass and XPS viewers, only the words are the infrared's own.
  *
  * A third line names the band under the pointer when there is one, which is what
  * makes the crosshair worth having on an infrared chart: the wavenumber alone is
@@ -49,59 +42,18 @@ export function IrPointerTracker(
   props: IrPointerTrackerProps,
 ): ReactElement | null {
   const { position, readout, plot, unit = 'cm⁻¹' } = props;
-  if (position === null || readout === null) return null;
-
-  const band = readout.band;
-  const lines = [
-    `${formatWavenumber(readout.wavenumber)} ${unit}`,
-    `${shortModeLabel(readout.mode)} ${formatIrValue(readout.value, readout.mode)}`,
-  ];
-  if (band !== null) {
-    lines.push(`band ${formatWavenumber(band.wavenumber)} (${band.strength})`);
+  let lines: string[] | null = null;
+  if (readout !== null) {
+    lines = [
+      `${formatWavenumber(readout.wavenumber)} ${unit}`,
+      `${shortModeLabel(readout.mode)} ${formatIrValue(readout.value, readout.mode)}`,
+    ];
+    const { band } = readout;
+    if (band !== null) {
+      lines.push(
+        `band ${formatWavenumber(band.wavenumber)} (${band.strength})`,
+      );
+    }
   }
-  const place = readoutPlacement(position, plot, lines.length);
-
-  return (
-    <g pointerEvents="none">
-      <line
-        x1={position.x}
-        y1={plot.top}
-        x2={position.x}
-        y2={plot.bottom}
-        style={crosshairStyle}
-      />
-      <line
-        x1={plot.left}
-        y1={position.y}
-        x2={plot.right}
-        y2={position.y}
-        style={crosshairStyle}
-      />
-      {lines.map((line, index) => (
-        <text
-          key={line}
-          x={place.x}
-          y={place.y + index * CHART_FONT.readout}
-          textAnchor={place.anchor}
-          style={readoutStyle}
-        >
-          {line}
-        </text>
-      ))}
-    </g>
-  );
+  return <ChartTracker position={position} plot={plot} lines={lines} />;
 }
-
-const crosshairStyle = {
-  stroke: CHART_COLORS.tracker,
-  strokeDasharray: '3 3',
-} as const;
-
-const readoutStyle = {
-  fill: CHART_COLORS.trackerText,
-  fontSize: CHART_FONT.readout,
-  // Haloed like every other label written onto the plot, and it needs it more
-  // than any of them: the pointer is put wherever the question is, which is over
-  // the trace rather than beside it.
-  ...LABEL_HALO,
-} as const;

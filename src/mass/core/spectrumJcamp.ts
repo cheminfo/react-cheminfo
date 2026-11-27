@@ -17,14 +17,12 @@
 
 import { fromJSON } from 'convert-to-jcamp';
 
+import { jcampLinkFile, jcampRecordValue } from '../../download/core/jcamp.ts';
+
 import { metaRecord } from './massMeta.ts';
 import type { MassSpectrum } from './massSpectrum.ts';
 
-/** The extension a written spectrum is saved under. */
-export const JCAMP_EXTENSION = '.jdx';
-
-/** What a JCAMP-DX file is served as. */
-export const JCAMP_MIME_TYPE = 'chemical/x-jcamp-dx';
+export { JCAMP_EXTENSION, JCAMP_MIME_TYPE } from '../../download/core/jcamp.ts';
 
 /**
  * Write one spectrum as a JCAMP-DX block.
@@ -61,18 +59,9 @@ export function massSpectraToJcamp(
   spectra: readonly MassSpectrum[],
   title = `${spectra.length} mass spectra`,
 ): string {
-  const only = spectra.length === 1 ? spectra[0] : undefined;
-  if (only !== undefined) return massSpectrumToJcamp(only);
-
   const blocks: string[] = [];
   for (const spectrum of spectra) blocks.push(massSpectrumToJcamp(spectrum));
-  return `##TITLE=${recordValue(title)}
-##JCAMP-DX=4.24
-##DATA TYPE=LINK
-##BLOCKS=${blocks.length}
-${blocks.join('\n')}
-##END=
-`;
+  return jcampLinkFile(title, blocks);
 }
 
 /**
@@ -82,7 +71,7 @@ ${blocks.join('\n')}
  */
 function infoRecords(spectrum: MassSpectrum): Record<string, string> {
   const info: Record<string, string> = {
-    title: recordValue(spectrum.name),
+    title: jcampRecordValue(spectrum.name),
     dataType: 'MASS SPECTRUM',
     xUnits: 'M/Z',
     yUnits: 'RELATIVE ABUNDANCE',
@@ -92,10 +81,10 @@ function infoRecords(spectrum: MassSpectrum): Record<string, string> {
 
   for (const field of meta.fields) {
     const record = metaRecord(field.label);
-    if (record?.info === true) info[record.key] = recordValue(field.value);
+    if (record?.info === true) info[record.key] = jcampRecordValue(field.value);
   }
   if (meta.molecularFormula !== null) {
-    info.MOLFORM = recordValue(meta.molecularFormula);
+    info.MOLFORM = jcampRecordValue(meta.molecularFormula);
   }
   // `origin` is the one standard record `fromJSON` writes from a lowercase key,
   // and the reader shows it as the source, so it goes through that key or not at
@@ -131,14 +120,14 @@ function metaRecords(spectrum: MassSpectrum): Record<string, string> {
     for (const field of meta.fields) {
       const record = metaRecord(field.label);
       if (record !== null && !record.info) {
-        records[record.key] = recordValue(field.value);
+        records[record.key] = jcampRecordValue(field.value);
       }
     }
     if (meta.conditions !== null) {
-      records.CONDITIONS = recordValue(meta.conditions);
+      records.CONDITIONS = jcampRecordValue(meta.conditions);
     }
     if (meta.molecularFormula !== null) {
-      records.ACCURATE_MF = recordValue(meta.molecularFormula);
+      records.ACCURATE_MF = jcampRecordValue(meta.molecularFormula);
     }
   }
 
@@ -167,20 +156,5 @@ function fill(
   value: string | number | undefined,
 ): void {
   if (value === undefined || records[key] !== undefined) return;
-  records[key] = recordValue(String(value));
-}
-
-/**
- * A value put where a JCAMP record's value goes.
- *
- * A record is one line and `$$` opens a comment that runs to the end of it, so
- * an instrument's scan description — which arrives with newlines in it as often
- * as not — would otherwise either break the file in two or lose its tail. Both
- * failures are silent on the way back in, which is why this is done to every
- * value rather than to the ones known to be long.
- * @param value - The value as it is held.
- * @returns The value as one line, with no comment marker in it.
- */
-function recordValue(value: string): string {
-  return value.replaceAll(/\s+/g, ' ').replaceAll('$$', '$').trim();
+  records[key] = jcampRecordValue(String(value));
 }

@@ -12,15 +12,9 @@
  * open one.
  */
 
-import {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 
+import { useReportedSpectra } from '../../panel/ui/spectrumHooks.ts';
 import type { XpsEditorActions } from '../core/xpsActions.ts';
 import { createXpsActions } from '../core/xpsActions.ts';
 import type { CreateXpsStateOptions } from '../core/xpsReducer.ts';
@@ -110,41 +104,10 @@ export function useXpsEditor(options: UseXpsEditorOptions = {}): XpsEditorApi {
 
   const actions = useMemo(() => createXpsActions(dispatch), [dispatch]);
 
-  // The spectra the host has already been told about. Compared by identity
-  // rather than by contents: every edit replaces the array, including the ones
-  // that only change how a spectrum is drawn, and those are not the document.
-  const notified = useRef(state.data.spectra);
-  useLayoutEffect(() => {
-    const { spectra } = state.data;
-    if (sameSpectra(notified.current, spectra)) return;
-    notified.current = spectra;
-    onChange?.(spectra);
-  });
+  useReportedSpectra(state.data.spectra, onChange);
 
   return useMemo(
     () => ({ state, dispatch, actions }),
     [state, dispatch, actions],
   );
-}
-
-/**
- * Whether two lists hold the same spectra, whatever has been done to them.
- * @param current - The spectra open before the action.
- * @param next - The spectra open after it.
- * @returns Whether the same identities are open, in the same order.
- */
-function sameSpectra(
-  current: readonly XpsSpectrum[],
-  next: readonly XpsSpectrum[],
-): boolean {
-  if (current === next) return true;
-  if (current.length !== next.length) return false;
-  for (let index = 0; index < current.length; index++) {
-    if (
-      (current[index] as XpsSpectrum).id !== (next[index] as XpsSpectrum).id
-    ) {
-      return false;
-    }
-  }
-  return true;
 }

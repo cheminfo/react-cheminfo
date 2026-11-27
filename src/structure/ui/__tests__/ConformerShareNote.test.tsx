@@ -7,9 +7,10 @@ test('force-field shares are called an ordering, with the factor they are good t
   const html = renderToStaticMarkup(<ConformerShareNote />);
 
   expect(html).toContain(
-    'Shares at 300 K, from MMFF94 energies alone: no entropy, no solvent. ' +
-      'On drug-like molecules MMFF94 is off by 3.6 kcal/mol, which places a ' +
-      'share only within a factor of 420: read the column as an ordering.',
+    'Shares at 300 K, from energy alone: no entropy, no solvent. On ' +
+      'drug-like molecules MMFF94 is off by 3.6 kcal/mol, against 2.2 for ' +
+      'GFN2-xTB, which places a share only within a factor of 420: read the ' +
+      'column as an ordering.',
   );
   expect(html).toContain('data-testid="conformer-share-note"');
 });
@@ -18,9 +19,9 @@ test('refined shares quote the GFN2-xTB error instead', () => {
   const html = renderToStaticMarkup(<ConformerShareNote ranking="refined" />);
 
   expect(html).toContain(
-    'Shares at 300 K, from GFN2-xTB energies alone: no entropy, no solvent. ' +
-      'GFN2-xTB is typically off by 1.5 kcal/mol, which places a share within ' +
-      'a factor of 12.',
+    'Shares at 300 K, from energy alone: no entropy, no solvent. GFN2-xTB ' +
+      'is typically off by 1.5 kcal/mol, which places a share within a factor ' +
+      'of 12.',
   );
 });
 

@@ -95,7 +95,7 @@ export function OverlayValueButton(
   const { active = false, disabled = false, disabledReason } = props;
   const { opensMenu = false, onClick, testId } = props;
   const { metrics } = useOverlaySurface();
-  const { hovered, focused, handlers } = useOverlayInteraction();
+  const { hovered, handlers } = useOverlayInteraction();
 
   const name = `${label} — ${value}`;
   const told = disabled && disabledReason !== undefined ? disabledReason : name;
@@ -111,7 +111,6 @@ export function OverlayValueButton(
       data-testid={testId}
       style={overlayValueButtonStyle(metrics, {
         hovered,
-        focused,
         active,
         disabled,
       })}

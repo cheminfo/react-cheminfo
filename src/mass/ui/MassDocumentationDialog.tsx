@@ -1,8 +1,6 @@
-import type { ReactNode } from 'react';
-
+import { CommandKeysTable } from '../../panel/ui/CommandKeysTable.tsx';
 import type { DocumentationSection } from '../../panel/ui/DocumentationDialogFrame.tsx';
 import { DocumentationDialogFrame } from '../../panel/ui/DocumentationDialogFrame.tsx';
-import type { MassCommand } from '../core/massCommands.ts';
 import { massCommandLabel, massCommands } from '../core/massCommands.ts';
 import { HIGH_RESOLVING_POWER } from '../core/massResolution.ts';
 
@@ -34,47 +32,6 @@ export function MassDocumentationDialog(props: MassDocumentationDialogProps) {
     />
   );
 }
-
-/**
- * One row of the gestures table: a command, its key and what it does.
- * @param props - Component props.
- * @param props.entry - The command, as the table words it.
- * @returns The row.
- */
-function CommandRow(props: { entry: MassCommand }): ReactNode {
-  const { entry } = props;
-  const keys = entry.shortcut?.label ?? entry.shortcut?.keys ?? [];
-  const gestures = (entry.gestures ?? []).flatMap(
-    (gesture) => gesture.shortcuts,
-  );
-  return (
-    <tr>
-      <th style={labelCellStyle}>{entry.title}</th>
-      <td style={keyCellStyle}>{[...keys, ...gestures].join(' · ')}</td>
-      <td style={cellStyle}>{entry.description}</td>
-    </tr>
-  );
-}
-
-const tableStyle = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  fontSize: 12,
-} as const;
-
-const cellStyle = { padding: '3px 6px', verticalAlign: 'top' } as const;
-
-const labelCellStyle = {
-  ...cellStyle,
-  textAlign: 'left',
-  whiteSpace: 'nowrap',
-} as const;
-
-const keyCellStyle = {
-  ...cellStyle,
-  whiteSpace: 'nowrap',
-  opacity: 0.7,
-} as const;
 
 /** What the guide says, in reading order. */
 const SECTIONS: readonly DocumentationSection[] = [
@@ -123,14 +80,6 @@ const SECTIONS: readonly DocumentationSection[] = [
   {
     id: 'keys',
     title: 'Gestures and keys',
-    body: (
-      <table style={tableStyle}>
-        <tbody>
-          {Object.values(massCommands).map((entry) => (
-            <CommandRow key={entry.title} entry={entry} />
-          ))}
-        </tbody>
-      </table>
-    ),
+    body: <CommandKeysTable commands={Object.values(massCommands)} />,
   },
 ];

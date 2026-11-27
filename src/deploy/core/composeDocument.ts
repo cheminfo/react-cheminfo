@@ -8,6 +8,8 @@ import {
   parseDocument,
 } from 'yaml';
 
+import { isRecord } from '../../values/core/values.ts';
+
 /** One service of a compose file, with its merge keys applied. */
 export interface ComposeService {
   /** The service's key under `services`. */
@@ -170,9 +172,7 @@ function isMergeKey(pair: Pair): boolean {
 }
 
 function recordOf(value: unknown): Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
+  return isRecord(value) ? value : {};
 }
 
 function firstLine(message: string): string {

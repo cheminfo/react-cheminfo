@@ -11,6 +11,7 @@ export {
 export type { FormatRelativeTimeOptions } from './relativeTime.ts';
 export { formatRelativeTime } from './relativeTime.ts';
 export { roundTo } from './roundTo.ts';
+export { formatValueRange } from './valueRange.ts';
 export { formatSuperscript } from './superscript.ts';
 export type { DurationStyle, FormatDurationOptions } from './units.ts';
 export { formatBytes, formatDuration } from './units.ts';

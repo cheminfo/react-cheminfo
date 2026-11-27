@@ -1,3 +1,8 @@
+import { isRecord } from '../../values/core/values.ts';
+
+/** A plain object, as the JSON payload of a bucket is: the family's record guard. */
+export { isRecord as isPlainRecord } from '../../values/core/values.ts';
+
 /**
  * Merge what came out of storage over the defaults it was stored against.
  *
@@ -17,20 +22,8 @@
  * @returns The defaults, with whatever was stored and is usable on top.
  */
 export function mergeStored<T extends object>(defaults: T, stored: unknown): T {
-  const source = isPlainRecord(stored) ? stored : {};
+  const source = isRecord(stored) ? stored : {};
   return mergeRecord(defaults as Record<string, unknown>, source) as T;
-}
-
-/**
- * Whether a value is a plain object — the shape the JSON payload of a bucket
- * takes — rather than an array, a primitive or null.
- * @param value - Value to inspect.
- * @returns True for a plain object.
- */
-export function isPlainRecord(
-  value: unknown,
-): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function mergeRecord(
@@ -51,7 +44,7 @@ function mergeRecord(
 }
 
 function mergeValue(defaultValue: unknown, storedValue: unknown): unknown {
-  if (isPlainRecord(defaultValue) && isPlainRecord(storedValue)) {
+  if (isRecord(defaultValue) && isRecord(storedValue)) {
     return mergeRecord(defaultValue, storedValue);
   }
   return hasSameShape(defaultValue, storedValue)
@@ -76,7 +69,7 @@ function cloneValue(value: unknown): unknown {
     }
     return copy;
   }
-  if (isPlainRecord(value)) {
+  if (isRecord(value)) {
     const copy: Record<string, unknown> = {};
     for (const [name, item] of Object.entries(value)) {
       copy[name] = cloneValue(item);

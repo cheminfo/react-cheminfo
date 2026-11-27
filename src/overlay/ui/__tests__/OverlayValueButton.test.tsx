@@ -137,21 +137,9 @@ test('a setting that cannot be reached says why, and is greyed rather than gone'
   expect(html).toContain('cursor:default;opacity:0.6');
 });
 
-test('the keyboard is shown a ring, which is not the ground the pointer gets', () => {
-  const metrics = overlayMetrics('compact');
-  const focused = overlayValueButtonStyle(metrics, { focused: true });
-  const hovered = overlayValueButtonStyle(metrics, { hovered: true });
-
-  expect(focused.outline).toBe('2px solid var(--accent, var(--text))');
-  expect(focused.background).toBe('transparent');
-  expect(hovered.outline).toBeUndefined();
-  expect(hovered.background).toBe('var(--surface-sunken)');
-});
-
 test('a greyed control is given no ring and no ground at all', () => {
   const metrics = overlayMetrics('compact');
   const style = overlayValueButtonStyle(metrics, {
-    focused: true,
     hovered: true,
     disabled: true,
   });

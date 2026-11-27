@@ -10,6 +10,7 @@
 
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 
+import type { ImageSize } from '../../download/core/croppedMarkup.ts';
 import type { FramePlayback, MolstarPlugin } from '../../molstar/core/index.ts';
 import {
   captureFrames,
@@ -17,7 +18,6 @@ import {
   stopTrajectory,
 } from '../../molstar/core/index.ts';
 import { DEFAULT_FRAMES_PER_SECOND } from '../core/animatedPng.ts';
-import type { ImageSize } from '../core/exportImage.ts';
 
 /** The frames of what one viewer shows. */
 export class MoleculeFrames {

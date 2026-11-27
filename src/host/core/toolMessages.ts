@@ -8,9 +8,10 @@
  * a request it does not know: a newer tool talking, not an error.
  */
 
+import { isRecord } from '../../values/core/values.ts';
+
 import {
   MAX_LABEL_LENGTH,
-  isRecord,
   readItems,
   readSettings,
   readStrings,

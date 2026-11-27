@@ -4,9 +4,9 @@
  * is handed to or a file the site saves.
  */
 
+import type { ImageSize } from '../../download/core/croppedMarkup.ts';
 import type { MolstarPlugin } from '../../molstar/core/index.ts';
 import { captureFigure, captureScene } from '../../molstar/core/index.ts';
-import type { ImageSize } from '../core/exportImage.ts';
 import type { RenderedFigure } from '../core/figureFrame.ts';
 
 /**

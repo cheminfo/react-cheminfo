@@ -27,7 +27,11 @@ import { useState } from 'react';
 import type { ChartAxisSpec, ChartFrameRender } from './ChartFrame.tsx';
 import { ChartFrame } from './ChartFrame.tsx';
 import type { ChartTrackEvent } from './TrackedLineChart.tsx';
-import { plotPointer, trackedValues } from './chartTracking.ts';
+import {
+  TRACKED_RULE_STYLE,
+  plotPointer,
+  trackedValues,
+} from './chartTracking.ts';
 import type { ChartStickSeries } from './stickChartModel.ts';
 import {
   nearestPosition,
@@ -164,8 +168,7 @@ export function TrackedStickChart(props: TrackedStickChartProps): ReactElement {
             <path
               data-chart-rule="tracked"
               d={`M${frame.x.offset + positions[held] * frame.x.factor} ${frame.plot.top}V${frame.plot.bottom}`}
-              stroke="var(--text-faint)"
-              strokeDasharray="3 3"
+              style={TRACKED_RULE_STYLE}
               shapeRendering="crispEdges"
             />
           )}

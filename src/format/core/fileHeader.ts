@@ -37,7 +37,7 @@ export function readFileHeader(
  * @returns The prefix without its mark.
  */
 export function stripByteOrderMark(header: string): string {
-  return header.startsWith('﻿') ? header.slice(1) : header;
+  return header.startsWith('\uFEFF') ? header.slice(1) : header;
 }
 
 /**
@@ -54,4 +54,41 @@ export function formatFromExtension<Format>(
   const extension = fileName.split('.').pop();
   if (extension === undefined || extension === fileName) return undefined;
   return table.get(extension.toLowerCase());
+}
+
+/**
+ * How far into the file a JCAMP record may sit and still name the format.
+ *
+ * `##TITLE=` is required to be first, but exporters put a comment line or a
+ * blank one above it often enough that insisting on the very first line loses
+ * real files.
+ */
+const JCAMP_LINES = 5;
+
+/**
+ * Whether a JCAMP record opens the file: a `##` label within its first lines,
+ * blank lines and `$$` comments above it skipped.
+ * @param header - The decoded prefix, already trimmed at the front.
+ * @returns Whether one of the first lines is a JCAMP label.
+ */
+export function startsJcamp(header: string): boolean {
+  const lines = header.split(/\r?\n/);
+  const limit = Math.min(lines.length, JCAMP_LINES);
+  for (let index = 0; index < limit; index++) {
+    const line = (lines[index] as string).trim();
+    if (line.startsWith('##')) return true;
+    if (line.length > 0 && !line.startsWith('$$')) return false;
+  }
+  return false;
+}
+
+/**
+ * What a file input accepts, from the extensions a format table knows.
+ * @param table - The format each lower-case extension names.
+ * @returns The `accept` attribute, e.g. `.jdx,.dx,.txt`.
+ */
+export function acceptOf(table: ReadonlyMap<string, unknown>): string {
+  const extensions: string[] = [];
+  for (const extension of table.keys()) extensions.push(`.${extension}`);
+  return extensions.join(',');
 }

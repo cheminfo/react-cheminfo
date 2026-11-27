@@ -13,13 +13,13 @@
 
 import type { ElementBlock, PeriodicElement } from './elements.ts';
 import { PERIODIC_ELEMENTS, elementBySymbol } from './elements.ts';
-import type { Cell, TableColumns, TableGeometry } from './geometry.ts';
+import type { GridCell, TableColumns, TableGeometry } from './geometry.ts';
 import { tableGeometry } from './geometry.ts';
 
 export type {
   BlockLabel,
-  Cell,
   GridBlock,
+  GridCell,
   InnerTransitionMarker,
   InnerTransitionRow,
   TableColumns,
@@ -95,7 +95,7 @@ const INNER_TRANSITION_STARTS = [57, 89] as const;
 export function cellOf(
   element: PeriodicElement,
   columns: TableColumns = 18,
-): Cell {
+): GridCell {
   const geometry = tableGeometry(columns);
   const inner = innerTransitionCell(element, geometry);
   if (inner !== null) return inner;
@@ -111,7 +111,7 @@ export interface PlacedElement {
   /** The element. */
   element: PeriodicElement;
   /** Its cell. */
-  cell: Cell;
+  cell: GridCell;
 }
 
 /**
@@ -227,7 +227,7 @@ function cellKey(column: number, row: number): string {
 function innerTransitionCell(
   element: PeriodicElement,
   geometry: TableGeometry,
-): Cell | null {
+): GridCell | null {
   for (const [index, start] of INNER_TRANSITION_STARTS.entries()) {
     const offset = element.atomicNumber - start;
     if (offset >= 0 && offset < INNER_TRANSITION_LENGTH) {

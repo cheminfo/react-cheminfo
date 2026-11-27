@@ -21,15 +21,13 @@
 
 import { fromJSON } from 'convert-to-jcamp';
 
+import { jcampLinkFile, jcampRecordValue } from '../../download/core/jcamp.ts';
+
 import type { IrMode, IrSpectrum } from './irSpectrum.ts';
 import type { IrTechnique } from './irTechnique.ts';
 import { IR_TECHNIQUE_RULES, irModeTechnique } from './irTechnique.ts';
 
-/** The extension a written spectrum is saved under. */
-export const JCAMP_EXTENSION = '.jdx';
-
-/** What a JCAMP-DX file is served as. */
-export const JCAMP_MIME_TYPE = 'chemical/x-jcamp-dx';
+export { JCAMP_EXTENSION, JCAMP_MIME_TYPE } from '../../download/core/jcamp.ts';
 
 /**
  * Write one spectrum as a JCAMP-DX block.
@@ -98,20 +96,11 @@ export function irSpectraToJcamp(
   technique: IrTechnique = irModeTechnique(mode),
   title = `${spectra.length} ${IR_TECHNIQUE_RULES[technique].name} spectra`,
 ): string {
-  const only = spectra.length === 1 ? spectra[0] : undefined;
-  if (only !== undefined) return irSpectrumToJcamp(only, mode, technique);
-
   const blocks: string[] = [];
   for (const spectrum of spectra) {
     blocks.push(irSpectrumToJcamp(spectrum, mode, technique));
   }
-  return `##TITLE=${recordValue(title)}
-##JCAMP-DX=4.24
-##DATA TYPE=LINK
-##BLOCKS=${blocks.length}
-${blocks.join('\n')}
-##END=
-`;
+  return jcampLinkFile(title, blocks);
 }
 
 /**
@@ -154,7 +143,7 @@ function infoRecords(
 ): Record<string, string> {
   const rules = IR_TECHNIQUE_RULES[measured];
   return {
-    title: recordValue(spectrum.name),
+    title: jcampRecordValue(spectrum.name),
     // The technique as the file stated it, and otherwise the one being read,
     // so a Raman or UV-vis spectrum is never written out claiming to be
     // infrared.
@@ -195,7 +184,7 @@ function metaRecords(spectrum: IrSpectrum): Record<string, string> {
   const fields = spectrum.meta?.fields ?? [];
   for (const field of fields) {
     if (field.label === TECHNIQUE) continue;
-    records[recordKey(field.label)] = recordValue(field.value);
+    records[recordKey(field.label)] = jcampRecordValue(field.value);
   }
   return records;
 }
@@ -210,7 +199,7 @@ const TECHNIQUE = 'Technique';
  */
 function statedTechnique(spectrum: IrSpectrum): string | undefined {
   for (const field of spectrum.meta?.fields ?? []) {
-    if (field.label === TECHNIQUE) return recordValue(field.value);
+    if (field.label === TECHNIQUE) return jcampRecordValue(field.value);
   }
   return undefined;
 }
@@ -226,18 +215,4 @@ function statedTechnique(spectrum: IrSpectrum): string | undefined {
  */
 function recordKey(label: string): string {
   return label.replaceAll(/[\s=]+/g, '_');
-}
-
-/**
- * A value put where a JCAMP record's value goes.
- *
- * A record is one line and `$$` opens a comment that runs to the end of it, so a
- * value with a newline in it would otherwise either break the file in two or
- * lose its tail. Both failures are silent on the way back in, which is why this
- * is done to every value rather than to the ones known to be long.
- * @param value - The value as it is held.
- * @returns The value as one line, with no comment marker in it.
- */
-function recordValue(value: string): string {
-  return value.replaceAll(/\s+/g, ' ').replaceAll('$$', '$').trim();
 }

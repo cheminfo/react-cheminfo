@@ -20,7 +20,6 @@ import type { CSSProperties } from 'react';
 import type { OverlayMetrics } from '../core/overlayMetrics.ts';
 
 import { OVERLAY_HELP_NAME_STYLE } from './overlayRowStyles.ts';
-import { overlayFocusRing } from './overlayValueStyles.ts';
 
 /**
  * The panel itself: a header, a body, and whatever the figure can be told to
@@ -90,19 +89,17 @@ export function overlayPanelTitleStyle(metrics: OverlayMetrics): CSSProperties {
  * not the title, and drawing an outline around it would make it compete with
  * the settings it undoes. It is faint until pointed at, then the accent, so a
  * reader who is not looking for it never sees it and one who is finds it where
- * every other panel keeps it. The keyboard is shown the ring every button of
- * the family draws.
+ * every other panel keeps it.
  * @param metrics - The measurements the card is drawn from.
- * @param look - Whether it is pointed at, and whether it holds focus.
+ * @param look - Whether it is pointed at.
  * @param look.hovered - Whether the pointer is over it.
- * @param look.focused - Whether the keyboard is on it.
  * @returns The button's rules.
  */
 export function overlayPanelResetStyle(
   metrics: OverlayMetrics,
-  look: { hovered: boolean; focused: boolean },
+  look: { hovered: boolean },
 ): CSSProperties {
-  const { hovered, focused } = look;
+  const { hovered } = look;
   return {
     flex: 'none',
     padding: 0,
@@ -114,7 +111,6 @@ export function overlayPanelResetStyle(
     lineHeight: 1,
     textDecoration: hovered ? 'underline' : 'none',
     cursor: 'pointer',
-    ...overlayFocusRing(focused),
   };
 }
 

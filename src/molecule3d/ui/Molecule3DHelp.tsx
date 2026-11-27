@@ -6,8 +6,9 @@
 import { Classes } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
+import { gestureRowKey } from '../../help/core/gestures.ts';
+import { GestureInput } from '../../help/ui/GestureInput.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { Molecule3DGesture } from '../core/gestures.ts';
 import {
   MOLECULE_3D_GESTURES,
   molecule3dInputWordId,
@@ -23,24 +24,16 @@ export function Molecule3DHelp(): ReactElement {
   return (
     <div style={PANEL_STYLE} data-testid="molecule3d-help">
       <div style={GRID_STYLE}>
-        {MOLECULE_3D_GESTURES.map(({ id, input, action }) => (
-          <div key={`${inputText(input)} ${action}`} style={ROW_STYLE}>
-            <span style={INPUT_STYLE}>
-              {input.map((part) =>
-                typeof part === 'string' ? (
-                  <span key={part}>
-                    {word(part) === undefined
-                      ? part
-                      : t.or(`molecule3d.input.${word(part)}`, part)}
-                  </span>
-                ) : (
-                  <kbd key={part.key} className={Classes.KEY}>
-                    {part.key}
-                  </kbd>
-                ),
-              )}
+        {MOLECULE_3D_GESTURES.map((gesture) => (
+          <div key={gestureRowKey(gesture)} style={ROW_STYLE}>
+            <GestureInput
+              input={gesture.input}
+              wordId={molecule3dInputWordId}
+              prefix="molecule3d.input"
+            />
+            <span>
+              {t.or(`molecule3d.gesture.${gesture.id}`, gesture.action)}
             </span>
-            <span>{t.or(`molecule3d.gesture.${id}`, action)}</span>
           </div>
         ))}
       </div>
@@ -49,14 +42,6 @@ export function Molecule3DHelp(): ReactElement {
       </p>
     </div>
   );
-}
-
-const word = molecule3dInputWordId;
-
-function inputText(input: Molecule3DGesture['input']): string {
-  return input
-    .map((part) => (typeof part === 'string' ? part : part.key))
-    .join(' ');
 }
 
 const PANEL_STYLE: CSSProperties = {
@@ -77,12 +62,5 @@ const GRID_STYLE: CSSProperties = {
 };
 
 const ROW_STYLE: CSSProperties = { display: 'contents' };
-
-const INPUT_STYLE: CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-  whiteSpace: 'nowrap',
-};
 
 const NOTE_STYLE: CSSProperties = { margin: 0 };

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { Header, Toolbar, useFullscreen } from 'react-science/ui';
+
+import { EditorHeader } from '../../panel/ui/EditorHeader.tsx';
 
 import { IrLogo } from './IrLogo.tsx';
 import { useIrCommandProps } from './irCommandContext.tsx';
@@ -7,46 +8,21 @@ import { useIrEditorState } from './irStateContext.ts';
 import { useIrText } from './useIrText.ts';
 
 /**
- * The bar across the top: the mark on the left, the viewer on the right.
- *
- * Nothing that is done to the spectra is here — that is the rail down the left
- * and the panels down the right — only what is asked of the viewer itself. The
- * mark is the About button, in the corner `react-mass` and `react-glycan` put
- * theirs in, so a chemist switching between the three tools looks in one place
- * for what they are in; and help then full screen close the bar, hard against
- * the right edge, in all three. A host's own actions on what it keeps — open,
- * save — follow the mark, as an application menu follows its icon.
+ * The family's viewer header, worded for the technique on screen.
  * @param props - Component props.
  * @param props.actions - The host's actions, as toolbar items.
  * @returns The header.
  */
 export function IrHeader(props: { actions?: ReactNode }) {
-  const { actions } = props;
-  const command = useIrCommandProps();
-  const { isFullScreen } = useFullscreen();
   const { technique } = useIrEditorState().state.settings;
   const text = useIrText(technique);
-
   return (
-    <Header>
-      <Toolbar aria-label={text.viewer}>
-        <Toolbar.Item
-          icon={<IrLogo size={16} technique={technique} />}
-          {...command('about')}
-        />
-        {actions}
-      </Toolbar>
-      <Toolbar aria-label={text.viewerHelp}>
-        <Toolbar.Item icon="help" {...command('documentation')} />
-        {/* Always the last thing in the bar, hard against the right edge: the
-            corner a window is made bigger from is the corner it is looked for
-            in, whatever else the header grows. */}
-        <Toolbar.Item
-          icon="fullscreen"
-          active={isFullScreen}
-          {...command('fullScreen')}
-        />
-      </Toolbar>
-    </Header>
+    <EditorHeader
+      logo={<IrLogo size={16} technique={technique} />}
+      label={text.viewer}
+      helpLabel={text.viewerHelp}
+      command={useIrCommandProps()}
+      actions={props.actions}
+    />
   );
 }

@@ -10,45 +10,21 @@
  * so a chemist who has learned one has learned the other.
  */
 
+import type {
+  CommandGesture,
+  CommandShortcut,
+  EditorCommand,
+} from '../../panel/core/editorCommands.ts';
+import { commandEntryLabel } from '../../panel/core/editorCommands.ts';
+
 /** The key a command answers to. */
-export interface MassShortcut {
-  /** The `event.key` values it fires on, the first being the one shown. */
-  keys: readonly string[];
-  /**
-   * How to write the key in a tooltip, where the raw value would read badly.
-   * @default the first of `keys`
-   */
-  label?: readonly string[];
-}
+export type MassShortcut = CommandShortcut;
 
 /** A gesture that does the same thing, listed under the tooltip's title. */
-export interface MassGesture {
-  /** Where the gesture is made, or what it is made with. */
-  title: string;
-  /** The buttons, keys or wheel that make it. */
-  shortcuts: readonly string[];
-}
+export type MassGesture = CommandGesture;
 
 /** One thing the viewer can be asked to do. */
-export interface MassCommand {
-  /** What it is called, which is what the tooltip is titled. */
-  title: string;
-  /**
-   * The key it answers to, absent for a command with none.
-   * @default undefined
-   */
-  shortcut?: MassShortcut;
-  /**
-   * What it does, in a sentence, under the title in the tooltip.
-   * @default undefined
-   */
-  description?: string;
-  /**
-   * The gestures that do the same thing, for the ones a key cannot describe.
-   * @default undefined
-   */
-  gestures?: readonly MassGesture[];
-}
+export type MassCommand = EditorCommand;
 
 /** Where the chart is, for a gesture made anywhere on it. */
 const OVER_THE_CHART = 'Over the chart';
@@ -150,7 +126,5 @@ export type RunMassCommand = (id: MassCommandId) => void;
  * @returns The title, and the key in parentheses when it has one.
  */
 export function massCommandLabel(id: MassCommandId): string {
-  const entry: MassCommand = massCommands[id];
-  const key = entry.shortcut?.label?.[0] ?? entry.shortcut?.keys[0];
-  return key === undefined ? entry.title : `${entry.title} (${key})`;
+  return commandEntryLabel(massCommands[id]);
 }

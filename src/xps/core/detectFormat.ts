@@ -15,8 +15,10 @@
  */
 
 import {
+  acceptOf,
   formatFromExtension,
   readFileHeader,
+  startsJcamp,
   stripByteOrderMark,
 } from '../../format/core/fileHeader.ts';
 
@@ -35,15 +37,6 @@ const HEADER_BYTES = 2048;
  */
 const VAMAS_MAGIC =
   'VAMAS Surface Chemical Analysis Standard Data Transfer Format';
-
-/**
- * How far into the file a JCAMP record may sit and still name the format.
- *
- * `##TITLE=` is required to be first, but exporters put a comment line or a
- * blank one above it often enough that insisting on the very first line loses
- * real files.
- */
-const JCAMP_LINES = 5;
 
 /**
  * How many lines of numbers make a two-column paste.
@@ -80,9 +73,7 @@ const EXTENSIONS = new Map<string, XpsFormat>([
  * picker offers first, while a file it does not name is still read by its
  * content.
  */
-export const XPS_FILE_ACCEPT = [...EXTENSIONS.keys()]
-  .map((extension) => `.${extension}`)
-  .join(',');
+export const XPS_FILE_ACCEPT = acceptOf(EXTENSIONS);
 
 /**
  * Decide what a dropped file is, from its first bytes and only then its name.
@@ -109,22 +100,6 @@ export function detectFormat(
   if (named !== undefined) return named;
   if (hasNumberColumns(header)) return 'text';
   return null;
-}
-
-/**
- * Whether a JCAMP record opens the file.
- * @param header - The decoded prefix, already trimmed at the front.
- * @returns Whether one of the first lines is a JCAMP label.
- */
-function startsJcamp(header: string): boolean {
-  const lines = header.split(/\r?\n/);
-  const limit = Math.min(lines.length, JCAMP_LINES);
-  for (let index = 0; index < limit; index++) {
-    const line = (lines[index] as string).trim();
-    if (line.startsWith('##')) return true;
-    if (line.length > 0 && !line.startsWith('$$')) return false;
-  }
-  return false;
 }
 
 /**

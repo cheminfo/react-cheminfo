@@ -249,3 +249,10 @@ export const panelEmptyStyle = {
   fontSize: 12,
   opacity: 0.7,
 } as const;
+
+/**
+ * The ground of the row every other panel is about — the spectrum selected, the
+ * peak lit — in the accent, on every viewer.
+ */
+export const SELECTED_ROW_TINT =
+  'color-mix(in oklab, var(--accent) 10%, var(--surface))';

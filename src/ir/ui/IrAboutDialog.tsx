@@ -1,7 +1,10 @@
-import { Dialog, DialogBody } from '@blueprintjs/core';
-
-import { Prose } from '../../i18n/ui/Prose.tsx';
+import type { CreditEntry, CreditId } from '../../credits/core/credits.ts';
+import { credits } from '../../credits/core/credits.ts';
+import { CreditsList } from '../../credits/ui/CreditsList.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { paragraphStyle } from '../../panel/core/dialogStyles.ts';
+import { AboutDialogFrame } from '../../panel/ui/AboutDialogFrame.tsx';
+import { Section } from '../../panel/ui/Section.tsx';
 import { irCommands } from '../core/irCommands.ts';
 import type { IrTechnique } from '../core/irTechnique.ts';
 import { IR_TECHNIQUE_RULES } from '../core/irTechnique.ts';
@@ -26,9 +29,10 @@ export interface IrAboutDialogProps {
  * What the viewer is, what it stands on, and who is owed for it.
  *
  * The credits are not decoration. Every band this viewer names is named out of a
- * correlation table that generations of chemists compiled, every file it opens is
- * read by somebody else's parser, and the examples it opens on are somebody
- * else's measurements — so each is named here, with its licence where it has one.
+ * correlation table that generations of chemists compiled, and every file it
+ * opens is read by somebody else's parser. The works are read from the family's
+ * registry, so each is named, linked and licensed the way every other page of
+ * the family names it.
  * @param props - Component props.
  * @returns The dialog.
  */
@@ -37,97 +41,41 @@ export function IrAboutDialog(props: IrAboutDialogProps) {
   const t = useChromeT();
   const title = (useIrText(technique).command('about') ?? irCommands.about)
     .title;
-  const raman = technique === 'raman';
 
   return (
-    <Dialog
+    <AboutDialogFrame
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      icon={<IrLogo size={20} technique={technique} />}
-      style={dialogStyle}
+      mark={<IrLogo size={20} technique={technique} />}
+      logo={<IrLogo size={64} technique={technique} />}
+      name={DOORS[technique]}
+      intro={
+        <p style={paragraphStyle}>
+          {technique === 'raman' ? t('ir.raman.aboutLead') : LEADS[technique]}
+        </p>
+      }
     >
-      <DialogBody>
-        <div style={brandStyle}>
-          <IrLogo size={64} technique={technique} />
-          <div>
-            <p style={leadStyle}>{DOORS[technique]}</p>
-            <p style={paragraphStyle}>
-              {raman ? t('ir.raman.aboutLead') : LEADS[technique]}
-            </p>
-          </div>
-        </div>
-
-        <h4 style={headingStyle}>Credits</h4>
-        <ul style={listStyle}>
-          {raman ? (
-            <>
-              <li>
-                <Prose text={t('ir.raman.credit.picking')} />
-              </li>
-              <li>
-                <Prose text={t('ir.raman.credit.jcamp')} />
-              </li>
-            </>
-          ) : technique === 'uvvis' || technique === 'fluorescence' ? (
-            <>
-              <li>
-                <strong>uv-spectrum</strong> (cheminfo, MIT) reads the JCAMP-DX,
-                SPC, PerkinElmer SP, Cary Eclipse and text files, derives the
-                absorbance/transmittance pair, and tells light emitted from
-                light absorbed.
-              </li>
-              <li>
-                <strong>ir-spectrum</strong>, <strong>common-spectrum</strong>{' '}
-                and <strong>spc-parser</strong> (cheminfo, MIT) pick the maxima
-                and read the files through.
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <strong>ir-spectrum</strong> (cheminfo, MIT) reads the JCAMP-DX
-                and SPC files, derives the absorbance/transmittance pair, and
-                picks the bands. This package deliberately does none of that
-                arithmetic itself.
-              </li>
-              <li>
-                <strong>common-spectrum</strong>,{' '}
-                <strong>jcampconverter</strong> and <strong>spc-parser</strong>{' '}
-                (cheminfo, MIT) are what it reads through.
-              </li>
-            </>
-          )}
-          <li>
-            <strong>ml-spectra-processing</strong> (mljs, MIT) for the array
-            work.
-          </li>
-          <li>
-            The <strong>shared chart</strong> of this package for the drawing —
-            the same arithmetic every other spectrum viewer of the family is
-            drawn with.
-          </li>
-          <li>
-            <strong>react-science</strong> and <strong>BlueprintJS</strong>
-            (zakodium, Palantir) for the shell this viewer is shaped like.
-          </li>
-          {IR_TECHNIQUE_RULES[technique].assignments ? (
-            <li>
-              The <strong>correlation table</strong> is the conventional
-              teaching set of group frequencies, as any introductory
-              spectroscopy text tabulates them. The ranges are deliberately the
-              rounded, generous ones: narrowing them to look precise would rule
-              out assignments that are genuinely possible.
-            </li>
-          ) : null}
-          <li>
-            The <strong>colours</strong> are Okabe and Ito&apos;s
-            colour-universal palette, so two traces stay distinguishable for a
-            reader with a colour vision deficiency.
-          </li>
-        </ul>
-      </DialogBody>
-    </Dialog>
+      <Section title="Built on">
+        <CreditsList entries={CREDITS[technique]} />
+      </Section>
+      <Section title="Colours and tables">
+        {IR_TECHNIQUE_RULES[technique].assignments ? (
+          <p style={paragraphStyle}>
+            The <strong>correlation table</strong> is the conventional teaching
+            set of group frequencies, as any introductory spectroscopy text
+            tabulates them. The ranges are deliberately the rounded, generous
+            ones: narrowing them to look precise would rule out assignments that
+            are genuinely possible.
+          </p>
+        ) : null}
+        <p style={paragraphStyle}>
+          The <strong>colours</strong> are Okabe and Ito&apos;s colour-universal
+          palette, so two traces stay distinguishable for a reader with a colour
+          vision deficiency.
+        </p>
+      </Section>
+    </AboutDialogFrame>
   );
 }
 
@@ -149,22 +97,22 @@ const LEADS: Record<Exclude<IrTechnique, 'raman'>, string> = {
     'Draws fluorescence spectra over their wavelengths, as the intensity of the light emitted, and picks every emission maximum.',
 };
 
-const dialogStyle = { width: 'min(680px, 92vw)' } as const;
+/** The works each technique's viewer reads its files through, then draws with. */
+const SHARED_CREDITS: readonly CreditId[] = [
+  'common-spectrum',
+  'jcampconverter',
+  'spc-parser',
+  'convert-to-jcamp',
+  'ml-gsd',
+  'ml-spectra-processing',
+  'react-science',
+  'blueprint',
+];
 
-const brandStyle = {
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: 16,
-} as const;
-
-const leadStyle = {
-  margin: '0 0 4px',
-  fontWeight: 600,
-  fontSize: 16,
-} as const;
-
-const paragraphStyle = { margin: '0 0 6px' } as const;
-
-const headingStyle = { margin: '14px 0 4px' } as const;
-
-const listStyle = { margin: 0, paddingLeft: 20 } as const;
+/** Every work each technique's viewer borrows, its own reader first. */
+const CREDITS: Record<IrTechnique, readonly CreditEntry[]> = {
+  infrared: credits(['ir-spectrum', ...SHARED_CREDITS]),
+  raman: credits(['raman-spectrum', 'ir-spectrum', ...SHARED_CREDITS]),
+  uvvis: credits(['uv-spectrum', 'ir-spectrum', ...SHARED_CREDITS]),
+  fluorescence: credits(['uv-spectrum', 'ir-spectrum', ...SHARED_CREDITS]),
+};

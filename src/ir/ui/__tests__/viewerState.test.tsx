@@ -31,6 +31,9 @@ beforeEach(() => {
   installProbeStubs();
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('ResizeObserver', NoResizeObserver);
+  // The spectra list scrolls its selected row into view, which jsdom does not
+  // lay out.
+  Element.prototype.scrollIntoView = () => undefined;
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
     new DOMRect(0, 0, 600, 400),
   );

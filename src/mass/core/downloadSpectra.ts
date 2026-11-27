@@ -7,27 +7,17 @@
  * and not for this.
  */
 
-import { downloadText } from '../../download/core/downloadText.ts';
-import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import { downloadJcampList } from '../../download/core/jcamp.ts';
 
 import type { MassSpectrum } from './massSpectrum.ts';
-import {
-  JCAMP_EXTENSION,
-  JCAMP_MIME_TYPE,
-  massSpectraToJcamp,
-  massSpectrumToJcamp,
-} from './spectrumJcamp.ts';
+import { massSpectraToJcamp } from './spectrumJcamp.ts';
 
 /**
  * Download one spectrum, named after what the list calls it.
  * @param spectrum - The spectrum.
  */
 export function downloadMassSpectrum(spectrum: MassSpectrum): void {
-  downloadText(
-    massSpectrumToJcamp(spectrum),
-    `${sanitizeFileName(spectrum.name, 'spectrum')}${JCAMP_EXTENSION}`,
-    JCAMP_MIME_TYPE,
-  );
+  downloadMassSpectra([spectrum]);
 }
 
 /**
@@ -39,14 +29,9 @@ export function downloadMassSpectrum(spectrum: MassSpectrum): void {
  * @param spectra - The spectra, in the order the list holds them.
  */
 export function downloadMassSpectra(spectra: readonly MassSpectrum[]): void {
-  const only = spectra.length === 1 ? spectra[0] : undefined;
-  if (only !== undefined) {
-    downloadMassSpectrum(only);
-    return;
-  }
-  downloadText(
-    massSpectraToJcamp(spectra),
-    `spectra${JCAMP_EXTENSION}`,
-    JCAMP_MIME_TYPE,
+  downloadJcampList(
+    spectra,
+    (spectrum) => spectrum.name,
+    (list) => massSpectraToJcamp(list),
   );
 }

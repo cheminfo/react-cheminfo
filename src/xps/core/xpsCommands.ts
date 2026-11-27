@@ -11,48 +11,14 @@
  * measurement underneath and then turns straight back on.
  */
 
-/** The key a command answers to. */
-interface XpsShortcut {
-  /** The `event.key` values it fires on, the first being the one shown. */
-  keys: readonly string[];
-  /**
-   * How the keys are shown when they do not read as themselves.
-   * @default the first of `keys`
-   */
-  label?: readonly string[];
-}
-
-/** A gesture that does the same thing, listed under the tooltip's title. */
-interface XpsGesture {
-  /** Where the gesture is made, or what it is made with. */
-  title: string;
-  /** The buttons, keys or wheel that make it. */
-  shortcuts: readonly string[];
-}
+import type { EditorCommand } from '../../panel/core/editorCommands.ts';
+import {
+  commandShortcutLabels,
+  matchCommand,
+} from '../../panel/core/editorCommands.ts';
 
 /** One thing the viewer can be asked to do. */
-interface XpsCommand {
-  /** What it is called, which is what the tooltip is titled. */
-  title: string;
-  /**
-   * The key that asks for it, left out for the one that closes a file somebody
-   * spent a minute loading.
-   * @default undefined
-   */
-  shortcut?: XpsShortcut;
-  /**
-   * What it does, when the title does not already say it.
-   * @default undefined
-   */
-  description?: string;
-  /**
-   * The gestures that do the same thing, shown under the title. A gesture
-   * nobody has been told about is not a feature, and the chart is worked far
-   * more by wheel and drag than by the rail.
-   * @default []
-   */
-  gestures?: readonly XpsGesture[];
-}
+type XpsCommand = EditorCommand;
 
 /** Everything the viewer offers, in the order it is reached for. */
 export const xpsCommands = {
@@ -162,13 +128,7 @@ export function xpsCommand(id: XpsCommandId): XpsCommand {
 export function matchXpsCommand(
   event: Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'metaKey' | 'altKey'>,
 ): XpsCommandId | null {
-  if (event.ctrlKey || event.metaKey || event.altKey) return null;
-  for (const id of Object.keys(xpsCommands) as XpsCommandId[]) {
-    const { shortcut } = xpsCommand(id);
-    if (shortcut === undefined) continue;
-    if (shortcut.keys.includes(event.key)) return id;
-  }
-  return null;
+  return matchCommand(xpsCommands, event);
 }
 
 /**
@@ -177,7 +137,5 @@ export function matchXpsCommand(
  * @returns One chip per key, empty when the command has no shortcut.
  */
 export function xpsShortcutLabels(id: XpsCommandId): string[] {
-  const { shortcut } = xpsCommand(id);
-  if (shortcut === undefined) return [];
-  return [...(shortcut.label ?? shortcut.keys.slice(0, 1))];
+  return commandShortcutLabels(xpsCommand(id));
 }

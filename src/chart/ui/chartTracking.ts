@@ -3,7 +3,7 @@
  * and every series' value at the slot it found.
  */
 
-import type { MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 
 import type { PlotRect } from '../core/chartGeometry.ts';
 import type { ChartPoint } from '../core/svgPoint.ts';
@@ -63,3 +63,14 @@ export function trackedValues(
   }
   return values;
 }
+
+/**
+ * The dashed rule a tracking chart draws at the slot under the pointer, on the
+ * band chart and the stick chart alike. Written as a style, because a browser
+ * does not resolve `var()` in a presentation attribute.
+ */
+export const TRACKED_RULE_STYLE = {
+  stroke: 'var(--border-strong)',
+  strokeWidth: 1,
+  strokeDasharray: '3 3',
+} as const satisfies CSSProperties;

@@ -1,9 +1,5 @@
-import { useMemo } from 'react';
-
-import { panelStyle } from '../../panel/core/panelStyles.ts';
-import { SidePanelStack } from '../../panel/ui/SidePanelStack.tsx';
-import type { CollapsedPanels } from '../../panel/ui/useCollapsedPanels.ts';
-import type { XpsPanelId, XpsSidePanelId } from '../core/xpsSidePanels.ts';
+import { EditorSidePanels } from '../../panel/ui/EditorSidePanels.tsx';
+import type { XpsSidePanelId } from '../core/xpsSidePanels.ts';
 
 import { ComponentsPanel } from './ComponentsPanel.tsx';
 import { CompositionPanel } from './CompositionPanel.tsx';
@@ -12,23 +8,11 @@ import { MetadataPanel } from './MetadataPanel.tsx';
 import { PeaksPanel } from './PeaksPanel.tsx';
 import { QuantificationPanel } from './QuantificationPanel.tsx';
 import { SpectraPanel } from './SpectraPanel.tsx';
-import type { XpsHostPanel } from './xpsHostPanels.ts';
-import { isXpsHostPanel, xpsStackPanels } from './xpsHostPanels.ts';
-import { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
+import type { XpsSide } from './useXpsSide.ts';
 
 export interface XpsSidePanelProps {
-  /**
-   * What to draw and what closes a panel, for a viewer whose panels may be
-   * collapsed.
-   * @default every panel the state has open
-   */
-  side?: Pick<CollapsedPanels<XpsPanelId>, 'shownIds' | 'toggle' | 'folds'>;
-  /**
-   * The panels the host adds to the viewer's own, stacked above them in the
-   * order given.
-   * @default []
-   */
-  panels?: readonly XpsHostPanel[];
+  /** The side, as `useXpsSide` holds it: the host's panels and the viewer's own. */
+  side: XpsSide;
 }
 
 /**
@@ -47,27 +31,13 @@ export interface XpsSidePanelProps {
  * @returns The panel stack.
  */
 export function XpsSidePanel(props: XpsSidePanelProps) {
-  const { panels: hostPanels = NO_PANELS, side } = props;
-  const { state } = useXpsEditorState();
-  const actions = useXpsActions();
-  const { openPanelIds } = state.view;
-  const panels = useMemo(() => xpsStackPanels(hostPanels), [hostPanels]);
+  const { side } = props;
 
   return (
-    <SidePanelStack
-      panels={panels}
-      openPanelIds={side?.shownIds ?? openPanelIds}
-      onClose={side?.toggle ?? actions.togglePanel}
-      {...side?.folds}
-    >
-      {(panel) =>
-        isXpsHostPanel(panel) ? (
-          <div style={panelStyle}>{panel.content}</div>
-        ) : (
-          <PanelBody panelId={panel.id} />
-        )
-      }
-    </SidePanelStack>
+    <EditorSidePanels
+      side={side}
+      renderPanel={(panel) => <PanelBody panelId={panel.id} />}
+    />
   );
 }
 
@@ -96,6 +66,3 @@ function PanelBody(props: PanelBodyProps) {
   if (panelId === 'components') return <ComponentsPanel />;
   return <CompositionPanel />;
 }
-
-/** What a stack the host adds nothing to holds, kept stable for the memo. */
-const NO_PANELS: readonly XpsHostPanel[] = [];

@@ -3,8 +3,9 @@
  * paste. See `groups.ts` for what a group is.
  */
 
+import { isRecord } from '../../values/core/values.ts';
+
 import type { DrawGroup } from './groups.ts';
-import { isRecord } from './values.ts';
 
 /**
  * The groups of a figure read from a file; `reconcileGroups` then drops

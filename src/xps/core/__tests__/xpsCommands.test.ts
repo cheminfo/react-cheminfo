@@ -51,8 +51,8 @@ test('a key that asks for nothing, and the modifiers that spoil one', () => {
 
 test('the tooltip shows the key the matcher fires on', () => {
   expect(xpsShortcutLabels('resetZoom')).toStrictEqual(['f']);
-  expect(xpsShortcutLabels('zoomIn')).toStrictEqual(['+']);
-  expect(xpsShortcutLabels('zoomOut')).toStrictEqual(['-']);
+  expect(xpsShortcutLabels('zoomIn')).toStrictEqual(['+', '=']);
+  expect(xpsShortcutLabels('zoomOut')).toStrictEqual(['-', '_']);
   expect(xpsShortcutLabels('showComponents')).toStrictEqual(['c']);
   expect(xpsShortcutLabels('clear')).toStrictEqual([]);
   expect(xpsShortcutLabels('about')).toStrictEqual([]);

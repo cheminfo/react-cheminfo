@@ -27,13 +27,6 @@ interface OverlayValueLook {
    */
   hovered?: boolean;
   /**
-   * Whether the keyboard is on it. Drawn as a ring rather than as the hover
-   * ground, because a reader tabbing through a bar has to be able to tell
-   * where the focus is from a control the pointer happens to be resting on.
-   * @default false
-   */
-  focused?: boolean;
-  /**
    * Whether the choices behind it are showing.
    * @default false
    */
@@ -152,25 +145,6 @@ export function overlayCaretStyle(): CSSProperties {
   };
 }
 
-/**
- * The ring around the control the keyboard is on.
- *
- * Offset by a pixel so it reads as a ring around the control rather than as
- * the outline these controls spend the rest of their life not having. It falls
- * back to the text colour on a page that never declared an accent, since a
- * focus ring nobody can see is the one accessibility fault a keyboard reader
- * cannot work around. Every button of a floating bar draws the same one.
- * @param focused - Whether the keyboard is on it.
- * @returns The outline rules, or nothing.
- */
-export function overlayFocusRing(focused: boolean): CSSProperties {
-  if (!focused) return {};
-  return {
-    outline: '2px solid var(--accent, var(--text))',
-    outlineOffset: 1,
-  };
-}
-
 /** What is left between the swatches, the words and the caret. */
 const OVERLAY_VALUE_GAP = 4;
 
@@ -194,7 +168,7 @@ function valueControlStyle(
   look: OverlayValueLook,
   shape: ValueControlShape,
 ): CSSProperties {
-  const { focused = false, disabled = false } = look;
+  const { disabled = false } = look;
   return {
     boxSizing: 'border-box',
     display: 'inline-flex',
@@ -214,7 +188,6 @@ function valueControlStyle(
     whiteSpace: 'nowrap',
     cursor: disabled ? 'default' : 'pointer',
     opacity: disabled ? 0.6 : 1,
-    ...overlayFocusRing(focused && !disabled),
   };
 }
 

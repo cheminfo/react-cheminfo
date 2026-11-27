@@ -59,7 +59,12 @@ export {
   svgFigure,
 } from './croppedMarkup.ts';
 export { cssTokenNames, resolveCssTokens } from './cssTokens.ts';
-export { blobDataUrl, svgDataUrl, svgOfDataUrl } from './dataUrl.ts';
+export {
+  blobDataUrl,
+  dataUrlBytes,
+  svgDataUrl,
+  svgOfDataUrl,
+} from './dataUrl.ts';
 export type { DocumentFigureRedraw } from './documentFigure.ts';
 export {
   DOCUMENT_FIGURE_SIZE,
@@ -111,7 +116,6 @@ export {
   figurePixels,
   figureScaleFits,
   figureScaleLabel,
-  formatFigurePixels,
 } from './figureScale.ts';
 export type { FigureSvg, FigureSvgOptions } from './figureSvg.ts';
 export { FIGURE_SVG_TYPE, figureSvg } from './figureSvg.ts';

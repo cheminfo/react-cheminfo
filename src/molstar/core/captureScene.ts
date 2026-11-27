@@ -7,7 +7,7 @@ import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 import type { ViewportScreenshotHelper } from 'molstar/lib/mol-plugin/util/viewport-screenshot.js';
 import { Task } from 'molstar/lib/mol-task/index.js';
 
-import type { ImageSize } from '../../molecule3d/core/exportImage.ts';
+import type { ImageSize } from '../../download/core/croppedMarkup.ts';
 
 import {
   setTrajectoryPlayback,

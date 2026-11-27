@@ -11,6 +11,7 @@ import { Classes } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement } from 'react';
 
 import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
+import { KeyCaps } from '../../help/ui/KeyCaps.tsx';
 import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OverlayIconButton } from '../../overlay/ui/OverlayIconButton.tsx';
@@ -104,7 +105,7 @@ export function PeriodicTableGestures(): ReactElement {
             <th style={HEAD_STYLE}>{t('periodic.help.click')}</th>
             <th style={HEAD_STYLE}>
               <span style={KEYS_STYLE}>
-                <kbd className={Classes.KEY}>{modifier}</kbd>
+                <KeyCaps keys={[modifier]} />
                 {t('periodic.help.modClick')}
               </span>
             </th>
@@ -114,17 +115,7 @@ export function PeriodicTableGestures(): ReactElement {
           {TARGETS.map(({ name, keys, click, modClick }) => (
             <tr key={click} style={ROW_STYLE}>
               <th scope="row" style={TARGET_STYLE}>
-                {name === undefined ? (
-                  <span style={KEYS_STYLE}>
-                    {keys?.map((key) => (
-                      <kbd key={key} className={Classes.KEY}>
-                        {key}
-                      </kbd>
-                    ))}
-                  </span>
-                ) : (
-                  t(name)
-                )}
+                {name === undefined ? <KeyCaps keys={keys ?? []} /> : t(name)}
               </th>
               <td style={CELL_STYLE}>{t(click)}</td>
               <td style={CELL_STYLE}>

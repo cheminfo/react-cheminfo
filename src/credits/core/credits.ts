@@ -274,6 +274,14 @@ export const CREDITS = [
     license: 'MIT',
   },
   {
+    id: 'common-spectrum',
+    name: 'common-spectrum',
+    href: 'https://www.npmjs.com/package/common-spectrum',
+    own: true,
+    description: 'holds a spectrum with its variables, and picks its peaks.',
+    license: 'MIT',
+  },
+  {
     id: 'ms-spectrum',
     name: 'ms-spectrum',
     href: 'https://www.npmjs.com/package/ms-spectrum',

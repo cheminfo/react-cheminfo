@@ -5,8 +5,8 @@ import { Accordion, Button } from 'react-science/ui';
 import type { Language } from '../../i18n/core/languages.ts';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { canFillScreen } from '../../shared/core/canFillScreen.ts';
 import { FullscreenStage } from '../../shared/ui/FullscreenStage.tsx';
-import { canFillScreen } from '../../shared/ui/canFillScreen.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { panelStyle, panelToolbarStyle } from '../core/panelStyles.ts';
 

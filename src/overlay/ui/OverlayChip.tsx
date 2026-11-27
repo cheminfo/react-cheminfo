@@ -79,7 +79,7 @@ export function OverlayChip(props: OverlayChipProps): ReactElement {
   const { metrics } = useOverlaySurface();
   const headingId = useId();
   const [open, setOpen] = useState(false);
-  const { hovered, focused, handlers } = useOverlayInteraction();
+  const { hovered, handlers } = useOverlayInteraction();
 
   const swatches = leadingSwatches(settings);
   const name = announce(settings);
@@ -113,7 +113,6 @@ export function OverlayChip(props: OverlayChipProps): ReactElement {
         data-testid={testId}
         style={overlayChipStyle(metrics, {
           hovered,
-          focused,
           active: open,
           disabled,
         })}

@@ -7,6 +7,7 @@
  */
 
 import { formatTrimmed } from '../../format/core/numbers.ts';
+import { formatValueRange } from '../../format/core/valueRange.ts';
 
 import type { IrMode } from './irSpectrum.ts';
 
@@ -77,11 +78,7 @@ export function formatWavenumberRange(
   reversed: boolean,
   unit = 'cm⁻¹',
 ): string {
-  const lowest = wavenumbers[0];
-  const highest = wavenumbers.at(-1);
-  if (lowest === undefined || highest === undefined) return '';
-  const [first, last] = reversed ? [highest, lowest] : [lowest, highest];
-  return `${formatWavenumber(first)}–${formatWavenumber(last)} ${unit}`;
+  return formatValueRange(wavenumbers, formatWavenumber, reversed, unit);
 }
 
 /** How each value axis is written: its symbol, and its count of decimals. */

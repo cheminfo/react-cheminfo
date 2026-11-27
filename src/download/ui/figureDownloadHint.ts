@@ -4,7 +4,7 @@ import type { FigureFormat } from '../core/downloadFigure.ts';
 import type { FigureResolutionUnit } from '../core/figureDpi.ts';
 import { formatFigureCentimetres } from '../core/figureDpi.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
-import { figurePixels, formatFigurePixels } from '../core/figureScale.ts';
+import { figurePixels } from '../core/figureScale.ts';
 
 /** What the lines of the figure panel are written from. */
 export interface HintState {
@@ -42,7 +42,7 @@ export function pictureHintOf(
 ): string {
   const { size, scale, unit, language } = state;
   if (size === null) return t('download.noFigure');
-  const pixels = formatFigurePixels(figurePixels(size, scale));
+  const pixels = figurePixelsText(figurePixels(size, scale), t);
   return unit === 'dpi'
     ? t('download.hintPngDpi', {
         pixels,
@@ -67,10 +67,27 @@ export function fileHintOf(
   if (size === null || format === 'png') return '';
   if (rasterSvg) {
     return t('download.hintRasterSvg', {
-      pixels: formatFigurePixels(figurePixels(size, scale)),
+      pixels: figurePixelsText(figurePixels(size, scale), t),
     });
   }
   return unit === 'dpi'
     ? t('download.hintSvgDpi', formatFigureCentimetres(size, language))
-    : t('download.hintSvg', { pixels: formatFigurePixels(size) });
+    : t('download.hintSvg', { pixels: figurePixelsText(size, t) });
+}
+
+/**
+ * What a size reads in a sentence, in the language of the page: `1280 × 920
+ * pixels`. The two numbers are written as they are, never grouped.
+ * @param pixels - The size of the saved file.
+ * @param t - The chrome's formatter.
+ * @returns The measurement, written out.
+ */
+export function figurePixelsText(
+  pixels: FigurePixels,
+  t: Translate<ChromeKey>,
+): string {
+  return t('download.pixels', {
+    width: String(pixels.width),
+    height: String(pixels.height),
+  });
 }

@@ -5,10 +5,12 @@
  * it was taken from.
  */
 
-import { rasterSvgMarkup } from '../../molecule3d/core/exportImage.ts';
-
 import type { RasterFigureSource } from './croppedMarkup.ts';
-import { croppedSvgMarkup, rasterFigureSource } from './croppedMarkup.ts';
+import {
+  croppedSvgMarkup,
+  rasterFigureSource,
+  rasterSvgMarkup,
+} from './croppedMarkup.ts';
 import { decodedImage, decodedSvgImage } from './figurePng.ts';
 import { readFigureSource, withFigureSource } from './figureSource.ts';
 import { readFigureStates, statesOf } from './figureState.ts';

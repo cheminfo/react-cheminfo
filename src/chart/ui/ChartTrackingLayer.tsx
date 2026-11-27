@@ -18,7 +18,11 @@ import { chartRoundPixel } from '../core/chartScale.ts';
 import { ChartAxis } from './ChartAxis.tsx';
 import type { ChartPlotArea } from './ChartFrame.tsx';
 import type { ChartSeries, ChartTrackEvent } from './TrackedLineChart.tsx';
-import { plotPointer, trackedValues } from './chartTracking.ts';
+import {
+  TRACKED_RULE_STYLE,
+  plotPointer,
+  trackedValues,
+} from './chartTracking.ts';
 
 /** What {@link ChartTrackingLayer} needs. */
 export interface ChartTrackingLayerProps {
@@ -118,7 +122,7 @@ export function ChartTrackingLayer(
         layer="axis"
         showGrid={false}
       />
-      {tracked ? <path d={crosshair} style={CROSSHAIR_STYLE} /> : null}
+      {tracked ? <path d={crosshair} style={TRACKED_RULE_STYLE} /> : null}
       {tracked ? markers(series, slot, at, y) : null}
       <rect
         x={plot.left}
@@ -159,11 +163,7 @@ function markers(
       <circle key={item.id} cx={at} cy={cy} r={3.5} fill={item.color} />,
     );
   }
-  return (
-    <g stroke="var(--surface)" strokeWidth={1.5}>
-      {dots}
-    </g>
-  );
+  return <g style={MARKER_RING_STYLE}>{dots}</g>;
 }
 
 const LAYER_STYLE = {
@@ -180,8 +180,8 @@ const SLIDER_STYLE = {
   cursor: 'crosshair',
 } as const satisfies CSSProperties;
 
-const CROSSHAIR_STYLE = {
-  stroke: 'var(--border-strong)',
-  strokeWidth: 1,
-  strokeDasharray: '3 3',
+/** The ring that sets a marker off the trace it sits on. */
+const MARKER_RING_STYLE = {
+  stroke: 'var(--surface)',
+  strokeWidth: 1.5,
 } as const satisfies CSSProperties;

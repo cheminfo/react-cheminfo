@@ -13,6 +13,7 @@ import {
   formatScientific,
 } from '../../chart/core/axisLabels.ts';
 import { formatInteger } from '../../format/core/numbers.ts';
+import { formatValueRange } from '../../format/core/valueRange.ts';
 
 import type { MassResolution } from './massResolution.ts';
 import { MZ_DECIMALS } from './massResolution.ts';
@@ -69,13 +70,10 @@ export function formatIntensity(
  * A range of masses, low end first, as the list and the table write it.
  * @param masses - The m/z of every peak, ascending.
  * @param decimals - How many decimals to write them with.
- * @returns `43.8490 – 223.6762`, or `''` for a spectrum holding no peak.
+ * @returns `43.8490–223.6762`, or `''` for a spectrum holding no peak.
  */
 export function formatMzRange(masses: Float64Array, decimals: number): string {
-  if (masses.length === 0) return '';
-  const first = masses[0] as number;
-  const last = masses.at(-1) as number;
-  return `${formatMz(first, decimals)} – ${formatMz(last, decimals)}`;
+  return formatValueRange(masses, (mz) => formatMz(mz, decimals));
 }
 
 /**

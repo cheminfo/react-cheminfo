@@ -14,11 +14,11 @@ import {
   FIGURE_SCALES,
   figureScaleFits,
   figureScaleLabel,
-  formatFigurePixels,
 } from '../../download/core/figureScale.ts';
 import { FIGURE_SVG_TYPE } from '../../download/core/figureSvg.ts';
 import { withPageFigureSource } from '../../download/core/pageFigureSource.ts';
 import { announcedFigureCopy } from '../../download/ui/announceFigureCopy.ts';
+import { figurePixelsText } from '../../download/ui/figureDownloadHint.ts';
 import { HelpTooltip } from '../../help/ui/HelpTooltip.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { OVERLAY_HELP_NAME_STYLE } from '../../overlay/ui/overlayRowStyles.ts';
@@ -115,7 +115,7 @@ export function StructurePicturePane(
         />
       </div>
       <p className="structure-export__pixels" style={PIXELS_STYLE}>
-        {formatFigurePixels(picture)}
+        {figurePixelsText(picture, t)}
       </p>
       <div className="structure-export__actions">
         <Button
@@ -172,7 +172,7 @@ export function StructurePicturePane(
               );
               if (notice === 'copied') {
                 return t('download.hintCopied', {
-                  pixels: formatFigurePixels(picture),
+                  pixels: figurePixelsText(picture, t),
                 });
               }
               return notice === 'copyRefused'

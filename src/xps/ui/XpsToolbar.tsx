@@ -1,6 +1,8 @@
 import { Toolbar } from 'react-science/ui';
 
+import { FigureToolbarItem } from '../../download/ui/FigureToolbarItem.tsx';
 import type { FigureDownloadState } from '../../download/ui/useFigureDownload.tsx';
+import { ZoomToolbarItems } from '../../panel/ui/ZoomToolbarItems.tsx';
 
 import { useXpsCommandProps } from './xpsCommandContext.tsx';
 import { useXpsEditorState } from './xpsStateContext.ts';
@@ -43,7 +45,6 @@ export function XpsToolbar(props: XpsToolbarProps) {
     state.settings;
 
   const isEmpty = spectra.length === 0;
-  const exportCommand = command('exportImage');
 
   return (
     <Toolbar vertical overflow="collapse" aria-label="XPS chart tools">
@@ -54,16 +55,10 @@ export function XpsToolbar(props: XpsToolbarProps) {
         disabled={isEmpty}
       />
 
-      <Toolbar.Item icon="zoom-in" {...command('zoomIn')} disabled={isEmpty} />
-      <Toolbar.Item
-        icon="zoom-out"
-        {...command('zoomOut')}
-        disabled={isEmpty}
-      />
-      <Toolbar.Item
-        icon="zoom-to-fit"
-        {...command('resetZoom')}
-        disabled={domain === null}
+      <ZoomToolbarItems
+        command={command}
+        isEmpty={isEmpty}
+        fitted={domain === null}
       />
 
       <Toolbar.Item
@@ -101,27 +96,11 @@ export function XpsToolbar(props: XpsToolbarProps) {
       {/* What the chart looks like right now is what a figure is of — the
           window it was dragged to, the axis it is read on, the labels over the
           peaks — so the picture is taken here rather than rebuilt in a panel. */}
-      {figure === undefined ? (
-        <Toolbar.Item
-          icon="media"
-          {...command('exportImage')}
-          disabled={isEmpty}
-        />
-      ) : (
-        <Toolbar.PopoverItem
-          isOpen={figure.isOpen}
-          onInteraction={figure.setOpen}
-          content={figure.panel}
-          disabled={isEmpty}
-          itemProps={{
-            icon: 'media',
-            tooltip: exportCommand.tooltip,
-            'aria-label': exportCommand['aria-label'],
-            active: figure.isOpen,
-            disabled: isEmpty,
-          }}
-        />
-      )}
+      <FigureToolbarItem
+        figure={figure}
+        command={command('exportImage')}
+        disabled={isEmpty}
+      />
     </Toolbar>
   );
 }

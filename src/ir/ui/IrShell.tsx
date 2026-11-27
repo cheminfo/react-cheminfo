@@ -179,7 +179,6 @@ export function IrShell(props: IrShellProps) {
             }
             panels={
               <IrSidePanel
-                panels={panels}
                 side={side}
                 highlight={highlight}
                 onHighlight={setHighlight}

@@ -188,7 +188,7 @@ export function FigureDownloadPanel<TFile extends string = never>(
         label={t('download.resolution')}
         help={resolutionHelp(unit, t)}
         value={String(scale)}
-        options={scaleChoices(scales, drawn, true, unit)}
+        options={scaleChoices(scales, drawn, true, unit, t)}
         onChange={(next) => onScaleChange(Number(next))}
       />
       <p style={overlayPanelHintStyle(metrics)}>{pictureHintOf(hint, t)}</p>

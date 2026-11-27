@@ -7,17 +7,11 @@
  * and not for this.
  */
 
-import { downloadText } from '../../download/core/downloadText.ts';
-import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
+import { downloadJcampList } from '../../download/core/jcamp.ts';
 
 import type { IrMode, IrSpectrum } from './irSpectrum.ts';
 import type { IrTechnique } from './irTechnique.ts';
-import {
-  JCAMP_EXTENSION,
-  JCAMP_MIME_TYPE,
-  irSpectraToJcamp,
-  irSpectrumToJcamp,
-} from './spectrumJcamp.ts';
+import { irSpectraToJcamp } from './spectrumJcamp.ts';
 
 /**
  * Download one spectrum, named after what the list calls it.
@@ -31,11 +25,7 @@ export function downloadIrSpectrum(
   mode: IrMode,
   technique?: IrTechnique,
 ): void {
-  downloadText(
-    irSpectrumToJcamp(spectrum, mode, technique),
-    `${sanitizeFileName(spectrum.name, 'spectrum')}${JCAMP_EXTENSION}`,
-    JCAMP_MIME_TYPE,
-  );
+  downloadIrSpectra([spectrum], mode, technique);
 }
 
 /**
@@ -54,14 +44,9 @@ export function downloadIrSpectra(
   mode: IrMode,
   technique?: IrTechnique,
 ): void {
-  const only = spectra.length === 1 ? spectra[0] : undefined;
-  if (only !== undefined) {
-    downloadIrSpectrum(only, mode, technique);
-    return;
-  }
-  downloadText(
-    irSpectraToJcamp(spectra, mode, technique),
-    `spectra${JCAMP_EXTENSION}`,
-    JCAMP_MIME_TYPE,
+  downloadJcampList(
+    spectra,
+    (spectrum) => spectrum.name,
+    (list) => irSpectraToJcamp(list, mode, technique),
   );
 }

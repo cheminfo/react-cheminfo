@@ -5,6 +5,7 @@
  */
 
 import { viewBoxAttribute } from '../../chart/core/viewTransform.ts';
+import { escapeAttribute } from '../../share/core/escape.ts';
 
 import type { FigurePixels } from './figureScale.ts';
 import type { FigureSvg } from './figureSvg.ts';
@@ -15,6 +16,32 @@ import {
   svgRootTag,
   svgViewBox,
 } from './svgMarkup.ts';
+import { SVG_NAMESPACE } from './svgNamespace.ts';
+
+/** The pixel size of a rendered image. */
+export interface ImageSize {
+  width: number;
+  height: number;
+}
+
+/**
+ * An SVG document holding one raster image at its own size: the inverse of
+ * {@link rasterFigureSource}.
+ *
+ * A picture rendered by WebGL has no vector form, so its SVG is the picture
+ * itself, embedded: it opens in every editor and can be placed beside vector
+ * artwork, but it does not stay sharp past the resolution it was rendered at.
+ * The image is named once, as `xlink:href`, which every browser and every
+ * editor reads; naming it a second time as `href` would carry it twice.
+ * @param dataUri - The image, as a `data:` URI.
+ * @param size - Its pixel size.
+ * @returns The SVG markup.
+ */
+export function rasterSvgMarkup(dataUri: string, size: ImageSize): string {
+  const { width, height } = size;
+  const href = escapeAttribute(dataUri);
+  return `<svg xmlns="${SVG_NAMESPACE}" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><image width="${width}" height="${height}" xlink:href="${href}"/></svg>`;
+}
 
 /** An SVG whose only element is one image. */
 const ONLY_IMAGE =

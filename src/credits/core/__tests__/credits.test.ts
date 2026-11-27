@@ -115,7 +115,7 @@ test('no work is registered twice, and each one is reachable', () => {
   const ids = CREDITS.map((entry) => entry.id);
 
   expect(new Set(ids).size).toBe(ids.length);
-  expect(CREDITS).toHaveLength(74);
+  expect(CREDITS).toHaveLength(75);
 });
 
 test('the Word and Excel readers are credited to their own authors', () => {

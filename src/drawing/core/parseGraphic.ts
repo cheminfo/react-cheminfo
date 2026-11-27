@@ -3,6 +3,8 @@
  * from a file, kept only when they fit the schema.
  */
 
+import { isFiniteNumber, isRecord } from '../../values/core/values.ts';
+
 import type { CurveControl } from './curves.ts';
 import { isLineDash } from './dashes.ts';
 import { parseGradient } from './graphicGradients.ts';
@@ -11,7 +13,6 @@ import { isClosedGraphic } from './graphics.ts';
 import { isColor } from './palette.ts';
 import { normalizeDegrees } from './pictures.ts';
 import type { Point } from './types.ts';
-import { isFiniteNumber, isRecord } from './values.ts';
 
 const PATH_KINDS: ReadonlySet<unknown> = new Set<DrawPathGraphic['kind']>([
   'line',
