@@ -52,20 +52,3 @@ export function withoutDrawings(
   }
   return kept;
 }
-
-/**
- * Whether two sets would draw the same thing, so an unchanged render is skipped.
- * @param a - One set.
- * @param b - The other.
- * @returns Whether they hold the same drawings, in the same order.
- */
-export function sameDrawings(
-  a: readonly SymmetryDrawing[],
-  b: readonly SymmetryDrawing[],
-): boolean {
-  if (a.length !== b.length) return false;
-  for (let index = 0; index < a.length; index++) {
-    if (a[index] !== b[index]) return false;
-  }
-  return true;
-}

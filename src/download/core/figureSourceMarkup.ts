@@ -5,6 +5,10 @@
  */
 
 import { presentSiteId } from '../../ecosystem/core/lookup.ts';
+import { escapeRegExp, unescapeXml } from '../../share/core/escape.ts';
+
+import { svgAttribute } from './svgMarkup.ts';
+import { boundPrefix, withoutEmptyMetadata } from './svgMetadata.ts';
 
 /** The namespace the source is written in, which names it whatever its prefix. */
 export const FIGURE_SOURCE_NAMESPACE = 'https://www.cheminfo.org/ns/source/2';
@@ -36,9 +40,7 @@ const SITE = /^[a-z\d]+(?:-[a-z\d]+)*$/;
  * namespace or holds no source.
  */
 export function findSource(svg: string): FoundSource | undefined {
-  const prefix = new RegExp(
-    String.raw`xmlns:(?<prefix>[A-Za-z_][\w.-]*)\s*=\s*["']${escapeRegExp(FIGURE_SOURCE_NAMESPACE)}["']`,
-  ).exec(svg)?.groups?.prefix;
+  const prefix = boundPrefix(svg, FIGURE_SOURCE_NAMESPACE);
   if (prefix === undefined) return undefined;
   const name = `${prefix}:source`;
   const open = new RegExp(String.raw`<${escapeRegExp(name)}\b[^>]*>`).exec(svg);
@@ -101,14 +103,14 @@ export function sourceChildren(
  * @returns The figure.
  */
 export function withoutFigureSource(svg: string): string {
-  return svg
-    .replace(
+  return withoutEmptyMetadata(
+    svg.replace(
       new RegExp(
         String.raw`<cheminfo:source xmlns:cheminfo="${escapeRegExp(FIGURE_SOURCE_NAMESPACE)}"[^>]*?(?:/>|>[\s\S]*?</cheminfo:source>)`,
       ),
       '',
-    )
-    .replace('<metadata></metadata>', '');
+    ),
+  );
 }
 
 /**
@@ -118,23 +120,6 @@ export function withoutFigureSource(svg: string): string {
  * @returns Its value, or `undefined` when the tag has none.
  */
 export function attribute(tag: string, name: string): string | undefined {
-  const groups = new RegExp(
-    String.raw`\s${name}\s*=\s*(?:"(?<double>[^"]*)"|'(?<single>[^']*)')`,
-  ).exec(tag)?.groups;
-  const value = groups?.double ?? groups?.single;
-  return value === undefined ? undefined : unescapeAttribute(value);
-}
-
-function unescapeAttribute(value: string): string {
-  return value
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#39;', "'")
-    .replaceAll('&apos;', "'")
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&amp;', '&');
-}
-
-function escapeRegExp(value: string): string {
-  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+  const value = svgAttribute(tag, name);
+  return value === undefined ? undefined : unescapeXml(value);
 }

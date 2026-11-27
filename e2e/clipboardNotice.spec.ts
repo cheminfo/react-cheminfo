@@ -1,6 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { readClipboardText } from '../src/host/testing/chatFrame.ts';
+
 import { openStory } from './story.ts';
 
 /**
@@ -51,9 +53,7 @@ test('an SVG this browser copies only as text says so in orange, until it is cli
   );
   await expect(notice).toHaveAttribute('role', 'alert');
   await expect(notice).toHaveCSS('background-color', 'rgb(180, 83, 9)');
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(
-    /^<svg /,
-  );
+  expect(await readClipboardText(page)).toMatch(/^<svg /);
 
   await page.clock.fastForward(10_000);
 

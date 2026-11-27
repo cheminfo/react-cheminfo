@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type { AboutContent } from '../../../about/core/about.ts';
 import { createTabRouter } from '../../../router/core/tabRouter.ts';
 import type { SiteShellProps } from '../SiteShell.tsx';
@@ -21,22 +20,13 @@ const NAV = [
   { id: 'lewis', label: 'Lewis', href: '/lewis' },
 ];
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('ResizeObserver', NoResizeObserver);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   globalThis.history.replaceState(null, '', '/');
   vi.unstubAllGlobals();
 });

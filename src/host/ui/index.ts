@@ -24,11 +24,10 @@ export type {
   FramedToolOptions,
   FramedToolStatus,
 } from './useFramedTool.ts';
-export { HELLO_TIMEOUT, useFramedTool } from './useFramedTool.ts';
+export { useFramedTool } from './useFramedTool.ts';
 export type { HostHandlers } from './useHostConnection.ts';
 export { useHostConnection } from './useHostConnection.ts';
 export type { FramedPanelProps, FramedToolAccess } from './FramedPanel.tsx';
 export { FramedPanel } from './FramedPanel.tsx';
 export type { ToolSwitchViewProps } from './ToolSwitchView.tsx';
 export { ToolSwitchView } from './ToolSwitchView.tsx';
-export { croppedToolFigure } from './croppedToolFigure.ts';

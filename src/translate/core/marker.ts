@@ -17,7 +17,6 @@ const END = '⁠';
 const BASE = DIGITS.length;
 const FIRST_DIGIT = 0x20_61;
 
-const MARKER = /[⁡-⁤]+⁠/;
 const MARKERS = /[⁡-⁤]+⁠/g;
 
 /**
@@ -64,15 +63,6 @@ export function readMarkers(text: string): number[] {
     ids.push(id);
   }
   return ids;
-}
-
-/**
- * Whether a string carries at least one marker.
- * @param text - The string to look at.
- * @returns True when a marker is present.
- */
-export function hasMarker(text: string): boolean {
-  return MARKER.test(text);
 }
 
 /**

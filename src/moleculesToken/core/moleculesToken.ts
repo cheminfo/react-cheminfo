@@ -1,3 +1,4 @@
+import { errorMessage } from '../../error/core/toError.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 
 /**
@@ -252,5 +253,5 @@ function whyUnanswered(error: unknown, timeoutMs: number): string {
   if ((error as { name?: unknown } | null)?.name === 'TimeoutError') {
     return `no answer within ${timeoutMs} ms`;
   }
-  return error instanceof Error ? error.message : String(error);
+  return errorMessage(error);
 }

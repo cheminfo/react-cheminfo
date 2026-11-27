@@ -7,6 +7,8 @@
  * whole exchange with a fake host and a real `MessageChannel`.
  */
 
+import { errorMessage } from '../../error/core/toError.ts';
+
 import { answerGet } from './answerGet.ts';
 import type { HostConnectionOptions } from './hostConnectionOptions.ts';
 import { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';
@@ -116,7 +118,7 @@ export function connectHost(options: HostConnectionOptions): () => void {
     try {
       await load(selection.inputs);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+      const message = errorMessage(error);
       return {
         type: 'result',
         id,

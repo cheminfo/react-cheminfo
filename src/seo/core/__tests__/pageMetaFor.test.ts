@@ -5,21 +5,10 @@ import type { RouteMeta } from '../routes.ts';
 import { pageMetaFor } from '../routes.ts';
 import { sitemapXml } from '../siteFiles.ts';
 
-const ROUTES: RouteMeta[] = [
-  { path: '/', title: 'Home', description: 'The home page.' },
-  { path: '/about', title: 'About', description: 'What it computes.' },
-];
-
-const SECTIONS: RouteMeta[] = [
-  { path: '/', title: 'Home', description: 'The home page.' },
-  {
-    path: '/molecules',
-    title: 'The ligands',
-    description: 'Every chemical component.',
-    prefix: true,
-  },
-  { path: '/molecules/hem', title: 'HEM', description: 'One ligand.' },
-];
+import {
+  HOME_ROUTES as ROUTES,
+  SECTION_ROUTES as SECTIONS,
+} from './routeFixtures.ts';
 
 test('the query string and the fragment never reach the lookup', () => {
   expect(pageMetaFor(ROUTES, '/about?smiles=CCO')).toStrictEqual(ROUTES[1]);

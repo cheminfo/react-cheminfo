@@ -146,9 +146,8 @@ export {
 } from './figureFileName.ts';
 export { sanitizeFileName } from './sanitizeFileName.ts';
 
-export { drawingIn, stackDrawings } from './stackedDrawing.ts';
 export type { SvgBox } from './svgBounds.ts';
-export { CONTENT_ATTRIBUTE, contentBox, elementBox } from './svgBounds.ts';
+export { CONTENT_ATTRIBUTE, contentBox } from './svgBounds.ts';
 export { SVG_NAMESPACE } from './svgNamespace.ts';
 export type { PngOptions } from './svgToPng.ts';
 export { svgToPng } from './svgToPng.ts';

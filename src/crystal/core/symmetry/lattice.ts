@@ -126,7 +126,12 @@ function applyMatrix(matrix: number[][], point: readonly number[]): number[] {
   return image;
 }
 
-function toRadians(degrees: number): number {
+/**
+ * An angle in radians.
+ * @param degrees - The angle in degrees, as a cell states it.
+ * @returns The same angle in radians.
+ */
+export function toRadians(degrees: number): number {
   return (degrees * Math.PI) / 180;
 }
 

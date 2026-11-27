@@ -1,21 +1,17 @@
 // @vitest-environment jsdom
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { useFigureSend } from '../useFigureSend.ts';
 import { useFigureTask } from '../useFigureTask.ts';
 
-let host: HTMLDivElement;
-let root: Root;
 let written: number;
 let shared: File[];
 let refusals: string[];
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   written = 0;
   shared = [];
   refusals = [];
@@ -29,19 +25,14 @@ beforeEach(() => {
         : Promise.reject(new DOMException(refusal, refusal));
     },
   });
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
   act(() => {
     root.render(<Harness />);
   });
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

@@ -1,6 +1,7 @@
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 import type { ArchiveFile } from './backupFiles.ts';
+import { findArchiveManifest } from './backupFiles.ts';
 
 /** The name a backup's table of contents is written under. */
 export const BACKUP_MANIFEST = 'manifest.json';
@@ -26,8 +27,8 @@ export interface BackupManifest {
 }
 
 /**
- * The table of contents nearest the top of an archive, in any folder, so a
- * backup unzipped and zipped again inside a folder still restores.
+ * The table of contents nearest the top of an archive that reads, in any
+ * folder, so a backup unzipped and zipped again inside a folder still restores.
  * @param files - The files of the archive.
  * @returns It, with the folder its paths start from; undefined when the
  * archive has none that reads.
@@ -35,34 +36,7 @@ export interface BackupManifest {
 export function readBackupManifest(
   files: readonly ArchiveFile[],
 ): { manifest: BackupManifest; folder: string } | undefined {
-  let found: ArchiveFile | undefined;
-  for (const file of files) {
-    const named =
-      file.path === BACKUP_MANIFEST ||
-      file.path.endsWith(`/${BACKUP_MANIFEST}`);
-    if (named && (!found || file.path.length < found.path.length)) {
-      found = file;
-    }
-  }
-  if (!found) return undefined;
-  const manifest = manifestFrom(readJson(found));
-  return manifest
-    ? { manifest, folder: found.path.slice(0, -BACKUP_MANIFEST.length) }
-    : undefined;
-}
-
-/**
- * A file of the archive read as JSON.
- * @param file - The file, or nothing.
- * @returns What it holds; undefined when it is missing or not JSON.
- */
-export function readJson(file: ArchiveFile | undefined): unknown {
-  if (!file) return undefined;
-  try {
-    return JSON.parse(file.text());
-  } catch {
-    return undefined;
-  }
+  return findArchiveManifest(files, manifestFrom);
 }
 
 function manifestFrom(value: unknown): BackupManifest | undefined {

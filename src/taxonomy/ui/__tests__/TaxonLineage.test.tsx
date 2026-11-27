@@ -6,11 +6,10 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type { Taxon } from '../../core/lineage.ts';
 import { TaxonLineage } from '../TaxonLineage.tsx';
 
@@ -24,19 +23,12 @@ const LINEAGE: Taxon[] = [
   { rank: 'species', name: 'Penicillium chrysogenum', taxId: 5076 },
 ];
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
 });
 
 /**

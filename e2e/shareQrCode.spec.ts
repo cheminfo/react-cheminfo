@@ -1,12 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { readClipboardTypes } from '../src/host/testing/chatFrame.ts';
 import { qrCodeSvg } from '../src/share/core/qrCode.ts';
 
+import { PNG_SIGNATURE, PNG_WIDTH_AT } from './figurePanel.ts';
 import { openStory } from './story.ts';
-
-// The first eight bytes of every PNG, and where its header writes the width.
-const PNG_SIGNATURE = '89504e470d0a1a0a';
-const PNG_WIDTH_AT = 16;
 
 // How many pixels the copied PNG gives each pixel of the SVG.
 const PNG_SCALE = 4;
@@ -36,11 +34,7 @@ test('the QR code copies as a PNG of the link the dialog hands out', async ({
   await panel.getByRole('button', { name: 'Copy as PNG', exact: true }).click();
 
   // The code is painted after the click, so the clipboard holds it a moment later.
-  const readTypes = () =>
-    page.evaluate(async () => {
-      const [item] = await navigator.clipboard.read();
-      return item?.types ?? [];
-    });
+  const readTypes = () => readClipboardTypes(page);
   await expect.poll(readTypes).toStrictEqual(['image/png']);
 
   const bytes = await page.evaluate(async () => {

@@ -1,21 +1,9 @@
 import { expect, test } from 'vitest';
 
 import { injectPageMeta } from '../pageMeta.ts';
-import type { RouteMeta } from '../routes.ts';
 import { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from '../template.ts';
 
-const ROUTES: RouteMeta[] = [
-  {
-    path: '/',
-    title: '2D to 3D — conformers from a drawn structure',
-    description: 'Draw a structure and turn it into 3D conformers.',
-  },
-  {
-    path: '/about',
-    title: 'About the browser conformer generator',
-    description: 'What this tool computes, and how to cite it.',
-  },
-];
+import { THREE_D_ROUTES as ROUTES } from './routeFixtures.ts';
 
 const OPTIONS = { site: '3d', routes: ROUTES, url: '/about' } as const;
 

@@ -99,8 +99,8 @@ export function tableKey(
  * @param table - The table to walk.
  * @returns One entry per cell, in reading order.
  */
-export function tableCells(table: TranslatableTable): TableCell[] {
-  const cells: TableCell[] = [];
+export function tableCells(table: TranslatableTable): TranslatableCell[] {
+  const cells: TranslatableCell[] = [];
   for (const row of table.rows) {
     for (const field of table.fields) {
       cells.push({ key: tableKey(table, row.id, field.id), row, field });
@@ -110,7 +110,7 @@ export function tableCells(table: TranslatableTable): TableCell[] {
 }
 
 /** One cell of a table: where it is, and what it is kept under. */
-export interface TableCell {
+export interface TranslatableCell {
   /** The catalog key. */
   key: string;
   /** The row it belongs to. */

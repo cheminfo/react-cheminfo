@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { resolve } from 'node:path';
 
 import { expect, test } from 'vitest';
+
+import { staticGraph } from '../../build/vite/__tests__/importGraph.ts';
 
 const ENTRY = resolve(import.meta.dirname, '../../server.ts');
 
@@ -13,39 +15,6 @@ const PEERS = new Set([
   'react-dom',
   'vite',
 ]);
-
-/**
- * The bare specifiers every module a static `import` of the entry point pulls
- * in reads at load time; a type-only import is erased and skipped.
- * @param entry - The file to start from.
- * @returns Each visited file, with its bare specifiers.
- */
-function staticGraph(entry: string): Map<string, string[]> {
-  const seen = new Map<string, string[]>();
-  const queue = [entry];
-  const statements =
-    /^(?<kind>import|export)(?<clause>[^'"]*?)from\s*'(?<specifier>[^']+)'/gmu;
-
-  while (queue.length > 0) {
-    const file = queue.pop() as string;
-    if (seen.has(file)) continue;
-    const bare: string[] = [];
-    for (const match of readFileSync(file, 'utf8').matchAll(statements)) {
-      const { clause, specifier } = match.groups as {
-        clause: string;
-        specifier: string;
-      };
-      if (/^\s+type\s/u.test(clause)) continue;
-      if (specifier.startsWith('.')) {
-        queue.push(join(dirname(file), specifier));
-      } else {
-        bare.push(specifier);
-      }
-    }
-    seen.set(file, bare);
-  }
-  return seen;
-}
 
 test('importing react-cheminfo/server loads no optional peer', () => {
   const graph = staticGraph(ENTRY);

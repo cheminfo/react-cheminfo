@@ -24,7 +24,6 @@ import type {
 } from '../core/primitives.ts';
 import type { SymmetryDrawing } from '../core/types.ts';
 
-import { clearShapeLayer } from './layerRegistry.ts';
 import type { ShapeGroup } from './shapeLayer.ts';
 import { renderShapeLayer } from './shapeLayer.ts';
 import { renderTextLayer } from './textLayer.ts';
@@ -104,16 +103,6 @@ export async function renderSymmetryElements(
     LABEL_COLOUR,
   );
   return groups;
-}
-
-/**
- * Remove the symmetry elements and their labels.
- * @param plugin - The molstar context.
- */
-export function clearSymmetryElements(plugin: PluginContext): void {
-  clearShapeLayer(plugin, FACE_LAYER);
-  clearShapeLayer(plugin, ELEMENT_LAYER);
-  clearShapeLayer(plugin, ELEMENT_LABEL_LAYER);
 }
 
 const FACE_LAYER = 'symmetry-element-faces';

@@ -10,13 +10,10 @@
  */
 
 import type { CSSProperties, ReactElement } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Molecule3DCamera } from '../../molecule3d/core/camera.ts';
-import type { Measurement } from '../../molecule3d/core/measurement.ts';
-import type { Molecule3DSettings } from '../../molecule3d/core/settings.ts';
 import { normalizeMolecule3DSettings } from '../../molecule3d/core/settings.ts';
-import type { Molecule3DTools } from '../../molecule3d/core/tools.ts';
 import { Molecule3DOptions } from '../../molecule3d/ui/Molecule3DOptions.tsx';
 import { Molecule3DStage } from '../../molecule3d/ui/Molecule3DStage.tsx';
 import { useControlledState } from '../../molecule3d/ui/useControlledState.ts';
@@ -25,63 +22,30 @@ import { MolstarToolbar } from '../../molstar/ui/MolstarToolbar.tsx';
 import { useMolstarTools } from '../../molstar/ui/useMolstarTools.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import { sceneOrientation } from '../core/orientation.ts';
-import type { ViewerAtom } from '../core/types.ts';
-import type { CrystalViewer, StructureStyle } from '../viewer/index.ts';
+import type { CrystalViewer } from '../viewer/index.ts';
 import {
   DEFAULT_CAMERA_DURATION,
   createCrystalViewer,
 } from '../viewer/index.ts';
 
-import type { CrystalScene, CrystalViewHandle } from './crystalScene.ts';
+import type { CrystalViewer3DProps } from './CrystalViewer3D.tsx';
+import {
+  report,
+  useMeasurementsOf,
+  useStructureStyle,
+} from './crystalCanvasState.ts';
 
-/** Props of {@link CrystalCanvas3D}. */
-export interface CrystalCanvas3DProps {
-  /** What to show. */
-  scene: CrystalScene;
-  /**
-   * Scene background, `#rrggbb`.
-   * @default '#ffffff'
-   */
-  background?: string;
-  /**
-   * Which tools the toolbars offer; every one it does not name is on.
-   * @default every tool
-   */
-  tools?: Partial<Molecule3DTools>;
-  /**
-   * How the atoms are drawn, when the page owns it — to keep it in the
-   * address, or the same on every page of the site.
-   * @default undefined
-   */
-  settings?: Molecule3DSettings;
-  /**
-   * How the atoms are drawn at first when the canvas owns it, and what the
-   * display options' reset button returns to either way.
-   * @default DEFAULT_MOLECULE_3D_SETTINGS
-   */
-  defaultSettings?: Partial<Molecule3DSettings>;
-  /**
-   * Called with the new settings after any change from the toolbar.
-   * @default undefined
-   */
-  onSettingsChange?: (settings: Molecule3DSettings) => void;
-  /**
-   * Base name of a picture saved from the toolbar, extension excluded.
-   * @default 'crystal'
-   */
-  fileName?: string;
+/** Props of {@link CrystalCanvas3D}: the viewer's, less what surrounds the canvas. */
+export interface CrystalCanvas3DProps extends Omit<
+  CrystalViewer3DProps,
+  'height' | 'caption' | 'emptyMessage' | 'unsupportedNote'
+> {
   /**
    * Called whenever drawing fails, with one sentence, or `null` once it works
    * again.
    * @default undefined
    */
   onFailure?: (message: string | null) => void;
-  /**
-   * Called with the means to picture the scene once the canvas exists, and with
-   * `null` once it is gone.
-   * @default undefined
-   */
-  onHandle?: (handle: CrystalViewHandle | null) => void;
 }
 
 /**
@@ -332,119 +296,6 @@ export function CrystalCanvas3D(props: CrystalCanvas3DProps): ReactElement {
     </Molecule3DStage>
   );
 }
-
-/**
- * The style the viewer draws, the same object while nothing it reads changes:
- * a page rebuilding equal settings on every render must not redraw the atoms.
- * @param settings - The display options.
- * @param bonds - Which bonds the scene asks for.
- * @returns The style.
- */
-function useStructureStyle(
-  settings: Molecule3DSettings,
-  bonds: StructureStyle['bonds'],
-): StructureStyle {
-  const {
-    representation,
-    sizeFactor,
-    bondSizeFactor,
-    showSurface,
-    probeRadius,
-    surfaceAlpha,
-    surfaceColoring,
-    surfaceColor,
-  } = settings;
-  return useMemo(
-    () => ({
-      representation,
-      sizeFactor,
-      bondSizeFactor,
-      bonds,
-      surface: showSurface
-        ? {
-            probeRadius,
-            alpha: surfaceAlpha,
-            coloring: surfaceColoring,
-            color: surfaceColor,
-          }
-        : null,
-    }),
-    [
-      representation,
-      sizeFactor,
-      bondSizeFactor,
-      bonds,
-      showSurface,
-      probeRadius,
-      surfaceAlpha,
-      surfaceColoring,
-      surfaceColor,
-    ],
-  );
-}
-
-/** What was measured, and on which atoms. */
-interface TakenMeasurements {
-  readonly atoms: readonly ViewerAtom[];
-  readonly list: readonly Measurement[];
-}
-
-/**
- * The measurements taken on the atoms on screen. A new set of atoms is a new
- * structure, whose atoms no measurement names, so the list starts empty again.
- * @param atoms - The atoms on screen.
- * @returns The list, and stable callbacks that change it.
- */
-function useMeasurementsOf(atoms: readonly ViewerAtom[]): {
-  measurements: readonly Measurement[];
-  addMeasurement: (measurement: Measurement) => void;
-  clearMeasurements: () => void;
-} {
-  const latest = useRef(atoms);
-  useEffect(() => {
-    latest.current = atoms;
-  }, [atoms]);
-  const [taken, setTaken] = useState<TakenMeasurements>(() => ({
-    atoms,
-    list: NO_MEASUREMENTS,
-  }));
-  const addMeasurement = useCallback((measurement: Measurement) => {
-    setTaken((previous) => ({
-      atoms: latest.current,
-      list:
-        previous.atoms === latest.current
-          ? [...previous.list, measurement]
-          : [measurement],
-    }));
-  }, []);
-  const clearMeasurements = useCallback(() => {
-    setTaken({ atoms: latest.current, list: NO_MEASUREMENTS });
-  }, []);
-  const measurements = taken.atoms === atoms ? taken.list : NO_MEASUREMENTS;
-  return { measurements, addMeasurement, clearMeasurements };
-}
-
-/**
- * Report a failure as one sentence, and clear it once the next draw works.
- * @param listener - The ref holding the page's failure callback.
- * @param listener.current - The callback, given the message or `null`.
- * @param work - The draw whose outcome is reported.
- */
-async function report(
-  listener: { current?: (message: string | null) => void },
-  work: Promise<void>,
-): Promise<void> {
-  try {
-    await work;
-    listener.current?.(null);
-  } catch (error) {
-    listener.current?.(
-      error instanceof Error ? error.message : 'The scene could not be drawn.',
-    );
-  }
-}
-
-const NO_MEASUREMENTS: readonly Measurement[] = [];
 
 const STAGE_STYLE: CSSProperties = {
   position: 'relative',

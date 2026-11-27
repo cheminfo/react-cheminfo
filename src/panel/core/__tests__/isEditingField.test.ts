@@ -1,10 +1,8 @@
 // @vitest-environment jsdom
 import { expect, test } from 'vitest';
 
+import { SVG_NAMESPACE } from '../../../download/core/svgNamespace.ts';
 import { isEditingField } from '../isEditingField.ts';
-
-/** Where an SVG element is created, the chart being one. */
-const SVG_NAMESPACE = 'https://www.w3.org/2000/svg';
 
 test('the fields a key belongs to rather than to the chart', () => {
   expect(isEditingField(document.createElement('input'))).toBe(true);

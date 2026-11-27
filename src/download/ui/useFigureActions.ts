@@ -96,19 +96,13 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
   // Both are stated at the width picked; a PNG is painted at the resolution,
   // which it states as its dpi.
   function save(): void {
-    const options = { format, scale, fileName };
-    const written =
-      writeFigure === undefined
-        ? withFigure((box) =>
-            downloadFigureSvg(
-              resized(figureSvg(box, { background }), sizeFactor),
-              options,
-            ),
-          )
-        : writeFigure().then((figure) =>
-            downloadFigureSvg(resized(figure, sizeFactor), options),
-          );
-    run(written.then(() => null));
+    run(
+      atSize()
+        .then((figure) =>
+          downloadFigureSvg(figure, { format, scale, fileName }),
+        )
+        .then(() => null),
+    );
   }
 
   // The figure at the width picked, for a copy or a send.

@@ -3,11 +3,7 @@ import { useSyncExternalStore } from 'react';
 import { useSiteLanguage } from '../../language/ui/siteLanguageContext.ts';
 import type { Language } from '../core/languages.ts';
 import { DEFAULT_LANGUAGE, isLanguage } from '../core/languages.ts';
-import {
-  messageSession,
-  messagesVersion,
-  subscribeToMessages,
-} from '../core/session.ts';
+import { messagesVersion, subscribeToMessages } from '../core/session.ts';
 
 /**
  * The language the page is written in.
@@ -35,14 +31,4 @@ export function useMessagesVersion(): number {
     messagesVersion,
     messagesVersion,
   );
-}
-
-/**
- * Whether a translator has the page open, in which case the language switch
- * says nothing about what is on show.
- * @returns True in translate mode.
- */
-export function useIsTranslating(): boolean {
-  useMessagesVersion();
-  return messageSession() !== null;
 }

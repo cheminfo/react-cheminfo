@@ -100,18 +100,6 @@ export function operationAt(
 }
 
 /**
- * Whether the path from the identity is a rigid motion all the way.
- *
- * A page says so in one line under the button: a proper rotation turns, and an
- * improper one has to pass through its own mirror.
- * @param operation - What is about to be applied.
- * @returns Whether every frame of it is a rotation.
- */
-export function operationIsRigid(operation: ViewerOperation): boolean {
-  return operation.kind === 'rotation' || operation.kind === 'screw';
-}
-
-/**
  * The fraction of an improper animation spent turning, before the reflection or
  * the inversion begins.
  */

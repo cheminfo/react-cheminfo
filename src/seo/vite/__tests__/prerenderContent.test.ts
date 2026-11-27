@@ -6,7 +6,7 @@ import { expect, test } from 'vitest';
 
 import type { PageContent } from '../../core/pageProse.ts';
 import type { RouteMeta } from '../../core/routes.ts';
-import type { PrerenderOptions } from '../prerender.ts';
+import type { PrerenderOptions } from '../prerenderOptions.ts';
 
 import { PAGE, ROUTES, build, prerendered } from './prerenderHarness.ts';
 

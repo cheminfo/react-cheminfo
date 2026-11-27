@@ -7,10 +7,12 @@
 import { expect, test, vi } from 'vitest';
 
 import type { SavedDocument, SavedDocuments } from '../createSavedDocuments.ts';
-import type { Cell, DocumentFile } from '../documentFile.ts';
+import type { DocumentFile } from '../documentFile.ts';
 import type { SaveFormat } from '../documentSaverTypes.ts';
 import { moveToFolder } from '../moveToFolder.ts';
 import type { SiteFolder } from '../siteFolderTypes.ts';
+
+import { cell } from './fakeFileSystem.ts';
 
 const TEXT: SaveFormat<string> = {
   id: 'text',
@@ -19,11 +21,6 @@ const TEXT: SaveFormat<string> = {
   picker: { description: 'Text', accept: { 'text/plain': ['.txt'] } },
   write: (text, _parts, name) => `${name}: ${text}`,
 };
-
-function cell<T>(value: T): Cell<T> {
-  const holder = { value, peek: () => holder.value };
-  return holder;
-}
 
 function fakeDirectory(taken: string[], failOn?: string) {
   const written = new Map<string, string>();

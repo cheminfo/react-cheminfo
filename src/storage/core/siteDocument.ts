@@ -7,7 +7,13 @@ import { isSameSite } from '../../ecosystem/core/lookup.ts';
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 import type { ArchiveEntry, ArchiveFile } from './backupFiles.ts';
-import { readArchive, writeArchive } from './backupFiles.ts';
+import {
+  filesByPath,
+  findArchiveManifest,
+  readArchive,
+  readArchiveJson,
+  writeArchive,
+} from './backupFiles.ts';
 import type { WorkspaceRecord } from './workspaceFile.ts';
 import { readWorkspaceValue, writeWorkspaceText } from './workspaceFile.ts';
 
@@ -166,7 +172,7 @@ export async function readSiteDocument(
   site?: string,
 ): Promise<SiteDocument> {
   const files = await readArchive(file);
-  const found = findManifest(files);
+  const found = findArchiveManifest(files, readManifest);
   if (!found) {
     throw new Error(
       'This archive holds no saved document, so nothing was opened.',
@@ -178,7 +184,7 @@ export async function readSiteDocument(
       `This document was saved by ${manifest.site}, so it does not open here.`,
     );
   }
-  const byPath = new Map(files.map((entry) => [entry.path, entry]));
+  const byPath = filesByPath(files);
   const data: ArchiveFile[] = [];
   for (const path of manifest.data) {
     const entry = byPath.get(`${folder}${path}`);
@@ -194,7 +200,7 @@ export async function readSiteDocument(
     attachments.push({ ...entry, path: entry.path.slice(kept.length) });
   }
   const view = manifest.view
-    ? parsedJson(byPath.get(`${folder}${manifest.view}`))
+    ? readArchiveJson(byPath.get(`${folder}${manifest.view}`))
     : undefined;
   return {
     site: manifest.site,
@@ -233,21 +239,6 @@ export function siteDocumentExtension(site: string): string {
   return `.${site}.zip`;
 }
 
-function findManifest(
-  files: readonly ArchiveFile[],
-): { manifest: DocumentManifest; folder: string } | undefined {
-  const candidates = files
-    .filter(({ path }) => path === MANIFEST || path.endsWith(`/${MANIFEST}`))
-    .toSorted((a, b) => a.path.length - b.path.length);
-  for (const candidate of candidates) {
-    const manifest = readManifest(parsedJson(candidate));
-    if (manifest) {
-      return { manifest, folder: candidate.path.slice(0, -MANIFEST.length) };
-    }
-  }
-  return undefined;
-}
-
 function readManifest(value: unknown): DocumentManifest | undefined {
   if (
     !isPlainRecord(value) ||
@@ -276,19 +267,10 @@ function readPreferencesPart(
 ): { preferences?: WorkspaceRecord } {
   if (!options.listed || !entry) return {};
   try {
-    return { preferences: readWorkspaceValue(parsedJson(entry), options.site) };
+    return {
+      preferences: readWorkspaceValue(readArchiveJson(entry), options.site),
+    };
   } catch {
     return {};
   }
 }
-
-function parsedJson(entry: ArchiveFile | undefined): unknown {
-  if (!entry) return undefined;
-  try {
-    return JSON.parse(entry.text());
-  } catch {
-    return undefined;
-  }
-}
-
-export { SOURCE_FORMAT as DOCUMENT_FORMAT } from '../../download/core/sourceEnvelope.ts';

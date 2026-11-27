@@ -3,7 +3,7 @@ import { fromBase64Url, pipeBytes, toBase64Url } from './linkBytes.ts';
 import { firstValues, parseQuery, serializeQuery } from './query.ts';
 
 /** The query parameter a sealed link carries, and the only one it carries. */
-export const SEAL_PARAM = 's';
+const SEAL_PARAM = 's';
 
 /** Why a sealed link could not be opened. */
 export type SealProblem = 'malformed' | 'tampered' | 'unsupported';

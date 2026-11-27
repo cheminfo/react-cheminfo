@@ -1,7 +1,11 @@
 import type { RefObject } from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
-import { DEMO_READY, DEMO_STEP, readDemoMessage } from '../core/index.ts';
+import {
+  DEMO_READY,
+  DEMO_STEP,
+  readDemoMessage,
+} from '../core/demoProtocol.ts';
 
 /**
  * Keep the tool framed on a slide on the step the slide shows.

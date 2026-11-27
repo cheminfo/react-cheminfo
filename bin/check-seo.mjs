@@ -38,6 +38,8 @@ import { join, relative, sep } from 'node:path';
 import process from 'node:process';
 
 import {
+  DESCRIPTION_MAX,
+  DESCRIPTION_MIN,
   PAGE_HEAD_MARKER,
   shippedSourceProblem,
   withheldPhrase,
@@ -47,8 +49,6 @@ import { countOf, usageError } from './cli.mjs';
 
 const TOOL = 'check-seo';
 const SKIPPED = new Set(['assets', 'node_modules']);
-const DESCRIPTION_MIN = 110;
-const DESCRIPTION_MAX = 160;
 
 const roots = [];
 let quiet = false;

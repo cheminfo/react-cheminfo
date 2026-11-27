@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import type { ShareRegion } from '../core/index.ts';
-import { SHARE_REGIONS_MESSAGE, isShareRegionsRequest } from '../core/index.ts';
+import type { ShareRegion } from '../core/regions.ts';
+import {
+  SHARE_REGIONS_MESSAGE,
+  isShareRegionsRequest,
+} from '../core/regions.ts';
 
 /**
  * Report where each part of this page sits, while a share dialog is looking at

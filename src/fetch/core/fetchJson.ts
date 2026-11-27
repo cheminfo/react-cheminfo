@@ -8,6 +8,8 @@
  * and Node alike.
  */
 
+import { isPlainRecord } from '../../state/core/mergeStored.ts';
+
 import { ApiError } from './apiError.ts';
 
 /**
@@ -76,7 +78,7 @@ export async function readApiError(response: Response): Promise<ApiError> {
   } catch {
     body = undefined;
   }
-  const envelope = isRecord(body) ? body : {};
+  const envelope = isPlainRecord(body) ? body : {};
   const status =
     typeof envelope.statusCode === 'number'
       ? envelope.statusCode
@@ -122,8 +124,4 @@ function parseOrKeep(text: string): unknown {
   } catch {
     return text;
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

@@ -34,6 +34,13 @@ export const LEVEL_ORDER: readonly ExerciseLevel[] = [
   'advanced',
 ];
 
+/** The chrome key naming each status, as the pointer and a screen reader hear it. */
+export const STATUS_NAME_KEY = {
+  idle: 'pedagogy.statusIdle',
+  attempted: 'pedagogy.statusAttempted',
+  solved: 'pedagogy.statusSolved',
+} as const satisfies Record<ExerciseStatus, ChromeKey>;
+
 /** An empty circle, a warning sign, a tick: untouched, handed in, right. */
 export const STATUS_ICON: Record<ExerciseStatus, IconName> = {
   idle: 'circle',

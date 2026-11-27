@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { expect, test } from 'vitest';
 
-import type { PrerenderOptions } from '../prerender.ts';
+import type { PrerenderOptions } from '../prerenderOptions.ts';
 
 import { PAGE, ROUTES, build, prerendered } from './prerenderHarness.ts';
 

@@ -51,14 +51,20 @@ export interface AtomicOrbitalViewerProps {
    * Samples along each edge of the cube; the cost is the cube of it.
    *
    * A number fixes it. A {@link ResolutionLimits} pair lets each orbital's own
-   * shape pick a resolution between the two.
+   * shape pick a resolution between the two, which is what the orbitals with
+   * inner shells packed against the nucleus need.
    * @default 56
    */
   resolution?: number | ResolutionLimits;
   /**
    * Whether the labelled x, y, z frame is drawn through the nucleus when the
-   * canvas opens — it is what tells a `3d_xz` from a `3d_yz`. The button in the
-   * canvas's corner flips it from there.
+   * canvas opens. A `3d_xz` is only `3d_xz` because of where its lobes sit
+   * against those axes, and a lone isosurface says nothing about that, so the
+   * frame is on unless a site says otherwise.
+   *
+   * The canvas owns the state from then on: the button in its corner flips it,
+   * and {@link AtomicOrbitalViewerProps.onAxesChange} reports the new value to
+   * a site that wants to remember it for the next mount.
    * @default true
    */
   axes?: boolean;
@@ -69,8 +75,12 @@ export interface AtomicOrbitalViewerProps {
    */
   onAxesChange?: (axes: boolean) => void;
   /**
-   * Whether the scene turns on its own when the canvas opens. The button in the
-   * canvas's corner flips it from there.
+   * Whether the scene turns on its own when the canvas opens, which is what
+   * makes a still screenshot of a 3D shape readable.
+   *
+   * The canvas owns the state from then on: the button in its corner flips it,
+   * and {@link AtomicOrbitalViewerProps.onSpinningChange} reports the new value
+   * to a site that wants to remember it for the next mount.
    * @default false
    */
   spinning?: boolean;
@@ -93,7 +103,7 @@ export interface AtomicOrbitalViewerProps {
   sample?: AtomicSampler;
   /**
    * Called with the radial node radii, ångström, each time an orbital is
-   * sampled.
+   * sampled — so the page can mark them on a radial plot beside the canvas.
    * @default undefined
    */
   onNodeRadii?: (radii: number[]) => void;

@@ -32,7 +32,7 @@ const VALID: MoleculesTokenCheck = {
   verdict: 'ok',
   source: 'NP Atlas',
   hint: 'mct_1a2b3c4d',
-  email: 'chembio@cheminfo.org',
+  email: 'chembio@example.org',
   issuedAt: ISSUED_AT,
   lastUsedAt: USED_AT,
 };
@@ -93,7 +93,7 @@ test('each token reads as its variable, its source, its verdict and what molecul
       'MOLECULES_TOKEN_NPATLAS',
       'NP Atlas',
       'valid',
-      `issued to chembio@cheminfo.org on ${INSTANT.format(ISSUED_AT)} · last used on ${INSTANT.format(USED_AT)} · mct_1a2b3c4d…`,
+      `issued to chembio@example.org on ${INSTANT.format(ISSUED_AT)} · last used on ${INSTANT.format(USED_AT)} · mct_1a2b3c4d…`,
     ],
     [
       'MOLECULES_TOKEN_LOTUS',

@@ -1,3 +1,4 @@
+import { lineOf } from './json.ts';
 import type { DeployProblem } from './types.ts';
 
 /** The workflow that publishes this repository's image, at its fixed path. */
@@ -105,10 +106,4 @@ export function readInstallRetries(
       patient = true;
     }
   }
-}
-
-function lineOf(text: string, pattern: RegExp): number {
-  const match = pattern.exec(text);
-  if (match === null) return 0;
-  return text.slice(0, match.index).split('\n').length;
 }

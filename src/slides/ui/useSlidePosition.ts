@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import type { SlidePosition, Talk } from '../core/index.ts';
+import type { Talk } from '../core/index.ts';
+import { clampSlideIndex } from '../core/index.ts';
+import type { SlidePosition } from '../core/slideSteps.ts';
 import {
-  clampSlideIndex,
   nextPosition,
   previousPosition,
   talkStepCounts,
-} from '../core/index.ts';
+} from '../core/slideSteps.ts';
 
 /** Where the presentation stands, and the ways to move. */
 export interface SlidePositionControls {

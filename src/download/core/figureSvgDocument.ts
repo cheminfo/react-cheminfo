@@ -12,6 +12,11 @@
  * that decides what the file *is* can be read without a DOM to run it in.
  */
 
+import { escapeAttribute } from '../../share/core/escape.ts';
+
+import { svgNumber } from './svgMarkup.ts';
+import { SVG_NAMESPACE } from './svgNamespace.ts';
+
 /** One piece of the page, and where it sits inside the saved figure. */
 export interface FigurePiece {
   /** The markup, tokens already resolved. */
@@ -62,10 +67,6 @@ export interface FigureSvgDocumentOptions {
   scale?: number;
 }
 
-/** Where an SVG document says it belongs. */
-// eslint-disable-next-line unicorn/prefer-https -- an XML namespace is a name fixed by the SVG specification, not an address anything is fetched from.
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
-
 /**
  * Every drawing of a figure, in one standalone SVG document.
  * @param pieces - The drawings, in the order they are painted.
@@ -78,7 +79,7 @@ export function figureSvgDocument(
 ): string {
   const { width, height, background, fontFamily, fontSize, scale } = options;
   const factor = positiveOrOne(scale);
-  const box = `0 0 ${round(width)} ${round(height)}`;
+  const box = `0 0 ${svgNumber(width)} ${svgNumber(height)}`;
   const style = documentStyle(fontFamily, fontSize);
 
   let inside =
@@ -88,13 +89,13 @@ export function figureSvgDocument(
   for (const piece of pieces) {
     const kind = piece.kind ?? 'drawing';
     inside +=
-      `<g data-figure="${kind}" transform="translate(${round(piece.x)} ${round(piece.y)})">` +
+      `<g data-figure="${kind}" transform="translate(${svgNumber(piece.x)} ${svgNumber(piece.y)})">` +
       `${piece.markup}</g>`;
   }
 
   return (
     `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<svg xmlns="${SVG_NAMESPACE}" width="${round(width * factor)}" height="${round(height * factor)}" viewBox="${box}"${style}>` +
+    `<svg xmlns="${SVG_NAMESPACE}" width="${svgNumber(width * factor)}" height="${svgNumber(height * factor)}" viewBox="${box}"${style}>` +
     `${inside}</svg>`
   );
 }
@@ -114,7 +115,7 @@ function documentStyle(
     rules.push(`font-family:${fontFamily}`);
   }
   if (fontSize !== undefined && Number.isFinite(fontSize)) {
-    rules.push(`font-size:${round(fontSize)}px`);
+    rules.push(`font-size:${svgNumber(fontSize)}px`);
   }
   return rules.length === 0
     ? ''
@@ -128,29 +129,4 @@ function documentStyle(
  */
 function positiveOrOne(value: number | undefined): number {
   return value !== undefined && Number.isFinite(value) && value > 0 ? value : 1;
-}
-
-/**
- * A number as an attribute reads it: whole pixels where it is one, and two
- * decimals otherwise, because a serialized figure carrying sixteen digits per
- * offset is a file twice the size for no visible difference.
- * @param value - The measurement.
- * @returns How it is written.
- */
-function round(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.round(value * 100) / 100;
-}
-
-/**
- * A value written inside double quotes, with the three characters that would
- * end the attribute or the tag spelled out.
- * @param value - The value.
- * @returns The value, safe to quote.
- */
-function escapeAttribute(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('"', '&quot;');
 }

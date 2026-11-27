@@ -4,10 +4,9 @@ import { Blob as NodeBlob } from 'node:buffer';
 
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { readSiteDocument } from '../../../storage/core/siteDocument.ts';
 import { useSaveFigureAs } from '../useSaveFigureAs.tsx';
 
@@ -22,25 +21,16 @@ vi.mock('../../../download/core/downloadBlob.ts', () => ({
 const SVG =
   '<svg xmlns="http://www.w3.org/2000/svg"><title>plate</title></svg>';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   // A browser has one Blob. Under jsdom on Node 22, zip.js wraps the Blob
   // Node's `Response` returns in jsdom's, which writes it as "[object Blob]".
   vi.stubGlobal('Blob', NodeBlob);
   downloads.length = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   document.body.innerHTML = '';
   vi.unstubAllGlobals();
 });

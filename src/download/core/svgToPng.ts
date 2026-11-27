@@ -1,6 +1,6 @@
-import { svgImageUrl } from './figurePng.ts';
+import { canvasPng, decodedSvgImage } from './figurePng.ts';
 import type { SvgBox } from './svgBounds.ts';
-import { svgToString } from './svgToString.ts';
+import { side, svgToString } from './svgToString.ts';
 
 /** How many device pixels a PNG gets per pixel the drawing is shown at. */
 const DEFAULT_SCALE = 2;
@@ -59,7 +59,7 @@ export async function svgToPng(
   // The document is written at the size the PNG is asked for rather than blown
   // up afterwards: the shapes are rasterized once, at the final size, so the
   // symbols and their labels stay sharp however big the picture is.
-  const image = await loadImage(
+  const image = await decodedSvgImage(
     svgToString(svg, { box, width: pixelWidth, height: pixelHeight, label }),
   );
 
@@ -75,46 +75,5 @@ export async function svgToPng(
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-  return await toPngBlob(canvas);
-}
-
-/**
- * A side of the picture, in whole pixels.
- * @param value - How long it is.
- * @returns Whole pixels, never zero: a canvas sized zero rasterizes nothing.
- */
-function side(value: number): number {
-  return Math.max(1, Math.round(value));
-}
-
-/**
- * Load an SVG document as an image.
- * @param source - The SVG document.
- * @returns The image, already decoded, so it can be drawn straight away.
- */
-async function loadImage(source: string): Promise<HTMLImageElement> {
-  const url = svgImageUrl(source);
-  try {
-    const image = new Image();
-    image.src = url;
-    await image.decode();
-    return image;
-  } finally {
-    // The decoded image no longer needs the URL it came from.
-    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-  }
-}
-
-/**
- * Read a canvas back as a PNG.
- * @param canvas - What was drawn.
- * @returns The PNG.
- */
-async function toPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  return await new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error('The browser produced no PNG.'));
-    }, 'image/png');
-  });
+  return await canvasPng(canvas, 'The browser produced no PNG.');
 }

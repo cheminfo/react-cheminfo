@@ -9,4 +9,3 @@ export {
   checkMoleculesTokens,
   publicTokenCheck,
 } from './moleculesToken.ts';
-export { issueTokenCommand, tokensToFix } from './tokenFix.ts';

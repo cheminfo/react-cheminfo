@@ -4,23 +4,15 @@
  * crash. A draft that crashed the page while it was reopened is skipped once.
  */
 
-import {
-  IDBCursor,
-  IDBCursorWithValue,
-  IDBDatabase,
-  IDBFactory,
-  IDBIndex,
-  IDBKeyRange,
-  IDBObjectStore,
-  IDBRequest,
-  IDBTransaction,
-} from 'fake-indexeddb';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { createDraftSession } from '../createDraftSession.ts';
 import type { DraftStore } from '../createDraftStore.ts';
 import { createDraftStore } from '../createDraftStore.ts';
-import type { Cell, DocumentFile } from '../documentFile.ts';
+import type { DocumentFile } from '../documentFile.ts';
+
+import { cell } from './fakeFileSystem.ts';
+import { stubIndexedDB } from './fakeIndexedDB.ts';
 
 interface Doc {
   items: string[];
@@ -33,29 +25,11 @@ function readDoc(value: unknown): Doc | undefined {
   return { items: items.filter((item) => typeof item === 'string') };
 }
 
-function cell<T>(value: T): Cell<T> {
-  const holder = { value, peek: () => holder.value };
-  return holder;
-}
-
 // Web Locks held by every page of the test, as one browser holds them.
 const locks = new Map<string, () => void>();
 
 beforeEach(() => {
-  const classes = {
-    IDBCursor,
-    IDBCursorWithValue,
-    IDBDatabase,
-    IDBIndex,
-    IDBKeyRange,
-    IDBObjectStore,
-    IDBRequest,
-    IDBTransaction,
-  };
-  for (const [name, value] of Object.entries(classes)) {
-    vi.stubGlobal(name, value);
-  }
-  vi.stubGlobal('indexedDB', new IDBFactory());
+  stubIndexedDB();
   const entries = new Map<string, string>();
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => entries.get(key) ?? null,

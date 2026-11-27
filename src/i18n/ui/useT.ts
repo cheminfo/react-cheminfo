@@ -1,11 +1,6 @@
 import type { ChromeKey } from '../core/chromeCatalog.ts';
 import { CHROME_CATALOG } from '../core/chromeCatalog.ts';
-import type {
-  Language,
-  LooseKey,
-  Translate,
-  TranslateOptions,
-} from '../core/index.ts';
+import type { Translate } from '../core/index.ts';
 import { catalogTranslate } from '../core/index.ts';
 import type { MessageCatalog } from '../core/messageCatalog.ts';
 
@@ -43,25 +38,4 @@ export function useT<TKey extends string>(
  */
 export function useChromeT(): Translate<ChromeKey> {
   return useT(CHROME_CATALOG);
-}
-
-/**
- * One message of a catalog, outside a component.
- *
- * Only for the rare place a hook cannot go — a label computed in a module
- * helper, a message thrown from a worker. A component uses {@link useT}, which
- * redraws when the language does.
- * @param catalog - The catalog to read.
- * @param key - Key to read.
- * @param language - Language to read it in.
- * @param options - See `TranslateOptions`.
- * @returns The text.
- */
-export function translateMessage<TKey extends string>(
-  catalog: MessageCatalog<TKey>,
-  key: LooseKey<TKey>,
-  language: Language,
-  options?: TranslateOptions,
-): string {
-  return catalog.translate(key, language, options);
 }

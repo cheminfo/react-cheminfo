@@ -8,7 +8,7 @@
 
 import type { Citation, Engine } from 'citeproc';
 
-import { unescapeXml } from '../../drawing/render/markup.ts';
+import { unescapeXml } from '../../share/core/escape.ts';
 
 import type { CslItem } from './cslItems.ts';
 import { loadCslLocale, loadCslStyle } from './cslStyles.ts';

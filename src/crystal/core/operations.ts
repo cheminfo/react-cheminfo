@@ -1,3 +1,5 @@
+import { errorMessage } from '../../error/core/toError.ts';
+
 import type { CrystalStructure } from './cif/types.ts';
 import { resolveStructureSetting } from './resolve.ts';
 import { spaceGroupOperations } from './spaceGroups/spaceGroupOperations.ts';
@@ -59,7 +61,7 @@ function readListed(
     try {
       operations.push(parseOperation(xyz, 3));
     } catch (error) {
-      return error instanceof Error ? error.message : String(error);
+      return errorMessage(error);
     }
   }
   return operations;

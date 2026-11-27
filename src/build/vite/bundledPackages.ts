@@ -18,6 +18,8 @@ import {
   LICENSE_TEXTS_FILE,
 } from '../core/bundledPackages.ts';
 
+import { readManifest } from './manifest.ts';
+
 /** What a bundle is read for, whichever bundler wrote it. */
 type BundleToRead = Record<
   string,
@@ -133,7 +135,7 @@ const LICENSE_FILE = /^(?:licen[cs]e|copying|notice)/i;
 const SEPARATOR = '='.repeat(72);
 
 function readPackage(directory: string): BundledPackage | undefined {
-  const manifest = readManifest(directory);
+  const manifest = readManifest(directory) ?? {};
   const { name, version, repository } = manifest;
   if (typeof name !== 'string' || typeof version !== 'string') return undefined;
   if (UNLISTED.has(name)) return undefined;
@@ -145,16 +147,6 @@ function readPackage(directory: string): BundledPackage | undefined {
     ...(license === undefined ? {} : { license }),
     own: isOwnPackage(name, repository),
   };
-}
-
-function readManifest(directory: string): Record<string, unknown> {
-  try {
-    return JSON.parse(
-      readFileSync(join(directory, 'package.json'), 'utf8'),
-    ) as Record<string, unknown>;
-  } catch {
-    return {};
-  }
 }
 
 /**

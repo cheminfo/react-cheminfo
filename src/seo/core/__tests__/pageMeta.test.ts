@@ -3,29 +3,10 @@ import { expect, test } from 'vitest';
 import { injectPageMeta, pageDocumentMeta } from '../pageMeta.ts';
 import type { RouteMeta } from '../routes.ts';
 
-const ROUTES: RouteMeta[] = [
-  {
-    path: '/',
-    title: '2D to 3D — conformers from a drawn structure',
-    description: 'Draw a structure and turn it into 3D conformers.',
-  },
-  {
-    path: '/about',
-    title: 'About the browser conformer generator',
-    description: 'What this tool computes, and how to cite it.',
-  },
-];
-
-const PAGE = [
-  '<!doctype html>',
-  '<html lang="en">',
-  '  <head>',
-  '    <meta charset="utf-8" />',
-  '    <!--cheminfo:head-->',
-  '  </head>',
-  '  <body><div id="root"></div><!--cheminfo:body--></body>',
-  '</html>',
-].join('\n');
+import {
+  PAGE_SHELL as PAGE,
+  THREE_D_ROUTES as ROUTES,
+} from './routeFixtures.ts';
 
 test('a page carries the title and description of the route it answers', () => {
   const html = injectPageMeta(PAGE, {

@@ -3,53 +3,8 @@ import { expect, test } from 'vitest';
 import {
   SUPERCELL_ATOM_CAP,
   largestRepeatThatFits,
-  repeatCell,
   repeatedAtomCount,
 } from '../cellStack.ts';
-
-const HALITE_CELL = {
-  a: 5.6402,
-  b: 5.6402,
-  c: 5.6402,
-  alpha: 90,
-  beta: 90,
-  gamma: 90,
-};
-
-const RUTILE_CELL = {
-  a: 4.59373,
-  b: 4.59373,
-  c: 2.95812,
-  alpha: 90,
-  beta: 90,
-  gamma: 90,
-};
-
-test('the stack multiplies the edges and leaves the angles alone', () => {
-  expect(repeatCell(HALITE_CELL, 3)).toStrictEqual({
-    a: 16.9206,
-    b: 16.9206,
-    c: 16.9206,
-    alpha: 90,
-    beta: 90,
-    gamma: 90,
-  });
-  expect(repeatCell(RUTILE_CELL, 2)).toStrictEqual({
-    a: 9.18746,
-    b: 9.18746,
-    c: 5.91624,
-    alpha: 90,
-    beta: 90,
-    gamma: 90,
-  });
-});
-
-test('one cell is the cell itself, and a nonsense count is one cell', () => {
-  expect(repeatCell(HALITE_CELL, 1)).toStrictEqual(HALITE_CELL);
-  expect(repeatCell(HALITE_CELL, 0)).toStrictEqual(HALITE_CELL);
-  expect(repeatCell(HALITE_CELL, -4)).toStrictEqual(HALITE_CELL);
-  expect(repeatCell(HALITE_CELL, Number.NaN)).toStrictEqual(HALITE_CELL);
-});
 
 test('a 2x2x2 stack is eight cells, not four', () => {
   // The old site started its first loop at 1 and its other two at 0, so half

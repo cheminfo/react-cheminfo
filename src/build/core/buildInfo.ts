@@ -113,18 +113,6 @@ export function buildStamp(builtAt: string): string {
 }
 
 /**
- * The whole record in one line, for the hover of a badge that shows one part
- * of it.
- * @param build - What the build published about itself.
- * @returns e.g. `Built 2026-09-16 09:41:07 UTC from commit a1b2c3d`.
- */
-export function buildSummary(build: BuildInfo): string {
-  const built = `Built ${formatBuiltAt(build.builtAt)}`;
-  if (build.commit === undefined) return built;
-  return `${built} from commit ${shortCommit(build.commit)}`;
-}
-
-/**
  * The commit as it is written for a reader.
  * @param commit - The full hash.
  * @returns Its first seven characters, which is what git itself shows.

@@ -6,32 +6,23 @@
 
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type {
   BackupRestore,
   BackupRestoreOptions,
 } from '../useBackupRestore.tsx';
 import { useBackupRestore } from '../useBackupRestore.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
 const seen: BackupRestore[] = [];
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   document.body.innerHTML = '';
   seen.length = 0;
   vi.restoreAllMocks();

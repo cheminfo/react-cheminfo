@@ -6,6 +6,7 @@
 
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { until } from '../../../__tests__/until.ts';
 import type { HostMessageEvent } from '../../core/connectHost.ts';
 import { connectHost } from '../../core/connectHost.ts';
 import { REQUEST_TIMEOUT } from '../../core/connectTool.ts';
@@ -13,7 +14,6 @@ import { openTool } from '../openTool.ts';
 import { HELLO_TIMEOUT } from '../useFramedTool.ts';
 
 import { TOOL, TOOL_ORIGIN } from './framedToolPage.ts';
-import { until } from './until.ts';
 
 const FRAMED = `${TOOL_ORIGIN}/viewer?embed=1&hide=menu&smiles=CCO`;
 const PAGE = `${TOOL_ORIGIN}/viewer?smiles=CCO`;

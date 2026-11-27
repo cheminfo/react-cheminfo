@@ -3,8 +3,11 @@ import { Button, ButtonGroup } from '@blueprintjs/core';
 import type { ReactElement } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { SharePreviewDeviceKey, SharePreviewSize } from '../core/index.ts';
-import { SHARE_PREVIEW_DEVICES, sharePreviewSize } from '../core/index.ts';
+import type {
+  SharePreviewDeviceKey,
+  SharePreviewSize,
+} from '../core/devices.ts';
+import { SHARE_PREVIEW_DEVICES, sharePreviewSize } from '../core/devices.ts';
 
 /**
  * The glyph each screen is picked by: a window of one's own, a phone, a

@@ -15,18 +15,15 @@
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 
 import type { Molecule3DCamera } from '../../molecule3d/core/camera.ts';
-import type { ImageSize } from '../../molecule3d/core/exportImage.ts';
-import type { RenderedFigure } from '../../molecule3d/core/figureFrame.ts';
 import type {
   Measurement,
   MeasurementKind,
 } from '../../molecule3d/core/measurement.ts';
 import type { SceneCapture } from '../../molecule3d/ui/exportMoleculeImage.ts';
+import { ScenePictures } from '../../molecule3d/ui/scenePictures.ts';
 import {
   MeasurementPicker,
   MolstarPlugin,
-  captureFigure,
-  captureScene,
   clearMeasurements,
   focusPoint,
   renderMeasurements,
@@ -60,15 +57,21 @@ export interface CrystalViewerOptions {
 }
 
 /** One molstar canvas, and the queue everything drawn on it goes through. */
-export class CrystalViewerPlugin implements SceneCapture {
+export class CrystalViewerPlugin extends ScenePictures implements SceneCapture {
   readonly #plugin: MolstarPlugin;
   #picker: MeasurementPicker | undefined;
 
   /** Resolves once the canvas exists; every call awaits it internally. */
   readonly ready: Promise<void>;
 
+  /**
+   * Mount a canvas in `container` and start initialising it.
+   * @param container - A positioned element; molstar inserts its canvas into
+   * it.
+   * @param options - See {@link CrystalViewerOptions}.
+   */
   constructor(container: HTMLElement, options: CrystalViewerOptions = {}) {
-    this.#plugin = new MolstarPlugin(container, {
+    const plugin = new MolstarPlugin(container, {
       background: options.background,
       // Replacing a scene commits several times, and molstar's own default
       // glides the camera on each, so the structure appears to drift into
@@ -76,6 +79,8 @@ export class CrystalViewerPlugin implements SceneCapture {
       // structures is not.
       cameraResetDurationMilliseconds: 0,
     });
+    super(plugin);
+    this.#plugin = plugin;
     this.ready = this.#plugin.ready;
     const { onMeasure } = options;
     if (onMeasure !== undefined) {
@@ -144,28 +149,6 @@ export class CrystalViewerPlugin implements SceneCapture {
     return this.run((plugin) => {
       applyCamera(plugin, camera);
     });
-  }
-
-  /**
-   * Render the scene off screen at a size of its own, for a picture to save.
-   * @param size - Pixel size of the picture.
-   * @returns The PNG as a data URI; `undefined` once the viewer is disposed.
-   */
-  captureImage(size: ImageSize): Promise<string | undefined> {
-    return this.#plugin.run((plugin) => captureScene(plugin, size));
-  }
-
-  /**
-   * Render the part of the scene holding the crystal, for a figure handed on.
-   * @param size - Pixel size of the frame the crystal is cut from.
-   * @param longest - Longest side of the figure, in pixels.
-   * @returns The figure; `undefined` once the viewer is disposed.
-   */
-  captureFigure(
-    size: ImageSize,
-    longest: number,
-  ): Promise<RenderedFigure | undefined> {
-    return this.#plugin.run((plugin) => captureFigure(plugin, size, longest));
   }
 
   /**

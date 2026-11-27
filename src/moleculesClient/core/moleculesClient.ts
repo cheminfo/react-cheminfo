@@ -1,5 +1,6 @@
 import { XSadd } from 'ml-xsadd';
 
+import { requestSignal } from '../../fetch/core/requestSignal.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 
 import type {
@@ -19,7 +20,6 @@ import {
   gzipBody,
   messageOf,
   pause,
-  requestSignal,
   retryAfter,
 } from './requestRetry.ts';
 

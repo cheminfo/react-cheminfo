@@ -6,6 +6,7 @@
 
 import type { BuildInfo } from '../../build/core/buildInfo.ts';
 import { BUILD_INFO_FILE, readBuildInfo } from '../../build/core/buildInfo.ts';
+import { requestSignal } from '../../fetch/core/requestSignal.ts';
 
 /**
  * How long the server has to answer, in milliseconds, before it counts as
@@ -42,9 +43,7 @@ export async function probeDeployment(
   signal?: AbortSignal,
 ): Promise<Deployment> {
   const origin = new URL(url, globalThis.location?.href).origin;
-  const timeout = AbortSignal.timeout(PROBE_TIMEOUT);
-  const asked =
-    signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
+  const asked = requestSignal(signal, PROBE_TIMEOUT);
   try {
     const response = await fetch(new URL(`/${BUILD_INFO_FILE}`, origin), {
       cache: 'no-store',

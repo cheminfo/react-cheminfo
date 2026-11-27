@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 import { useRef, useState } from 'react';
 
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
-import { splitSteps } from '../core/index.ts';
+import { splitSteps } from '../core/slideSteps.ts';
 
 import { FramedTool } from './FramedTool.tsx';
 import type { SlideLayoutProps } from './Slide.tsx';

@@ -8,6 +8,8 @@ import {
 } from '../history.ts';
 import { createTabRouter } from '../tabRouter.ts';
 
+import { installBrowser } from './browserStub.ts';
+
 type Tab = 'convert' | 'tutorial' | 'exercises';
 
 const router = createTabRouter<Tab>({
@@ -147,58 +149,3 @@ test('without a browser the route is the home one and nothing is written', () =>
     subscribeToRoute(router, () => null)();
   }).not.toThrow();
 });
-
-interface Move {
-  kind: 'push' | 'replace';
-  address: string;
-}
-
-// The smallest browser the binding reads: this package has no DOM
-// implementation and must not grow one.
-function installBrowser(address: string) {
-  const url = new URL(address, 'https://smiles.cheminfo.org');
-  const events = new EventTarget();
-  const moves: Move[] = [];
-
-  function move(kind: Move['kind'], next: string): void {
-    moves.push({ kind, address: next });
-    url.href = new URL(next, url).href;
-  }
-
-  vi.stubGlobal('location', {
-    get pathname() {
-      return url.pathname;
-    },
-    get search() {
-      return url.search;
-    },
-    get hash() {
-      return url.hash;
-    },
-    get origin() {
-      return url.origin;
-    },
-  });
-  vi.stubGlobal('history', {
-    state: null,
-    pushState: (_state: unknown, _unused: string, next: string) => {
-      move('push', next);
-    },
-    replaceState: (_state: unknown, _unused: string, next: string) => {
-      move('replace', next);
-    },
-  });
-  vi.stubGlobal('addEventListener', events.addEventListener.bind(events));
-  vi.stubGlobal('removeEventListener', events.removeEventListener.bind(events));
-  vi.stubGlobal('dispatchEvent', events.dispatchEvent.bind(events));
-
-  return {
-    url,
-    moves,
-    events,
-    visit(next: string): void {
-      url.href = new URL(next, url).href;
-      events.dispatchEvent(new Event('popstate'));
-    },
-  };
-}

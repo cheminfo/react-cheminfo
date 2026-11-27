@@ -1,6 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { readClipboardText } from '../src/host/testing/chatFrame.ts';
+
 import { openStory } from './story.ts';
 
 /**
@@ -12,7 +14,7 @@ import { openStory } from './story.ts';
  */
 async function copiedText(page: Page, value: Locator): Promise<string> {
   await expect(value).toHaveAttribute('data-copy', 'copied');
-  return page.evaluate(() => navigator.clipboard.readText());
+  return readClipboardText(page);
 }
 
 /** The cursor drawn over a copyable value: a pointer carrying a clipboard. */

@@ -1,7 +1,6 @@
 export type { CellAtoms, CellAtomsOptions } from './cellAtoms.ts';
 export { crystalCellAtoms } from './cellAtoms.ts';
 export * from './cif/index.ts';
-export type { BondGraph, PeriodicComponent } from './components.ts';
 export {
   BOND_TOLERANCE,
   covalentBondLimit,
@@ -13,7 +12,6 @@ export {
   chooseDisorder,
   disorderGroupOf,
   isDummy,
-  keptSites,
 } from './disorder.ts';
 export type { AsymmetricSite, ExpandedAtom } from './expand.ts';
 export {

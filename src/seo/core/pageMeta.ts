@@ -20,7 +20,7 @@ import {
   readLanguagePath,
   withLanguagePath,
 } from '../../language/core/languagePath.ts';
-import { withoutQueryOrFragment } from '../../router/core/address.ts';
+import { addressPath } from '../../router/core/address.ts';
 import { stripBasePath } from '../../router/core/basePath.ts';
 import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
 
@@ -30,9 +30,6 @@ import type { RouteMeta } from './routes.ts';
 import { pageMetaFor } from './routes.ts';
 import { mountPathOf, originOf, resolveSite } from './siteFiles.ts';
 import { PAGE_HEAD_MARKER, fill } from './template.ts';
-
-// A scheme and an authority: what `location.href` hands out.
-const ABSOLUTE_URL = /^[a-z][\d+.a-z-]*:\/\//i;
 
 /** Which site is being served, and what it answers. */
 export interface PageMetaOptions {
@@ -206,12 +203,7 @@ function tableOf(
 // handing over `location.href` is answered too, so the one reading serves a
 // server, a build and a click alike.
 function ownPath(options: PageMetaOptions): string {
-  const url = options.url;
-  const path =
-    ABSOLUTE_URL.test(url) && URL.canParse(url)
-      ? new URL(url).pathname
-      : withoutQueryOrFragment(url);
-  return stripBasePath(mountPathOf(options), path);
+  return stripBasePath(mountPathOf(options), addressPath(options.url));
 }
 
 function languagesOf(options: PageMetaOptions): readonly Language[] {

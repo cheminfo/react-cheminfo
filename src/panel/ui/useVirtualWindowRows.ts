@@ -12,9 +12,8 @@
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useState } from 'react';
 
-import { rowSpacers } from '../core/rowSpacers.ts';
-
 import type { VirtualRows } from './useVirtualRows.ts';
+import { OVERSCAN, virtualRowsOf } from './useVirtualRows.ts';
 
 /** The rows to draw, and what the list reports its own position through. */
 export interface VirtualWindowRows extends VirtualRows {
@@ -62,25 +61,13 @@ export function useVirtualWindowRows(
     scrollMargin,
   });
 
-  const drawn = virtualizer.getVirtualItems();
-  const indices = new Array<number>(drawn.length);
-  for (let position = 0; position < drawn.length; position++) {
-    indices[position] = (drawn[position] as { index: number }).index;
-  }
-
   return {
-    indices,
-    ...rowSpacers(drawn, virtualizer.getTotalSize()),
-    measure: virtualizer.measureElement,
+    ...virtualRowsOf(
+      virtualizer.getVirtualItems(),
+      virtualizer.getTotalSize(),
+      virtualizer.measureElement,
+      scrollMargin,
+    ),
     measureList,
   };
 }
-
-/**
- * How many rows are drawn beyond each end of the window.
- *
- * The same reasoning as `useVirtualRows`, and the same number: enough that a
- * wheel gesture never reaches the edge of what was drawn before the next render
- * has run.
- */
-const OVERSCAN = 12;

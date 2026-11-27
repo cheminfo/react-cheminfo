@@ -1,15 +1,7 @@
-export { copyCitation, copyCitations } from './clipboard.ts';
-export { downloadCitation, downloadCitations } from './download.ts';
-export type {
-  CitationDownload,
-  CitationFormat,
-  CitationFormatId,
-} from './formats.ts';
+export { downloadCitations } from './download.ts';
+export type { CitationFormatId } from './formats.ts';
 export {
-  CITATION_DOWNLOADS,
-  CITATION_FORMATS,
   DEFAULT_CITATION_STYLE,
-  citationFilename,
   formatCitation,
   formatEach,
 } from './formats.ts';

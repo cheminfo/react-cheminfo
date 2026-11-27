@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { mergeDrawings, sameDrawings, withoutDrawings } from '../drawingSet.ts';
+import { mergeDrawings, withoutDrawings } from '../drawingSet.ts';
 import type { SymmetryDrawing } from '../types.ts';
 
 const axis: SymmetryDrawing = {
@@ -49,11 +49,4 @@ test('removing takes only the named ids and ignores the rest', () => {
   expect(
     withoutDrawings([axis, mirror], ['sv', 'nothing']).map((one) => one.id),
   ).toStrictEqual(['c3']);
-});
-
-test('two sets are the same only when they hold the same drawings in the same order', () => {
-  expect(sameDrawings([axis, mirror], [axis, mirror])).toBe(true);
-  expect(sameDrawings([axis, mirror], [mirror, axis])).toBe(false);
-  expect(sameDrawings([axis], [axis, mirror])).toBe(false);
-  expect(sameDrawings([axis], [{ ...axis }])).toBe(false);
 });

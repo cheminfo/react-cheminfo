@@ -15,13 +15,13 @@ import {
   applySharePreset,
   buildEmbedCode,
   buildShareUrl,
-  canOpenSealedAddresses,
   findSharePreset,
   isShareConfigured,
   parseShareConfig,
   suggestedShareConfig,
   visibleShareParts,
 } from '../core/index.ts';
+import { canOpenSealedAddresses } from '../core/sealedAddress.ts';
 
 import { ShareConfigOptions } from './ShareConfigOptions.tsx';
 import type { ShareDialogProps, ShareDraft } from './ShareDialog.tsx';

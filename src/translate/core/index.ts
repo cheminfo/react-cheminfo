@@ -27,31 +27,23 @@ export {
   MAX_MESSAGE_LENGTH,
   MAX_NOTE_LENGTH,
 } from './contribution.ts';
-export {
-  encodeMarker,
-  hasMarker,
-  markText,
-  readMarkers,
-  stripMarkers,
-} from './marker.ts';
+export { markText, readMarkers } from './marker.ts';
 export {
   changedKeys,
   mergeMessages,
   parseMessages,
   serializeMessages,
 } from './mergeMessages.ts';
+export type { MessageValues } from '../../i18n/core/messageValues.ts';
 export type {
   CatalogSnapshot,
-  MessageValues,
   TranslateBridge,
   TranslateSessionOptions,
 } from './session.ts';
 export { BRIDGE_GLOBAL, BRIDGE_PROTOCOL, TranslateSession } from './session.ts';
-export type { LoadOverlayOptions, StartTranslatingOptions } from './start.ts';
+export type { StartTranslatingOptions } from './start.ts';
 export {
-  TRANSLATE_ORIGIN,
   TRANSLATE_PARAM,
-  loadOverlay,
   readTranslateLocale,
   startTranslating,
 } from './start.ts';
@@ -61,12 +53,12 @@ export type {
   SuggestionOptions,
   TranslatedPair,
 } from './suggestions.ts';
-export { messageSimilarity, messageSuggestions } from './suggestions.ts';
+export { messageSuggestions } from './suggestions.ts';
 export type {
-  TableCell,
+  TranslatableCell,
   TranslatableField,
   TranslatableFieldSize,
   TranslatableRow,
   TranslatableTable,
 } from './tables.ts';
-export { tableCells, tableKey } from './tables.ts';
+export { tableCells } from './tables.ts';

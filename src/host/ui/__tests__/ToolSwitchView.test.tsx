@@ -10,13 +10,13 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { until } from '../../../__tests__/until.ts';
 import { readFigureSource } from '../../../download/core/figureSource.ts';
 import type { HostItem } from '../../core/protocol.ts';
 import { ToolSwitchView } from '../ToolSwitchView.tsx';
 
 import type { ToolSite } from './framedToolPage.ts';
 import { TOOL_ORIGIN, startToolPage } from './framedToolPage.ts';
-import { until } from './until.ts';
 
 const DRAWN =
   '<svg xmlns="http://www.w3.org/2000/svg" width="40pt" height="20pt"><path d="M0 0h40"/></svg>';

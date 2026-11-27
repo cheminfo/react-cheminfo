@@ -1,4 +1,4 @@
-export { formatCifNumber, formatNumber, parseCifNumber } from './number.ts';
+export { formatCifNumber, parseCifNumber } from './number.ts';
 export { readCif } from './read.ts';
 export type {
   CifGeometryBond,

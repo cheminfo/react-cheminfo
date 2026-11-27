@@ -5,7 +5,6 @@ import {
   IDENTITY_MATRIX4,
   ROTATION_PHASE,
   operationAt,
-  operationIsRigid,
   operationMatrix,
 } from '../operationMatrix.ts';
 import type { Point3, ViewerOperation } from '../types.ts';
@@ -184,30 +183,6 @@ test('every operation starts at the identity, and a fraction outside 0..1 is cla
     expectMatrix(operationAt(operation, -3), [...IDENTITY_MATRIX4]);
     expectMatrix(operationAt(operation, 7), [...operationMatrix(operation)]);
   }
-});
-
-test('only a proper rotation and a screw have a rigid path from the identity', () => {
-  expect(
-    operationIsRigid({
-      kind: 'rotation',
-      axis: Z_AXIS,
-      origin: ORIGIN,
-      order: 3,
-    }),
-  ).toBe(true);
-  expect(
-    operationIsRigid({
-      kind: 'screw',
-      axis: Z_AXIS,
-      origin: ORIGIN,
-      order: 2,
-      translation: [0, 0, 1],
-    }),
-  ).toBe(true);
-  expect(operationIsRigid({ kind: 'inversion', centre: ORIGIN })).toBe(false);
-  expect(
-    operationIsRigid({ kind: 'mirror', normal: Z_AXIS, point: ORIGIN }),
-  ).toBe(false);
 });
 
 /**

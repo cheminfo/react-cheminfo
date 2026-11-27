@@ -8,14 +8,14 @@ import { HelpIcon } from '../../help/ui/index.ts';
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
 import { useDebouncedValue } from '../../hooks/ui/useDebouncedValue.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
-import type { SharePreviewDeviceKey, ShareRegion } from '../core/index.ts';
+import type { SharePreviewDeviceKey } from '../core/devices.ts';
 import {
-  SHARE_REGIONS_REQUEST,
-  readShareRegions,
   sharePreviewAddress,
   sharePreviewScale,
   sharePreviewSize,
-} from '../core/index.ts';
+} from '../core/devices.ts';
+import type { ShareRegion } from '../core/regions.ts';
+import { SHARE_REGIONS_REQUEST, readShareRegions } from '../core/regions.ts';
 
 import { SharePreviewDevices } from './SharePreviewDevices.tsx';
 

@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import type { Locator } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { readClipboardText } from '../src/host/testing/chatFrame.ts';
 import type { Molecule3DCamera } from '../src/molecule3d/core/camera.ts';
 import { parseMolecule3DCamera } from '../src/molecule3d/core/camera.ts';
 
@@ -158,7 +159,7 @@ test('the model on screen is copied or saved as a molfile of either dialect', as
   await expect(copy).not.toHaveAttribute('aria-disabled', 'true');
   await copy.click();
   await expect(panel).toContainText('Copied, as a V3000 molfile.');
-  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  const copied = await readClipboardText(page);
   expect(copied).toContain('V3000');
   expect(copied).toContain('M  V30 BEGIN ATOM');
 

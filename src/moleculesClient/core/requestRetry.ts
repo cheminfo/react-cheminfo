@@ -1,24 +1,10 @@
 import { toError } from '../../error/core/toError.ts';
 
 /**
- * The pieces of a request that is tried again: its deadline, the pause the
- * server asks for, what an error answer says, and what a failed fetch says.
- * Browser-safe: no Node module is read.
+ * The pieces of a request that is tried again: the pause the server asks
+ * for, what an error answer says, and what a failed fetch says. Browser-safe:
+ * no Node module is read.
  */
-
-/**
- * The signal one attempt runs under: the caller's, and its own deadline.
- * @param signal - The caller's, if any.
- * @param timeoutMs - How long the attempt may take.
- * @returns The signal.
- */
-export function requestSignal(
-  signal: AbortSignal | undefined,
-  timeoutMs: number,
-): AbortSignal {
-  const timeout = AbortSignal.timeout(timeoutMs);
-  return signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
-}
 
 /**
  * How long a `Retry-After` header asks to wait.

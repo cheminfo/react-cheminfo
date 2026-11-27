@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 import { act, useEffect, useState } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type { CollapsedPanels } from '../useCollapsedPanels.ts';
 import { useCollapsedPanels } from '../useCollapsedPanels.ts';
 
@@ -11,8 +10,6 @@ type Id = 'spectra' | 'peaks' | 'metadata';
 
 let listeners: Set<() => void>;
 let narrow: boolean;
-let host: HTMLDivElement;
-let root: Root;
 let seen: CollapsedPanels<Id>;
 let open: readonly Id[];
 
@@ -55,7 +52,6 @@ function mount() {
 }
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   narrow = true;
   listeners = new Set();
   vi.stubGlobal('matchMedia', (query: string) => ({
@@ -69,14 +65,11 @@ beforeEach(() => {
       listeners.delete(listener);
     },
   }));
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

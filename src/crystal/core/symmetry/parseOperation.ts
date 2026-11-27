@@ -1,4 +1,5 @@
 import { matrixDeterminant } from './integerMatrix.ts';
+import { wrapTwelfths } from './operation.ts';
 import type { CrystalOperation, Dimension } from './types.ts';
 import { AXIS_NAMES, TWELFTHS_PER_CELL } from './types.ts';
 
@@ -114,11 +115,7 @@ function parseComponent(
     row[axis] = updated;
     cursor += 1;
   }
-  return {
-    row,
-    translation:
-      ((twelfths % TWELFTHS_PER_CELL) + TWELFTHS_PER_CELL) % TWELFTHS_PER_CELL,
-  };
+  return { row, translation: wrapTwelfths(twelfths) };
 }
 
 /**

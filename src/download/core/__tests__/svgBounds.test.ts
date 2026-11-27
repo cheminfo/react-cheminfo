@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
- * The rectangles a drawing is measured by: the marks it is of, and the box it
- * covers. jsdom measures nothing, so each element says what it measures.
+ * The rectangle a drawing is measured by: the marks it is of. jsdom measures
+ * nothing, so each element says what it measures.
  */
 
 import { expect, test } from 'vitest';
@@ -12,45 +12,8 @@ import {
   CONTENT_PADDING,
   contentBox,
   drawingCrop,
-  elementBox,
 } from '../svgBounds.ts';
 import { SVG_NAMESPACE } from '../svgNamespace.ts';
-
-import { placeAt } from './pageLayout.ts';
-
-test('a drawing laid out on the page covers the box it is drawn to', () => {
-  const svg = placeAt(
-    drawing({ width: '999', height: '999' }),
-    40,
-    30,
-    320,
-    180,
-  );
-
-  expect(elementBox(svg)).toStrictEqual({
-    x: 0,
-    y: 0,
-    width: 320,
-    height: 180,
-  });
-});
-
-test('a drawing not on the page covers the size it states', () => {
-  expect(
-    elementBox(drawing({ width: '320', height: '180.5px' })),
-  ).toStrictEqual({
-    x: 0,
-    y: 0,
-    width: 320,
-    height: 180.5,
-  });
-});
-
-test('a drawing neither laid out nor sized covers nothing', () => {
-  expect(elementBox(drawing({}))).toBeNull();
-  expect(elementBox(drawing({ width: '320' }))).toBeNull();
-  expect(elementBox(drawing({ width: 'auto', height: '180' }))).toBeNull();
-});
 
 test('a drawing marking what it is of is measured by that group, with room around it', () => {
   const svg = drawing({});

@@ -4,12 +4,10 @@ import type { ReactElement } from 'react';
 import { CodeBlock } from '../../clipboard/ui/CodeBlock.tsx';
 import { useLanguage } from '../../i18n/ui/useLanguage.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
+import { MOLECULES_URL } from '../../moleculesSources/core/moleculesSources.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 import type { MoleculesTokenCheck } from '../core/moleculesToken.ts';
 import { issueTokenCommand, tokensToFix } from '../core/tokenFix.ts';
-
-/** Where molecules.cheminfo.org answers when the site names no other. */
-const DEFAULT_MOLECULES_URL = 'https://molecules.cheminfo.org';
 
 /** What {@link MoleculesTokenFix} shows. */
 export interface MoleculesTokenFixProps {
@@ -33,7 +31,7 @@ export interface MoleculesTokenFixProps {
 export function MoleculesTokenFix(
   props: MoleculesTokenFixProps,
 ): ReactElement | null {
-  const { checks, moleculesUrl = DEFAULT_MOLECULES_URL } = props;
+  const { checks, moleculesUrl = MOLECULES_URL } = props;
   const t = useChromeT();
   const language = useLanguage();
   const toFix = tokensToFix(checks);

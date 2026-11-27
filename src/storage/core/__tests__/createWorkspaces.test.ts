@@ -1,19 +1,10 @@
-import {
-  IDBCursor,
-  IDBCursorWithValue,
-  IDBDatabase,
-  IDBFactory,
-  IDBIndex,
-  IDBKeyRange,
-  IDBObjectStore,
-  IDBRequest,
-  IDBTransaction,
-} from 'fake-indexeddb';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { createReactiveSystem } from '../../../state/core/__tests__/fakeSignals.ts';
 import { createWorkspaces } from '../createWorkspaces.ts';
 import type { BuiltinWorkspace } from '../workspaceTypes.ts';
+
+import { stubIndexedDB } from './fakeIndexedDB.ts';
 
 const BUILTINS: readonly [BuiltinWorkspace, ...BuiltinWorkspace[]] = [
   { id: 'drawing', name: 'Drawing' },
@@ -25,21 +16,7 @@ const BUILTINS: readonly [BuiltinWorkspace, ...BuiltinWorkspace[]] = [
 ];
 
 beforeEach(() => {
-  // idb recognises what it wraps by these classes, read off the globals.
-  const classes = {
-    IDBCursor,
-    IDBCursorWithValue,
-    IDBDatabase,
-    IDBIndex,
-    IDBKeyRange,
-    IDBObjectStore,
-    IDBRequest,
-    IDBTransaction,
-  };
-  for (const [name, value] of Object.entries(classes)) {
-    vi.stubGlobal(name, value);
-  }
-  vi.stubGlobal('indexedDB', new IDBFactory());
+  stubIndexedDB();
   const entries = new Map<string, string>();
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => entries.get(key) ?? null,

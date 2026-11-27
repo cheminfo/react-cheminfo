@@ -30,6 +30,7 @@ import {
 } from './figureSourceMarkup.ts';
 import type { FigureStates } from './figureState.ts';
 import { figureDigest, stateElements } from './figureState.ts';
+import { withMetadataElement } from './svgMetadata.ts';
 
 export { FIGURE_SOURCE_NAMESPACE } from './figureSourceMarkup.ts';
 
@@ -79,15 +80,7 @@ export async function withFigureSource(
 ): Promise<string> {
   const text = withoutFigureSource(svg);
   const element = await sourceElement(source, text);
-  const root = /<svg\b[^>]*>/i.exec(text);
-  if (!root || root[0].endsWith('/>')) return svg;
-  const after = root.index + root[0].length;
-  const metadata = /<metadata(?:\s[^>]*)?>/.exec(text.slice(after));
-  if (metadata) {
-    const inside = after + metadata.index + metadata[0].length;
-    return `${text.slice(0, inside)}${element}${text.slice(inside)}`;
-  }
-  return `${text.slice(0, after)}<metadata>${element}</metadata>${text.slice(after)}`;
+  return withMetadataElement(text, element) ?? svg;
 }
 
 /**

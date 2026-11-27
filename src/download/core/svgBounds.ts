@@ -63,39 +63,3 @@ export function drawingCrop(svg: SVGSVGElement): SvgBox | null {
   if (svg.querySelector(marked) === null) return null;
   return contentBox(svg, CONTENT_PADDING);
 }
-
-/**
- * The rectangle the element itself covers, rather than the marks inside it.
- *
- * A chart is drawn to the box it was given — its axes reach the edges of it and
- * its trace reaches wherever the data does — so the box is the picture, and
- * measuring the marks would crop the frame off it. It is measured where it is
- * on the page, and read off its own attributes where it is not: a picture of a
- * stacked editor is composed out of the panes rather than being any one element
- * on screen, so it never has a place on the page to be measured at and carries
- * the size it was composed at instead.
- * @param svg - The element to measure.
- * @returns The rectangle, or `null` when it is neither laid out nor sized.
- */
-export function elementBox(svg: SVGSVGElement): SvgBox | null {
-  const laidOut = svg.getBoundingClientRect();
-  if (laidOut.width > 0 && laidOut.height > 0) {
-    return { x: 0, y: 0, width: laidOut.width, height: laidOut.height };
-  }
-
-  const width = statedSide(svg, 'width');
-  const height = statedSide(svg, 'height');
-  if (width <= 0 || height <= 0) return null;
-  return { x: 0, y: 0, width, height };
-}
-
-/**
- * A side the element states for itself, for one that is not on the page.
- * @param svg - The element.
- * @param name - Which side to read.
- * @returns Its length in drawing units, `0` when it states none.
- */
-function statedSide(svg: SVGSVGElement, name: 'width' | 'height'): number {
-  const stated = Number.parseFloat(svg.getAttribute(name) ?? '');
-  return Number.isFinite(stated) ? stated : 0;
-}

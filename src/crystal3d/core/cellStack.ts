@@ -3,12 +3,9 @@
  *
  * The stack is n×n×n and starts every axis at cell 0. The atoms themselves are
  * repeated by `supercellAtoms`, which works in Cartesian ångström and is what
- * the scene wants. What is here is what that does not say: the six parameters
- * of the stack, how many atoms it holds, and how large a stack this machine
- * should be asked to draw.
+ * the scene wants. What is here is what that does not say: how many atoms the
+ * stack holds, and how large a stack this machine should be asked to draw.
  */
-
-import type { UnitCell } from '../../crystal/core/symmetry/lattice.ts';
 
 /**
  * How many atoms a page draws before it stops growing the stack.
@@ -18,28 +15,6 @@ import type { UnitCell } from '../../crystal/core/symmetry/lattice.ts';
  * the page rather than drawing it.
  */
 export const SUPERCELL_ATOM_CAP = 20000;
-
-/**
- * The six parameters of the stack itself: the edges multiply, the angles do not.
- *
- * Its operations are **not** those of the cell it was built from — half of
- * `P2₁/c`'s stop being symmetry operations the moment `a` is doubled — so
- * nothing here claims a space group for it.
- * @param cell - The cell being repeated.
- * @param cells - Cells along each axis; anything below 1 counts as 1.
- * @returns The stack's own cell.
- */
-export function repeatCell(cell: UnitCell, cells: number): UnitCell {
-  const count = wholeCells(cells);
-  return {
-    a: cell.a * count,
-    b: cell.b * count,
-    c: cell.c * count,
-    alpha: cell.alpha,
-    beta: cell.beta,
-    gamma: cell.gamma,
-  };
-}
 
 /**
  * How many atoms the stack holds, without building it.

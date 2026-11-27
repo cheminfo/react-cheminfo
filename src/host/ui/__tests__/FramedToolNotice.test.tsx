@@ -5,10 +5,9 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type { FramedToolNoticeProps } from '../FramedToolNotice.tsx';
 import { FramedToolNotice } from '../FramedToolNotice.tsx';
 
@@ -20,19 +19,12 @@ const RECORD = {
 };
 const NEXT = 'Cancel goes back to the document, which is as it was.';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

@@ -1,17 +1,9 @@
 import { afterEach, expect, test, vi } from 'vitest';
 
-import type { Cell } from '../../../storage/core/documentFile.ts';
+import { cell } from '../../../storage/core/__tests__/fakeFileSystem.ts';
 import { createPanelState } from '../createPanelState.ts';
 
 type Panel = 'parts' | 'info' | 'folder';
-
-function cell<T>(value: T): Cell<T> {
-  const holder = {
-    value,
-    peek: () => holder.value,
-  };
-  return holder;
-}
 
 function panels(open: Panel[], folded: Panel[] = []) {
   const cells = {

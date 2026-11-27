@@ -4,7 +4,6 @@ import {
   UNRELEASED_VERSION,
   buildLabel,
   buildStamp,
-  buildSummary,
   formatBuiltAt,
   readBuildInfo,
   releasedVersion,
@@ -74,19 +73,6 @@ test('a build with neither a release nor a commit is named by nothing', () => {
     }),
   ).toBeUndefined();
   expect(buildLabel(undefined)).toBeUndefined();
-});
-
-test('the summary is the whole record in one line', () => {
-  expect(
-    buildSummary({
-      version: '2.4.0',
-      builtAt: '2026-09-16T09:41:07Z',
-      commit: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678',
-    }),
-  ).toBe('Built 2026-09-16 09:41:07 UTC from commit a1b2c3d');
-  expect(
-    buildSummary({ version: '2.4.0', builtAt: '2026-09-16T09:41:07Z' }),
-  ).toBe('Built 2026-09-16 09:41:07 UTC');
 });
 
 test('the badge dates a build to the minute, in UTC', () => {

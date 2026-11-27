@@ -1,11 +1,19 @@
 import { readFileSync } from 'node:fs';
 
-import type { Download, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { pngDpi } from '../src/download/core/pngDpi.ts';
 
-import { announcedPng, openFigurePanel, pickPng } from './figurePanel.ts';
+import {
+  PNG_HEIGHT_AT,
+  PNG_SIGNATURE,
+  PNG_WIDTH_AT,
+  announcedPng,
+  openFigurePanel,
+  pickPng,
+  save,
+} from './figurePanel.ts';
 import { openStory } from './story.ts';
 
 // The embedded viewer, whose bar carries the glyph that saves the figure.
@@ -13,24 +21,6 @@ const IRIS = 'projection-pcaviewer--iris';
 
 // The same viewer opened on the grid, which is sixteen charts rather than one.
 const PAIRS = 'projection-pcaviewer--every-pair';
-
-// The first eight bytes of every PNG, and where its header writes the size.
-const PNG_SIGNATURE = '89504e470d0a1a0a';
-const PNG_WIDTH_AT = 16;
-const PNG_HEIGHT_AT = 20;
-
-/**
- * Press save, and hand back the file the browser was given.
- * @param page - The page showing the figure.
- * @returns The download.
- */
-async function save(page: Page): Promise<Download> {
-  const [download] = await Promise.all([
-    page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Save', exact: true }).click(),
-  ]);
-  return download;
-}
 
 /**
  * Press save, and read back the file the browser wrote.

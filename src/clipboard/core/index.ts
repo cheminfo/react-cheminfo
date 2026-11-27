@@ -9,10 +9,4 @@ export type {
   ClipboardNoticeOptions,
   ClipboardNoticeTone,
 } from './showClipboardNotice.ts';
-export {
-  CLIPBOARD_NOTICE_CLASS,
-  CLIPBOARD_NOTICE_LEAVE,
-  CLIPBOARD_NOTICE_TIME,
-  hideClipboardNotice,
-  showClipboardNotice,
-} from './showClipboardNotice.ts';
+export { showClipboardNotice } from './showClipboardNotice.ts';

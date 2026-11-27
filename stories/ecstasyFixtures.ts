@@ -30,12 +30,6 @@ import type {
 
 import data from './ecstasyPca.json' with { type: 'json' };
 
-/** Where the spectra came from, for the story to credit them. */
-export const ECSTASY_SOURCE = data.source;
-
-/** How the spectra were read and reduced, for the story to state it. */
-export const ECSTASY_PROCESSING = data.processing;
-
 /** What is known about each pill, in the score matrix's row order. */
 const ECSTASY_PILLS: ReadonlyArray<{
   /** The spectrum's own name, which is its file's name in `original.zip`. */

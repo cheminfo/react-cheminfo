@@ -6,8 +6,8 @@
  * talks to the frame through `cheminfo-mcp-server/embed`: a site that serves
  * no tools must never be made to install it. The addresses — `CARD_PARAM`,
  * `sitePageUrl`, `cardPageUrl` — need neither React nor the frame, and are in
- * `react-cheminfo/core` too.
+ * `react-cheminfo/core`.
  */
 
-export * from './card/core/index.ts';
 export * from './card/ui/index.ts';
+export type { SitePageOptions } from './card/core/cardAddress.ts';

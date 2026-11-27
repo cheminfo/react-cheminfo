@@ -1,5 +1,14 @@
-import type { Page } from '@playwright/test';
+import type { Download, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
+
+/** The first eight bytes of every PNG, in hexadecimal. */
+export const PNG_SIGNATURE = '89504e470d0a1a0a';
+
+/** Where a PNG's header writes its width. */
+export const PNG_WIDTH_AT = 16;
+
+/** Where a PNG's header writes its height. */
+export const PNG_HEIGHT_AT = 20;
 
 /** The glyph that opens the figure panel, which opens on an SVG. */
 export const SAVE_SVG = 'Save this figure — SVG';
@@ -43,4 +52,17 @@ export async function announcedPng(
   const [, width, height] =
     /(?<width>\d+) × (?<height>\d+)/u.exec(hint ?? '') ?? [];
   return { width: Number(width), height: Number(height) };
+}
+
+/**
+ * Press save, and hand back the file the browser was given.
+ * @param page - The page showing the figure.
+ * @returns The download.
+ */
+export async function save(page: Page): Promise<Download> {
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Save', exact: true }).click(),
+  ]);
+  return download;
 }

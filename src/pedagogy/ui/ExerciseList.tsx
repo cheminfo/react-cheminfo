@@ -2,7 +2,6 @@ import { Tag } from '@blueprintjs/core';
 import type { ReactElement, ReactNode } from 'react';
 
 import { useDocumentListNavigation } from '../../hooks/ui/useDocumentListNavigation.ts';
-import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { ProgressRecords } from '../core/progress.ts';
@@ -81,12 +80,6 @@ export interface ExerciseListProps<TExercise extends ExerciseListEntry> {
    */
   className?: string;
 }
-
-const STATUS_TITLE: Record<ExerciseStatus, ChromeKey> = {
-  idle: 'pedagogy.statusIdle',
-  attempted: 'pedagogy.statusAttempted',
-  solved: 'pedagogy.statusSolved',
-};
 
 /**
  * The exercises of a set, each with where the student stands on it, under the
@@ -169,10 +162,7 @@ export function ExerciseList<TExercise extends ExerciseListEntry>(
                 onSelect(exercise.id);
               }}
             >
-              <ExerciseStatusIcon
-                status={status}
-                title={t(STATUS_TITLE[status])}
-              />
+              <ExerciseStatusIcon status={status} />
               <span className="exercise-list__title">
                 {renderTitle === undefined ? (
                   <InlineText text={exercise.title} />

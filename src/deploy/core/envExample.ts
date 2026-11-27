@@ -1,3 +1,5 @@
+import { escapeRegExp } from '../../share/core/escape.ts';
+
 import type { DeployProblem } from './types.ts';
 
 /**
@@ -39,8 +41,4 @@ export function readEnvExample(
       });
     }
   }
-}
-
-function escapeRegExp(value: string): string {
-  return value.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
 }

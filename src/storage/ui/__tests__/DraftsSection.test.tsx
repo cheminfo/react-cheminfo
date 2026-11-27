@@ -6,22 +6,21 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import {
+  freshRoot,
+  host,
+  mountRoot,
+  root,
+  unmountRoot,
+} from '../../../__tests__/root.ts';
 import type { Draft, DraftStore } from '../../core/createDraftStore.ts';
 import type { DraftSession } from '../../core/draftSessionTypes.ts';
 import { DraftsSection } from '../DraftsSection.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
   const entries = new Map<string, string>();
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => entries.get(key) ?? null,
@@ -35,10 +34,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 
@@ -137,7 +133,7 @@ test('drafts start closed, say how many they are, and stay open once opened', as
   act(() => {
     root.unmount();
   });
-  root = createRoot(host);
+  freshRoot();
   await render(sessionOf());
 
   expect(rows()).toHaveLength(3);

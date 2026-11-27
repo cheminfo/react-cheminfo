@@ -1,6 +1,6 @@
 import type { AboutContent } from './about.ts';
 import { affiliationProblems } from './affiliations.ts';
-import { COORDINATOR } from './team.ts';
+import { COORDINATOR } from './familyPeople.ts';
 
 /**
  * What is wrong with a record before anyone reads the page it draws.

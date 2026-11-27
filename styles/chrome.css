@@ -39,6 +39,12 @@
   --warning: #d97706;
 }
 
+/* Every page of the family is drawn light: the form controls and the scroll
+   bars the browser paints follow it, whatever the system asks for. */
+:root {
+  color-scheme: light;
+}
+
 /* The size goes on `body`, never on `html`: `rem` has to stay the browser's
    16px, or every measurement written here shrinks by 6.25% and the bar renders
    45px tall on one site and 48px on its sibling. */
@@ -58,6 +64,13 @@ textarea,
 select,
 button {
   font-family: inherit;
+}
+
+/* A link is the site's own colour, at rest and under the pointer: Blueprint's
+   blue is no colour of the family. */
+a,
+a:hover {
+  color: var(--accent);
 }
 
 /* No focus ring, ever: not after a click, not from the keyboard. `!important`

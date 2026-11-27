@@ -6,11 +6,10 @@
 
 import type * as Embed from 'cheminfo-mcp-server/embed';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import {
   holdPageAddress,
   releasePageAddress,
@@ -32,20 +31,13 @@ beforeAll(async () => {
   await loadEmbed();
 });
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   opened.length = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   releasePageAddress();
   globalThis.history.replaceState(null, '', '/');
   vi.unstubAllGlobals();

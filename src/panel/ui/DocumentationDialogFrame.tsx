@@ -10,6 +10,8 @@
 import { Button, Dialog, DialogBody, DialogFooter } from '@blueprintjs/core';
 import type { ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 import { Section } from './Section.tsx';
 import { useConfirmOnEnter } from './useConfirmOnEnter.ts';
 
@@ -33,7 +35,7 @@ export interface DocumentationDialogFrameProps {
   sections: readonly DocumentationSection[];
   /**
    * What the title bar reads.
-   * @default 'Documentation'
+   * @default 'Documentation', in the language of the page
    */
   title?: string;
 }
@@ -46,7 +48,9 @@ export interface DocumentationDialogFrameProps {
 export function DocumentationDialogFrame(
   props: DocumentationDialogFrameProps,
 ): ReactNode {
-  const { isOpen, onClose, sections, title = 'Documentation' } = props;
+  const { isOpen, onClose, sections } = props;
+  const t = useChromeT();
+  const title = props.title ?? t('panel.documentation');
   useConfirmOnEnter(isOpen, onClose);
 
   return (
@@ -69,7 +73,7 @@ export function DocumentationDialogFrame(
       <DialogFooter
         actions={
           <Button intent="primary" onClick={onClose}>
-            Close
+            {t('figure.close')}
           </Button>
         }
       />

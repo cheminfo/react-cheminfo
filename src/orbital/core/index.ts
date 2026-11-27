@@ -37,16 +37,11 @@ export {
   enclosingRadius,
   meanRadius,
   orbitalEnergy,
-  radialAmplitude,
   radialNodeCount,
   radialNodeRadii,
   radialProfile,
 } from './hydrogenic.ts';
-export {
-  hundDistribution,
-  outermostShell,
-  withoutOutermostElectron,
-} from './occupancy.ts';
+export { hundDistribution } from './occupancy.ts';
 export type { PhasePalette, PhasePaletteId } from './palette.ts';
 export { DEFAULT_PHASE_PALETTE_ID, PHASE_PALETTES } from './palette.ts';
 export type {

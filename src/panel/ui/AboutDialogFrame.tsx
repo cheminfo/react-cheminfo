@@ -11,6 +11,8 @@
 import { Button, Dialog, DialogBody, DialogFooter } from '@blueprintjs/core';
 import type { ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
+
 import { useConfirmOnEnter } from './useConfirmOnEnter.ts';
 
 /** What an About dialog is given. */
@@ -40,6 +42,7 @@ export interface AboutDialogFrameProps {
  */
 export function AboutDialogFrame(props: AboutDialogFrameProps): ReactNode {
   const { isOpen, onClose, title, mark, logo, name, intro, children } = props;
+  const t = useChromeT();
   useConfirmOnEnter(isOpen, onClose);
 
   return (
@@ -65,7 +68,7 @@ export function AboutDialogFrame(props: AboutDialogFrameProps): ReactNode {
       <DialogFooter
         actions={
           <Button intent="primary" onClick={onClose}>
-            Close
+            {t('figure.close')}
           </Button>
         }
       />

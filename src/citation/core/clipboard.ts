@@ -40,18 +40,3 @@ export async function copyCitations(
     throw new Error('The clipboard refused the citation');
   }
 }
-
-/**
- * Put one reference on the clipboard.
- * @param reference - Reference to copy.
- * @param format - Format to copy it in.
- * @param style - The CSL style of a format written as a journal writes it.
- * @returns Resolves once the clipboard holds the citation.
- */
-export function copyCitation(
-  reference: Reference,
-  format: CitationFormatId,
-  style?: string,
-): Promise<void> {
-  return copyCitations([reference], format, style);
-}

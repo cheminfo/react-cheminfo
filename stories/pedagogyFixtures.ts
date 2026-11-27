@@ -10,7 +10,7 @@
 
 import type { Glossary } from '../src/pedagogy/core/glossary.ts';
 import type { ProgressSummary } from '../src/pedagogy/core/progress.ts';
-import type { BaseExercise, TutorialStep } from '../src/pedagogy/core/types.ts';
+import type { TutorialStep } from '../src/pedagogy/core/types.ts';
 import type { TestCaseResult } from '../src/pedagogy/core/validation.ts';
 import type { ReferenceSection } from '../src/pedagogy/ui/ReferenceSectionBlock.tsx';
 import type { SyntaxTooltipContent } from '../src/pedagogy/ui/SyntaxTooltip.tsx';
@@ -127,82 +127,6 @@ export const ALANINE_HINTS: string[] = [
   'The α carbon carries four different neighbours, so it needs brackets.',
   'Inside the brackets the hydrogen is written out, right after the @ or @@.',
   'Start the walk at the nitrogen, and the natural form is the @@ one.',
-];
-
-/** Six exercises, two per level, of the kind the Exercises tab hands out. */
-export const SMILES_EXERCISES: BaseExercise[] = [
-  {
-    id: 'ethanol',
-    title: 'Ethanol',
-    level: 'beginner',
-    description:
-      'Write ethanol as a [[smiles|SMILES]] string. Its [[implicit hydrogen|hydrogens]] are filled in for you.',
-    hints: [
-      'Carbon is C and oxygen is O; nothing else has to be written.',
-      'Walk the molecule: carbon, carbon, then the oxygen of the hydroxyl.',
-      'Three characters, no bond symbols at all.',
-    ],
-    solution: 'CCO',
-  },
-  {
-    id: 'propan-2-ol',
-    title: 'Propan-2-ol',
-    level: 'beginner',
-    description:
-      'Write propan-2-ol, whose hydroxyl sits on the middle carbon. You will need a [[branch]].',
-    hints: [
-      'Start on an end carbon and walk to the middle one.',
-      'Hang the third carbon off the middle atom in parentheses, then carry on to the oxygen.',
-    ],
-    solution: 'CC(C)O',
-  },
-  {
-    id: 'acetic-acid',
-    title: 'Acetic acid',
-    level: 'intermediate',
-    description:
-      'Write acetic acid. The carbonyl is a [[double bond]] and belongs in a [[branch]].',
-    hints: [
-      'The two oxygens are not the same: one is doubly bonded, one carries the acidic hydrogen.',
-      'A branch may hold a bond symbol: (=O).',
-      'Methyl, then the carboxyl carbon, then its two oxygens.',
-    ],
-    solution: 'CC(=O)O',
-  },
-  {
-    id: 'benzene',
-    title: 'Benzene',
-    level: 'intermediate',
-    description:
-      'Write benzene with [[aromatic atom|aromatic atoms]] rather than alternating single and double bonds.',
-    hints: [
-      'Lowercase c is an aromatic carbon.',
-      'Open the ring with a digit on the first atom and close it with the same digit on the last.',
-    ],
-    solution: 'c1ccccc1',
-  },
-  {
-    id: 'l-alanine',
-    title: 'L-alanine',
-    level: 'advanced',
-    description:
-      'Write L-alanine, the natural enantiomer, with its [[stereocentre]] spelled out.',
-    hints: ALANINE_HINTS,
-    solution: 'N[C@@H](C)C(=O)O',
-  },
-  {
-    id: 'paracetamol',
-    title: 'Paracetamol',
-    level: 'advanced',
-    description:
-      'Write paracetamol: an acetamide on a para-substituted phenol. Every construct of this tour is in it.',
-    hints: [
-      'Build it in three pieces: the acetyl, the amide nitrogen, the ring.',
-      'A substituent on an aromatic ring is a branch hanging off a lowercase atom.',
-      'Para means three ring atoms between the two substituents, either way round.',
-    ],
-    solution: 'CC(=O)Nc1ccc(O)cc1',
-  },
 ];
 
 /** What a step of this tour preloads into the live playground. */

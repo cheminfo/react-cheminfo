@@ -10,7 +10,6 @@ export {
   UNRELEASED_VERSION,
   buildLabel,
   buildStamp,
-  buildSummary,
   formatBuiltAt,
   readBuildInfo,
   releasedVersion,

@@ -3,6 +3,8 @@
  * browser: the size it asks to be drawn at, and the attributes of its root.
  */
 
+import { roundTo } from '../../format/core/roundTo.ts';
+
 import type { SvgBox } from './svgBounds.ts';
 
 /** A width and a height, in points. */
@@ -110,4 +112,14 @@ function lengthInPoints(value: string | undefined): number | undefined {
   const amount = Number(match.groups.amount);
   if (factor === undefined || !(amount > 0)) return undefined;
   return amount * factor;
+}
+
+/**
+ * A number as an SVG attribute writes it: at most two decimals, `0` for a
+ * measurement that is not a number at all, and never `-0`.
+ * @param value - The number.
+ * @returns The number to write.
+ */
+export function svgNumber(value: number): number {
+  return Number.isFinite(value) ? roundTo(value) + 0 : 0;
 }

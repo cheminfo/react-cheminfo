@@ -1,7 +1,7 @@
-import { Alert, Button, ProgressBar } from '@blueprintjs/core';
+import { ProgressBar } from '@blueprintjs/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
-import { useState } from 'react';
 
+import { ConfirmButton } from '../../confirm/ui/ConfirmButton.tsx';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { ProgressSummary } from '../core/progress.ts';
@@ -59,7 +59,6 @@ export function ExerciseProgressHeader(
     className,
   } = props;
   const t = useChromeT();
-  const [confirming, setConfirming] = useState(false);
   const complete = summary.total > 0 && summary.solved === summary.total;
 
   return (
@@ -75,16 +74,17 @@ export function ExerciseProgressHeader(
           style={PERCENT_STYLE}
         >{`${Math.round(summary.ratio * 100)}%`}</span>
         {onClearAll !== undefined && (
-          <Button
+          <ConfirmButton
             size="small"
             variant="minimal"
             intent="danger"
             icon="trash"
             text={clearLabel ?? t('pedagogy.clearAll')}
             disabled={clearDisabled}
-            onClick={() => {
-              setConfirming(true);
-            }}
+            question={clearWarning ?? t('pedagogy.clearWarning')}
+            confirmLabel={t('pedagogy.clearEverything')}
+            cancelLabel={t('pedagogy.keepAnswers')}
+            onConfirm={onClearAll}
           />
         )}
       </div>
@@ -95,25 +95,6 @@ export function ExerciseProgressHeader(
         intent={complete ? 'success' : 'primary'}
         value={summary.ratio}
       />
-
-      {onClearAll !== undefined && (
-        <Alert
-          isOpen={confirming}
-          intent="danger"
-          icon="trash"
-          cancelButtonText={t('pedagogy.keepAnswers')}
-          confirmButtonText={t('pedagogy.clearEverything')}
-          onCancel={() => {
-            setConfirming(false);
-          }}
-          onConfirm={() => {
-            onClearAll();
-            setConfirming(false);
-          }}
-        >
-          {clearWarning ?? t('pedagogy.clearWarning')}
-        </Alert>
-      )}
     </div>
   );
 }

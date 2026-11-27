@@ -1,44 +1,16 @@
 // @vitest-environment jsdom
-import {
-  IDBCursor,
-  IDBCursorWithValue,
-  IDBDatabase,
-  IDBFactory,
-  IDBIndex,
-  IDBKeyRange,
-  IDBObjectStore,
-  IDBRequest,
-  IDBTransaction,
-} from 'fake-indexeddb';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { createReactiveSystem } from '../../../state/core/__tests__/fakeSignals.ts';
+import { stubIndexedDB } from '../../../storage/core/__tests__/fakeIndexedDB.ts';
 import { createWorkspaces } from '../../../storage/core/createWorkspaces.ts';
 import type { Workspaces } from '../../../storage/core/workspaceTypes.ts';
 import { SettingsDialog } from '../SettingsDialog.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  const classes = {
-    IDBCursor,
-    IDBCursorWithValue,
-    IDBDatabase,
-    IDBIndex,
-    IDBKeyRange,
-    IDBObjectStore,
-    IDBRequest,
-    IDBTransaction,
-  };
-  for (const [name, value] of Object.entries(classes)) {
-    vi.stubGlobal(name, value);
-  }
-  vi.stubGlobal('indexedDB', new IDBFactory());
+  stubIndexedDB();
   const entries = new Map<string, string>();
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => entries.get(key) ?? null,
@@ -49,16 +21,11 @@ beforeEach(() => {
       entries.delete(key);
     },
   });
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   document.body.innerHTML = '';
   vi.unstubAllGlobals();
 });

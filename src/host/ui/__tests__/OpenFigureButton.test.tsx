@@ -13,13 +13,12 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { until } from '../../../__tests__/until.ts';
 import { setFigureRevision } from '../../../download/core/figureRevision.ts';
 import { withFigureSource } from '../../../download/core/figureSource.ts';
 import { writeSiteDocument } from '../../../storage/core/siteDocument.ts';
 import type { OpenFigureButtonProps } from '../OpenFigureButton.tsx';
 import { OpenFigureButton } from '../OpenFigureButton.tsx';
-
-import { until } from './until.ts';
 
 const FIGURE =
   '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20"/></svg>';

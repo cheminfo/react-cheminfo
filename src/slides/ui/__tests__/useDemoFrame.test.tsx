@@ -8,17 +8,14 @@
  */
 
 import { act, useRef } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import { DEMO_READY, DEMO_STEP } from '../../core/index.ts';
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
+import { DEMO_READY, DEMO_STEP } from '../../core/demoProtocol.ts';
 import { useDemoFrame } from '../useDemoFrame.ts';
 
 const TOOL = 'https://glassware.cheminfo.org/?embed=1&demo=reflux';
 
-let host: HTMLDivElement;
-let root: Root;
 let posted: Array<[unknown, string]>;
 
 interface ProbeProps {
@@ -34,16 +31,12 @@ function Probe(props: ProbeProps) {
 }
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   posted = [];
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });

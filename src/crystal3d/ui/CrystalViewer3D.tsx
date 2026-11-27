@@ -106,18 +106,11 @@ export interface CrystalViewer3DProps {
  */
 export function CrystalViewer3D(props: CrystalViewer3DProps): ReactElement {
   const {
-    scene,
     height = 420,
-    background,
-    tools,
-    settings,
-    defaultSettings,
-    onSettingsChange,
-    fileName,
     caption,
     emptyMessage,
     unsupportedNote,
-    onHandle,
+    ...canvas
   } = props;
   const t = useChromeT();
   const [capability] = useState(probeViewerCapability);
@@ -140,7 +133,7 @@ export function CrystalViewer3D(props: CrystalViewer3DProps): ReactElement {
   return (
     <div style={ROOT_STYLE}>
       <div style={{ ...FRAME_STYLE, height }}>
-        {scene.atoms.length === 0 ? (
+        {canvas.scene.atoms.length === 0 ? (
           <div style={NOTICE_STYLE}>{emptyMessage}</div>
         ) : (
           <Suspense
@@ -151,17 +144,7 @@ export function CrystalViewer3D(props: CrystalViewer3DProps): ReactElement {
               </div>
             }
           >
-            <CrystalCanvas3D
-              scene={scene}
-              background={background}
-              tools={tools}
-              settings={settings}
-              defaultSettings={defaultSettings}
-              onSettingsChange={onSettingsChange}
-              fileName={fileName}
-              onFailure={setFailure}
-              onHandle={onHandle}
-            />
+            <CrystalCanvas3D {...canvas} onFailure={setFailure} />
           </Suspense>
         )}
       </div>

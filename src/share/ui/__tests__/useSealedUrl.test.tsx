@@ -6,34 +6,26 @@
 
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
+import { until } from '../../../__tests__/until.ts';
 import { sealShareUrl } from '../../core/index.ts';
 import type { SealedUrl } from '../useSealedUrl.ts';
 import { useSealedUrl } from '../useSealedUrl.ts';
 
-import { until } from './until.ts';
-
 const ALKANES = 'https://isomers.cheminfo.org/exercises?formulas=C4H10O';
 const ALCOHOLS = 'https://isomers.cheminfo.org/exercises?formulas=C5H12O';
 
-let host: HTMLDivElement;
-let root: Root;
 const seen: SealedUrl[] = [];
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   seen.length = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

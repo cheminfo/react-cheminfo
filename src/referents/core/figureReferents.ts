@@ -4,7 +4,16 @@
  * may come from any program, and is read before anything trusts it.
  */
 
-import { escapeText } from '../../share/core/escape.ts';
+import {
+  boundPrefix,
+  withMetadataElement,
+  withoutEmptyMetadata,
+} from '../../download/core/svgMetadata.ts';
+import {
+  escapeRegExp,
+  escapeText,
+  unescapeXml,
+} from '../../share/core/escape.ts';
 
 import { readReferents } from './readReferents.ts';
 import type { FigureReferents } from './types.ts';
@@ -34,15 +43,7 @@ export function withFigureReferents(
     return text;
   }
   const element = `<cheminfo:referents xmlns:cheminfo="${FIGURE_REFERENTS_NAMESPACE}">${escapeText(JSON.stringify(referents))}</cheminfo:referents>`;
-  const root = /<svg\b[^>]*>/i.exec(text);
-  if (!root || root[0].endsWith('/>')) return svg;
-  const after = root.index + root[0].length;
-  const metadata = /<metadata(?:\s[^>]*)?>/.exec(text.slice(after));
-  if (metadata) {
-    const inside = after + metadata.index + metadata[0].length;
-    return `${text.slice(0, inside)}${element}${text.slice(inside)}`;
-  }
-  return `${text.slice(0, after)}<metadata>${element}</metadata>${text.slice(after)}`;
+  return withMetadataElement(text, element) ?? svg;
 }
 
 /**
@@ -55,7 +56,7 @@ export function readFigureReferents(svg: string): FigureReferents | undefined {
   const found = findReferents(svg);
   if (found === undefined) return undefined;
   try {
-    return readReferents(JSON.parse(unescapeText(found.body)));
+    return readReferents(JSON.parse(unescapeXml(found.body)));
   } catch {
     return undefined;
   }
@@ -69,9 +70,8 @@ export function readFigureReferents(svg: string): FigureReferents | undefined {
 export function withoutFigureReferents(svg: string): string {
   const found = findReferents(svg);
   if (found === undefined) return svg;
-  return `${svg.slice(0, found.start)}${svg.slice(found.end)}`.replace(
-    '<metadata></metadata>',
-    '',
+  return withoutEmptyMetadata(
+    `${svg.slice(0, found.start)}${svg.slice(found.end)}`,
   );
 }
 
@@ -82,9 +82,7 @@ interface FoundReferents {
 }
 
 function findReferents(svg: string): FoundReferents | undefined {
-  const prefix = new RegExp(
-    String.raw`xmlns:(?<prefix>[A-Za-z_][\w.-]*)\s*=\s*["']${escapeRegExp(FIGURE_REFERENTS_NAMESPACE)}["']`,
-  ).exec(svg)?.groups?.prefix;
+  const prefix = boundPrefix(svg, FIGURE_REFERENTS_NAMESPACE);
   if (prefix === undefined) return undefined;
   const name = escapeRegExp(`${prefix}:referents`);
   const match = new RegExp(
@@ -96,16 +94,4 @@ function findReferents(svg: string): FoundReferents | undefined {
     end: match.index + match[0].length,
     body: match.groups?.body ?? '',
   };
-}
-
-function unescapeText(value: string): string {
-  return value
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&amp;', '&');
-}
-
-function escapeRegExp(value: string): string {
-  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }

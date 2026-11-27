@@ -6,11 +6,10 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { Toolbar } from 'react-science/ui';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type {
   SavedDocument,
   SavedDocuments,
@@ -18,21 +17,12 @@ import type {
 import type { SaveInBrowserItemProps } from '../SaveInBrowserItem.tsx';
 import { SaveInBrowserItem } from '../SaveInBrowserItem.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   document.body.innerHTML = '';
   vi.unstubAllGlobals();
 });

@@ -6,10 +6,9 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type { SharePreviewProps } from '../SharePreview.tsx';
 import { SharePreview } from '../SharePreview.tsx';
 
@@ -37,12 +36,9 @@ class FakeResizeObserver {
   }
 }
 
-let host: HTMLDivElement;
-let root: Root;
 const scrolled: unknown[] = [];
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('ResizeObserver', FakeResizeObserver);
   Object.defineProperty(Element.prototype, 'scrollIntoView', {
     configurable: true,
@@ -51,14 +47,11 @@ beforeEach(() => {
     },
   });
   scrolled.length = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   delete (Element.prototype as Partial<Element>).scrollIntoView;
   vi.useRealTimers();
   vi.unstubAllGlobals();

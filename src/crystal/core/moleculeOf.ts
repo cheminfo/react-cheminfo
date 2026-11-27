@@ -8,6 +8,7 @@ import type {
   CrystalMoleculeBond,
 } from './moleculeTypes.ts';
 import type { Lattice } from './symmetry/lattice.ts';
+import { fractionalToCartesian } from './symmetry/lattice.ts';
 
 /** Slack on a centroid sitting on a cell face, so it lands in one cell only. */
 const CENTRE_TOLERANCE = 1e-6;
@@ -45,7 +46,6 @@ export function buildMolecule(
   const { atoms, sites, shifts, lattice, localOf } = context;
   const order = moleculeOrder(members, context);
   const move = placement(order, context);
-  const m = lattice.cartesian;
   const placed: CrystalMoleculeAtom[] = [];
   for (let local = 0; local < order.length; local++) {
     const index = order[local] ?? 0;
@@ -59,17 +59,13 @@ export function buildMolecule(
         (shifts[index * 3 + axis] ?? 0) +
         (move[axis] ?? 0);
     }
-    const [x = 0, y = 0, z = 0] = fractional;
+    const [x = 0, y = 0, z = 0] = fractionalToCartesian(lattice, fractional);
     placed.push({
       element: atom.element,
       label: atom.label,
       siteIndex: atom.siteIndex,
       operationIndex: atom.operationIndex,
-      position: [
-        (m[0]?.[0] ?? 0) * x + (m[0]?.[1] ?? 0) * y + (m[0]?.[2] ?? 0) * z,
-        (m[1]?.[0] ?? 0) * x + (m[1]?.[1] ?? 0) * y + (m[1]?.[2] ?? 0) * z,
-        (m[2]?.[0] ?? 0) * x + (m[2]?.[1] ?? 0) * y + (m[2]?.[2] ?? 0) * z,
-      ],
+      position: [x, y, z],
       occupancy: atom.occupancy,
       disorderGroup: disorderGroupOf(site),
     });

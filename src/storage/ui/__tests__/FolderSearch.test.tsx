@@ -1,58 +1,25 @@
 // @vitest-environment jsdom
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { matchesNeedle } from '../../../panel/core/textFilter.ts';
 import { PanelCount, PanelSearch } from '../../../panel/ui/PanelSearch.tsx';
 import { usePanelNeedle } from '../../../panel/ui/panelSearchContext.ts';
-import type {
-  SavedDocument,
-  SavedDocuments,
-} from '../../core/createSavedDocuments.ts';
+import { listedDocuments } from '../../core/__tests__/fakeFileSystem.ts';
 import { ExamplesSection } from '../ExamplesSection.tsx';
 import { FolderSearchField } from '../FolderSearch.tsx';
 import { SavedDocumentsSection } from '../SavedDocumentsSection.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
-
-function stopListening(): void {
-  // Nothing is listened to.
-}
-
-function memoryStore(
-  documents: Array<SavedDocument<string>>,
-): SavedDocuments<string> {
-  return {
-    isAvailable: () => Promise.resolve(true),
-    list: () => Promise.resolve(documents),
-    named: () => Promise.resolve(undefined),
-    save: () => Promise.reject(new Error('not in this test')),
-    update: () => Promise.resolve(undefined),
-    rename: () => Promise.resolve(),
-    remove: () => Promise.resolve(),
-    restore: () => Promise.resolve(0),
-    subscribe: () => stopListening,
-  };
-}
 
 const DRAFTS = ['Benzene draft', 'Cyclohexane draft'];
 
@@ -83,7 +50,7 @@ async function showPanel(): Promise<void> {
         <PanelCount />
         <DraftsSection />
         <SavedDocumentsSection
-          store={memoryStore([
+          store={listedDocuments([
             { id: 'b', name: 'Caffeine', savedAt: now, data: 'c' },
             { id: 'a', name: 'Aspirin', savedAt: now, data: 'a' },
           ])}

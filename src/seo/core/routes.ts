@@ -9,18 +9,11 @@
  */
 
 import {
+  addressPath,
   safeDecode,
   trimTrailingSlash,
-  withoutQueryOrFragment,
 } from '../../router/core/address.ts';
 import { stripBasePath } from '../../router/core/basePath.ts';
-
-const QUERY_OR_FRAGMENT = /[?#]/;
-
-// A scheme and an authority: what `location.href` hands out, and the one shape
-// that cannot be confused with a path. `//host/path` is left as a path, because
-// a route table is free to name one.
-const ABSOLUTE_URL = /^[a-z][\d+.a-z-]*:\/\//i;
 
 /** A page, as a crawler and a shared card see it. */
 export interface RouteMeta {
@@ -126,7 +119,7 @@ export function pageMetaFor(
   basePath = '',
 ): RouteMeta {
   const home = homeRoute(routes);
-  const path = pathOf(url);
+  const path = addressPath(url);
   const own = stripBasePath(basePath, path);
   return (
     exactRoute(routes, own) ??
@@ -147,69 +140,6 @@ export function homeRoute(routes: readonly RouteMeta[]): RouteMeta {
   const first = routes[0];
   if (first === undefined) throw new Error('a site answers at least one route');
   return exactRoute(routes, '/') ?? first;
-}
-
-/**
- * Check a route table before a build reads it as a set of file names.
- *
- * An address written twice ships two sitemap entries and two links to a page
- * only the first entry describes, and one carrying a `..` segment writes its
- * file outside the build output. Two addresses that differ only in an empty
- * segment or in case are the same defect wearing a disguise: `//x` and `/x`
- * both write `dist/x.html`, and so do `/About` and `/about` on the
- * case-insensitive filesystem macOS and Windows ship by default — one file, two
- * sitemap entries, and only one of the two descriptions survives. All of it is
- * author configuration read at build time, so it is refused where it is written
- * rather than repaired where it lands.
- * @param routes - Every address the site answers.
- * @throws {Error} When the table is empty, names one address twice — under any
- * of those spellings — or carries a path that is not one.
- */
-export function assertRoutes(routes: readonly RouteMeta[]): void {
-  if (routes.length === 0) throw new Error('a site answers at least one route');
-
-  const claimed = new Set<string>();
-  const folded = new Map<string, string>();
-  for (const route of routes) {
-    const written = JSON.stringify(route.path);
-    assertPath(route.path, written);
-    const address = trimTrailingSlash(route.path) || '/';
-    if (address.includes('//')) {
-      throw new Error(`a route path names no empty segment: ${written}`);
-    }
-    if (claimed.has(address)) {
-      throw new Error(`a route path is written once: ${written}`);
-    }
-    const first = folded.get(address.toLowerCase());
-    if (first !== undefined) {
-      throw new Error(
-        `two route paths name one file on a case-insensitive disk: ${first} and ${written}`,
-      );
-    }
-    claimed.add(address);
-    folded.set(address.toLowerCase(), written);
-  }
-}
-
-function assertPath(path: string, written: string): void {
-  if (!path.startsWith('/')) {
-    throw new Error(`a route path starts at the site root: ${written}`);
-  }
-  if (QUERY_OR_FRAGMENT.test(path)) {
-    throw new Error(
-      `a route path carries no query string and no fragment: ${written}`,
-    );
-  }
-  if (path.split('/').includes('..')) {
-    throw new Error(`a route path stays inside the site: ${written}`);
-  }
-}
-
-// The path half of whatever the caller had at hand: an absolute address, or a
-// path already, with the query string and the fragment cut off either way.
-function pathOf(url: string): string {
-  if (ABSOLUTE_URL.test(url) && URL.canParse(url)) return new URL(url).pathname;
-  return withoutQueryOrFragment(url);
 }
 
 // The one shape two paths are compared in: no trailing slash, and each segment

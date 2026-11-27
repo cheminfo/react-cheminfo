@@ -116,32 +116,6 @@ export async function setStructureStyle(
 }
 
 /**
- * The ball-and-stick parameters that draw these bonds. A metal's bonds are
- * molstar's metal coordination, which it draws dashed.
- * @param bonds - Which bonds are drawn.
- * @returns The parameters to merge into the representation's own.
- */
-export function bondParams(bonds: CrystalBonds): BondParams {
-  return {
-    visuals:
-      bonds === 'none'
-        ? ['element-sphere']
-        : ['element-sphere', 'intra-bond', 'inter-bond'],
-    excludeTypes: bonds === 'noMetal' ? ['metal-coordination'] : [],
-  };
-}
-
-/**
- * Remove the atoms, leaving every drawn layer in place.
- * @param plugin - The molstar context.
- */
-export async function clearStructure(plugin: PluginContext): Promise<void> {
-  structureRefs.delete(plugin);
-  if (!plugin.state.data.cells.has(STRUCTURE_DATA_REF)) return;
-  await plugin.build().delete(STRUCTURE_DATA_REF).commit();
-}
-
-/**
  * The representations the atoms are drawn by — the model and its surface —
  * which is what an operation moves.
  *
@@ -175,6 +149,32 @@ export function crystalStructure(plugin: PluginContext): Structure | undefined {
   const object = plugin.state.data.cells.get(ref)?.obj;
   if (!PluginStateObject.Molecule.Structure.is(object)) return undefined;
   return object.data;
+}
+
+/**
+ * The ball-and-stick parameters that draw these bonds. A metal's bonds are
+ * molstar's metal coordination, which it draws dashed.
+ * @param bonds - Which bonds are drawn.
+ * @returns The parameters to merge into the representation's own.
+ */
+function bondParams(bonds: CrystalBonds): BondParams {
+  return {
+    visuals:
+      bonds === 'none'
+        ? ['element-sphere']
+        : ['element-sphere', 'intra-bond', 'inter-bond'],
+    excludeTypes: bonds === 'noMetal' ? ['metal-coordination'] : [],
+  };
+}
+
+/**
+ * Remove the atoms, leaving every drawn layer in place.
+ * @param plugin - The molstar context.
+ */
+async function clearStructure(plugin: PluginContext): Promise<void> {
+  structureRefs.delete(plugin);
+  if (!plugin.state.data.cells.has(STRUCTURE_DATA_REF)) return;
+  await plugin.build().delete(STRUCTURE_DATA_REF).commit();
 }
 
 /**

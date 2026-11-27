@@ -8,12 +8,11 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type { ShareVocabulary } from '../../core/index.ts';
-import { qrCodeSvg } from '../../core/index.ts';
+import { qrCodeSvg } from '../../core/qrCode.ts';
 import { ShareDialog } from '../ShareDialog.tsx';
 
 const VOCABULARY: ShareVocabulary = {
@@ -25,13 +24,10 @@ const VOCABULARY: ShareVocabulary = {
 
 const BASE = 'https://smiles.cheminfo.org/exercises';
 
-let host: HTMLDivElement;
-let root: Root;
 const written: string[] = [];
 const dialog = { closed: 0, refuse: false };
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('ResizeObserver', NoResizeObserver);
   vi.stubGlobal('navigator', {
     clipboard: {
@@ -45,14 +41,11 @@ beforeEach(() => {
   written.length = 0;
   dialog.closed = 0;
   dialog.refuse = false;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

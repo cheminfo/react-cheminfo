@@ -8,9 +8,9 @@ export type {
   ToolFrameWindow,
   ToolWindowEvent,
 } from './connectTool.ts';
-export { REQUEST_TIMEOUT, connectTool } from './connectTool.ts';
+export { connectTool } from './connectTool.ts';
 export type { Deployment } from './probeDeployment.ts';
-export { PROBE_TIMEOUT, probeDeployment } from './probeDeployment.ts';
+export { probeDeployment } from './probeDeployment.ts';
 export {
   FIGURE_INPUT,
   figureToolDocument,
@@ -19,18 +19,11 @@ export {
 export type { FigureDestination } from './figureForward.ts';
 export { figureDestination, forwardedFigureDocument } from './figureForward.ts';
 export type { FigurePage } from './answerGet.ts';
-export { answerGet } from './answerGet.ts';
-export { figureOutputKey, readFigureOutput } from './figureOutput.ts';
 export type { HostOutputs, OutputPublisher } from './hostOutputs.ts';
 export type { HostSettings } from './hostSettings.ts';
-export { OUTPUT_DELAY, createOutputPublisher } from './hostOutputs.ts';
+export { OUTPUT_DELAY } from './hostOutputs.ts';
 export type { StructureValue } from './hostStructure.ts';
-export {
-  STRUCTURE_KINDS,
-  STRUCTURE_NOTATIONS,
-  hostStructureSource,
-  isStructureValue,
-} from './hostStructure.ts';
+export { STRUCTURE_KINDS } from './hostStructure.ts';
 export type { BandStrength } from './bandStrength.ts';
 export { BAND_STRENGTHS, BAND_STRENGTH_SCHEMA } from './bandStrength.ts';
 export type {
@@ -95,7 +88,6 @@ export {
   MAX_ITEMS,
   MAX_LABEL_LENGTH,
   PROTOCOL_VERSION,
-  isConnect,
   parseRequest,
 } from './protocol.ts';
 export type {
@@ -127,14 +119,6 @@ export { NAME_SCHEMA, SVG_IMAGE_SCHEMA, TABLE_SCHEMA } from './resultKinds.ts';
 export type { InputSelection, LoadedInput } from './selectInputs.ts';
 export { selectInputs } from './selectInputs.ts';
 export type { ToolHelp } from './toolCredits.ts';
-export {
-  MAX_CITED_WORKS,
-  readCitedWorks,
-  readToolHelp,
-} from './toolCredits.ts';
-export { toolAboutUrl, toolPageUrl } from './toolPage.ts';
 export type { ToolHello } from './toolMessages.ts';
-export { readSettingFields } from './toolSettings.ts';
-export { readHello, readToolMessage } from './toolMessages.ts';
 export type { SendOffer, SendTarget } from './sendTargets.ts';
 export { sendTargets } from './sendTargets.ts';

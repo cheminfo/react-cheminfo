@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { errorMessage } from '../../error/core/toError.ts';
 import type { FigureNotice } from '../core/copyFigure.ts';
 
 /** What {@link useFigureTask} hands back. */
@@ -32,7 +33,7 @@ export function useFigureTask(): FigureTask {
     setNotice(null);
     void task
       .then(setNotice, (error: unknown) => {
-        setFailure(error instanceof Error ? error.message : String(error));
+        setFailure(errorMessage(error));
       })
       .finally(() => setBusy(false));
   }, []);

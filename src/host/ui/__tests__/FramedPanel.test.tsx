@@ -9,12 +9,12 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { until } from '../../../__tests__/until.ts';
 import type { ToolDocument } from '../../core/connectToolTypes.ts';
 import type { HostItem } from '../../core/protocol.ts';
 import { FramedPanel } from '../FramedPanel.tsx';
 
 import { TOOL_ORIGIN, startToolPage } from './framedToolPage.ts';
-import { until } from './until.ts';
 
 const PICKED: HostItem = {
   key: 'figure',

@@ -9,8 +9,8 @@
  * running with one request each.
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 
 import type { Plugin } from 'vite';
 
@@ -19,6 +19,7 @@ import { BUILD_INFO_FILE, UNRELEASED_VERSION } from '../core/buildInfo.ts';
 
 import { createPackageCollector } from './bundledPackages.ts';
 import { commitFromEnvironment, readGitHead } from './gitHead.ts';
+import { manifestVersion, readManifest } from './manifest.ts';
 
 /** The module a site imports its build record from. */
 export const BUILD_INFO_MODULE = 'react-cheminfo/build-info';
@@ -106,7 +107,10 @@ export function resolveBuildInfo(root: string): BuildInfo {
   const deployment = deploymentFromEnvironment();
 
   return {
-    version: readVersion(repository) ?? readVersion(root) ?? UNRELEASED_VERSION,
+    version:
+      manifestVersion(repository) ??
+      manifestVersion(root) ??
+      UNRELEASED_VERSION,
     builtAt: buildInstant(),
     commit: readGitHead(repository) ?? commitFromEnvironment(),
     reactCheminfo: readOwnVersion(),
@@ -140,22 +144,15 @@ export function findRepositoryRoot(start: string): string {
   let highest = directory;
 
   for (;;) {
-    if (readPackage(directory) !== undefined) highest = directory;
+    if (readManifest(directory) !== undefined) highest = directory;
     const parent = dirname(directory);
     // The run has ended: a directory with no package.json is above the project,
     // and so is everything above it.
-    if (parent === directory || readPackage(parent) === undefined) {
+    if (parent === directory || readManifest(parent) === undefined) {
       return highest;
     }
     directory = parent;
   }
-}
-
-function readVersion(directory: string): string | undefined {
-  const version = readPackage(directory)?.version;
-  return typeof version === 'string' && version.length > 0
-    ? version
-    : undefined;
 }
 
 /**
@@ -166,25 +163,13 @@ function readOwnVersion(): string | undefined {
   let directory = import.meta.dirname;
 
   for (;;) {
-    const manifest = readPackage(directory);
+    const manifest = readManifest(directory);
     if (manifest?.name === OWN_NAME && typeof manifest.version === 'string') {
       return manifest.version;
     }
     const parent = dirname(directory);
     if (parent === directory) return undefined;
     directory = parent;
-  }
-}
-
-function readPackage(
-  directory: string,
-): { name?: unknown; version?: unknown } | undefined {
-  try {
-    return JSON.parse(
-      readFileSync(join(directory, 'package.json'), 'utf8'),
-    ) as Record<string, unknown>;
-  } catch {
-    return undefined;
   }
 }
 

@@ -71,20 +71,14 @@ export async function figureFile(
   target: string | Element,
   options: DownloadFigureOptions = {},
 ): Promise<File> {
-  const { format = 'png', fileName = DEFAULT_FILE_NAME, background } = options;
+  const { background, ...file } = options;
+  const { format = 'png' } = file;
   const scale = options.scale ?? defaultFigureScale(format);
-  const name = sanitizeFileName(fileName, DEFAULT_FILE_NAME);
-
-  if (format === 'svg') {
-    const figure = figureSvg(target, { background, scale });
-    const markup = await withPageFigureSource(figure.markup);
-    return new File([markup], figureFileName(name, markup), {
-      type: FIGURE_SVG_TYPE,
-    });
-  }
-  const figure = figureSvg(target, { background });
-  const png = await figurePng(figure, scale);
-  return new File([png], `${name}.png`, { type: png.type });
+  const figure = figureSvg(
+    target,
+    format === 'svg' ? { background, scale } : { background },
+  );
+  return await figureSvgFile(figure, { ...file, scale });
 }
 
 /**

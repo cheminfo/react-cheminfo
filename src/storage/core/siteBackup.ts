@@ -1,13 +1,15 @@
 import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
 
 import type { ArchiveEntry } from './backupFiles.ts';
-import { backupFileName, readArchive, writeArchive } from './backupFiles.ts';
-import type { BackupManifest } from './backupManifest.ts';
 import {
-  BACKUP_MANIFEST,
-  readBackupManifest,
-  readJson,
-} from './backupManifest.ts';
+  backupFileName,
+  filesByPath,
+  readArchive,
+  readArchiveJson,
+  writeArchive,
+} from './backupFiles.ts';
+import type { BackupManifest } from './backupManifest.ts';
+import { BACKUP_MANIFEST, readBackupManifest } from './backupManifest.ts';
 import type { Draft, DraftStore } from './createDraftStore.ts';
 import type { SavedDocuments } from './createSavedDocuments.ts';
 import type { DraftSession } from './draftSessionTypes.ts';
@@ -129,8 +131,8 @@ export function createSiteBackup<D>(options: SiteBackupOptions<D>): SiteBackup {
       const contents = readBackupManifest(files);
       if (!contents) return undefined;
       const { manifest, folder } = contents;
-      const byPath = new Map(files.map((entry) => [entry.path, entry]));
-      const json = (path: string) => readJson(byPath.get(folder + path));
+      const byPath = filesByPath(files);
+      const json = (path: string) => readArchiveJson(byPath.get(folder + path));
       const restored = await documents.restore(
         manifest.documents.map((entry) => ({
           id: entry.id,

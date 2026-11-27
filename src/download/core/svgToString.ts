@@ -1,3 +1,5 @@
+import { viewBoxAttribute } from '../../chart/core/viewTransform.ts';
+
 import type { SvgBox } from './svgBounds.ts';
 import { SVG_NAMESPACE } from './svgNamespace.ts';
 
@@ -65,10 +67,7 @@ export function svgToString(
   clone.setAttribute('width', String(drawnWidth));
   clone.setAttribute('height', String(drawnHeight));
   if (box) {
-    clone.setAttribute(
-      'viewBox',
-      `${round(box.x)} ${round(box.y)} ${round(box.width)} ${round(box.height)}`,
-    );
+    clone.setAttribute('viewBox', viewBoxAttribute(box));
   } else if (!clone.hasAttribute('viewBox')) {
     // Without a view box the drawing is in pixels of the size it is shown at,
     // so that is what the view box spans, whatever size the copy opens at.
@@ -82,19 +81,12 @@ export function svgToString(
 }
 
 /**
- * A side of the document, as an attribute takes it.
+ * A side of the document, as an attribute takes it, or of a canvas painted
+ * from it.
  * @param value - How long it is.
- * @returns Whole pixels, never zero: a document sized zero is an empty file.
+ * @returns Whole pixels, never zero: a document sized zero is an empty file,
+ *   and a canvas sized zero rasterizes nothing.
  */
-function side(value: number): number {
+export function side(value: number): number {
   return Math.max(1, Math.round(value));
-}
-
-/**
- * A drawing coordinate, short enough to read.
- * @param value - The coordinate.
- * @returns It, to two decimals.
- */
-function round(value: number): number {
-  return Math.round(value * 100) / 100;
 }

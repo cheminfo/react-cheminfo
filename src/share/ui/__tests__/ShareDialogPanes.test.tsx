@@ -6,16 +6,14 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
+import { until } from '../../../__tests__/until.ts';
 import type { ShareVocabulary } from '../../core/index.ts';
 import { openSealedAddress, sealShareUrl } from '../../core/index.ts';
 import type { ShareDialogProps } from '../ShareDialog.tsx';
 import { ShareDialog } from '../ShareDialog.tsx';
-
-import { until } from './until.ts';
 
 const VOCABULARY: ShareVocabulary = {
   parts: [{ key: 'answers', label: 'The answers', description: 'The list.' }],
@@ -24,19 +22,12 @@ const VOCABULARY: ShareVocabulary = {
 
 const BASE = 'https://isomers.cheminfo.org/exercises';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   delete (Element.prototype as Partial<Element>).scrollIntoView;
   vi.unstubAllGlobals();
 });

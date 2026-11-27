@@ -24,7 +24,7 @@ const meta = {
   title: 'Chrome/AccountButton',
   component: AccountButton,
   args: {
-    identity: { name: 'Ada Lovelace', detail: 'ada.lovelace@epfl.ch' },
+    identity: { name: 'Ada Lovelace', detail: 'ada.lovelace@example.org' },
     onSignIn: noop,
     onSignOut: noop,
     signInHref: '/login',

@@ -1,15 +1,12 @@
 // @vitest-environment jsdom
 import { act, useState } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import type { AnswerField, Answers } from '../../core/series.ts';
 import { AnswerFields } from '../AnswerFields.tsx';
 import { GlossaryProvider } from '../GlossaryProvider.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
 let changes: Array<[string, string]>;
 let submits: number;
 
@@ -27,19 +24,13 @@ const FIELDS: readonly AnswerField[] = [
 ];
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   changes = [];
   submits = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

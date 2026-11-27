@@ -18,6 +18,7 @@ import type {
   ToolSettings,
 } from '../core/protocol.ts';
 import type { ToolHello } from '../core/toolMessages.ts';
+import { listenToWindow } from '../core/windowMessages.ts';
 
 import type {
   FramedTool,
@@ -93,12 +94,7 @@ export function useFramedTool(options: FramedToolOptions): FramedTool {
       frame: () => element.contentWindow,
       origin: new URL(url, globalThis.location.href).origin,
       host: { name: host },
-      listen: (listener) => {
-        globalThis.addEventListener('message', listener);
-        return () => {
-          globalThis.removeEventListener('message', listener);
-        };
-      },
+      listen: listenToWindow,
       onHello: (tool) => {
         greeted = true;
         setLink({ url, status: 'connected', tool });

@@ -1,14 +1,3 @@
-import {
-  IDBCursor,
-  IDBCursorWithValue,
-  IDBDatabase,
-  IDBFactory,
-  IDBIndex,
-  IDBKeyRange,
-  IDBObjectStore,
-  IDBRequest,
-  IDBTransaction,
-} from 'fake-indexeddb';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { readArchive, writeArchive } from '../backupFiles.ts';
@@ -17,21 +6,10 @@ import { createSavedDocuments } from '../createSavedDocuments.ts';
 import type { DraftSession } from '../draftSessionTypes.ts';
 import { createSiteBackup } from '../siteBackup.ts';
 
+import { stubIndexedDB } from './fakeIndexedDB.ts';
+
 beforeEach(() => {
-  const classes = {
-    IDBCursor,
-    IDBCursorWithValue,
-    IDBDatabase,
-    IDBIndex,
-    IDBKeyRange,
-    IDBObjectStore,
-    IDBRequest,
-    IDBTransaction,
-  };
-  for (const [name, value] of Object.entries(classes)) {
-    vi.stubGlobal(name, value);
-  }
-  vi.stubGlobal('indexedDB', new IDBFactory());
+  stubIndexedDB();
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(Date.UTC(2026, 10, 13));
 });
@@ -188,6 +166,33 @@ test('nothing kept yet means no archive, and an archive without a table of conte
   const stray = await writeArchive([{ path: 'readme.txt', content: 'hello' }]);
 
   await expect(backup.read(stray)).resolves.toBeUndefined();
+});
+
+test('a backup whose top table of contents does not read restores from the copy in a folder', async () => {
+  const notes = openNotes();
+  await notes.save('Aspirin', { text: 'acetylsalicylic acid' });
+  const backup = createSiteBackup({
+    stem: 'notes-cheminfo',
+    generator: 'notes.cheminfo.org',
+    documents: notes,
+  });
+  const files = await readArchive(await archiveOf(backup.write()));
+  const entries = [
+    { path: 'manifest.json', content: 'not a table of contents' },
+  ];
+  for (const file of files) {
+    entries.push({ path: `copy/${file.path}`, content: file.text() });
+  }
+
+  const restore = createSiteBackup({
+    stem: 'notes-cheminfo',
+    generator: 'notes.cheminfo.org',
+    documents: openNotes('notes-copy'),
+  });
+
+  await expect(
+    restore.read(await writeArchive(entries)),
+  ).resolves.toStrictEqual({ documents: 1, drafts: 0, copies: 0 });
 });
 
 test('a document the site cannot read is left out of a restore', async () => {

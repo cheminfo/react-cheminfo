@@ -35,16 +35,23 @@ export interface RowSpacers {
  * measures nothing because it is showing nothing.
  * @param drawn - The rows being drawn, in order.
  * @param total - How tall the whole list is, in pixels.
+ * @param margin - How far down the page the list begins, when the rows are
+ *   placed from the top of the document rather than from the top of the list.
+ *   Defaults to `0`.
  * @returns The height of each spacer.
  */
 export function rowSpacers(
   drawn: readonly RowPlacement[],
   total: number,
+  margin = 0,
 ): RowSpacers {
   const first = drawn[0];
   const last = drawn.at(-1);
   if (first === undefined || last === undefined) {
     return { before: 0, after: Math.max(0, total) };
   }
-  return { before: first.start, after: Math.max(0, total - last.end) };
+  return {
+    before: first.start - margin,
+    after: Math.max(0, total - (last.end - margin)),
+  };
 }

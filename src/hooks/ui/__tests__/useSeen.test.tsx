@@ -5,10 +5,9 @@
  */
 
 import { act, useState } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { useSeen } from '../useSeen.ts';
 
 /** The observers made, with what they watch and whether they were dropped. */
@@ -45,23 +44,14 @@ function Thumbnail() {
   return <div ref={setElement}>{seen ? 'drawn' : 'waiting'}</div>;
 }
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('IntersectionObserver', StandInObserver);
   observers.length = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

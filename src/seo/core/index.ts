@@ -26,7 +26,6 @@ export {
   pageLanguage,
 } from './pageMeta.ts';
 export type { PageContent, PageSection, PageTable } from './pageProse.ts';
-export { pageProseHtml } from './pageProse.ts';
 export type { PlainDescriptionOptions } from './plainDescription.ts';
 export { plainDescription, plainProse } from './plainDescription.ts';
 export type { RobotsDisallow } from './robots.ts';
@@ -34,14 +33,9 @@ export { robotsTxt } from './robots.ts';
 export { routeProblems, withheldPhrase } from './routeProblems.ts';
 export { shippedSourceProblem } from './shippedSources.ts';
 export type { RouteField } from './routeTable.ts';
-export {
-  ROUTE_FIELDS,
-  ROUTE_TABLE_FILE,
-  parseRouteTable,
-  serializeRouteTable,
-} from './routeTable.ts';
 export type { RouteMeta } from './routes.ts';
-export { assertRoutes, homeRoute, pageMetaFor, routeFor } from './routes.ts';
+export { assertRoutes } from './assertRoutes.ts';
+export { homeRoute, pageMetaFor, routeFor } from './routes.ts';
 export type { SiteFilesOptions } from './siteFiles.ts';
 export { sitemapXml } from './siteFiles.ts';
 export type { StartDocumentMetaOptions } from './startDocumentMeta.ts';

@@ -4,7 +4,7 @@
  * bold.
  */
 
-import { unescapeXml } from '../../drawing/render/markup.ts';
+import { unescapeXml } from '../../share/core/escape.ts';
 
 /**
  * A formatted reference as one line of Markdown: italics and bold kept, a

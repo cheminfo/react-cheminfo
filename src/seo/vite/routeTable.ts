@@ -14,6 +14,7 @@ import { join, resolve } from 'node:path';
 
 import type { Plugin } from 'vite';
 
+import { assertRoutes } from '../core/assertRoutes.ts';
 import type { RouteField } from '../core/routeTable.ts';
 import {
   ROUTE_FIELDS,
@@ -21,7 +22,6 @@ import {
   serializeRouteTable,
 } from '../core/routeTable.ts';
 import type { RouteMeta } from '../core/routes.ts';
-import { assertRoutes } from '../core/routes.ts';
 
 /** Options of {@link cheminfoRouteTable}. */
 export interface RouteTableOptions {

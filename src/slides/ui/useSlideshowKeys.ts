@@ -1,7 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { isTextEntryTarget } from '../../hooks/ui/keyTargets.ts';
-import { slideActionForKey, slideDirectionForKey } from '../core/index.ts';
+import {
+  slideActionForKey,
+  slideDirectionForKey,
+} from '../core/slideNavigation.ts';
 
 import type { SlidePositionControls } from './useSlidePosition.ts';
 

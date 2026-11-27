@@ -8,34 +8,27 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { AccountButton } from '../AccountButton.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
 const signedOut = vi.fn();
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   signedOut.mockClear();
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
 });
 
 function openTheMenu(): void {
   act(() =>
     root.render(
       <AccountButton
-        identity={{ name: 'Ada Lovelace', detail: 'ada@epfl.ch' }}
+        identity={{ name: 'Ada Lovelace', detail: 'ada@example.org' }}
         items={[{ id: 'settings', label: 'Settings', href: '/settings' }]}
         onSignOut={signedOut}
       />,
@@ -49,7 +42,7 @@ test('the menu names the account it belongs to', () => {
   openTheMenu();
 
   expect(document.body.textContent).toContain('Ada Lovelace');
-  expect(document.body.textContent).toContain('ada@epfl.ch');
+  expect(document.body.textContent).toContain('ada@example.org');
 });
 
 test("the account's own pages are listed above the way out", () => {

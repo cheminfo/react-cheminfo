@@ -27,7 +27,7 @@ export function writeDocumentMeta(meta: DocumentMeta): void {
  * engine, and nothing on screen shows it.
  * @param language - The language tag, e.g. `fr`.
  */
-export function documentLanguage(language: string): void {
+function documentLanguage(language: string): void {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   if (root) root.lang = language;

@@ -70,6 +70,17 @@ export function withoutQueryOrFragment(address: string): string {
 }
 
 /**
+ * The path half of whatever a caller has at hand: an absolute address, or a
+ * path already, with the query string and the fragment cut off either way.
+ * @param url - An absolute address (`https://host/path?x`) or a path.
+ * @returns The path.
+ */
+export function addressPath(url: string): string {
+  if (ABSOLUTE_URL.test(url) && URL.canParse(url)) return new URL(url).pathname;
+  return withoutQueryOrFragment(url);
+}
+
+/**
  * Decode one component of an address, tolerating an escape that is not one.
  *
  * `decodeURIComponent` throws on a lone `%`, and an address is hand-editable:
@@ -88,3 +99,8 @@ export function safeDecode(value: string): string {
 const TRAILING_SLASHES = /\/+$/;
 
 const QUERY_OR_FRAGMENT = /[?#]/;
+
+// A scheme and an authority: what `location.href` hands out, and the one shape
+// that cannot be confused with a path. `//host/path` is left as a path, because
+// a route table is free to name one.
+const ABSOLUTE_URL = /^[a-z][\d+.a-z-]*:\/\//i;

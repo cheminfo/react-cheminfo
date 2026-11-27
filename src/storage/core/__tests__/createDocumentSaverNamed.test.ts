@@ -8,9 +8,11 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { createDocumentSaver } from '../createDocumentSaver.ts';
 import type { SavedDocuments } from '../createSavedDocuments.ts';
-import type { Cell, DocumentFile } from '../documentFile.ts';
+import type { DocumentFile } from '../documentFile.ts';
 import type { SaveFormat } from '../documentSaverTypes.ts';
-import type { FolderEntry, SiteFolder } from '../siteFolderTypes.ts';
+import type { SiteFolder } from '../siteFolderTypes.ts';
+
+import { cell, fakeFolder } from './fakeFileSystem.ts';
 
 const SVG: SaveFormat<string> = {
   id: 'svg',
@@ -19,64 +21,6 @@ const SVG: SaveFormat<string> = {
   picker: { description: 'SVG', accept: { 'image/svg+xml': ['.svg'] } },
   write: (text) => `<svg>${text}</svg>`,
 };
-
-function cell<T>(value: T): Cell<T> {
-  const holder = { value, peek: () => holder.value };
-  return holder;
-}
-
-function fakeFile(name: string) {
-  const written: string[] = [];
-  const handle = {
-    kind: 'file',
-    name,
-    queryPermission: () => Promise.resolve('granted'),
-    createWritable: () =>
-      Promise.resolve({
-        write: (content: string) => {
-          written.push(content);
-          return Promise.resolve();
-        },
-        close: () => Promise.resolve(),
-        abort: () => Promise.resolve(),
-      }),
-    isSameEntry: (other: { name: string }) =>
-      Promise.resolve(other.name === name),
-    getFile: () => Promise.resolve({ lastModified: 1 }),
-  };
-  return { handle: handle as unknown as FileSystemFileHandle, written };
-}
-
-function fakeFolder(names: string[]) {
-  const files = new Map(names.map((name) => [name, fakeFile(name)]));
-  const directory = {
-    kind: 'directory',
-    name: 'Course',
-    getFileHandle: (name: string, options?: { create?: boolean }) => {
-      let entry = files.get(name);
-      if (!entry && options?.create) {
-        entry = fakeFile(name);
-        files.set(name, entry);
-      }
-      return entry
-        ? Promise.resolve(entry.handle)
-        : Promise.reject(new DOMException('absent', 'NotFoundError'));
-    },
-  } as unknown as FileSystemDirectoryHandle;
-  const folder = {
-    writable: () => Promise.resolve(directory),
-    list: (): Promise<FolderEntry[]> =>
-      Promise.resolve(
-        [...files.keys()].map((name) => ({
-          name,
-          handle: files.get(name)?.handle as FileSystemFileHandle,
-          modified: 1,
-        })),
-      ),
-    changed: vi.fn(),
-  } as unknown as SiteFolder;
-  return { folder, files };
-}
 
 function saverOf(folder: SiteFolder, savedDocuments?: SavedDocuments<string>) {
   const file = cell<DocumentFile<string> | null>(null);
@@ -110,7 +54,7 @@ afterEach(() => {
 });
 
 test('told to keep new documents in the folder, Save asks a new one its name, then writes over it', async () => {
-  const { folder, files } = fakeFolder([]);
+  const { folder, files } = fakeFolder([], { name: 'Course' });
   const { saver } = saverOf(folder);
   saver.remember('folder');
 
@@ -134,7 +78,9 @@ test('told to keep new documents in the folder, Save asks a new one its name, th
 });
 
 test('a name the dialog said is taken is written over, not beside', async () => {
-  const { folder, files } = fakeFolder(['Einstein.tex.svg']);
+  const { folder, files } = fakeFolder(['Einstein.tex.svg'], {
+    name: 'Course',
+  });
   const { saver } = saverOf(folder);
 
   const outcome = await saver.saveTo({
@@ -156,7 +102,7 @@ test('a name the dialog said is taken is written over, not beside', async () => 
 });
 
 test('the place can be changed, or forgotten so Save asks again', async () => {
-  const { folder } = fakeFolder([]);
+  const { folder } = fakeFolder([], { name: 'Course' });
   const { saver } = saverOf(folder);
 
   saver.remember('download');
@@ -170,7 +116,9 @@ test('the place can be changed, or forgotten so Save asks again', async () => {
 });
 
 test('the names taken in the folder are its files without their extension', async () => {
-  const { folder } = fakeFolder(['Nernst.tex.svg', 'Gibbs energy.tex.svg']);
+  const { folder } = fakeFolder(['Nernst.tex.svg', 'Gibbs energy.tex.svg'], {
+    name: 'Course',
+  });
   const { saver } = saverOf(folder);
 
   await expect(saver.takenNames('folder')).resolves.toStrictEqual(
@@ -182,7 +130,7 @@ test('the names taken in the folder are its files without their extension', asyn
 });
 
 test('a name kept with a time is saved in the folder without its colon', async () => {
-  const { folder, files } = fakeFolder([]);
+  const { folder, files } = fakeFolder([], { name: 'Course' });
   const { saver } = saverOf(folder);
 
   const outcome = await saver.saveTo({

@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { readClipboardText } from '../src/host/testing/chatFrame.ts';
+
 import { openStory } from './story.ts';
 
 // The dialog pulls openchemlib, which a cold Vite dev server compiles before it
@@ -22,9 +24,9 @@ test('the glyph beside a card’s structure opens its export, which copies it', 
   const smiles = dialog.getByText('C[n]1c(C(N(C)C(N2C)=O)=O)c2nc1');
   await smiles.click();
 
-  await expect(
-    page.evaluate(() => navigator.clipboard.readText()),
-  ).resolves.toBe('C[n]1c(C(N(C)C(N2C)=O)=O)c2nc1');
+  await expect(readClipboardText(page)).resolves.toBe(
+    'C[n]1c(C(N(C)C(N2C)=O)=O)c2nc1',
+  );
 });
 
 test('every structure of a grid carries a glyph of its own', async ({

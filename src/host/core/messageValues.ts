@@ -3,7 +3,11 @@
  * on either side of the frame boundary.
  */
 
+import { isPlainRecord } from '../../state/core/mergeStored.ts';
+
 import type { HostItem, ToolSettings } from './protocol.ts';
+
+export { isPlainRecord as isRecord } from '../../state/core/mergeStored.ts';
 
 /** How many items one message may carry; the rest are dropped. */
 export const MAX_ITEMS = 64;
@@ -22,7 +26,7 @@ export function readItems(values: readonly unknown[]): HostItem[] {
   const count = Math.min(values.length, MAX_ITEMS);
   for (let index = 0; index < count; index++) {
     const value = values[index];
-    if (!isRecord(value) || typeof value.kind !== 'string') continue;
+    if (!isPlainRecord(value) || typeof value.kind !== 'string') continue;
     const item: HostItem = { kind: value.kind, value: value.value };
     if (typeof value.id === 'string') item.id = value.id;
     if (typeof value.key === 'string') item.key = value.key;
@@ -55,7 +59,7 @@ export function readStrings(value: unknown): string[] {
  * @returns The settings, or none when it is not an object.
  */
 export function readSettings(value: unknown): ToolSettings {
-  if (!isRecord(value)) return {};
+  if (!isPlainRecord(value)) return {};
   const settings: Array<[string, string]> = [];
   for (const [name, setting] of Object.entries(value)) {
     if (typeof setting !== 'string') continue;
@@ -63,13 +67,4 @@ export function readSettings(value: unknown): ToolSettings {
     if (settings.length === MAX_ITEMS) break;
   }
   return Object.fromEntries(settings);
-}
-
-/**
- * Whether a value is a plain object, as every message is.
- * @param value - The value.
- * @returns `true` for an object that is not an array.
- */
-export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

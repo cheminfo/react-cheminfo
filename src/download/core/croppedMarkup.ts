@@ -4,10 +4,17 @@
  * part of it.
  */
 
+import { viewBoxAttribute } from '../../chart/core/viewTransform.ts';
+
 import type { FigurePixels } from './figureScale.ts';
 import type { FigureSvg } from './figureSvg.ts';
 import type { SvgBox } from './svgBounds.ts';
-import { svgAttribute, svgRootTag, svgViewBox } from './svgMarkup.ts';
+import {
+  svgAttribute,
+  svgNumber,
+  svgRootTag,
+  svgViewBox,
+} from './svgMarkup.ts';
 
 /** An SVG whose only element is one image. */
 const ONLY_IMAGE =
@@ -100,16 +107,14 @@ export function croppedSvgMarkup(
   const unitsX = view.width / figure.width;
   const unitsY = view.height / figure.height;
   if (Math.abs(unitsX - unitsY) > 0.01 * unitsX) return null;
-  const width = rounded(box.width);
-  const height = rounded(box.height);
-  const cropped = [
-    view.x + box.x * unitsX,
-    view.y + box.y * unitsY,
-    box.width * unitsX,
-    box.height * unitsY,
-  ]
-    .map((value) => rounded(value))
-    .join(' ');
+  const width = svgNumber(box.width);
+  const height = svgNumber(box.height);
+  const cropped = viewBoxAttribute({
+    x: view.x + box.x * unitsX,
+    y: view.y + box.y * unitsY,
+    width: box.width * unitsX,
+    height: box.height * unitsY,
+  });
   const fixed = root
     .replaceAll(SIZE_ATTRIBUTES, '')
     .replace(
@@ -141,11 +146,9 @@ export function resizedSvgFigure(
     width: figure.width,
     height: figure.height,
   };
-  const width = rounded(size.width);
-  const height = rounded(size.height);
-  const box = [view.x, view.y, view.width, view.height]
-    .map((value) => rounded(value))
-    .join(' ');
+  const width = svgNumber(size.width);
+  const height = svgNumber(size.height);
+  const box = viewBoxAttribute(view);
   const fixed = root
     .replaceAll(SIZE_ATTRIBUTES, '')
     .replace(
@@ -153,16 +156,6 @@ export function resizedSvgFigure(
       `<svg width="${width}" height="${height}" viewBox="${box}"`,
     );
   return { markup: figure.markup.replace(root, () => fixed), width, height };
-}
-
-/**
- * A number as SVG writes it: at most two decimals.
- * @param value - The number.
- * @returns The rounded number.
- */
-export function rounded(value: number): number {
-  const result = Math.round(value * 100) / 100;
-  return Object.is(result, -0) ? 0 : result;
 }
 
 function pixels(value: string | undefined): number | undefined {

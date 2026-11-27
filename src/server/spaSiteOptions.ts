@@ -21,10 +21,7 @@ export interface SpaPage {
 }
 
 /** What the structured-data block says beyond the site and its address. */
-export type SpaStructuredData = Omit<
-  StructuredDataOptions,
-  'site' | 'routes' | 'origin' | 'languages'
->;
+export type SpaStructuredData = Omit<StructuredDataOptions, 'site' | 'origin'>;
 
 /** Options of `spaSite`. */
 export interface SpaSiteOptions {

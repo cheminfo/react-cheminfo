@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { GlossaryEntry, GlossaryExample } from '../core/glossary.ts';
 
 import { InlineText } from './InlineText.tsx';
@@ -87,6 +88,7 @@ function ExampleLine(props: {
   ink: ProseInk;
 }): ReactElement | null {
   const { example, ink } = props;
+  const t = useChromeT();
   const code = exampleText(example, 'code');
   const input = exampleText(example, 'input');
   if (code === undefined) return null;
@@ -94,7 +96,7 @@ function ExampleLine(props: {
   return (
     <>
       <code style={codeStyle(ink)}>{code}</code>
-      {input !== undefined && <span>{` on ${input}`}</span>}
+      {input !== undefined && <span>{` ${t('help.on')} ${input}`}</span>}
     </>
   );
 }

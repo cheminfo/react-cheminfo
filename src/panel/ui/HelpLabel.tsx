@@ -1,5 +1,6 @@
 import type { HelpText } from '../../help/ui/HelpBody.tsx';
 import { HelpIcon } from '../../help/ui/HelpIcon.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { labelStyle } from '../core/panelStyles.ts';
 
 /** What the label names, and what its question mark answers. */
@@ -26,13 +27,14 @@ export interface HelpLabelProps {
  */
 export function HelpLabel(props: HelpLabelProps) {
   const { label, help } = props;
+  const t = useChromeT();
 
   return (
     <div style={rowStyle}>
       <span style={labelStyle}>{label}</span>
       <HelpIcon
         content={{ body: help }}
-        label={`What ${label} means`}
+        label={t('panel.whatMeans', { label })}
         placement="left"
         size={12}
       />

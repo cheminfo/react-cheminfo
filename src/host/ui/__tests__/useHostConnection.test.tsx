@@ -7,17 +7,21 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import {
+  freshRoot,
+  mountRoot,
+  root,
+  unmountRoot,
+} from '../../../__tests__/root.ts';
+import { until } from '../../../__tests__/until.ts';
 import { PLATFORM_WORK } from '../../../citation/core/platformPaper.ts';
 import { readFigureSource } from '../../../download/core/figureSource.ts';
 import type { ToolInterface } from '../../core/protocol.ts';
 import type { HostHandlers } from '../useHostConnection.ts';
 
 import { connectAsHost, hostWindow, loadToolPage } from './hostPage.tsx';
-import { until } from './until.ts';
 
 const TOOL: ToolInterface = {
   name: 'draw',
@@ -32,21 +36,14 @@ const BUILD = {
 
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   // Each test starts a page of its own: a host is greeted once per page.
   vi.resetModules();
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -74,7 +71,7 @@ test('a page nobody frames greets nobody, yet its figures name the site and the 
   expect(postMessage).not.toHaveBeenCalled();
 
   act(() => root.unmount());
-  root = createRoot(host);
+  freshRoot();
 
   expect(figureRevision('draw')).toBeUndefined();
   await expect(withPageFigureSource(SVG)).resolves.toBe(SVG);
@@ -188,7 +185,7 @@ test('a protocol that failed to load is loaded again when the tool mounts anew',
   });
   await until(() => asked);
   act(() => root.unmount());
-  root = createRoot(host);
+  freshRoot();
   vi.doUnmock('../../core/connectHost.ts');
   await act(async () => {
     root.render(<Tool handlers={{ load: vi.fn() }} />);

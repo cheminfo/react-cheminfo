@@ -85,27 +85,6 @@ export function readCslItems(value: unknown): CslItem[] {
 }
 
 /**
- * One work, under the key it is cited by.
- * @param value - A parsed CSL JSON object.
- * @returns The work, or undefined when it is not one.
- */
-export function readCslItem(value: unknown): CslItem | undefined {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    return undefined;
-  }
-  const record = value as Record<string, unknown>;
-  if (typeof record.type !== 'string' || record.type === '') return undefined;
-  const key = keyOf(record);
-  if (key === undefined) return undefined;
-  const item: Record<string, unknown> = {};
-  for (const [variable, content] of Object.entries(record)) {
-    if (!DROPPED.has(variable)) item[variable] = content;
-  }
-  item.id = key;
-  return item as CslItem;
-}
-
-/**
  * How a work is named in a menu: its first author and the year,
  * `Patiny & Borel 2013`, `Patiny et al. 2024`.
  * @param item - The work.
@@ -175,13 +154,34 @@ export function itemSearchText(item: CslItem): string {
 }
 
 /**
+ * One work, under the key it is cited by.
+ * @param value - A parsed CSL JSON object.
+ * @returns The work, or undefined when it is not one.
+ */
+function readCslItem(value: unknown): CslItem | undefined {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+  const record = value as Record<string, unknown>;
+  if (typeof record.type !== 'string' || record.type === '') return undefined;
+  const key = keyOf(record);
+  if (key === undefined) return undefined;
+  const item: Record<string, unknown> = {};
+  for (const [variable, content] of Object.entries(record)) {
+    if (!DROPPED.has(variable)) item[variable] = content;
+  }
+  item.id = key;
+  return item as CslItem;
+}
+
+/**
  * A variable of a work that is text, `container-title` and the others named
  * with a hyphen.
  * @param item - The work.
  * @param variable - The variable's name.
  * @returns Its text; empty when the work has none.
  */
-export function textVariable(item: CslItem, variable: string): string {
+function textVariable(item: CslItem, variable: string): string {
   return stringOf(item[variable]);
 }
 

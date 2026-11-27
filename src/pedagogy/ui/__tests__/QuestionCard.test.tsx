@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { HiddenPartsProvider } from '../../../share/ui/HiddenPartsProvider.tsx';
 import type { AttemptStore } from '../../core/attempts.ts';
 import { createAttemptStore } from '../../core/attempts.ts';
@@ -12,25 +11,17 @@ import { QuestionCard } from '../QuestionCard.tsx';
 import type { Ion } from './seriesFixture.ts';
 import { ELECTRONS, IONS } from './seriesFixture.ts';
 
-let host: HTMLDivElement;
-let root: Root;
 let store: AttemptStore;
 const SODIUM = IONS[0] as Ion;
 const KEY = 'electrons/7/Na+';
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   store = createAttemptStore({ key: 'test' });
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

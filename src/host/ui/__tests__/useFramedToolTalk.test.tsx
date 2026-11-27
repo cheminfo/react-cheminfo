@@ -11,6 +11,7 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { until } from '../../../__tests__/until.ts';
 import type { ToolDocument } from '../../core/connectTool.ts';
 import type { HostItem } from '../../core/protocol.ts';
 import type { FramedTool } from '../useFramedTool.ts';
@@ -18,7 +19,6 @@ import { useFramedTool } from '../useFramedTool.ts';
 
 import type { ToolSite } from './framedToolPage.ts';
 import { TOOL_ORIGIN, startToolPage } from './framedToolPage.ts';
-import { until } from './until.ts';
 
 const TOOL_URL = `${TOOL_ORIGIN}/?embed=1`;
 

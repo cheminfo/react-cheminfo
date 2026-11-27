@@ -34,3 +34,15 @@ test('rows measured taller than the list was reckoned to be leave no gap under i
 test('an empty table asks for no room at all', () => {
   expect(rowSpacers([], 0)).toStrictEqual({ before: 0, after: 0 });
 });
+
+test("rows placed from the top of the document leave the list's own offset out of the spacers", () => {
+  const drawn = [
+    { start: 1360, end: 1378 },
+    { start: 1378, end: 1396 },
+  ];
+
+  expect(rowSpacers(drawn, 9000, 1000)).toStrictEqual({
+    before: 360,
+    after: 8604,
+  });
+});

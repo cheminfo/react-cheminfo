@@ -26,6 +26,8 @@ interface RadialPlotMarksProps {
   showPeak: boolean;
   /** The colours of the two phases. */
   palette: PhasePalette;
+  /** The words written over a node and over the peak, in the page language. */
+  labels: { node: string; peak: string };
 }
 
 /**
@@ -34,8 +36,15 @@ interface RadialPlotMarksProps {
  * @returns An SVG group.
  */
 export function RadialPlotMarks(props: RadialPlotMarksProps): ReactElement {
-  const { frame, distribution, unitFactor, showAmplitude, showPeak, palette } =
-    props;
+  const {
+    frame,
+    distribution,
+    unitFactor,
+    showAmplitude,
+    showPeak,
+    palette,
+    labels,
+  } = props;
   const geometry = radialPlotGeometry(
     distribution,
     frame.x,
@@ -70,7 +79,8 @@ export function RadialPlotMarks(props: RadialPlotMarksProps): ReactElement {
           key={radius}
           frame={frame}
           value={radius * unitFactor}
-          label="node"
+          mark="node"
+          text={labels.node}
           color={INK}
           dashed
         />
@@ -79,7 +89,8 @@ export function RadialPlotMarks(props: RadialPlotMarksProps): ReactElement {
         <VerticalRule
           frame={frame}
           value={distribution.peakDistance * unitFactor}
-          label="peak"
+          mark="peak"
+          text={labels.peak}
           color={FAINT_INK}
           dashed={false}
         />
@@ -91,16 +102,17 @@ export function RadialPlotMarks(props: RadialPlotMarksProps): ReactElement {
 interface VerticalRuleProps {
   frame: ChartFrameRender;
   value: number;
-  label: 'node' | 'peak';
+  mark: 'node' | 'peak';
+  text: string;
   color: string;
   dashed: boolean;
 }
 
 function VerticalRule(props: VerticalRuleProps): ReactElement {
-  const { frame, value, label, color, dashed } = props;
+  const { frame, value, mark, text, color, dashed } = props;
   const x = frame.x.offset + value * frame.x.factor;
   return (
-    <g data-mark={label}>
+    <g data-mark={mark}>
       <line
         x1={x}
         x2={x}
@@ -118,7 +130,7 @@ function VerticalRule(props: VerticalRuleProps): ReactElement {
         fontSize={12}
         fill={MUTED_INK}
       >
-        {label}
+        {text}
       </text>
     </g>
   );

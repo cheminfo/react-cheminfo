@@ -13,26 +13,29 @@
  * molstar's own UI is not mounted: the surrounding site owns every control.
  */
 
-import { PluginViewModel } from 'molstar/lib/extensions/plugin/view-model.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 
+import { withManualCamera } from '../../molecule3d/ui/camera.ts';
+import { DEFAULT_CAMERA_DURATION, setSpin } from '../../molstar/core/camera.ts';
+import { MolstarPlugin } from '../../molstar/core/plugin.ts';
 import type { OrbitalGrid } from '../core/grid.ts';
 import type { OrbitalContour } from '../core/isovalue.ts';
 
-import {
-  DEFAULT_CAMERA_DURATION,
-  DEFAULT_SPIN_SPEED,
-  frameOrbital,
-  refitOrbital,
-  setSpin,
-} from './camera.ts';
-import type { OrbitalViewerOptions } from './orbitalPluginSpec.ts';
-import { orbitalPluginSpec } from './orbitalPluginSpec.ts';
+import { DEFAULT_SPIN_SPEED, frameOrbital, refitOrbital } from './camera.ts';
 import type { AxesStyle } from './renderAxes.ts';
 import { clearOrbitalAxes, renderOrbitalAxes } from './renderAxes.ts';
 import type { VolumeStyle } from './renderVolume.ts';
 import { clearSampledVolume, renderSampledVolume } from './renderVolume.ts';
 import { createSerialRunner } from './serial.ts';
+
+/** Settings fixed for the life of a viewer. */
+export interface OrbitalViewerOptions {
+  /**
+   * Scene background, as `#rrggbb`.
+   * @default '#ffffff'
+   */
+  background?: string;
+}
 
 /**
  * Create a viewer inside `container` and start initialising it.
@@ -55,21 +58,34 @@ export function createOrbitalViewer(
  * render started by an unmounting component cannot throw into React.
  */
 export class OrbitalViewer {
-  readonly #model: PluginViewModel;
+  readonly #plugin: MolstarPlugin;
   // One canvas, so one operation at a time — see `serial.ts` for what
   // interleaving two of them does to the scene.
   readonly #serial = createSerialRunner();
-  #disposed = false;
   /** Extent the camera was last fitted to; `null` before it has been placed. */
   #fittedRadius: number | null = null;
 
   /** Resolves once the canvas exists; every method awaits it internally. */
   readonly ready: Promise<void>;
 
+  /**
+   * Mount a canvas in `container` and start initialising it.
+   *
+   * The camera is the viewer's alone: molstar reframes itself whenever a scene
+   * commit leaves the renderable count at zero, which is what replacing one
+   * orbital by another does, and it frames the whole sampled box rather than
+   * the isosurface inside it, which leaves the orbital a fifth of the frame
+   * wide.
+   * @param container - An element with `position: relative`; molstar inserts
+   * its own canvas into it.
+   * @param options - See {@link OrbitalViewerOptions}.
+   */
   constructor(container: HTMLElement, options: OrbitalViewerOptions = {}) {
-    this.#model = new PluginViewModel({ spec: orbitalPluginSpec(options) });
-    this.#model.mount(container);
-    this.ready = this.#model.initialized;
+    this.#plugin = new MolstarPlugin(container, {
+      background: options.background,
+      spec: withManualCamera,
+    });
+    this.ready = this.#plugin.ready;
   }
 
   /**
@@ -77,7 +93,7 @@ export class OrbitalViewer {
    * @returns True once the viewer has been disposed.
    */
   get disposed(): boolean {
-    return this.#disposed;
+    return this.#plugin.disposed;
   }
 
   /**
@@ -202,8 +218,7 @@ export class OrbitalViewer {
 
   /** Re-read the container's size. Call from a `ResizeObserver`. */
   handleResize(): void {
-    if (this.#disposed) return;
-    this.#model.plugin.handleResize();
+    this.#plugin.handleResize();
   }
 
   /**
@@ -211,17 +226,7 @@ export class OrbitalViewer {
    * call before initialisation has finished.
    */
   dispose(): void {
-    if (this.#disposed) return;
-    this.#disposed = true;
-    // `mount` creates the canvas synchronously, so the WebGL context exists
-    // even when initialisation went on to fail; releasing it is what stops the
-    // browser dropping an older viewer's context. A rejected `ready` must not
-    // escape here either — nobody is left to handle it.
-    void this.ready
-      .catch(() => undefined)
-      .then(() => {
-        this.#model.plugin.dispose();
-      });
+    this.#plugin.dispose();
   }
 
   /**
@@ -235,16 +240,6 @@ export class OrbitalViewer {
   run<Result>(
     action: (plugin: PluginContext) => Result | Promise<Result>,
   ): Promise<Result | undefined> {
-    return this.#serial.run(async () => {
-      if (this.#disposed) return undefined;
-      await this.ready;
-      if (this.#disposed) return undefined;
-      try {
-        return await action(this.#model.plugin);
-      } catch (error) {
-        if (this.#disposed) return undefined;
-        throw error;
-      }
-    });
+    return this.#serial.run(() => this.#plugin.run(action));
   }
 }

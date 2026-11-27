@@ -18,6 +18,7 @@
  */
 
 import { isSameSite } from '../../ecosystem/core/lookup.ts';
+import { escapeText, unescapeXml } from '../../share/core/escape.ts';
 
 import {
   FIGURE_STATE_ENCODING,
@@ -219,7 +220,7 @@ async function encodeState(
 ): Promise<{ encoding: string; text: string }> {
   const json = JSON.stringify(value);
   if (new TextEncoder().encode(json).length <= READABLE_STATE_BYTES) {
-    return { encoding: JSON_ENCODING, text: escapeXmlText(json) };
+    return { encoding: JSON_ENCODING, text: escapeText(json) };
   }
   return {
     encoding: FIGURE_STATE_ENCODING,
@@ -236,7 +237,7 @@ async function decodeState(
   const encoding = attribute(tag, 'encoding');
   try {
     if (encoding === JSON_ENCODING) {
-      return { version, value: JSON.parse(unescapeXmlText(text)) as unknown };
+      return { version, value: JSON.parse(unescapeXml(text)) as unknown };
     }
     if (encoding === FIGURE_STATE_ENCODING) {
       return { version, value: await unpackFigureValue(text) };
@@ -245,18 +246,4 @@ async function decodeState(
     return undefined;
   }
   return undefined;
-}
-
-function escapeXmlText(text: string): string {
-  return text
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
-}
-
-function unescapeXmlText(text: string): string {
-  return text
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&amp;', '&');
 }

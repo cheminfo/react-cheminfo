@@ -1,4 +1,4 @@
-import { parseJsonObject } from './json.ts';
+import { lineAt, parseJsonObject } from './json.ts';
 import type { DeployProblem } from './types.ts';
 
 /** A Vite config, whichever build it describes: `vite.overlay.config.ts` too. */
@@ -42,7 +42,7 @@ export function readViteBuild(
     for (const match of code.matchAll(OPTION)) {
       const key = match.groups?.key;
       const value = (match.groups?.value ?? '').trim();
-      const line = code.slice(0, match.index).split('\n').length;
+      const line = lineAt(code, match.index);
       if (key === 'sourcemap' && value !== 'false') {
         problems.push({
           file: path,

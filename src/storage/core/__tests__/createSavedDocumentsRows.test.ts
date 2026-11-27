@@ -4,38 +4,15 @@
  * something else than this store.
  */
 
-import {
-  IDBCursor,
-  IDBCursorWithValue,
-  IDBDatabase,
-  IDBFactory,
-  IDBIndex,
-  IDBKeyRange,
-  IDBObjectStore,
-  IDBRequest,
-  IDBTransaction,
-} from 'fake-indexeddb';
 import { openDB } from 'idb';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { createSavedDocuments } from '../createSavedDocuments.ts';
 
+import { stubIndexedDB } from './fakeIndexedDB.ts';
+
 beforeEach(() => {
-  // idb recognises what it wraps by these classes, read off the globals.
-  const classes = {
-    IDBCursor,
-    IDBCursorWithValue,
-    IDBDatabase,
-    IDBIndex,
-    IDBKeyRange,
-    IDBObjectStore,
-    IDBRequest,
-    IDBTransaction,
-  };
-  for (const [name, value] of Object.entries(classes)) {
-    vi.stubGlobal(name, value);
-  }
-  vi.stubGlobal('indexedDB', new IDBFactory());
+  stubIndexedDB();
 });
 
 afterEach(() => {

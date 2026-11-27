@@ -3,6 +3,8 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { persistBucket } from '../persistBucket.ts';
 import { persistSignalBucket } from '../persistSignalBucket.ts';
 
+import { createReactiveSystem } from './fakeSignals.ts';
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -169,39 +171,6 @@ function migrate(stored: unknown) {
   const chart = (stored as { settings: { chart: { fwhm: number } } }).settings
     .chart;
   return { chart: { fwhm: chart.fwhm, widthMode: 'fwhm' } };
-}
-
-interface FakeSignal<T> {
-  value: T;
-  peek: () => T;
-  subscribe: () => () => void;
-}
-
-function createReactiveSystem() {
-  const effects: Array<() => void> = [];
-  const effect = (callback: () => void): void => {
-    effects.push(callback);
-    callback();
-  };
-  const signal = <T>(initial: T): FakeSignal<T> => {
-    let current = initial;
-    return {
-      get value() {
-        return current;
-      },
-      set value(next: T) {
-        current = next;
-        for (const listener of effects) listener();
-      },
-      peek: () => current,
-      subscribe: () => unsubscribe,
-    };
-  };
-  return { effect, signal };
-}
-
-function unsubscribe(): void {
-  // The fake signals keep no subscriber list, so there is nothing to release.
 }
 
 function stubStorage(initial: Record<string, string>) {

@@ -19,6 +19,9 @@ import { useMemo, useRef } from 'react';
 
 import { ChartFrame } from '../../chart/ui/ChartFrame.tsx';
 import { useContainerSize } from '../../hooks/ui/useContainerSize.ts';
+import type { ChromeKey } from '../../i18n/core/chromeCatalog.ts';
+import type { Translate } from '../../i18n/ui/useT.ts';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 import type { HydrogenicParameters } from '../core/hydrogenic.ts';
 import type { PhasePalette } from '../core/palette.ts';
@@ -102,6 +105,7 @@ export function RadialPlot(props: RadialPlotProps): ReactElement {
     className,
   } = props;
   const { n, l, charge } = parameters;
+  const t = useChromeT();
 
   const figureRef = useRef<HTMLElement>(null);
   const measured = useContainerSize(figureRef);
@@ -110,7 +114,6 @@ export function RadialPlot(props: RadialPlotProps): ReactElement {
     [n, l, charge],
   );
   const unitFactor = UNIT_FACTORS[unit];
-  const curves = showAmplitude ? 'r²R² and R' : 'r²R²';
 
   return (
     <figure ref={figureRef} className={className} style={FIGURE_STYLE}>
@@ -119,17 +122,21 @@ export function RadialPlot(props: RadialPlotProps): ReactElement {
         height={height}
         x={{
           domain: [0, distribution.limit * unitFactor],
-          label: `Distance from the nucleus (${UNIT_LABELS[unit]})`,
+          label: t('orbital.radial.distance', { unit: UNIT_LABELS[unit] }),
           showGrid: false,
         }}
         y={{
           domain: showAmplitude ? [-1, 1] : [0, 1],
-          label: `${curves} (relative)`,
+          label: t(
+            showAmplitude
+              ? 'orbital.radial.densityAmplitude'
+              : 'orbital.radial.density',
+          ),
           showGrid: false,
           showTicks: false,
           nice: false,
         }}
-        label={accessibleLabel(name, distribution.nodeRadii.length)}
+        label={accessibleLabel(t, name, distribution.nodeRadii.length)}
         testId="radial-plot"
       >
         {(frame) => (
@@ -140,6 +147,10 @@ export function RadialPlot(props: RadialPlotProps): ReactElement {
             showAmplitude={showAmplitude}
             showPeak={showPeak}
             palette={palette}
+            labels={{
+              node: t('orbital.radial.node'),
+              peak: t('orbital.radial.peak'),
+            }}
           />
         )}
       </ChartFrame>
@@ -152,10 +163,23 @@ export function RadialPlot(props: RadialPlotProps): ReactElement {
   );
 }
 
-function accessibleLabel(name: string | undefined, nodes: number): string {
-  const subject = name === undefined ? 'an orbital' : `the ${name} orbital`;
-  const count = `${nodes} radial node${nodes === 1 ? '' : 's'}`;
-  return `Radial distribution of ${subject}, ${count}`;
+function accessibleLabel(
+  t: Translate<ChromeKey>,
+  name: string | undefined,
+  nodes: number,
+): string {
+  if (name === undefined) {
+    return t(
+      nodes === 1
+        ? 'orbital.radial.labelUnnamedOne'
+        : 'orbital.radial.labelUnnamedMany',
+      { count: nodes },
+    );
+  }
+  return t(
+    nodes === 1 ? 'orbital.radial.labelOne' : 'orbital.radial.labelMany',
+    { name, count: nodes },
+  );
 }
 
 const UNIT_FACTORS: Record<RadialPlotUnit, number> = {

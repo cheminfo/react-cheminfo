@@ -1,6 +1,8 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { readClipboardText } from '../src/host/testing/chatFrame.ts';
+
 import { openStory } from './story.ts';
 
 const DOI_URL = 'https://doi.org/10.1021/ci300563h';
@@ -27,7 +29,7 @@ async function openCiteMenu(page: Page): Promise<void> {
  */
 async function copiedText(page: Page): Promise<string> {
   await expect(page.getByRole('menuitem', { name: /copied/ })).toBeVisible();
-  return page.evaluate(() => navigator.clipboard.readText());
+  return readClipboardText(page);
 }
 
 test('the menu opens on the work, at its DOI', async ({ page }) => {

@@ -9,6 +9,7 @@ import {
   LEVEL_NAME_KEY,
   STATUS_ICON,
   STATUS_INTENT,
+  STATUS_NAME_KEY,
 } from './exerciseMeta.ts';
 
 /** What {@link ExerciseLevelTag} needs. */
@@ -77,7 +78,7 @@ export interface ExerciseStatusIconProps {
   status: ExerciseStatus;
   /**
    * What the pointer and a screen reader are told.
-   * @default the status itself — `idle`, `attempted`, `solved`
+   * @default the status in the chrome's words, in the language of the page
    */
   title?: string;
   /**
@@ -100,7 +101,9 @@ export interface ExerciseStatusIconProps {
 export function ExerciseStatusIcon(
   props: ExerciseStatusIconProps,
 ): ReactElement {
-  const { className, status, title = status, size } = props;
+  const { className, status, size } = props;
+  const t = useChromeT();
+  const title = props.title ?? t(STATUS_NAME_KEY[status]);
 
   return (
     <Icon

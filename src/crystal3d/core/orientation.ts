@@ -12,6 +12,8 @@
  * scene's own axis**: the highest-order axis it draws, or a crystal's c edge.
  */
 
+import { toRadians } from '../../crystal/core/symmetry/lattice.ts';
+
 import { cellAxes } from './cellGeometry.ts';
 import { perpendicularTo } from './frame.ts';
 import type { Point3, SymmetryDrawing, UnitCell } from './types.ts';
@@ -186,10 +188,6 @@ function rollAbout(vector: Point3, unit: Point3, angle: number): Point3 {
  */
 function hasDirection(vector: Point3): boolean {
   return vectorNorm(vector) > DIRECTION_FLOOR;
-}
-
-function toRadians(degrees: number): number {
-  return (degrees * Math.PI) / 180;
 }
 
 /**

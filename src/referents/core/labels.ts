@@ -4,15 +4,19 @@
  * the number they last showed. A document writes its own numbers over them.
  */
 
-import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
+import {
+  escapeAttribute,
+  escapeText,
+  unescapeXml,
+} from '../../share/core/escape.ts';
 
 import type { ReferentMention } from './types.ts';
 
 /** The attribute naming the referent a label shows. */
-export const REFERENT_ATTRIBUTE = 'data-cheminfo-ref';
+const REFERENT_ATTRIBUTE = 'data-cheminfo-ref';
 
 /** The attribute naming the row of its series, for a member. */
-export const REFERENT_ROW_ATTRIBUTE = 'data-cheminfo-row';
+const REFERENT_ROW_ATTRIBUTE = 'data-cheminfo-row';
 
 const LABEL =
   /<(?<tag>text|tspan)\b(?<attributes>[^>]*\sdata-cheminfo-ref\s*=\s*"[^"]*"[^>]*)>(?<body>[\s\S]*?)<\/\k<tag>\s*>/g;
@@ -43,7 +47,7 @@ export function readFigureLabels(
     const { attributes = '', body = '' } = match.groups ?? {};
     labels.push({
       ...mentionOf(attributes),
-      text: unescapeText(body.replaceAll(/<[^>]*>/g, '')),
+      text: unescapeXml(body.replaceAll(/<[^>]*>/g, '')),
     });
   }
   return labels;
@@ -78,14 +82,5 @@ function attributeOf(attributes: string, name: string): string | undefined {
   const value = new RegExp(String.raw`\s${name}\s*=\s*"(?<value>[^"]*)"`).exec(
     attributes,
   )?.groups?.value;
-  return value === undefined ? undefined : unescapeText(value);
-}
-
-function unescapeText(value: string): string {
-  return value
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#39;', "'")
-    .replaceAll('&amp;', '&');
+  return value === undefined ? undefined : unescapeXml(value);
 }

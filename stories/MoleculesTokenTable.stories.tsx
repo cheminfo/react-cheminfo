@@ -22,7 +22,7 @@ const VALID: MoleculesTokenCheck = {
   verdict: 'ok',
   source: 'NP Atlas',
   hint: 'mct_1a2b3c4d',
-  email: 'chembio@cheminfo.org',
+  email: 'chembio@example.org',
   issuedAt: Date.UTC(2026, 8, 1, 9, 30),
   lastUsedAt: Date.UTC(2026, 9, 20, 19, 59),
 };

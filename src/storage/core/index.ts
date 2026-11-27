@@ -6,8 +6,6 @@ export {
   readJsonFile,
   writeArchive,
 } from './backupFiles.ts';
-export type { BackupManifest } from './backupManifest.ts';
-export { BACKUP_MANIFEST, readBackupManifest } from './backupManifest.ts';
 export type {
   BackupDrafts,
   RestoredBackup,
@@ -32,11 +30,7 @@ export type {
   SavedDocuments,
   SavedDocumentsOptions,
 } from './createSavedDocuments.ts';
-export {
-  MAX_DOCUMENT_NAME,
-  createSavedDocuments,
-  nameKey,
-} from './createSavedDocuments.ts';
+export { createSavedDocuments } from './createSavedDocuments.ts';
 export { documentFigure, openedFigureSvg } from './documentFigure.ts';
 export type {
   SiteDocument,
@@ -44,20 +38,13 @@ export type {
   WriteSiteDocumentOptions,
 } from './siteDocument.ts';
 export {
-  DOCUMENT_FORMAT,
   readSiteDocument,
   siteDocumentExtension,
   siteDocumentName,
   writeSiteDocument,
 } from './siteDocument.ts';
 export type { WorkspaceRecord } from './workspaceFile.ts';
-export {
-  WORKSPACE_FORMAT,
-  readWorkspaceText,
-  readWorkspaceValue,
-  workspaceFileName,
-  writeWorkspaceText,
-} from './workspaceFile.ts';
+export { readWorkspaceText, writeWorkspaceText } from './workspaceFile.ts';
 export type {
   BuiltinWorkspace,
   WorkspaceSource,
@@ -78,7 +65,6 @@ export { createDocumentSaver } from './createDocumentSaver.ts';
 export type { DocumentPlace, PlaceKind } from './documentPlace.ts';
 export { documentPlace, placeKind } from './documentPlace.ts';
 export type { MoveOutcome, MoveToFolderOptions } from './moveToFolder.ts';
-export { moveToFolder } from './moveToFolder.ts';
 export type {
   Draft,
   DraftFile,
@@ -86,7 +72,7 @@ export type {
   DraftStoreOptions,
 } from './createDraftStore.ts';
 export { createDraftStore } from './createDraftStore.ts';
-export { DRAFT_LIMIT, draftsToForget, isSavedAsIs } from './draftFiles.ts';
+export { DRAFT_LIMIT } from './draftFiles.ts';
 export type {
   DraftCells,
   DraftSession,
@@ -104,16 +90,12 @@ export type {
   SaveTarget,
   SignalTools,
 } from './documentFile.ts';
-export { SAVE_TARGETS } from './documentFile.ts';
 export type { PickerType } from './fileAccess.ts';
 export {
-  browserPicksFiles,
   canPickFiles,
   canPickFolders,
-  chooseFolder,
   chooseOpenFile,
   chooseSaveFile,
-  freeFileName,
   hasAccess,
   mayAccess,
   writeFile,

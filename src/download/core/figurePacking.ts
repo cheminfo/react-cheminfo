@@ -6,6 +6,8 @@
 
 import { decode, encode } from 'uint8-base64';
 
+import { pipeBytes } from '../../share/core/linkBytes.ts';
+
 /** How a state is packed, as its element says. */
 export const FIGURE_STATE_ENCODING = 'gzip+base64';
 
@@ -24,7 +26,7 @@ const BASE64 = /^[A-Za-z\d+/]*={0,2}$/;
  */
 export async function packFigureValue(value: unknown): Promise<string> {
   const json = new TextEncoder().encode(JSON.stringify(value));
-  const packed = await piped(json, new CompressionStream('gzip'));
+  const packed = await pipeBytes(json, new CompressionStream('gzip'));
   return new TextDecoder().decode(encode(packed));
 }
 
@@ -42,36 +44,10 @@ export async function unpackFigureValue(text: string): Promise<unknown> {
     throw new Error('The value is not written in base64.');
   }
   const packed = Uint8Array.from(decode(new TextEncoder().encode(base64)));
-  const json = await piped(
+  const json = await pipeBytes(
     packed,
     new DecompressionStream('gzip'),
     MAX_FIGURE_STATE_BYTES,
   );
   return JSON.parse(new TextDecoder().decode(json));
-}
-
-async function piped(
-  bytes: Uint8Array<ArrayBuffer>,
-  stream: CompressionStream | DecompressionStream,
-  limit = Infinity,
-): Promise<Uint8Array<ArrayBuffer>> {
-  const output = new Blob([bytes])
-    .stream()
-    .pipeThrough(stream)
-    .pipeThrough(capped(limit));
-  return new Uint8Array(await new Response(output).arrayBuffer());
-}
-
-function capped(limit: number): TransformStream<Uint8Array, Uint8Array> {
-  let length = 0;
-  return new TransformStream({
-    transform(chunk, controller) {
-      length += chunk.byteLength;
-      if (length > limit) {
-        controller.error(new Error('The value unpacks larger than allowed.'));
-        return;
-      }
-      controller.enqueue(chunk);
-    },
-  });
 }

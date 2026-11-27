@@ -1,29 +1,21 @@
 import { readFileSync } from 'node:fs';
 
-import type { Download, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { PERIODIC_ELEMENTS } from '../src/periodic/core/elements.ts';
 
-import { openFigurePanel } from './figurePanel.ts';
+import {
+  PNG_HEIGHT_AT,
+  PNG_SIGNATURE,
+  PNG_WIDTH_AT,
+  openFigurePanel,
+  save,
+} from './figurePanel.ts';
 import { openStory } from './story.ts';
 
 // The property map with its strips, its corner and its key, and a bar above
 // it carrying the save glyph.
 const STORY = 'periodic-periodictable--download';
-
-// The first eight bytes of every PNG, and where its header writes the size.
-const PNG_SIGNATURE = '89504e470d0a1a0a';
-const PNG_WIDTH_AT = 16;
-const PNG_HEIGHT_AT = 20;
-
-async function save(page: Page): Promise<Download> {
-  const [download] = await Promise.all([
-    page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Save', exact: true }).click(),
-  ]);
-  return download;
-}
 
 test('the table is saved as an SVG holding every cell, its strips and its key', async ({
   page,

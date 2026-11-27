@@ -9,10 +9,17 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { downloadBlob } from '../../../download/core/downloadBlob.ts';
 import { createDocumentSaver } from '../createDocumentSaver.ts';
-import type { SavedDocument, SavedDocuments } from '../createSavedDocuments.ts';
+import type { SavedDocuments } from '../createSavedDocuments.ts';
 import type { SiteFolder } from '../createSiteFolder.ts';
-import type { Cell, DocumentFile } from '../documentFile.ts';
+import type { DocumentFile } from '../documentFile.ts';
 import type { SaveFormat } from '../documentSaverTypes.ts';
+
+import {
+  cell,
+  fakeFile,
+  fakeFolder,
+  memoryDocuments,
+} from './fakeFileSystem.ts';
 
 vi.mock('../../../download/core/downloadBlob.ts', () => ({
   downloadBlob: vi.fn(),
@@ -25,95 +32,6 @@ const HTML: SaveFormat<string> = {
   picker: { description: 'Document', accept: { 'text/html': ['.html'] } },
   write: (text) => `<p>${text}</p>`,
 };
-
-function stopNothing(): void {
-  // Nothing was subscribed to.
-}
-
-function cell<T>(value: T): Cell<T> {
-  const holder = { value, peek: () => holder.value };
-  return holder;
-}
-
-// A file of this computer, recording what is written into it.
-function fakeFile(name: string) {
-  const written: string[] = [];
-  const handle = {
-    kind: 'file',
-    name,
-    queryPermission: () => Promise.resolve('granted'),
-    createWritable: () =>
-      Promise.resolve({
-        write: (content: string) => {
-          written.push(content);
-          return Promise.resolve();
-        },
-        close: () => Promise.resolve(),
-        abort: () => Promise.resolve(),
-      }),
-    isSameEntry: (other: { name: string }) =>
-      Promise.resolve(other.name === name),
-  };
-  return { handle: handle as unknown as FileSystemFileHandle, written };
-}
-
-// A folder holding the named files.
-function fakeFolder(names: string[]) {
-  const files = new Map(names.map((name) => [name, fakeFile(name)]));
-  const directory = {
-    kind: 'directory',
-    name: 'Notebook',
-    getFileHandle: (name: string, options?: { create?: boolean }) => {
-      let entry = files.get(name);
-      if (!entry && options?.create) {
-        entry = fakeFile(name);
-        files.set(name, entry);
-      }
-      return entry
-        ? Promise.resolve(entry.handle)
-        : Promise.reject(new DOMException('absent', 'NotFoundError'));
-    },
-  } as unknown as FileSystemDirectoryHandle;
-  const folder = {
-    writable: () => Promise.resolve(directory),
-    changed: vi.fn(),
-  } as unknown as SiteFolder;
-  return { folder, files };
-}
-
-// Documents kept in this browser, in memory.
-function memoryDocuments(): SavedDocuments<string> & {
-  rows: Array<SavedDocument<string>>;
-} {
-  const rows: Array<SavedDocument<string>> = [];
-  return {
-    rows,
-    isAvailable: () => Promise.resolve(true),
-    list: () => Promise.resolve([...rows]),
-    named: (name) => Promise.resolve(rows.find((row) => row.name === name)),
-    save: (name, data) => {
-      const previous = rows.find((row) => row.name === name);
-      const row = {
-        id: previous?.id ?? `id-${rows.length + 1}`,
-        name,
-        savedAt: 1,
-        data,
-      };
-      if (previous) rows[rows.indexOf(previous)] = row;
-      else rows.push(row);
-      return Promise.resolve(row);
-    },
-    update: (id, data) => {
-      const row = rows.find((candidate) => candidate.id === id);
-      if (row) row.data = data;
-      return Promise.resolve(row);
-    },
-    rename: () => Promise.resolve(),
-    remove: () => Promise.resolve(),
-    restore: () => Promise.resolve(0),
-    subscribe: () => stopNothing,
-  };
-}
 
 function saverOf(
   extra: {

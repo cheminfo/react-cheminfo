@@ -212,12 +212,3 @@ export function wrapTwelfths(twelfths: number): number {
     ((twelfths % TWELFTHS_PER_CELL) + TWELFTHS_PER_CELL) % TWELFTHS_PER_CELL
   );
 }
-
-/**
- * The dimension an operation lives in, read off its rotation part.
- * @param operation - The operation.
- * @returns 2 or 3.
- */
-export function dimensionOf(operation: CrystalOperation<Dimension>): Dimension {
-  return operation.rotation.length === 2 ? 2 : 3;
-}

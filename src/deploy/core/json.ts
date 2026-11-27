@@ -42,12 +42,28 @@ export function stringEntries(value: unknown): Record<string, string> {
 /**
  * Where a report should point, so the reader lands on the line itself.
  * @param text - The file to search, when there is one.
- * @param needle - The literal to find.
+ * @param needle - The literal, or the pattern, to find.
  * @returns Its line, counting from 1, or 0 when it is not there.
  */
-export function lineOf(text: string | undefined, needle: string): number {
+export function lineOf(
+  text: string | undefined,
+  needle: string | RegExp,
+): number {
   if (text === undefined) return 0;
-  const at = text.indexOf(needle);
+  const at =
+    typeof needle === 'string'
+      ? text.indexOf(needle)
+      : (needle.exec(text)?.index ?? -1);
   if (at === -1) return 0;
-  return text.slice(0, at).split('\n').length;
+  return lineAt(text, at);
+}
+
+/**
+ * The line an offset of a file falls on.
+ * @param text - The file.
+ * @param offset - Where in it, counting characters from 0.
+ * @returns The line, counting from 1.
+ */
+export function lineAt(text: string, offset: number): number {
+  return text.slice(0, offset).split('\n').length;
 }

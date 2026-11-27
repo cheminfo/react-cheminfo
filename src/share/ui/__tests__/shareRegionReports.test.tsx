@@ -7,10 +7,15 @@
 
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import {
+  freshRoot,
+  host,
+  mountRoot,
+  root,
+  unmountRoot,
+} from '../../../__tests__/root.ts';
 import { HiddenPartsProvider } from '../HiddenPartsProvider.tsx';
 import { PagePart } from '../PagePart.tsx';
 
@@ -18,8 +23,6 @@ import { PagePart } from '../PagePart.tsx';
 const boxes = new Map<string, { x: number; y: number; w: number; h: number }>();
 const frames: FrameRequestCallback[] = [];
 const resized = new Set<() => void>();
-let host: HTMLDivElement;
-let root: Root;
 const posted: unknown[] = [];
 
 class FakeResizeObserver {
@@ -39,7 +42,6 @@ class FakeResizeObserver {
 }
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('ResizeObserver', FakeResizeObserver);
   vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
     frames.push(callback);
@@ -53,14 +55,11 @@ beforeEach(() => {
   boxes.set('hints', { x: 10.4, y: 20.6, w: 300.2, h: 99.5 });
   boxes.set('answers', { x: 10, y: 140, w: 300, h: 0 });
   posted.length = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   boxes.clear();
   frames.length = 0;
   resized.clear();
@@ -215,7 +214,7 @@ test('a page taken down stops measuring, a frame already asked for included', ()
   expect(frames).toHaveLength(1);
 
   act(() => root.unmount());
-  root = createRoot(host);
+  freshRoot();
 
   expect(frames).toStrictEqual([]);
   expect(resized.size).toBe(0);

@@ -3,6 +3,8 @@
  * what does not is dropped, so a figure written by any program reads.
  */
 
+import { isPlainRecord } from '../../state/core/mergeStored.ts';
+
 import type {
   FigureQuote,
   FigureReferent,
@@ -20,7 +22,7 @@ import type {
  * anything else, and no quotes when none read.
  */
 export function readReferents(value: unknown): FigureReferents {
-  const record = isRecord(value) ? value : {};
+  const record = isPlainRecord(value) ? value : {};
   const referents: FigureReferent[] = [];
   for (const item of listOf(record.referents)) {
     const referent = readReferent(item);
@@ -42,7 +44,7 @@ export function readReferents(value: unknown): FigureReferents {
 }
 
 function readQuote(value: unknown): FigureQuote | undefined {
-  if (!isRecord(value) || !isKey(value.key) || !isKey(value.kind)) {
+  if (!isPlainRecord(value) || !isKey(value.key) || !isKey(value.kind)) {
     return undefined;
   }
   if (!isText(value.title) || !isText(value.html)) return undefined;
@@ -58,7 +60,7 @@ function readQuote(value: unknown): FigureQuote | undefined {
 }
 
 function readReferent(value: unknown): FigureReferent | undefined {
-  if (!isRecord(value) || !isKey(value.key)) return undefined;
+  if (!isPlainRecord(value) || !isKey(value.key)) return undefined;
   const referent: FigureReferent = { key: value.key };
   if (isKey(value.kind)) referent.kind = value.kind;
   if (isText(value.name)) referent.name = value.name;
@@ -78,7 +80,7 @@ function readReferent(value: unknown): FigureReferent | undefined {
 }
 
 function readMember(value: unknown): ReferentMember | undefined {
-  if (!isRecord(value) || !isKey(value.row)) return undefined;
+  if (!isPlainRecord(value) || !isKey(value.row)) return undefined;
   const member: ReferentMember = { row: value.row };
   copyStructure(value, member);
   if (isText(value.preview)) member.preview = value.preview;
@@ -86,13 +88,13 @@ function readMember(value: unknown): ReferentMember | undefined {
 }
 
 function readSeries(value: unknown): ReferentSeries | undefined {
-  if (!isRecord(value) || !isKey(value.key)) return undefined;
+  if (!isPlainRecord(value) || !isKey(value.key)) return undefined;
   const columns = listOf(value.columns).filter(isKey);
   const rows: SeriesRow[] = [];
   for (const item of listOf(value.rows)) {
-    if (!isRecord(item) || !isKey(item.id)) continue;
+    if (!isPlainRecord(item) || !isKey(item.id)) continue;
     const values: Record<string, string> = {};
-    if (isRecord(item.values)) {
+    if (isPlainRecord(item.values)) {
       for (const column of columns) {
         const cell = item.values[column];
         if (typeof cell === 'string') values[column] = cell;
@@ -106,7 +108,7 @@ function readSeries(value: unknown): ReferentSeries | undefined {
 }
 
 function readBox(value: unknown): ReferentBox | undefined {
-  if (!isRecord(value)) return undefined;
+  if (!isPlainRecord(value)) return undefined;
   const { x, y, width, height } = value;
   if (!isFinite(x) || !isFinite(y) || !isFinite(width) || !isFinite(height)) {
     return undefined;
@@ -126,10 +128,6 @@ function copyStructure(
 
 function listOf(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function isText(value: unknown): value is string {

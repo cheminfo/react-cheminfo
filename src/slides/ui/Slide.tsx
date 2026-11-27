@@ -1,24 +1,19 @@
 import type { ComponentType, ReactElement } from 'react';
-import { Fragment } from 'react';
 
-import { useChromeT } from '../../i18n/ui/useT.ts';
+import { splitEmbedAddress } from '../core/embedAddress.ts';
 import type {
   Slide as SlideData,
   TalkMeta,
   TalkOrigin,
 } from '../core/index.ts';
-import {
-  STEPS_LAYOUT,
-  demoLabel,
-  splitDemoLinks,
-  splitEmbedAddress,
-} from '../core/index.ts';
+import { splitDemoLinks } from '../core/index.ts';
+import { STEPS_LAYOUT } from '../core/slideSteps.ts';
 
 import type { RenderSlideLink } from './DemoLink.tsx';
-import { DemoLink } from './DemoLink.tsx';
 import { EmbedSlide } from './EmbedSlide.tsx';
 import { SectionSlide } from './SectionSlide.tsx';
 import { SlideBody } from './SlideBody.tsx';
+import { SlideDemos } from './SlideDemos.tsx';
 import { StepsSlide } from './StepsSlide.tsx';
 import { TitleToolSlide } from './TitleToolSlide.tsx';
 
@@ -109,7 +104,6 @@ function GenericSlide(
 ): ReactElement {
   const { slide, talkId, slideIndex, meta, renderLink, site, talkOrigin } =
     props;
-  const t = useChromeT();
   const layout = GENERIC_LAYOUTS.has(slide.layout) ? slide.layout : 'content';
   const { body, demos } = splitDemoLinks(slide.body);
   const origin: TalkOrigin =
@@ -129,44 +123,13 @@ function GenericSlide(
             ))}
           </div>
         )}
-        {demos.length === 0 ? null : (
-          <div className="slide-demos">
-            <span className="slide-demos-label">{t('slides.liveDemos')}</span>
-            {demos.map((demo, index) => (
-              <Fragment key={demo.href}>
-                {index === 0 ? null : (
-                  <span className="slide-demos-separator" aria-hidden="true">
-                    |
-                  </span>
-                )}
-                <DemoLink
-                  href={resolveDemoHref(demo.href, talkOrigin)}
-                  origin={origin}
-                  renderLink={renderLink}
-                >
-                  {demoLabel(demo.label)}
-                </DemoLink>
-              </Fragment>
-            ))}
-          </div>
-        )}
+        <SlideDemos
+          demos={demos}
+          origin={origin}
+          renderLink={renderLink}
+          talkOrigin={talkOrigin}
+        />
       </div>
     </div>
   );
-}
-
-/**
- * Where a demo link actually points.
- *
- * A deck writes `/mf-finder?mass=300`, meaning its own site. Played there it is
- * exactly that; played on another site of the family it has to be resolved
- * against the site that wrote it, or the link lands on a page that does not
- * exist.
- * @param href - The address the slide wrote.
- * @param talkOrigin - Where the publishing site lives, when it is not this one.
- * @returns The address to open.
- */
-function resolveDemoHref(href: string, talkOrigin?: string): string {
-  if (talkOrigin === undefined || !href.startsWith('/')) return href;
-  return `${talkOrigin.replace(/\/$/, '')}${href}`;
 }

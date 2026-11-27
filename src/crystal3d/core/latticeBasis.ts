@@ -12,6 +12,10 @@
  */
 
 import type { Lattice } from '../../crystal/core/symmetry/lattice.ts';
+import {
+  cartesianToFractional,
+  fractionalToCartesian,
+} from '../../crystal/core/symmetry/lattice.ts';
 
 import type { Vec3 } from './vec3.ts';
 
@@ -22,7 +26,8 @@ import type { Vec3 } from './vec3.ts';
  * @returns The same point, Cartesian ångström.
  */
 export function toCartesian(lattice: Lattice, point: readonly number[]): Vec3 {
-  return applyMatrix(lattice.cartesian, point);
+  const [x = 0, y = 0, z = 0] = fractionalToCartesian(lattice, point);
+  return [x, y, z];
 }
 
 /**
@@ -32,7 +37,8 @@ export function toCartesian(lattice: Lattice, point: readonly number[]): Vec3 {
  * @returns The same point, in fractions of the cell edges.
  */
 export function toFractional(lattice: Lattice, point: readonly number[]): Vec3 {
-  return applyMatrix(lattice.fractional, point);
+  const [x = 0, y = 0, z = 0] = cartesianToFractional(lattice, point);
+  return [x, y, z];
 }
 
 /**
@@ -65,27 +71,6 @@ export function normalToFractional(
   normal: readonly number[],
 ): Vec3 {
   return applyTransposed(lattice.cartesian, normal);
-}
-
-/**
- * `A v`.
- * @param matrix - The 3×3 matrix, as its rows.
- * @param point - The vector it is applied to.
- * @returns The image.
- */
-function applyMatrix(
-  matrix: ReadonlyArray<readonly number[]>,
-  point: readonly number[],
-): Vec3 {
-  const image: number[] = [0, 0, 0];
-  for (let i = 0; i < 3; i++) {
-    let sum = 0;
-    for (let j = 0; j < 3; j++) {
-      sum += (matrix[i]?.[j] ?? 0) * (point[j] ?? 0);
-    }
-    image[i] = sum;
-  }
-  return [image[0] ?? 0, image[1] ?? 0, image[2] ?? 0];
 }
 
 /**

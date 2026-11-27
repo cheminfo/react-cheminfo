@@ -111,8 +111,7 @@ export function readReactCopies(
     // All four, not the runtime pair: a lock that pins only `react` and
     // `react-dom` keeps a nested `@types/react` of the wrong major, and `tsc`
     // then rejects a component crossing between the two type trees, in a file
-    // nobody touched. Twenty-one sites were in that state while this check
-    // asked for two.
+    // nobody touched.
     for (const name of SINGLE_COPY) {
       if (declared.get(name)?.override !== undefined) continue;
       problems.push({

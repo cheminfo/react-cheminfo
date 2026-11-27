@@ -4,10 +4,7 @@ import { trimTrailingSlash } from '../../../router/core/address.ts';
 import type { RouteMeta } from '../routes.ts';
 import { homeRoute, routeFor } from '../routes.ts';
 
-const ROUTES: RouteMeta[] = [
-  { path: '/', title: 'Home', description: 'The home page.' },
-  { path: '/about', title: 'About', description: 'What it computes.' },
-];
+import { HOME_ROUTES as ROUTES } from './routeFixtures.ts';
 
 test('an address names its route', () => {
   expect(routeFor(ROUTES, '/about')).toStrictEqual(ROUTES[1]);

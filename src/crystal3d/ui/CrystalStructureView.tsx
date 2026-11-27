@@ -14,6 +14,7 @@ import { useMemo } from 'react';
 import type { CellAtoms } from '../../crystal/core/cellAtoms.ts';
 import { crystalCellAtoms } from '../../crystal/core/cellAtoms.ts';
 import { readCif } from '../../crystal/core/cif/read.ts';
+import { errorMessage } from '../../error/core/toError.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { useControlledState } from '../../molecule3d/ui/useControlledState.ts';
 import { bondLimit } from '../../molstar/bonds/index.ts';
@@ -170,7 +171,7 @@ function readCell(cif: string): CellAtoms | string {
   try {
     return crystalCellAtoms(readCif(cif));
   } catch (error) {
-    return error instanceof Error ? error.message : String(error);
+    return errorMessage(error);
   }
 }
 

@@ -11,6 +11,7 @@ import {
   withFigureSource,
 } from '../../download/core/figureSource.ts';
 import type { FigureStates } from '../../download/core/figureState.ts';
+import { errorMessage } from '../../error/core/toError.ts';
 
 import type { HostOutputs } from './hostOutputs.ts';
 import { kindAccepts } from './kindAccepts.ts';
@@ -91,7 +92,7 @@ export async function answerGet(
       if (item !== undefined && key !== undefined) items.push({ ...item, key });
     }
   } catch (error) {
-    return noOutput(id, error instanceof Error ? error.message : String(error));
+    return noOutput(id, errorMessage(error));
   }
   return {
     type: 'result',

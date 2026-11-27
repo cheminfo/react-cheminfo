@@ -7,8 +7,10 @@
 import { Vec3 } from 'molstar/lib/mol-math/linear-algebra.js';
 import type { PluginContext } from 'molstar/lib/mol-plugin/context.js';
 
-/** Transition length used when the caller does not pick one, milliseconds. */
-export const DEFAULT_CAMERA_DURATION = 250;
+import {
+  DEFAULT_CAMERA_DURATION,
+  FRAMING_MARGIN,
+} from '../../molstar/core/camera.ts';
 
 /**
  * Turn rate used when the caller does not pick one, in molstar's own spin unit.
@@ -17,37 +19,6 @@ export const DEFAULT_CAMERA_DURATION = 250;
  * an orbital fast enough that the phases blur into each other.
  */
 export const DEFAULT_SPIN_SPEED = 0.3;
-
-/**
- * Fraction of the bounding sphere kept as breathing room around the orbital.
- *
- * `camera.reset()` frames the scene with molstar's own margin, which suits a
- * protein filling a wide viewport. One orbital in a square frame measured 20%
- * of the pixels that way — it read as a speck. Framing the visible bounding
- * sphere directly, with a small margin, is what makes it legible.
- */
-const FRAMING_MARGIN = 0.08;
-
-/**
- * Frame everything currently in the scene.
- * @param plugin - The molstar context.
- * @param durationMs - Transition length. Pass 0 for an instant jump.
- */
-function resetCamera(
-  plugin: PluginContext,
-  durationMs = DEFAULT_CAMERA_DURATION,
-): void {
-  const scene = plugin.canvas3d?.boundingSphereVisible;
-  if (scene === undefined || scene.radius <= 0) {
-    plugin.managers.camera.reset(undefined, durationMs);
-    return;
-  }
-  plugin.managers.camera.focusSphere(scene, {
-    extraRadius: scene.radius * FRAMING_MARGIN,
-    minRadius: 0.5,
-    durationMs,
-  });
-}
 
 /**
  * Direction from the target to the camera for a single atom's orbital.
@@ -86,7 +57,7 @@ export function frameOrbital(
   const canvas3d = plugin.canvas3d;
   const scene = canvas3d?.boundingSphereVisible;
   if (canvas3d === undefined || scene === undefined || scene.radius <= 0) {
-    resetCamera(plugin, durationMs);
+    plugin.managers.camera.reset(undefined, durationMs);
     return;
   }
   const radius =
@@ -191,24 +162,4 @@ function sceneRadius(canvas3d: PluginContext['canvas3d'] & object): number {
       ? canvas3d.boundingSphere.radius
       : canvas3d.boundingSphereVisible.radius;
   return radius * canvas3d.props.sceneRadiusFactor;
-}
-
-/**
- * Turn the automatic spin on or off.
- * @param plugin - The molstar context.
- * @param spinning - Whether the scene should keep turning.
- * @param speed - Revolutions per minute-ish; molstar's own unit.
- */
-export function setSpin(
-  plugin: PluginContext,
-  spinning: boolean,
-  speed = DEFAULT_SPIN_SPEED,
-): void {
-  plugin.canvas3d?.setProps({
-    trackball: {
-      animate: spinning
-        ? { name: 'spin', params: { speed, axis: Vec3.create(0, 1, 0) } }
-        : { name: 'off', params: {} },
-    },
-  });
 }

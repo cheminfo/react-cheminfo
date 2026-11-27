@@ -8,16 +8,13 @@
 import { rasterSvgMarkup } from '../../molecule3d/core/exportImage.ts';
 
 import type { RasterFigureSource } from './croppedMarkup.ts';
-import {
-  croppedSvgMarkup,
-  rasterFigureSource,
-  rounded,
-} from './croppedMarkup.ts';
-import { svgImageUrl } from './figurePng.ts';
+import { croppedSvgMarkup, rasterFigureSource } from './croppedMarkup.ts';
+import { decodedImage, decodedSvgImage } from './figurePng.ts';
 import { readFigureSource, withFigureSource } from './figureSource.ts';
 import { readFigureStates, statesOf } from './figureState.ts';
 import type { FigureSvg } from './figureSvg.ts';
 import { paintedBox } from './paintedBox.ts';
+import { svgNumber } from './svgMarkup.ts';
 
 /** How much finer than its own size a drawing is painted to find its marks. */
 const SCAN_SCALE = 2;
@@ -61,7 +58,7 @@ export async function cropFigure(figure: FigureSvg): Promise<FigureSvg> {
 async function cropImage(
   raster: RasterFigureSource,
 ): Promise<FigureSvg | null> {
-  const image = await loadImage(raster.source);
+  const image = await decodedImage(raster.source);
   const width = image.naturalWidth;
   const height = image.naturalHeight;
   const box = paintedBox(paint(image, width, height), width, height);
@@ -84,8 +81,8 @@ async function cropImage(
     );
   const scale = raster.width / width;
   const size = {
-    width: rounded(box.width * scale),
-    height: rounded(box.height * scale),
+    width: svgNumber(box.width * scale),
+    height: svgNumber(box.height * scale),
   };
   return {
     markup: rasterSvgMarkup(canvas.toDataURL('image/png'), size),
@@ -100,29 +97,17 @@ async function cropDrawing(figure: FigureSvg): Promise<FigureSvg | null> {
   );
   const columns = Math.max(1, Math.round(figure.width * scale));
   const rows = Math.max(1, Math.round(figure.height * scale));
-  const url = svgImageUrl(figure.markup);
-  try {
-    const image = await loadImage(url);
-    const box = paintedBox(paint(image, columns, rows), columns, rows);
-    if (box === null) return null;
-    const scaleX = columns / figure.width;
-    const scaleY = rows / figure.height;
-    return croppedSvgMarkup(figure, {
-      x: box.x / scaleX,
-      y: box.y / scaleY,
-      width: box.width / scaleX,
-      height: box.height / scaleY,
-    });
-  } finally {
-    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-  }
-}
-
-async function loadImage(url: string): Promise<HTMLImageElement> {
-  const image = new Image();
-  image.src = url;
-  await image.decode();
-  return image;
+  const image = await decodedSvgImage(figure.markup);
+  const box = paintedBox(paint(image, columns, rows), columns, rows);
+  if (box === null) return null;
+  const scaleX = columns / figure.width;
+  const scaleY = rows / figure.height;
+  return croppedSvgMarkup(figure, {
+    x: box.x / scaleX,
+    y: box.y / scaleY,
+    width: box.width / scaleX,
+    height: box.height / scaleY,
+  });
 }
 
 function paint(

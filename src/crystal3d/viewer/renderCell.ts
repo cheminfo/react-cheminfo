@@ -80,7 +80,7 @@ export async function renderUnitCell(
  * Remove the cell and its letters.
  * @param plugin - The molstar context.
  */
-export function clearUnitCell(plugin: PluginContext): void {
+function clearUnitCell(plugin: PluginContext): void {
   clearShapeLayer(plugin, CELL_LAYER);
   clearShapeLayer(plugin, CELL_LABEL_LAYER);
 }

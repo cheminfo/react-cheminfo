@@ -13,6 +13,10 @@
  * file gets.
  */
 
+import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
+
+import { svgNumber } from './svgMarkup.ts';
+
 /** The card the entries sit on. */
 export interface FigureLegendCard {
   /** Its width, in pixels. */
@@ -97,7 +101,7 @@ export function figureLegendMarkup(print: FigureLegendPrint): string {
 
   for (const mark of marks) {
     parts.push(
-      `<g transform="translate(${round(mark.x)} ${round(mark.y)})">${mark.markup}</g>`,
+      `<g transform="translate(${svgNumber(mark.x)} ${svgNumber(mark.y)})">${mark.markup}</g>`,
     );
   }
   for (const run of texts) parts.push(textMarkup(run));
@@ -121,13 +125,13 @@ function groundMarkup(card: FigureLegendCard): string {
   const line =
     border === undefined
       ? ''
-      : ` stroke="${attribute(border)}" stroke-width="${round(borderWidth)}"`;
+      : ` stroke="${escapeAttribute(border)}" stroke-width="${svgNumber(borderWidth)}"`;
 
   return (
-    `<rect x="${round(inset)}" y="${round(inset)}"` +
-    ` width="${round(Math.max(0, width - inset * 2))}"` +
-    ` height="${round(Math.max(0, height - inset * 2))}"` +
-    ` rx="${round(radius)}" fill="${attribute(background ?? 'none')}"${line}/>`
+    `<rect x="${svgNumber(inset)}" y="${svgNumber(inset)}"` +
+    ` width="${svgNumber(Math.max(0, width - inset * 2))}"` +
+    ` height="${svgNumber(Math.max(0, height - inset * 2))}"` +
+    ` rx="${svgNumber(radius)}" fill="${escapeAttribute(background ?? 'none')}"${line}/>`
   );
 }
 
@@ -139,29 +143,19 @@ function groundMarkup(card: FigureLegendCard): string {
 function textMarkup(run: FigureLegendText): string {
   if (run.text === '') return '';
 
-  const fill = run.color === undefined ? '' : ` fill="${attribute(run.color)}"`;
+  const fill =
+    run.color === undefined ? '' : ` fill="${escapeAttribute(run.color)}"`;
   const size =
-    run.fontSize === undefined ? '' : ` font-size="${round(run.fontSize)}px"`;
+    run.fontSize === undefined
+      ? ''
+      : ` font-size="${svgNumber(run.fontSize)}px"`;
   const weight =
     run.fontWeight === undefined
       ? ''
-      : ` font-weight="${attribute(run.fontWeight)}"`;
+      : ` font-weight="${escapeAttribute(run.fontWeight)}"`;
 
   return (
-    `<text x="${round(run.x)}" y="${round(run.y)}" dominant-baseline="central"` +
-    `${fill}${size}${weight}>${text(run.text)}</text>`
+    `<text x="${svgNumber(run.x)}" y="${svgNumber(run.y)}" dominant-baseline="central"` +
+    `${fill}${size}${weight}>${escapeText(run.text)}</text>`
   );
 }
-
-function attribute(value: string): string {
-  return text(value).replaceAll('"', '&quot;');
-}
-
-function text(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
-}
-
-const round = (value: number): number => Math.round(value * 100) / 100;

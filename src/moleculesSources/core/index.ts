@@ -6,6 +6,5 @@ export type {
 export {
   MOLECULES_URL,
   fetchSourceLooks,
-  readSourceLooks,
   sourceLook,
 } from './moleculesSources.ts';

@@ -1,3 +1,6 @@
+import { escapeRegExp } from '../../share/core/escape.ts';
+
+import { lineOf } from './json.ts';
 import type { DeployProblem } from './types.ts';
 
 /** The page cache policy of a static-web-server site, at the repository root. */
@@ -107,14 +110,4 @@ function readNoCacheRule(
       hint: 'give the page Cache-Control: no-cache, and keep the long life for the hashed bundles alone',
     });
   }
-}
-
-function lineOf(text: string, pattern: RegExp): number {
-  const match = pattern.exec(text);
-  if (match === null) return 0;
-  return text.slice(0, match.index).split('\n').length;
-}
-
-function escapeRegExp(value: string): string {
-  return value.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
 }

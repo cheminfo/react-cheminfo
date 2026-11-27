@@ -12,6 +12,7 @@ import type {
 } from '../core/connectTool.ts';
 import { REQUEST_TIMEOUT, connectTool } from '../core/connectTool.ts';
 import { toolPageUrl } from '../core/toolPage.ts';
+import { listenToWindow } from '../core/windowMessages.ts';
 
 import { HELLO_TIMEOUT } from './useFramedTool.ts';
 
@@ -63,12 +64,7 @@ export function openTool(options: OpenToolOptions): boolean {
     frame: () => opened,
     origin: new URL(page).origin,
     host: { name: host },
-    listen: (listener) => {
-      globalThis.addEventListener('message', listener);
-      return () => {
-        globalThis.removeEventListener('message', listener);
-      };
-    },
+    listen: listenToWindow,
   });
   void handOver(connection, document)
     .then(

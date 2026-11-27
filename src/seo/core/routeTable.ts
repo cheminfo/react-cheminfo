@@ -5,8 +5,8 @@
  * pages, so there is one table rather than two that drift.
  */
 
+import { assertRoutes } from './assertRoutes.ts';
 import type { RouteMeta } from './routes.ts';
-import { assertRoutes } from './routes.ts';
 
 /** The file the table is written to, next to `index.html`. */
 export const ROUTE_TABLE_FILE = 'routes.json';

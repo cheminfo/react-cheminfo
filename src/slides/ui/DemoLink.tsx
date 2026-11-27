@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import type { TalkOrigin } from '../core/index.ts';
-import { withTalkOrigin } from '../core/index.ts';
+import { withTalkOrigin } from '../core/talkOrigin.ts';
 
 /**
  * How a site draws a link that leaves a slide for one of its own pages.

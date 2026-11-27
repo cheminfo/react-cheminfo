@@ -45,7 +45,7 @@ test('a label holding several runs is written as one', () => {
 
 test('@ tokens typed in any figure become labels, attributes and addresses left alone', () => {
   const svg =
-    '<svg><text x="3">@aldehyde → @acid-2, @aldehyde</text><text data-x="@no">mail me@host.org</text><desc>@not-text</desc></svg>';
+    '<svg><text x="3">@aldehyde → @acid-2, @aldehyde</text><text data-x="@no">mail me@example.org</text><desc>@not-text</desc></svg>';
   const adopted = adoptLabelTokens(svg);
 
   expect(adopted.referents).toStrictEqual([
@@ -53,12 +53,12 @@ test('@ tokens typed in any figure become labels, attributes and addresses left 
     { key: 'acid-2', name: 'acid-2' },
   ]);
   expect(adopted.svg).toBe(
-    '<svg><text x="3"><tspan data-cheminfo-ref="aldehyde">aldehyde</tspan> → <tspan data-cheminfo-ref="acid-2">acid-2</tspan>, <tspan data-cheminfo-ref="aldehyde">aldehyde</tspan></text><text data-x="@no">mail me@host.org</text><desc>@not-text</desc></svg>',
+    '<svg><text x="3"><tspan data-cheminfo-ref="aldehyde">aldehyde</tspan> → <tspan data-cheminfo-ref="acid-2">acid-2</tspan>, <tspan data-cheminfo-ref="aldehyde">aldehyde</tspan></text><text data-x="@no">mail me@example.org</text><desc>@not-text</desc></svg>',
   );
   expect(
     relabelFigure(adopted.svg, ({ key }) => (key === 'aldehyde' ? '1' : '2')),
   ).toBe(
-    '<svg><text x="3"><tspan data-cheminfo-ref="aldehyde">1</tspan> → <tspan data-cheminfo-ref="acid-2">2</tspan>, <tspan data-cheminfo-ref="aldehyde">1</tspan></text><text data-x="@no">mail me@host.org</text><desc>@not-text</desc></svg>',
+    '<svg><text x="3"><tspan data-cheminfo-ref="aldehyde">1</tspan> → <tspan data-cheminfo-ref="acid-2">2</tspan>, <tspan data-cheminfo-ref="aldehyde">1</tspan></text><text data-x="@no">mail me@example.org</text><desc>@not-text</desc></svg>',
   );
 });
 

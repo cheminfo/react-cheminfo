@@ -6,10 +6,9 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { setFigureRevision } from '../../../download/core/figureRevision.ts';
 import { withFigureSource } from '../../../download/core/figureSource.ts';
 import { SavedRevisionButton } from '../SavedRevisionButton.tsx';
@@ -19,21 +18,15 @@ const FIGURE =
 const SAVED = 'https://1a2b3c4d.draw-cheminfo.pages.dev';
 const RUNNING = 'https://9f8e7d6c.draw-cheminfo.pages.dev';
 
-let host: HTMLDivElement;
-let root: Root;
 const forgets: Array<() => void> = [];
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
   forgets.push(setFigureRevision('draw', { deployment: RUNNING }));
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   while (forgets.length > 0) forgets.pop()?.();
   vi.unstubAllGlobals();
 });

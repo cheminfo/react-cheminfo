@@ -7,10 +7,9 @@
 
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { downloadBlob } from '../../../download/core/downloadBlob.ts';
 import { createDocumentSaver } from '../../core/createDocumentSaver.ts';
 import type {
@@ -25,8 +24,6 @@ vi.mock('../../../download/core/downloadBlob.ts', () => ({
   downloadBlob: vi.fn(),
 }));
 
-let host: HTMLDivElement;
-let root: Root;
 const said: string[] = [];
 
 function stopNothing(): void {
@@ -82,7 +79,6 @@ function Page(props: { saver: DocumentSaver<string> }): ReactElement {
 }
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   said.length = 0;
   vi.mocked(downloadBlob).mockClear();
   const entries = new Map<string, string>();
@@ -91,16 +87,11 @@ beforeEach(() => {
     setItem: (key: string, value: string) => entries.set(key, value),
     removeItem: (key: string) => entries.delete(key),
   });
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   document.body.innerHTML = '';
   vi.unstubAllGlobals();
 });

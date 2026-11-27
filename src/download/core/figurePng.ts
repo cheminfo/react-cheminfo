@@ -43,7 +43,10 @@ export async function figurePng(
   }
   context.drawImage(drawing, 0, 0, pixels.width, pixels.height);
 
-  const encoded = await encode(canvas);
+  const encoded = await canvasPng(
+    canvas,
+    'The figure could not be encoded as a PNG.',
+  );
   const png = new Uint8Array(await encoded.arrayBuffer());
   return new Blob([withPngDpi(png, figureDpi(scale))], {
     type: FIGURE_PNG_TYPE,
@@ -92,15 +95,47 @@ async function loadFigure(figure: FigureSvg): Promise<HTMLImageElement> {
 }
 
 /**
- * The painted canvas, as a file.
- * @param canvas - The canvas the figure was painted into.
+ * An SVG document, decoded and ready to be painted.
+ * @param markup - The SVG document.
+ * @returns The decoded image; the URL it was read from is let go.
+ */
+export async function decodedSvgImage(
+  markup: string,
+): Promise<HTMLImageElement> {
+  const url = svgImageUrl(markup);
+  try {
+    return await decodedImage(url);
+  } finally {
+    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+  }
+}
+
+/**
+ * An image, decoded and ready to be painted.
+ * @param url - Where it is read from.
+ * @returns The decoded image.
+ */
+export async function decodedImage(url: string): Promise<HTMLImageElement> {
+  const image = new Image();
+  image.src = url;
+  await image.decode();
+  return image;
+}
+
+/**
+ * A painted canvas, as a PNG file.
+ * @param canvas - The canvas.
+ * @param failure - What the error says when the browser encodes nothing.
  * @returns The image.
  */
-function encode(canvas: HTMLCanvasElement): Promise<Blob> {
+export function canvasPng(
+  canvas: HTMLCanvasElement,
+  failure: string,
+): Promise<Blob> {
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (blob === null) {
-        reject(new Error('The figure could not be encoded as a PNG.'));
+        reject(new Error(failure));
         return;
       }
       resolve(blob);

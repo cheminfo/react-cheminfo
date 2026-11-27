@@ -6,15 +6,14 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
+import { until } from '../../../__tests__/until.ts';
 import { readFigureStates } from '../../../download/core/figureState.ts';
 import type { ToolInterface } from '../../core/protocol.ts';
 
 import { connectAsHost, hostWindow, loadToolPage } from './hostPage.tsx';
-import { until } from './until.ts';
 
 const TOOL: ToolInterface = {
   name: 'plate',
@@ -24,20 +23,13 @@ const TOOL: ToolInterface = {
 
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.resetModules();
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

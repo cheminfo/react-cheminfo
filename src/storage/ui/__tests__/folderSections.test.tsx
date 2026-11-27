@@ -1,60 +1,21 @@
 // @vitest-environment jsdom
 import type { ReactElement } from 'react';
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
-import type {
-  SavedDocument,
-  SavedDocuments,
-} from '../../core/createSavedDocuments.ts';
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
+import { listedDocuments } from '../../core/__tests__/fakeFileSystem.ts';
 import { ExamplesSection } from '../ExamplesSection.tsx';
 import { SavedDocumentsSection } from '../SavedDocumentsSection.tsx';
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
-
-/** What subscribing hands back: nothing to stop in a store that never changes. */
-function stopListening(): void {
-  // Nothing is listened to.
-}
-
-/**
- * Documents kept in memory, as the store would list them.
- * @param documents - What it holds, the latest first.
- * @returns The store.
- */
-function memoryStore(
-  documents: Array<SavedDocument<string>>,
-): SavedDocuments<string> {
-  return {
-    isAvailable: () => Promise.resolve(true),
-    list: () => Promise.resolve(documents),
-    named: () => Promise.resolve(undefined),
-    save: () => Promise.reject(new Error('not in this test')),
-    update: () => Promise.resolve(undefined),
-    rename: () => Promise.resolve(),
-    remove: () => Promise.resolve(),
-    restore: () => Promise.resolve(0),
-    subscribe: () => stopListening,
-  };
-}
 
 async function show(element: ReactElement): Promise<void> {
   await act(async () => {
@@ -74,7 +35,7 @@ test('the saved documents are listed the latest first, the one on screen marked'
   const now = Date.now();
   await show(
     <SavedDocumentsSection
-      store={memoryStore([
+      store={listedDocuments([
         { id: 'b', name: 'Caffeine', savedAt: now, data: 'c' },
         { id: 'a', name: 'Aspirin', savedAt: now - 3 * 3_600_000, data: 'a' },
       ])}
@@ -103,7 +64,7 @@ test('the saved documents are listed the latest first, the one on screen marked'
 
 test('with nothing saved, the section says how to save', async () => {
   await show(
-    <SavedDocumentsSection store={memoryStore([])} onOpen={vi.fn()} />,
+    <SavedDocumentsSection store={listedDocuments([])} onOpen={vi.fn()} />,
   );
 
   expect(host.textContent).toBe(

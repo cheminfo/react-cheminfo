@@ -6,6 +6,10 @@
  * one sits, so the file it becomes can be read — and tested — without a page.
  */
 
+import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
+
+import { svgNumber } from './svgMarkup.ts';
+
 /** A box the browser painted: a ground, a line round it, or both. */
 export interface HtmlPaintBox {
   /** What it is. */
@@ -130,9 +134,9 @@ function paintMarkup(paint: HtmlPaint): string {
     case 'text':
       return textMarkup(paint);
     case 'drawing':
-      return `<g transform="translate(${round(paint.x)} ${round(paint.y)})">${sizedDrawing(paint)}</g>`;
+      return `<g transform="translate(${svgNumber(paint.x)} ${svgNumber(paint.y)})">${sizedDrawing(paint)}</g>`;
     case 'group':
-      return `<g opacity="${round(paint.opacity)}">${figureHtmlMarkup(paint.children)}</g>`;
+      return `<g opacity="${svgNumber(paint.opacity)}">${figureHtmlMarkup(paint.children)}</g>`;
     default:
       return '';
   }
@@ -141,7 +145,7 @@ function paintMarkup(paint: HtmlPaint): string {
 function sizedDrawing(drawing: HtmlPaintDrawing): string {
   const { markup, size } = drawing;
   if (size === undefined) return markup;
-  return `<svg width="${round(size.width)}" height="${round(size.height)}" overflow="visible">${markup}</svg>`;
+  return `<svg width="${svgNumber(size.width)}" height="${svgNumber(size.height)}" overflow="visible">${markup}</svg>`;
 }
 
 function boxMarkup(box: HtmlPaintBox): string {
@@ -151,16 +155,16 @@ function boxMarkup(box: HtmlPaintBox): string {
   const line =
     stroke === undefined
       ? ''
-      : ` stroke="${attribute(stroke)}" stroke-width="${round(strokeWidth)}"${
+      : ` stroke="${escapeAttribute(stroke)}" stroke-width="${svgNumber(strokeWidth)}"${
           dash === undefined || dash.length === 0
             ? ''
-            : ` stroke-dasharray="${dash.map(round).join(' ')}"`
+            : ` stroke-dasharray="${dash.map(svgNumber).join(' ')}"`
         }`;
   return (
-    `<rect x="${round(x)}" y="${round(y)}"` +
-    ` width="${round(Math.max(0, width))}" height="${round(Math.max(0, height))}"${
-      radius > 0 ? ` rx="${round(radius)}"` : ''
-    } fill="${attribute(fill ?? 'none')}"${line}/>`
+    `<rect x="${svgNumber(x)}" y="${svgNumber(y)}"` +
+    ` width="${svgNumber(Math.max(0, width))}" height="${svgNumber(Math.max(0, height))}"${
+      radius > 0 ? ` rx="${svgNumber(radius)}"` : ''
+    } fill="${escapeAttribute(fill ?? 'none')}"${line}/>`
   );
 }
 
@@ -169,32 +173,16 @@ function textMarkup(run: HtmlPaintText): string {
   const style =
     run.fontStyle === undefined || run.fontStyle === 'normal'
       ? ''
-      : ` font-style="${attribute(run.fontStyle)}"`;
+      : ` font-style="${escapeAttribute(run.fontStyle)}"`;
   const family =
     run.fontFamily === undefined
       ? ''
-      : ` font-family="${attribute(run.fontFamily)}"`;
+      : ` font-family="${escapeAttribute(run.fontFamily)}"`;
   return (
-    `<text x="${round(run.x)}" y="${round(run.y)}" dominant-baseline="central"` +
-    ` textLength="${round(run.width)}" lengthAdjust="spacingAndGlyphs"` +
-    ` fill="${attribute(run.color)}" font-size="${round(run.fontSize)}px"` +
-    ` font-weight="${attribute(run.fontWeight)}"${style}${family}>` +
-    `${text(run.text)}</text>`
+    `<text x="${svgNumber(run.x)}" y="${svgNumber(run.y)}" dominant-baseline="central"` +
+    ` textLength="${svgNumber(run.width)}" lengthAdjust="spacingAndGlyphs"` +
+    ` fill="${escapeAttribute(run.color)}" font-size="${svgNumber(run.fontSize)}px"` +
+    ` font-weight="${escapeAttribute(run.fontWeight)}"${style}${family}>` +
+    `${escapeText(run.text)}</text>`
   );
-}
-
-function attribute(value: string): string {
-  return text(value).replaceAll('"', '&quot;');
-}
-
-function text(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
-}
-
-function round(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.round(value * 100) / 100;
 }

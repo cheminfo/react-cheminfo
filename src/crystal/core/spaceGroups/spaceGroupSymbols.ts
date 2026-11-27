@@ -1,5 +1,8 @@
 import type { SpaceGroupSetting } from './spaceGroups.ts';
-import { SPACE_GROUP_SETTINGS } from './spaceGroups.ts';
+import {
+  SPACE_GROUP_SETTINGS,
+  SPACE_GROUP_SETTINGS_BY_NUMBER,
+} from './spaceGroups.ts';
 
 /**
  * Every setting a query names, the standard setting first.
@@ -25,13 +28,15 @@ import { SPACE_GROUP_SETTINGS } from './spaceGroups.ts';
 export function resolveSpaceGroups(
   query: string | number,
 ): readonly SpaceGroupSetting[] {
-  if (typeof query === 'number') return settingsOfNumber(query);
+  if (typeof query === 'number') {
+    return SPACE_GROUP_SETTINGS_BY_NUMBER.get(query) ?? [];
+  }
   const { symbol, qualifier } = splitQualifier(query.trim());
   const number = /^\d+$/.test(symbol) ? Number(symbol) : null;
   const candidates =
     number === null
       ? (index().get(normalizeSpaceGroupSymbol(symbol)) ?? [])
-      : settingsOfNumber(number);
+      : (SPACE_GROUP_SETTINGS_BY_NUMBER.get(number) ?? []);
   return applyQualifier(candidates, qualifier);
 }
 
@@ -64,19 +69,6 @@ export function normalizeSpaceGroupSymbol(symbol: string): string {
     .replaceAll(/[\s_()]/g, '')
     .replaceAll('.', '/')
     .toUpperCase();
-}
-
-/**
- * The settings of one International Tables number, variant 0 first.
- * @param number - The International Tables number.
- * @returns The settings, variant 0 first.
- */
-function settingsOfNumber(number: number): readonly SpaceGroupSetting[] {
-  const found: SpaceGroupSetting[] = [];
-  for (const setting of SPACE_GROUP_SETTINGS) {
-    if (setting.number === number) found.push(setting);
-  }
-  return found;
 }
 
 /**

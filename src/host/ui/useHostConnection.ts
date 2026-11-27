@@ -20,6 +20,7 @@ import type { HostSettings } from '../core/hostSettings.ts';
 import type { ToolInterface } from '../core/protocol.ts';
 import type { LoadedInput } from '../core/selectInputs.ts';
 import type { ToolHelp } from '../core/toolCredits.ts';
+import { listenToWindow } from '../core/windowMessages.ts';
 
 /** What a tool does with what its host sends, and what it says about itself. */
 export interface HostHandlers {
@@ -140,12 +141,7 @@ export function useHostConnection(
       .then(({ connectHost }) => {
         connectHost({
           host,
-          listen: (listener) => {
-            globalThis.addEventListener('message', listener);
-            return () => {
-              globalThis.removeEventListener('message', listener);
-            };
-          },
+          listen: listenToWindow,
           tool,
           origin: globalThis.location.origin,
           build: latest.current.build ?? null,

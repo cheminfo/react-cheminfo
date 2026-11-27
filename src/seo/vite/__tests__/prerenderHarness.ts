@@ -10,8 +10,8 @@ import { join } from 'node:path';
 import type { Plugin } from 'vite';
 
 import type { RouteMeta } from '../../core/routes.ts';
-import type { PrerenderOptions } from '../prerender.ts';
 import { cheminfoPrerender } from '../prerender.ts';
+import type { PrerenderOptions } from '../prerenderOptions.ts';
 
 /** The addresses the specs' site answers. */
 export const ROUTES: RouteMeta[] = [

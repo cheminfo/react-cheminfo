@@ -1,23 +1,11 @@
 import { expect, test } from 'vitest';
 
-import type { RouteMeta } from '../routes.ts';
-import { assertRoutes } from '../routes.ts';
+import { assertRoutes } from '../assertRoutes.ts';
 
-const ROUTES: RouteMeta[] = [
-  { path: '/', title: 'Home', description: 'The home page.' },
-  { path: '/about', title: 'About', description: 'What it computes.' },
-];
-
-const SECTIONS: RouteMeta[] = [
-  { path: '/', title: 'Home', description: 'The home page.' },
-  {
-    path: '/molecules',
-    title: 'The ligands',
-    description: 'Every chemical component.',
-    prefix: true,
-  },
-  { path: '/molecules/hem', title: 'HEM', description: 'One ligand.' },
-];
+import {
+  HOME_ROUTES as ROUTES,
+  SECTION_ROUTES as SECTIONS,
+} from './routeFixtures.ts';
 
 test('a route table names each address once', () => {
   expect(() =>

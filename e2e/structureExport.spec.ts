@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { readClipboardText } from '../src/host/testing/chatFrame.ts';
+
 import { openStory } from './story.ts';
 
 // The dialog pulls openchemlib, which a cold Vite dev server compiles before it
@@ -89,9 +91,9 @@ test('a notation is copied by clicking it', async ({ page }) => {
 
   await dialog.getByText('C[n]1c(C(N(C)C(N2C)=O)=O)c2nc1').click();
 
-  await expect(
-    page.evaluate(() => navigator.clipboard.readText()),
-  ).resolves.toBe('C[n]1c(C(N(C)C(N2C)=O)=O)c2nc1');
+  await expect(readClipboardText(page)).resolves.toBe(
+    'C[n]1c(C(N(C)C(N2C)=O)=O)c2nc1',
+  );
 });
 
 test('the picture is copied as an SVG, which a slide pastes as a drawing', async ({
@@ -105,7 +107,7 @@ test('the picture is copied as an SVG, which a slide pastes as a drawing', async
   await expect(
     dialog.getByText('Copied the SVG to the clipboard.'),
   ).toBeVisible();
-  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  const copied = await readClipboardText(page);
   expect(copied).toMatch(/^<svg\b/);
   expect(copied).toContain('</svg>');
 });

@@ -5,10 +5,9 @@
  */
 
 import { act, useRef } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { CardFrame } from '../CardFrame.tsx';
 import { loadEmbed } from '../embed.ts';
 import { fitCardToFrame, useOverlayRoom } from '../fitCardToFrame.ts';
@@ -17,8 +16,6 @@ beforeAll(async () => {
   await loadEmbed();
 });
 
-let host: HTMLDivElement;
-let root: Root;
 let posted: unknown[];
 let observers: Array<{ connected: boolean }>;
 
@@ -43,20 +40,16 @@ class StandInResizeObserver {
 }
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('requestAnimationFrame', () => 1);
   vi.stubGlobal('cancelAnimationFrame', () => undefined);
   vi.stubGlobal('ResizeObserver', StandInResizeObserver);
   posted = [];
   observers = [];
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => root.unmount());
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

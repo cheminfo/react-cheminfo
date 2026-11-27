@@ -10,10 +10,9 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { AtomicOrbitalViewer } from '../AtomicOrbitalViewer.tsx';
 
 const handed = vi.hoisted(() => [] as Array<Record<string, unknown>>);
@@ -37,22 +36,13 @@ vi.mock('../AtomicOrbitalCanvas.tsx', async () => {
   };
 });
 
-let host: HTMLDivElement;
-let root: Root;
-
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   handed.length = 0;
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });

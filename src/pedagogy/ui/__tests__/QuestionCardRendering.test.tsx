@@ -5,10 +5,9 @@
  */
 
 import { act } from 'react';
-import type { Root } from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import { host, mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
 import { CHROME_CATALOG } from '../../../i18n/core/chromeCatalog.ts';
 import { SiteLanguage } from '../../../language/ui/SiteLanguage.tsx';
 import type { AttemptStore } from '../../core/attempts.ts';
@@ -20,25 +19,17 @@ import { QuestionCard } from '../QuestionCard.tsx';
 import type { Ion } from './seriesFixture.ts';
 import { ELECTRONS, IONS, SIGNS } from './seriesFixture.ts';
 
-let host: HTMLDivElement;
-let root: Root;
 let store: AttemptStore;
 const SODIUM = IONS[0] as Ion;
 const IRON = IONS[2] as Ion;
 
 beforeEach(() => {
-  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   store = createAttemptStore({ key: 'test' });
-  host = document.createElement('div');
-  document.body.append(host);
-  root = createRoot(host);
+  mountRoot();
 });
 
 afterEach(() => {
-  act(() => {
-    root.unmount();
-  });
-  host.remove();
+  unmountRoot();
   vi.unstubAllGlobals();
 });
 

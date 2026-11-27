@@ -7,14 +7,14 @@
 
 import { siteDisplayName } from '../../ecosystem/core/lookup.ts';
 
-import type { SiteFilesOptions } from './siteFiles.ts';
+import type { SiteOrigin } from './siteFiles.ts';
 import { originOf, resolveSite } from './siteFiles.ts';
 
 /** The sequence that must not appear raw inside a script element. */
 const SCRIPT_SAFE_LESS_THAN = String.raw`\u003c`;
 
 /** What the structured-data block says the tool is. */
-export interface StructuredDataOptions extends SiteFilesOptions {
+export interface StructuredDataOptions extends SiteOrigin {
   /**
    * The schema.org application category.
    * @default 'EducationalApplication'

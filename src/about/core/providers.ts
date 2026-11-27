@@ -34,7 +34,7 @@ export function providers(ids: readonly ProviderId[]): ProviderEntry[] {
 }
 
 /** Every institution a site of the family may name as its provider. */
-export const PROVIDERS = [
+const PROVIDERS = [
   {
     id: 'epfl',
     name: 'EPFL',

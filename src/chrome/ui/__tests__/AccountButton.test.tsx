@@ -31,7 +31,7 @@ test('a site names who its accounts are for', () => {
 test('somebody signed in is their own initials, and their name on hover', () => {
   const html = renderToStaticMarkup(
     <AccountButton
-      identity={{ name: 'Ada Lovelace', detail: 'ada@epfl.ch' }}
+      identity={{ name: 'Ada Lovelace', detail: 'ada@example.org' }}
     />,
   );
 
@@ -53,7 +53,9 @@ test('a name written as one word keeps two letters, and an address its local par
     renderToStaticMarkup(<AccountButton identity={{ name: 'admin' }} />),
   ).toContain('>AD<');
   expect(
-    renderToStaticMarkup(<AccountButton identity={{ name: 'bo@epfl.ch' }} />),
+    renderToStaticMarkup(
+      <AccountButton identity={{ name: 'bo@example.org' }} />,
+    ),
   ).toContain('>BO<');
 });
 

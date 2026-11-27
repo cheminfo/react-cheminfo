@@ -64,7 +64,7 @@ export function createSpaPages(
   const write = indexed ? fill : fillIfPresent;
   const bodyFor = keptBodies(options.maxCachedPages ?? 2000);
   const crawled = options.noscript?.routes ?? indexedRoutes(routes);
-  const structured = structuredData(routes, options);
+  const structured = structuredData(options);
 
   return {
     async answer(url, origin) {
@@ -132,7 +132,6 @@ function isKnown(
 // The block is the same on every page of an origin, so the one origin a
 // configured site is served at is written once rather than per request.
 function structuredData(
-  routes: readonly RouteMeta[],
   options: SpaSiteOptions,
 ): (origin: string) => string | undefined {
   const option = options.structuredData ?? {};
@@ -144,7 +143,6 @@ function structuredData(
       const script = structuredDataScript({
         ...option,
         site: options.site,
-        routes,
         origin,
       });
       last = { origin, script };

@@ -1,7 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { RefObject } from 'react';
 
-import type { RowSpacers } from '../core/rowSpacers.ts';
+import type { RowPlacement, RowSpacers } from '../core/rowSpacers.ts';
 import { rowSpacers } from '../core/rowSpacers.ts';
 
 /** Which rows a scrolled table draws, and the empty room around them. */
@@ -59,17 +59,34 @@ export function useVirtualRows(
     overscan: OVERSCAN,
   });
 
-  const drawn = virtualizer.getVirtualItems();
+  return virtualRowsOf(
+    virtualizer.getVirtualItems(),
+    virtualizer.getTotalSize(),
+    virtualizer.measureElement,
+  );
+}
+
+/**
+ * The rows a virtualiser drew, as the table draws them: their indices and the
+ * spacers standing in for the others.
+ * @param drawn - The rows the virtualiser drew, in order.
+ * @param total - How tall the whole list is, in pixels.
+ * @param measure - What a drawn row reports its height through.
+ * @param margin - How far down the page the list begins, for rows placed from
+ *   the top of the document. Defaults to `0`.
+ * @returns See {@link VirtualRows}.
+ */
+export function virtualRowsOf(
+  drawn: ReadonlyArray<RowPlacement & { index: number }>,
+  total: number,
+  measure: (node: HTMLElement | null) => void,
+  margin = 0,
+): VirtualRows {
   const indices = new Array<number>(drawn.length);
   for (let position = 0; position < drawn.length; position++) {
     indices[position] = (drawn[position] as { index: number }).index;
   }
-
-  return {
-    indices,
-    ...rowSpacers(drawn, virtualizer.getTotalSize()),
-    measure: virtualizer.measureElement,
-  };
+  return { indices, ...rowSpacers(drawn, total, margin), measure };
 }
 
 /**
@@ -79,4 +96,4 @@ export function useVirtualRows(
  * of what was drawn before the next render has run, and enough to cover the
  * header the list is offset by.
  */
-const OVERSCAN = 12;
+export const OVERSCAN = 12;

@@ -1,13 +1,12 @@
 import { IntlMessageFormat } from 'intl-messageformat';
 
+import type { MessageValues } from '../../i18n/core/messageValues.ts';
+
 import type { CatalogSource, MessageRef, Messages } from './catalog.ts';
 import { SOURCE_LOCALE, ownMessage } from './catalog.ts';
 import { checkTranslation } from './checkTranslation.ts';
 import { markText } from './marker.ts';
 import type { TranslatableTable } from './tables.ts';
-
-/** The values a message's placeholders are filled with. */
-export type MessageValues = Record<string, string | number | Date>;
 
 /** The version of the page ↔ overlay protocol this session speaks. */
 export const BRIDGE_PROTOCOL = 2;

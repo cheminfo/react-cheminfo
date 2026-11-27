@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react';
 
 import { ClickToCopy } from '../../clipboard/ui/ClickToCopy.tsx';
+import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import { TOKEN } from '../../tokens/core/familyTokens.ts';
 
@@ -110,13 +111,14 @@ function ReferenceRowLine(props: {
   width: number | string;
 }): ReactElement {
   const { row, width } = props;
+  const t = useChromeT();
   const interactive = row.tooltip !== undefined;
   const line = (
     <span style={interactive ? INTERACTIVE_ROW_STYLE : ROW_STYLE}>
       <span style={syntaxStyle(width, interactive)}>
         <ClickToCopy
           value={row.syntax}
-          label="syntax"
+          label={t('pedagogy.syntax')}
           title={interactive ? '' : undefined}
         >
           {row.syntax}

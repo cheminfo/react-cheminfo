@@ -52,11 +52,8 @@ export function startDocumentMeta(
 ): () => void {
   if (typeof document === 'undefined') return stopNothing;
 
-  // Everything the caller passed goes through, rather than the four fields this
-  // once named one by one: an option added to `PageMetaOptions` and forgotten
-  // here is dropped in silence. `languages` was, and every translated page took
-  // the English home page's title and canonical — type-checked, linted and unit
-  // tested all the way.
+  // Every option passes through, so one PageMetaOptions gains reaches
+  // pageDocumentMeta without being named here.
   const { url, follow, ...page } = options;
 
   const write = (): void => {

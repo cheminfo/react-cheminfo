@@ -14,18 +14,10 @@ export {
   itemLabel,
   itemSearchText,
   itemVenue,
-  itemYear,
-  readCslItem,
   readCslItems,
   readCslText,
-  textVariable,
 } from './csl/core/cslItems.ts';
-export {
-  CSL_STYLE_IDS,
-  hasCslStyle,
-  loadCslLocale,
-  loadCslStyle,
-} from './csl/core/cslStyles.ts';
+export { CSL_STYLE_IDS, hasCslStyle } from './csl/core/cslStyles.ts';
 export type { CslOutput, FormattedCslCitations } from './csl/core/formatCsl.ts';
 export { formatCslCitations, formatCslEntries } from './csl/core/formatCsl.ts';
 export { referenceToCsl } from './csl/core/referenceItem.ts';

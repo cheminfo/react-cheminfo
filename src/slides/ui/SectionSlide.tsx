@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 
-import { parseSectionHeading } from '../core/index.ts';
+import { parseSectionHeading } from '../core/sectionHeading.ts';
 
 import { SlideBody } from './SlideBody.tsx';
 

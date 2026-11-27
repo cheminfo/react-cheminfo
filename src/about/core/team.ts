@@ -6,12 +6,6 @@ import {
   FAMILY_PEOPLE,
 } from './familyPeople.ts';
 
-export {
-  COORDINATOR,
-  FAMILY_MAINTAINERS,
-  FAMILY_PEOPLE,
-} from './familyPeople.ts';
-
 /** Where someone works, named and linked after what they do. */
 export interface Organisation {
   /** Its name, as it writes it. */
@@ -101,26 +95,6 @@ export interface MaintainerLine {
 }
 
 /**
- * Whether a site was made with somebody besides the family's coordinator. Only
- * then would the people keeping its libraries going read as its authors, so
- * only then do they leave the list of who made it.
- * @param named - The people and contributors the site names.
- * @param leads - The people whose work the site is.
- * @returns True when anyone else is named with a role.
- */
-export function isMadeWithOthers(
-  named: readonly AboutTeamEntry[],
-  leads: readonly AboutTeamEntry[] = [],
-): boolean {
-  return (
-    leads.length > 0 ||
-    named.some(
-      (person) => person.role !== undefined && person.name !== COORDINATOR,
-    )
-  );
-}
-
-/**
  * The list under the names. On a site made with others it is who made it, in
  * the order the site names them. Otherwise it is the family's people, each on a
  * site where they apply.
@@ -203,6 +177,26 @@ export function ownTeam(
   leads: readonly AboutTeamEntry[] = [],
 ): TeamMember[] {
   return withNamed([...leads], named);
+}
+
+/**
+ * Whether a site was made with somebody besides the family's coordinator. Only
+ * then would the people keeping its libraries going read as its authors, so
+ * only then do they leave the list of who made it.
+ * @param named - The people and contributors the site names.
+ * @param leads - The people whose work the site is.
+ * @returns True when anyone else is named with a role.
+ */
+function isMadeWithOthers(
+  named: readonly AboutTeamEntry[],
+  leads: readonly AboutTeamEntry[] = [],
+): boolean {
+  return (
+    leads.length > 0 ||
+    named.some(
+      (person) => person.role !== undefined && person.name !== COORDINATOR,
+    )
+  );
 }
 
 function makers(

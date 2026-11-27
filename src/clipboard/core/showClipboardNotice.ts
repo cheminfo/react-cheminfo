@@ -35,7 +35,7 @@ export const CLIPBOARD_NOTICE_TIME = 2500;
 export const CLIPBOARD_NOTICE_LEAVE = 200;
 
 /** The class the notice carries, styled by `chrome.css`. */
-export const CLIPBOARD_NOTICE_CLASS = 'clipboard-notice';
+const CLIPBOARD_NOTICE_CLASS = 'clipboard-notice';
 
 interface Notice {
   element: HTMLElement;

@@ -1,17 +1,10 @@
-import {
-  IDBCursor,
-  IDBCursorWithValue,
-  IDBDatabase,
-  IDBFactory,
-  IDBIndex,
-  IDBKeyRange,
-  IDBObjectStore,
-  IDBRequest,
-  IDBTransaction,
-} from 'fake-indexeddb';
+import type { IDBDatabase } from 'fake-indexeddb';
+import { IDBFactory } from 'fake-indexeddb';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { openSiteDatabase } from '../openSiteDatabase.ts';
+
+import { stubIndexedDB } from './fakeIndexedDB.ts';
 
 interface NotesSchema {
   notes: { key: string; value: { id: string; text: string } };
@@ -30,21 +23,7 @@ function notesDatabase(version = 1) {
 }
 
 beforeEach(() => {
-  // idb recognises what it wraps by these classes, read off the globals.
-  const classes = {
-    IDBCursor,
-    IDBCursorWithValue,
-    IDBDatabase,
-    IDBIndex,
-    IDBKeyRange,
-    IDBObjectStore,
-    IDBRequest,
-    IDBTransaction,
-  };
-  for (const [name, value] of Object.entries(classes)) {
-    vi.stubGlobal(name, value);
-  }
-  vi.stubGlobal('indexedDB', new IDBFactory());
+  stubIndexedDB();
 });
 
 afterEach(() => {

@@ -3,7 +3,7 @@ import { isSameSite } from '../../ecosystem/core/lookup.ts';
 import { isPlainRecord } from '../../state/core/mergeStored.ts';
 
 /** What a workspace file says it is, in its `format` field. */
-export const WORKSPACE_FORMAT = 'cheminfo-workspace';
+const WORKSPACE_FORMAT = 'cheminfo-workspace';
 
 /** A workspace as it travels in a file or in a document. */
 export interface WorkspaceRecord {

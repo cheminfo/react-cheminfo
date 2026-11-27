@@ -6,8 +6,8 @@ import { expect, test } from 'vitest';
 
 import type { Language } from '../../../i18n/core/languages.ts';
 import type { RouteMeta } from '../../core/routes.ts';
-import type { PrerenderOptions } from '../prerender.ts';
 import { cheminfoPrerender } from '../prerender.ts';
+import type { PrerenderOptions } from '../prerenderOptions.ts';
 
 import { PAGE, build } from './prerenderHarness.ts';
 

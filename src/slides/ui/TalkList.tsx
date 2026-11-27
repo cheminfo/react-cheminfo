@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react';
 
 import { isModifiedClick } from '../../chrome/ui/navItem.ts';
-import { pluralize } from '../../format/core/index.ts';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import { joinClassNames } from '../../shared/ui/joinClassNames.ts';
 import type { TalkManifest, TalkSummary } from '../core/index.ts';
@@ -30,6 +29,12 @@ export interface TalkListProps {
    */
   emptyNote?: string;
   /**
+   * How each site's talks are ordered: the most recent first, or as its
+   * manifest lists them — a course whose decks are read in sequence.
+   * @default 'newest'
+   */
+  order?: 'newest' | 'listed';
+  /**
    * Class names added to the root element, after the component's own.
    * @default undefined
    */
@@ -46,10 +51,17 @@ export interface TalkListProps {
  * @returns The listing.
  */
 export function TalkList(props: TalkListProps): ReactElement {
-  const { className, manifests, onOpen, renderHref, siteName, emptyNote } =
-    props;
+  const {
+    className,
+    manifests,
+    onOpen,
+    renderHref,
+    siteName,
+    emptyNote,
+    order = 'newest',
+  } = props;
   const t = useChromeT();
-  const groups = groupBySite(manifests);
+  const groups = groupBySite(manifests, order);
   const showSite = groups.length > 1;
 
   if (groups.length === 0) {
@@ -85,7 +97,12 @@ export function TalkList(props: TalkListProps): ReactElement {
                 )}
                 <div className="talk-card-meta">{occasion(talk)}</div>
                 <div className="talk-card-count">
-                  {`${talk.slideCount} ${pluralize(talk.slideCount, 'slide')}`}
+                  {t(
+                    talk.slideCount === 1
+                      ? 'slides.slideCountOne'
+                      : 'slides.slideCountMany',
+                    { count: talk.slideCount },
+                  )}
                 </div>
               </a>
             ))}
@@ -104,7 +121,7 @@ interface TalkEntry {
   talk: TalkSummary;
 }
 
-/** Every talk one site published, most recent first. */
+/** Every talk one site published, in the order the list shows them. */
 interface TalkGroup {
   /** The `ECOSYSTEM_SITES` id of the publishing site. */
   site: string;
@@ -112,7 +129,10 @@ interface TalkGroup {
   entries: TalkEntry[];
 }
 
-function groupBySite(manifests: readonly TalkManifest[]): TalkGroup[] {
+function groupBySite(
+  manifests: readonly TalkManifest[],
+  order: 'newest' | 'listed',
+): TalkGroup[] {
   const bySite = new Map<string, TalkEntry[]>();
   for (const manifest of manifests) {
     let entries = bySite.get(manifest.site);
@@ -127,7 +147,10 @@ function groupBySite(manifests: readonly TalkManifest[]): TalkGroup[] {
   for (const [site, entries] of bySite) {
     // A site that has published nothing is not a heading over an empty row.
     if (entries.length === 0) continue;
-    groups.push({ site, entries: entries.toSorted(byMostRecent) });
+    groups.push({
+      site,
+      entries: order === 'newest' ? entries.toSorted(byMostRecent) : entries,
+    });
   }
   return groups;
 }

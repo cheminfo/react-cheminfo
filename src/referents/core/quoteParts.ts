@@ -5,7 +5,7 @@
  * dropped, its text kept, so nothing a figure carries is ever run as markup.
  */
 
-import { unescapeXml } from '../../drawing/render/markup.ts';
+import { unescapeXml } from '../../share/core/escape.ts';
 
 /** A mark over a run of a quote's text. */
 export type QuoteMark = 'superscript' | 'subscript' | 'italic' | 'bold';

@@ -4,10 +4,7 @@ import type { NoscriptRoute } from '../noscript.ts';
 import { noscriptIndex } from '../noscript.ts';
 import type { RouteMeta } from '../routes.ts';
 
-const ROUTES: RouteMeta[] = [
-  { path: '/', title: 'Conformers in 3D', description: 'The home page.' },
-  { path: '/about', title: 'About', description: 'What it computes.' },
-];
+import { CONFORMER_ROUTES as ROUTES } from './routeFixtures.ts';
 
 const OPTIONS = { site: '3d', routes: ROUTES } as const;
 

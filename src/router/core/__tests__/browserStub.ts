@@ -11,7 +11,8 @@ interface Move {
  * Stand a browser in for the router: its location, its history and its
  * events, recording every move written through the history.
  * @param address - The address the page opens on.
- * @returns The moves written so far.
+ * @returns The address, the moves written so far, the window's events, and
+ *   `visit`, which moves the address as the back button does.
  */
 export function installBrowser(address: string) {
   const url = new URL(address, 'https://smiles.cheminfo.org');
@@ -33,6 +34,9 @@ export function installBrowser(address: string) {
     get hash() {
       return url.hash;
     },
+    get origin() {
+      return url.origin;
+    },
   });
   vi.stubGlobal('history', {
     state: null,
@@ -47,5 +51,13 @@ export function installBrowser(address: string) {
   vi.stubGlobal('removeEventListener', events.removeEventListener.bind(events));
   vi.stubGlobal('dispatchEvent', events.dispatchEvent.bind(events));
 
-  return { moves };
+  return {
+    url,
+    moves,
+    events,
+    visit(next: string): void {
+      url.href = new URL(next, url).href;
+      events.dispatchEvent(new Event('popstate'));
+    },
+  };
 }

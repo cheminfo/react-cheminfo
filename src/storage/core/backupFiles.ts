@@ -134,6 +134,65 @@ export async function readArchive(file: Blob): Promise<ArchiveFile[]> {
 }
 
 /**
+ * A file of an archive read as JSON.
+ * @param file - The file, or nothing.
+ * @returns What it holds; undefined when it is missing or not JSON.
+ */
+export function readArchiveJson(file: ArchiveFile | undefined): unknown {
+  if (!file) return undefined;
+  try {
+    return JSON.parse(file.text());
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The files of an archive by their path.
+ * @param files - The files.
+ * @returns Each file under its path.
+ */
+export function filesByPath(
+  files: readonly ArchiveFile[],
+): Map<string, ArchiveFile> {
+  const byPath = new Map<string, ArchiveFile>();
+  for (const file of files) byPath.set(file.path, file);
+  return byPath;
+}
+
+/**
+ * The `manifest.json` nearest the top of an archive that reads, in any folder,
+ * so an archive unzipped and zipped again inside a folder still opens.
+ * @param files - The files of the archive.
+ * @param read - What makes a manifest of parsed JSON, or refuses it.
+ * @returns The manifest, with the folder its paths start from; undefined when
+ *   no `manifest.json` reads.
+ */
+export function findArchiveManifest<T>(
+  files: readonly ArchiveFile[],
+  read: (value: unknown) => T | undefined,
+): { manifest: T; folder: string } | undefined {
+  const candidates = files
+    .filter(
+      ({ path }) =>
+        path === MANIFEST_NAME || path.endsWith(`/${MANIFEST_NAME}`),
+    )
+    .toSorted((a, b) => a.path.length - b.path.length);
+  for (const candidate of candidates) {
+    const manifest = read(readArchiveJson(candidate));
+    if (manifest !== undefined) {
+      return {
+        manifest,
+        folder: candidate.path.slice(0, -MANIFEST_NAME.length),
+      };
+    }
+  }
+  return undefined;
+}
+
+const MANIFEST_NAME = 'manifest.json';
+
+/**
  * Read a JSON backup.
  * @param file - The file the visitor picked.
  * @returns What it holds, not yet checked.

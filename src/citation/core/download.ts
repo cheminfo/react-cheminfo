@@ -24,16 +24,3 @@ export async function downloadCitations(
     citationsFilename(references, download.extension),
   );
 }
-
-/**
- * Save one reference as the file a reference manager imports.
- * @param reference - Reference to save.
- * @param download - File to write, from `CITATION_DOWNLOADS`.
- * @returns Resolves once the file is handed to the browser.
- */
-export function downloadCitation(
-  reference: Reference,
-  download: CitationDownload,
-): Promise<void> {
-  return downloadCitations([reference], download);
-}

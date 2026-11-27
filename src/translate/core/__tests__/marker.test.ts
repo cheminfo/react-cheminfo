@@ -2,7 +2,6 @@ import { expect, test } from 'vitest';
 
 import {
   encodeMarker,
-  hasMarker,
   markText,
   readMarkers,
   stripMarkers,
@@ -30,14 +29,6 @@ test('markers are read in the order they appear in the text', () => {
 
 test('a text without a marker yields no id', () => {
   expect(readMarkers('Plain text')).toStrictEqual([]);
-  expect(hasMarker('Plain text')).toBe(false);
-});
-
-test('hasMarker answers the same when asked twice', () => {
-  const text = markText('Share', 12);
-
-  expect(hasMarker(text)).toBe(true);
-  expect(hasMarker(text)).toBe(true);
 });
 
 test('stripping the markers leaves exactly the visible text', () => {
