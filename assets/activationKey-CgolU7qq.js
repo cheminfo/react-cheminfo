@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t,r as n,t as r}from"./keyTargets-DZXROCyP.js";function i(e){return e.key===`Enter`||e.key===` `}function a(e){return r=>{if(!i(r)||r.repeat===!0)return;let{target:a,currentTarget:o}=r;n(a)||a!==o&&o!==void 0&&t(a)||(r.preventDefault(),e(r))}}function o(){return(o=e((()=>{r()})))()}export{i as n,a as r,o as t};
