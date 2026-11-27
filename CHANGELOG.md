@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.149.1](https://github.com/cheminfo/react-cheminfo/compare/v0.149.0...v0.149.1) (2026-11-27)
+
+
+### Bug Fixes
+
+* let a focused code editor keep Ctrl+C instead of copying the figure ([488289d](https://github.com/cheminfo/react-cheminfo/commit/488289dbc16c6547d9f338ec25061fce0cdef1be))
+
 ## [0.149.0](https://github.com/cheminfo/react-cheminfo/compare/v0.148.2...v0.149.0) (2026-11-26)
 
 
