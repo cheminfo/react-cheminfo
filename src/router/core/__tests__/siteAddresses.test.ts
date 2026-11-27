@@ -23,7 +23,11 @@ test('a site mounted under a shared host writes its addresses under the mount', 
 });
 
 test('the mount and the origin are read off the page a browser shows', () => {
-  vi.stubGlobal('document', { baseURI: 'https://www.cheminfo.org/isomers/' });
+  // A page whose deployment stamped `<base href="/isomers/">`.
+  vi.stubGlobal('document', {
+    baseURI: 'https://www.cheminfo.org/isomers/',
+    querySelector: () => ({}),
+  });
   vi.stubGlobal('location', { origin: 'https://www.cheminfo.org' });
 
   const isomers = createSiteAddresses('isomers');

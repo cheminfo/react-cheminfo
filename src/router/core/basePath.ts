@@ -9,13 +9,14 @@ import { trimTrailingSlash } from './address.ts';
  * the deployment stamps into the page it hands out, and `document.baseURI`
  * resolves it against the address actually opened. So this answers correctly
  * whether or not a slash closes the address, and on an address the SPA
- * fallback answered.
+ * fallback answered. A page that carries no `<base>` is mounted at the root:
+ * its `baseURI` is then the address opened, a page of the site.
  * @returns The mount path, in the shape {@link normalizeBasePath} returns.
  */
 export function readMountPath(): string {
-  const baseUri = globalThis.document?.baseURI;
-  if (!baseUri) return '';
-  return normalizeBasePath(new URL(baseUri).pathname);
+  const page = globalThis.document;
+  if (!page?.querySelector('base[href]')) return '';
+  return normalizeBasePath(new URL(page.baseURI).pathname);
 }
 
 /**

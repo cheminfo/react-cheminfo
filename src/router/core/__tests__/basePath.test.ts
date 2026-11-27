@@ -17,7 +17,20 @@ afterEach(() => {
  * @param baseUri - What `document.baseURI` reads, the two already resolved.
  */
 function stubPage(baseUri: string): void {
-  vi.stubGlobal('document', { baseURI: baseUri });
+  vi.stubGlobal('document', {
+    baseURI: baseUri,
+    querySelector: (selector: string) =>
+      selector === 'base[href]' ? {} : null,
+  });
+}
+
+/**
+ * A page that carries no `<base>`, opened at a given address: its
+ * `document.baseURI` is that address.
+ * @param address - The address opened.
+ */
+function stubPageWithoutBase(address: string): void {
+  vi.stubGlobal('document', { baseURI: address, querySelector: () => null });
 }
 
 test('a mount path is normalized however it was written', () => {
@@ -90,4 +103,18 @@ test('a page with no document at all mounts at the root', () => {
   vi.stubGlobal('document', undefined);
 
   expect(readMountPath()).toBe('');
+});
+
+test('a page with no <base> mounts at the root, whatever address was opened', () => {
+  // Its `baseURI` is the address opened: `/about` is a page of the site, and
+  // reading it as the mount sent the About for `/about/packages.json`.
+  for (const address of [
+    'https://fair.cheminfo.org/',
+    'https://fair.cheminfo.org/about',
+    'https://fair.cheminfo.org/zenodo/18851416/files/si.docx',
+  ]) {
+    stubPageWithoutBase(address);
+
+    expect(readMountPath()).toBe('');
+  }
 });
