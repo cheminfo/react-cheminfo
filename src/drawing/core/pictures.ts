@@ -78,6 +78,32 @@ export function isPictureSource(value: unknown): value is string {
 }
 
 /**
+ * A picture centred on the origin, as it is placed before being added to a
+ * drawing, its frame to the hundredth of a point.
+ * @param id - Its identifier.
+ * @param source - The image, as a `data:` URL.
+ * @param width - Its width, in points.
+ * @param height - Its height, in points.
+ * @returns The picture.
+ */
+export function centredPicture(
+  id: string,
+  source: string,
+  width: number,
+  height: number,
+): DrawPicture {
+  return {
+    type: 'picture',
+    id,
+    src: source,
+    x: roundCoordinate(-width / 2),
+    y: roundCoordinate(-height / 2),
+    width: roundCoordinate(width),
+    height: roundCoordinate(height),
+  };
+}
+
+/**
  * The centre of a picture, which it turns about.
  * @param picture - The picture.
  * @returns The centre, in points.

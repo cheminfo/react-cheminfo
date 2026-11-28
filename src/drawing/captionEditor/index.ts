@@ -17,3 +17,4 @@ export { captionDocument, captionText } from './captionSchema.ts';
 export type { CaptionToolbarProps } from './CaptionToolbar.tsx';
 export { CaptionToolbar } from './CaptionToolbar.tsx';
 export { useToolbarInView } from './toolbarInView.ts';
+export { withTypedAhead } from './typedAhead.ts';

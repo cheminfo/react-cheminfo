@@ -59,7 +59,11 @@ export type {
   TabRouterOptions,
 } from './tabRouterTypes.ts';
 export { createTabRouter } from './tabRouter.ts';
-export { FIGURE_SPLIT, createEditorRouter } from './editorRouter.ts';
+export {
+  DRAWING_SPLIT,
+  FIGURE_SPLIT,
+  createEditorRouter,
+} from './editorRouter.ts';
 export type {
   EditorHeadOptions,
   EditorRouter,

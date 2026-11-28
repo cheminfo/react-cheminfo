@@ -51,6 +51,7 @@ export {
 } from './pageFigureSource.ts';
 export type { SvgSize } from './svgMarkup.ts';
 export { svgSizeInPoints } from './svgMarkup.ts';
+export { pointsSvgFigure } from './pointsSvgFigure.ts';
 export type { RasterFigureSource } from './croppedMarkup.ts';
 export {
   croppedSvgMarkup,

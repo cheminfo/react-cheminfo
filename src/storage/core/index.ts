@@ -13,6 +13,8 @@ export type {
   SiteBackupOptions,
 } from './siteBackup.ts';
 export { createSiteBackup } from './siteBackup.ts';
+export type { BackupEntryCodec } from './backupEntries.ts';
+export { JSON_ENTRIES } from './backupEntries.ts';
 export type { Autosave, AutosaveOptions } from './createAutosave.ts';
 export { createAutosave } from './createAutosave.ts';
 export type { RestoreGuard } from './createRestoreGuard.ts';

@@ -194,6 +194,7 @@ export type { DrawPicture, PicturePatch, TurnedBox } from './pictures.ts';
 export {
   MAX_PICTURE_SOURCE,
   MIN_PICTURE_SIDE,
+  centredPicture,
   drawingToPicture,
   isPictureSource,
   normalizeDegrees,
@@ -261,3 +262,22 @@ export { arrayOf, isFiniteNumber, isRecord } from '../../values/core/values.ts';
 export { along, leftOf, turnAbout, unit } from './vectors.ts';
 export type { UndoHistory, UndoHistoryOptions } from './undoHistory.ts';
 export { createUndoHistory } from './undoHistory.ts';
+export { fitSize, isForeignSvg, svgAsImage } from './foreignSvg.ts';
+export type { XmlElement } from './xmlTree.ts';
+export {
+  attributeOf,
+  childrenOf,
+  descendantsOf,
+  readXmlTree,
+  startsWithRoot,
+  withoutByteOrderMark,
+} from './xmlTree.ts';
+export type { PictureHandle } from './pictureHandles.ts';
+export {
+  dragPictureHandle,
+  pictureHandleAt,
+  pictureHandleCursor,
+  pictureHandles,
+} from './pictureHandles.ts';
+export type { TypedAhead } from './captionTypeAhead.ts';
+export { NOTHING_TYPED, typedCaptionText } from './captionTypeAhead.ts';

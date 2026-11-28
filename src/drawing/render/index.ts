@@ -106,5 +106,7 @@ export type {
 export type { SpinRun } from './spinning.ts';
 export { spinClass, spinRuns } from './spinning.ts';
 export type { DrawingStyle } from './style.ts';
+export type { StyleLengthRange } from './parseStyle.ts';
+export { DRAWING_STYLE_LIMITS, parseDrawingStyle } from './parseStyle.ts';
 export type { MoleculeGroup, SvgOptions } from './svg.ts';
 export { DRAW_NAMESPACE, sceneBody, sheetBody } from './svg.ts';

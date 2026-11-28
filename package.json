@@ -34,6 +34,7 @@
     "./molstar/*": "./lib/molstar/*/index.js",
     "./orbital": "./lib/orbital.js",
     "./pages": "./lib/pages.js",
+    "./pdf": "./lib/pdf.js",
     "./playwright": "./lib/playwright.js",
     "./raman": "./lib/raman.js",
     "./server": "./lib/server.js",
@@ -57,6 +58,7 @@
     "cheminfo-og-image": "bin/og-image.mjs"
   },
   "files": [
+    "assets",
     "bin",
     "lib",
     "src",
@@ -89,6 +91,7 @@
     "@tanstack/react-virtual": "^3.14.13",
     "@zip.js/zip.js": "^2.24.0",
     "ajv": "^8.20.0",
+    "arraybuffer-xml-parser": "^2.2.1",
     "bezier-js": "^6.1.4",
     "cheminfo-font": "^1.28.0",
     "cheminfo-types": "^1.16.0",
@@ -138,6 +141,7 @@
   },
   "devDependencies": {
     "@blueprintjs/core": "^6.21.0",
+    "@blueprintjs/icons": "^6.14.1",
     "@fastify/type-provider-typebox": "^6.3.0",
     "@playwright/test": "^1.62.1",
     "@storybook/addon-docs": "^10.5.8",
@@ -160,10 +164,12 @@
     "fake-indexeddb": "^6.2.7",
     "fast-png": "^8.0.0",
     "jsdom": "^30.1.1",
+    "jspdf": "^4.2.1",
     "ml-dataset-iris": "^1.2.1",
     "ml-pca": "^4.1.1",
     "ml-signal-processing": "^2.2.2",
     "molstar": "^5.11.0",
+    "pdf-lib": "^1.17.1",
     "prettier": "^3.9.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -172,6 +178,7 @@
     "rimraf": "^6.1.3",
     "spectra-processor": "^5.0.0",
     "storybook": "^10.5.8",
+    "svg2pdf.js": "^2.9.0",
     "typescript": "^6.0.3",
     "vite": "^8.2.1",
     "vitest": "^4.1.12",
@@ -179,17 +186,21 @@
   },
   "peerDependencies": {
     "@blueprintjs/core": "^6.18.0",
+    "@blueprintjs/icons": "^6.0.0",
     "@fastify/type-provider-typebox": "^6.0.0",
     "@playwright/test": "^1.50.0",
     "cheminfo-mcp-server": "^0.6.2 || ^0.7.0",
+    "jspdf": "^4.0.0",
     "ml-pca": "^4.1.1",
     "ml-signal-processing": "^2.2.2",
     "molstar": "^5.11.0",
+    "pdf-lib": "^1.17.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-ocl": "^8.7.1",
     "react-science": "^20.6.2 || ^21.0.0 || ^22.0.0 || ^23.0.0 || ^24.0.0",
     "spectra-processor": "^5.0.0",
+    "svg2pdf.js": "^2.5.0",
     "vite": "^7.0.0 || ^8.0.0",
     "xtb-wasm": "^2.0.0"
   },
@@ -211,6 +222,9 @@
     "cheminfo-mcp-server": {
       "optional": true
     },
+    "jspdf": {
+      "optional": true
+    },
     "ml-pca": {
       "optional": true
     },
@@ -220,10 +234,16 @@
     "molstar": {
       "optional": true
     },
+    "pdf-lib": {
+      "optional": true
+    },
     "react-ocl": {
       "optional": true
     },
     "spectra-processor": {
+      "optional": true
+    },
+    "svg2pdf.js": {
       "optional": true
     },
     "vite": {

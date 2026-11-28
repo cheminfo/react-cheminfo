@@ -32,6 +32,15 @@ export const FIGURE_SPLIT: Readonly<
 > = { ratio: 76, min: 45, max: 90 };
 
 /**
+ * The bar of a drawing editor (draw, glassware): the drawing takes 72 % of the
+ * row beside a column of identifiers and fields, and between 50 and 85 % once
+ * dragged — past two fifths of the row the panels only stretch their fields.
+ */
+export const DRAWING_SPLIT: Readonly<
+  Pick<EditorSplit, 'ratio' | 'min' | 'max'>
+> = { ratio: 72, min: 50, max: 85 };
+
+/**
  * Write an editor's addresses.
  * @param options - Its pages, its bars, the parameters a move carries over
  * and the head of its pages.

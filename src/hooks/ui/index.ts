@@ -19,6 +19,7 @@ export type { AsyncResult } from './useAsync.ts';
 export { useAsync } from './useAsync.ts';
 export { useContainerSize } from './useContainerSize.ts';
 export { useDebouncedValue } from './useDebouncedValue.ts';
+export { useFocusCount } from './useFocusCount.ts';
 export type { DocumentListNavigationHookOptions } from './useDocumentListNavigation.ts';
 export { useDocumentListNavigation } from './useDocumentListNavigation.ts';
 export type { ListKeyboardNavigationOptions } from './useListKeyboardNavigation.ts';

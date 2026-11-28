@@ -8,3 +8,5 @@ export type {
 } from './SiteShell.tsx';
 export { SiteShell } from './SiteShell.tsx';
 export { mountSite } from './mountSite.tsx';
+export type { IconPathModules, IconPathSets } from './iconLoader.ts';
+export { loadIconsOneByOne } from './iconLoader.ts';

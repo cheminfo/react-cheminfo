@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
+import type { BackupEntryCodec } from '../backupEntries.ts';
 import { readArchive, writeArchive } from '../backupFiles.ts';
 import type { Draft, DraftStore } from '../createDraftStore.ts';
 import { createSavedDocuments } from '../createSavedDocuments.ts';
@@ -270,4 +271,106 @@ test('drafts come back under their identifier, a copy of one open in another tab
   expect(target.kept.has('other-tab')).toBe(false);
   expect(target.kept.size).toBe(2);
   expect(target.calls).toStrictEqual(['discard', 'changed', 'open on-screen']);
+});
+
+/** A note written as a file of its own, as a site writes its native SVG. */
+const NOTE_FILES: BackupEntryCodec<Note> = {
+  extension: 'note',
+  write: (note) => `note:${note.text}`,
+  read: (text) => {
+    if (!text.startsWith('note:')) throw new Error('not a note');
+    return { text: text.slice('note:'.length) };
+  },
+  name: (note) => note.text.split(' ', 1)[0],
+};
+
+test('a site writes each entry in its own format, and names an unsaved draft itself', async () => {
+  const notes = openNotes();
+  await notes.save('Aspirin', { text: 'acetylsalicylic acid' });
+  const source = memoryDrafts();
+  await source.store.putMany([
+    {
+      id: 'd1',
+      document: { text: 'benzene ring' },
+      createdAt: 1,
+      updatedAt: 2,
+    },
+    {
+      id: 'd2',
+      document: { text: 'kept in a file' },
+      createdAt: 3,
+      updatedAt: 4,
+      file: { name: 'reaction.notes.svg', modified: false },
+    },
+  ]);
+  const archive = await archiveOf(
+    createSiteBackup({
+      stem: 'notes-cheminfo',
+      generator: 'notes.cheminfo.org',
+      documents: notes,
+      drafts: { ...source, current: () => null },
+      entries: NOTE_FILES,
+    }).write(),
+  );
+  const files = await readArchive(archive);
+
+  expect(files.map((file) => [file.path, file.text()])).toStrictEqual([
+    ['manifest.json', files[0]?.text()],
+    ['documents/001-Aspirin.note', 'note:acetylsalicylic acid'],
+    ['drafts/001-benzene.note', 'note:benzene ring'],
+    ['drafts/002-reaction.notes.note', 'note:kept in a file'],
+  ]);
+
+  const target = memoryDrafts();
+  const elsewhere = openNotes('notes-own-format');
+
+  await expect(
+    createSiteBackup({
+      stem: 'notes-cheminfo',
+      generator: 'notes.cheminfo.org',
+      documents: elsewhere,
+      drafts: { ...target, current: () => null },
+      entries: NOTE_FILES,
+    }).read(archive),
+  ).resolves.toStrictEqual({ documents: 1, drafts: 2, copies: 0 });
+
+  const [restored] = await elsewhere.list();
+
+  expect(restored?.data).toStrictEqual({ text: 'acetylsalicylic acid' });
+  expect(target.kept.get('d1')?.document).toStrictEqual({
+    text: 'benzene ring',
+  });
+});
+
+test('an entry the site’s reader refuses is left out, the others restored', async () => {
+  const archive = await writeArchive([
+    {
+      path: 'manifest.json',
+      content: JSON.stringify({
+        generator: 'notes.cheminfo.org',
+        version: 1,
+        documents: [
+          { id: 'a', name: 'Good', savedAt: 5, path: 'documents/a.note' },
+          { id: 'b', name: 'Bad', savedAt: 6, path: 'documents/b.note' },
+          { id: 'c', name: 'Gone', savedAt: 7, path: 'documents/c.note' },
+        ],
+      }),
+    },
+    { path: 'documents/a.note', content: 'note:kept' },
+    { path: 'documents/b.note', content: '<svg/>' },
+  ]);
+  const notes = openNotes();
+
+  await expect(
+    createSiteBackup({
+      stem: 'notes-cheminfo',
+      generator: 'notes.cheminfo.org',
+      documents: notes,
+      entries: NOTE_FILES,
+    }).read(archive),
+  ).resolves.toStrictEqual({ documents: 1, drafts: 0, copies: 0 });
+
+  const listed = await notes.list();
+
+  expect(listed.map((document) => document.name)).toStrictEqual(['Good']);
 });

@@ -1,4 +1,8 @@
-export { clipboardSupports, pictureRefusal } from './clipboardItem.ts';
+export {
+  clipboardSupports,
+  pictureRefusal,
+  writeClipboardItem,
+} from './clipboardItem.ts';
 export type { CopyOutcome } from './copyOutcome.ts';
 export { isCopied } from './copyOutcome.ts';
 export type { WriteBlobToClipboardOptions } from './writeBlobToClipboard.ts';

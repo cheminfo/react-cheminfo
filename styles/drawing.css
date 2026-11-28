@@ -30,6 +30,14 @@
   stroke: var(--border-strong);
 }
 
+/* Even–odd, as the selection reads it: a loop crossed over itself leaves the
+   doubly wound part out. */
+.draw-frame--loop {
+  fill: color-mix(in oklab, var(--accent) 8%, transparent);
+  fill-rule: evenodd;
+  stroke-linejoin: round;
+}
+
 /* The lines `PageGrid` draws between the sheets of a drawing, and the number
    each sheet prints under. */
 .draw-sheet {
@@ -241,6 +249,128 @@
 .page-field__unit {
   color: var(--text-muted);
   font-size: 0.8125rem;
+}
+
+/* The icon of a tool, `EditorToolIcon` and `TextToolIcon`: never squeezed in
+   a row of buttons. */
+.tool-icon {
+  flex: none;
+}
+
+/* An icon is fetched the first time it is drawn (`loadIconsOneByOne`). Until
+   it arrives Blueprint shows its glyph from the icon font, and that font is not
+   shipped, so the space stays blank instead of holding a missing-glyph box. */
+span.bp6-icon:empty::before {
+  content: none;
+}
+
+/* The body of a panel, and the row of its own actions under its title, as
+   `FramedPanel` and `PageToolbar` draw them. */
+.panel-body {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 1px;
+  flex-direction: column;
+  padding: 8px 10px;
+  gap: 8px;
+  overflow: auto;
+}
+
+/* A panel whose own actions sit in a row under its title: the row runs edge
+   to edge, and what follows keeps the body's padding. */
+.panel-body--toolbar {
+  padding: 0;
+  gap: 0;
+}
+
+/* No padding above or below: the toolbar spaces its own buttons, and a row
+   padded again stands taller than the panel header and the other editors'.
+   None at the right either, so the buttons there stand under the header's. */
+.panel-toolbar {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 0 0 6px;
+  border-bottom: 1px solid var(--border);
+  gap: 6px;
+}
+
+/* A panel's settings, at the right end of its toolbar row, after the actions
+   that sit there with them. */
+.panel-toolbar__end {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* A search box takes what the toolbar's buttons leave of the row. */
+.panel-toolbar__search {
+  min-width: 0;
+  flex: 1 1 8rem;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  gap: 8px;
+}
+
+/* A form as a short table: each label beside its control, the labels in one
+   column, every control one small row high. */
+.form-rows {
+  display: grid;
+  align-items: start;
+  column-gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: 4px;
+}
+
+.form-rows > .bp6-form-group,
+.form-rows > .size-fields,
+.form-rows > .size-fields > .bp6-form-group {
+  display: contents;
+}
+
+.form-rows .bp6-form-group > .bp6-label {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+.form-rows .bp6-form-group > .bp6-label .bp6-text-muted {
+  color: var(--text-faint);
+}
+
+.form-rows .bp6-form-content {
+  display: flex;
+  min-width: 0;
+  min-height: 24px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-rows .bp6-form-helper-text {
+  margin-top: 2px;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+/* What is not a labelled field takes the whole row: a switch, a heading, a
+   group of fields; a button keeps its own width. */
+.form-rows > :not(.bp6-form-group, .size-fields) {
+  grid-column: 1 / -1;
+}
+
+.form-rows > .bp6-button {
+  justify-self: start;
+}
+
+.form-rows .bp6-control {
+  margin-bottom: 0;
 }
 
 /* `PrintSheets`: on paper the editor gives way to the figure it holds, at the

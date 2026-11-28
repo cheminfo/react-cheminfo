@@ -1,17 +1,20 @@
-import { sanitizeFileName } from '../../download/core/sanitizeFileName.ts';
-
+import type { BackupEntryCodec } from './backupEntries.ts';
+import {
+  JSON_ENTRIES,
+  numberedEntry,
+  readBackupEntry,
+} from './backupEntries.ts';
 import type { ArchiveEntry } from './backupFiles.ts';
 import {
   backupFileName,
   filesByPath,
   readArchive,
-  readArchiveJson,
   writeArchive,
 } from './backupFiles.ts';
 import type { BackupManifest } from './backupManifest.ts';
 import { BACKUP_MANIFEST, readBackupManifest } from './backupManifest.ts';
 import type { Draft, DraftStore } from './createDraftStore.ts';
-import type { SavedDocuments } from './createSavedDocuments.ts';
+import type { SavedDocument, SavedDocuments } from './createSavedDocuments.ts';
 import type { DraftSession } from './draftSessionTypes.ts';
 
 /** The drafts a site keeps several of, for a backup to carry. */
@@ -37,6 +40,11 @@ export interface SiteBackupOptions<D> {
    * @default undefined — the backup holds the saved documents alone
    */
   drafts?: BackupDrafts<D>;
+  /**
+   * How each document and draft is written into the archive and read back.
+   * @default JSON_ENTRIES — the JSON the site stores
+   */
+  entries?: BackupEntryCodec<D>;
 }
 
 /** How many of each came back from a backup. */
@@ -78,7 +86,9 @@ export interface SiteBackup {
  * @returns See {@link SiteBackup}.
  */
 export function createSiteBackup<D>(options: SiteBackupOptions<D>): SiteBackup {
-  const { stem, generator, documents, drafts } = options;
+  const { stem, generator, documents, drafts, entries: own } = options;
+  const codec = own ?? (JSON_ENTRIES as BackupEntryCodec<D>);
+  const { extension } = codec;
   return {
     write: async () => {
       if (drafts) await drafts.session.flush();
@@ -97,10 +107,18 @@ export function createSiteBackup<D>(options: SiteBackupOptions<D>): SiteBackup {
         documents: [],
         drafts: [],
       };
+      const writing: Array<Promise<string>> = [];
+      for (const document of saved) {
+        writing.push(Promise.resolve(codec.write(document.data)));
+      }
+      for (const draft of kept) {
+        writing.push(Promise.resolve(codec.write(draft.document)));
+      }
+      const texts = await Promise.all(writing);
       const entries: ArchiveEntry[] = [];
       for (const [index, document] of saved.entries()) {
-        const path = `documents/${numbered(index, document.name, 'document')}`;
-        entries.push({ path, content: JSON.stringify(document.data) });
+        const path = `documents/${numberedEntry(index, document.name, 'document', extension)}`;
+        entries.push({ path, content: texts[index] ?? '' });
         manifest.documents.push({
           id: document.id,
           name: document.name,
@@ -110,8 +128,9 @@ export function createSiteBackup<D>(options: SiteBackupOptions<D>): SiteBackup {
       }
       for (const [index, draft] of kept.entries()) {
         const name = draft.file?.name;
-        const path = `drafts/${numbered(index, name ?? '', 'draft')}`;
-        entries.push({ path, content: JSON.stringify(draft.document) });
+        const called = name ?? codec.name?.(draft.document) ?? '';
+        const path = `drafts/${numberedEntry(index, called, 'draft', extension)}`;
+        entries.push({ path, content: texts[saved.length + index] ?? '' });
         manifest.drafts.push({
           id: draft.id,
           ...(name ? { name } : {}),
@@ -132,28 +151,34 @@ export function createSiteBackup<D>(options: SiteBackupOptions<D>): SiteBackup {
       if (!contents) return undefined;
       const { manifest, folder } = contents;
       const byPath = filesByPath(files);
-      const json = (path: string) => readArchiveJson(byPath.get(folder + path));
-      const restored = await documents.restore(
-        manifest.documents.map((entry) => ({
-          id: entry.id,
-          name: entry.name,
-          savedAt: entry.savedAt,
-          data: json(entry.path),
-        })),
-      );
+      const entriesAt = (paths: ReadonlyArray<{ path: string }>) => {
+        const reading: Array<Promise<D | undefined>> = [];
+        for (const { path } of paths) {
+          reading.push(readBackupEntry(codec, byPath.get(folder + path)));
+        }
+        return Promise.all(reading);
+      };
+      const data = await entriesAt(manifest.documents);
+      const named: Array<SavedDocument<unknown>> = [];
+      for (const [index, entry] of manifest.documents.entries()) {
+        const { id, name, savedAt } = entry;
+        named.push({ id, name, savedAt, data: data[index] });
+      }
+      const restored = await documents.restore(named);
       const result: RestoredBackup = {
         documents: restored,
         drafts: 0,
         copies: 0,
       };
       if (!drafts || manifest.drafts.length === 0) return result;
+      const read = await entriesAt(manifest.drafts);
       const incoming: Array<Draft<D>> = [];
-      for (const entry of manifest.drafts) {
-        const document = json(entry.path);
+      for (const [index, entry] of manifest.drafts.entries()) {
+        const document = read[index];
         if (document === undefined) continue;
         incoming.push({
           id: entry.id,
-          document: document as D,
+          document,
           createdAt: entry.createdAt,
           updatedAt: entry.updatedAt,
           // The file it was kept in is on another computer: Save asks again.
@@ -190,9 +215,4 @@ async function restoreDrafts<D>(
     await session.open(current, { force: true });
   }
   return { drafts: restored.length, copies };
-}
-
-function numbered(index: number, name: string, fallback: string): string {
-  const stem = sanitizeFileName(name.replace(/\.[^.]+$/, ''), fallback);
-  return `${String(index + 1).padStart(3, '0')}-${stem}.json`;
 }
