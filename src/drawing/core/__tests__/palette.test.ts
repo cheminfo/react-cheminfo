@@ -11,6 +11,7 @@ import {
   joinColor,
   shadeOf,
   splitColor,
+  tintOf,
 } from '../palette.ts';
 
 test('the palette is the eight of Okabe and Ito, black first', () => {
@@ -64,4 +65,12 @@ test('a fill shades into itself half as bright, a dark one into white', () => {
   expect(shadeOf('#56b4e980')).toBe('#2b5a7580');
   expect(shadeOf('#202020')).toBe('#ffffff');
   expect(shadeOf('#20202080')).toBe('#ffffff80');
+});
+
+test('a colour is lightened towards white by the share of white that goes in', () => {
+  expect(tintOf('#e69f00', 0)).toBe('#e69f00');
+  expect(tintOf('#e69f00', 1)).toBe('#ffffff');
+  expect(tintOf('#0072b2', 0.5)).toBe('#80b9d9');
+  // diagram's block fills: 22 % of the colour kept, so 78 % white.
+  expect(tintOf('#e69f00', 1 - 0.22)).toBe('#faeac7');
 });

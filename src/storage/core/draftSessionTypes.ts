@@ -7,6 +7,7 @@ import type {
   ReadonlyCell,
   SignalTools,
 } from './documentFile.ts';
+import type { KeepDraftOptions } from './draftKeeping.ts';
 
 /** What a drafts list reads, in the site's signals. */
 export interface DraftStatus {
@@ -80,6 +81,13 @@ export interface DraftSession {
    * @returns A function that stops it.
    */
   start: (options: { linked: boolean }) => Promise<() => void>;
+  /**
+   * Keep the document from now on, as {@link DraftSession.start} does, from an
+   * effect that hands back its stop at once: stopping before the start has
+   * resolved stops the session as soon as it has. A framed page keeps nothing.
+   * @returns A function that stops it.
+   */
+  keep: (options: KeepDraftOptions) => () => void;
   /** Write what is waiting to be kept. */
   flush: () => Promise<void>;
   /** Drop what is waiting to be kept, which a backup is about to replace. */

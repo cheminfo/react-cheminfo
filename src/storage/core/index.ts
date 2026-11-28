@@ -80,6 +80,18 @@ export type {
   DraftStatus,
 } from './draftSessionTypes.ts';
 export { createDraftSession } from './createDraftSession.ts';
+export type {
+  EditorDocuments,
+  EditorDocumentsOptions,
+} from './editorDocuments.ts';
+export { createEditorDocuments } from './editorDocuments.ts';
+export type {
+  LinkWorkspacesOptions,
+  LinkedWorkspaces,
+} from './linkWorkspaces.ts';
+export { linkWorkspaces } from './linkWorkspaces.ts';
+export type { KeepDraftOptions } from './draftKeeping.ts';
+export { createDraftStatus } from './draftKeeping.ts';
 export type { FolderEntry, SiteFolder } from './createSiteFolder.ts';
 export { createSiteFolder } from './createSiteFolder.ts';
 export type {

@@ -32,7 +32,12 @@ export type {
   ShareExample,
   ShareOnScreen,
 } from './opensOn.ts';
-export { EXAMPLE_PARAM, defaultOpensOn, opensOnLinks } from './opensOn.ts';
+export {
+  EXAMPLE_PARAM,
+  WORKSPACE_PARAM,
+  defaultOpensOn,
+  opensOnLinks,
+} from './opensOn.ts';
 export type { PageShareConfig } from './pageShareConfig.ts';
 export { createPageShareConfig } from './pageShareConfig.ts';
 export type {

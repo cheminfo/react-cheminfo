@@ -7,7 +7,7 @@ import {
 import { EMBED_PARAM, HIDE_PARAM } from './config.ts';
 import type { ShareParamCodec } from './params.ts';
 import type { QueryEntry } from './query.ts';
-import { firstValues, parseQuery, serializeQuery } from './query.ts';
+import { parseQuery, queryValues, serializeQuery } from './query.ts';
 
 /**
  * One persisted user choice mirrored in the address bar: how it is read from
@@ -76,16 +76,17 @@ export interface SyncPreferencesOptions {
  * Store the preferences a link carries. Only the keys present are set: a key
  * the link omits leaves the saved preference as it is. A malformed value falls
  * back to the codec's default.
- * @param search - The query string, with or without its leading `?`.
+ * @param search - The query string, with or without its leading `?`, or the
+ * parameters a router has already decoded.
  * @param preferences - The preferences, keyed by their URL parameter name.
  * @returns The names of the preferences that were set, in declaration order.
  */
 export function applyPreferencesFromSearch(
-  search: string,
+  search: string | Readonly<Record<string, string>>,
   preferences: UrlPreferences,
 ): string[] {
   assertPreferenceNames(preferences);
-  const values = firstValues(parseQuery(search));
+  const values = queryValues(search);
   const applied: string[] = [];
   for (const [name, preference] of Object.entries(preferences)) {
     const raw = values.get(name);

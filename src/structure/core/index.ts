@@ -22,7 +22,12 @@ export {
 } from './conformerEnergy.ts';
 export type { EditorLine, EditorValue } from './editorValue.ts';
 export type { IdCodeValue } from './editorValue.ts';
-export { isEmptyIdCode, splitEditorValue, splitIdCode } from './editorValue.ts';
+export {
+  isEmptyIdCode,
+  sameIdCode,
+  splitEditorValue,
+  splitIdCode,
+} from './editorValue.ts';
 export type { FragmentQuery } from './fragmentQuery.ts';
 export { fragmentQuery } from './fragmentQuery.ts';
 export type {

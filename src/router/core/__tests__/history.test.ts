@@ -2,6 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 
 import {
   ROUTE_CHANGE_EVENT,
+  followRoute,
   readRoute,
   subscribeToRoute,
   writeRoute,
@@ -148,4 +149,19 @@ test('without a browser the route is the home one and nothing is written', () =>
   expect(() => {
     subscribeToRoute(router, () => null)();
   }).not.toThrow();
+});
+
+test('followRoute writes the head now, then after every move until stopped', () => {
+  const browser = installBrowser('/');
+  const written: string[] = [];
+  const stop = followRoute(router)(() => {
+    written.push(globalThis.location.pathname);
+  });
+
+  writeRoute(router, { tab: 'tutorial', id: '1' });
+  browser.visit('/exercises/rings');
+  stop();
+  writeRoute(router, { tab: 'convert' });
+
+  expect(written).toStrictEqual(['/', '/tutorial/1', '/exercises/rings']);
 });

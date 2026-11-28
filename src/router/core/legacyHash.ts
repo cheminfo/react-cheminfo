@@ -1,5 +1,7 @@
 import { splitAddress } from './address.ts';
 import { normalizeBasePath, stripBasePath } from './basePath.ts';
+import { pageHistory, pageLocation } from './pageAddress.ts';
+import type { TabRouter } from './tabRouterTypes.ts';
 
 /** How a legacy hash link is turned into the path it means. */
 export interface LegacyHashOptions {
@@ -74,4 +76,41 @@ export function adoptLegacyHashAddress(
   const { path: adopted, search } = splitAddress(path);
   const mounted = `${basePath}${adopted}`;
   return search === '' ? mounted : `${mounted}?${search}`;
+}
+
+/**
+ * The path a link written before a tab-routed site routed by path points at,
+ * as its router writes it. A fragment naming no tab of the site is an anchor
+ * inside a page, not an address, and comes back `null`.
+ * @param router - The site's router.
+ * @param address - The address, or the fragment on its own, e.g. `#/tutorial/3`.
+ * @returns The path, query kept, or `null`.
+ */
+export function legacyTabAddress<Tab extends string>(
+  router: Pick<TabRouter<Tab>, 'isTab' | 'parse' | 'format'>,
+  address: string,
+): string | null {
+  const legacy = pathFromLegacyHash(address);
+  if (legacy === null) return null;
+  const [, first = ''] = legacy.split(/[/?]/);
+  return router.isTab(first) ? router.format(router.parse(legacy)) : null;
+}
+
+/**
+ * Put the address a legacy hash link meant in the bar, before anything reads
+ * it: called once at startup, so nothing downstream has to know the site ever
+ * routed by the hash. Nothing happens where there is no browser.
+ * @param router - The site's router.
+ * @param withBase - The path under the site's mount.
+ */
+export function adoptLegacyTabAddress<Tab extends string>(
+  router: Pick<TabRouter<Tab>, 'isTab' | 'parse' | 'format'>,
+  withBase: (path: string) => string = (path) => path,
+): void {
+  const location = pageLocation();
+  const history = pageHistory();
+  if (location === undefined || history === undefined) return;
+  const { pathname, search, hash } = location;
+  const path = legacyTabAddress(router, `${pathname}${search}${hash}`);
+  if (path !== null) history.replaceState(null, '', withBase(path));
 }

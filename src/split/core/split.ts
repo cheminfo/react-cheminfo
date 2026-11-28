@@ -18,6 +18,12 @@ import { integerParam } from '../../share/core/params.ts';
 export const SPLIT_PARAM = 'split';
 
 /**
+ * Query parameter of a page's second bar: the bars are numbered in reading
+ * order, left to right and then down, so the first is {@link SPLIT_PARAM}.
+ */
+export const SPLIT2_PARAM = 'split2';
+
+/**
  * The narrowest either pane is left at. Under a fifth of the row neither side
  * is read, and a drag that lands there is one nobody can undo without the
  * splitter they have just squeezed out of sight.

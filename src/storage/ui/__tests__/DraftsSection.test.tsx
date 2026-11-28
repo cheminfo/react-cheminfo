@@ -73,6 +73,7 @@ function storeOf(drafts: Array<Draft<string>>): DraftStore<string> {
 function sessionOf(): DraftSession {
   return {
     start: () => Promise.resolve(vi.fn()),
+    keep: () => vi.fn(),
     flush: () => Promise.resolve(),
     discardPending: vi.fn(),
     heldElsewhere: () => Promise.resolve(new Set(['empty-name'])),

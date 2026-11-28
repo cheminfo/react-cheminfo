@@ -65,6 +65,11 @@ export { ExerciseList } from './ExerciseList.tsx';
 export type { ExerciseSeriesProps } from './ExerciseSeries.tsx';
 export { ExerciseSeries } from './ExerciseSeries.tsx';
 export type {
+  RoutedSeriesOptions,
+  RoutedSeriesProps,
+} from './useRoutedSeries.ts';
+export { useRoutedSeries } from './useRoutedSeries.ts';
+export type {
   AnswerInputProps,
   QuestionCardProps,
   QuestionRendering,

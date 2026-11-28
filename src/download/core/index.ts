@@ -159,6 +159,8 @@ export { sanitizeFileName } from './sanitizeFileName.ts';
 export type { SvgBox } from './svgBounds.ts';
 export { CONTENT_ATTRIBUTE, contentBox } from './svgBounds.ts';
 export { SVG_NAMESPACE } from './svgNamespace.ts';
+export type { StandaloneSvgOptions } from './standaloneSvg.ts';
+export { standaloneSvg } from './standaloneSvg.ts';
 export type { PngOptions } from './svgToPng.ts';
 export { svgToPng } from './svgToPng.ts';
 export type { SvgDocumentOptions } from './svgToString.ts';

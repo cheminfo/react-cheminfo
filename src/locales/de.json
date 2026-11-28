@@ -406,6 +406,7 @@
   "figure.openSavedHelp": "Diese Abbildung in einem neuen Tab öffnen, in der Version der Seite, die sie gespeichert hat.",
   "figure.drawnElsewhere": "Diese Abbildung wurde auf {host} gezeichnet und öffnet sich dort so, wie sie war.",
   "figure.notAFigure": "{file} enthält keine Abbildung dieser Website zum Öffnen.",
+  "figure.otherVersion": "Diese Abbildung wurde von einer anderen Version von {host} gespeichert.",
   "figure.close": "Schließen",
   "figure.saveSvg": "SVG-Bild, das sich hier wieder öffnet",
   "figure.saveDocument": "Dokument: dasselbe Bild, mit dem, was Sie unten ankreuzen",

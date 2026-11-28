@@ -1,12 +1,21 @@
 export { ArrangeIcon } from './ArrangeIcon.tsx';
 export type { BoxSizeFieldsProps } from './BoxSizeFields.tsx';
 export { BoxSizeFields } from './BoxSizeFields.tsx';
+export type { CaptionViewProps } from './CaptionView.tsx';
+export { CaptionView } from './CaptionView.tsx';
 export { curveHandleMarks, pointHandleMarks } from './curveHandleMarks.tsx';
 export type {
   CanvasNavigation,
   CanvasNavigationOptions,
 } from './useCanvasNavigation.ts';
 export { useCanvasNavigation } from './useCanvasNavigation.ts';
+export type { DragHandlers } from './followPointer.ts';
+export {
+  CLICK_SLOP,
+  followPointer,
+  inGesture,
+  pastClickSlop,
+} from './followPointer.ts';
 export type { DashedOutlineProps, HandleMarkProps } from './DashedOutline.tsx';
 export { DashedOutline, HandleMark } from './DashedOutline.tsx';
 export type { DashSelectProps } from './DashSelect.tsx';

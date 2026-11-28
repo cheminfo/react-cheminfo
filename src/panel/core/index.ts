@@ -14,9 +14,12 @@ export type {
   PanelState,
   PanelStateCells,
   PanelStateOptions,
-} from './createPanelState.ts';
+} from './panelStateTypes.ts';
 export { createPanelState } from './createPanelState.ts';
+export type { EditorKeyAction, EditorKeyEvent } from './editorKeys.ts';
+export { editorKeyAction, isTypingTarget } from './editorKeys.ts';
 export { isEditingField } from './isEditingField.ts';
+export { PANEL_PARAM, readPanelList } from './panelParam.ts';
 export type { PanelLayout, PanelStatus } from './panelLayout.ts';
 export {
   PANEL_STATUSES,

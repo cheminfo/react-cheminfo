@@ -37,6 +37,7 @@ export type {
   OverlayPointerKind,
 } from './overlay/core/index.ts';
 export { emptiestCorner, overlayBarFolded } from './overlay/core/index.ts';
+export * from './numeric/core/index.ts';
 export * from './panel/core/index.ts';
 export * from './parallel/core/index.ts';
 export * from './pedagogy/core/index.ts';

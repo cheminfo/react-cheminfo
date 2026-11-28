@@ -74,6 +74,20 @@ export {
 export { Pen } from './pen.ts';
 export type { ImagePrimitive } from './pictures.ts';
 export { imageCorners, imageTransform, picturePrimitive } from './pictures.ts';
+export {
+  circleContour,
+  crescent,
+  roundBottomSide,
+  segmentContour,
+  smoothContour,
+  streak,
+} from './contourShapes.ts';
+export {
+  lathe,
+  latheSide,
+  mirrorContour,
+  reverseContour,
+} from './contourTransforms.ts';
 export { mapContour, polygonContour, roundedRect } from './outlines.ts';
 export { primitiveMarkup } from './primitiveMarkup.ts';
 export type {

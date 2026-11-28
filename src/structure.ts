@@ -1,5 +1,7 @@
 export * from './structure/core/index.ts';
 export * from './structure/ui/index.ts';
+// Needs OpenChemLib, so it is behind this door rather than `react-cheminfo/core`.
+export { editorMolecule } from './structure/core/editorMolecule.ts';
 // Reading a structure a host handed over needs OpenChemLib, so it is behind
 // this door rather than `react-cheminfo/host`.
 export {

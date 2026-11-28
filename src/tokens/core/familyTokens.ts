@@ -30,6 +30,14 @@ export const FAMILY_TOKEN_VALUES = {
   '--warning': '#d97706',
 } as const;
 
+/**
+ * The family's type, as `chrome.css` sets it on `body`: what a picture served
+ * on its own — a guide figure, a link's card — names on its root, since it
+ * reads no stylesheet.
+ */
+export const FAMILY_FONT =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
 /** The name of one of the family's tokens, `--border` for instance. */
 export type FamilyToken = keyof typeof FAMILY_TOKEN_VALUES;
 

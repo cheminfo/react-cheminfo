@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { expect, test } from 'vitest';
 
 import {
+  FAMILY_FONT,
   FAMILY_TOKEN_VALUES,
   TOKEN,
   isFamilyToken,
@@ -52,4 +53,21 @@ test('only the properties chrome.css declares are family tokens', () => {
   expect(isFamilyToken('--brand')).toBe(false);
   expect(isFamilyToken('--font-mono')).toBe(false);
   expect(isFamilyToken('toString')).toBe(false);
+});
+
+test('the family font is the one chrome.css sets on body', () => {
+  const css = readFileSync(
+    join(import.meta.dirname, '../../../../styles/chrome.css'),
+    'utf8',
+  ).replaceAll(/\/\*[\s\S]*?\*\//g, '');
+  const body = css.slice(
+    css.indexOf('body {'),
+    css.indexOf('}', css.indexOf('body {')),
+  );
+  const font = /font-family:(?<stack>[^;]*);/
+    .exec(body)
+    ?.groups?.stack?.trim()
+    .replaceAll(/\s+/g, ' ');
+
+  expect(font).toBe(FAMILY_FONT);
 });

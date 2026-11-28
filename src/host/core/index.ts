@@ -16,6 +16,12 @@ export {
   figureToolDocument,
   loadedFigureStates,
 } from './figureDocument.ts';
+export type {
+  FigureDocumentCell,
+  SiteFigure,
+  SiteFigureOptions,
+} from './siteFigure.ts';
+export { createSiteFigure } from './siteFigure.ts';
 export type { FigureDestination } from './figureForward.ts';
 export { figureDestination, forwardedFigureDocument } from './figureForward.ts';
 export type { FigurePage } from './answerGet.ts';

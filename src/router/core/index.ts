@@ -9,6 +9,7 @@ export {
 export type { WriteRouteOptions } from './history.ts';
 export {
   ROUTE_CHANGE_EVENT,
+  followRoute,
   openingRoute,
   readRoute,
   subscribeToRoute,
@@ -18,7 +19,12 @@ export type {
   AdoptLegacyHashOptions,
   LegacyHashOptions,
 } from './legacyHash.ts';
-export { adoptLegacyHashAddress, pathFromLegacyHash } from './legacyHash.ts';
+export {
+  adoptLegacyHashAddress,
+  adoptLegacyTabAddress,
+  legacyTabAddress,
+  pathFromLegacyHash,
+} from './legacyHash.ts';
 export type { PageHistory, PageLocation } from './pageAddress.ts';
 export {
   holdPageAddress,
@@ -35,6 +41,8 @@ export {
   parseQueryEntries,
   parseQueryString,
 } from './query.ts';
+export type { WithQueryValueOptions } from './queryPatch.ts';
+export { setSearchParams, withQueryValue } from './queryPatch.ts';
 export type { SiteAddresses, SiteAddressesOptions } from './siteAddresses.ts';
 export { anchorHref, createSiteAddresses } from './siteAddresses.ts';
 export { createSiteRouter } from './siteRouter.ts';
@@ -51,3 +59,21 @@ export type {
   TabRouterOptions,
 } from './tabRouterTypes.ts';
 export { createTabRouter } from './tabRouter.ts';
+export { FIGURE_SPLIT, createEditorRouter } from './editorRouter.ts';
+export type {
+  EditorHeadOptions,
+  EditorRouter,
+  EditorRouterOptions,
+  EditorSplit,
+  EditorSplitOf,
+  EditorSplitProps,
+} from './editorRouterTypes.ts';
+export type { RouteSyncOptions } from './routeSync.ts';
+export { startRouteSync } from './routeSync.ts';
+export type { SeriesRouter, SeriesRouterOptions } from './seriesRouter.ts';
+export { createSeriesRouter } from './seriesRouter.ts';
+export type {
+  EditorExamples,
+  EditorExamplesOptions,
+} from './editorExamples.ts';
+export { createEditorExamples } from './editorExamples.ts';

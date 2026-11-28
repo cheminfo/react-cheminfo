@@ -11,6 +11,7 @@
  * the site's too.
  */
 
+import { grownBox } from './boxes.ts';
 import { roundCoordinate } from './geometry.ts';
 import { normalizeDegrees } from './pictures.ts';
 import type { Similarity } from './transform.ts';
@@ -55,13 +56,7 @@ export function framedBox(
   pixel: number,
 ): Box | undefined {
   if (!box || Math.max(box.width, box.height) < 1) return undefined;
-  const gap = FRAME_GAP * pixel;
-  return {
-    x: box.x - gap,
-    y: box.y - gap,
-    width: box.width + 2 * gap,
-    height: box.height + 2 * gap,
-  };
+  return grownBox(box, FRAME_GAP * pixel);
 }
 
 /**

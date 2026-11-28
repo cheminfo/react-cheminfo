@@ -16,6 +16,7 @@ import {
   draftFile,
   tidyDrafts,
 } from './draftFiles.ts';
+import { keepStarted } from './draftKeeping.ts';
 import type { DraftSession, DraftSessionOptions } from './draftSessionTypes.ts';
 import { requestPersistentStorage } from './persistentStorage.ts';
 
@@ -201,37 +202,40 @@ export function createDraftSession<D>(
     return true;
   }
 
-  return {
-    start: async ({ linked }) => {
-      try {
-        const available = await store.isAvailable();
-        status.available.value = available;
-        if (!available) return () => undefined;
-        if (!linked) {
-          reopening ??= reopenLastWork();
-          await reopening;
-        }
-        // Copies kept before a document was kept once go too; best effort.
-        void tidy(cells.draftId.peek()).catch(() => undefined);
-      } finally {
-        status.settled.value = true;
+  const start: DraftSession['start'] = async ({ linked }) => {
+    try {
+      const available = await store.isAvailable();
+      status.available.value = available;
+      if (!available) return () => undefined;
+      if (!linked) {
+        reopening ??= reopenLastWork();
+        await reopening;
       }
-      const stop = signals.effect(() => {
-        const document = cells.document.value;
-        const file = cells.file.value;
-        const id = cells.draftId.value;
-        signals.untracked(() => {
-          keep(document, file, id);
-        });
+      // Copies kept before a document was kept once go too; best effort.
+      void tidy(cells.draftId.peek()).catch(() => undefined);
+    } finally {
+      status.settled.value = true;
+    }
+    const stop = signals.effect(() => {
+      const document = cells.document.value;
+      const file = cells.file.value;
+      const id = cells.draftId.value;
+      signals.untracked(() => {
+        keep(document, file, id);
       });
-      return () => {
-        stop();
-        void autosave.dispose().then(() => {
-          if (heldId !== undefined) claims.release(heldId);
-          heldId = undefined;
-        });
-      };
-    },
+    });
+    return () => {
+      stop();
+      void autosave.dispose().then(() => {
+        if (heldId !== undefined) claims.release(heldId);
+        heldId = undefined;
+      });
+    };
+  };
+
+  return {
+    start,
+    keep: (keepOptions) => keepStarted(start, keepOptions),
     flush: () => autosave.flush(),
     discardPending: () => {
       autosave.cancel();

@@ -63,6 +63,23 @@ export function firstValues(
   return values;
 }
 
+/**
+ * The first value each key of a query carries, read from the query string or
+ * from the parameters a router has already decoded, which keep a bare key
+ * such as `?embed` as an empty string.
+ * @param search - The query string, with or without its `?`, or the decoded
+ * parameters.
+ * @returns One value per key.
+ */
+export function queryValues(
+  search: string | Readonly<Record<string, string>>,
+): ReadonlyMap<string, string> {
+  if (typeof search === 'string') return firstValues(parseQuery(search));
+  const values = new Map<string, string>();
+  for (const key in search) values.set(key, search[key] as string);
+  return values;
+}
+
 function decodeComponent(value: string): string {
   try {
     return decodeURIComponent(value);

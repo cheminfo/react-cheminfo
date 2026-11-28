@@ -406,6 +406,7 @@
   "figure.openSavedHelp": "Apri questa figura in una nuova scheda, nella versione del sito che l’ha salvata.",
   "figure.drawnElsewhere": "Questa figura è stata disegnata su {host} e si apre lì così com’era.",
   "figure.notAFigure": "{file} non contiene alcuna figura di questo sito da aprire.",
+  "figure.otherVersion": "Questa figura è stata salvata da un’altra versione di {host}.",
   "figure.close": "Chiudi",
   "figure.saveSvg": "Immagine SVG che si riapre qui",
   "figure.saveDocument": "Documento: la stessa immagine, con ciò che spunti qui sotto",

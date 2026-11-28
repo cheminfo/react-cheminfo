@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 import {
   MAX_SPLIT,
   MIN_SPLIT,
+  SPLIT2_PARAM,
   SPLIT_CLOSED,
   SPLIT_PARAM,
   clampSplit,
@@ -27,6 +28,7 @@ test('a page that wants its own range gets it', () => {
 
 test('the parameter is named the same on every site', () => {
   expect(SPLIT_PARAM).toBe('split');
+  expect(SPLIT2_PARAM).toBe('split2');
 });
 
 test('a link that names no share leaves the page at its own', () => {

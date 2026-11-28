@@ -74,6 +74,7 @@ function memoryDrafts(held: string[] = []) {
   };
   const session: DraftSession = {
     start: () => Promise.resolve(() => undefined),
+    keep: () => vi.fn(),
     flush: () => {
       calls.push('flush');
       return Promise.resolve();

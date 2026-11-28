@@ -167,6 +167,23 @@ export function subscribeToRoute<Tab extends string>(
 }
 
 /**
+ * The `follow` of `startDocumentMeta` for a tab router: the head is written
+ * now, then again after every move.
+ * @param router - The site's router.
+ * @returns What `startDocumentMeta` takes as `follow`.
+ */
+export function followRoute<Tab extends string>(
+  router: TabRouter<Tab>,
+): (write: () => void) => () => void {
+  return (write) => {
+    write();
+    return subscribeToRoute(router, () => {
+      write();
+    });
+  };
+}
+
+/**
  * The address on screen: path, query string and fragment.
  * @returns It, or `/` where there is no browser.
  */

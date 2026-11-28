@@ -16,6 +16,20 @@ export {
   zoomOfShare,
   zoomShare,
 } from './camera.ts';
+export { grownBox, pointsAttribute, roundPoint } from './boxes.ts';
+export {
+  halfWidthAt,
+  heldVolume,
+  levelForVolume,
+  volumeBelow,
+} from './vesselVolume.ts';
+export type {
+  CameraZoom,
+  FittedCamera,
+  FittedCameraOptions,
+  ViewSize,
+} from './fittedCamera.ts';
+export { createCameraZoom, createFittedCamera } from './fittedCamera.ts';
 export type {
   DrawText,
   TextAlign,
@@ -153,7 +167,14 @@ export type { PageDirection, PageStops, PageStopsInput } from './pageStops.ts';
 export { NO_STOPS, pageStops, pagesInOrder } from './pageStops.ts';
 export type { LabelReferent } from './labelReferent.ts';
 export { isReferentKey } from './labelReferent.ts';
-export { PALETTE, isColor, joinColor, shadeOf, splitColor } from './palette.ts';
+export {
+  PALETTE,
+  isColor,
+  joinColor,
+  shadeOf,
+  splitColor,
+  tintOf,
+} from './palette.ts';
 export type { DrawPicture, PicturePatch, TurnedBox } from './pictures.ts';
 export {
   MAX_PICTURE_SOURCE,

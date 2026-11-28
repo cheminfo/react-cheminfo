@@ -34,3 +34,25 @@ export function ordinal(position: number): string {
 }
 
 const ORDINAL_SUFFIXES: Record<number, string> = { 1: 'st', 2: 'nd', 3: 'rd' };
+
+/**
+ * Words gathered into lines of at most a width, in characters; a word longer
+ * than the width stands on a line of its own.
+ * @param text - The words, separated by spaces.
+ * @param width - The most characters a line takes.
+ * @returns The lines.
+ */
+export function wrapWords(text: string, width: number): string[] {
+  const lines: string[] = [];
+  let line = '';
+  for (const word of text.split(' ')) {
+    if (line !== '' && line.length + 1 + word.length > width) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = line === '' ? word : `${line} ${word}`;
+    }
+  }
+  if (line !== '') lines.push(line);
+  return lines;
+}

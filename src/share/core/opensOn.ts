@@ -14,6 +14,9 @@ import {
 /** The parameter naming the example a link opens on, on every site. */
 export const EXAMPLE_PARAM = 'example';
 
+/** The parameter naming the site's workspace a link opens in, on every site. */
+export const WORKSPACE_PARAM = 'workspace';
+
 /** What a link opens the page on. */
 export type OpensOnTarget = 'screen' | 'example' | 'none';
 

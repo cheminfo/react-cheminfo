@@ -16,7 +16,10 @@ import type { ReactNode } from 'react';
 import { siteNameColors } from '../../ecosystem/core/nameColors.ts';
 import type { SiteId, SiteRecord } from '../../ecosystem/core/sites.ts';
 import { escapeText } from '../../share/core/escape.ts';
-import { FAMILY_TOKEN_VALUES } from '../../tokens/core/familyTokens.ts';
+import {
+  FAMILY_FONT,
+  FAMILY_TOKEN_VALUES,
+} from '../../tokens/core/familyTokens.ts';
 import { resolveSite } from '../core/siteFiles.ts';
 
 /** The width every card is drawn at. */
@@ -90,8 +93,7 @@ export async function ogCardHtml(options: OgCardOptions): Promise<string> {
         padding: 88px;
         background: ${FAMILY_TOKEN_VALUES['--surface']};
         color: ${FAMILY_TOKEN_VALUES['--text']};
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif;
+        font-family: ${FAMILY_FONT};
         gap: 28px;
       }
       h1 { font-size: 76px; font-weight: 700; letter-spacing: -0.02em; }

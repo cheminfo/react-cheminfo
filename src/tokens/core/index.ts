@@ -2,6 +2,7 @@ export type { CheckTokensOptions, TokenViolation } from './checkTokens.ts';
 export { findTokenViolations } from './checkTokens.ts';
 export type { FamilyToken } from './familyTokens.ts';
 export {
+  FAMILY_FONT,
   FAMILY_TOKEN_VALUES,
   TOKEN,
   isFamilyToken,

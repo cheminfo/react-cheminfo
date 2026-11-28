@@ -1,5 +1,5 @@
 import type { QueryEntry } from './query.ts';
-import { firstValues, parseQuery, serializeQuery } from './query.ts';
+import { parseQuery, queryValues, serializeQuery } from './query.ts';
 import type {
   HideablePart,
   ShareParamCodecs,
@@ -32,14 +32,18 @@ export interface ShareConfig<
  * ignored, a malformed number falls back to its default, and every number is
  * clamped to what the tool can serve, so a link written two years ago still
  * opens.
- * @param search - The query string, with or without its leading `?`.
+ * @param search - The query string, with or without its leading `?`, or the
+ * parameters a router has already decoded.
  * @param vocabulary - What this site's links can say.
  * @returns The configuration in force.
  */
 export function parseShareConfig<
   Codecs extends ShareParamCodecs = Record<string, never>,
->(search: string, vocabulary: ShareVocabulary<Codecs>): ShareConfig<Codecs> {
-  const values = firstValues(parseQuery(search));
+>(
+  search: string | Readonly<Record<string, string>>,
+  vocabulary: ShareVocabulary<Codecs>,
+): ShareConfig<Codecs> {
+  const values = queryValues(search);
   const embed = values.get(EMBED_PARAM);
   const asked = splitHidden(values.get(HIDE_PARAM));
   return {

@@ -35,7 +35,7 @@ export { shippedSourceProblem } from './shippedSources.ts';
 export type { RouteField } from './routeTable.ts';
 export type { RouteMeta } from './routes.ts';
 export { assertRoutes } from './assertRoutes.ts';
-export { homeRoute, pageMetaFor, routeFor } from './routes.ts';
+export { homeRoute, pageMetaFor, routeFor, routeOfTab } from './routes.ts';
 export type { SiteFilesOptions } from './siteFiles.ts';
 export { sitemapXml } from './siteFiles.ts';
 export type { StartDocumentMetaOptions } from './startDocumentMeta.ts';

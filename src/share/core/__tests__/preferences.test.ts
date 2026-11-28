@@ -340,3 +340,15 @@ function runEffect(callback: () => void): () => void {
 function stopNothing(): void {
   // An effect run once has nothing to stop.
 }
+
+test('the preferences of parameters a router already decoded are stored too', () => {
+  const preferences = makePreferences();
+  const applied = applyPreferencesFromSearch(
+    { smiles: 'CCO', strategy: 'exhaustive', labels: '' },
+    preferences,
+  );
+
+  expect(applied).toStrictEqual(['strategy', 'labels']);
+  expect(preferences.strategy.value).toBe('exhaustive');
+  expect(preferences.labels.value).toBe(true);
+});

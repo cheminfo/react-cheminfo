@@ -142,6 +142,28 @@ export function homeRoute(routes: readonly RouteMeta[]): RouteMeta {
   return exactRoute(routes, '/') ?? first;
 }
 
+/**
+ * The route of a tab: the entry of the table whose `tab` it is.
+ * @param routes - The site's route table, each entry naming its tab.
+ * @param tab - The tab asked about.
+ * @param fallback - The route a tab the table does not hold falls back to.
+ * @returns The route, or the fallback, or the table's first entry.
+ * @throws {Error} When the table is empty and no fallback is given.
+ */
+export function routeOfTab<R extends { tab: string }>(
+  routes: readonly R[],
+  tab: R['tab'],
+  fallback?: R,
+): R {
+  for (let i = 0; i < routes.length; i++) {
+    const route = routes[i] as R;
+    if (route.tab === tab) return route;
+  }
+  const first = fallback ?? routes[0];
+  if (first === undefined) throw new Error('a site answers at least one route');
+  return first;
+}
+
 // The one shape two paths are compared in: no trailing slash, and each segment
 // decoded, so a browser's `caf%C3%A9` names the table's `café`. A segment whose
 // escapes decode to a `/` stays escaped: `/a%2Fb` is one segment, not `/a/b`.

@@ -96,6 +96,16 @@ export function isEmptyIdCode(value: string): boolean {
   return EMPTY_ID_CODES.has(splitIdCode(value).idCode);
 }
 
+/**
+ * Whether two editor values hold the same drawing, wherever its atoms sit.
+ * @param one - An editor value, coordinates included or not.
+ * @param other - Another one.
+ * @returns True when the idCodes agree.
+ */
+export function sameIdCode(one: string, other: string): boolean {
+  return splitIdCode(one).idCode === splitIdCode(other).idCode;
+}
+
 /** What openchemlib writes for a structure with no atoms: molecule, fragment. */
 const EMPTY_ID_CODES = new Set(['', 'd@', 'dH']);
 

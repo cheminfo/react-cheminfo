@@ -85,3 +85,19 @@ export function shadeOf(fill: string): string {
     .join('');
   return joinColor(`#${shaded}`, opacity);
 }
+
+/**
+ * A colour lightened towards white.
+ * @param color - The colour, `#rrggbb`.
+ * @param white - How much white goes in, from 0 (the colour) to 1 (white).
+ * @returns The lighter colour, `#rrggbb`.
+ */
+export function tintOf(color: string, white: number): string {
+  let tinted = '#';
+  for (let start = 1; start < 7; start += 2) {
+    const channel = Number.parseInt(color.slice(start, start + 2), 16);
+    const mixed = Math.round(channel + (255 - channel) * white);
+    tinted += mixed.toString(16).padStart(2, '0');
+  }
+  return tinted;
+}

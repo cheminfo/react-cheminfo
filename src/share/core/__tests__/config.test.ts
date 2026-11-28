@@ -266,3 +266,14 @@ test('a tool with nothing of its own carries only embed and hide', () => {
     'page=3&hide=about',
   );
 });
+
+test('the parameters a router already decoded read the same as the query string', () => {
+  const search = 'embed&hide=answers,menu&count=12';
+  const decoded = Object.fromEntries(parseQuery(search));
+
+  expect(parseShareConfig(decoded, VOCABULARY)).toStrictEqual(
+    parseShareConfig(search, VOCABULARY),
+  );
+  expect(parseShareConfig({ embed: '' }, BARE_VOCABULARY).embed).toBe(true);
+  expect(parseShareConfig({ embed: '0' }, BARE_VOCABULARY).embed).toBe(false);
+});
