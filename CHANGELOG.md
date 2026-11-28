@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.152.0](https://github.com/cheminfo/react-cheminfo/compare/v0.151.0...v0.152.0) (2026-11-28)
+
+
+### Features
+
+* **card:** CardAnswer, CardFoot and the tool-server routes the sites wrote by hand ([8fcc6b0](https://github.com/cheminfo/react-cheminfo/commit/8fcc6b0acce446c9907529f2f5e669bbf86e928d))
+* generate the 404 page, mount the site and route page content from react-cheminfo ([ee74647](https://github.com/cheminfo/react-cheminfo/commit/ee7464710e05e66675ddac612d519deceba7078f))
+* **playwright:** share the split, page-error, canvas, host and card helpers of the site suites ([d7b105d](https://github.com/cheminfo/react-cheminfo/commit/d7b105d987b1f5309095f52cc8690315a274a6d9))
+* share the draw and glassware editor kit, with a pdf door for figure PDFs ([597c4fd](https://github.com/cheminfo/react-cheminfo/commit/597c4fd45b004b2dc2e2d10692b96226278618a8))
+* share the editor shell's file bar, status line, panels and palette gesture ([6509d4f](https://github.com/cheminfo/react-cheminfo/commit/6509d4f59299658d3035ccdba63108cb1b57908f))
+* share the editor shell's router, documents, figure, panels and camera ([9167ec0](https://github.com/cheminfo/react-cheminfo/commit/9167ec0c8818ad22ca50ea0c93e59315425ce0e4))
+* share the remaining site helpers: fetch retries, OSIRIS, filters, pager, host spectra ([bfe8d35](https://github.com/cheminfo/react-cheminfo/commit/bfe8d353e3127db540b910ec6c07635c3ad4bd77))
+* **slides:** a site's talks route, deck catalog and figure slides, written once ([d36c1ea](https://github.com/cheminfo/react-cheminfo/commit/d36c1eaa94f8a94f19cecca810f496db0d5edf5d))
+
 ## [0.151.0](https://github.com/cheminfo/react-cheminfo/compare/v0.150.0...v0.151.0) (2026-11-28)
 
 
