@@ -397,6 +397,7 @@ const STORY_IDS = [
   'shell-siteshell--default',
   'shell-siteshell--embedded',
   'shell-siteshell--full-width',
+  'shell-siteshell--workbench',
   'slides-slideshow--content',
   'slides-slideshow--default',
   'slides-slideshow--live-tool',

@@ -42,6 +42,7 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
     renderNavItem,
     navPart = 'tabs',
     width = 'page',
+    fit = false,
     embedded = false,
     hidden,
     about = false,
@@ -65,7 +66,12 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
       ) : (
         <SiteTheme siteId={siteId} />
       )}
-      <div className="site-shell">
+      <div
+        className={joinClassNames(
+          'site-shell',
+          fit === false ? undefined : 'site-shell--fit',
+        )}
+      >
         <SiteHeader
           siteId={siteId}
           site={site}
@@ -88,6 +94,8 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
           className={joinClassNames(
             'site-shell__main',
             width === 'full' ? 'site-shell__main--full' : undefined,
+            fit === false ? undefined : 'site-shell__main--fit',
+            fit === 'row' ? 'site-shell__main--fit-row' : undefined,
             embedded ? 'site-shell__main--embedded' : undefined,
             mainClassName,
           )}

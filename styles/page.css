@@ -1,0 +1,22 @@
+/*
+ * The page every site of the family sets its content on: the grey behind it,
+ * edge to edge, and white paper when it is printed. A site imports it right
+ * after chrome.css, so a rule of its own written later still wins — which is
+ * why it is not part of chrome.css itself.
+ */
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--surface-sunken);
+  color: var(--text);
+}
+
+@media print {
+  /* The paper is the page, even when the print dialog prints backgrounds. */
+  html,
+  body {
+    background: none;
+  }
+}

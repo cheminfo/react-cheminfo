@@ -94,3 +94,21 @@ export const Embedded: Story = {
 export const FullWidth: Story = {
   args: { width: 'full' },
 };
+
+/**
+ * A workbench: the bar and the tool own the window, the tool's column scrolls
+ * inside itself, and the footer waits below the fold.
+ */
+export const Workbench: Story = {
+  args: {
+    width: 'full',
+    fit: true,
+    children: (
+      <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>
+        <p style={{ margin: 0, padding: 16, height: 2000 }}>
+          A tool whose column scrolls inside the window.
+        </p>
+      </div>
+    ),
+  },
+};

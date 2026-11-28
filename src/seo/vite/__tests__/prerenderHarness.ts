@@ -95,7 +95,7 @@ function configure(plugin: Plugin, command: string, root: string): void {
     command,
     root,
     build: { outDir: '.' },
-    logger: { info: () => undefined },
+    logger: { info: () => undefined, warn: () => undefined },
   });
 }
 

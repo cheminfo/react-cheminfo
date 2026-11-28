@@ -6,10 +6,10 @@
  * `--brand`, `--brand-alt`, the readable `--brand-alt-text` when the second one
  * is too light for text, and `--accent: var(--brand)`.
  *
- * The page background and the box-sizing reset stay with the site: a rule
- * shipped from a package cannot be relied on to lose the cascade against the
- * page importing it. The focus reset is the exception, because it must win on
- * every site: no ring, ever.
+ * The page background is `page.css`, imported right after this file, and the
+ * box-sizing reset stays with the site: a rule shipped here cannot be relied on
+ * to lose the cascade against the page importing it. The focus reset is the
+ * exception, because it must win on every site: no ring, ever.
  */
 
 :root {
@@ -2236,8 +2236,46 @@ span.taxon-lineage__name {
   padding: 0;
 }
 
+/* A workbench: the bar and the tool own the window, every column scrolls inside
+   itself, and the family links wait under it. The page is a column, or a row
+   for a tool whose panes sit straight in it. */
+.site-shell--fit {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.site-shell__main--fit {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 1px;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.site-shell__main--fit-row {
+  flex-direction: row;
+}
+
+/* On paper the workbench gives way to what it prints: the page grows to hold
+   every sheet. */
+@media print {
+  .site-shell--fit {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
+  .site-shell__main--fit {
+    display: block;
+    overflow: visible;
+  }
+}
+
+/* A workbench keeps its edges on a phone too: its figure is the page. */
 @media (max-width: 40rem) {
-  .site-shell__main:not(.site-shell__main--embedded) {
+  .site-shell__main:not(.site-shell__main--embedded, .site-shell__main--fit) {
     padding-inline: 0.5rem;
   }
 }

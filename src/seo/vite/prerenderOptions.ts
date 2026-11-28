@@ -11,6 +11,8 @@ import type { PageContent } from '../core/pageProse.ts';
 import type { RobotsDisallow } from '../core/robots.ts';
 import type { RouteMeta } from '../core/routes.ts';
 
+import type { NotFoundOptions } from './notFoundPage.ts';
+
 /** What the build needs to know to write the site's addresses. */
 export interface PrerenderOptions {
   /** The site, named or passed. */
@@ -110,4 +112,19 @@ export interface PrerenderOptions {
    * @default [the default language]
    */
   languages?: readonly Language[];
+  /**
+   * Whether the build carries the family's page for an address the site does
+   * not have, `404.html`, which static-web-server, Cloudflare Pages and
+   * `react-cheminfo/server` hand out with a 404. It is drawn from the site's
+   * record — its mark and its name in its two colours, over the family's bar —
+   * says so in every language the site is written in, and needs no script. A
+   * site outside the family passes its mark's `glyph`.
+   *
+   * Leave it off where the host is meant to answer an unwritten address with
+   * the tool instead: a `SERVER_FALLBACK_PAGE`, or Cloudflare Pages, which
+   * falls back to the front page only while the build holds no `404.html`. A
+   * `404.html` the site ships in `public/` is kept, and the build says so.
+   * @default false
+   */
+  notFound?: boolean | NotFoundOptions;
 }

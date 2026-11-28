@@ -46,3 +46,5 @@ export { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from './template.ts';
 export { injectTrackingScript } from './trackingScript.ts';
 export type { PageContentRecord } from './pageContent.ts';
 export { pageContentOf } from './pageContent.ts';
+export type { RoutePageContentOptions } from './routePageContent.ts';
+export { routeItem, routePageContent } from './routePageContent.ts';

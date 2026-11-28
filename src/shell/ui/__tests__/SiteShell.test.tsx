@@ -97,6 +97,34 @@ test('a framed page is the page alone', () => {
   );
 });
 
+test('a workbench fills the window, its page a column', () => {
+  render({ fit: true, mainClassName: 'bench-main' });
+
+  expect(host.querySelector('.site-shell')?.className).toBe(
+    'site-shell site-shell--fit',
+  );
+  expect(host.querySelector('main')?.className).toBe(
+    'site-shell__main site-shell__main--fit bench-main',
+  );
+});
+
+test('a workbench whose panes sit in the page lays it out as a row', () => {
+  render({ fit: 'row', width: 'full' });
+
+  expect(host.querySelector('.site-shell')?.className).toBe(
+    'site-shell site-shell--fit',
+  );
+  expect(host.querySelector('main')?.className).toBe(
+    'site-shell__main site-shell__main--full site-shell__main--fit site-shell__main--fit-row',
+  );
+});
+
+test('a page that grows keeps the shell as it is', () => {
+  render({ fit: false });
+
+  expect(host.querySelector('.site-shell')?.className).toBe('site-shell');
+});
+
 test('a site routing its own About keeps its page on show', () => {
   render({ about: { content: ABOUT, active: true, routed: true } });
 

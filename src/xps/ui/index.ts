@@ -28,6 +28,13 @@ export { useXpsActions, useXpsEditorState } from './xpsStateContext.ts';
 export type { XpsStateProviderProps } from './XpsStateProvider.tsx';
 export { XpsStateProvider } from './XpsStateProvider.tsx';
 
+// Files read into spectra one after the other, each in a colour of its own.
+export type {
+  ReadSpectrumFilesOptions,
+  ReadSpectrumFilesResult,
+} from './readSpectrumFiles.ts';
+export { readSpectrumFiles } from './readSpectrumFiles.ts';
+
 // The panels the editor ships.
 export { SpectraPanel } from './SpectraPanel.tsx';
 export { MetadataPanel } from './MetadataPanel.tsx';

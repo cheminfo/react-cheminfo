@@ -6,6 +6,7 @@ export {
   formatEach,
 } from './formats.ts';
 export { GFN2_XTB_PAPER, GFN2_XTB_WORK } from './gfn2Paper.ts';
+export { INCHI_PAPER, INCHI_WORK } from './inchiPaper.ts';
 export {
   OPEN_CHEMISTRY_PAPER,
   OPEN_CHEMISTRY_WORK,

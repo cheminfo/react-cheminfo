@@ -7,3 +7,4 @@ export type {
   SiteShellProps,
 } from './SiteShell.tsx';
 export { SiteShell } from './SiteShell.tsx';
+export { mountSite } from './mountSite.tsx';

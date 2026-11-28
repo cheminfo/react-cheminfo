@@ -8,11 +8,13 @@
  * Reading them in parallel would hand the same free hue to every one of them.
  */
 
+import type { LightLogger } from 'cheminfo-types';
+
 import { loadSpectra } from '../core/loadSpectra.ts';
 import type { XpsSpectrum } from '../core/xpsSpectrum.ts';
 
 /** What the colours already on the chart are, and how much of a file to read. */
-interface ReadSpectrumFilesOptions {
+export interface ReadSpectrumFilesOptions {
   /**
    * The colours already taken, so what is dropped onto a chart that already
    * holds spectra is drawn in a colour of its own.
@@ -24,10 +26,17 @@ interface ReadSpectrumFilesOptions {
    * @default the reader's own limit
    */
   maxSpectra?: number;
+  /**
+   * Receives what went wrong or was left out of each file, at `error`, with
+   * the file's name as `meta.source` — one line per file, beside the one
+   * sentence `error` joins them into.
+   * @default undefined — nothing is logged
+   */
+  logger?: LightLogger;
 }
 
 /** What came out of one drop. */
-interface ReadSpectrumFilesResult {
+export interface ReadSpectrumFilesResult {
   /** The spectra, ready to draw. Empty when nothing could be read. */
   spectra: XpsSpectrum[];
   /**
@@ -49,7 +58,7 @@ export async function readSpectrumFiles(
   files: FileList | readonly File[],
   options: ReadSpectrumFilesOptions = {},
 ): Promise<ReadSpectrumFilesResult> {
-  const { taken = [], maxSpectra } = options;
+  const { taken = [], maxSpectra, logger } = options;
   const colours = [...taken];
   const spectra: XpsSpectrum[] = [];
   const problems: string[] = [];
@@ -67,7 +76,10 @@ export async function readSpectrumFiles(
       spectra.push(spectrum);
       colours.push(spectrum.color);
     }
-    if (result.error !== null) problems.push(result.error);
+    if (result.error !== null) {
+      problems.push(result.error);
+      logger?.error({ source: file.name }, result.error);
+    }
   }
 
   return { spectra, error: problems.length === 0 ? null : problems.join(' ') };

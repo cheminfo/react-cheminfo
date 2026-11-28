@@ -1,6 +1,8 @@
+import { FifoLogger } from 'fifo-logger';
 import { expect, test } from 'vitest';
 
 import { SPECTRUM_COLORS } from '../../../chart/core/spectrumColor.ts';
+import { plainLogLines } from '../../../log/core/logLines.ts';
 import { readSpectrumFiles } from '../readSpectrumFiles.ts';
 
 const NARROW_SCAN = '282.16 178\n282.21 180\n282.26 190\n';
@@ -86,4 +88,25 @@ test('nothing dropped is nothing read', async () => {
   const result = await readSpectrumFiles([]);
 
   expect(result).toStrictEqual({ spectra: [], error: null });
+});
+
+test('each file that failed is logged on its own, named as its source', async () => {
+  const logger = new FifoLogger();
+  const result = await readSpectrumFiles(
+    [
+      new File([NARROW_SCAN], 'sample.txt'),
+      new File(['<html></html>'], 'report.html'),
+    ],
+    { logger },
+  );
+
+  expect(result.spectra).toHaveLength(1);
+  expect(plainLogLines(logger.getLogs())).toStrictEqual([
+    {
+      levelLabel: 'error',
+      message:
+        '"report.html" is not a spectrum this reader knows — it takes VAMAS, JCAMP-DX, and two columns of "binding energy counts".',
+      meta: { source: 'report.html' },
+    },
+  ]);
 });

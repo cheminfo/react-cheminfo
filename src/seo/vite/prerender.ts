@@ -14,7 +14,8 @@
  * These files are also what makes the server's catch-all fallback unnecessary.
  * Every address the tool answers is on disk, so an address that is *not* on
  * disk is genuinely not a page and must 404 rather than serving the tool under
- * a name it does not have.
+ * a name it does not have — with the family's `404.html`, when `notFound` asks
+ * for it.
  *
  * `/about` is written to `about.html`, never `about/index.html`: a static host
  * serves a folder's index at `/about/` and redirects the address every link and
@@ -23,7 +24,7 @@
  * and `vite preview` alike.
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
 import type { Logger, Plugin } from 'vite';
@@ -41,6 +42,7 @@ import { homeRoute } from '../core/routes.ts';
 import { sitemapXml } from '../core/siteFiles.ts';
 import { PAGE_BODY_MARKER, PAGE_HEAD_MARKER, fill } from '../core/template.ts';
 
+import { notFoundPageHtml } from './notFoundPage.ts';
 import type { PrerenderOptions } from './prerenderOptions.ts';
 import {
   assertSamePaths,
@@ -57,7 +59,7 @@ import {
  * is not a path, or when the origin is not an absolute address.
  */
 export function cheminfoPrerender(options: PrerenderOptions): Plugin {
-  const { site, origin, robots = [] } = options;
+  const { site, origin, robots = [], notFound = false } = options;
   const languages = options.languages ?? [DEFAULT_LANGUAGE];
   const tableFor = (language: Language): readonly RouteMeta[] =>
     typeof options.routes === 'function'
@@ -172,6 +174,21 @@ export function cheminfoPrerender(options: PrerenderOptions): Plugin {
           join(out, 'robots.txt'),
           robotsTxt({ site, routes, origin }, robots),
         );
+      }
+
+      if (notFound !== false) {
+        const file = join(out, '404.html');
+        if (existsSync(file)) {
+          logger?.warn(
+            "404.html is the site's own, from public/: delete it to ship the family's page",
+          );
+        } else {
+          const glyph = notFound === true ? undefined : notFound.glyph;
+          writeFileSync(
+            file,
+            await notFoundPageHtml({ site, languages, glyph }),
+          );
+        }
       }
 
       const spoken =
