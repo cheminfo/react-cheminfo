@@ -64,6 +64,21 @@ export {
   withPointAt,
   withoutPoint,
 } from './curveShape.ts';
+export type {
+  InHand,
+  InHandOptions,
+  PaletteDragEvent,
+  PaletteDragProps,
+  PalettePointerEvent,
+  PaletteTransfer,
+  PaletteTransferOptions,
+} from './paletteGesture.ts';
+export {
+  createInHand,
+  createPaletteTransfer,
+  paletteClick,
+  startPaletteDrag,
+} from './paletteGesture.ts';
 export type { PickerType } from '../../storage/core/fileAccess.ts';
 export {
   chooseOpenFile,

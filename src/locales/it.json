@@ -1199,5 +1199,22 @@
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} celle, perché {asked}×{asked}×{asked} conterrebbero troppi atomi",
   "crystal3d.unreadable": "Non è stato possibile leggere quel file",
   "crystal3d.tooLarge": "Questa cella contiene {count} atomi, più di quanti il visualizzatore ne disegni.",
-  "crystal3d.unsupported": "Niente 3D su questo computer"
+  "crystal3d.unsupported": "Niente 3D su questo computer",
+  "editor.fileBar.label": "File",
+  "editor.fileBar.saveAs": "Salva come…",
+  "editor.fileBar.saveAsTitle": "Salva la figura con un nome e in un posto, come l’SVG che si riapre qui (Maiusc+Ctrl+S); Ctrl+S la salva dove hai scelto",
+  "editor.fileBar.undo": "Annulla",
+  "editor.fileBar.undoTitle": "Annulla (Ctrl+Z)",
+  "editor.fileBar.redo": "Ripeti",
+  "editor.fileBar.redoTitle": "Ripeti (Maiusc+Ctrl+Z)",
+  "editor.fileBar.delete": "Elimina la selezione",
+  "editor.fileBar.deleteTitle": "Elimina la selezione (Canc)",
+  "editor.fileBar.clear": "Svuota",
+  "editor.folder.actions": "{name}: azioni",
+  "editor.palette.tooltip.bench": "{name}: trascinalo sul banco di lavoro, oppure fai clic su di esso e poi sul banco di lavoro. Un doppio clic lo aggiunge subito.",
+  "editor.palette.tooltip.figure": "{name}: trascinalo sulla figura, oppure fai clic su di esso e poi sulla figura. Un doppio clic lo aggiunge subito.",
+  "editor.palette.tooltip.drawing": "{name}: trascinalo sul disegno, oppure fai clic su di esso e poi sul disegno. Un doppio clic lo aggiunge subito.",
+  "editor.palette.gestures.bench": "Trascinalo sul banco di lavoro, oppure fai clic su di esso e poi sul banco di lavoro. Un doppio clic lo aggiunge subito.",
+  "editor.palette.gestures.figure": "Trascinalo sulla figura, oppure fai clic su di esso e poi sulla figura. Un doppio clic lo aggiunge subito.",
+  "editor.palette.gestures.drawing": "Trascinalo sul disegno, oppure fai clic su di esso e poi sul disegno. Un doppio clic lo aggiunge subito."
 }

@@ -17,6 +17,12 @@ export type {
   DocumentationSection,
 } from './DocumentationDialogFrame.tsx';
 export { DocumentationDialogFrame } from './DocumentationDialogFrame.tsx';
+export type {
+  EditorPanel,
+  EditorPanelRailProps,
+  EditorPanelStackProps,
+} from './EditorPanels.tsx';
+export { EditorPanelRail, EditorPanelStack } from './EditorPanels.tsx';
 export type { FilterInputProps } from './FilterInput.tsx';
 export { FilterInput } from './FilterInput.tsx';
 export { PanelCount, PanelSearch, PanelSearchField } from './PanelSearch.tsx';
@@ -37,6 +43,8 @@ export { PanelFrame } from './PanelFrame.tsx';
 export type { PanelRowProps } from './PanelRow.tsx';
 export { PanelRow } from './PanelRow.tsx';
 export type { PanelRailProps, RailPanel } from './PanelRail.tsx';
+export type { PanelSectionProps } from './PanelSection.tsx';
+export { PanelSection } from './PanelSection.tsx';
 export type { PanelSettingsButtonProps } from './PanelSettingsButton.tsx';
 export { PanelSettingsButton } from './PanelSettingsButton.tsx';
 export type { PanelStatusTableProps } from './PanelStatusTable.tsx';

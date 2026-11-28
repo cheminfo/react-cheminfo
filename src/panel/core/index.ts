@@ -64,5 +64,11 @@ export {
   statusMutedStyle,
   statusSpacerStyle,
 } from './statusBar.ts';
+export type {
+  SayInStatusLine,
+  StatusNotice,
+  StatusNoticeOptions,
+} from './statusNotice.ts';
+export { createStatusNotice } from './statusNotice.ts';
 export { filterNeedle, matchesNeedle } from './textFilter.ts';
 export { yieldToPainting } from './yieldToPainting.ts';

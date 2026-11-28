@@ -5,7 +5,11 @@
  * Its own door because the schemas are checked with ajv. `useHostConnection`
  * fetches ajv and the connection only when the page is framed, so a site that
  * calls it ships nothing extra to a visitor who opened it directly.
+ *
+ * The shell of a figure editor — its file bar, status line and folder panel —
+ * comes through it too, because it opens and saves through the same parts.
  */
 
 export * from './host/core/index.ts';
 export * from './host/ui/index.ts';
+export * from './editor/ui/index.ts';

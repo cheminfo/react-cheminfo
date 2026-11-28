@@ -1199,5 +1199,22 @@
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} cells, as {asked}×{asked}×{asked} would hold too many atoms",
   "crystal3d.unreadable": "That file could not be read",
   "crystal3d.tooLarge": "This cell holds {count} atoms, more than the viewer draws.",
-  "crystal3d.unsupported": "No 3D on this machine"
+  "crystal3d.unsupported": "No 3D on this machine",
+  "editor.fileBar.label": "File",
+  "editor.fileBar.saveAs": "Save as…",
+  "editor.fileBar.saveAsTitle": "Save the figure under a name and a place, as the SVG that opens here again (Shift+Ctrl+S); Ctrl+S saves it where you chose",
+  "editor.fileBar.undo": "Undo",
+  "editor.fileBar.undoTitle": "Undo (Ctrl+Z)",
+  "editor.fileBar.redo": "Redo",
+  "editor.fileBar.redoTitle": "Redo (Shift+Ctrl+Z)",
+  "editor.fileBar.delete": "Delete the selection",
+  "editor.fileBar.deleteTitle": "Delete the selection (Delete)",
+  "editor.fileBar.clear": "Clear",
+  "editor.folder.actions": "{name}: actions",
+  "editor.palette.tooltip.bench": "{name}: drag it onto the bench, or click it and then the bench. Double-click adds it at once.",
+  "editor.palette.tooltip.figure": "{name}: drag it onto the figure, or click it and then the figure. Double-click adds it at once.",
+  "editor.palette.tooltip.drawing": "{name}: drag it onto the drawing, or click it and then the drawing. Double-click adds it at once.",
+  "editor.palette.gestures.bench": "Drag it onto the bench, or click it and then the bench. Double-click adds it at once.",
+  "editor.palette.gestures.figure": "Drag it onto the figure, or click it and then the figure. Double-click adds it at once.",
+  "editor.palette.gestures.drawing": "Drag it onto the drawing, or click it and then the drawing. Double-click adds it at once."
 }

@@ -1199,5 +1199,22 @@
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} Zellen, da {asked}×{asked}×{asked} zu viele Atome enthielten",
   "crystal3d.unreadable": "Diese Datei konnte nicht gelesen werden",
   "crystal3d.tooLarge": "Diese Zelle enthält {count} Atome, mehr als der Betrachter zeichnet.",
-  "crystal3d.unsupported": "Kein 3D auf diesem Rechner"
+  "crystal3d.unsupported": "Kein 3D auf diesem Rechner",
+  "editor.fileBar.label": "Datei",
+  "editor.fileBar.saveAs": "Speichern unter…",
+  "editor.fileBar.saveAsTitle": "Die Abbildung unter einem Namen an einem Ort speichern, als SVG, das sich hier wieder öffnet (Umschalt+Strg+S); Strg+S speichert sie dort, wo Sie es gewählt haben",
+  "editor.fileBar.undo": "Rückgängig",
+  "editor.fileBar.undoTitle": "Rückgängig (Strg+Z)",
+  "editor.fileBar.redo": "Wiederholen",
+  "editor.fileBar.redoTitle": "Wiederholen (Umschalt+Strg+Z)",
+  "editor.fileBar.delete": "Die Auswahl löschen",
+  "editor.fileBar.deleteTitle": "Die Auswahl löschen (Entf)",
+  "editor.fileBar.clear": "Leeren",
+  "editor.folder.actions": "{name}: Aktionen",
+  "editor.palette.tooltip.bench": "{name}: auf die Arbeitsfläche ziehen oder anklicken und dann auf die Arbeitsfläche klicken. Ein Doppelklick fügt es sofort hinzu.",
+  "editor.palette.tooltip.figure": "{name}: auf die Abbildung ziehen oder anklicken und dann auf die Abbildung klicken. Ein Doppelklick fügt es sofort hinzu.",
+  "editor.palette.tooltip.drawing": "{name}: auf die Zeichnung ziehen oder anklicken und dann auf die Zeichnung klicken. Ein Doppelklick fügt es sofort hinzu.",
+  "editor.palette.gestures.bench": "Auf die Arbeitsfläche ziehen oder anklicken und dann auf die Arbeitsfläche klicken. Ein Doppelklick fügt es sofort hinzu.",
+  "editor.palette.gestures.figure": "Auf die Abbildung ziehen oder anklicken und dann auf die Abbildung klicken. Ein Doppelklick fügt es sofort hinzu.",
+  "editor.palette.gestures.drawing": "Auf die Zeichnung ziehen oder anklicken und dann auf die Zeichnung klicken. Ein Doppelklick fügt es sofort hinzu."
 }

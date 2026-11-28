@@ -1199,5 +1199,22 @@
   "crystal3d.caption.cellsCapped": "{count}×{count}×{count} celdas, ya que {asked}×{asked}×{asked} contendrían demasiados átomos",
   "crystal3d.unreadable": "Ese archivo no se ha podido leer",
   "crystal3d.tooLarge": "Esta celda contiene {count} átomos, más de los que dibuja el visor.",
-  "crystal3d.unsupported": "Sin 3D en este equipo"
+  "crystal3d.unsupported": "Sin 3D en este equipo",
+  "editor.fileBar.label": "Archivo",
+  "editor.fileBar.saveAs": "Guardar como…",
+  "editor.fileBar.saveAsTitle": "Guardar la figura con un nombre y en un lugar, como el SVG que se vuelve a abrir aquí (Mayús+Ctrl+S); Ctrl+S la guarda donde usted eligió",
+  "editor.fileBar.undo": "Deshacer",
+  "editor.fileBar.undoTitle": "Deshacer (Ctrl+Z)",
+  "editor.fileBar.redo": "Rehacer",
+  "editor.fileBar.redoTitle": "Rehacer (Mayús+Ctrl+Z)",
+  "editor.fileBar.delete": "Borrar la selección",
+  "editor.fileBar.deleteTitle": "Borrar la selección (Supr)",
+  "editor.fileBar.clear": "Borrar todo",
+  "editor.folder.actions": "{name}: acciones",
+  "editor.palette.tooltip.bench": "{name}: arrástrelo a la mesa de trabajo, o haga clic en él y luego en la mesa de trabajo. Un doble clic lo añade al instante.",
+  "editor.palette.tooltip.figure": "{name}: arrástrelo a la figura, o haga clic en él y luego en la figura. Un doble clic lo añade al instante.",
+  "editor.palette.tooltip.drawing": "{name}: arrástrelo al dibujo, o haga clic en él y luego en el dibujo. Un doble clic lo añade al instante.",
+  "editor.palette.gestures.bench": "Arrástrelo a la mesa de trabajo, o haga clic en él y luego en la mesa de trabajo. Un doble clic lo añade al instante.",
+  "editor.palette.gestures.figure": "Arrástrelo a la figura, o haga clic en él y luego en la figura. Un doble clic lo añade al instante.",
+  "editor.palette.gestures.drawing": "Arrástrelo al dibujo, o haga clic en él y luego en el dibujo. Un doble clic lo añade al instante."
 }

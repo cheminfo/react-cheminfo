@@ -160,6 +160,8 @@ const STORY_IDS = [
   'ecosystem-wordmark--default',
   'ecosystem-wordmark--every-site',
   'ecosystem-wordmark--every-size',
+  'editor-editorshell--bench',
+  'editor-editorshell--lesson',
   'error-errorboundary--caught',
   'error-errorboundary--caught-with-title',
   'error-errorboundary--custom-fallback',

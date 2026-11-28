@@ -48,9 +48,15 @@ export {
   useFigureMoves,
   useMovingFigureSource,
 } from './movingFigure.ts';
+export type { PaletteEntryProps } from './PaletteEntry.tsx';
+export { PaletteEntry } from './PaletteEntry.tsx';
+export type { PaletteCanvas, PaletteWords } from './usePaletteWords.ts';
+export { usePaletteWords } from './usePaletteWords.ts';
 export type { PageChange, PageFieldProps } from './PageField.tsx';
 export { PageField } from './PageField.tsx';
 export { PageGrid } from './PageGrid.tsx';
+export type { PageSetupPanelProps } from './PageSetupPanel.tsx';
+export { PageSetupPanel } from './PageSetupPanel.tsx';
 export { PageMask } from './PageMask.tsx';
 export { FigureSideInput } from './PageSideInput.tsx';
 export { PageToolbar } from './PageToolbar.tsx';

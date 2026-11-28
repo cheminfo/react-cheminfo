@@ -166,6 +166,13 @@ export interface SiteShellProps<
    */
   belowHeader?: ReactNode;
   /**
+   * Whether the page fills the window under the bar, as a workbench does: the
+   * shell is one screen tall and never scrolls, and the main area is a column
+   * the tool grows in, with no gutter, so the footer stays below the fold.
+   * @default false
+   */
+  fill?: boolean;
+  /**
    * Classes the main area carries beside the shell's own.
    * @default undefined
    */

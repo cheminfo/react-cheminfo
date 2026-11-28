@@ -2145,6 +2145,160 @@ span.taxon-lineage__name {
   inset: 0;
 }
 
+/* ── An editor's shell ──────────────────────────────────────────────────── */
+
+/*
+  The same shell in every editor of the family: the file bar above, the tools
+  down the left, the figure and its panels in the row, the rail holding the
+  right edge, and the status line under the figure. A site lays its page out
+  with these classes and styles none of them itself.
+*/
+.editor-workbench {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 1px;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+.editor-file-bar {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 2px 6px;
+  border-bottom: 1px solid var(--border);
+  gap: 2px;
+}
+
+/* What pushes the settings, or a page's own end, to the right of the bar. */
+.editor-file-bar__spacer {
+  flex: 1 1 auto;
+}
+
+.editor-workbench__body {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 1px;
+}
+
+.editor-workbench__tools,
+.editor-workbench__rail {
+  display: flex;
+  flex: none;
+  background: var(--surface);
+}
+
+.editor-workbench__tools {
+  border-right: 1px solid var(--border);
+}
+
+.editor-workbench__rail {
+  border-left: 1px solid var(--border);
+}
+
+.editor-workbench__row {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 1px;
+}
+
+.editor-workbench__row > * {
+  min-width: 0;
+  flex: 1 1 1px;
+}
+
+/* The figure over its status line. */
+.editor-view {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+/* The hint on one line, so the figure above does not resize as it changes,
+   and the zoom at the right end. */
+.editor-status {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 1px 4px 1px 10px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  gap: 12px;
+}
+
+.editor-status__message {
+  overflow: hidden;
+  min-width: 0;
+  flex: 1 1 auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-status__message--danger {
+  color: var(--danger);
+}
+
+.editor-panel-stack {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+}
+
+/* The tools, then the entries of the palette, each group under a rule. */
+.editor-palette {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.editor-palette > * + * {
+  border-top: 1px solid var(--border);
+}
+
+/* The page setup panel's fields. */
+.editor-page-panel {
+  padding: 10px 12px;
+}
+
+/* A titled block of a panel: what is selected, one section at a time. */
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.panel-section__title {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.panel-section__hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.panel-section__list {
+  padding-left: 18px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 /* ── Printing ────────────────────────────────────────────────────────────── */
 
 /*
@@ -2278,6 +2432,24 @@ span.taxon-lineage__name {
   .site-shell__main:not(.site-shell__main--embedded, .site-shell__main--fit) {
     padding-inline: 0.5rem;
   }
+}
+
+/* A workbench fills the window under the bar: the page itself never scrolls,
+   the tool takes the height there is and each panel scrolls inside itself, so
+   the footer stays below the fold. */
+.site-shell--fill {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.site-shell__main.site-shell__main--fill {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 1px;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
 }
 
 /* ── The About's hero ────────────────────────────────────────────────────── */
