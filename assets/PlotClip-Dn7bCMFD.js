@@ -1,3 +1,0 @@
-import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{n as t}from"./iframe-C326WbYZ.js";function n(e){let{id:t,plot:n}=e;return(0,r.jsx)(`defs`,{children:(0,r.jsx)(`clipPath`,{id:t,children:(0,r.jsx)(`rect`,{x:n.left,y:n.top,width:n.width,height:n.height})})})}var r;function i(){return(i=e((()=>{r=t(),n.__docgenInfo={description:`The clip path that keeps a chart's data layers inside its plot.
-@param props - See {@link PlotClipProps}.
-@returns The definition, as SVG.`,methods:[],displayName:`PlotClip`,props:{id:{required:!0,tsType:{name:`string`},description:"The id the clip path is referred to by, from `url(#…)`."},plot:{required:!0,tsType:{name:`PlotRect`},description:`The plot the data layers are kept inside.`}}}})))()}export{i as n,n as t};

@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{h as t}from"./iframe-C326WbYZ.js";function n(e){return`${e}-${(0,r.useId)().replaceAll(/\W/g,``)}`}var r;function i(){return(i=e((()=>{r=t()})))()}export{n,i as t};
