@@ -233,6 +233,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Taxonomy**               | `TAXON_RANKS`, `PRINCIPAL_RANKS`, `rankOrder`, `isPrincipalRank`, `isGenusOrBelow`, `isAboveGenus`, `principalLineage`, `lineageFromNodes`, `lineageFromRanks`, `genusOrBelow`, `ncbiTaxonomyUrl`, `splitOrganismName`                                                                                                                                                                                                                                                                                                | `TaxonLineage`, `OrganismName`, `useRankLabel`                                                                                                                                                                                                                                                                  |
 | **Framed by a host**       | `hostStructureLoader`, `readHostMolecule` (`/structure`, which carries OpenChemLib, so `/host` does not); `STRUCTURE_KINDS`, `IR_JDX_SCHEMA`, `IR_PEAKS_SCHEMA`, `RAMAN_JDX_SCHEMA`, `RAMAN_PEAKS_SCHEMA`, `BAND_STRENGTHS`, `connectHost`, `selectInputs`, `checkValue`, `kindAccepts`, `parseRequest`, `OUTPUT_DELAY` (all `/host`); `startStandInHost`, `sendStandInHostRequest`, `SCIPEAKS_ETHYLBENZENE_LOAD`, `sciPeaksEthylbenzeneIrLoad`, `sciPeaksEthylbenzeneRamanLoad` (`/host-testing`)                    | `useHostConnection` (`/host`)                                                                                                                                                                                                                                                                                   |
 | **Answer cards**           | `CARD_PARAM`, `ONLY_PARAM`, `isCardAddress`, `parseOnlyParam`, `sitePageUrl`, `cardPageUrl`, `framedPageUrl`, `roomForPanels`; `answerAddresses`, `joinAddress`, `viewOrigins`, `cardMeta`, `pageAnswer`, `siteView` (all `/server`)                                                                                                                                                                                                                                                                                  | `CardFrame`, `CardDetailsButton`, `CardStatus`, `CardMissing`, `CardFigure`, `CopyTableButton`, `fitCardToFrame`, `useFitCardToFrame`, `useOverlayRoom`, `holdRoomForPanels` (all `/card`); `StructureExportButton`, `useStructureDraft` (`/structure`)                                                         |
+| **Browser suites**         | `splitBar`, `dragSplitBar`, `splitShare`, `rectOf`, `collectPageErrors`, `canvasSignature`, `waitForStableCanvas`, `buildBadgePattern`, `readFold`, `readImagesLoaded`, `noFixedWaitRules` (all `/playwright`); `standInHostAnswer`, `sendWhenConnected`, `standInHostFigure`, `sharedLink`, `copiedFrame`, `copyByClick`, `readToolCard`, `frameInSandbox`, `settledCardHeight`, `stubFolderPicker` (all `/host-testing`)                                                                                            | —                                                                                                                                                                                                                                                                                                               |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -1479,6 +1480,21 @@ machine more of them only time out. `PLAYWRIGHT_WORKERS` — a count, or a share
 of the cores such as `25%` — sets the number on any machine, over a site's own
 `overrides.workers` and over CI.
 
+The same entry holds what a spec measures the family's components with, so a
+change to their markup updates one file rather than every suite. A split is read
+as it is drawn: `splitBar(page)` is the bar after the first pane, `splitShare(bar)`
+the share the pane beside it takes, and `dragSplitBar(page, bar, by)` takes it
+and lets it go. `collectPageErrors(page)` collects what a page throws, for a
+test to hold against `[]`; `canvasSignature` and the waits beside it read what a
+WebGL canvas shows; `buildBadgePattern(version)` is what the About's build badge
+reads. None of them asserts: the site's spec keeps every expectation.
+
+```ts
+const bar = splitBar(page);
+await dragSplitBar(page, bar, -260);
+expect(await splitShare(bar)).toBeCloseTo(30, -0.5);
+```
+
 `react-cheminfo/host-testing` serves a stand-in host for Playwright on
 `127.0.0.1`, and exports `SCIPEAKS_ETHYLBENZENE_LOAD`: the message SciPeaks'
 tool tab sends for a sample, byte for byte. visualizer-helper's tests pin the
@@ -1499,6 +1515,15 @@ bands translated as its readers are to translate them — the letter to a word,
 the visualizer's `_highlight` dropped, a spectrum with no bands sent without
 `peaks`. Hand them the attachments' JCAMP-DX. `sendStandInHostRequest` sends a
 later `get`.
+
+The test's side of that host is there too: `standInHostAnswer(page, id)` waits
+for the answer to one request, `sendWhenConnected` sends once the site has
+connected, `standInHostFigure` asks for the `figure` output, and
+`framedAddress` reads where the framed site is. Beside them sit the reads a spec
+makes of the family's chrome: `sharedLink` and `copiedFrame` for the share
+dialog, `copyByClick` for a `<ClickToCopy>`, `readToolCard` for the card a tool
+server's answer carries, `frameInSandbox` and `settledCardHeight` for a framed
+card, and `stubFolderPicker` for the folder panel.
 
 ## Reading what a link asks for
 
