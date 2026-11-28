@@ -14,6 +14,12 @@ export interface CardFrameProps {
    */
   className?: string;
   /**
+   * Lay the card out as a column, its parts 8px apart, for a card whose parts
+   * carry no margin of their own: `card--stack`.
+   * @default false - the parts are blocks, spaced by their own margins
+   */
+  stack?: boolean;
+  /**
    * Value of the `data-testid` attribute.
    * @default 'card'
    */
@@ -27,17 +33,17 @@ export interface CardFrameProps {
  * so the frame holds that too; opened on its own, it is a page like any other.
  *
  * `react-cheminfo/styles/card.css` draws it: no margin on the page around it,
- * the chat's corner left free by `card__header`, and the row of actions at its
- * end, `card__end`.
+ * the chat's corner left free by `card__header`, and the last row of actions
+ * and folds, `CardFoot`.
  * @param props - See {@link CardFrameProps}.
  * @returns The card's root element.
  */
 export function CardFrame(props: CardFrameProps): ReactElement {
-  const { children, className, testId = 'card' } = props;
+  const { children, className, stack = false, testId = 'card' } = props;
   return (
     <div
       ref={fitCardToFrame}
-      className={joinClassNames('card', className)}
+      className={joinClassNames('card', stack && 'card--stack', className)}
       data-testid={testId}
     >
       {children}

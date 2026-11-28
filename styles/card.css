@@ -43,8 +43,9 @@ body:has(.card) {
   color: var(--text-muted);
 }
 
-/* The last row of a card: a remark, then the actions — copying its table, the
-   way to the site's page — keeping its right edge together. */
+/* A row of a remark, then the actions — copying its table, the way to the
+   site's page — keeping its right edge together: what a card shows until its
+   answer comes. */
 .card__end {
   display: flex;
   flex-wrap: wrap;
@@ -60,6 +61,120 @@ body:has(.card) {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.8125rem;
+}
+
+/* A card laid out as a column: its parts carry no margin of their own. */
+.card--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The one value the question asked for, read before anything else. */
+.card__value {
+  width: fit-content;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.card__line {
+  margin: 2px 0 0;
+}
+
+/* A line while the answer is computed: a small spinner, and what is done. */
+.card__wait {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  gap: 8px;
+}
+
+/* ── The last row: what is folded away, and the actions ─────────────────── */
+
+/* Under a line, as on every card of the family. A column of a card already
+   keeps its parts apart, so the row adds no margin there. */
+.card__foot {
+  display: flow-root;
+  min-height: 24px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.card--stack > .card__foot {
+  margin-top: 0;
+}
+
+/* The actions float: a remark or the line of a fold keeps clear of them,
+   whatever length their labels take in the page's language, while what a
+   fold opens below them takes the card's whole width. The buttons are 5px
+   taller than the row holds: they hang into the card's padding below it
+   rather than growing the card. */
+.card__actions {
+  display: flex;
+  align-items: center;
+  margin-bottom: -5px;
+  margin-left: 8px;
+  float: right;
+  gap: 4px;
+}
+
+.card__foot > .card__note {
+  padding: 3px 0;
+}
+
+.card-fold > summary {
+  padding: 3px 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.card-fold[open] > summary {
+  margin-bottom: 6px;
+}
+
+/* What a fold opens on starts below the actions, the card's whole width. */
+.card-fold__body {
+  clear: both;
+}
+
+.card-fold__body--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── The key numbers a card leads with ──────────────────────────────────── */
+
+.card-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 18px;
+}
+
+.card-fact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.card-fact__label,
+.card-fact__detail {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.card-fact__value {
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
 /* A card whose answer is on its way, or could not be had: the spinner or the

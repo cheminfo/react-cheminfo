@@ -1,8 +1,9 @@
-import { siteById } from '../ecosystem/core/lookup.ts';
-import type { SiteId } from '../ecosystem/core/sites.ts';
+import type { SiteId, SiteRecord } from '../ecosystem/core/sites.ts';
 import { siteUrl } from '../ecosystem/core/sites.ts';
 import { normalizeBasePath } from '../router/core/basePath.ts';
+import { resolveSite } from '../seo/core/siteFiles.ts';
 
+import type { AnswerAddresses } from './answerAddresses.ts';
 import { readEnvNumber } from './envNumber.ts';
 import { parseTrustProxy } from './trustProxy.ts';
 
@@ -80,15 +81,67 @@ export function readServerConfig(
     port,
     host: env.HOST?.trim() || '0.0.0.0',
     trackingScript: env.TRACKING_SCRIPT?.trim() || undefined,
-    siteUrl: readHttpAddress(
-      env,
-      'SITE_URL',
-      siteUrl(siteById(options.siteId)),
-    ),
-    publicUrl: readHttpAddress(env, 'PUBLIC_URL', `http://localhost:${port}/`),
+    ...siteAnswerAddresses(env, { site: options.siteId, port }),
     trustProxy: parseTrustProxy(env.TRUST_PROXY),
     root: env.SERVER_ROOT?.trim() || options.root || 'dist',
     basePath: normalizeBasePath(env.BASE_PATH ?? ''),
+  };
+}
+
+/** What {@link siteAnswerAddresses} knows before it reads the environment. */
+export interface SiteAnswerAddressOptions {
+  /**
+   * The site: an id of `ECOSYSTEM_SITES`, or the record of a site outside
+   * the family. `https://<host>/` is the default `SITE_URL`.
+   */
+  site: SiteId | SiteRecord;
+  /**
+   * The port this server listens on, for the default `PUBLIC_URL`,
+   * `http://localhost:<port>/`.
+   * @default undefined - `PUBLIC_URL` falls back to the site's address
+   */
+  port?: number;
+  /**
+   * This server serves the site itself: a deployment naming `SITE_URL` and no
+   * `PUBLIC_URL` is framed on `SITE_URL`.
+   * @default false
+   */
+  servesSite?: boolean;
+}
+
+/**
+ * Read where a tool server's answers point, once, at startup: `SITE_URL`, the
+ * site people share, which every `link` names, and `PUBLIC_URL`, this server,
+ * whose pages a chat frames. A blank variable counts as unset, since compose
+ * forwards `${VAR:-}`. `PUBLIC_URL` falls back to `SITE_URL` when this server
+ * serves the site and the deployment named one, else to
+ * `http://localhost:<port>/`, else to the site's address.
+ *
+ *   const addresses = siteAnswerAddresses(process.env, {
+ *     site: 'chembio',
+ *     port: 10_630,
+ *     servesSite: true,
+ *   });
+ * @param env - The environment, e.g. `process.env`.
+ * @param options - The site, the port, and whether this server serves it.
+ * @returns The two addresses, each ending in `/`.
+ * @throws {Error} When `SITE_URL` or `PUBLIC_URL` is not an http or https
+ * address.
+ */
+export function siteAnswerAddresses(
+  env: ServerEnvironment,
+  options: SiteAnswerAddressOptions,
+): AnswerAddresses {
+  const { site, port, servesSite = false } = options;
+  const shared = readHttpAddress(env, 'SITE_URL', siteUrl(resolveSite(site)));
+  const named = (env.SITE_URL?.trim() ?? '') !== '';
+  const fallback =
+    (servesSite && named) || port === undefined
+      ? shared
+      : `http://localhost:${port}/`;
+  return {
+    siteUrl: shared,
+    publicUrl: readHttpAddress(env, 'PUBLIC_URL', fallback),
   };
 }
 

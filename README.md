@@ -234,6 +234,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Framed by a host**       | `hostStructureLoader`, `readHostMolecule` (`/structure`, which carries OpenChemLib, so `/host` does not); `STRUCTURE_KINDS`, `IR_JDX_SCHEMA`, `IR_PEAKS_SCHEMA`, `RAMAN_JDX_SCHEMA`, `RAMAN_PEAKS_SCHEMA`, `BAND_STRENGTHS`, `connectHost`, `selectInputs`, `checkValue`, `kindAccepts`, `parseRequest`, `OUTPUT_DELAY` (all `/host`); `startStandInHost`, `sendStandInHostRequest`, `SCIPEAKS_ETHYLBENZENE_LOAD`, `sciPeaksEthylbenzeneIrLoad`, `sciPeaksEthylbenzeneRamanLoad` (`/host-testing`)                    | `useHostConnection` (`/host`)                                                                                                                                                                                                                                                                                   |
 | **Answer cards**           | `CARD_PARAM`, `ONLY_PARAM`, `isCardAddress`, `parseOnlyParam`, `sitePageUrl`, `cardPageUrl`, `framedPageUrl`, `roomForPanels`; `answerAddresses`, `joinAddress`, `viewOrigins`, `cardMeta`, `pageAnswer`, `siteView` (all `/server`)                                                                                                                                                                                                                                                                                  | `CardFrame`, `CardDetailsButton`, `CardStatus`, `CardMissing`, `CardFigure`, `CopyTableButton`, `fitCardToFrame`, `useFitCardToFrame`, `useOverlayRoom`, `holdRoomForPanels` (all `/card`); `StructureExportButton`, `useStructureDraft` (`/structure`)                                                         |
 | **Browser suites**         | `splitBar`, `dragSplitBar`, `splitShare`, `rectOf`, `collectPageErrors`, `canvasSignature`, `waitForStableCanvas`, `buildBadgePattern`, `readFold`, `readImagesLoaded`, `noFixedWaitRules` (all `/playwright`); `standInHostAnswer`, `sendWhenConnected`, `standInHostFigure`, `sharedLink`, `copiedFrame`, `copyByClick`, `readToolCard`, `frameInSandbox`, `settledCardHeight`, `stubFolderPicker` (all `/host-testing`)                                                                                            | —                                                                                                                                                                                                                                                                                                               |
+| **A card's parts**         | `pagePath`, `withQuery`; `siteAnswerAddresses`, `siteToolRoutes`, `siteViewUri` (all `/server`); `addedStructureOutputs` (`/host`)                                                                                                                                                                                                                                                                                                                                                                                    | `CardAnswer`, `CardFoot`, `CardFold`, `CardFacts`, `CardWaiting` (all `/card`)                                                                                                                                                                                                                                  |
 
 Everything in that table is exported from `./core`, `./ui`, `./slides`,
 `./vite` or `./structure` and nothing else is: the sub-components a component is built
@@ -2273,10 +2274,19 @@ import {
   answerAddresses,
   cardMeta,
   pageAnswer,
+  siteAnswerAddresses,
+  siteToolRoutes,
   siteView,
 } from 'react-cheminfo/server';
 
 const addresses = answerAddresses({ siteUrl, publicUrl });
+// Or read off the environment, as a backend serving its own site does:
+// PUBLIC_URL, else SITE_URL when one is named, else http://localhost:10630/.
+const fromEnv = siteAnswerAddresses(process.env, {
+  site: 'chembio',
+  port: 10_630,
+  servesSite: true,
+});
 // { link: 'https://equilibrium.cheminfo.org/titration?ind=thymol', meta }
 const answer = pageAnswer(addresses, '/titration', { ind: 'thymol' });
 // A query written by the site's own codec, and what only the card reads.
@@ -2285,7 +2295,22 @@ const meta = cardMeta(addresses, `/?${libraryQuery}`, {
   extra: { rows: '10' },
 });
 const view = siteView({ uri: 'ui://vcl/page', name, description, addresses });
+// The whole of createToolRoutes' options: the host as the name, the view
+// ui://<id>/page framed from both addresses, every origin allowed.
+const routes = siteToolRoutes({
+  site: 'vcl',
+  addresses,
+  version,
+  instructions,
+  tools,
+  examples,
+  view: { description: 'The library on vcl.cheminfo.org, as a card.' },
+});
 ```
+
+A link of an answer is written with `pagePath('/formats', { q, direction })`,
+from `react-cheminfo/core`, which writes the query as the page reads it back
+and no `?` when nothing is set.
 
 **A precise question gets a card about that and nothing else.** A tool that
 looks one thing up — a compound, an element, a molecule's predictions — takes
@@ -2315,12 +2340,7 @@ The card itself is drawn with `react-cheminfo/card` and
 
 ```tsx
 import 'react-cheminfo/styles/card.css';
-import {
-  CardDetailsButton,
-  CardFigure,
-  CardFrame,
-  CopyTableButton,
-} from 'react-cheminfo/card';
+import { CardFigure, CardFoot, CardFrame } from 'react-cheminfo/card';
 import { StructureExportButton } from 'react-cheminfo/structure';
 
 <CardFrame>
@@ -2331,12 +2351,35 @@ import { StructureExportButton } from 'react-cheminfo/structure';
   >
     <TitrationChart />
   </CardFigure>
-  <div className="card__end">
-    <CopyTableButton table={() => toDelimited(rows)} />
-    <CardDetailsButton address={{ cardParams: ['scale', 'ph'] }} />
-  </div>
+  <CardFoot
+    table={{ table: () => toDelimited(rows) }}
+    address={{ cardParams: ['scale', 'ph'] }}
+  />
 </CardFrame>;
 ```
+
+`CardFoot` is the card's last row, under a line: the card's own `actions`, the
+copy of its `table` and Details, floated right, so a `note` or the line of a
+`CardFold` keeps clear of them while what a fold opens takes the card's whole
+width. `CardAnswer` is the whole card most sites write: a `lead` on the line
+that leaves the chat's corner free, its `children`, and the foot, with `more`
+folded away — whose `table` is copied while it is open, unless the card has a
+`table` of its own:
+
+```tsx
+<CardAnswer
+  className="answer-card"
+  lead={<div className="card__value">pH 8.72</div>}
+  more={{ summary: 'How it was computed', content: <Points />, table }}
+>
+  <TitrationChart />
+</CardAnswer>
+```
+
+A card laid out as a column passes `stack` to `CardFrame` (or `CardAnswer`),
+and its parts are 8px apart with no margin of their own. Its key numbers are
+`<CardFacts facts={[{ label: 'HOMO', value: '−12.18 eV' }]} />`, each copied by
+a click unless `copy: false`.
 
 `CardFrame` reports the card's height to the frame and grows the card while a
 dialog or a popover it opened is open, so the frame holds it — only when the
@@ -2347,7 +2390,9 @@ when framed and in place otherwise. Their words come from the chrome's
 catalog, in the language of the page.
 
 Until its answer comes, a card shows `<CardStatus failure={error} />`: a
-spinner, then why the answer could not be had, with Details either way. A page
+spinner, with what is being done when `waiting` says so, then why the answer
+could not be had, with Details either way. A line further down the card says
+the same with `<CardWaiting>Counting…</CardWaiting>`. A page
 that has no card shows `<CardMissing />`.
 
 A site's end-to-end tests frame a card as a chat does, three frames deep and

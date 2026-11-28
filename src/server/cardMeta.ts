@@ -6,7 +6,7 @@
 
 import type { CardPageOptions } from '../card/core/cardPageUrl.ts';
 import { cardPageUrl, framedPageUrl } from '../card/core/cardPageUrl.ts';
-import { formatQueryString } from '../router/core/query.ts';
+import { pagePath } from '../card/core/pagePath.ts';
 
 import type { AnswerAddressesInput } from './answerAddresses.ts';
 import { joinAddress } from './answerAddresses.ts';
@@ -79,8 +79,7 @@ export function pageAnswer(
   params: Readonly<Record<string, string | undefined>> = {},
   options: CardMetaOptions = {},
 ): PageAnswer {
-  const query = formatQueryString(params);
-  const page = query === '' ? path : `${path}?${query}`;
+  const page = pagePath(path, params);
   return {
     link: joinAddress(addresses.siteUrl, page),
     meta: cardMeta(addresses, page, options),

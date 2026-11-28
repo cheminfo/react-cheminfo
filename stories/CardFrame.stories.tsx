@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { CardDetailsButton } from '../src/card/ui/CardDetailsButton.tsx';
 import { CardFigure } from '../src/card/ui/CardFigure.tsx';
+import { CardFoot } from '../src/card/ui/CardFoot.tsx';
 import { CardFrame } from '../src/card/ui/CardFrame.tsx';
-import { CopyTableButton } from '../src/card/ui/CopyTableButton.tsx';
 import { Structure } from '../src/structure/ui/Structure.tsx';
 import { StructureExportButton } from '../src/structure/ui/StructureExportButton.tsx';
 
@@ -20,7 +19,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The page a chat frames inline for one answer — a site page under `?embed=1&card=1` — drawn by `react-cheminfo/styles/card.css`. Framed, it reports its height so the frame fits it, and grows while a panel it opened is open. Its first line leaves the chat’s corner free (`card__header`), and its last row (`card__end`) holds the copy of its table and the way to the site’s page.',
+          'The page a chat frames inline for one answer — a site page under `?embed=1&card=1` — drawn by `react-cheminfo/styles/card.css`. Framed, it reports its height so the frame fits it, and grows while a panel it opened is open. Its first line leaves the chat’s corner free (`card__header`), and its last row (`CardFoot`) holds the copy of its table and the way to the site’s page.',
       },
     },
   },
@@ -42,14 +41,13 @@ export const Default: Story = {
         <CardFigure fileName="acetic-acid-titration">
           <TitrationCurve />
         </CardFigure>
-        <div className="card__end">
-          <p className="card__note">Phenolphthalein marks the equivalence.</p>
-          <CopyTableButton
-            table={titrationTable}
-            tooltip="Copy the curve as a table, to paste into a spreadsheet"
-          />
-          <CardDetailsButton />
-        </div>
+        <CardFoot
+          note="Phenolphthalein marks the equivalence."
+          table={{
+            table: titrationTable,
+            tooltip: 'Copy the curve as a table, to paste into a spreadsheet',
+          }}
+        />
       </CardFrame>
     </ChatFrame>
   ),
@@ -68,9 +66,7 @@ export const WithStructure: Story = {
         >
           <Structure smiles={CAFFEINE} width={240} height={160} />
         </CardFigure>
-        <div className="card__end">
-          <CardDetailsButton />
-        </div>
+        <CardFoot />
       </CardFrame>
     </ChatFrame>
   ),

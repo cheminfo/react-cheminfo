@@ -4,8 +4,13 @@ export type {
   ServerConfig,
   ServerConfigOptions,
   ServerEnvironment,
+  SiteAnswerAddressOptions,
 } from './server/config.ts';
-export { readHttpAddress, readServerConfig } from './server/config.ts';
+export {
+  readHttpAddress,
+  readServerConfig,
+  siteAnswerAddresses,
+} from './server/config.ts';
 export type { ReadEnvNumberOptions } from './server/envNumber.ts';
 export { readEnvNumber } from './server/envNumber.ts';
 export type { HealthRouteOptions } from './server/healthRoute.ts';
@@ -40,3 +45,8 @@ export type { CardMetaOptions, PageAnswer } from './server/cardMeta.ts';
 export { cardMeta, pageAnswer } from './server/cardMeta.ts';
 export type { SiteViewOptions } from './server/siteView.ts';
 export { siteView } from './server/siteView.ts';
+export type {
+  SiteToolRoutesOptions,
+  SiteToolView,
+} from './server/siteToolRoutes.ts';
+export { siteToolRoutes, siteViewUri } from './server/siteToolRoutes.ts';
