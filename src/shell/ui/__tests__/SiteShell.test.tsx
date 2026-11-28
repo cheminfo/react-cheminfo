@@ -143,14 +143,14 @@ test('a page bringing its own main landmark is drawn in a div', () => {
   expect(host.querySelector('[data-testid="page-api"]')?.tagName).toBe('DIV');
 });
 
-test('a workbench fills the window, its page a column with no gutter', () => {
-  render({ fill: true, width: 'full', mainClassName: 'bench-main' });
+test('a full-width workbench fills the window, its page a column with no gutter', () => {
+  render({ fit: true, width: 'full', mainClassName: 'bench-main' });
 
   expect(host.querySelector('.site-shell')?.className).toBe(
-    'site-shell site-shell--fill',
+    'site-shell site-shell--fit',
   );
   expect(host.querySelector('main')?.className).toBe(
-    'site-shell__main site-shell__main--full site-shell__main--fill bench-main',
+    'site-shell__main site-shell__main--full site-shell__main--fit bench-main',
   );
 });
 

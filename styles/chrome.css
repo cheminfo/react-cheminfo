@@ -2434,24 +2434,6 @@ span.taxon-lineage__name {
   }
 }
 
-/* A workbench fills the window under the bar: the page itself never scrolls,
-   the tool takes the height there is and each panel scrolls inside itself, so
-   the footer stays below the fold. */
-.site-shell--fill {
-  height: 100dvh;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.site-shell__main.site-shell__main--fill {
-  display: flex;
-  min-height: 0;
-  flex: 1 1 1px;
-  flex-direction: column;
-  padding: 0;
-  overflow: hidden;
-}
-
 /* ── The About's hero ────────────────────────────────────────────────────── */
 
 /* The build stamp and the sign-in sit in the hero's corner. */

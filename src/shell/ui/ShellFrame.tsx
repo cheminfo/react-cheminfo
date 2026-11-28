@@ -48,7 +48,6 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
     about = false,
     contact,
     belowHeader,
-    fill: fillsWindow = false,
     mainClassName,
     mainTestId,
     mainElement: Main = 'main',
@@ -71,7 +70,6 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
         className={joinClassNames(
           'site-shell',
           fit === false ? undefined : 'site-shell--fit',
-          fillsWindow ? 'site-shell--fill' : undefined,
         )}
       >
         <SiteHeader
@@ -99,7 +97,6 @@ export function ShellFrame<Codecs extends ShareParamCodecs, Tab extends string>(
             fit === false ? undefined : 'site-shell__main--fit',
             fit === 'row' ? 'site-shell__main--fit-row' : undefined,
             embedded ? 'site-shell__main--embedded' : undefined,
-            fillsWindow ? 'site-shell__main--fill' : undefined,
             mainClassName,
           )}
           data-testid={mainTestId}

@@ -24,7 +24,10 @@ import type { Language } from '../../i18n/core/languages.ts';
 import { DEFAULT_LANGUAGE } from '../../i18n/core/languages.ts';
 import { withLanguagePath } from '../../language/core/languagePath.ts';
 import { escapeAttribute, escapeText } from '../../share/core/escape.ts';
-import { FAMILY_TOKEN_VALUES } from '../../tokens/core/familyTokens.ts';
+import {
+  FAMILY_FONT,
+  FAMILY_TOKEN_VALUES,
+} from '../../tokens/core/familyTokens.ts';
 import { resolveSite } from '../core/siteFiles.ts';
 
 /** What the page needs beyond the site's record. */
@@ -183,8 +186,7 @@ function pageStyle(site: SiteRecord): string {
         display: flex;
         min-height: 100dvh;
         flex-direction: column;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif;
+        font-family: ${FAMILY_FONT};
         font-size: 15px;
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
