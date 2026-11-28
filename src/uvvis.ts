@@ -46,3 +46,22 @@ export type {
   UvVisEditorProps,
 } from './ir/ui/UvVisEditor.tsx';
 export { UvVisEditor } from './ir/ui/UvVisEditor.tsx';
+export type { ReadHostUvSpectraOptions } from './ir/core/hostUvSpectra.ts';
+export { readHostUvSpectra } from './ir/core/hostUvSpectra.ts';
+export type {
+  HostSpectraSession,
+  HostSpectraSessionOptions,
+  HostSpectraTab,
+} from './ir/core/hostSpectraSession.ts';
+export { createHostSpectraSession } from './ir/core/hostSpectraSession.ts';
+export type {
+  HostItemName,
+  HostSpectra,
+  HostSpectrumItem,
+} from './ir/core/hostSpectraRead.ts';
+export { NO_HOST_SPECTRA } from './ir/core/hostSpectraRead.ts';
+export type {
+  SpectraDocument,
+  SpectraDocumentOptions,
+} from './ir/ui/useSpectraDocument.tsx';
+export { useSpectraDocument } from './ir/ui/useSpectraDocument.tsx';

@@ -12,3 +12,5 @@ export type { SettingsGroupProps } from './SettingsGroup.tsx';
 export { SettingsGroup } from './SettingsGroup.tsx';
 export type { WorkspaceBarProps } from './WorkspaceBar.tsx';
 export { WorkspaceBar } from './WorkspaceBar.tsx';
+export type { SettingsButtonProps } from './SettingsButton.tsx';
+export { SettingsButton } from './SettingsButton.tsx';

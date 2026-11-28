@@ -130,3 +130,15 @@ export type { ToolHelp } from './toolCredits.ts';
 export type { ToolHello } from './toolMessages.ts';
 export type { SendOffer, SendTarget } from './sendTargets.ts';
 export { sendTargets } from './sendTargets.ts';
+export { findFigureFile, mayBeFigureFile } from './figureFiles.ts';
+export type { CarriedValueOptions } from './carriedValue.ts';
+export { carriedValue } from './carriedValue.ts';
+export type { FramedSiteOriginOptions } from './framedOrigins.ts';
+export { framedSiteOrigin, localOrigins } from './framedOrigins.ts';
+export type {
+  FigureTool,
+  FigureToolOptions,
+  ScreenFigure,
+  ScreenFigureRegistry,
+} from './figureTool.ts';
+export { createScreenFigure, figureTool } from './figureTool.ts';

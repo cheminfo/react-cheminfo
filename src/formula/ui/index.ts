@@ -8,3 +8,4 @@ export type { QuestionFormulaProps } from './QuestionFormula.tsx';
 export { QuestionFormula } from './QuestionFormula.tsx';
 export type { QuestionCompoundProps } from './QuestionCompound.tsx';
 export { QuestionCompound } from './QuestionCompound.tsx';
+export { renderMf } from './renderMf.tsx';

@@ -7,6 +7,7 @@ import { act } from 'react';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { mountRoot, root, unmountRoot } from '../../../__tests__/root.ts';
+import { withFigureSource } from '../../../download/core/figureSource.ts';
 import { readSiteDocument } from '../../../storage/core/siteDocument.ts';
 import { useSaveFigureAs } from '../useSaveFigureAs.tsx';
 
@@ -155,4 +156,68 @@ test('a site keeping no workspace saves its document with the figure alone', asy
   );
 
   expect(saved.preferences).toBeUndefined();
+});
+
+function SavingAtOnce(props: {
+  figure: () => Promise<string | undefined>;
+}): ReactElement {
+  const saveAs = useSaveFigureAs({
+    site: 'lcao',
+    figure: props.figure,
+    stem: () => 'CCO',
+  });
+  return (
+    <>
+      <button type="button" id="save" onClick={saveAs.save} />
+      {saveAs.dialog}
+    </>
+  );
+}
+
+function pressSave(figure: () => Promise<string | undefined>): void {
+  act(() => {
+    root.render(<SavingAtOnce figure={figure} />);
+  });
+  act(() => {
+    document.querySelector<HTMLButtonElement>('#save')?.click();
+  });
+}
+
+test('Save writes the site’s figure at once, named by the site it says drew it', async () => {
+  const figure = await withFigureSource(SVG, {
+    site: 'lcao',
+    href: 'https://lcao.cheminfo.org/?smiles=CCO',
+  });
+  pressSave(async () => figure);
+
+  await vi.waitFor(() => {
+    expect(downloads).toHaveLength(1);
+  });
+
+  expect(downloads[0]?.name).toBe('CCO.lcao.svg');
+  expect(downloads[0]?.blob.type).toBe('image/svg+xml;charset=utf-8');
+  await expect(downloads[0]?.blob.text()).resolves.toBe(figure);
+});
+
+test('Save does nothing while there is no figure', async () => {
+  pressSave(async () => undefined);
+  await act(async () => {
+    await Promise.resolve();
+  });
+
+  expect(downloads).toHaveLength(0);
+});
+
+test('Save says why it failed, in the same alert as Save as', async () => {
+  pressSave(async () => {
+    throw new Error('The viewer is not ready.');
+  });
+
+  await vi.waitFor(() => {
+    expect(document.querySelector('.bp6-alert-contents')?.textContent).toBe(
+      'The viewer is not ready.',
+    );
+  });
+
+  expect(downloads).toHaveLength(0);
 });

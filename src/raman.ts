@@ -25,3 +25,22 @@ export type {
   RamanEditorProps,
 } from './ir/ui/RamanEditor.tsx';
 export { RamanEditor } from './ir/ui/RamanEditor.tsx';
+export { readHostRamanSpectra } from './ir/core/hostIrSpectra.ts';
+export type {
+  HostSpectraSession,
+  HostSpectraSessionOptions,
+  HostSpectraTab,
+} from './ir/core/hostSpectraSession.ts';
+export { createHostSpectraSession } from './ir/core/hostSpectraSession.ts';
+export type {
+  HostItemName,
+  HostSpectra,
+  HostSpectrumItem,
+} from './ir/core/hostSpectraRead.ts';
+export { NO_HOST_SPECTRA } from './ir/core/hostSpectraRead.ts';
+export { spectrumLabel } from './ir/core/spectrumLabel.ts';
+export type {
+  SpectraDocument,
+  SpectraDocumentOptions,
+} from './ir/ui/useSpectraDocument.tsx';
+export { useSpectraDocument } from './ir/ui/useSpectraDocument.tsx';

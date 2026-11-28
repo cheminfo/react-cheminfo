@@ -24,6 +24,8 @@ export * from './moleculesSources/core/index.ts';
 export * from './moleculesToken/core/index.ts';
 export * from './number/core/index.ts';
 export * from './orbital/core/index.ts';
+// OSIRIS predictions, OpenChemLib handed in by the caller.
+export * from './osiris/core/index.ts';
 // Only what the overlay ui's own props point a caller at: the rest of the
 // geometry of the floating cards is the ui's.
 export type {

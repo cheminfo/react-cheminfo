@@ -1,5 +1,12 @@
 import { XSadd } from 'ml-xsadd';
 
+import {
+  causeOf,
+  gzipBody,
+  messageOf,
+  pause,
+  retryAfter,
+} from '../../fetch/core/requestRetry.ts';
 import { requestSignal } from '../../fetch/core/requestSignal.ts';
 import { trimTrailingSlash } from '../../router/core/address.ts';
 
@@ -15,13 +22,6 @@ import type {
   PurgeResponse,
   SubmitResponse,
 } from './moleculesTypes.ts';
-import {
-  causeOf,
-  gzipBody,
-  messageOf,
-  pause,
-  retryAfter,
-} from './requestRetry.ts';
 
 /** Statuses a request is tried again on: the server is busy or in between. */
 const RETRIED_STATUSES = new Set([429, 502, 503, 504]);

@@ -20,3 +20,5 @@ export {
   DEFAULT_COPY_RESET_AFTER,
   useCopyToClipboard,
 } from './useCopyToClipboard.ts';
+export type { CopyState } from './copyState.ts';
+export { copyStateIcon, copyStateLabel } from './copyState.ts';

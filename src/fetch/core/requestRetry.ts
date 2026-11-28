@@ -24,6 +24,17 @@ export function retryAfter(
 }
 
 /**
+ * Whether an answer of this status may come out differently the next time:
+ * no answer at all (`0`, the network failed), throttling (429) or a server
+ * error (5xx). Any other refusal would be given again.
+ * @param status - The HTTP status, `0` when no answer came back.
+ * @returns True when asking again is worth it.
+ */
+export function isRetryableStatus(status: number): boolean {
+  return status === 0 || status === 429 || status >= 500;
+}
+
+/**
  * The message of an error body Fastify wrote, or the body itself.
  * @param text - The body.
  * @returns The message, or `undefined` when the body is empty.

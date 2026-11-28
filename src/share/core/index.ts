@@ -68,6 +68,9 @@ export {
   syncPreferencesWithUrl,
   writePreferencesToSearch,
 } from './preferences.ts';
+export type { HiddenParts, PageShareOptions } from './shareParts.ts';
+export { createHiddenParts, pickShareParts } from './shareParts.ts';
+export { signalPreference } from './signalPreference.ts';
 export type { SharePreset } from './presets.ts';
 export { applySharePreset, findSharePreset } from './presets.ts';
 export type { SealProblem, UnsealResult } from './seal.ts';

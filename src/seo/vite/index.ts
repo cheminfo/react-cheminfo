@@ -6,3 +6,7 @@ export type { PrerenderOptions } from './prerenderOptions.ts';
 export { cheminfoPrerender } from './prerender.ts';
 export type { RouteTableOptions } from './routeTable.ts';
 export { cheminfoRouteTable } from './routeTable.ts';
+export type { FaviconMarkupOptions } from './faviconMarkup.ts';
+export { faviconMarkup } from './faviconMarkup.ts';
+export type { WriteOgCardOptions } from './writeOgCard.ts';
+export { writeOgCard } from './writeOgCard.ts';

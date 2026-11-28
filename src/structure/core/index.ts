@@ -20,6 +20,8 @@ export {
   relativeEnergyOf,
   totalEnergyOf,
 } from './conformerEnergy.ts';
+export type { CanonicalIdCodeOptions } from './canonicalIdCode.ts';
+export { isIdCodeText, readCanonicalIdCode } from './canonicalIdCode.ts';
 export type { EditorLine, EditorValue } from './editorValue.ts';
 export type { IdCodeValue } from './editorValue.ts';
 export {

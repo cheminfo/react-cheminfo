@@ -26,6 +26,8 @@ export {
   pageLanguage,
 } from './pageMeta.ts';
 export type { PageContent, PageSection, PageTable } from './pageProse.ts';
+export type { FitTitleOptions } from './fitTitle.ts';
+export { fitTitle } from './fitTitle.ts';
 export type { PlainDescriptionOptions } from './plainDescription.ts';
 export { plainDescription, plainProse } from './plainDescription.ts';
 export type { RobotsDisallow } from './robots.ts';

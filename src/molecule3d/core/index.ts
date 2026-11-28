@@ -78,3 +78,11 @@ export {
   readMolecule3DSettings,
   writeMolecule3DSettings,
 } from './settingSignals.ts';
+export type {
+  LinkedMolecule3DSettings,
+  Molecule3DSettingCells,
+} from './linkedSettings.ts';
+export {
+  linkedMolecule3DSettings,
+  molecule3DSettingSignals,
+} from './linkedSettings.ts';

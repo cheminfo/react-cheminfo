@@ -63,3 +63,8 @@ export { sameIrReadout, useIrPointer } from './useIrPointer.ts';
 export { useIrShortcuts } from './useIrShortcuts.ts';
 export type { IrZoomOptions } from './useIrZoom.ts';
 export { useIrZoom } from './useIrZoom.ts';
+export type {
+  SpectraDocument,
+  SpectraDocumentOptions,
+} from './useSpectraDocument.tsx';
+export { selectedStem, useSpectraDocument } from './useSpectraDocument.tsx';

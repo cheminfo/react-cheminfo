@@ -3,12 +3,17 @@
  */
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 
 import type { Plugin } from 'vite';
 
+import {
+  keptResources,
+  openchemlibResourcesPath,
+} from '../../server/openchemlibResources.ts';
 import { OCL_RESOURCES_FILE } from '../../worker/core/oclResourcesUrl.ts';
+
+export { keptResources } from '../../server/openchemlibResources.ts';
 
 /** The torsion database the conformer generator reads, and the MMFF94 tables. */
 export const OCL_CONFORMER_RESOURCES = [
@@ -58,10 +63,7 @@ export function openchemlibResources(
   return {
     name: 'cheminfo-openchemlib-resources',
     configResolved(config) {
-      const require = createRequire(join(config.root, 'package.json'));
-      const path = require
-        .resolve('openchemlib')
-        .replace(/openchemlib\.js$/, 'resources.json');
+      const path = openchemlibResourcesPath(config.root);
       const kept = keptResources(
         JSON.parse(readFileSync(path, 'utf8')) as Record<string, string>,
         keep,
@@ -90,25 +92,6 @@ export function openchemlibResources(
       }
     },
   };
-}
-
-/**
- * The entries of `resources.json` whose key starts with one of the prefixes.
- * @param all - Every entry of the file.
- * @param keep - Prefixes of the keys to keep.
- * @returns The entries kept.
- */
-export function keptResources(
-  all: Record<string, string>,
-  keep: readonly string[],
-): Record<string, string> {
-  const kept: Record<string, string> = {};
-  for (const key of Object.keys(all)) {
-    if (keep.some((prefix) => key.startsWith(prefix))) {
-      kept[key] = all[key] as string;
-    }
-  }
-  return kept;
 }
 
 function readHead(path: string): string {

@@ -17,6 +17,10 @@ export type { HealthRouteOptions } from './server/healthRoute.ts';
 export { healthRoute } from './server/healthRoute.ts';
 export type { ListenSiteOptions } from './server/listenSite.ts';
 export { listenSite } from './server/listenSite.ts';
+export {
+  openchemlibResourcesPath,
+  readOpenchemlibResources,
+} from './server/openchemlibResources.ts';
 export { readRepositoryVersion } from './server/repositoryVersion.ts';
 export { readRouteTable } from './server/routeTable.ts';
 export { spaSite } from './server/spaSite.ts';

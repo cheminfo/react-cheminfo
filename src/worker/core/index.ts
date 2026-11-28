@@ -15,6 +15,8 @@ export type {
 } from './serveWorkerRequests.ts';
 export { serveWorkerRequests } from './serveWorkerRequests.ts';
 export { createWorkerChannel } from './workerChannel.ts';
+export type { WorkerPoolSizeOptions } from './workerPoolSize.ts';
+export { workerPoolSize } from './workerPoolSize.ts';
 export type {
   WorkerChannel,
   WorkerChannelOptions,

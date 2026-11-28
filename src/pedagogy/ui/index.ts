@@ -79,3 +79,7 @@ export { SERIES_COUNTS } from './seriesCounts.ts';
 export { useAttemptRecords } from './useAttemptRecords.ts';
 export type { PracticePageProps } from './PracticePage.tsx';
 export { PracticePage } from './PracticePage.tsx';
+export type { PracticeCheatsheetProps } from './PracticeCheatsheet.tsx';
+export { PracticeCheatsheet } from './PracticeCheatsheet.tsx';
+export type { ProblemCalloutProps } from './ProblemCallout.tsx';
+export { ProblemCallout } from './ProblemCallout.tsx';

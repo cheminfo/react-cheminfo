@@ -8,6 +8,13 @@ export {
 export { GFN2_XTB_PAPER, GFN2_XTB_WORK } from './gfn2Paper.ts';
 export { INCHI_PAPER, INCHI_WORK } from './inchiPaper.ts';
 export {
+  MMFF94S_PAPER,
+  MMFF94S_WORK,
+  MMFF94_PAPER,
+  MMFF94_WORK,
+} from './mmff94Paper.ts';
+export { MOLSTAR_PAPER, MOLSTAR_WORK } from './molstarPaper.ts';
+export {
   OPEN_CHEMISTRY_PAPER,
   OPEN_CHEMISTRY_WORK,
 } from './openChemistryPaper.ts';

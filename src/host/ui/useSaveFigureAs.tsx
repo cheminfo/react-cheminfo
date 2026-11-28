@@ -9,6 +9,7 @@ import type {
 } from '../../document/ui/saveDocumentTypes.ts';
 import { downloadBlob } from '../../download/core/downloadBlob.ts';
 import {
+  figureFileName,
   siteFigureExtension,
   siteFigureName,
 } from '../../download/core/figureFileName.ts';
@@ -52,6 +53,12 @@ export interface SaveFigureAsOptions {
 export interface SaveFigureAs {
   /** Ask how to save the figure: Shift+Ctrl+S, or a Save as button. */
   open: () => void;
+  /**
+   * Save the figure at once, as the site's own SVG under the stem's name:
+   * Ctrl+S. Nothing happens while there is no figure; a failure is said in
+   * the same alert as one of Save as.
+   */
+  save: () => void;
   /** The dialog, and the alert saying why a save failed. */
   dialog: ReactElement;
 }
@@ -139,7 +146,21 @@ export function useSaveFigureAs(options: SaveFigureAsOptions): SaveFigureAs {
       </Alert>
     </>
   );
+  async function saveAtOnce(): Promise<void> {
+    const svg = await figure();
+    if (svg === undefined) return;
+    downloadBlob(
+      new Blob([svg], { type: FIGURE_SVG_TYPE }),
+      figureFileName(stem(), svg),
+    );
+  }
+
   return {
+    save: () => {
+      saveAtOnce().catch((error: unknown) => {
+        setFailure(errorMessage(error));
+      });
+    },
     open: () =>
       setInitial({
         name: stem(),

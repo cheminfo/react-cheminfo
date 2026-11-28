@@ -45,6 +45,33 @@
   color-scheme: light;
 }
 
+/* Blueprint's primary intent is its own blue; on every site of the family the
+   accent is the brand, so a primary button, tag or link is drawn in it. The
+   doubled `:root` outranks Blueprint's own `:root`, whichever stylesheet a
+   site imports first. */
+:root:root {
+  --bp-intent-primary-rest: var(--accent);
+  --bp-intent-primary-hover: color-mix(in oklab, var(--accent) 85%, black);
+  --bp-intent-primary-active: color-mix(in oklab, var(--accent) 72%, black);
+  --bp-intent-primary-disabled: color-mix(in oklab, var(--accent) 55%, white);
+  --bp-typography-color-primary-rest: var(--accent);
+  --bp-typography-color-primary-hover: color-mix(
+    in oklab,
+    var(--accent) 85%,
+    black
+  );
+  --bp-typography-color-primary-active: color-mix(
+    in oklab,
+    var(--accent) 72%,
+    black
+  );
+  --bp-typography-color-primary-disabled: color-mix(
+    in oklab,
+    var(--accent) 55%,
+    white
+  );
+}
+
 /* The size goes on `body`, never on `html`: `rem` has to stay the browser's
    16px, or every measurement written here shrinks by 6.25% and the bar renders
    45px tall on one site and 48px on its sibling. */
@@ -2412,6 +2439,23 @@ span.taxon-lineage__name {
   flex-direction: row;
 }
 
+/* A scrolling box prints as the one screen it happens to show, so on paper
+   every box of the shell unfolds and the whole page comes out. */
+@media print {
+  html,
+  body,
+  #root,
+  .site-shell,
+  .site-shell__main {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .site-shell__main {
+    padding: 0 !important;
+  }
+}
+
 /* On paper the workbench gives way to what it prints: the page grows to hold
    every sheet. */
 @media print {
@@ -2431,6 +2475,213 @@ span.taxon-lineage__name {
 @media (max-width: 40rem) {
   .site-shell__main:not(.site-shell__main--embedded, .site-shell__main--fit) {
     padding-inline: 0.5rem;
+  }
+}
+
+/* ── A search's filter column ───────────────────────────────────────────── */
+
+/* Every filter of a search in one column beside the results: `<FilterColumn>`.
+   On a page it stays under the bar while the results scroll past; in a pane
+   it fills what the split row gives it. */
+.filter-column {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+.filter-column--page {
+  position: sticky;
+  top: calc(var(--header-height) + 1rem);
+  max-height: calc(100vh - var(--header-height) - 2rem);
+}
+
+/* Framed, there is no bar to stand under. */
+.site-shell__main--embedded .filter-column--page {
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+}
+
+.filter-column__header {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.filter-column__title {
+  margin: 0 auto 0 0;
+  font-size: 1rem;
+}
+
+.filter-column__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filter-column__fold {
+  display: none;
+}
+
+/* The heading of one section of filters: a word, then whatever the site puts
+   beside it — a help glyph, a count. */
+.filter-column__legend {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0 0 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  gap: 0.35rem;
+}
+
+.filter-column__ranges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* While newer counts are on their way, what they will change is dimmed. */
+.filter-column--loading .filter-column__ranges,
+.filter-column--loading .capsule-filter {
+  opacity: 0.55;
+  transition: opacity 150ms;
+}
+
+/* A narrow window folds the filters behind Show, so the results are not
+   pushed below a dozen sliders. */
+@media (width <= 56rem) {
+  .filter-column--page {
+    position: static;
+    max-height: none;
+  }
+
+  .filter-column--page .filter-column__fold {
+    display: inline-flex;
+  }
+
+  .filter-column--page:not(.filter-column--open) .filter-column__body {
+    display: none;
+  }
+}
+
+/* The structure section of a filter column: the drawing, then how it is
+   matched. */
+.structure-filter {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.structure-filter__preview {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.structure-filter__preview:hover {
+  border-color: var(--border-strong);
+}
+
+.structure-filter__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ── A pager of results ─────────────────────────────────────────────────── */
+
+/* Under a table of results: which are on screen, then the steps. */
+.result-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-pager__summary {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.result-pager--compact {
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── A printable sheet ──────────────────────────────────────────────────── */
+
+/* The head of a reference meant for paper: a heading and a lead, a legend of
+   its colours, and a line that exists only once printed, saying whose sheet it
+   is and what the colours mean, which the legend on screen says instead. */
+.sheet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.sheet-head h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.sheet-lead {
+  max-width: 62ch;
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.sheet-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  gap: 10px;
+  list-style: none;
+}
+
+.sheet-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sheet-legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.sheet-print-line {
+  display: none;
+}
+
+@media print {
+  .sheet-print-line {
+    display: block;
+    margin: 0 0 6px;
+    color: var(--text-muted);
+    font-size: 10px;
   }
 }
 

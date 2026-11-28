@@ -8,6 +8,7 @@
 
 import { Canonizer, Molecule } from 'openchemlib';
 
+import { readCanonicalIdCode } from '../core/canonicalIdCode.ts';
 import { splitEditorValue } from '../core/editorValue.ts';
 
 import type { StructureEditorMoleculeChange } from './editorChange.ts';
@@ -54,14 +55,9 @@ function parseStructure(text: string): Molecule | null {
   const notation = value.entries[0]?.structure;
   if (notation === undefined) return null;
   return (
-    attempt(() => Molecule.fromSmiles(notation)) ?? canonicalIdCode(notation)
+    attempt(() => Molecule.fromSmiles(notation)) ??
+    readCanonicalIdCode(notation, (idCode) => Molecule.fromIDCode(idCode))
   );
-}
-
-function canonicalIdCode(text: string): Molecule | null {
-  if (!ID_CODE.test(text)) return null;
-  const molecule = attempt(() => Molecule.fromIDCode(text));
-  return molecule?.getIDCode() === text ? molecule : null;
 }
 
 function attempt(parse: () => Molecule): Molecule | null {
@@ -78,6 +74,3 @@ function hasDepth(molecule: Molecule): boolean {
   }
   return false;
 }
-
-/** An idCode is written in six-bit groups offset to `@`, so in `@` to DEL. */
-const ID_CODE = /^[\u0040-\u007F]+$/;

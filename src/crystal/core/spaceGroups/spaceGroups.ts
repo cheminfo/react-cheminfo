@@ -1,14 +1,5 @@
+import type { CrystalSystem } from './crystalSystems.ts';
 import { SPACE_GROUP_ROWS } from './spaceGroupRows.ts';
-
-/** The seven crystal systems, named by the point group rather than the lattice. */
-export type CrystalSystem =
-  | 'triclinic'
-  | 'monoclinic'
-  | 'orthorhombic'
-  | 'tetragonal'
-  | 'trigonal'
-  | 'hexagonal'
-  | 'cubic';
 
 /** The Bravais letter a Hermann–Mauguin symbol opens with. */
 export type Centring = 'P' | 'A' | 'B' | 'C' | 'I' | 'F' | 'R';

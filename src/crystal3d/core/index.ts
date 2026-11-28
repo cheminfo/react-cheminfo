@@ -84,3 +84,12 @@ export {
   DEFAULT_CRYSTAL_VIEW_SETTINGS,
   crystalView,
 } from './crystalView.ts';
+export type {
+  CrystalViewParams,
+  CrystalViewParamsOptions,
+} from './crystalViewParams.ts';
+export {
+  crystalViewParams,
+  readCrystalView,
+  writeCrystalView,
+} from './crystalViewParams.ts';

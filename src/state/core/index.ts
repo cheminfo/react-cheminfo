@@ -16,3 +16,5 @@ export {
   hydrateSignalBucket,
   snapshotSignalBucket,
 } from './signalBucket.ts';
+export type { HandleRef, ViewerSlot } from './viewerSlot.ts';
+export { createViewerSlot } from './viewerSlot.ts';

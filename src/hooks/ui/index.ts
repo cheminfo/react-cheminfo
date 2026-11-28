@@ -6,6 +6,7 @@ export type {
   DocumentListNavigationOptions,
 } from './documentListNavigation.ts';
 export type { ElementTarget } from './elementTarget.ts';
+export { isInteractiveTarget, isTextEntryTarget } from './keyTargets.ts';
 export type {
   ListNavigationHandlerOptions,
   ListNavigationKeyEvent,
@@ -29,3 +30,9 @@ export { usePolling } from './usePolling.ts';
 export type { ElementSize } from './useResizeObserver.ts';
 export { useResizeObserver } from './useResizeObserver.ts';
 export { useSeen } from './useSeen.ts';
+export type { MediaQueryStore } from './mediaQueryStore.ts';
+export { mediaQueryStore } from './mediaQueryStore.ts';
+export { useMediaQuery } from './useMediaQuery.ts';
+export type { ScrollToSelectedOptions } from './scrollSelected.ts';
+export { SELECTED_ROW, scrollSelectedIntoView } from './scrollSelected.ts';
+export { useScrollToSelected } from './useScrollToSelected.ts';

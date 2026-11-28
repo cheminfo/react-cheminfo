@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 
 import { closure } from '../../symmetry/group.ts';
 import { operationKey } from '../../symmetry/operation.ts';
+import { CRYSTAL_SYSTEMS } from '../crystalSystems.ts';
 import { spaceGroupOperations } from '../spaceGroupOperations.ts';
 import {
   SPACE_GROUP_SETTINGS,
@@ -59,4 +60,20 @@ test('the operations of a setting are parsed once and kept', () => {
     ],
     translation: [0, 6, 6],
   });
+});
+
+test('the seven crystal systems are listed in the order the space groups number them', () => {
+  const firstNumber = new Map<string, number>();
+  for (let number = 1; number <= 230; number++) {
+    const system =
+      SPACE_GROUP_SETTINGS_BY_NUMBER.get(number)?.[0]?.crystalSystem;
+    if (system !== undefined && !firstNumber.has(system)) {
+      firstNumber.set(system, number);
+    }
+  }
+
+  expect([...firstNumber.keys()]).toStrictEqual([...CRYSTAL_SYSTEMS]);
+  expect([...firstNumber.values()]).toStrictEqual([
+    1, 3, 16, 75, 143, 168, 195,
+  ]);
 });

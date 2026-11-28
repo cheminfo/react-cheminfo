@@ -5,6 +5,8 @@ export { AboutPage } from './AboutPage.tsx';
 export type { AboutProvidedByProps } from './AboutProvidedBy.tsx';
 export { AboutProvidedBy } from './AboutProvidedBy.tsx';
 export type { AboutSectionProps } from './AboutSection.tsx';
+export type { ExternalLinkProps } from './ExternalLink.tsx';
+export { ExternalLink } from './ExternalLink.tsx';
 export { AboutSection } from './AboutSection.tsx';
 export type { AboutSignInProps } from './AboutSignIn.tsx';
 export { AboutSignIn } from './AboutSignIn.tsx';

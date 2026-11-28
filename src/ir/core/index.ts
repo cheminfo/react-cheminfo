@@ -157,3 +157,22 @@ export type { ToIrSpectrumOptions } from './toIrSpectrum.ts';
 export { toIrSpectra, toIrSpectrum } from './toIrSpectrum.ts';
 export type { IrPanelId, IrSidePanelId } from './irSidePanels.ts';
 export { irSidePanels } from './irSidePanels.ts';
+export { readHostIrSpectra, readHostRamanSpectra } from './hostIrSpectra.ts';
+export type {
+  HostSpectraSession,
+  HostSpectraSessionOptions,
+  HostSpectraTab,
+} from './hostSpectraSession.ts';
+export { createHostSpectraSession } from './hostSpectraSession.ts';
+export type {
+  HostItemName,
+  HostSpectra,
+  HostSpectraTechnique,
+  HostSpectrumItem,
+} from './hostSpectraRead.ts';
+export {
+  NO_HOST_SPECTRA,
+  hostFileName,
+  readHostSpectra,
+} from './hostSpectraRead.ts';
+export { spectrumLabel } from './spectrumLabel.ts';

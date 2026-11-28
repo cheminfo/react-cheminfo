@@ -78,3 +78,18 @@ export type {
   FieldCase,
   SeriesTool,
 } from './series.ts';
+export type { KeepProgressOptions, KeptProgress } from './keepProgress.ts';
+export { keepProgress } from './keepProgress.ts';
+export type {
+  KeyedPart,
+  PracticeShareOptions,
+  PracticeShareParts,
+  SeriesShareParts,
+} from './practiceShare.ts';
+export {
+  practiceShareParts,
+  practiceSharePresets,
+  seriesShareParts,
+} from './practiceShare.ts';
+export type { ReadOutcome } from './readOutcome.ts';
+export { readOutcome } from './readOutcome.ts';

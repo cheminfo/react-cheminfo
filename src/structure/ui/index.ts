@@ -19,6 +19,8 @@ export type {
 } from './editorChange.ts';
 export type { StructureLabels, StructureProps } from './structureProps.ts';
 export { Structure } from './Structure.tsx';
+export type { StructureFilterSectionProps } from './StructureFilterSection.tsx';
+export { StructureFilterSection } from './StructureFilterSection.tsx';
 export type { StructureEditorProps } from './StructureEditor.tsx';
 export { StructureEditor } from './StructureEditor.tsx';
 export type { StructureDropProps } from './StructureDrop.tsx';
