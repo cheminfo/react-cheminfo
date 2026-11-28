@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
+import type { FigureColors } from '../core/figureColors.ts';
 import {
   DEFAULT_FIGURE_DPI,
   FIGURE_DPIS,
@@ -45,10 +46,10 @@ export interface FigureDownloadState {
 const DPI_SCALES = FIGURE_DPIS.map(dpiScale);
 
 /**
- * The figure panel — the width the figure is taken at, then copy it, send it
- * as a PNG through the device's share sheet, or save it as PNG or SVG — for a
- * caller
- * that brings its own trigger, such as a button in an editor's toolbar.
+ * The figure panel — the width and the colours the figure is taken in, then
+ * copy it, send it as a PNG through the device's share sheet, or save it as
+ * PNG or SVG — for a caller that brings its own trigger, such as a button in
+ * an editor's toolbar.
  * `FigureDownload` is the same panel behind the family's own glyph.
  * @param options - See {@link FigureDownloadOptions}.
  * @returns See {@link FigureDownloadState}.
@@ -71,6 +72,7 @@ export function useFigureDownload(
   const [format, setFormat] = useState<FigureFormat>(defaultFormat);
   // The PNG's: a copy, a send and a saved PNG. An SVG takes the width alone.
   const [resolution, setResolution] = useState(defaultScale);
+  const [colors, setColors] = useState<FigureColors>('color');
   const [size, setSize] = useState<FigurePixels | null>(null);
   const opening = useRef(0);
   const [layout, setLayout] = useState<FigureLayout>('screen');
@@ -98,6 +100,7 @@ export function useFigureDownload(
     sizeFactor,
     fileName,
     background,
+    colors,
     redrawAt,
     redraw,
   });
@@ -165,6 +168,7 @@ export function useFigureDownload(
         onLayoutChange: changed(setLayout),
         onCustomChange: changed(setCustom),
       }}
+      colors={{ value: colors, onChange: changed(setColors) }}
     />
   );
 

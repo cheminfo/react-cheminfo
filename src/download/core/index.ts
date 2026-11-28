@@ -119,6 +119,12 @@ export {
 } from './figureScale.ts';
 export type { FigureSvg, FigureSvgOptions } from './figureSvg.ts';
 export { FIGURE_SVG_TYPE, figureSvg } from './figureSvg.ts';
+export type { FigureColors } from './figureColors.ts';
+export {
+  FIGURE_COLORS,
+  recolorFigureMarkup,
+  recoloredFigure,
+} from './figureColors.ts';
 export type {
   FigurePiece,
   FigureSvgDocumentOptions,

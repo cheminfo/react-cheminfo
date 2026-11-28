@@ -15,40 +15,14 @@ import type { FigureResolutionUnit } from '../core/figureDpi.ts';
 import { figureLayoutSize } from '../core/figureLayout.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 
+import type { FigureColorChoice } from './FigureColorsRow.tsx';
+import { FigureColorsRow } from './FigureColorsRow.tsx';
 import { FigureQuickActions } from './FigureQuickActions.tsx';
 import type { FigureSizing } from './FigureSizeRows.tsx';
 import { FigureSizeRows } from './FigureSizeRows.tsx';
 import { fileHintOf, pictureHintOf } from './figureDownloadHint.ts';
+import type { FigureFileChoice } from './figureFileChoice.ts';
 import { resolutionHelp, scaleChoices } from './resolutionChoices.ts';
-
-/**
- * Files of another kind offered after the two a picture is saved as, such as a
- * molfile.
- */
-export interface FigureFileChoice<TFile extends string> {
-  /** The files offered. */
-  options: ReadonlyArray<OverlayOption<TFile>>;
-  /** The one picked, or `null` while a picture is. */
-  value: TFile | null;
-  /** Called with the file picked, and with `null` when a picture is. */
-  onChange: (value: TFile | null) => void;
-  /** The line at the foot of the panel while one is picked. */
-  hint: string;
-  /**
-   * What Copy says while one is picked, for a file Copy takes in place of the
-   * picture, such as a molfile pasted into an editor.
-   * @default undefined — Copy takes the picture whatever is picked
-   */
-  copy?: FigureFileCopy;
-}
-
-/** What Copy says while it takes a file rather than the picture. */
-export interface FigureFileCopy {
-  /** Said beside Copy before it is pressed. */
-  ready: string;
-  /** Said once it has copied. */
-  copied: string;
-}
 
 /** What {@link FigureDownloadPanel} is drawn from. */
 export interface FigureDownloadPanelProps<TFile extends string = never> {
@@ -122,6 +96,12 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
    */
   sizing?: FigureSizing;
   /**
+   * The colours the figure is copied, sent and saved in: colour, grey, or
+   * black and white.
+   * @default undefined — it leaves in the colours it is drawn in
+   */
+  colors?: FigureColorChoice;
+  /**
    * Rows of the figure's own, shown after the format: what else decides the
    * file, such as which frames of an animation go into it.
    * @default undefined
@@ -131,8 +111,8 @@ export interface FigureDownloadPanelProps<TFile extends string = never> {
 
 /**
  * What can be done with a figure, in three parts read top down: the width it
- * is taken at and the resolution of its PNG, which Copy, Send and Save all
- * use; Copy and Send; and the file, whose format is its own, with Save at the
+ * is taken at, its colours and the resolution of its PNG, which Copy, Send
+ * and Save all use; Copy and Send; and the file, whose format is its own, with Save at the
  * foot. Copy puts a PNG and, where the browser takes one, an SVG on the
  * clipboard; a share sheet hands every file on as an attachment, so Send
  * hands it the one a chat or a mail shows as a picture, a PNG.
@@ -145,7 +125,7 @@ export function FigureDownloadPanel<TFile extends string = never>(
   const { title, format, scale, scales, size, failure, saving } = props;
   const { file } = props;
   const { onFormatChange, onScaleChange, onSave, rasterSvg = false } = props;
-  const { sizing, onCopy, onSend, notice = null, children } = props;
+  const { sizing, colors, onCopy, onSend, notice = null, children } = props;
   const { unit = 'multiple' } = props;
   const t = useChromeT();
   const language = useLanguage();
@@ -184,6 +164,7 @@ export function FigureDownloadPanel<TFile extends string = never>(
       {sizing === undefined ? null : (
         <FigureSizeRows sizing={sizing} size={size} />
       )}
+      {colors === undefined ? null : <FigureColorsRow {...colors} />}
       <OverlaySegmented
         label={t('download.resolution')}
         help={resolutionHelp(unit, t)}

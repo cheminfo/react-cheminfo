@@ -14,7 +14,7 @@ import { SVG_CLIPBOARD_TYPE } from '../core/copySvg.ts';
 import { FIGURE_PNG_TYPE } from '../core/figurePng.ts';
 import { canShareFile } from '../core/shareFile.ts';
 
-import type { FigureFileCopy } from './FigureDownloadPanel.tsx';
+import type { FigureFileCopy } from './figureFileChoice.ts';
 
 /** What {@link FigureQuickActions} needs. */
 export interface FigureQuickActionsProps {

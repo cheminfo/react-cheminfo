@@ -3,6 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 
 import type { FigureNotice } from '../../core/copyFigure.ts';
 import type { FigureFormat } from '../../core/downloadFigure.ts';
+import type { FigureColors } from '../../core/figureColors.ts';
 import type { FigureResolutionUnit } from '../../core/figureDpi.ts';
 import { FIGURE_DPIS, dpiScale } from '../../core/figureDpi.ts';
 import type { FigureLayout } from '../../core/figureLayout.ts';
@@ -257,6 +258,17 @@ function stubSheet(refuse?: string): void {
   });
 }
 
+test('the colours are offered where the caller handles them, the one picked checked', () => {
+  const offered = panel({ format: 'png', colors: 'grey' });
+
+  expect(offered).toContain('aria-label="Colours"');
+  expect(offered).toMatch(/aria-checked="true"[^>]*>Grey<\/button>/u);
+  expect(offered).toMatch(
+    /aria-checked="false"[^>]*>Black and white<\/button>/u,
+  );
+  expect(panel({ format: 'png' })).not.toContain('aria-label="Colours"');
+});
+
 /**
  * The send button, as markup.
  * @param html - The panel.
@@ -289,6 +301,8 @@ interface PanelOptions {
   scales?: readonly number[];
   /** Whether the caller can send the file. */
   send?: boolean;
+  /** The colours picked, or none when the caller offers no choice. */
+  colors?: FigureColors;
 }
 
 /**
@@ -299,7 +313,7 @@ interface PanelOptions {
 function panel(options: PanelOptions): string {
   const { format, layout, custom = null, scale = 2, size = SCREEN } = options;
   const { notice = null, saving = false } = options;
-  const { unit, scales = [1, 2, 3, 4], send = false } = options;
+  const { unit, scales = [1, 2, 3, 4], send = false, colors } = options;
   return renderToStaticMarkup(
     <FigureDownloadPanel
       title="Save figure"
@@ -325,6 +339,11 @@ function panel(options: PanelOptions): string {
               onLayoutChange: () => null,
               onCustomChange: () => null,
             }
+      }
+      colors={
+        colors === undefined
+          ? undefined
+          : { value: colors, onChange: () => null }
       }
     />,
   );

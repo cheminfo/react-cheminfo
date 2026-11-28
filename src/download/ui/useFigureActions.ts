@@ -3,6 +3,8 @@ import { copyFigure } from '../core/copyFigure.ts';
 import { resizedSvgFigure } from '../core/croppedMarkup.ts';
 import type { FigureFormat } from '../core/downloadFigure.ts';
 import { downloadFigureSvg, figureSvgFile } from '../core/downloadFigure.ts';
+import type { FigureColors } from '../core/figureColors.ts';
+import { recoloredFigure } from '../core/figureColors.ts';
 import { figurePng } from '../core/figurePng.ts';
 import type { FigurePixels } from '../core/figureScale.ts';
 import type { FigureSvg } from '../core/figureSvg.ts';
@@ -42,6 +44,11 @@ export interface FigureActionsOptions {
   /** What is painted under the figure. */
   background?: string;
   /**
+   * The colours the figure is copied, sent and saved in.
+   * @default 'color'
+   */
+  colors?: FigureColors;
+  /**
    * The size the figure is drawn again at, off the page, or `null` to take
    * the figure as it is on screen.
    */
@@ -80,7 +87,7 @@ export interface FigureActions extends Omit<FigureTask, 'run'> {
 export function useFigureActions(options: FigureActionsOptions): FigureActions {
   const { targetId, writeFigure, format, scale, fileName, background } =
     options;
-  const { pictureScale, sizeFactor = 1 } = options;
+  const { pictureScale, sizeFactor = 1, colors = 'color' } = options;
   const { redrawAt, redraw } = options;
   const t = useChromeT();
   const { run, busy, failure, notice, clear } = useFigureTask();
@@ -105,14 +112,19 @@ export function useFigureActions(options: FigureActionsOptions): FigureActions {
     );
   }
 
-  // The figure at the width picked, for a copy or a send.
+  // The figure at the width and in the colours picked, for a file, a copy or
+  // a send.
   function atSize(): Promise<FigureSvg> {
-    if (writeFigure !== undefined) {
-      return writeFigure().then((figure) => resized(figure, sizeFactor));
-    }
+    return drawn().then((figure) =>
+      recoloredFigure(resized(figure, sizeFactor), colors),
+    );
+  }
+
+  function drawn(): Promise<FigureSvg> {
+    if (writeFigure !== undefined) return writeFigure();
     return new Promise<FigureSvg>((resolve, reject) => {
       withFigure(async (box) => {
-        resolve(resized(figureSvg(box, { background }), sizeFactor));
+        resolve(figureSvg(box, { background }));
       }).catch(reject);
     });
   }
