@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import { useChromeT } from '../../i18n/ui/useT.ts';
 import type { DemoLinkSpec, TalkOrigin } from '../core/index.ts';
 import { demoLabel } from '../core/index.ts';
+import { resolveTalkAddress } from '../core/talkOrigin.ts';
 
 import type { RenderSlideLink } from './DemoLink.tsx';
 import { DemoLink } from './DemoLink.tsx';
@@ -56,7 +57,7 @@ export function SlideDemos(props: SlideDemosProps): ReactElement | null {
             </span>
           )}
           <DemoLink
-            href={resolveDemoHref(demo.href, talkOrigin)}
+            href={resolveTalkAddress(demo.href, talkOrigin)}
             origin={origin}
             renderLink={renderLink}
           >
@@ -66,20 +67,4 @@ export function SlideDemos(props: SlideDemosProps): ReactElement | null {
       ))}
     </div>
   );
-}
-
-/**
- * Where a demo link actually points.
- *
- * A deck writes `/mf-finder?mass=300`, meaning its own site. Played there it is
- * exactly that; played on another site of the family it has to be resolved
- * against the site that wrote it, or the link lands on a page that does not
- * exist.
- * @param href - The address the slide wrote.
- * @param talkOrigin - Where the publishing site lives, when it is not this one.
- * @returns The address to open.
- */
-function resolveDemoHref(href: string, talkOrigin?: string): string {
-  if (talkOrigin === undefined || !href.startsWith('/')) return href;
-  return `${talkOrigin.replace(/\/$/, '')}${href}`;
 }

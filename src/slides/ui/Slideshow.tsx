@@ -67,6 +67,13 @@ export interface SlideshowProps {
    */
   talkOrigin?: string;
   /**
+   * The host this site is published at, as `draw.cheminfo.org`: an address on
+   * it in a deck is played from the page's own origin, so a checkout or a
+   * preview rehearses itself.
+   * @default undefined — addresses are played as written
+   */
+  frameHost?: string;
+  /**
    * What the bar reads.
    * @default the talk's own title
    */
@@ -119,6 +126,7 @@ export function Slideshow(props: SlideshowProps): ReactElement {
     talkId = '',
     site,
     talkOrigin,
+    frameHost,
     fullscreen,
     title,
     className,
@@ -184,6 +192,7 @@ export function Slideshow(props: SlideshowProps): ReactElement {
                 talkId={talkId}
                 site={site}
                 talkOrigin={talkOrigin}
+                frameHost={frameHost}
                 slideIndex={current}
                 step={step}
                 onStep={setStep}

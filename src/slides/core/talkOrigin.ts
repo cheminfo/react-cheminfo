@@ -79,5 +79,86 @@ export function withTalkOrigin(href: string, origin: TalkOrigin): string {
   return `${address}${separator}${TALK_ORIGIN_PARAM}=${value}${fragment}`;
 }
 
+/**
+ * The origin every link of a slide carries, from what the player hands a
+ * layout.
+ * @param props - The slide's place in its talk.
+ * @param props.talkId - How the publishing site names the talk.
+ * @param props.slideIndex - Which slide, zero-based.
+ * @param props.site - Which site published the deck, when it is played
+ *   elsewhere.
+ * @returns The origin, naming the site only when one is given.
+ */
+export function slideOriginOf(props: {
+  talkId: string;
+  slideIndex: number;
+  site?: string;
+}): TalkOrigin {
+  const { talkId, slideIndex, site } = props;
+  return site === undefined
+    ? { talkId, slide: slideIndex }
+    : { talkId, slide: slideIndex, site };
+}
+
+/**
+ * Where an address a deck wrote actually points.
+ *
+ * A deck writes `/mf-finder?mass=300`, meaning its own site. Played there it is
+ * exactly that; played on another site of the family it has to be resolved
+ * against the site that wrote it, or the link lands on a page that does not
+ * exist.
+ * @param href - The address the slide wrote.
+ * @param talkOrigin - Where the publishing site lives, when it is not this
+ *   one, as `https://host`.
+ * @returns A root-relative address prefixed with that origin; anything else —
+ *   an absolute address, a protocol-relative one, a relative one, or any
+ *   address when no origin is given — as written.
+ */
+export function resolveTalkAddress(href: string, talkOrigin?: string): string {
+  if (
+    talkOrigin === undefined ||
+    !href.startsWith('/') ||
+    href.startsWith('//')
+  ) {
+    return href;
+  }
+  return `${talkOrigin.replace(/\/$/, '')}${href}`;
+}
+
+/** What {@link followTalkOrigin} is told about the page on screen. */
+export interface FollowTalkOriginOptions {
+  /** Whether the page is a talk or the list of talks, which forget the way back. */
+  onTalkPage: boolean;
+  /**
+   * The `ECOSYSTEM_SITES` id of this site: an origin naming another site is
+   * not followed, because that deck is played there.
+   * @default undefined — any site's origin is followed
+   */
+  site?: string;
+}
+
+/**
+ * Which slide a page reached from a demo link leads back to, while the
+ * presenter browses on through the site.
+ * @param kept - The origin remembered so far, or `null`.
+ * @param search - The query string on screen, with or without its `?`.
+ * @param options - See {@link FollowTalkOriginOptions}.
+ * @returns The origin the address names, else the one kept; `null` once a
+ *   talk or the list is open again.
+ */
+export function followTalkOrigin(
+  kept: TalkOrigin | null,
+  search: string,
+  options: FollowTalkOriginOptions,
+): TalkOrigin | null {
+  const { onTalkPage, site } = options;
+  if (onTalkPage) return null;
+  const parsed = parseTalkOrigin(search);
+  if (parsed === null) return kept;
+  const ours =
+    site === undefined || parsed.site === undefined || parsed.site === site;
+  return ours ? parsed : kept;
+}
+
 const ORIGIN_RE =
   /^talk:(?:(?<site>[\da-z-]+):)?(?<talkId>[^:]+):(?<slide>\d+)$/i;

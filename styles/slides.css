@@ -12,6 +12,7 @@
 
 .slideshow,
 .talk-list,
+.talks-page,
 .back-to-slides {
   --slide-bg: var(--surface-sunken, #f5f7fa);
   --slide-surface: var(--surface, #ffffff);
@@ -19,6 +20,7 @@
   --slide-ink-soft: color-mix(in oklab, var(--text, #16202c) 82%, white);
   --slide-muted: var(--text-muted, #5b6875);
   --slide-line: var(--border, #dfe3e8);
+  --slide-line-strong: var(--border-strong, #c3cad3);
   --slide-accent: var(--accent, var(--brand, #4338ca));
   --slide-accent-soft: color-mix(in oklab, var(--slide-accent) 10%, white);
   --slide-answer: var(--brand-alt-text, var(--brand-alt, #be123c));
@@ -61,13 +63,22 @@
   width: 100%;
 }
 
-.slideshow:fullscreen .slideshow-stage {
+/* The player fills the box it is put in, as it does fullscreen, instead of
+   keeping a 16:9 card under a capped height. */
+.slideshow--fill {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.slideshow:fullscreen .slideshow-stage,
+.slideshow--fill .slideshow-stage {
   flex: 1 1 auto;
   aspect-ratio: auto;
   max-height: none;
 }
 
 .slide-canvas {
+  position: relative;
   display: flex;
   width: 1920px;
   height: 1080px;
@@ -678,6 +689,39 @@
   text-transform: uppercase;
 }
 
+/* ── The talks page ──────────────────────────────────────────────────────── */
+
+/* A site's `/talks`: the list under its heading and the line that says how to
+   present, or the player, in the room the bar leaves. */
+.site-shell > .app-talks {
+  width: 100%;
+  padding: 16px;
+}
+
+.talks-page {
+  max-width: var(--page-max, 84rem);
+  padding: 24px 0;
+  margin: 0 auto;
+}
+
+.talks-page__lead {
+  max-width: 48rem;
+  color: var(--slide-muted);
+}
+
+/* The keys the line names, drawn as the keys to press. */
+.talks-page__lead kbd {
+  padding: 0 0.35em;
+  border: 1px solid var(--slide-line-strong);
+  border-radius: 4px;
+  background: var(--slide-surface);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgb(16 32 48 / 8%));
+  color: var(--slide-ink);
+  font-family: inherit;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
 /* ── Back to slides ──────────────────────────────────────────────────────── */
 
 /* The way back to the exact slide, floating over whichever tool the demo link
@@ -885,4 +929,272 @@
 .talk-list-empty {
   margin: 0;
   color: var(--slide-muted);
+}
+
+/* ── A figure beside the text ───────────────────────────────────────────── */
+
+/* The heading pinned like a content slide's, then the text and the figure a
+   site's layout draws: side by side, or the figure under the text. */
+.figure-slide__body {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 64px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+}
+
+/* Beside a figure a line is shorter than on a slide of text alone, so it is
+   set a little smaller rather than broken twice as often. */
+.figure-slide__text {
+  font-size: 0.92em;
+}
+
+/* A slide with no text beside its figure gives the figure the whole width. */
+.figure-slide__body:has(> .figure-slide__figure:only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.figure-slide--below .figure-slide__body {
+  align-items: start;
+  gap: 32px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.figure-slide__text > :first-child {
+  margin-top: 0;
+}
+
+.figure-slide__figure {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.figure-slide__figure svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* What a figure says in place of itself, for the author rehearsing the deck. */
+.chem-figure-message {
+  margin: 0;
+  color: var(--slide-muted);
+  font-size: 40px;
+  text-align: center;
+}
+
+/* The room the figure takes while the code drawing it loads. */
+.chem-figure-loading {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Structures over their names ────────────────────────────────────────── */
+
+.molecule-grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  gap: 24px 32px;
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+.molecule-grid__cell {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  gap: 8px;
+}
+
+/* Every structure keeps the size of its bonds, and stands on its name. */
+.molecule-grid__drawing {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.molecule-grid__drawing > svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* A structure alone stands over its name, the two centred together. */
+.molecule-grid--alone .molecule-grid__cell {
+  justify-content: center;
+}
+
+.molecule-grid--alone .molecule-grid__drawing {
+  flex: 0 1 auto;
+}
+
+.molecule-grid__name {
+  color: var(--slide-ink);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ── A cartoon a slide names ────────────────────────────────────────────── */
+
+/* The drawing a `<!-- glyph: … -->` marker names: in the corner of a section
+   divider, measured from the canvas, or as the figure of its slide. A site's
+   own class carries its colours and its motion. */
+.slide-glyph {
+  overflow: visible;
+}
+
+.slide-glyph--corner {
+  position: absolute;
+  right: 96px;
+  bottom: 72px;
+  width: 620px;
+  height: 240px;
+}
+
+.slide-glyph--figure {
+  display: block;
+  width: 1240px;
+  height: 480px;
+  margin: 48px auto 0;
+}
+
+/* ── The closing slide ──────────────────────────────────────────────────── */
+
+/* What the talk covered on the left, and the sites it showed on the right,
+   each with its mark, its name and its address. */
+.slide--end {
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.slide--end .end-slide {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  gap: 96px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.slide--end .end-slide__recap h1,
+.slide--end .end-slide__recap h2 {
+  margin: 0 0 0.45em;
+  font-size: 84px;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.slide--end .end-slide__recap ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.slide--end .end-slide__recap li {
+  position: relative;
+  padding-left: 1.4em;
+  margin: 0.28em 0;
+  animation: end-slide-in 0.45s ease-out both;
+  font-size: 42px;
+  line-height: 1.3;
+}
+
+.slide--end .end-slide__recap li::before {
+  position: absolute;
+  left: 0;
+  color: var(--slide-answer);
+  content: '✓';
+  font-weight: 800;
+}
+
+.slide--end .end-slide__recap li:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.slide--end .end-slide__recap li:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.slide--end .end-slide__recap li:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.slide--end .end-slide__recap li:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+.slide--end .end-slide__recap li:nth-child(6) {
+  animation-delay: 0.75s;
+}
+
+.slide--end .end-slide__sites {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  gap: 48px;
+  list-style: none;
+}
+
+.slide--end .end-slide__site a {
+  display: flex;
+  align-items: center;
+  padding: 28px 40px 28px 28px;
+  border: 2px solid var(--slide-line);
+  border-radius: var(--radius-lg, 16px);
+  animation: end-slide-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 0.4s both;
+  background: var(--slide-surface);
+  box-shadow: var(--shadow-md, 0 4px 14px rgb(16 32 48 / 10%));
+  color: inherit;
+  gap: 32px;
+  text-decoration: none;
+}
+
+.slide--end .end-slide__name {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slide--end .end-slide__host {
+  color: var(--slide-accent);
+  font-size: 34px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.16em;
+}
+
+@keyframes end-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+@keyframes end-slide-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide--end .end-slide__recap li,
+  .slide--end .end-slide__site a {
+    animation: none;
+  }
 }

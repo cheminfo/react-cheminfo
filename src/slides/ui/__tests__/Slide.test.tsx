@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 
 import type { Slide as SlideData, TalkMeta } from '../../core/index.ts';
 import type { SlideLayoutProps, SlideViewProps } from '../Slide.tsx';
@@ -130,4 +130,30 @@ test('a deck played away from home keeps its links pointing at the site that wro
   expect(html).toContain(
     'href="https://www.chemcalc.org/?mf=C6H12O6&amp;from=talk:chemcalc:demo:4"',
   );
+});
+
+test('a deck’s addresses of the site frame the build being served, a site’s own layouts included', () => {
+  const location = { origin: 'http://localhost:11029' };
+  vi.stubGlobal('location', location);
+  let seen = '';
+  function Live(props: SlideLayoutProps) {
+    seen = props.slide.body;
+    return <div />;
+  }
+
+  const html = render(
+    {
+      layout: 'content',
+      body: '[Draw](https://draw.cheminfo.org/?smiles=CCO)',
+    },
+    { frameHost: 'draw.cheminfo.org' },
+  );
+  render(
+    { layout: 'live', body: 'https://draw.cheminfo.org/?embed=1' },
+    { frameHost: 'draw.cheminfo.org', layouts: { live: Live } },
+  );
+  vi.unstubAllGlobals();
+
+  expect(html).toContain('href="http://localhost:11029/?smiles=CCO"');
+  expect(seen).toBe('http://localhost:11029/?embed=1');
 });

@@ -5,6 +5,7 @@ import { splitEmbedAddress } from '../core/embedAddress.ts';
 import { FramedTool } from './FramedTool.tsx';
 import type { SlideLayoutProps } from './Slide.tsx';
 import { SlideBody } from './SlideBody.tsx';
+import { SlideLogos } from './SlideLogos.tsx';
 
 /**
  * A title slide with the tool running beside it: the title on the left half,
@@ -19,18 +20,11 @@ export function TitleToolSlide(
 ): ReactElement {
   const { slide, meta, renderLink } = props;
   const { prose, src } = splitEmbedAddress(slide.body);
-  const logos = meta.logos ?? [];
   return (
     <div className="slide slide--title slide--title-tool">
       <div className="slide-content">
         <SlideBody body={prose} renderLink={renderLink} />
-        {logos.length === 0 ? null : (
-          <div className="slide-logos">
-            {logos.map((logo) => (
-              <img key={logo} className="slide-logo" src={logo} alt="" />
-            ))}
-          </div>
-        )}
+        <SlideLogos logos={meta.logos ?? []} />
       </div>
       {src === null ? null : <FramedTool src={src} />}
     </div>

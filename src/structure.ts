@@ -6,3 +6,7 @@ export {
   hostStructureLoader,
   readHostMolecule,
 } from './host/core/hostMolecule.ts';
+// The `molecules` layout of a slideshow draws structures, so it is behind this
+// door rather than `react-cheminfo/slides`, which a site without OpenChemLib
+// imports.
+export { MoleculesSlide } from './slides/molecules/MoleculesSlide.tsx';

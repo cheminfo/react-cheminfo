@@ -224,7 +224,7 @@ through a wildcard subpath exactly as `react-science` serves its own.
 | **Spectra**                | `FILTER_CATALOG`, `filterMenu`, `settingsProblems`, `normalizationFilters`, `addFilter`, `moveFilter`, `setFilterOption`, `principalComponentChoices`, `clampPrincipalComponents`, `EMPTY_SETTINGS` (all `/spectra`)                                                                                                                                                                                                                                                                                                  | `SpectraSettingsEditor`, `FilterChainEditor`, `PrincipalComponentSelect` (all `/spectra`)                                                                                                                                                                                                                       |
 | **About**                  | `resolveAbout`, `aboutProblems`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `AboutPage`                                                                                                                                                                                                                                                                                                     |
 | **Which build is running** | `formatBuiltAt`, `shortCommit`, `BuildInfo`                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `AboutVersion`, `cheminfoBuildInfo` (`/vite`)                                                                                                                                                                                                                                                                   |
-| **Slideshows**             | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest` (all `/slides`)                                                                                                                                                                                                                                                                                                                                                                                                            | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides` (all `/slides`), `cheminfoTalks` (`/vite`)                                                                                                                                                                                                                 |
+| **Slideshows**             | `parseTalk`, `splitDemoLinks`, `slideActionForKey`, `parseTalkOrigin`, `buildTalkManifest`, `createSiteTalks`, `talkRoute`, `talkPageContent`, `slideParam`, `withSlideParam`, `openTalk`, `showTalkSlide`, `takeSlideMarker`, `parseMarkerOptions`, `followTalkOrigin`, `resolveTalkAddress`, `openRoutedAddress`, `PLAYER_LAYOUTS` (all `/slides`)                                                                                                                                                                  | `Slideshow`, `SlideView`, `TalkList`, `BackToSlides`, `TalksRoute`, `FigureSlide`, `SlideGlyph`, `sectionWithGlyph`, `inPageSlideLink` (all `/slides`), `MoleculesSlide` (`/structure`), `cheminfoTalks` (`/vite`)                                                                                              |
 | **Token guard**            | `findTokenViolations`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | `cheminfo-check-tokens`, `cheminfo-check-messages`, `cheminfo-check-deploy` (the bins)                                                                                                                                                                                                                          |
 | **Figures**                | `chartScale`, `chartAxisScale`, `chartAxisTitle`, `chartShare`, `chartColumnExtent`, `chartBinCounts`, `chartSeriesColor`, `rowMatrix`, `stackedMatrix`, `emptiestCorner`                                                                                                                                                                                                                                                                                                                                             | `ChartFrame`, `ChartAxis`, `TrackedLineChart`, `OverlayBar`, `OverlaySelect`, `OverlaySegmented`, `OverlayToggle`, `OverlayNumber`, `OverlayLegend`, `OverlayCaption`, `OverlayReadout`                                                                                                                         |
 | **Projections**            | `pcaResult`, `embeddingResult`, `projectionTabs`, `loadingProfiles`, `explainedShares`, `confidenceEllipse`, `projectEllipse`, `pointsInPolygon`, `resolveProjectionGroups`, `resolveProjectionShapes`, `PROJECTION_COPY`                                                                                                                                                                                                                                                                                             | `PcaViewer`, `ProjectionViewer`, `ScatterPlot`, `ScatterMatrix`                                                                                                                                                                                                                                                 |
@@ -1853,6 +1853,66 @@ plugins: [cheminfoTalks({ site: 'chemcalc' })];
 
 It writes `dist/talks.json` and `dist/talks/<id>.md`, which is what
 learn.cheminfo.org reads to list and play every site's talks beside its own.
+Under `npm run dev` the same plugin answers both addresses from disk, with
+the same permissive CORS, and reloads the page when a deck changes.
+
+### A site's `/talks`, written once
+
+The glob stays in the site, because Vite resolves it where it is written; the
+rest is the library's:
+
+```tsx
+// src/pages/talks/talks.ts
+import { createSiteTalks } from 'react-cheminfo/slides';
+
+export const TALKS = createSiteTalks({
+  site: SITE_ID,
+  sources: import.meta.glob(['../../talks/*.md', '../../talks/*/index.md'], {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  }),
+});
+
+// src/pages/talks/TalksRoute.tsx — the lazy boundary of the tab
+<TalksRoute
+  router={router}
+  tab="talks"
+  talks={TALKS}
+  title="Learn to draw"
+  lead={
+    <>
+      Press <kbd>F</kbd> for full screen.
+    </>
+  }
+  layouts={TALK_LAYOUTS}
+  frameHost={SITE.host}
+/>;
+```
+
+The bare address lists the talks, `/talks/<id>` plays one with the slide in
+`?slide=` counted from one — the first writes nothing — and a name no deck has
+leads back to the list. Opening a talk and leaving it push an entry of the
+history, turning a slide rewrites it, so Back from a talk returns to the list;
+`openTalk`, `showTalkSlide` and `talkSlideRoute` are those moves for a site's
+own links, and `slideParam()` the codec for a site that routes another way.
+`TALKS.routes()` is each deck's `RouteMeta`, and `talkPageContent(talk)` the
+text its prerendered page is indexed on. `frameHost` plays every address of
+the published host from the page's own origin, so a checkout rehearses itself.
+
+A site builds its figure layouts on the library's frame rather than its own:
+`FigureSlide` pins the heading and sets the figure beside the text,
+`takeSlideMarker` and `parseMarkerOptions` read the `<!-- name: value -->`
+marker that says what to draw, and `FigureMessage` or `FigureLoading` stand in
+for a figure that cannot be drawn yet. `MoleculesSlide`, from
+`react-cheminfo/structure` because it draws with OpenChemLib, is the
+`molecules` layout; `sectionWithGlyph(GLYPHS)` the divider with the cartoon a
+`<!-- glyph: … -->` marker names. The player draws `end` itself: what the
+talk covered, beside every site a `<!-- sites: id, … -->` marker names. A
+site that routes in the browser opens demo links in the page with
+`inPageSlideLink(open)`, `openRoutedAddress(router, href)` being the `open`
+of a site on a tab router, and keeps the way back while the presenter browses
+on with `followTalkOrigin`.
 
 ## Prerendering a site
 

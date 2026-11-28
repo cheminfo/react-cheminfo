@@ -4,9 +4,9 @@
  * A deck is Markdown in the repository of the site whose subject it teaches,
  * which is what keeps a talk reviewable. For learn.cheminfo.org to gather the
  * family's talks it needs two static files per site and no API: a manifest of
- * what exists, and the source of each deck. Both are written at build time and
- * served with permissive CORS, because public teaching material is fetched from
- * a page that is not ours.
+ * what exists, and the source of each deck. Both are written at build time,
+ * answered the same way by the dev server, and served with permissive CORS,
+ * because public teaching material is fetched from a page that is not ours.
  */
 
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -16,8 +16,10 @@ import type { Plugin } from 'vite';
 
 import { siteById, siteUrl } from '../../ecosystem/core/index.ts';
 import type { SiteId } from '../../ecosystem/core/sites.ts';
+import { talkIdFromPath } from '../core/siteTalks.ts';
 import type { Talk } from '../core/talk.ts';
 import { parseTalk } from '../core/talk.ts';
+import type { TalkManifest } from '../core/talkManifest.ts';
 import { buildTalkManifest } from '../core/talkManifest.ts';
 
 /** What the build needs to know to publish the decks. */
@@ -47,7 +49,9 @@ export interface LoadedTalk {
 }
 
 /**
- * Write `talks.json` and `talks/<id>.md` into the build.
+ * Write `talks.json` and `talks/<id>.md` into the build, and answer both under
+ * `vite dev`, read from disk on each request, with the page reloaded when a
+ * deck changes.
  * @param options - Which site, and where its decks are.
  * @returns The Vite plugin.
  */
@@ -55,23 +59,45 @@ export function cheminfoTalks(options: TalksOptions): Plugin {
   const { site, dir = 'src/talks' } = options;
   let root = process.cwd();
   let outDir = 'dist';
+  let command: 'build' | 'serve' = 'build';
+
+  function manifestOrigin(): string {
+    return options.origin ?? siteUrl(siteById(site)).replace(/\/$/, '');
+  }
 
   return {
     name: 'cheminfo-talks',
-    apply: 'build',
     configResolved(config) {
       root = config.root;
       outDir = config.build.outDir;
+      command = config.command;
+    },
+    configureServer(server) {
+      const directory = join(root, dir);
+      server.watcher.add(directory);
+      server.watcher.on('all', (_event, path) => {
+        if (path.startsWith(directory)) server.ws.send({ type: 'full-reload' });
+      });
+      server.middlewares.use((request, response, next) => {
+        const answer = talkFileResponse(request.url ?? '', {
+          site,
+          origin: manifestOrigin(),
+          directory,
+        });
+        if (answer === null) {
+          next();
+          return;
+        }
+        response.setHeader('content-type', answer.contentType);
+        response.setHeader('access-control-allow-origin', '*');
+        response.end(answer.body);
+      });
     },
     closeBundle() {
+      // A dev server closing calls this too, and must write nothing.
+      if (command !== 'build') return;
       const talks = loadTalksFromDisk(join(root, dir));
-      const origin =
-        options.origin ?? siteUrl(siteById(site)).replace(/\/$/, '');
-      const manifest = buildTalkManifest({
-        site,
-        origin,
-        talks: talks.map((entry) => ({ id: entry.id, ...entry.talk })),
-      });
+      const manifest = talksManifest(talks, site, manifestOrigin());
 
       const target = resolve(root, outDir);
       mkdirSync(join(target, 'talks'), { recursive: true });
@@ -84,6 +110,47 @@ export function cheminfoTalks(options: TalksOptions): Plugin {
       }
     },
   };
+}
+
+/** What the dev server answers for one of the two published files. */
+export interface TalkFileResponse {
+  /** The media type of the answer. */
+  contentType: string;
+  /** The answer itself. */
+  body: string;
+}
+
+/**
+ * What the dev server answers at an address: the manifest at `/talks.json`,
+ * a deck's source at `/talks/<id>.md`, and nothing anywhere else.
+ * @param url - The requested address, its query string included.
+ * @param source - Where the decks are, and what the manifest says.
+ * @param source.site - The site the talks belong to.
+ * @param source.origin - The manifest's origin.
+ * @param source.directory - Absolute path of the decks.
+ * @returns The answer, or `null` for an address the decks do not answer.
+ */
+export function talkFileResponse(
+  url: string,
+  source: { site: string; origin: string; directory: string },
+): TalkFileResponse | null {
+  const path = url.split('?', 1)[0] ?? '';
+  if (path === '/talks.json') {
+    const talks = loadTalksFromDisk(source.directory);
+    const manifest = talksManifest(talks, source.site, source.origin);
+    return { contentType: 'application/json', body: JSON.stringify(manifest) };
+  }
+  const id = DECK_PATH.exec(path)?.groups?.id;
+  if (id === undefined) return null;
+  for (const entry of loadTalksFromDisk(source.directory)) {
+    if (entry.id === id) {
+      return {
+        contentType: 'text/markdown; charset=utf-8',
+        body: entry.source,
+      };
+    }
+  }
+  return null;
 }
 
 /**
@@ -106,7 +173,7 @@ export function loadTalksFromDisk(directory: string): LoadedTalk[] {
     if (entry.endsWith('.md')) {
       const source = readFileSync(path, 'utf8');
       loaded.push({
-        id: entry.slice(0, -3),
+        id: talkIdFromPath(entry),
         source,
         talk: parseTalk(source),
       });
@@ -119,8 +186,24 @@ export function loadTalksFromDisk(directory: string): LoadedTalk[] {
     } catch {
       continue;
     }
-    loaded.push({ id: entry, source, talk: parseTalk(source) });
+    loaded.push({
+      id: talkIdFromPath(`${entry}/index.md`),
+      source,
+      talk: parseTalk(source),
+    });
   }
 
   return loaded.toSorted((left, right) => left.id.localeCompare(right.id));
 }
+
+function talksManifest(
+  talks: readonly LoadedTalk[],
+  site: string,
+  origin: string,
+): TalkManifest {
+  const listed: Array<{ id: string } & Talk> = [];
+  for (const entry of talks) listed.push({ id: entry.id, ...entry.talk });
+  return buildTalkManifest({ site, origin, talks: listed });
+}
+
+const DECK_PATH = /^\/talks\/(?<id>[^/]+)\.md$/;
