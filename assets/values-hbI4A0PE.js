@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e){return typeof e==`object`&&!!e&&!Array.isArray(e)}function n(e){return typeof e==`number`&&Number.isFinite(e)}function r(){return(r=e((()=>{})))()}export{n,t as r,r as t};
