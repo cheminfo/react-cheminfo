@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.151.0](https://github.com/cheminfo/react-cheminfo/compare/v0.150.0...v0.151.0) (2026-11-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* the periodic grid Cell of /core is now GridCell (Cell is the signal cell); /mass drops MassStackPanel, isMassHostPanel and massStackPanels; IrSidePanelProps and MassSidePanelProps lose panels, and side is required.
+* exports no site imports are removed from /core, /ui, /storage, /host, /vite, /server, /crystal, /crystal3d, /orbital, /slides, /card, /csl and /translate.
+* exports no site imports are removed from /xps, /ir, /uvvis, /mass, /demo, /ui, /core, /structure, /conformers, /caption-editor, /molecule3d and /drawing.
+
+### Features
+
+* **download:** save, copy and send a figure in grey or in black and white ([a110233](https://github.com/cheminfo/react-cheminfo/commit/a110233971f36be69c9f2c99ccb8330839bf2f5b))
+* **ecosystem:** list electrochemistry.cheminfo.org under Physics ([5c36454](https://github.com/cheminfo/react-cheminfo/commit/5c364545cf226c7f353e7bacbafaede208ea96a1))
+
+
+### Bug Fixes
+
+* mount a page with no &lt;base&gt; at the root ([4f114d5](https://github.com/cheminfo/react-cheminfo/commit/4f114d5990f23739578b0fa4548c3873b1bb13fe))
+
+
+### Code Refactoring
+
+* remove duplicated and unused code from the spectra, chart, drawing and structure modules ([721cc75](https://github.com/cheminfo/react-cheminfo/commit/721cc75f39ee0c907fcfe574c7fb6e634816292a))
+* remove duplicated and unused code from the storage, share, host, crystal and slides modules ([b9eacba](https://github.com/cheminfo/react-cheminfo/commit/b9eacbae0eab5471f7111929aff0c00d1be2f49d))
+* share the spectrum viewers chrome, the record guard and the help vocabulary ([2fca151](https://github.com/cheminfo/react-cheminfo/commit/2fca15176246038e8a916480a5c3a18f282f9dfe))
+
 ## [0.150.0](https://github.com/cheminfo/react-cheminfo/compare/v0.149.1...v0.150.0) (2026-11-27)
 
 
